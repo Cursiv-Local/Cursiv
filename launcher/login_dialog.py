@@ -139,9 +139,10 @@ class SecurityQSetupDialog(_BaseDialog):
     and provides answers that are bcrypt-hashed for later recovery.
     """
 
-    def __init__(self, parent=None):
+    def __init__(self, parent=None, required: bool = False):
         super().__init__("Cursiv — Security Questions", parent)
         self.setFixedWidth(500)
+        self._required = required     # first account: no skipping (it's how a forgotten password is reset)
         self._build()
 
     def _build(self):
@@ -163,6 +164,9 @@ class SecurityQSetupDialog(_BaseDialog):
 
         self._combos: list[QComboBox] = []
         self._ans_fields: list[QLineEdit] = []
+        if self._required:
+            vlay.addWidget(self._sub(
+                "Needed: these are the only way to reset a forgotten password."))
 
         for i in range(3):
             lbl = QLabel(f"Question {i + 1}")
@@ -200,7 +204,8 @@ class SecurityQSetupDialog(_BaseDialog):
         save = QPushButton("Save Security Questions  ✓")
         save.clicked.connect(self._submit)
 
-        btn_row.addWidget(skip)
+        if not self._required:
+            btn_row.addWidget(skip)
         btn_row.addWidget(save)
         vlay.addLayout(btn_row)
 
@@ -566,17 +571,34 @@ class SetupDialog(_BaseDialog):
         self._username_result = username
 
         if not self._is_additional:
-            # Prompt for security questions — skippable. Primary account
-            # only; additional accounts don't have their own SQ-based
-            # recovery yet, so there's nothing meaningful to offer here.
-            sq_dlg = SecurityQSetupDialog(self)
-            sq_dlg.exec()   # result ignored — skip is always allowed
+            # Security questions are required for the first account: without
+            # them the only way back in was "Reset Entire Account", which let
+            # anyone at the keyboard in. Additional accounts don't have their
+            # own question-based recovery yet.
+            while True:
+                sq_dlg = SecurityQSetupDialog(self, required=True)
+                if sq_dlg.exec() and sq_dlg.accepted_ok():
+                    break
 
         self._ok = True
         self.accept()
 
     def get_username(self) -> str:
         return self._username_result
+
+
+def _clear_saved_keys() -> None:
+    """Remove the AI keys from Cursiv's config (part of a full account reset)."""
+    import json
+    try:
+        from cursiv_v215.ui.chat_app import _KEYS_FILE_APP as path
+        data = json.loads(path.read_text(encoding="utf-8"))
+        for field in ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key",
+                      "cf_account_id", "cf_api_token"):
+            data.pop(field, None)
+        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    except Exception:
+        pass
 
 
 # ── Login dialog ───────────────────────────────────────────────────────────────
@@ -635,7 +657,7 @@ class LoginDialog(_BaseDialog):
         create_btn = QPushButton("Create Account")
         create_btn.setStyleSheet(link_style)
         create_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        create_btn.setToolTip("Add another login for this device")
+        create_btn.setToolTip("Add another login — type an existing username and password first")
         create_btn.clicked.connect(self._create_account)
         link_row.addWidget(create_btn)
         link_row.addStretch(1)
@@ -645,6 +667,19 @@ class LoginDialog(_BaseDialog):
         self._user.setFocus()
 
     def _create_account(self):
+        # A new login sees the same keys, memories and conversations, so only
+        # someone who can already log in may add one.
+        username, password = self._user.text().strip(), self._pw.text()
+        try:
+            from cursiv_v215.guardian.access_gate import verify_credentials
+            approved = bool(username and password and verify_credentials(username, password))
+        except Exception:
+            approved = False
+        if not approved:
+            self._status.setStyleSheet(f"color: {RED}; font-size: 11px;")
+            self._status.setText("To add an account, first type an existing username and "
+                                 "password above, then click Create Account.")
+            return
         dlg = SetupDialog(self, is_additional=True)
         if dlg.exec() and dlg.accepted_ok():
             self._status.setStyleSheet(f"color: {GREEN}; font-size: 11px;")
@@ -669,8 +704,11 @@ class LoginDialog(_BaseDialog):
             # User has no SQ and wants the nuclear option
             reply = QMessageBox.question(
                 self, "Reset Account",
-                "This will permanently delete your login credentials.\n"
-                "Your conversation history and API keys are not affected.\n\n"
+                "This deletes every login on this computer and the AI keys "
+                "saved in Cursiv (you'll need to add them again).\n\n"
+                "Memories and conversations stay. Cursiv's login is a lock on the "
+                "front door, not encryption — anyone with access to this "
+                "computer's files can read them.\n\n"
                 "Continue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.Cancel,
             )
@@ -681,6 +719,7 @@ class LoginDialog(_BaseDialog):
                 from cursiv_v215.guardian.security_questions import clear_security_questions
                 reset_credentials()
                 clear_security_questions()
+                _clear_saved_keys()
             except Exception as exc:
                 self._status.setText(f"Reset error: {exc}")
                 return

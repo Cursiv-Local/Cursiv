@@ -34,7 +34,6 @@ BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
 GOLD, SILVER, SILV2 = "#FFD700", "#C8C8D4", "#666680"
 GREEN, RED = "#3ecf6e", "#FF4455"
 
-OLLAMA_ZIP_URL = "https://github.com/ollama/ollama/releases/latest/download/ollama-windows-amd64.zip"
 FAT32_MAX = 4 * 1024 ** 3 - 1
 OLLAMA_API = "http://127.0.0.1:11434"
 
@@ -231,11 +230,127 @@ def build_plan(models: list[dict], include_private: bool, ollama_src: Path | Non
     return pairs
 
 
+MTIME_SLACK = 2.0      # seconds -- FAT-family drives store times in 2-second steps
+PRIVATE_MARKER = Path("Home") / ".cursiv-private-copy"   # set when a private copy was made
+PRUNED_DIRS = ("Cursiv", "Ollama")      # program files only; models and personal data are never pruned
+
+
 def _needs_copy(src: Path, dest: Path) -> bool:
+    """Copy unless the drive already has this exact file (same size and time --
+    copies keep the source's modified time, so a rebuilt file of the same size
+    still differs)."""
     try:
-        return not dest.exists() or dest.stat().st_size != src.stat().st_size
+        s, d = src.stat(), dest.stat()
     except Exception:
         return True
+    return s.st_size != d.st_size or abs(s.st_mtime - d.st_mtime) > MTIME_SLACK
+
+
+def _is_personal(rel: Path) -> bool:
+    return ".cursiv" in rel.parts or rel.name == "portable.cursiv"
+
+
+def stale_files(root: Path, plan: list[tuple[Path, Path]]) -> list[Path]:
+    """Files in the drive's program folders that the current build doesn't have
+    (e.g. a library a newer Cursiv dropped). Never personal data."""
+    wanted = {d.resolve() for _s, d in plan}
+    out = []
+    for top in PRUNED_DIRS:
+        base = root / top
+        if not base.is_dir():
+            continue
+        for f in base.rglob("*"):
+            if f.is_file() and f.resolve() not in wanted and not _is_personal(f.relative_to(root)):
+                out.append(f)
+    return out
+
+
+def verify_usb(plan: list[tuple[Path, Path]]) -> list[str]:
+    """Every planned file is on the drive with the right size and time.
+    Returns the problems (empty list = the drive matches the build)."""
+    problems = []
+    for src, dest in plan:
+        if not dest.exists():
+            problems.append(f"missing: {dest}")
+        elif _needs_copy(src, dest):
+            problems.append(f"different: {dest}")
+    return problems
+
+
+def wipe_private_copy(root: Path) -> bool:
+    """Remove personal data that an earlier private copy put on the drive.
+    Only acts when the marker says a private copy was made -- data the drive's
+    own user created later on a fresh copy is left alone."""
+    if not (root / PRIVATE_MARKER).exists():
+        return False
+    shutil.rmtree(root / "Home" / ".cursiv", ignore_errors=True)
+    prog = root / "Cursiv"
+    if prog.is_dir():
+        for d in sorted(prog.rglob(".cursiv"), key=lambda p: len(p.parts), reverse=True):
+            if d.is_dir():
+                shutil.rmtree(d, ignore_errors=True)
+    (root / PRIVATE_MARKER).unlink(missing_ok=True)
+    return True
+
+
+def copy_files(todo: list[tuple[Path, Path]], progress, cancel: threading.Event) -> None:
+    """Copy each file to a .part file, flush it to disk, then rename it into
+    place -- an interrupted copy never leaves a half-written file behind."""
+    total = sum(s.stat().st_size for s, _ in todo) or 1
+    copied = 0
+    for i, (src, dest) in enumerate(todo, 1):
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        part = dest.with_name(dest.name + ".part")
+        with open(src, "rb") as fi, open(part, "wb") as fo:
+            while chunk := fi.read(8 << 20):
+                if cancel.is_set():
+                    fo.close()
+                    part.unlink(missing_ok=True)
+                    raise InterruptedError
+                fo.write(chunk)
+                copied += len(chunk)
+                progress(int(copied * 100 / total),
+                         f"Copying {i} of {len(todo)} files — {copied / GB:.1f} of {total / GB:.1f} GB")
+            fo.flush()
+            os.fsync(fo.fileno())
+        os.replace(part, dest)
+        shutil.copystat(src, dest, follow_symlinks=True)
+
+
+def _download_ollama(dest_dir: Path, progress, cancel: threading.Event) -> Path:
+    """Download Ollama's Windows zip from its latest GitHub release and check it
+    against the SHA-256 GitHub publishes for that file. Returns the unpacked folder."""
+    import hashlib
+    api = urllib.request.Request("https://api.github.com/repos/ollama/ollama/releases/latest",
+                                 headers={"User-Agent": "Cursiv-USB"})
+    with urllib.request.urlopen(api, timeout=30) as r:
+        release = json.loads(r.read())
+    asset = next((a for a in release.get("assets", []) if a.get("name") == "ollama-windows-amd64.zip"), None)
+    digest = (asset or {}).get("digest", "")
+    if not asset or not digest.startswith("sha256:"):
+        raise RuntimeError("Couldn't find a checksum for the Ollama download, so it wasn't used. "
+                           "Install Ollama on this computer (Setup window) and try again.")
+    zpath = dest_dir / "ollama.zip"
+    sha = hashlib.sha256()
+    req = urllib.request.Request(asset["browser_download_url"], headers={"User-Agent": "Cursiv-USB"})
+    with urllib.request.urlopen(req, timeout=60) as r, open(zpath, "wb") as out:
+        total = int(r.headers.get("Content-Length") or 0)
+        got = 0
+        while chunk := r.read(1 << 20):
+            if cancel.is_set():
+                raise InterruptedError
+            out.write(chunk)
+            sha.update(chunk)
+            got += len(chunk)
+            progress(int(got * 100 / total) if total else -1,
+                     f"Downloading Ollama… {got >> 20} MB" + (f" of {total >> 20} MB" if total else ""))
+    if "sha256:" + sha.hexdigest() != digest:
+        zpath.unlink(missing_ok=True)
+        raise RuntimeError("The Ollama download didn't match its published checksum, so it wasn't used. Try again.")
+    out_dir = dest_dir / "ollama"
+    with zipfile.ZipFile(zpath) as z:
+        z.extractall(out_dir)
+    return out_dir
 
 
 # ── Worker ───────────────────────────────────────────────────────────────────
@@ -260,21 +375,10 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         if osrc is None:
             sig.progress.emit(-1, "Downloading the Ollama engine (about 1-2 GB)…")
             tmp_zip_dir = Path(tempfile.mkdtemp(prefix="cursiv_ollama_"))
-            zpath = tmp_zip_dir / "ollama.zip"
-            req = urllib.request.Request(OLLAMA_ZIP_URL, headers={"User-Agent": "Cursiv-USB"})
-            with urllib.request.urlopen(req, timeout=60) as r, open(zpath, "wb") as out:
-                total = int(r.headers.get("Content-Length") or 0)
-                got = 0
-                while chunk := r.read(1 << 20):
-                    if cancel.is_set():
-                        raise InterruptedError
-                    out.write(chunk)
-                    got += len(chunk)
-                    sig.progress.emit(int(got * 100 / total) if total else -1,
-                                      f"Downloading Ollama… {got >> 20} MB" + (f" of {total >> 20} MB" if total else ""))
-            osrc = tmp_zip_dir / "ollama"
-            with zipfile.ZipFile(zpath) as z:
-                z.extractall(osrc)
+            osrc = _download_ollama(tmp_zip_dir, sig.progress.emit, cancel)
+
+        # Fresh copy on a drive that once held a private one: remove that first.
+        wiped = False if include_private else wipe_private_copy(root)
 
         plan = [(s, root / d) for s, d in build_plan(models, include_private, osrc)]
         todo = [(s, d) for s, d in plan if _needs_copy(s, d)]
@@ -289,22 +393,22 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             raise RuntimeError(f"Not enough space: needs {total / GB:.1f} GB, the drive has "
                                f"{free / GB:.1f} GB free. Untick some models and try again.")
 
-        copied = 0
-        for i, (src, dest) in enumerate(todo, 1):
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            part = dest.with_name(dest.name + ".part")
-            with open(src, "rb") as fi, open(part, "wb") as fo:
-                while chunk := fi.read(8 << 20):
-                    if cancel.is_set():
-                        fo.close()
-                        part.unlink(missing_ok=True)
-                        raise InterruptedError
-                    fo.write(chunk)
-                    copied += len(chunk)
-                    sig.progress.emit(int(copied * 100 / total),
-                                      f"Copying {i} of {len(todo)} files — {copied / GB:.1f} of {total / GB:.1f} GB")
-            os.replace(part, dest)
-            shutil.copystat(src, dest, follow_symlinks=True)
+        copy_files(todo, sig.progress.emit, cancel)
+        for f in stale_files(root, plan):
+            f.unlink(missing_ok=True)
+        for leftover in root.rglob("*.part"):
+            leftover.unlink(missing_ok=True)
+        if include_private:
+            (root / PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
+            (root / PRIVATE_MARKER).write_text(
+                "This drive holds a private copy of someone's Cursiv data. Making a fresh "
+                "copy on it removes that data.\n", encoding="utf-8")
+
+        sig.progress.emit(-1, "Checking the drive matches…")
+        problems = verify_usb(plan)
+        if problems:
+            raise RuntimeError(f"{len(problems)} file(s) didn't copy correctly (first: {problems[0]}). "
+                               "Click Make USB again to fix them.")
 
         (root / "Cursiv" / "portable.cursiv").write_text(
             "This copy of Cursiv runs from this drive. See README.txt.\n", encoding="utf-8")
@@ -322,6 +426,8 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             shutil.rmtree(tmp_zip_dir, ignore_errors=True)
         note = (" Your memories, keys and settings are on it — keep it safe."
                 if include_private else " It starts fresh, so it can be given to someone else.")
+        if wiped:
+            note += " The private data from the earlier copy was removed from the drive."
         sig.done.emit(True, f"Done. Plug the drive into any Windows PC and double-click "
                             f"\"Start Cursiv\".{note}")
     except InterruptedError:
@@ -478,6 +584,15 @@ class UsbMakerDialog(QDialog):
         d = self._drive_box.currentData()
         if not d:
             return
+        if not self._private.isChecked() and (Path(d["root"]) / PRIVATE_MARKER).exists():
+            ok = QMessageBox.question(
+                self, "Private data on this drive",
+                "This drive has a private copy of your memories, keys and settings from an "
+                "earlier time. Making a fresh copy removes them from the drive (they stay on "
+                "this computer).\n\nContinue?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if ok != QMessageBox.StandardButton.Yes:
+                return
         if self._private.isChecked():
             ok = QMessageBox.question(
                 self, "Private data",

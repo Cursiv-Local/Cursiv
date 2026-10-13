@@ -31,7 +31,7 @@ where data lives, and how to run, build and release it.
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |
 | `agents/` | Custom agents (`agent new …`), Babel translation, coding agent, offline queue, reference brain, voice. |
 | `coding/` | The coding brain: playbooks, worked examples, error diagnosis, run-and-fix sandbox, `evolve` plugin writer. |
-| `guardian/` | Guardian checks (jailbreak and probing detection), login (bcrypt), security questions, identity rules. |
+| `guardian/` | Guardian checks (jailbreak and probing detection), login (bcrypt), security questions, identity rules. The login fails closed (Cursiv exits if it can't load), new logins need an existing login, and it is a front-door lock only — data on disk isn't encrypted. |
 | `training/` | LoRA training (`lora_trainer.py`) and merging the adapter into Ollama (`ollama_merge.py`). |
 | `family/`, `postal/` | Sealed letters: per-person letters that open with a name and birth date, and signed letters between people. |
 | `council/cursiv_facts.md`, `codex/system_prompt.md` | What Cursiv knows about itself and its persona. Keep the fact sheet accurate when features change. |

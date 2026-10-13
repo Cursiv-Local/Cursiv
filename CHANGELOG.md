@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.14-U58 — Trust: a login that holds, a USB that matches (2026-10-12)
+- **Cursiv never opens without its login.** If the login can't load, Cursiv says so and stops (with a problem-report button) instead of opening anyway.
+- **Only someone who can log in can add a login.** Type an existing username and password, then click Create Account. (Anyone at the login screen could add one before — and every login sees the same keys and memories.)
+- **Security questions are required for the first account** — they're how a forgotten password is reset. "Reset Entire Account" (only offered when there are no questions) now removes every login and the saved AI keys, and says plainly that memories and conversations stay.
+- **Honest about what the login is:** a lock on the front door, not encryption. The README and Cursiv's own self-knowledge now say so.
+- **Cursiv USB matches the build exactly.** Files are compared by size and date (a rebuilt file of the same size used to be skipped), files a newer Cursiv no longer uses are removed, each copy is written to disk before it's put in place, and the whole drive is checked against the build at the end.
+- **No leftover private data on a "fresh" USB.** If a drive once held a private copy (your memories and keys), making a fresh copy on it now removes that data — after asking. Data the drive's own user created is left alone.
+- **The Ollama download for the USB is checked** against the SHA-256 Ollama publishes; a mismatch is refused.
+- Tests: tests/test_trust.py (USB repeat updates, stale files, verify, interrupted copies, private-copy wipe; login fails closed, account approval, reset).
+
 ## v3.14-U57 — Honest replies, local first (2026-10-12)
 - **Cursiv no longer claims things that didn't happen.** It used to say it had written files and list files that weren't there, because its instructions said it could "read, write, create, delete" files and it copied the "(Checked on this computer: …)" lines it had seen earlier in the chat. Now its instructions say exactly what it can and can't do, those status lines are hidden from what the AI reads, and any fake one it writes is removed from the reply. (Writing files still needs file access turned on and a paid xAI, OpenAI or Claude key, with every write shown for approval.)
 - **Every reply says which AI answered** — "Answered by Ollama · qwen2.5:3b", "Answered by Gemini", and so on.

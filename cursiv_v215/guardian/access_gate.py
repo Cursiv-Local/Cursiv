@@ -185,7 +185,7 @@ def reset_password(new_password: str) -> None:
 
 def reset_credentials() -> None:
     """Delete all stored credential files, returning the app to first-run state."""
-    for f in (_HASH_FILE, _META_FILE, _FLAG_FILE):
+    for f in (_HASH_FILE, _META_FILE, _FLAG_FILE, _ACCOUNTS_FILE):
         try:
             f.unlink(missing_ok=True)
         except Exception:

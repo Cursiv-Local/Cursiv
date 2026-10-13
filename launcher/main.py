@@ -131,7 +131,7 @@ def main():
         Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
     )
 
-    app = QApplication(sys.argv)
+    app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName("Cursiv")
     app.setApplicationDisplayName("Cursiv v3.0")
     app.setApplicationVersion("3.0.0")
@@ -153,7 +153,9 @@ def main():
         pass  # cursiv_launcher not yet importable — skip (shouldn't happen)
 
     # ── Auth gate ─────────────────────────────────────────────────────────
-    username = "Joshua"
+    # Fails closed: if the login can't load or breaks, Cursiv stops instead of
+    # opening without it. (It used to warn and continue as "Joshua".)
+    username = ""
     try:
         from cursiv_v215.guardian.access_gate import is_setup_complete
         from login_dialog import LoginDialog, SetupDialog
@@ -162,27 +164,24 @@ def main():
             dlg = SetupDialog()
             if not dlg.exec() or not dlg.accepted_ok():
                 sys.exit(0)
-            username = dlg.get_username() or username
         else:
             dlg = LoginDialog()
             if not dlg.exec() or not dlg.accepted_ok():
                 sys.exit(0)
-            username = dlg.get_username() or username
+        username = dlg.get_username() or "friend"
 
-    except ImportError as e:
-        # Auth module or login_dialog unavailable. This used to fail silently
-        # and drop straight into an unauthenticated "Joshua" session with no
-        # register/reset UI -- surface it instead so a real install failure
-        # doesn't look like "there's no login screen."
+    except SystemExit:
+        raise
+    except Exception as e:
         _error_box(
             "Cursiv — Login Unavailable",
-            "Account login/setup couldn't load, so you're continuing without "
-            "a password gate and can't create or reset an account right now.\n\n"
-            f"Technical detail: {e}\n\n"
-            "This usually means a required package didn't install correctly. "
-            "Try reinstalling, or click Send problem report.",
-            critical=False,
+            "Cursiv's login couldn't load, so Cursiv won't open — it never runs "
+            "without the login.\n\n"
+            f"Technical detail: {type(e).__name__}: {e}\n\n"
+            "Reinstalling the latest version from the website usually fixes this "
+            "(your data is kept). Or click Send problem report.",
         )
+        sys.exit(1)
 
     # ── Family member welcome ─────────────────────────────────────────────
     # If the username matches a family member's first name, point them at
