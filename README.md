@@ -35,7 +35,7 @@ That's it — one window, nothing else to open. Updates arrive inside the app.
 ## What it does
 
 - **Chats offline** through Ollama on your own computer. Cursiv picks the right model for your graphics card.
-- **Free keys are enough.** Add a free [Gemini](https://aistudio.google.com/apikey) or [Groq](https://console.groq.com/keys) key for faster, longer answers. Paid keys (OpenAI, Anthropic, xAI) are optional upgrades, never required. Cursiv tries what you have and falls back to the next one automatically.
+- **Local first.** When your computer has a model, it answers — your messages stay on your PC. A free [Gemini](https://aistudio.google.com/apikey) or [Groq](https://console.groq.com/keys) key is a backup for when there's no local model or it can't answer, and the way to read images. Paid keys (OpenAI, Anthropic, xAI) are optional, never required. Every reply ends with **"Answered by …"** so you always know which one answered.
 - **Remembers you** — lasting facts about each person, learned from conversations or added with *"remember …"*. Everything stays on your computer. *"What I remember"* lets you see, edit and delete it.
 - **Reads images** you paste in — offline with the free Gemma 3 model, or with a key.
 - **Makes images** with a free Cloudflare account or a paid OpenAI key (type `image a lighthouse at dawn`). Offline models can't make images, and Cursiv tells you how to turn it on.
@@ -82,13 +82,13 @@ The goal is simple: **reduce the chance that future generations lose the systems
 
 ## Honest about what it is
 
-**Speed** — local models run on your CPU and graphics card. A gaming PC is fast; an older laptop is slower. A free key makes any computer fast.
+**Speed** — local models run on your CPU and graphics card. A gaming PC is fast; an older laptop is slower. On a computer too slow for local models, skip the model download and use a free key instead.
 
 **Accuracy** — the model does its best, and it will sometimes be wrong, confidently. Treat answers as a starting point. Verify what matters.
 
 **Coding** — built to get you most of the way there and help you understand the rest.
 
-**Privacy** — with only local models, nothing you type leaves your computer. If you add a key, your messages go to that provider. Optional extras — Cursiv Cloud backup, the phone link, problem reports — only send anything when you turn them on or click them. The update check reads GitHub's public release list; nothing about you is sent.
+**Privacy** — when the local model answers, nothing you type leaves your computer. A key is used only when there's no local model, it can't answer, or you paste an image — and then that message goes to that provider. Optional extras — Cursiv Cloud backup, the phone link, problem reports — only send anything when you turn them on or click them. The update check reads GitHub's public release list; nothing about you is sent.
 
 **Ownership** — your data, your models, your copy. Nobody can change it or shut it off remotely.
 

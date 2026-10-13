@@ -991,7 +991,7 @@ def _build_live_status() -> str:
 
     # ── Tools ─────────────────────────────────────────────────────────────
     tools = [
-        "File tools: read / write / list / search / create / delete (sandboxed to workspace root)",
+        "Computer lookups (read-only, run by Cursiv): system info, list folder, read file, find files. File writes only with file access on + a paid xAI/OpenAI/Claude key, each shown for approval",
         "Group Discovery: Cursiv → xAI → OpenAI → Claude consensus (command: council <question>)",
     ]
     if BRAVE_KEY:
@@ -1642,7 +1642,9 @@ def _save_cloud_settings(data: dict) -> None:
 
 
 def cloud_enabled() -> bool:
-    return bool(_cloud_settings().get("enabled", True))
+    # Off unless the person turns it on (Setup / Settings / "cloud on"): it sends
+    # their messages to cursiv.winklers-llc.com.
+    return bool(_cloud_settings().get("enabled", False))
 
 
 def set_cloud_enabled(on: bool) -> None:
@@ -1759,7 +1761,77 @@ def _local_model_ready() -> bool:
 
 # Error/placeholder chunks the cloud callers yield instead of raising.
 _PROVIDER_ERROR_PREFIXES = ("[xAI auth error", "[Claude error", "[OpenAI error", "[Gemini error", "[Groq error",
-                            "[Cursiv Cloud error", "[Ollama unavailable", "[Ollama not found")
+                            "[Cursiv Cloud error", "[Ollama unavailable", "[Ollama not found", "[Ollama is running")
+
+
+# ── Cursiv's own status lines ──────────────────────────────────────────────
+# Notes like "*(Checked on this computer: …)*", "*[Gemini unavailable — Ollama]*"
+# and "*[Answered by …]*" are written by this code, never by the model. They're
+# stripped from the history the model sees -- otherwise it copies them and
+# "reports" tool calls that never happened -- and any the model writes itself
+# are dropped from its reply.
+_STATUS_LINE_RE = _re.compile(r"(?m)^[ \t]*\*[\[(][^\n]*[\])]\*[ \t]*(?:\r?\n|$)")
+_TOOL_NOTE = "(Checked on this computer"
+_REAL_TOOL_NOTES: set[str] = set()     # notes this code emitted for the current turn
+_ANSWERED_BY = ""                      # engine that answered the current turn
+
+
+def _strip_status_lines(text: str) -> str:
+    return _STATUS_LINE_RE.sub("", text or "").strip()
+
+
+def _set_answered(label: str) -> None:
+    global _ANSWERED_BY
+    _ANSWERED_BY = label
+
+
+def _ollama_label(base: str = "Ollama") -> str:
+    try:
+        model = _resolve_ollama_model()
+    except Exception:
+        model = None
+    return f"{base} · {model}" if model else base
+
+
+def _drop_fake_tool_lines(gen: Generator) -> Generator:
+    """Pass the reply through, minus any "(Checked on this computer …)" line this
+    code didn't emit. A line is held back only while it could still turn into
+    one; everything else streams as it arrives."""
+    line, holding = "", True
+
+    def _is_fake(text: str) -> bool:
+        s = text.strip()
+        return s.lstrip("*_ ").startswith(_TOOL_NOTE) and s not in _REAL_TOOL_NOTES
+
+    for chunk in gen:
+        if not isinstance(chunk, str) or chunk == RATE_SENTINEL or chunk.startswith(WRITE_SENTINEL):
+            if line and holding and not _is_fake(line):
+                yield line
+            line, holding = "", True
+            yield chunk
+            continue
+        out = []
+        for ch in chunk:
+            if ch == "\n":
+                if holding:
+                    if not _is_fake(line):
+                        out.append(line + "\n")
+                else:
+                    out.append("\n")
+                line, holding = "", True
+                continue
+            line += ch
+            if holding:
+                head = line.lstrip(" \t*_")
+                if not (_TOOL_NOTE.startswith(head) or head.startswith(_TOOL_NOTE)):
+                    out.append(line)          # can't be a tool note -- release it
+                    holding = False
+            else:
+                out.append(ch)
+        if out:
+            yield "".join(out)
+    if line and holding and not _is_fake(line):
+        yield line
 
 
 def cascade_stream(
@@ -1769,16 +1841,19 @@ def cascade_stream(
     local_fn: Callable[[list[dict]], Generator[str, None, None]] | None = None,
 ) -> tuple[Generator[str, None, None], list[str]]:
     """
-    Stream a one-shot reply (Babel, grow, ...) through every configured provider
-    in order -- Claude, xAI, OpenAI, Gemini, Groq, then local Ollama (or Cursiv
-    Cloud when no local model is ready) -- moving to the next one
-    whenever a provider fails (bad/expired key, out of credits, offline, empty
-    reply). Ollama is always the last stop, so this works with no keys at all.
+    Stream a one-shot reply (Babel, grow, ...): the local model first when it has
+    one, then every configured key -- Claude, xAI, OpenAI, Groq, Gemini -- then
+    Cursiv Cloud (only when no local model is ready), moving on whenever one
+    fails (bad/expired key, out of credits, offline, empty reply). With no local
+    model, Ollama is the last stop (it downloads one), so this works with no keys.
 
     Returns (generator, used) where `used` is filled in with the label of the
     provider that actually answered once the generator starts producing text.
     """
+    local = (lambda: local_fn(messages)) if local_fn else (lambda: _call_ollama(messages, max_tokens=max_tokens))
     attempts: list[tuple[str, Callable[[], Generator[str, None, None]]]] = []
+    if _local_model_ready():
+        attempts.append(("Ollama (local)", local))     # tried like a provider: may fall through
     if keys.get("anthropic_key"):
         attempts.append(("Claude", lambda: _call_claude_direct(messages, keys["anthropic_key"])))
     if keys.get("api_key"):
@@ -1796,8 +1871,8 @@ def cascade_stream(
     if cloud_enabled():
         attempts.append(("Cursiv Cloud", lambda: _call_cursiv_cloud(messages, max_tokens)))
     # local_fn: e.g. the coding models for codex, instead of the general chat model
-    attempts.append(("Ollama", (lambda: local_fn(messages)) if local_fn
-                     else (lambda: _call_ollama(messages, max_tokens=max_tokens))))
+    if not attempts or attempts[0][0] != "Ollama (local)":
+        attempts.append(("Ollama", local))
 
     used: list[str] = []
 
@@ -1847,6 +1922,8 @@ def cascade_stream(
             except Exception as e:
                 failed = str(e)[:160]
             failures.append(f"{label}: {failed or 'empty reply'}")
+        if failures:      # reached only when the local model went first and everything failed
+            yield f"[Nothing answered — {'; '.join(failures)}]"
 
     return _gen(), used
 
@@ -2777,6 +2854,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     for h in history:
         role    = h.get("role", "user")
         content = h.get("content", "")
+        if role == "assistant" and isinstance(content, str):
+            content = _strip_status_lines(content)   # see _STATUS_LINE_RE
         if content:
             messages.append({"role": role, "content": content})
 
@@ -2921,7 +3000,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 if _calls:
                     _results = _tools.run(_calls)
                     messages[0]["content"] += "\n\n" + _tools.context_for(_results) + "\n"
-                    yield "*(Checked on this computer: " + "; ".join(l for l, _r in _results) + ")*\n\n"
+                    _note = "*(Checked on this computer: " + "; ".join(l for l, _r in _results) + ")*"
+                    _REAL_TOOL_NOTES.add(_note)
+                    yield _note + "\n\n"
         except Exception:
             pass
 
@@ -2943,6 +3024,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 if root_path.strip() else ROOT)
 
     # ── Forced provider (grok / claude / openai commands) ───────────────
+    if fp in ("grok", "claude", "openai", "ollama"):
+        _set_answered({"grok": "xAI", "claude": "Claude", "openai": "OpenAI"}.get(fp) or _ollama_label())
     if fp == "grok":
         if file_access and key:
             yield from _call_xai_with_tools(messages, key, _workspace(), oai,
@@ -2988,16 +3071,36 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         yield from _call_provider_council(raw, key, oai, ant, system_context=_sys_ctx)
         return
 
+    _text_msgs_all = [
+        {"role": m["role"],
+         "content": m["content"] if isinstance(m["content"], str)
+                    else next((p["text"] for p in m["content"] if p["type"] == "text"), "")}
+        for m in messages
+    ]
+
+    # ── Local first: the local model answers whenever it has one. Keys are
+    # fallbacks -- and the way to read pasted images (the local chat model
+    # can't see them) or to write files (only the tool-using paid providers can).
+    _tool_writer = file_access and (key or oai or ant)
+    _local_tried = False
+    if not has_images and not _tool_writer and _local_model_ready():
+        _local_tried = True
+        _label, _lgen = _local_stream(_text_msgs_all, user_text)
+        _first = next(_lgen, None)
+        if _first is not None and not _first.lstrip().startswith("[Ollama"):
+            _set_answered(_ollama_label(_label))
+            yield _first
+            yield from _lgen
+            return
+
     # ── Offline detection — skip all cloud providers immediately ────────
     if not _is_online():
+        if _local_tried:
+            yield "*[Offline, and the local model didn't answer.]*\n\n"
+            return
         yield "*[Offline — all cloud providers unreachable. Routing to Ollama (no token limits).]*\n\n"
-        _offline_msgs = [
-            {"role": m["role"],
-             "content": m["content"] if isinstance(m["content"], str)
-                        else next((p["text"] for p in m["content"] if p["type"] == "text"), "")}
-            for m in messages
-        ]
-        yield from _call_ollama(_offline_msgs)
+        _set_answered(_ollama_label())
+        yield from _call_ollama(_text_msgs_all)
         return
 
     # ── Smart routing — cascade: xAI → OpenAI → Claude → Ollama ────────
@@ -3035,6 +3138,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                                           confirm_writes=confirm_writes, anthropic_key=ant)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "xAI"):
+                _set_answered("xAI")
                 yield first
                 yield from gen
                 _fa_done = True
@@ -3044,6 +3148,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                                              anthropic_key=ant, confirm_writes=confirm_writes)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "OpenAI"):
+                _set_answered("OpenAI")
                 yield first
                 yield from gen
                 _fa_done = True
@@ -3054,6 +3159,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                                              is_owner=_owner_active())
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "Claude"):
+                _set_answered("Claude")
                 yield first
                 yield from gen
                 _fa_done = True
@@ -3062,7 +3168,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         # Ollama is local with no token rate limits — unlimited in offline mode
         if not _fa_done:
             yield from _fallback_chain(_text_only_msgs(messages), user_text,
-                                       [n for n, k in (("xAI", key), ("OpenAI", oai), ("Claude", ant)) if k])
+                                       [n for n, k in (("xAI", key), ("OpenAI", oai), ("Claude", ant)) if k],
+                                       local_tried=_local_tried)
 
     else:
         # ── Cascade for plain chat: xAI → OpenAI → Claude → Ollama ──────
@@ -3084,6 +3191,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             if first not in (RATE_SENTINEL, None) and not (
                 isinstance(first, str) and first.startswith("[xAI auth")
             ):
+                _set_answered("xAI")
                 yield first
                 for chunk in gen:
                     if chunk != RATE_SENTINEL:
@@ -3101,6 +3209,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             ):
                 if len(tried) > 1:
                     yield f"*[{' → '.join(tried[:-1])} unavailable — OpenAI]*\n\n"
+                _set_answered("OpenAI")
                 yield first
                 yield from gen
                 return
@@ -3116,6 +3225,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             ):
                 if len(tried) > 1:
                     yield f"*[{' → '.join(tried[:-1])} unavailable — Claude]*\n\n"
+                _set_answered("Claude")
                 yield first
                 yield from gen
                 return
@@ -3123,10 +3233,28 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
         # 4. Free providers (own Gemini/Groq keys), then local Ollama -- or
         #    Cursiv Cloud when no local model is ready.
-        yield from _fallback_chain(_text_only(messages), user_text, tried)
+        yield from _fallback_chain(_text_only(messages), user_text, tried, local_tried=_local_tried)
 
 
-def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str]) -> Generator[str, None, None]:
+def _local_stream(text_msgs: list[dict], user_text: str) -> tuple[str, Generator[str, None, None]]:
+    """The local model's reply -- the coding pair for code questions, unless a
+    small GPU already has the chat model loaded (switching costs minutes)."""
+    _is_code = _classify_message(user_text) == "code"
+    try:
+        from cursiv_v215.core import speed as _speed
+        if _is_code and _speed.small_gpu():
+            _loaded = _speed.loaded_models()
+            if _loaded and not any("coder" in m for m in _loaded):
+                _is_code = False
+    except Exception:
+        pass
+    if _is_code:
+        return "Code Council", _call_ollama_code_council(text_msgs)
+    return "Ollama", _call_ollama(text_msgs)
+
+
+def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str],
+                    local_tried: bool = False) -> Generator[str, None, None]:
     """Last part of chat()'s cascade, after the paid providers: the user's own
     free Gemini/Groq keys, then local Ollama. When Ollama has no usable model,
     Cursiv Cloud (if not turned off) answers before Ollama's first-time download."""
@@ -3141,6 +3269,7 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str]) -> 
         if first is not None and not first.lstrip().startswith(f"[{label} error"):
             if len(tried) > 1:
                 yield f"*[{' → '.join(tried[:-1])} unavailable — {label}]*\n\n"
+            _set_answered(label)
             yield first
             yield from gen
             return
@@ -3152,26 +3281,23 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str]) -> 
         if first is not None and not first.lstrip().startswith("[Cursiv Cloud error"):
             if len(tried) > 1:
                 yield f"*[{' → '.join(tried[:-1])} unavailable — Cursiv Cloud]*\n\n"
+            _set_answered("Cursiv Cloud")
             yield first
             yield from gen
             return
 
-    # Ollama -- use Code Council for code questions, standard for everything else
-    _is_code = _classify_message(user_text) == "code"
-    try:
-        from cursiv_v215.core import speed as _speed
-        if _is_code and _speed.small_gpu():
-            _loaded = _speed.loaded_models()
-            # On a small GPU, switching from the loaded chat model to a coding model
-            # costs minutes; keep the loaded one (`codex` still uses the coding models).
-            if _loaded and not any("coder" in m for m in _loaded):
-                _is_code = False
-    except Exception:
-        pass
-    _ollama_fn = _call_ollama_code_council if _is_code else _call_ollama
-    ollama_gen = _ollama_fn(text_msgs)
+    if local_tried:     # it already had its turn first and didn't answer
+        if tried:
+            yield f"*[{', '.join(tried + ['the local model'])} didn't answer.]*"
+        else:
+            yield "*[The local model didn't answer. Try again in a moment, or add a free key in Settings.]*"
+        return
+    _label, ollama_gen = _local_stream(text_msgs, user_text)
+    _is_code = _label == "Code Council"
     first_ol   = next(ollama_gen, None)
     if first_ol is not None:
+        if not first_ol.lstrip().startswith("[Ollama"):
+            _set_answered(_ollama_label(_label))
         if tried:
             _label = "Code Council" if _is_code else "Ollama"
             yield f"*[{' → '.join(tried)} unavailable — {_label}]*\n\n"
@@ -3197,8 +3323,8 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str]) -> 
 def _learn_later(message, reply: str) -> None:
     """Save lasting facts from this exchange (memory/semantic.py), off the UI thread."""
     text = message.get("text", "") if isinstance(message, dict) else str(message or "")
-    # drop routing notes like "*[Gemini unavailable — Code Council]*" before judging the reply
-    reply = _re.sub(r"^\s*(\*\[[^\]\n]*\]\*\s*)+", "", reply or "")
+    # drop Cursiv's own status lines ("*[Answered by …]*", routing notes) before judging the reply
+    reply = _strip_status_lines(reply or "")
     if not reply.strip() or reply.lstrip().startswith("[") or len(text.strip()) < 15:
         return
     coding = _CODING_TURN
@@ -3289,10 +3415,16 @@ def chat(
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
                  confirm_writes, anthropic_key, force_provider, reply: list[str]):
     from cursiv_v215.core import selfknow as _sk
-    for chunk in _friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider))):
+    _REAL_TOOL_NOTES.clear()
+    _set_answered("")
+    for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):
         if isinstance(chunk, str) and chunk not in (RATE_SENTINEL,) and not chunk.startswith(WRITE_SENTINEL):
             reply.append(chunk)
         yield chunk
+    if _ANSWERED_BY:     # say which engine answered (written by Cursiv, not the model)
+        note = f"\n\n*[Answered by {_ANSWERED_BY}]*"
+        reply.append(note)
+        yield note
 
 
 def _friendly(sk, gen):

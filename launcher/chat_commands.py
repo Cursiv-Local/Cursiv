@@ -395,14 +395,53 @@ _LANG_NAMES = {
 }
 
 
+# "into all the languages you can" / "as many languages as you can"
+_BABEL_MANY = re.compile(r"\b(all|every|many|lots of|as many)\b.*\blanguages?\b|\blanguages?\b.*\byou can\b", re.I)
+_BABEL_DEFAULT_SET = ["Spanish", "French", "German", "Italian", "Portuguese", "Mandarin Chinese",
+                      "Japanese", "Korean", "Hindi", "Arabic", "Russian", "Swahili", "Hebrew", "Greek"]
+
+
+def _babel_source(text: str) -> str:
+    """The text to translate: drop a leading "translate" and surrounding quotes."""
+    t = re.sub(r"^\s*translate\s+", "", text.strip(), flags=re.I).strip()
+    return t.strip("\"'“”‘’ ").strip()
+
+
+def _babel_targets(phrase: str) -> list[str]:
+    """Languages named after "into": split on commas / "and" / "&", and on spaces
+    only when every word is a known language ("spanish french"), so "Mandarin
+    Chinese" or "Brazilian Portuguese" stay whole and "all the languages you can"
+    means a broad set rather than five 'languages' called All, The, …"""
+    phrase = phrase.strip().rstrip(".!?")
+    if _BABEL_MANY.search(phrase):
+        return list(_BABEL_DEFAULT_SET)
+    targets: list[str] = []
+    for part in re.split(r"\s*(?:,|;|&|\band\b)\s*", phrase, flags=re.I):
+        part = part.strip()
+        if not part:
+            continue
+        words = part.split()
+        if len(words) > 1 and all(w.lower() in _LANG_NAMES for w in words):
+            targets += [_LANG_NAMES[w.lower()] for w in words]
+        else:
+            targets.append(_LANG_NAMES.get(part.lower(), part.title()))
+    seen: set[str] = set()
+    return [t for t in targets if not (t in seen or seen.add(t))]
+
+
 def _cascade_gen(cfg: dict, messages: list[dict], max_tokens: int = 900):
-    """Claude -> xAI -> OpenAI -> local Ollama, falling through to the next one
-    whenever a provider fails, so one-shot tools (babel, grow) work with no keys
-    or with dead ones. Returns (generator, label for the header)."""
-    gen, _used = _cascade_stream(messages, cfg, max_tokens=max_tokens)
-    order = [name for name, field in (("Claude", "anthropic_key"), ("xAI", "api_key"), ("OpenAI", "openai_key"))
-             if cfg.get(field)]
-    return gen, " → ".join(order + ["Ollama"])
+    """Local model first, then any keys (chat_app.cascade_stream), falling through
+    whenever one fails, so one-shot tools (babel, grow) work with no keys or dead
+    ones. Returns (generator, engine label); the generator ends with an
+    "Answered by …" line naming the engine that really answered."""
+    gen, used = _cascade_stream(messages, cfg, max_tokens=max_tokens)
+
+    def _labelled():
+        yield from gen
+        if used:
+            yield f"\n\n*[Answered by {used[0].replace(' (local)', '')}]*"
+
+    return _labelled(), (used[0] if used else "")
 
 
 
@@ -1192,7 +1231,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                 if _STRAND_OK and full:
                     _strand_save("grow system", full, tags=["grow", "system"], score=0.80,
                                  territory_tag="architecture", source="grow", model=label)
-            return StreamResult(f"⬡ Grow — system level (via {label})", gen, _finish)
+            return StreamResult(f"⬡ Grow — system level", gen, _finish)
         gpath = Path(sub)
         if not gpath.is_absolute():
             gpath = Path(cfg.get("workspace", str(_CHAT_ROOT))) / sub
@@ -1210,7 +1249,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             )},
             {"role": "user", "content": code},
         ], max_tokens=1200)
-        return StreamResult(f"⬡ Grow — {sub} (via {label})", gen)
+        return StreamResult(f"⬡ Grow — {sub}", gen)
 
     # ── Babel translation ────────────────────────────────────────────────
     if _BABEL_OK and (cmd == "babel" or (cmd.startswith("babel") and len(cmd) > 5 and cmd[5] in (" ", ":"))):
@@ -1219,10 +1258,9 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Usage: babel <text in any language>  ·  babel <text> into <language(s)>")
         into_match = re.search(r"\s+into\s+(.+)$", raw_input, re.IGNORECASE)
         if into_match and not re.match(r"^i\s+am\b", raw_input, re.IGNORECASE):
-            src = raw_input[:into_match.start()].strip()
-            langs = [l.strip().rstrip(",;") for l in re.split(r"[\s,]+", into_match.group(1).strip()) if l.strip()]
-            if src and langs:
-                targets = [_LANG_NAMES.get(l.lower(), l.title()) for l in langs]
+            src = _babel_source(raw_input[:into_match.start()])
+            targets = _babel_targets(into_match.group(1))
+            if src and targets:
                 gen, label = _cascade_gen(cfg, [
                     {"role": "system", "content": (
                         "You are a precise translation engine. Translate the user's text "
@@ -1232,12 +1270,12 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                     )},
                     {"role": "user", "content": f"Text to translate:\n{src}\n\nTranslate into: {', '.join(targets)}"},
                 ], max_tokens=800)
-                return StreamResult(f"⬡ Babel — English → {', '.join(targets)} (via {label})", gen)
+                return StreamResult(f"⬡ Babel — English → {', '.join(targets)}", gen)
         gen, label = _cascade_gen(cfg, [
             {"role": "system", "content": "Translate the following text to English. Return only the translation, nothing else."},
             {"role": "user", "content": raw_input},
         ], max_tokens=1500)
-        return StreamResult(f"⬡ Babel → English (via {label})", gen)
+        return StreamResult(f"⬡ Babel → English", gen)
 
     # ── Web search + synthesis ───────────────────────────────────────────
     if cmd.startswith("search:") or cmd.startswith("search "):
@@ -1284,7 +1322,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             if _STRAND_OK and full:
                 _strand_save(f"pull: {url}", full, tags=["pull", "web"], score=0.72,
                              territory_tag="worldmodel", source="pull", model=label)
-        return StreamResult(f"⬡ Page pull — {url[:70]} (via {label})", gen, _finish)
+        return StreamResult(f"⬡ Page pull — {url[:70]}", gen, _finish)
 
     # ── FunForge ─────────────────────────────────────────────────────────
     if cmd in ("forge done", "forge close"):

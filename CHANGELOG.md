@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.14-U57 — Honest replies, local first (2026-10-12)
+- **Cursiv no longer claims things that didn't happen.** It used to say it had written files and list files that weren't there, because its instructions said it could "read, write, create, delete" files and it copied the "(Checked on this computer: …)" lines it had seen earlier in the chat. Now its instructions say exactly what it can and can't do, those status lines are hidden from what the AI reads, and any fake one it writes is removed from the reply. (Writing files still needs file access turned on and a paid xAI, OpenAI or Claude key, with every write shown for approval.)
+- **Every reply says which AI answered** — "Answered by Ollama · qwen2.5:3b", "Answered by Gemini", and so on.
+- **Local first, for real.** When your computer has a model, it answers first and your message stays on your PC. Free and paid keys are used when there's no local model, it can't answer, or you paste an image. (Before, any key you'd added answered first.)
+- **Cursiv Cloud is off unless you turn it on** (Setup or Settings), matching what the README says.
+- **Babel understands "into all the languages you can"** (and "as many languages as you can") instead of translating into languages called "All", "The" and "You". Lists like "Spanish, French and German" and names like "Mandarin Chinese" work too.
+- The greeting no longer announces "14-agent council ready. All systems running." — it just says hi.
+
 ## v3.14-U56 — Clean startup (2026-10-09)
 - The chat says **"Getting Cursiv ready…"** while it loads, then replaces it with one line: **"Ready. Ask me anything — or type help to see what I can do."** It used to leave "Loading Cursiv's core…" on screen and add an out-of-date paragraph about terminals and paid keys. Free Gemini/Groq keys now count as ready too.
 - The status bar at the bottom left says **Ready** instead of staying on "Starting…", and the bottom right shows the real version number.

@@ -1,6 +1,6 @@
 ﻿; ============================================================
-; Cursiv v3.14-U56 — Clean startup messages
-; Produces: installer\Output\Cursiv-Setup-3.14-U56.exe
+; Cursiv v3.14-U57 — Honest replies, local first
+; Produces: installer\Output\Cursiv-Setup-3.14-U57.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat
 ; panel, tray, guardian, feedback loops, and terminal/chat mode via -t).
@@ -11,7 +11,7 @@
 ; ============================================================
 
 #define AppName      "Cursiv"
-#define AppVer       "3.14-U56"
+#define AppVer       "3.14-U57"
 #define AppPublisher "Joshua Winkler"
 #define AppURL       "https://github.com/winklersllc2026-bit/Cursiv"
 #define AppExe       "Cursiv.exe"
@@ -33,7 +33,7 @@ LicenseFile=..\LICENSE
 InfoAfterFile=..\CHANGELOG.md
 AppComments=Offline AI workspace with cascade routing (xAI → OpenAI → Claude → Ollama), live status indicators, and security-question password recovery. No internet required after install. Your data never leaves your machine.
 OutputDir=Output
-OutputBaseFilename=Cursiv-Setup-3.14-U56
+OutputBaseFilename=Cursiv-Setup-3.14-U57
 SetupIconFile=..\launcher\resources\icons\cursiv.ico
 WizardSmallImageFile=..\launcher\resources\icons\cursiv_256.png
 Compression=lzma2/ultra64

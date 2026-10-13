@@ -48,7 +48,7 @@ where data lives, and how to run, build and release it.
    - streams the answer from the first available model via **`cascade_stream()`**.
 4. After the reply, memory may learn a new fact about the person.
 
-**Model order:** paid keys the person added (OpenAI, Anthropic, xAI) → Groq → Gemini → local Ollama model → Cursiv Cloud (only if allowed). Local-only use always works; keys are upgrades, never requirements.
+**Model order:** the local Ollama model first whenever it has one → paid keys the person added (xAI, OpenAI, Claude) → Groq → Gemini → Cursiv Cloud (off unless turned on, and only when no local model is ready). Pasted images skip the local chat model (it can't see them); with file access on and a paid key, the tool-using paid provider goes first because only it can write files. Every reply ends with "Answered by …", added by the code. Local-only use always works; keys are fallbacks, never requirements.
 
 **Images:** reading uses Claude/GPT-4o keys, then a free Gemini key, then a local Ollama vision model (`gemma3:4b`). Making images uses a paid OpenAI key or a free Cloudflare Workers AI account (FLUX.1-schnell).
 
