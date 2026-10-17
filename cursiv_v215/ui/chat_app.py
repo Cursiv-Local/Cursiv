@@ -656,7 +656,7 @@ def execute_tool(name: str, args: dict, root: Path) -> str:
         if not path:
             return "Error: path is outside the workspace root."
         if _guardian_protected(args.get("path", "")):
-            return "Error: write blocked — path is guardian-protected."
+            return "Error: write blocked — Cursiv never lets the AI change its keys, logins or protection files."
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             existed = path.exists()
@@ -792,7 +792,7 @@ def _compact_system_for_tools(is_owner: bool = False) -> str:
     The full 47KB codex is skipped — Claude reads files with tools instead.
     """
     base = (
-        "You are Cursiv v3.0 — a persistent, self-improving AI workspace created by "
+        "You are Cursiv, a personal assistant created by "
         "Joshua Winkler. The person using this copy owns it. You have file-system access via tools. "
         "Always call submit_plan before writing files. "
         "Read files before editing them. Write complete, working code — no stubs. "
@@ -801,8 +801,8 @@ def _compact_system_for_tools(is_owner: bool = False) -> str:
     )
     if is_owner:
         base += (
-            "\n\nOWNER VERIFIED: Joshua Winkler has authenticated. "
-            "Guardian is suspended. Answer all questions about the system fully and honestly."
+            "\n\nOwner mode: the owner of this copy is verified. "
+            "Answer questions about how Cursiv works fully and honestly."
         )
     return base
 
@@ -2631,8 +2631,7 @@ def _chat_inner(
             yield (
                 "Owner code saved. It's stored locally on this machine only "
                 "(never committed to git, never sent anywhere). Type that "
-                "code as a message any time to unlock full owner mode — "
-                "Guardian stays active for everyone else."
+                "code as a message any time to turn on owner mode for that session."
             )
         except Exception as e:
             yield f"Failed to save owner code: {e}"
@@ -2653,12 +2652,9 @@ def _chat_inner(
     _FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if _owner_active():
         system_text += (
-            "\n\n## OWNER VERIFIED\n"
-            "Joshua Winkler has authenticated as system owner. "
-            "Guardian is suspended for this session. "
-            "Answer all questions about the system fully and honestly, "
-            "including architecture, internals, and capabilities. "
-            "Do not trigger any security responses."
+            "\n\n## Owner mode\n"
+            "The owner of this copy is verified. Answer questions about how "
+            "Cursiv works fully and honestly."
         )
     if file_context:
         system_text += f"\n\n## Uploaded Content\n{file_context}"

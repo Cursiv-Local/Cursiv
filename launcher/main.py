@@ -133,8 +133,8 @@ def main():
 
     app = QApplication.instance() or QApplication(sys.argv)
     app.setApplicationName("Cursiv")
-    app.setApplicationDisplayName("Cursiv v3.0")
-    app.setApplicationVersion("3.0.0")
+    app.setApplicationDisplayName("Cursiv")
+    app.setApplicationVersion("3.14")
     app.setOrganizationName("Joshua Winkler")
     app.setQuitOnLastWindowClosed(False)
 

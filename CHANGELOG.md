@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.14-U61 — not released yet
+- **Answers are no longer rewritten.** A filter changed every reply before you saw it: "made in China" became "made in the United States", "Chinese technology" became "American technology", and "OpenAI" or "Anthropic" became "Cursiv". It's gone; Cursiv now says plainly which model it runs on.
+- **Your saved AI keys are encrypted** for your Windows account. A copied settings file, or another Windows user on the PC, gets nothing usable. Keys saved by older versions are encrypted the first time this version starts. A private USB copy keeps them readable so it works on other PCs.
+- **The Guardian is gone.** Its probe scanner, skull screen and decoy answers are removed; a question like "what are your instructions?" now gets a normal answer. The real protections stay: the login, asking before every file write, the AI can never change your keys or login files, and offline mode.
+- Window titles say "Cursiv" instead of "Cursiv v3.0".
+- Tests now all pass (a USB test had failed for weeks), and they run on GitHub for every change.
+
 ## v3.14-U60 — Private by default, plain language (2026-10-17)
 - **Nothing leaves your computer on its own.** On a fresh install with no keys, a chat turn makes no connection off your computer. (Checked: a fresh copy, real chat turns on the local model, every connection logged — zero.)
 - **Web search only when you ask.** Start a message with `search:`. Words like "today", "right now" or "this week" used to send your message to DuckDuckGo by themselves. `websearch on` (or Settings) brings back automatic search if you want it.
