@@ -330,3 +330,177 @@ def test_chat_appends_a_revision_after_the_draft(monkeypatch):
     assert "3 retries" in out.split("Revised after check", 1)[1]
     assert learned["origin"] == "verified"
     assert learned["skip"] is False
+
+
+# ── C-025: Known must be grounded; sources must have been looked up ─────────
+
+def test_invented_quantity_listed_as_known_is_caught():
+    # qwen2.5:3b, 2026-10-17: "some water" became "Known: ... 50 liters", and the checker said CLEAR
+    problems = verify.known_problems(
+        "We have some water and 5 people. How long will it last?",
+        "It lasts 5 days.\n\n" + _ledger(known="The total amount of water is 50 liters"),
+    )
+    assert problems and "50 liters" in problems[0]
+
+
+def test_known_items_the_person_gave_are_not_flagged():
+    user = "We have 4 people and each needs 3 liters of water per day. How many liters for 3 days?"
+    text = "36 liters.\n\n" + _ledger(known="4 people, each needing 3 liters of water per day; 3 days")
+    assert verify.known_problems(user, text) == []
+    assert verify.known_problems(user, "36 liters.\n\n" + _ledger(known="...")) == []
+
+
+def test_known_from_the_conversation_is_grounded():
+    user = "Same water per person and same 3 days, but 6 people. Redo it."
+    context = "user: We have 4 people and each needs 3 liters of water per day."
+    text = "54 liters.\n\n" + _ledger(known="6 people; 3 liters of water per day; 3 days")
+    assert verify.known_problems(f"{user}\n{context}", text) == []
+
+
+def test_invented_report_is_flagged_as_an_unconfirmed_source():
+    # llama3.1, 2026-10-17: a creek report nobody looked up, filed under Known
+    draft = ("The creek water quality report from the local government shows a high level of "
+             "E. coli bacteria, likely from the cattle farm upstream.")
+    problems = verify.citation_problems(
+        "Is it safe to drink from the creek right now? We live near a cattle farm.", "", draft)
+    assert problems and "cannot be confirmed" in problems[0]
+
+
+def test_quoted_agency_needs_a_lookup():
+    draft = 'From the CDC: "Boil water for 1-3 minutes and let it cool."'
+    assert verify.citation_problems("How do I make water safe?", "", draft)
+    looked_up = "CDC: bring water to a rolling boil for 1 minute."
+    assert verify.citation_problems("How do I make water safe?", looked_up, draft) == []
+
+
+def test_one_source_gets_one_note():
+    # qwen2.5:3b, 2026-10-17: one invented WHO excerpt produced three notes
+    draft = ("Organizations like the World Health Organization (WHO) agree. "
+             "The WHO guidelines state that boiling for 1 minute is effective.")
+    assert len(verify.citation_problems("Quote your source.", "", draft)) == 1
+
+
+def test_ordinary_prose_is_not_a_citation():
+    for draft in ("Report any issues with the well to the relevant authorities.",
+                  "Ask who in the family can carry water. Boiling kills most germs.",
+                  "I recommend boiling the water first."):
+        assert verify.citation_problems("what now?", "", draft) == [], draft
+
+
+def test_ungrounded_known_fails_a_clear_verdict():
+    result = verify.run_pass(
+        "We have some water and 5 people. How long will it last?",
+        "About 5 days.\n\n" + _ledger(known="The total amount of water is 50 liters",
+                                      assumed="2 liters per person per day"),
+        ask=lambda _m: "CLEAR",
+    )
+    assert result.clear is False
+    assert result.learn_origin == "inferred" and result.skip_learn is True
+    assert "50 liters" in result.append
+
+
+# ── C-024: the checker sees the conversation and memory, not Cursiv's footer ─
+
+def test_checker_prompt_carries_the_context():
+    messages = verify.verifier_messages(
+        "Redo it with 6 people.", "54 liters.",
+        context="user: We have 4 people and each needs 3 liters per day.",
+        sources="Reference: 1 gallon per person per day.",
+    )
+    body = messages[1]["content"]
+    assert "4 people" in body and "1 gallon per person" in body
+    assert body.index("Already established") < body.index("Original user question")
+
+
+def test_chat_checks_the_model_text_with_history_and_memory(monkeypatch, memory):
+    from cursiv_v215.ui import chat_app as ca
+
+    memory.set_person("ada")
+    memory.add_fact("Ada: I prefer tea in the morning", person="ada", source="manual")
+
+    def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
+                    confirm_writes, anthropic_key, force_provider, reply):
+        for chunk in ("You prefer tea, and 6 people need 54 liters.",
+                      "\n\n*[Answered by Ollama · qwen2.5:3b]*"):
+            reply.append(chunk)
+            yield chunk
+
+    seen = []
+
+    def ask(messages, max_tokens=400):
+        if messages[0]["content"].startswith("You are a strict checker"):
+            seen.append(messages[1]["content"])
+        return "CLEAR"
+
+    monkeypatch.setattr(ca, "_chat_stream", fake_stream)
+    monkeypatch.setattr(ca, "_router_llm", ask)
+    monkeypatch.setattr(ca, "_learn_later", lambda *a, **k: None)
+    history = [{"role": "user", "content": "We have 4 people, 3 liters each per day, for 3 days."},
+               {"role": "assistant", "content": "36 liters.\n\n*[Answered by Ollama · qwen2.5:3b]*"}]
+    "".join(ca.chat("Actually 6 people. Also, what do I drink in the morning?", history, "", None))
+    assert seen, "a numeric answer is checked"
+    prompt = seen[0]
+    assert "Answered by" not in prompt                     # Cursiv's footer is not the model's claim
+    assert "4 people, 3 liters each" in prompt              # the earlier turn
+    assert "prefer tea" in prompt                           # recalled memory
+
+
+def test_casual_turn_with_the_engine_footer_is_not_checked(monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+
+    def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
+                    confirm_writes, anthropic_key, force_provider, reply):
+        for chunk in ("Doing well, thanks!", "\n\n*[Answered by Ollama · qwen2.5:3b]*"):
+            reply.append(chunk)
+            yield chunk
+
+    called = []
+    monkeypatch.setattr(ca, "_chat_stream", fake_stream)
+    monkeypatch.setattr(ca, "_router_llm", lambda m, max_tokens=400: called.append(1) or "CLEAR")
+    monkeypatch.setattr(ca, "_learn_later", lambda *a, **k: None)
+    "".join(ca.chat("hey how are you", [], "", None))
+    assert called == []                                     # the "2.5:3b" digits no longer trigger it
+
+
+# ── C-008: the local model first; a saved key is a fallback, not the default ─
+
+def _routing(monkeypatch, local_ready: bool):
+    from cursiv_v215.ui import chat_app as ca
+    from cursiv_v215.core import speed
+    used = []
+
+    def engine(name, reply):
+        def call(*_args, **_kwargs):
+            used.append(name)
+            return iter([reply])
+        return call
+
+    monkeypatch.setattr(ca, "_saved_key", lambda field: "gsk_test" if field == "groq_key" else "")
+    monkeypatch.setattr(ca, "_ollama_running", lambda: local_ready)
+    monkeypatch.setattr(ca, "_resolve_ollama_model", lambda: "qwen2.5:3b" if local_ready else None)
+    monkeypatch.setattr(ca, "_call_ollama", engine("local", "local"))
+    monkeypatch.setattr(ca, "_call_groq_direct", engine("groq", "groq"))
+    monkeypatch.setattr(ca, "_call_gemini_direct", engine("gemini", "gemini"))
+    monkeypatch.setattr(speed, "wait_idle", lambda *_a, **_k: True)
+    return ca, used, engine
+
+
+def test_check_stays_local_when_a_free_key_is_saved(monkeypatch):
+    ca, used, _ = _routing(monkeypatch, local_ready=True)
+    assert ca._router_llm([{"role": "user", "content": "check"}]) == "local"
+    assert ca._quick_llm([{"role": "user", "content": "learn"}]) == "local"
+    assert used == ["local", "local"]
+
+
+def test_free_key_is_used_only_without_a_local_model(monkeypatch):
+    ca, used, _ = _routing(monkeypatch, local_ready=False)
+    assert ca._router_llm([{"role": "user", "content": "check"}]) == "groq"
+    assert ca._quick_llm([{"role": "user", "content": "learn"}]) == "groq"
+    assert "local" not in used
+
+
+def test_failed_local_call_does_not_fall_back_to_the_cloud(monkeypatch):
+    ca, used, engine = _routing(monkeypatch, local_ready=True)
+    monkeypatch.setattr(ca, "_call_ollama", engine("local", "[Ollama error: timeout]"))
+    assert ca._router_llm([{"role": "user", "content": "check"}]) == ""
+    assert used == ["local"]

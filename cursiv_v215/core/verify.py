@@ -252,9 +252,122 @@ def introduced_number_problems(user_text: str, draft: str, revision: str) -> lis
     return [f"revision introduced new numbers: {', '.join(fresh)}"]
 
 
-def _problems(user_text: str, text: str) -> list[str]:
+# ── Known must come from somewhere; sources must have been looked up ────────
+
+_STOP = frozenset(
+    "the a an of to and or for in on is are was were be been with about that this these those "
+    "their his her your you they them from into over after before than then just not no "
+    "does did do has have had our we us its it as at by per each all any some there here "
+    "which what who whom when where how will would can could should may might".split()
+)
+_WORDS = re.compile(r"[a-z][a-z']+")
+# Acronyms are matched case-sensitively so "who" and "epa" in prose do not count.
+_AUTHORITY_ACRONYM = re.compile(r"\b(CDC|WHO|FEMA|EPA|USDA|NIH|NOAA|OSHA|FDA|USGS)\b")
+_AUTHORITY_NAME = re.compile(
+    r"(?i)\b(Centers for Disease Control|World Health Organization|Red Cross|Mayo Clinic|"
+    r"National Weather Service|health department|department of [a-z]+|ministry of [a-z]+)\b"
+)
+# A generic document only counts when the sentence points at a specific one.
+_AUTHORITY_DOC = re.compile(
+    r"(?i)\b(?:the|a|an|this|that|their|recent|latest|local|state|federal|county|official|government)\s+"
+    r"(?:[a-z-]+\s+){0,3}(report|study|survey|journal|guidelines?|advisory|data)\b"
+)
+_ATTRIBUTION = re.compile(
+    r"(?i)\b(according to|source[sd]?|recommends?|recommended|recommendations?|states|reports|"
+    r"reported|shows?|found|says|said|quoted?|advises?|guidelines?)\b|[\"“”]"
+)
+
+
+def _stem(word: str) -> str:
+    return word[:4] if len(word) > 4 else word
+
+
+def _content_stems(text: str) -> set[str]:
+    return {_stem(w) for w in _WORDS.findall((text or "").lower()) if w not in _STOP and len(w) > 2}
+
+
+def _is_placeholder(item: str) -> bool:
+    return item.strip(" .*").lower() in _EMPTY or set(item.strip()) <= set(". ")
+
+
+def known_problems(grounding: str, text: str) -> list[str]:
+    """Each Known item must come from the person, the conversation, memory, or a
+    source looked up this turn. A number nobody gave, or an item mostly made of
+    words nobody used, was filled in by the model -- it is Inferred or Assumed."""
+    ledger = extract_ledger(text)
+    if not ledger:
+        return []
+    known = ledger.get("Known") or ""
+    items = [part.strip(" .*-") for part in re.split(r";|\s\*\s|\s-\s", known)]
+    ground_nums = set(_NUM.findall(grounding or ""))
+    ground_words = _content_stems(grounding)
+    problems: list[str] = []
+    for item in items:
+        if not item or _is_placeholder(item):
+            continue
+        new_nums = [n for n in _NUM.findall(item) if n not in ground_nums]
+        words = _content_stems(item)
+        unsupported = len(words - ground_words) / len(words) if words else 0.0
+        if new_nums or unsupported > 0.5:
+            problems.append(
+                f"listed as Known but not stated by you or found in a looked-up source: {item} "
+                f"(it is an inference or an assumption)"
+            )
+    return problems
+
+
+_ALIASES = {"world health organization": "who", "centers for disease control": "cdc"}
+
+
+def _authority_key(name: str) -> str:
+    """One key per source, so "WHO", "World Health Organization" and "the WHO
+    guidelines" are a single note."""
+    low = name.lower()
+    for full, short in _ALIASES.items():
+        low = low.replace(full, short)
+    acronym = _AUTHORITY_ACRONYM.search(low.upper())
+    return acronym.group(1).lower() if acronym else low
+
+
+def _authorities(sentence: str) -> list[str]:
+    names = [m.group(1) for m in _AUTHORITY_ACRONYM.finditer(sentence)]
+    names += [m.group(1) for m in _AUTHORITY_NAME.finditer(sentence)]
+    names += [m.group(0).strip() for m in _AUTHORITY_DOC.finditer(sentence)]
+    return names
+
+
+def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
+    """A named source (the CDC, "the local government report") may only be cited
+    when its text was actually looked up this turn, or the person brought it up."""
+    body = answer_body(text)
+    have = f"{sources or ''}\n{grounding or ''}".lower()
+    problems: list[str] = []
+    seen: set[str] = set()
+    for sentence in re.split(r"(?<=[.!?])\s+|\n+", body):
+        if not _ATTRIBUTION.search(sentence):
+            continue
+        for name in _authorities(sentence):
+            key = _authority_key(name)
+            if key in seen:
+                continue
+            core = _AUTHORITY_DOC.match(name)
+            probe = core.group(1).lower() if core and key == name.lower() else key
+            if probe in have or name.lower() in have:
+                continue
+            seen.add(key)
+            problems.append(
+                f"cites {name} as a source, but nothing from it was looked up on this computer "
+                f"this turn, so it cannot be confirmed"
+            )
+    return problems
+
+
+def _problems(user_text: str, text: str, context: str = "", sources: str = "") -> list[str]:
+    grounding = "\n".join(part for part in (user_text, context, sources) if part)
     found = constraint_problems(user_text, text)
     found += assumptions_stated_as_facts(text)
+    found += known_problems(grounding, text)
+    found += citation_problems(f"{user_text}\n{context}", sources, text)
     if needs_ledger(user_text) and extract_ledger(text) is None:
         found.append(_MISSING_LEDGER)
     return found
@@ -270,7 +383,19 @@ def parse_verdict(text: str) -> tuple[bool, str]:
     return False, raw
 
 
-def verifier_messages(user_text: str, draft: str) -> list[dict]:
+def _background(context: str, sources: str) -> str:
+    """Conversation, memory, and looked-up text the draft may rely on."""
+    parts = []
+    if context:
+        parts.append(context[:4000])
+    if sources:
+        parts.append("Looked up on this computer this turn:\n" + sources[:3000])
+    if not parts:
+        return ""
+    return "Already established (the draft may rely on this; it is not a new claim):\n" + "\n\n".join(parts) + "\n\n"
+
+
+def verifier_messages(user_text: str, draft: str, context: str = "", sources: str = "") -> list[dict]:
     ledger = extract_ledger(draft)
     extra = ""
     assumed = (ledger or {}).get("Assumed", "")
@@ -283,6 +408,7 @@ def verifier_messages(user_text: str, draft: str) -> list[dict]:
     return [
         {"role": "system", "content": "You are a strict checker. Do not rewrite the answer. " + VERIFIER_INSTRUCTION},
         {"role": "user", "content": (
+            f"{_background(context, sources)}"
             f"Original user question:\n{user_text}\n\n"
             f"Constraints:\n{constraints}\n\n"
             f"Draft answer:\n{draft}\n"
@@ -298,28 +424,33 @@ def constraints_from(user_text: str) -> str:
     return "\n".join(lines)
 
 
-def revise_messages(user_text: str, draft: str, problems: list[str]) -> list[dict]:
+def revise_messages(user_text: str, draft: str, problems: list[str],
+                    context: str = "", sources: str = "") -> list[dict]:
     listed = "\n".join(f"- {item}" for item in problems)
     return [
         {"role": "system", "content": (
             "Rewrite the draft so the listed problems are gone. "
             "Keep every number and definition from the user's question. "
             "Do not add new factual claims. If something is unknown, say so. "
+            "Do not name or quote a source unless its text is in what was looked up. "
             + LEDGER_INSTRUCTION
         )},
         {"role": "user", "content": (
+            f"{_background(context, sources)}"
             f"User question:\n{user_text}\n\nProblems:\n{listed}\n\nDraft:\n{draft}"
         )},
     ]
 
 
-def ledger_messages(user_text: str, draft: str) -> list[dict]:
+def ledger_messages(user_text: str, draft: str, context: str = "", sources: str = "") -> list[dict]:
     return [
         {"role": "system", "content": (
             "Fill this block from the question and the draft. Do not rewrite the answer. "
             "Use none when a line is empty.\n" + LEDGER_INSTRUCTION
         )},
-        {"role": "user", "content": f"User question:\n{user_text}\n\nDraft:\n{draft}"},
+        {"role": "user", "content": (
+            f"{_background(context, sources)}User question:\n{user_text}\n\nDraft:\n{draft}"
+        )},
     ]
 
 
@@ -384,11 +515,11 @@ def _ask(ask, messages: list[dict]) -> str:
         return ""
 
 
-def _fill_ledger(user_text: str, draft: str, ask) -> str:
+def _fill_ledger(user_text: str, draft: str, ask, context: str = "", sources: str = "") -> str:
     """One short call that only fills the four lines. Empty when it fails."""
     if extract_ledger(draft) or not ask:
         return ""
-    ledger = extract_ledger(_ask(ask, ledger_messages(user_text, draft)))
+    ledger = extract_ledger(_ask(ask, ledger_messages(user_text, draft, context, sources)))
     if not ledger:
         return ""
     combined = draft.rstrip() + "\n\n" + ledger_block(ledger)
@@ -397,23 +528,29 @@ def _fill_ledger(user_text: str, draft: str, ask) -> str:
     return "\n\n" + ledger_block(ledger)
 
 
-def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = False) -> PassResult:
-    """Check one draft. `ask` is messages -> text. Casual turns return immediately."""
+def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = False,
+             context: str = "", sources: str = "") -> PassResult:
+    """Check one draft. `ask` is messages -> text. Casual turns return immediately.
+
+    context is the recent conversation and recalled memory; sources is text looked
+    up this turn. Both are what the draft may rely on without it being a new claim.
+    """
     global _previous_failed
     store_ledger_from(user_text, draft)
     if not should_verify(user_text, draft, memory_update=memory_update,
                          previous_failed=_previous_failed):
         return PassResult()
 
-    problems = _problems(user_text, draft)
+    problems = _problems(user_text, draft, context, sources)
     filled = ""
     if problems == [_MISSING_LEDGER]:
-        filled = _fill_ledger(user_text, draft, ask)
+        filled = _fill_ledger(user_text, draft, ask, context, sources)
         if filled:
-            problems = _problems(user_text, draft.rstrip() + filled)
+            problems = _problems(user_text, draft.rstrip() + filled, context, sources)
 
     checked = draft.rstrip() + filled
-    verdict = _ask(ask, verifier_messages(user_text, checked)) if (ask and checked.strip()) else ""
+    verdict = (_ask(ask, verifier_messages(user_text, checked, context, sources))
+               if (ask and checked.strip()) else "")
     model_clear, model_issues = parse_verdict(verdict)
     if verdict and not model_clear:
         problems.append(model_issues)
@@ -423,11 +560,11 @@ def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = Fals
         store_ledger_from(user_text, checked)
         return PassResult(append=filled, learn_origin="verified", clear=True)
 
-    revised = _ask(ask, revise_messages(user_text, draft, problems))
+    revised = _ask(ask, revise_messages(user_text, draft, problems, context, sources))
     if revised:
-        revised_problems = _problems(user_text, revised)
-        revised_problems += introduced_number_problems(user_text, draft, revised)
-        second = _ask(ask, verifier_messages(user_text, revised))
+        revised_problems = _problems(user_text, revised, context, sources)
+        revised_problems += introduced_number_problems(f"{user_text}\n{context}\n{sources}", draft, revised)
+        second = _ask(ask, verifier_messages(user_text, revised, context, sources))
         second_clear, second_issues = parse_verdict(second)
         if second and not second_clear:
             revised_problems.append(second_issues)

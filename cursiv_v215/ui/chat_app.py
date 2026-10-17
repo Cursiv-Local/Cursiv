@@ -1735,23 +1735,33 @@ def _store_key(field: str, value: str) -> None:
         pass
 
 
-def _quick_llm(messages: list[dict], max_tokens: int = 400) -> str:
-    """Small background jobs (memory learning): the user's free Groq/Gemini key,
-    else the local model. Never paid keys and never Cursiv Cloud. "" if none."""
+def _local_llm(messages: list[dict], max_tokens: int) -> str:
+    """One call to the local model. "" on an error."""
+    out = "".join(c for c in _call_ollama(messages, max_tokens=max_tokens) if c != RATE_SENTINEL).strip()
+    return "" if out.startswith(("[Ollama", "\n[Ollama")) else out
+
+
+def _free_key_llm(messages: list[dict], max_tokens: int) -> str:
+    """The user's own free Groq/Gemini key. Only for when no local model is ready."""
     for field, fn in (("groq_key", _call_groq_direct), ("gemini_key", _call_gemini_direct)):
         key = _saved_key(field)
         if key:
             out = "".join(fn(messages, key, max_tokens)).strip()
             if out and not out.startswith(("[Groq error", "[Gemini error")):
                 return out
-    from cursiv_v215.core import speed as _speed
-    if not _speed.wait_idle(300):          # never compete with a chat for the local model
-        return ""
-    if _ollama_running() and _resolve_ollama_model():
-        out = "".join(c for c in _call_ollama(messages, max_tokens=max_tokens) if c != RATE_SENTINEL).strip()
-        if out and not out.startswith(("[Ollama", "\n[Ollama")):
-            return out
     return ""
+
+
+def _quick_llm(messages: list[dict], max_tokens: int = 400) -> str:
+    """Small background jobs (memory learning, titles): the local model when one is
+    ready, else the user's free Groq/Gemini key. A local model that fails does not
+    fall back to the cloud. Never paid keys and never Cursiv Cloud. "" if none."""
+    if _ollama_running() and _resolve_ollama_model():
+        from cursiv_v215.core import speed as _speed
+        if not _speed.wait_idle(300):      # never compete with a chat for the local model
+            return ""
+        return _local_llm(messages, max_tokens)
+    return _free_key_llm(messages, max_tokens)
 
 
 def _local_model_ready() -> bool:
@@ -1773,6 +1783,7 @@ _PROVIDER_ERROR_PREFIXES = ("[xAI auth error", "[Claude error", "[OpenAI error",
 _STATUS_LINE_RE = _re.compile(r"(?m)^[ \t]*\*[\[(][^\n]*[\])]\*[ \t]*(?:\r?\n|$)")
 _TOOL_NOTE = "(Checked on this computer"
 _REAL_TOOL_NOTES: set[str] = set()     # notes this code emitted for the current turn
+_RETRIEVED: list[str] = []             # text actually looked up this turn (web, plugins, tools)
 _ANSWERED_BY = ""                      # engine that answered the current turn
 
 
@@ -2881,6 +2892,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     if _needs_search(user_text) and _is_online():
         _web_ctx = _web_search(_search_q[:300])
     if _web_ctx:
+        _RETRIEVED.append(_web_ctx)
         messages[0]["content"] += (
             "\n\n## Live Web Search Results\n"
             "*(Retrieved in real-time for this query — treat these as current facts)*\n\n"
@@ -2990,6 +3002,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             from cursiv_v215.core import plugins as _plugins
             _hc = _plugins.message_context(user_text)
             if _hc:
+                _RETRIEVED.append(_hc)
                 messages[0]["content"] += "\n\n## From your plugins\n" + _hc + "\n"
         except Exception:
             pass
@@ -2999,7 +3012,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 _calls = _tools.plan(user_text, _router_llm)
                 if _calls:
                     _results = _tools.run(_calls)
-                    messages[0]["content"] += "\n\n" + _tools.context_for(_results) + "\n"
+                    _tool_ctx = _tools.context_for(_results)
+                    _RETRIEVED.append(_tool_ctx)
+                    messages[0]["content"] += "\n\n" + _tool_ctx + "\n"
                     _note = "*(Checked on this computer: " + "; ".join(l for l, _r in _results) + ")*"
                     _REAL_TOOL_NOTES.add(_note)
                     yield _note + "\n\n"
@@ -3430,6 +3445,7 @@ def chat(
     try:
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply)
+        draft = _strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
         if _PHASE_AFTER:             # Route / Recovery notes from the phases
             reply.append(_PHASE_AFTER)
             yield _PHASE_AFTER
@@ -3439,9 +3455,11 @@ def chat(
             from cursiv_v215.core import verify as _verify
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
             outcome = _verify.run_pass(
-                user_text, "".join(reply),
+                user_text, draft,
                 ask=lambda msgs: _router_llm(msgs, max_tokens=500),
                 memory_update=_verify.looks_like_memory_update(user_text),
+                context=_check_context(history, user_text),
+                sources="\n\n".join(_RETRIEVED),
             )
             origin, skip = outcome.learn_origin, outcome.skip_learn
             if outcome.append:
@@ -3454,10 +3472,36 @@ def chat(
     _learn_later(message, "".join(reply), origin=origin, skip=skip)
 
 
+def _check_context(history: list[dict], user_text: str) -> str:
+    """What the checker may treat as already established: the last few turns and the
+    memories recalled for this question. Without it, a correct follow-up or a
+    memory-based answer reads as an unsupported claim."""
+    parts: list[str] = []
+    turns = []
+    for m in (history or [])[-6:]:
+        content = m.get("content", "")
+        if not isinstance(content, str):
+            content = next((p.get("text", "") for p in content if p.get("type") == "text"), "")
+        text = _strip_status_lines(content)
+        if text:
+            turns.append(f"{m.get('role', 'user')}: {text[:800]}")
+    if turns:
+        parts.append("Earlier in this conversation:\n" + "\n".join(turns))
+    try:
+        from cursiv_v215.memory import semantic as _sem
+        recalled = _sem.build_context(user_text)
+        if recalled:
+            parts.append("Saved memory recalled for this question:\n" + recalled)
+    except Exception:
+        pass
+    return "\n\n".join(parts)
+
+
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
                  confirm_writes, anthropic_key, force_provider, reply: list[str]):
     from cursiv_v215.core import selfknow as _sk
     _REAL_TOOL_NOTES.clear()
+    _RETRIEVED.clear()
     _set_answered("")
     for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):
         if isinstance(chunk, str) and chunk not in (RATE_SENTINEL,) and not chunk.startswith(WRITE_SENTINEL):
@@ -3481,17 +3525,13 @@ def _friendly(sk, gen):
 
 
 def _router_llm(messages: list[dict], max_tokens: int = 300) -> str:
-    """Fast, small calls during a chat (tool routing, the verification pass): free keys
-    first, then the local model directly -- not _quick_llm, which waits until no chat is running."""
-    for field, fn in (("groq_key", _call_groq_direct), ("gemini_key", _call_gemini_direct)):
-        key = _saved_key(field)
-        if key:
-            out = "".join(fn(messages, key, max_tokens)).strip()
-            if out and not out.startswith(("[Groq error", "[Gemini error")):
-                return out
+    """Fast, small calls during a chat (tool routing, the verification pass): the local
+    model directly when one is ready -- not _quick_llm, which waits until no chat is
+    running. The user's free keys only when there is no local model, so a turn the
+    local model answered never leaves this computer for its check."""
     if _ollama_running() and _resolve_ollama_model():
-        return "".join(c for c in _call_ollama(messages, max_tokens=max_tokens) if c != RATE_SENTINEL).strip()
-    return ""
+        return _local_llm(messages, max_tokens)
+    return _free_key_llm(messages, max_tokens)
 
 
 def warm_up_local() -> None:
