@@ -216,7 +216,6 @@ except Exception:
 # ── Paths ──────────────────────────────────────────────────────────────────
 ROOT               = Path(__file__).parent.parent.parent
 SYSTEM_PROMPT_FILE = ROOT / "cursiv_v215" / "codex" / "system_prompt.md"
-NEXUS_STATE        = ROOT / ".cursiv" / "nexus_state.json"
 MEMORY_FILE        = ROOT / ".cursiv" / "memory.json"
 TRAINING_JSONL     = ROOT / ".cursiv" / "training_data.jsonl"
 
@@ -953,7 +952,7 @@ def _build_strand_context(query: str, top_k: int = 2) -> str:
         results = _strand_search(query, top_k=top_k, min_score=0.12)
         if not results:
             return ""
-        lines = ["Relevant entries from your personal Strand archive (prior exchanges and insights):"]
+        lines = ["Related earlier conversations the person saved:"]
         for s in results:
             territory = s.get("territory_tag", "general")
             q_text    = s.get("query", "")[:150]
@@ -965,14 +964,9 @@ def _build_strand_context(query: str, top_k: int = 2) -> str:
 
 
 def _build_live_status() -> str:
-    """
-    Auto-generated capabilities block appended to every system prompt.
-    Reflects actual runtime state — no manual updates needed.
-    When a new agent or tool is added to the codebase, it appears here
-    automatically on next restart without editing system_prompt.md.
-    """
-    # ── Version ──────────────────────────────────────────────────────────
-    version = "3.14-U02"
+    """What's actually available right now, appended to the system prompt so the
+    model doesn't claim features that aren't installed or turned on."""
+    version = "3.14"
     try:
         _vfile = ROOT / "launcher" / "cursiv_launcher.py"
         if _vfile.exists():
@@ -983,69 +977,29 @@ def _build_live_status() -> str:
     except Exception:
         pass
 
-    # ── Agents ───────────────────────────────────────────────────────────
-    agents = []
+    items = []
     if _CODEX_OK and _codex_available():
-        agents.append("Winkler-Codex (qwen2.5-coder:14b + deepseek-coder-v2:16b · offline)")
+        items.append("Coding help (codex): local coding models installed")
     elif _CODEX_OK:
-        agents.append("Winkler-Codex (loaded · models not yet pulled)")
+        items.append("Coding help (codex): local coding models not downloaded yet")
     try:
         import cursiv_v215.agents.babel_agent  # noqa: F401
-        agents.append("Babel Agent (any language → UTF-8 binary → English · command: babel <text>)")
+        items.append("Translation: translate <text> into <language>")
     except Exception:
         pass
-    if _HERMES_OK and _hermes_available():
-        agents.append("Hermes (offline multi-step executor)")
     if _REF_OK and _ref_available():
-        agents.append("Reference Brain (offline SQLite knowledge base)")
-
-    # ── Tools ─────────────────────────────────────────────────────────────
-    tools = [
-        "Computer lookups (read-only, run by Cursiv): system info, list folder, read file, find files. File writes only with file access on + a paid xAI/OpenAI/Claude key, each shown for approval",
-        "Group Discovery: Cursiv → xAI → OpenAI → Claude consensus (command: council <question>)",
-    ]
-    if BRAVE_KEY:
-        tools.append("Web Search: Brave Search API (key set) + DuckDuckGo fallback — worldwide real-time")
+        items.append("Local reference data: ref <question>")
+    if netgate.is_offline():
+        items.append("Offline mode is ON: no web search, no cloud AI")
     else:
-        tools.append("Web Search: DuckDuckGo worldwide real-time (no key · set BRAVE_API_KEY for better results)")
-
-    # ── Strand memory ─────────────────────────────────────────────────────
-    strand_line = ""
+        items.append("Web search: only when the message starts with search:"
+                     + (" (automatic search is also on)" if netgate.web_search_auto() else ""))
     if _STRAND_APP_OK:
         sc = _strand_count()
-        strand_line = f"Strand archive: {sc} strand{'s' if sc != 1 else ''} (personal memory · anchor this · strands search <query>)"
+        items.append(f"Saved notes: {sc}")
 
-    # ── Commands quick-ref ────────────────────────────────────────────────
-    commands = (
-        "search: <query> · babel <text> · council <question> · "
-        "codex <prompt> · anchor this · strands · "
-        "files on/off · workspace <path> · help"
-    )
-
-    lines = [
-        "\n\n---",
-        f"## LIVE SYSTEM STATUS (auto-generated · Cursiv v{version})",
-        "",
-        "**Active agents:**",
-    ]
-    for a in agents:
-        lines.append(f"- {a}")
-    if not agents:
-        lines.append("- (none loaded)")
-    lines.append("")
-    lines.append("**Active tools:**")
-    for t in tools:
-        lines.append(f"- {t}")
-    lines.append("")
-    if strand_line:
-        lines.append(f"**Memory:** {strand_line}")
-        lines.append("")
-    lines.append(f"**Terminal commands:** {commands}")
-    lines.append("")
-    lines.append(
-        "_This block is generated at runtime from actual loaded modules — "
-        "it reflects true system state, not documentation._"
-    )
+    lines = ["\n\n---", f"## Available right now (Cursiv {version})", ""]
+    lines += [f"- {t}" for t in items]
     return "\n".join(lines)
 
 
@@ -1054,58 +1008,11 @@ def load_system_prompt() -> str:
         SYSTEM_PROMPT_FILE.read_text(encoding="utf-8")
         if SYSTEM_PROMPT_FILE.exists()
         else (
-            "You are Cursiv — a self-improving AI workspace built for Joshua Winkler. "
-            "Human approval is required before any system change is applied. "
-            "Be warm, direct, truthful, and frontier-oriented."
+            "You are Cursiv, a personal assistant running on this person's own computer. "
+            "Be warm, direct and truthful."
         )
     )
     return base + _build_live_status()
-
-
-def load_nexus_context() -> str:
-    """Read live agent assignments from the Nexus panel."""
-    if not NEXUS_STATE.exists():
-        return ""
-    try:
-        state    = json.loads(NEXUS_STATE.read_text(encoding="utf-8"))
-        domains  = state.get("agent_domains", {})
-        tasks    = state.get("agent_tasks",   {})
-        statuses = state.get("agent_status",  {})
-        yin_yang = state.get("yin_yang",      {})
-
-        active = [
-            (name, domains.get(name, "general"), tasks.get(name, ""), statuses.get(name, "IDLE"))
-            for name in domains
-            if domains.get(name, "general") != "general" or tasks.get(name, "")
-        ]
-
-        lines = ["\n\n---\n## LIVE NEXUS STATE (auto-injected)\n"]
-
-        if active:
-            lines.append("**Active agent assignments:**")
-            for name, domain, task, status in active:
-                line = f"- **{name}** → [{domain}]  status={status}"
-                if task:
-                    line += f"  task: {task}"
-                lines.append(line)
-        else:
-            lines.append("All 14 agents at IDLE / general assignment.")
-
-        imbalanced = [ax for ax, v in yin_yang.items() if v != 3]
-        if imbalanced:
-            lines.append("\n**Yin-Yang flags:** " + ", ".join(
-                f"{ax}={'Yang+' if yin_yang[ax]>3 else 'Yin+'}{abs(yin_yang[ax]-3)}"
-                for ax in imbalanced
-            ))
-
-        checkpoint = state.get("last_checkpoint", "checkpoint-120")
-        loss       = state.get("last_loss", 10.785)
-        lines.append(f"\n**Active LoRA:** {checkpoint}  (loss: {loss:.3f})")
-        lines.append("---")
-
-        return "\n".join(lines)
-    except Exception:
-        return ""
 
 
 def load_vault_context() -> str:
@@ -2876,7 +2783,7 @@ def _chat_inner(
     file_context, image_parts = process_uploaded_files(uploaded)
 
     # ── Build system prompt ─────────────────────────────────────────────
-    system_text = load_system_prompt() + load_nexus_context() + load_vault_context() + _load_session_ctx()
+    system_text = load_system_prompt() + load_vault_context() + _load_session_ctx()
     global _FULL_PERSONA
     _FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if _owner_active():

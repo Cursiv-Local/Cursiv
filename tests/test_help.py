@@ -24,7 +24,7 @@ def test_remember_is_described_as_saving(monkeypatch):
 def test_builder_topic_listed_only_for_the_owner(monkeypatch):
     assert "help builder" not in _help("help more", monkeypatch, builder=False)
     assert "help builder" in _help("help more", monkeypatch, builder=True)
-    assert "substrate" in _help("help builder", monkeypatch)    # still opens if typed
+    assert "evolve" in _help("help builder", monkeypatch)       # still opens if typed
 
 
 def test_help_me_is_still_chat(monkeypatch):
@@ -38,3 +38,18 @@ def test_tier_1_is_offline_mode(tmp_path, monkeypatch):
     cfg = cc._default_cfg()
     assert "Offline mode ON" in cc.handle_command("tier 1", cfg, []).text
     assert netgate.is_offline()
+
+
+def test_removed_commands_say_so_and_longer_text_is_chat(monkeypatch):
+    assert "was removed" in _help("governor on", monkeypatch)
+    assert "was removed" in _help("funforge", monkeypatch)
+    assert _help("grow tomatoes in clay soil", monkeypatch) is None
+    assert _help("notes from the meeting", monkeypatch) is None
+
+
+def test_persona_is_plain():
+    from pathlib import Path
+    text = Path(__file__).resolve().parent.parent.joinpath(
+        "cursiv_v215", "codex", "system_prompt.md").read_text(encoding="utf-8").lower()
+    for word in ("evocore", "sovereign", "yin", "meta", "nexus", "soul", "drift", "33π", "decal"):
+        assert word not in text, word

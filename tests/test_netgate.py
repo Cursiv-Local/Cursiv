@@ -124,7 +124,6 @@ def test_offline_on_persists_to_config(fresh):
     netgate._cache["mtime"] = None              # a restart re-reads the file
     assert netgate.allowed() is False
     assert cc._default_cfg()["offline_mode"] is True
-    assert cc._default_cfg()["trust_tier"] == 1
     assert "Offline mode:  ON" in cc.handle_command("status", cc._default_cfg(), []).text
     assert "Web search skipped" in cc.handle_command("search: weather", cfg, []).text
     cc.handle_command("offline off", cfg, [])

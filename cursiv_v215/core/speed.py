@@ -114,13 +114,13 @@ def ollama_env() -> dict:
 
 # ── Compact prompt ──────────────────────────────────────────────────────────
 
-_CORE_SECTIONS = ("SECTION 1 ", "SECTION 2 ", "SECTION 10 ")
+_CORE_SECTIONS = ("Rules that always apply", "How to talk")
 _compact_cache: tuple[float, str] | None = None
 
 
 def compact_persona(prompt_file: Path) -> str:
-    """Cursiv's core identity: owner, constitution, tone (~3k chars), read from the
-    real persona file so it never drifts from it."""
+    """Cursiv's rules and tone (~3k chars), read from the real persona file so it
+    never drifts from it."""
     global _compact_cache
     try:
         mtime = prompt_file.stat().st_mtime

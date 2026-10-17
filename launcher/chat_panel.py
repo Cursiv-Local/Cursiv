@@ -312,7 +312,7 @@ class ChatPanel(QWidget):
         lay.setSpacing(10)
 
         header_row = QHBoxLayout()
-        header = QLabel("⬡  Cursiv")
+        header = QLabel("Cursiv")
         header.setStyleSheet(
             f'color: {GOLD}; font-size: 15px; font-weight: 700;'
             f' font-family: "Segoe UI", "Segoe UI Historic";'
@@ -835,10 +835,6 @@ class ChatPanel(QWidget):
             self._open_legacy_vault()
             return True
 
-        if cmd.startswith("blast login") or cmd.startswith("blast register"):
-            self._open_blast_auth(is_register=cmd.startswith("blast register"))
-            return True
-
         if cmd.startswith("babel i am ") or cmd.startswith("babel: i am "):
             # Family letter activation ("babel I am [Name] born [Date][, PIN]")
             # existed in the terminal CLI but was never ported to the GUI --
@@ -980,39 +976,6 @@ class ChatPanel(QWidget):
         from training_data_dialog import TrainingDataDialog
         dlg = TrainingDataDialog(self._cfg, self)
         dlg.exec()
-
-    def _open_blast_auth(self, is_register: bool) -> None:
-        username, ok = QInputDialog.getText(self, "Cursiv Board", "Username:")
-        if not ok or not username.strip():
-            return
-        password, ok = QInputDialog.getText(
-            self, "Cursiv Board", "Password:", QLineEdit.EchoMode.Password
-        )
-        if not ok or not password:
-            return
-        if is_register:
-            confirm, ok = QInputDialog.getText(
-                self, "Cursiv Board", "Confirm password:", QLineEdit.EchoMode.Password
-            )
-            if not ok:
-                return
-            if confirm != password:
-                QMessageBox.warning(self, "Cursiv Board", "Passwords do not match.")
-                return
-
-        self._append_user(f"blast {'register' if is_register else 'login'} {username.strip()}")
-        self._begin_turn()
-        threading.Thread(
-            target=self._run_blast_auth, args=(is_register, username.strip(), password), daemon=True,
-        ).start()
-
-    def _run_blast_auth(self, is_register: bool, username: str, password: str) -> None:
-        try:
-            result = cc.blast_register(username, password) if is_register else cc.blast_login(username, password)
-            self._signals.chunk.emit(result.text)
-            self._signals.done.emit()
-        except Exception as e:
-            self._signals.error.emit(str(e))
 
     # ── Voice ─────────────────────────────────────────────────────────────
 

@@ -1,34 +1,13 @@
 """
-Cursiv — chat panel command router.
+Text commands for the chat window ("help", "offline on", "remember ...").
 
-The terminal CLI (cursiv_v215/ui/chat_cli.py) has ~40 built-in commands
-(key management, council deliberation, Babel translation, strand memory,
-Codex/Hermes agents, blast-to-board, Obsidian sync, substrate, etc.) all
-built directly against terminal I/O -- print() with ANSI codes, input()
-for prompts. This module ports the ROUTING + the calls to the same
-underlying functions (babel_agent, codex_agent, async_council, strand
-store, postal, etc.) to a UI-agnostic form the GUI chat panel can render,
-without touching or duplicating the terminal CLI itself.
+handle_command() returns a TextResult or StreamResult for a built-in command,
+or None for normal chat. It calls the same functions the terminal CLI
+(cursiv_v215/ui/chat_cli.py) uses, without terminal I/O.
 
-Not handled here at all (need a real dialog or widget, not a text command --
-these are intercepted directly in chat_panel.py's _try_dialog_command /
-_send instead of ever reaching this module):
-  - voice / listen / paste  -- mic control + clipboard-image widgets
-  - write to / legacy       -- multi-line compose + PIN-entry dialogs
-  - clear                   -- wipes the transcript widget + in-memory
-                                history, neither of which this UI-agnostic
-                                module has a handle to
-
-Everything else the terminal CLI has -- key/openai/anthropic, files,
-workspace, mode, tier, offline, governor, status, help, codex, hermes,
-council/full/deliberate, anchor this, strands/remember/strand export/
-strand import, grow, ref, search, pull, rate, funforge (start/done/
-extend), babel, blast, substrate, obsidian, letters/open letter/council
-letter, postal *, legacy import, image, queue, grok/claude direct retry,
-overseer, "hey <provider>" routing -- is handled here, calling the exact
-same lower-level functions the CLI calls. Full parity with the terminal's
-command set as of the chat-panel-only window (v3.14-U21); "exit" is the
-one deliberate omission, since there's no terminal process to quit.
+Handled in chat_panel.py instead, because they need a window or widget:
+voice / listen / paste, write to / legacy (compose and PIN dialogs), and
+clear (the transcript widget).
 """
 from __future__ import annotations
 
@@ -136,23 +115,6 @@ except Exception:
     def _strand_territories(): return {}
 
 try:
-    from cursiv_v215.web.board_client import (
-        board_login as _board_login,
-        board_register as _board_register,
-        board_logout as _board_logout,
-        board_whoami as _board_whoami,
-        board_blast as _board_blast,
-    )
-    _BOARD_OK = True
-except Exception:
-    _BOARD_OK = False
-    def _board_login(u, p): return (False, "board client unavailable")
-    def _board_register(u, p): return (False, "board client unavailable")
-    def _board_logout(): pass
-    def _board_whoami(): return None
-    def _board_blast(t, s): return (False, "board client unavailable")
-
-try:
     from cursiv_v215.obsidian.exporter import (
         load_config as _obs_load_config,
         save_config as _obs_save_config,
@@ -164,13 +126,6 @@ except Exception:
     def _obs_load_config(): return {"enabled": False, "vault_path": ""}
     def _obs_save_config(e, p): pass
     def _obs_export(vp, d=None): return (False, "Obsidian module unavailable.")
-
-try:
-    from cursiv_v215.substrate.activator import get_activator as _get_activator
-    _SUBSTRATE_OK = True
-except Exception:
-    _SUBSTRATE_OK = False
-    def _get_activator(): return None
 
 try:
     from cursiv_v215.memory.session_log import append_exchange as _session_append
@@ -350,6 +305,15 @@ class StreamResult:
         self.on_complete = on_complete
 
 
+# Commands removed in the plain-language cleanup (2026-10-17). Only their exact
+# old forms get a note; anything longer ("grow tomatoes") is normal chat.
+_RETIRED = {
+    "tier 2", "tier 3", "governor", "governor on", "governor off", "overseer on", "overseer off",
+    "funforge", "forge done", "forge close", "forge extend", "substrate", "substrate status",
+    "blast", "blast login", "blast register", "blast logout", "blast who", "grow system",
+}
+
+
 def _gate():
     from cursiv_v215.core import netgate
     return netgate
@@ -360,14 +324,10 @@ def _default_cfg() -> dict:
     return {
         "file_access":      False,
         "confirm_mode":     "confirm",   # same safe default as the terminal CLI -- every write needs approval until "mode" toggles it
-        "funforge_session": None,
         "workspace":        str(_CHAT_ROOT),
         "obsidian_enabled": False,
         "obsidian_path":    "",
-        "overseer_mode":    False,
-        "trust_tier":       1 if _gate().is_offline() else 3,
         "offline_mode":     _gate().is_offline(),
-        "cursiv_mode":      "personal",
         "last_user_msg":    "",
         "_last_council_synthesis": "",
         "_last_council_query":     "",
@@ -537,7 +497,7 @@ def _codex_command(prompt: str, cfg: dict, history: list[dict]):
                 pass
         threading.Thread(target=learn, daemon=True).start()
 
-    return StreamResult(f"⬡ Codex — {prompt[:60]}", stream(), _finish)
+    return StreamResult(f"Codex — {prompt[:60]}", stream(), _finish)
 
 
 _CODEX_HELP = """\
@@ -616,7 +576,7 @@ def _agent_command(text: str, cfg: dict, history: list[dict]):
                      {"role": "user", "content": f"Question: {question}\n\n" + "\n\n".join(views)}]
             gen, _u = _cascade_stream(synth, cfg, max_tokens=700)
             yield from gen
-        return StreamResult(f"⬡ Agent council — {len(agents[:6])} agents", stream(), None)
+        return StreamResult(f"Agent council — {len(agents[:6])} agents", stream(), None)
 
     m = _re.match(r"(?is)^(?:@|agent\s+(?:ask\s+)?@?)([\w-]+)[\s,:]+(.+)$", t)
     if m:
@@ -628,7 +588,7 @@ def _agent_command(text: str, cfg: dict, history: list[dict]):
         q = m.group(2).strip()
         gen, _u = _cascade_stream(custom.messages_for(a, q, history, _memory(q)), cfg, max_tokens=3000)
         custom.note_use(a)
-        return StreamResult(f"⬡ @{a['name']}", gen, None)
+        return StreamResult(f"@{a['name']}", gen, None)
     if t.startswith("@"):
         return None            # a lone "@something" -- let normal chat handle it
     return TextResult(custom.listing())
@@ -638,7 +598,7 @@ Just talk to me. Most things don't need a command.
 
   remember <something>        I'll keep it in mind
   what do you remember        see what I know (forget <words> to remove)
-  babel <text> into <lang>    translate (Spanish, French, Korean, ...)
+  translate <text> into <lang>   Spanish, French, Korean, ...
   search: <question>          look it up online, only when you ask
   write to <name>             a private sealed letter for family
   mic button / voice          talk instead of typing
@@ -656,8 +616,8 @@ _HELP_TOPICS = {
   what do you remember        list what I know, with when and how I learned it
   forget <words>              remove a saved fact
   memory learn on / off       learn from our chats on my own (on by default)
-  anchor this                 save the last answer as a note
-  strands search <words>      search saved notes
+  save this                   save the last answer as a note
+  notes / notes search <words>   your saved notes
   clear                       clear this conversation from the screen"""),
     "family": ("Family", """\
   write to <name>             write a sealed letter (opens a window)
@@ -666,8 +626,7 @@ _HELP_TOPICS = {
   legacy                      open the family Legacy Vault
   legacy import <file>        add a .legacypack file to the vault"""),
     "translate": ("Translate and voice", """\
-  babel <text>                any language into English
-  babel <text> into <lang>    English into one or more languages
+  translate <text> into <lang>   e.g. into English, or into Spanish and French
   voice / voice <seconds>     record, turn speech into text, then send
   voice raw / listen          speech to text only, no clean-up
   paste                       look at a picture from the clipboard
@@ -704,13 +663,9 @@ _HELP_TOPICS = {
   agent council <question>    ask all your agents, then combine their views
   council <question>          ask every AI at once and combine the answers
   /full <question>            council without the summary step
-  substrate / substrate status / substrate weave <query>
-  blast register / login / logout / who / blast
   postal setup <name> / my key / add user <n> <k> / contacts / rotate
-  funforge <topic> / spike <topic> / forge extend / forge done
-  overseer on / off           Claude reviews every Grok answer
-  governor on / off           formal, rule-bound answers
-  strands / strand export / strand import <file>
+  note export / note import <file>
+  ref <question>              answer from the local reference data
   queue list / queue add <task>
   obsidian on / off / path / export / status"""),
 }
@@ -756,6 +711,18 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         return None
     cmd = text.lower()
 
+    # Plain names for older commands. The old names still work.
+    if cmd in ("save this", "notes", "note export") or cmd.startswith(("save this ", "notes search ", "note import ")):
+        for _new, _old in (("save this", "anchor this"), ("notes", "strands"),
+                           ("note export", "strand export"), ("note import", "strand import")):
+            if cmd.startswith(_new):
+                text = _old + text[len(_new):]
+                break
+        cmd = text.lower()
+    elif cmd.startswith("translate ") and " into " in cmd and "json" not in cmd:
+        text = "babel " + text[len("translate "):]
+        cmd = text.lower()
+
     # "help" / "help more" / "help family" -- but "help me write a letter" is chat.
     _topic = cmd[5:].strip() if cmd.startswith("help ") else None
     if cmd in ("help", "help?", "commands") or (_topic and (_topic in _HELP_TOPICS or _topic in ("more", "all", "topics"))):
@@ -777,8 +744,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                     break
         ok, msg, entry = text_to_training_entry(notes, cfg)
         if ok and entry:
-            return TextResult(f"⬡ {msg}\n\n```json\n{json.dumps(entry, indent=2)}\n```")
-        return TextResult(f"⬡ {msg}")
+            return TextResult(f"{msg}\n\n```json\n{json.dumps(entry, indent=2)}\n```")
+        return TextResult(f"{msg}")
 
     # ── Simple state toggles ────────────────────────────────────────────
     if cmd == "status":
@@ -787,23 +754,18 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             f"OpenAI key:    {'set' if cfg.get('openai_key') else 'not set'}",
             f"Anthropic key: {'set' if cfg.get('anthropic_key') else 'not set'}",
             f"File access:   {'ON' if cfg.get('file_access') else 'OFF'}",
-            f"Trust tier:    {cfg.get('trust_tier', 3)}",
             f"Offline mode:  {'ON' if _gate().is_offline() else 'OFF'}",
             f"Web search:    {'automatic' if _gate().setting('web_search_auto') else 'only search:'}",
             f"Update check:  {'automatic' if _gate().setting('update_check_auto') else 'manual'}",
-            f"Cursiv mode:   {cfg.get('cursiv_mode', 'personal')}",
-            f"Overseer:      {'ON' if cfg.get('overseer_mode') else 'OFF'}",
             f"Workspace:     {cfg.get('workspace', '')}",
         ]
         return TextResult("\n".join(lines))
 
+    if cmd in _RETIRED:
+        return TextResult(f"'{text}' was removed in this version. Type help to see what Cursiv can do.")
+
     if cmd == "tier 1":
         cmd = "offline on"           # tier 1 meant "local only": the same as offline mode
-    if cmd in ("tier 2", "tier 3"):
-        cfg["trust_tier"] = int(cmd[-1])
-        labels = {1: "SOVEREIGN OFFLINE (Ollama only)", 2: "LOCAL + LIMITED", 3: "FULL COUNCIL"}
-        return TextResult(f"Trust tier → {cfg['trust_tier']} — {labels[cfg['trust_tier']]}")
-
     if cmd in ("offline on", "offline off"):
         from cursiv_v215.core import netgate
         try:
@@ -812,11 +774,9 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult(f"Couldn't save offline mode ({exc}). Nothing was changed.")
         cfg["offline_mode"] = netgate.is_offline()
         if cfg["offline_mode"]:
-            cfg["trust_tier"] = 1
             return TextResult("Offline mode ON — Cursiv won't connect to anything outside this computer "
                               "(cloud AI, web search, update checks, model downloads). Your local model still works. "
                               "This stays on after a restart; type 'offline off' to undo.")
-        cfg["trust_tier"] = 3
         return TextResult("Offline mode OFF — keys you've added, Cursiv Cloud and 'search:' can reach the internet again. "
                           "Automatic web search and update checks stay as set ('websearch on', 'autoupdate on').")
 
@@ -841,17 +801,6 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
              if on else "Automatic update check OFF — use \"Check for Updates\" when you want to.")
             + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
 
-    if cmd in ("governor on", "governor off", "governor"):
-        if cmd == "governor off":
-            cfg["cursiv_mode"] = "personal"
-            return TextResult("Governor mode OFF → Personal mode.")
-        cfg["cursiv_mode"] = "governor"
-        return TextResult(
-            "GOVERNOR MODE ENGAGED — constitutional enforcement elevated. "
-            "Responses will be formal and constitutionally grounded. "
-            "Type 'governor off' to return to personal mode."
-        )
-
     if cmd in ("files on", "files off"):
         cfg["file_access"] = cmd == "files on"
         return TextResult(f"File access → {'ON' if cfg['file_access'] else 'OFF'}")
@@ -859,17 +808,6 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     if cmd == "mode":
         cfg["confirm_mode"] = "confirm" if cfg.get("confirm_mode") == "auto" else "auto"
         return TextResult(f"Write mode → {cfg['confirm_mode'].upper()}")
-
-    if cmd in ("overseer on", "overseer off"):
-        if cmd == "overseer on":
-            if not cfg.get("anthropic_key"):
-                return TextResult("Overseer needs an Anthropic key for Claude. Type: anthropic sk-ant-xxxxx")
-            if not (cfg.get("api_key") or cfg.get("openai_key")):
-                return TextResult("Overseer needs a Grok/OpenAI key as the primary model. Type: key xai-xxxxx")
-            cfg["overseer_mode"] = True
-            return TextResult("Overseer mode → ON. Grok generates, Claude reviews every response.")
-        cfg["overseer_mode"] = False
-        return TextResult("Overseer mode → OFF. Normal routing restored.")
 
     if cmd.startswith("workspace"):
         new_ws = text[9:].strip()
@@ -997,7 +935,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         def _gen(msgs):
             g, _u = _cascade_stream(msgs, cfg, max_tokens=4000, local_fn=_lf)
             return g
-        return StreamResult(f"⬡ Forge — {_idea[:60]}", _forge.evolve(_idea, _gen), None)
+        return StreamResult(f"Forge — {_idea[:60]}", _forge.evolve(_idea, _gen), None)
     if cmd in ("projects", "topics", "my projects") or __import__("re").match(r"(?i)^project (show|forget|delete) ", text.strip()):
         from cursiv_v215.memory import projects as _projmem
         from cursiv_v215.memory import semantic as _sem
@@ -1114,14 +1052,14 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                     _strand_save(question, saved, tags=["council", "async"], score=0.80,
                                  territory_tag="worldmodel", source="async_council", model="council_synthesis")
 
-            return StreamResult(f"⬡ Council deliberating — {question[:60]}", _run(), _finish)
+            return StreamResult(f"Council deliberating — {question[:60]}", _run(), _finish)
         if not (cfg.get("api_key") or cfg.get("openai_key") or cfg.get("anthropic_key")):
             return TextResult("Council requires at least one API key.")
         def _finish2(full: str):
             cfg["_last_council_synthesis"] = full
             _session_append(question, full, "group_discovery")
         return StreamResult(
-            f"⬡ Group discovery — {question[:60]}",
+            f"Group discovery — {question[:60]}",
             _call_provider_council(question, cfg.get("api_key", ""), cfg.get("openai_key", ""), cfg.get("anthropic_key", "")),
             _finish2,
         )
@@ -1129,7 +1067,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     # ── Strand memory ────────────────────────────────────────────────────
     if cmd == "anchor this" or cmd.startswith("anchor this "):
         if not _STRAND_OK:
-            return TextResult("Strand store unavailable.")
+            return TextResult("Saved notes aren't available.")
         parts = cmd.split()
         territory = parts[2] if len(parts) >= 3 else "general"
         if territory != "general" and territory not in _strand_territories():
@@ -1142,38 +1080,38 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Nothing to anchor yet — send a message first.")
         sid = _strand_save(last_user, last_ai, tags=["anchor"], score=0.85,
                             territory_tag=territory, source="anchor", model="gui")
-        return TextResult(f"⬡ Anchored → Strand {sid}" + (f"  [{territory}]" if territory != "general" else ""))
+        return TextResult(f"Saved as note {sid}" + (f"  [{territory}]" if territory != "general" else ""))
 
     if cmd == "strands" or cmd.startswith("strands "):
         if not _STRAND_OK:
-            return TextResult("Strand store unavailable.")
+            return TextResult("Saved notes aren't available.")
         sub = text[8:].strip() if cmd.startswith("strands ") else ""
         if sub.startswith("search "):
             q = sub[7:].strip()
             if not q:
-                return TextResult("Usage: strands search <query>")
-            return TextResult(f"⬡ Strand search — {q}\n\n" + (_strand_fmt(_strand_search(q)) or "No matches."))
+                return TextResult("Usage: notes search <words>")
+            return TextResult(f"Notes search — {q}\n\n" + (_strand_fmt(_strand_search(q)) or "No matches."))
         if sub and sub in _strand_territories():
             results = _strand_list(territory=sub, limit=20)
-            return TextResult(f"⬡ Strands [{sub}] ({len(results)} found)\n\n" + (_strand_fmt(results) or "None yet."))
+            return TextResult(f"Notes [{sub}] ({len(results)} found)\n\n" + (_strand_fmt(results) or "None yet."))
         total = _strand_count()
         counts = _strand_terr_counts()
         recent = _strand_list(limit=8)
         counts_line = "  ".join(f"{t}:{n}" for t, n in counts.items()) if counts else "none yet"
-        out = f"⬡ Strand Archive — {total} total\n{counts_line}"
+        out = f"Saved notes — {total}\n{counts_line}"
         if recent:
             out += "\n\n" + _strand_fmt(recent)
         return TextResult(out)
 
     if cmd.startswith("strand export") or cmd == "strand export":
         if not (_STRAND_OK and _SFED_OK):
-            return TextResult("Strand federation unavailable.")
+            return TextResult("Note export isn't available.")
         parts = cmd.split()
         territory = parts[2] if len(parts) >= 3 else None
         all_s = _strand_list(territory=territory, limit=5000)
         if not all_s:
             t_label = f" in '{territory}'" if territory else ""
-            return TextResult(f"No strands{t_label} to export.")
+            return TextResult(f"No notes{t_label} to export.")
         terr_defs = _strand_territories()
         label = f"cursiv-{territory or 'all'}"
         pack_text = _sfed_export(all_s, terr_defs, label=label)
@@ -1182,16 +1120,16 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             out_path.write_text(pack_text, encoding="utf-8")
         except Exception as e:
             return TextResult(f"Export failed: {e}")
-        t_label = territory or "all territories"
+        t_label = territory or "all topics"
         return TextResult(
-            f"⬡ Strand Pack Exported\nFile    :  {out_path.name}\n"
-            f"Strands :  {len(all_s)}\nScope   :  {t_label}\n\n"
-            f"Transfer via USB / LAN. Import with:  strand import {out_path.name}"
+            f"Notes exported\nFile    :  {out_path.name}\n"
+            f"Notes   :  {len(all_s)}\nScope   :  {t_label}\n\n"
+            f"Transfer via USB / LAN. Import with:  note import {out_path.name}"
         )
 
     if cmd.startswith("strand import "):
         if not (_STRAND_OK and _SFED_OK):
-            return TextResult("Strand federation unavailable.")
+            return TextResult("Note export isn't available.")
         pack_path = Path(text[14:].strip().strip('"').strip("'"))
         if not pack_path.is_absolute() and not pack_path.exists():
             # "strand export" always writes into _CHAT_ROOT and tells the
@@ -1230,7 +1168,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         note = ""
         if not meta.get("same_machine"):
             note = "\n(Cross-machine pack — signature does not match this instance; expected for transfers between machines.)"
-        return TextResult(f"⬡ Strand Pack Import\n{_sfed_summary(in_strands, meta)}\n\nImported {imported}/{len(in_strands)} strands.{note}")
+        return TextResult(f"Notes import\n{_sfed_summary(in_strands, meta)}\n\nImported {imported}/{len(in_strands)} notes.{note}")
 
     if cmd == "queue" or cmd.startswith("queue "):
         if not _QUEUE_OK:
@@ -1248,14 +1186,14 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
 
     if cmd.startswith("remember ") or cmd == "remember":
         if not _STRAND_OK:
-            return TextResult("Strand store unavailable.")
+            return TextResult("Saved notes aren't available.")
         q = text[9:].strip()
         if not q:
             return TextResult("Type remember <something> to save it, or what do you remember to see what I know.")
         results = _strand_search(q, top_k=5, min_score=0.08)
         if not results:
-            return TextResult("No matching strands found. Anchor exchanges with: anchor this")
-        return TextResult(f"⬡ Local memory — {q}\n\n" + _strand_fmt(results))
+            return TextResult("No matching notes. Save an answer with: save this")
+        return TextResult(f"Local memory — {q}\n\n" + _strand_fmt(results))
 
     if cmd.startswith("rate"):
         parts = cmd.split()
@@ -1273,45 +1211,6 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not history:
             return TextResult("No exchange to rate yet.")
         return TextResult(f"Rated {'★' * score}{'☆' * (5 - score)}  ({score}/5)")
-
-    # ── Grow (self-referential code evolution) ─────────────────────────
-    if cmd == "grow" or cmd.startswith("grow "):
-        sub = text[5:].strip()
-        if not sub:
-            return TextResult("Usage: grow <filepath>  ·  grow system")
-        if sub.lower() == "system":
-            gen, label = _cascade_gen(cfg, [
-                {"role": "system", "content": (
-                    "You are a systems architect reviewing the Cursiv AI OS. "
-                    "Identify the single most valuable capability that is clearly "
-                    "missing or half-built and write a Python module stub for it "
-                    "(filename, docstring, key functions with signatures). No filler."
-                )},
-                {"role": "user", "content": "Suggest the next capability for this system."},
-            ], max_tokens=1200)
-            def _finish(full):
-                if _STRAND_OK and full:
-                    _strand_save("grow system", full, tags=["grow", "system"], score=0.80,
-                                 territory_tag="architecture", source="grow", model=label)
-            return StreamResult(f"⬡ Grow — system level", gen, _finish)
-        gpath = Path(sub)
-        if not gpath.is_absolute():
-            gpath = Path(cfg.get("workspace", str(_CHAT_ROOT))) / sub
-        if not gpath.exists():
-            return TextResult(f"File not found: {sub}")
-        try:
-            code = gpath.read_text(encoding="utf-8", errors="replace")
-        except Exception as e:
-            return TextResult(f"Read error: {e}")
-        gen, label = _cascade_gen(cfg, [
-            {"role": "system", "content": (
-                "You are a code evolution engine. Study this file's style and "
-                "patterns, then write the next logical addition -- same voice, "
-                "same conventions. Output only the new code, no explanation."
-            )},
-            {"role": "user", "content": code},
-        ], max_tokens=1200)
-        return StreamResult(f"⬡ Grow — {sub}", gen)
 
     # ── Babel translation ────────────────────────────────────────────────
     if _BABEL_OK and (cmd == "babel" or (cmd.startswith("babel") and len(cmd) > 5 and cmd[5] in (" ", ":"))):
@@ -1332,12 +1231,12 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                     )},
                     {"role": "user", "content": f"Text to translate:\n{src}\n\nTranslate into: {', '.join(targets)}"},
                 ], max_tokens=800)
-                return StreamResult(f"⬡ Babel — English → {', '.join(targets)}", gen)
+                return StreamResult(f"Translate — English → {', '.join(targets)}", gen)
         gen, label = _cascade_gen(cfg, [
             {"role": "system", "content": "Translate the following text to English. Return only the translation, nothing else."},
             {"role": "user", "content": raw_input},
         ], max_tokens=1500)
-        return StreamResult(f"⬡ Babel → English", gen)
+        return StreamResult(f"Translate → English", gen)
 
     # ── Web search + synthesis ───────────────────────────────────────────
     if cmd.startswith("search:") or cmd.startswith("search "):
@@ -1388,86 +1287,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             if _STRAND_OK and full:
                 _strand_save(f"pull: {url}", full, tags=["pull", "web"], score=0.72,
                              territory_tag="worldmodel", source="pull", model=label)
-        return StreamResult(f"⬡ Page pull — {url[:70]}", gen, _finish)
-
-    # ── FunForge ─────────────────────────────────────────────────────────
-    if cmd in ("forge done", "forge close"):
-        ff = cfg.get("funforge_session")
-        if not ff:
-            return TextResult("No active FunForge session.")
-        gen = _chat(
-            "Let's close this creative spike. Synthesize what we made into a final artifact.",
-            history, cfg.get("api_key", ""), None, False, cfg.get("workspace", str(_CHAT_ROOT)),
-            cfg.get("openai_key", ""), False, cfg.get("anthropic_key", ""),
-        )
-        cfg["funforge_session"] = None
-        return StreamResult("⬡ FunForge closing — producing artifact", gen)
-
-    if cmd.startswith("funforge") or cmd.startswith("spike "):
-        topic = text[len("funforge"):].strip() if cmd.startswith("funforge") else text[6:].strip()
-        topic = topic or "open-ended creative spike"
-        cfg["funforge_session"] = {"topic": topic, "started": datetime.now()}
-        gen = _chat(
-            f"[FUNFORGE] Playful 45-minute creative spike. Topic: {topic}. "
-            "Respond playfully and start the creative spike.",
-            history, cfg.get("api_key", ""), None, False, cfg.get("workspace", str(_CHAT_ROOT)),
-            cfg.get("openai_key", ""), False, cfg.get("anthropic_key", ""),
-        )
-        return StreamResult(f"⬡ FunForge active — {topic}  (type 'forge done' when finished)", gen)
-
-    # ── Blast (public board) ────────────────────────────────────────────
-    if cmd == "blast" or cmd.startswith("blast "):
-        if not _BOARD_OK:
-            return TextResult("Board client unavailable.")
-        sub = text[6:].strip() if cmd.startswith("blast ") else ""
-        if sub == "who":
-            who = _board_whoami()
-            return TextResult(f"Board: logged in as {who}" if who else "Not logged in. Use: blast login <username>")
-        if sub == "logout":
-            _board_logout()
-            return TextResult("Board session cleared.")
-        if sub.startswith(("login ", "register ")):
-            return TextResult(
-                "Signing in to the public board isn't available in the desktop "
-                "app yet — it needs a password window that hasn't been built."
-            )
-        synth = cfg.get("_last_council_synthesis", "")
-        if not synth:
-            return TextResult("No council synthesis yet — run a council deliberation first, then blast.")
-        who = _board_whoami()
-        if not who:
-            return TextResult("Not logged in to the board. Use the terminal to log in first.")
-        ok, msg = _board_blast(synth, source="council")
-        return TextResult(f"✓ Blasted. Post ID: {msg}" if ok else f"✗ {msg}")
-
-    # ── Substrate ────────────────────────────────────────────────────────
-    if cmd == "substrate" or cmd.startswith("substrate "):
-        if not _SUBSTRATE_OK:
-            return TextResult("Substrate module unavailable.")
-        act = _get_activator()
-        sub = text[10:].strip() if cmd.startswith("substrate ") else ""
-        if sub == "status":
-            st = act.status()
-            ly = st["layer"]
-            return TextResult(
-                f"⬡ Substrate — RUW layer\nNodes: {ly['nodes']}  Edges: {ly['edges']}  "
-                f"Activations: {st['activations']}\nAddress: {ly['address']}"
-            )
-        if sub.startswith("weave "):
-            q = sub[6:].strip()
-            hits = act.weave(q, top_k=5) if q else []
-            if not hits:
-                return TextResult("No nodes in layer yet. Run a council deliberation first.")
-            return TextResult("⬡ Substrate weave — resonant nodes\n" + "\n".join(f"{score:.3f}  {nid}" for nid, score in hits))
-        synth = cfg.get("_last_council_synthesis", "")
-        query = cfg.get("_last_council_query", "")
-        if not synth:
-            return TextResult("No council synthesis yet. Run a council deliberation first.")
-        result = act.activate(synth, query=query, session_id="gui")
-        return TextResult(
-            f"⬡ Substrate activated\nRUW address: {result['ruw_address']}\n"
-            f"Resonance: {result['resonance']:.4f}  Nodes: {result['layer_state']['nodes']}"
-        )
+        return StreamResult(f"Page pull — {url[:70]}", gen, _finish)
 
     # ── Obsidian ─────────────────────────────────────────────────────────
     if cmd in ("obsidian on", "obsidian off"):
@@ -1543,8 +1363,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         else:
             llist, heading = _postal_all(), "ALL SEALED LETTERS"
         if not llist:
-            return TextResult(f"⬡ {heading}\n\nNo sealed letters found.")
-        lines = [f"⬡ {heading}"]
+            return TextResult(f"{heading}\n\nNo sealed letters found.")
+        lines = [f"{heading}"]
         for e in llist:
             badge = "read" if e.get("read") else "unread"
             hint = f"  ({e['hint']})" if e.get("hint") else ""
@@ -1596,7 +1416,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Export failed — letter not found or cannot decrypt.")
         pack_path, passphrase = result
         return TextResult(
-            f"⬡ Sealpack exported\nfile: {pack_path}\npassphrase: {passphrase}\n\n"
+            f"Sealpack exported\nfile: {pack_path}\npassphrase: {passphrase}\n\n"
             "Share this passphrase with the recipient out-of-band. It is shown once and never stored."
         )
 
@@ -1613,7 +1433,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         new_id = _postal_import(pack_file.strip('"').strip("'"), passphrase)
         if new_id is None:
             return TextResult("Import failed — wrong passphrase or corrupted pack.")
-        return TextResult(f"⬡ Sealed locally as: {new_id}")
+        return TextResult(f"Sealed locally as: {new_id}")
 
     if cmd == "postal user" or cmd.startswith("postal user "):
         new_user = text[12:].strip().lower() if cmd.startswith("postal user ") else ""
@@ -1634,7 +1454,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult(f"Setup failed: {e}")
         cfg["postal_user"] = meta.get("name", name).lower()
         return TextResult(
-            f"⬡ Identity created\nName: {meta.get('name', name)}\nKey ID: {meta.get('key_id', '?')[:8]}\n"
+            f"Identity created\nName: {meta.get('name', name)}\nKey ID: {meta.get('key_id', '?')[:8]}\n"
             f"Public: {meta.get('pubkey', '?')}\n\n"
             f"Share this public key with anyone you want to receive letters from. "
             f"They add you with: postal add user {name} <your key>"
@@ -1647,7 +1467,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not my_id:
             return TextResult("No identity set up yet. Run: postal setup <your name>")
         return TextResult(
-            f"⬡ Your Cursiv identity\nName: {my_id.get('name', '?')}\n"
+            f"Your Cursiv identity\nName: {my_id.get('name', '?')}\n"
             f"Key ID: {my_id.get('key_id', '?')[:8]}\nPublic: {my_id.get('pubkey', '?')}"
         )
 
@@ -1661,7 +1481,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             entry = _postal_add_contact(parts[0], parts[1])
         except ValueError as e:
             return TextResult(f"Invalid public key: {e}")
-        return TextResult(f"⬡ Contact added: {parts[0]}  (key-id: {entry.get('key_id', '?')[:8]})")
+        return TextResult(f"Contact added: {parts[0]}  (key-id: {entry.get('key_id', '?')[:8]})")
 
     if cmd.startswith("postal remove user "):
         if not _POSTAL_OK:
@@ -1687,7 +1507,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             if compromised else ""
         )
         return TextResult(
-            f"⬡ Key rotation\nOld key ID: {rot.get('old_key_id', '?')[:8]} (archived locally)\n"
+            f"Key rotation\nOld key ID: {rot.get('old_key_id', '?')[:8]} (archived locally)\n"
             f"New key ID: {rot.get('new_key_id', '?')[:8]}\nNew public: {rot.get('new_pubkey', '?')}\n\n"
             f"Update your contacts: postal add user <your name> <new key>{note}"
         )
@@ -1697,8 +1517,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Postal module unavailable.")
         hist = _postal_key_history()
         if not hist:
-            return TextResult("⬡ Key history\n\nNo retired keys.")
-        lines = ["⬡ Key history"]
+            return TextResult("Key history\n\nNo retired keys.")
+        lines = ["Key history"]
         for hk in hist:
             flag = "  COMPROMISED — coherence degradation active" if hk.get("compromised") else ""
             lines.append(f"{hk.get('key_id', '?')[:8]}  retired:{hk.get('retired_at', '?')[:10]}  {hk.get('reason', '?')[:40]}{flag}")
@@ -1709,8 +1529,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Postal module unavailable.")
         clist = _postal_contacts()
         if not clist:
-            return TextResult("⬡ Contacts\n\nNo contacts yet. Use: postal add user <name> <pubkey>")
-        lines = [f"⬡ Contacts ({len(clist)})"]
+            return TextResult("Contacts\n\nNo contacts yet. Use: postal add user <name> <pubkey>")
+        lines = [f"Contacts ({len(clist)})"]
         for c in clist:
             lines.append(f"{c['name']:<16}  id:{c.get('key_id', '?')[:8]}  added:{c.get('added', '?')[:10]}")
         return TextResult("\n".join(lines))
@@ -1789,7 +1609,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             _strand_save(f"image: {prompt[:200]}", f"Generated: {img_path}\nRevised prompt: {revised[:300]}",
                          tags=["image", used_model], score=0.70, territory_tag="creative", source="image", model=used_model)
         note = f"\n\nThe model revised the prompt to:\n{revised[:300]}" if revised != prompt else ""
-        return TextResult(f"⬡ Image generated with {used_model}  ({img_path.name}){note}", image_path=str(img_path))
+        return TextResult(f"Image generated with {used_model}  ({img_path.name}){note}", image_path=str(img_path))
 
     return None
 
@@ -1814,24 +1634,6 @@ def hey_prefix(raw: str) -> tuple[str, str]:
         if lower.startswith(prefix):
             return fp, raw[len(prefix):].strip()
     return "", raw
-
-
-# ── Blast (board) login/register — password collected by the caller via a
-# Qt dialog, since this module stays UI-agnostic; the actual HTTP call
-# lives here so it's identical to what the terminal CLI does. ─────────────
-
-def blast_login(username: str, password: str) -> TextResult:
-    if not _BOARD_OK:
-        return TextResult("Board client unavailable.")
-    ok, msg = _board_login(username, password)
-    return TextResult(f"✓ Logged in as {msg}" if ok else f"✗ {msg}")
-
-
-def blast_register(username: str, password: str) -> TextResult:
-    if not _BOARD_OK:
-        return TextResult("Board client unavailable.")
-    ok, msg = _board_register(username, password)
-    return TextResult(f"✓ Account created. Logged in as {msg}" if ok else f"✗ {msg}")
 
 
 # ── Voice — caller (chat_panel.py) owns the mic-record UI affordance
@@ -2263,7 +2065,7 @@ def analyze_pasted_image(png_bytes: bytes, cfg: dict, width: int, height: int) -
         _strand_save(f"paste: image {img_path.stem}", body, tags=["image", "paste", "vision"],
                      score=0.72, territory_tag="worldmodel", source="paste", model=vision_provider or "none")
 
-    header = f"⬡ Image pasted — {width}×{height}px\n\n"
+    header = f"Image pasted — {width}×{height}px\n\n"
     if vision_result:
         return TextResult(f"{header}Vision analysis (via {vision_provider}):\n\n{vision_result}", image_path=str(img_path))
     return TextResult(f"{header}Image saved, no analysis. {_NO_VISION_HELP}", image_path=str(img_path))
@@ -2290,7 +2092,7 @@ def postal_compose(sender_user: str, recipient_raw: str, hint: str, content: str
         content=content, hint=hint,
     )
     return TextResult(
-        f"⬡ Sealed\nid: {lid}\nfor: {recipient_disp}\n"
+        f"Sealed\nid: {lid}\nfor: {recipient_disp}\n"
         f"signed: {'yes — Ed25519' if my_id else 'no — run postal setup first'}\n"
         f"readable: on this machine only"
     )
