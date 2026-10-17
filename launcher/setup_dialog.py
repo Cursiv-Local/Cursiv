@@ -51,15 +51,15 @@ VISION_FAMILIES = ("gemma3", "qwen2.5vl", "llama3.2-vision", "minicpm-v", "llava
 
 # (label, model tag, approximate download size)
 MODELS = [
-    ("llama3.1 — best answers, for 8 GB+ graphics cards (4.9 GB)", "llama3.1", "4.9 GB"),
-    ("qwen2.5 3B — fast on 4–6 GB graphics cards (1.9 GB)", "qwen2.5:3b", "1.9 GB"),
+    ("qwen3 8B — best answers, for 8 GB+ graphics cards (5.2 GB)", "qwen3:8b", "5.2 GB"),
+    ("qwen3 4B — good answers on 4–6 GB graphics cards (2.5 GB)", "qwen3:4b", "2.5 GB"),
     ("qwen2.5 1.5B — smallest and fastest (1 GB)", "qwen2.5:1.5b", "1 GB"),
 ]
 
 
 def recommended_index(options: list, small: bool) -> int:
     """Which entry to preselect for this PC's graphics card."""
-    want = ":3b" if small else None
+    want = ":4b" if small else None
     for i, opt in enumerate(options):
         if want and opt[1].endswith(want):
             return i

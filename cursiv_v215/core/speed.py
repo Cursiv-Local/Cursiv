@@ -88,10 +88,20 @@ def num_ctx() -> int:
 
 
 def chat_model_prefs() -> tuple[str, ...]:
-    """Preferred chat models, best first, for this GPU (only installed ones are used)."""
+    """Preferred chat models, best first, for this GPU (only installed ones are used).
+
+    Licenses (see MODELS.md): qwen3 and qwen2.5:1.5b are Apache 2.0; llama3.x and
+    gemma3 allow commercial use under their own terms. qwen2.5:3b is under Qwen's
+    research-only license, so it's last: used only if nothing else is installed."""
     if small_gpu():
-        return ("qwen2.5:3b", "llama3.2:3b", "llama3.1", "qwen2.5:1.5b")
-    return ("llama3.1", "qwen2.5:3b", "llama3.2:3b", "qwen2.5:1.5b")
+        return ("qwen3:4b", "llama3.2:3b", "qwen2.5:1.5b", "gemma3:4b", "llama3.1", "qwen2.5:3b")
+    return ("qwen3:8b", "llama3.1", "qwen3:4b", "llama3.2:3b", "gemma3:4b", "qwen2.5:1.5b", "qwen2.5:3b")
+
+
+def no_thinking(model: str) -> dict:
+    """Ollama options that turn off a thinking model's long hidden reasoning
+    (qwen3 thinks by default: slower, and the reasoning isn't for the person)."""
+    return {"think": False} if (model or "").startswith("qwen3") else {}
 
 
 def code_model_prefs() -> tuple[str, ...]:

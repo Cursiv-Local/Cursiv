@@ -1033,10 +1033,10 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
     if model is None:
         # Ollama is running but has no models at all -- download the default
         # once (progress shown in the reply) instead of failing with a 404.
-        yield from _pull_ollama_model(OLLAMA_MODEL)
+        yield from _pull_ollama_model(_speed.chat_model_prefs()[0])
         model = _resolve_ollama_model()
         if model is None:
-            yield f"\n[No local model available. Run: ollama pull {OLLAMA_MODEL}]"
+            yield f"\n[No local model available. Run: ollama pull {_speed.chat_model_prefs()[0]}]"
             return
     payload = json.dumps({
         "model": model,
@@ -1044,6 +1044,7 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
         "prompt": turns,
         "stream": True,
         "keep_alive": _speed.KEEP_ALIVE,          # stay loaded: a cold load took ~100 s
+        **_speed.no_thinking(model),
         "options": {
             "num_predict": max_tokens,
             "num_ctx": _speed.num_ctx(),
@@ -1769,6 +1770,7 @@ def _call_ollama_model(
 ) -> Generator[str, None, None]:
     """Call a specific Ollama model. If collect=True, yields one final chunk (full text)."""
     import json as _json
+    from cursiv_v215.core import speed as _speed
     # Always prepend identity override — DeepSeek especially needs it
     system_str = _IDENTITY_OVERRIDE + system_str
     payload = json.dumps({
@@ -1779,6 +1781,7 @@ def _call_ollama_model(
         # 16k context: coding prompts carry playbooks + worked examples; at 8k Ollama
         # silently dropped the start of the prompt (the instructions).
         "keep_alive": "30m",
+        **_speed.no_thinking(model),
         "options": {"num_predict": max_tokens, "num_ctx": _num_ctx()},
     }).encode()
     try:
