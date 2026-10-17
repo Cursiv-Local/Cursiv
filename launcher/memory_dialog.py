@@ -94,9 +94,7 @@ class MemoryDialog(QDialog):
             facts = [f for f in facts if q in f["text"].lower()]
         self._list.clear()
         for f in reversed(facts):
-            tag = "  · family" if f.get("person") == self._sem.SHARED else ""
-            src = "learned" if f.get("source") == "learned" else "added"
-            item = QListWidgetItem(f"{f['text']}\n{f.get('created', '')} · {src}{tag}")
+            item = QListWidgetItem(f"{f['text']}\n{self._sem.fact_subtitle(f)}")
             item.setData(Qt.ItemDataRole.UserRole, f["id"])
             self._list.addItem(item)
         self._status.setText(f"{len(facts)} memor{'y' if len(facts) == 1 else 'ies'}"

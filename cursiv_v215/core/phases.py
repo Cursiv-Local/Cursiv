@@ -122,7 +122,15 @@ def _grounding(text: str, r: PhaseResult, memory_fn) -> None:
             mem = ""
     r.memory = mem
     lines = [l for l in mem.splitlines() if l.strip().startswith("- ")]
-    r.trace.append(("Grounding", f"{len(lines)} memor{'y' if len(lines) == 1 else 'ies'} recalled" if mem else "nothing relevant in memory"))
+    note = (f"{len(lines)} memor{'y' if len(lines) == 1 else 'ies'} recalled" if mem
+            else "nothing relevant in memory")
+    try:
+        from cursiv_v215.core.verify import needs_ledger
+        if needs_ledger(text):
+            note += "; assumption ledger required"
+    except Exception:
+        pass
+    r.trace.append(("Grounding", note))
 
 
 # ── 4. Route ────────────────────────────────────────────────────────────────

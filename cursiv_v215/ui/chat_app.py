@@ -3006,6 +3006,18 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         except Exception:
             pass
 
+    # Safety rule, assumption ledger, and earlier ledgers. Appended last so the
+    # coding-brain prompt swap above does not drop them. The check itself runs
+    # in chat() once the draft is complete (core/verify.py).
+    try:
+        if not (locals().get("_ph") and getattr(_ph, "emergency", False)):
+            from cursiv_v215.core import verify as _verify
+            _vadd = _verify.prompt_addendum(user_text)
+            if _vadd:
+                messages[0]["content"] += "\n\n" + _vadd + "\n"
+    except Exception:
+        pass
+
     # Codex Agent is invoked explicitly via the `codex <prompt>` command only.
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
@@ -3320,8 +3332,16 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str],
 
 
 
-def _learn_later(message, reply: str) -> None:
-    """Save lasting facts from this exchange (memory/semantic.py), off the UI thread."""
+def _learn_later(message, reply: str, *, origin: str = "inferred", skip: bool = False) -> None:
+    """Save lasting facts from this exchange (memory/semantic.py), off the UI thread.
+
+    origin is verified only after the verification pass came back clean.
+    skip is set when that pass found problems, so the draft is not stored.
+    """
+    if skip:
+        return
+    if origin not in ("inferred", "verified"):
+        origin = "inferred"
     text = message.get("text", "") if isinstance(message, dict) else str(message or "")
     # drop Cursiv's own status lines ("*[Answered by …]*", routing notes) before judging the reply
     reply = _strip_status_lines(reply or "")
@@ -3332,7 +3352,7 @@ def _learn_later(message, reply: str) -> None:
         try:
             from cursiv_v215.memory import semantic as _sem
             if len(text.strip()) >= 20:
-                _sem.learn_from_exchange(text, reply, _quick_llm)
+                _sem.learn_from_exchange(text, reply, _quick_llm, origin=origin)
             try:              # project memory: running summary of ongoing projects
                 from cursiv_v215.memory import projects as _proj
                 _proj.learn(text, reply, _quick_llm, _sem.current_person())
@@ -3395,21 +3415,43 @@ def chat(
     anthropic_key: str = "",
     force_provider: str = "",   
 ) -> Generator[str, None, None]:
-    """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed);
-    afterwards, lasting facts from the exchange are learned in the background."""
+    """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
+
+    After the draft has streamed, one verification pass may append a revision
+    or the problems it could not clear. Lasting facts are then learned in the
+    background. Casual turns skip the pass.
+    """
     global _PHASE_AFTER
     _PHASE_AFTER = ""                # set by the phases for this message only
     reply: list[str] = []
     from cursiv_v215.core import speed as _speed
     _speed.chat_started()
+    origin, skip = "inferred", False
     try:
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply)
+        if _PHASE_AFTER:             # Route / Recovery notes from the phases
+            reply.append(_PHASE_AFTER)
+            yield _PHASE_AFTER
+        # Still inside this turn, so the check uses the fast router (no idle wait)
+        # and background learning cannot take the local model yet.
+        try:
+            from cursiv_v215.core import verify as _verify
+            user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
+            outcome = _verify.run_pass(
+                user_text, "".join(reply),
+                ask=lambda msgs: _router_llm(msgs, max_tokens=500),
+                memory_update=_verify.looks_like_memory_update(user_text),
+            )
+            origin, skip = outcome.learn_origin, outcome.skip_learn
+            if outcome.append:
+                reply.append(outcome.append)
+                yield outcome.append
+        except Exception:
+            pass
     finally:
         _speed.chat_finished()
-    if _PHASE_AFTER:                 # Route / Recovery notes from the phases
-        yield _PHASE_AFTER
-    _learn_later(message, "".join(reply))
+    _learn_later(message, "".join(reply), origin=origin, skip=skip)
 
 
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
@@ -3438,17 +3480,17 @@ def _friendly(sk, gen):
         yield chunk
 
 
-def _router_llm(messages: list[dict]) -> str:
-    """Fast, small decision calls during a chat (tool routing): free keys first, then the
-    local model directly -- not _quick_llm, which waits until no chat is running."""
+def _router_llm(messages: list[dict], max_tokens: int = 300) -> str:
+    """Fast, small calls during a chat (tool routing, the verification pass): free keys
+    first, then the local model directly -- not _quick_llm, which waits until no chat is running."""
     for field, fn in (("groq_key", _call_groq_direct), ("gemini_key", _call_gemini_direct)):
         key = _saved_key(field)
         if key:
-            out = "".join(fn(messages, key, 300)).strip()
+            out = "".join(fn(messages, key, max_tokens)).strip()
             if out and not out.startswith(("[Groq error", "[Gemini error")):
                 return out
     if _ollama_running() and _resolve_ollama_model():
-        return "".join(c for c in _call_ollama(messages, max_tokens=300) if c != RATE_SENTINEL).strip()
+        return "".join(c for c in _call_ollama(messages, max_tokens=max_tokens) if c != RATE_SENTINEL).strip()
     return ""
 
 
