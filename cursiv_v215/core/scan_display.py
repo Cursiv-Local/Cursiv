@@ -1,7 +1,7 @@
 """
 Rolling scan display — slow scrolling log of system activity.
 Prints one line per event to stdout. No cursor control.
-Used by the terminal CLI (chat_cli.py) to show live activity.
+Used by chat_app.py's rate limiter to log activity.
 """
 from __future__ import annotations
 
@@ -98,7 +98,7 @@ class ScanDisplay:
 
 
 # Default singleton with no limiter.
-# chat_cli.py replaces this after importing the rate limiter:
+# A caller can replace this after importing the rate limiter:
 #   from cursiv_v215.core.rate_limiter import limiter
 #   from cursiv_v215.core.scan_display import ScanDisplay
 #   scan = ScanDisplay(limiter)

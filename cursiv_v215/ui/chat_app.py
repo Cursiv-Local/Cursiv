@@ -36,11 +36,10 @@ except Exception:
 
 # Session ID — stable per process, rotates on every server restart
 _GRADIO_SESSION_ID = f"gradio_{os.getpid()}"
-_CLI_SESSION_ID    = f"cli_{os.getpid()}"    # mirrors chat_cli.py
 
 def _owner_active() -> bool:
     """True if owner is verified in any session (Gradio or CLI)."""
-    return _is_owner_session(_GRADIO_SESSION_ID) or _is_owner_session(_CLI_SESSION_ID)
+    return _is_owner_session(_GRADIO_SESSION_ID)
 
 # ── Codex Agent — offline-capable coding specialist ──────────────────────
 try:
@@ -1254,23 +1253,9 @@ providers aren't available -- including in the council. Keys are saved only on
 this computer. To remove one:  gemini off  /  groq off
 """
 
-_KEYS_FILE_APP = ROOT / ".cursiv" / "config.json"
+# Saved keys: cursiv_v215/chat/keys.py (encrypted for this Windows account).
+from cursiv_v215.chat.keys import saved_key as _saved_key, store_key as _store_key  # noqa: E402
 _CLOUD_FILE    = Path.home() / ".cursiv" / "cursiv_cloud.json"
-
-
-def _saved_key(field: str) -> str:
-    from cursiv_v215.core import keystore
-    try:
-        return keystore.reveal(json.loads(_KEYS_FILE_APP.read_text(encoding="utf-8")).get(field, "") or "")
-    except Exception:
-        return ""
-
-
-try:                                     # keys saved by older versions: encrypt them once
-    from cursiv_v215.core import keystore as _keystore
-    _keystore.migrate(_KEYS_FILE_APP)
-except Exception:
-    pass
 
 
 def _text_messages(messages: list[dict]) -> list[dict]:
@@ -1526,23 +1511,6 @@ def free_key_command(text: str) -> str | None:
         return ("Cursiv Cloud ON -- used only when no local model is ready."
                 if cmd == "cloud on" else "Cursiv Cloud OFF -- nothing is sent to the cloud unless you add your own keys.")
     return None
-
-
-def _store_key(field: str, value: str) -> None:
-    try:
-        try:
-            data = json.loads(_KEYS_FILE_APP.read_text(encoding="utf-8"))
-        except Exception:
-            data = {}
-        if value:
-            from cursiv_v215.core import keystore
-            data[field] = keystore.protect(value) if field in keystore.SECRET_FIELDS else value
-        else:
-            data.pop(field, None)
-        _KEYS_FILE_APP.parent.mkdir(parents=True, exist_ok=True)
-        _KEYS_FILE_APP.write_text(json.dumps(data, indent=2), encoding="utf-8")
-    except Exception:
-        pass
 
 
 def _local_llm(messages: list[dict], max_tokens: int) -> str:
@@ -2517,7 +2485,7 @@ def _call_provider_council(
     system_context: str = "",
 ) -> Generator[str, None, None]:
     """
-    Gradio's entry into the same Provider Council chat_cli.py uses
+    Entry into the Provider Council (council/async_council.py)
     (cursiv_v215.council.async_council.run_council) -- bridges its
     blocking/asyncio interior to Gradio's synchronous streaming generator
     via a background thread + queue, so both UI surfaces run one shared

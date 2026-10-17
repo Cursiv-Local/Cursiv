@@ -17,14 +17,13 @@ where data lives, and how to run, build and release it.
 | `scripts/` | `build.bat` (PyInstaller), `package.bat` (installer), `verify_build.bat`, `seal_family_letters.py`. |
 | `website/` | The public website and phone web app (cursiv.winklers-llc.com). |
 | `cloudflare/` | The Cloudflare Worker behind the website and phone app, plus `publish.mjs` to deploy it. |
-| `examples/` | Example knowledge packets for the Agent Factory (`cursiv_v215/forge/factory.py`). |
 
 ### Inside `cursiv_v215/`
 
 | Package | Job |
 |---|---|
-| `ui/chat_app.py` | **The chat engine.** Builds the system prompt, runs the 8 phases, routes to a model (paid keys → Groq → Gemini → local Ollama → Cursiv Cloud), stores and tests keys, tools, memory context. No user interface of its own. |
-| `ui/chat_cli.py` | The old terminal chat. Not shipped as an entry point; the desktop chat reuses its key helpers. |
+| `ui/chat_app.py` | **The chat engine.** Builds the system prompt, runs the 8 phases, routes to a model (the local Ollama model first; keys you added and Cursiv Cloud are fallbacks), runs the answer check. No user interface of its own. |
+| `chat/` | Parts of the chat engine: saved keys (`keys.py`), web search (`web_search.py`), the AI's file tools (`file_tools.py`), paid providers (`paid.py`). `chat_app.py` re-exports them. |
 | `core/` | Phases (`phases.py`), speed tuning for small GPUs and free keys (`speed.py`), self-knowledge (`selfknow.py`), read-only computer tools (`tools.py`), plugins / Cursiv Forge (`plugins.py`), talking style (`style.py`), strand memory archive (`strand_store.py`), constitution. |
 | `memory/` | Semantic memory (find by meaning with `nomic-embed-text`, keyword fallback), project memory, session logs. |
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |

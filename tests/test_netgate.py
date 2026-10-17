@@ -47,7 +47,8 @@ def fresh(tmp_path, monkeypatch):
     from cursiv_v215.memory import semantic as sem
     app_dir, home_dir = tmp_path / "app" / ".cursiv", tmp_path / "home" / ".cursiv"
     monkeypatch.setattr(netgate, "CONFIG_FILE", app_dir / "config.json")
-    monkeypatch.setattr(ca, "_KEYS_FILE_APP", app_dir / "config.json")
+    from cursiv_v215.chat import keys
+    monkeypatch.setattr(keys, "KEYS_FILE", app_dir / "config.json")
     monkeypatch.setattr(ca, "_CLOUD_FILE", home_dir / "cursiv_cloud.json")
     monkeypatch.setattr(sem, "CURSIV_DIR", app_dir)
     monkeypatch.setattr(sem, "FACTS_FILE", app_dir / "memory_facts.jsonl")

@@ -13,9 +13,9 @@ KEY = "gsk_" + "k" * 40
 
 @pytest.fixture
 def keys_file(tmp_path, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_v215.chat import keys
     path = tmp_path / ".cursiv" / "config.json"
-    monkeypatch.setattr(ca, "_KEYS_FILE_APP", path)
+    monkeypatch.setattr(keys, "KEYS_FILE", path)
     monkeypatch.delenv("CURSIV_PORTABLE", raising=False)
     return path
 

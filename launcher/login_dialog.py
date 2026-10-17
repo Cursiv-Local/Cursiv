@@ -591,7 +591,7 @@ def _clear_saved_keys() -> None:
     """Remove the AI keys from Cursiv's config (part of a full account reset)."""
     import json
     try:
-        from cursiv_v215.ui.chat_app import _KEYS_FILE_APP as path
+        from cursiv_v215.chat.keys import KEYS_FILE as path
         data = json.loads(path.read_text(encoding="utf-8"))
         for field in ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key",
                       "cf_account_id", "cf_api_token"):

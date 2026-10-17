@@ -469,8 +469,8 @@ def run_council(
     write_fn:   Callable[[str], None] | None = None,
 ) -> CouncilResult | None:
     """
-    Run a question through Cursiv's council. Used directly by chat_cli.py and,
-    through a thread+queue bridge, by the desktop chat window and chat_app.py.
+    Run a question through Cursiv's council. Used through a thread+queue bridge
+    by the desktop chat window and chat_app.py.
 
     force_full:  True  -> full deliberation (more seats + a refinement round)
                  False -> signal mode

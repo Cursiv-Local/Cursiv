@@ -97,7 +97,8 @@ def collect(context: str = "") -> dict:
         from cursiv_v215.ui import chat_app as ca
         cfg = {}
         try:
-            cfg = json.loads(ca._KEYS_FILE_APP.read_text(encoding="utf-8"))
+            from cursiv_v215.chat.keys import KEYS_FILE
+            cfg = json.loads(KEYS_FILE.read_text(encoding="utf-8"))
         except Exception:
             pass
         have = [name for name, field in (("xAI", "api_key"), ("OpenAI", "openai_key"), ("Claude", "anthropic_key"),

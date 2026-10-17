@@ -32,8 +32,8 @@ PROVIDERS = [
 
 
 def _keys_file() -> Path:
-    from cursiv_v215.ui import chat_app as ca
-    return ca._KEYS_FILE_APP
+    from cursiv_v215.chat import keys
+    return keys.KEYS_FILE
 
 
 def load_keys() -> dict:
@@ -50,8 +50,8 @@ def test_key(field: str, key: str) -> tuple[bool, str]:
         if field in ("gemini_key", "groq_key"):
             from cursiv_v215.ui import chat_app as ca
             return ca.check_free_key(field, key)
-        from cursiv_v215.ui import chat_cli as cli
-        probe = {"api_key": cli._probe_xai, "openai_key": cli._probe_openai, "anthropic_key": cli._probe_claude}[field]
+        from cursiv_v215.chat import keys
+        probe = {"api_key": keys.probe_xai, "openai_key": keys.probe_openai, "anthropic_key": keys.probe_claude}[field]
         ok = bool(probe(key))
         return ok, "Working." if ok else "The provider rejected this key, or couldn't be reached."
     except Exception as exc:

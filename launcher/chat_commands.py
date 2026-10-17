@@ -3,7 +3,7 @@ Text commands for the chat window ("help", "offline on", "remember ...").
 
 handle_command() returns a TextResult or StreamResult for a built-in command,
 or None for normal chat. It calls the same functions the terminal CLI
-(cursiv_v215/ui/chat_cli.py) uses, without terminal I/O.
+(cursiv_v215/chat) uses.
 
 Handled in chat_panel.py instead, because they need a window or widget:
 voice / listen / paste, write to / legacy (compose and PIN dialogs), and
@@ -46,13 +46,9 @@ from cursiv_v215.ui.chat_app import (
     free_key_command as _free_key_command,
 )
 
-try:
-    from cursiv_v215.ui.chat_cli import _save_key, _probe_xai, _probe_openai, _probe_claude
-except Exception:
-    def _save_key(field, value): pass
-    def _probe_xai(key): return None
-    def _probe_openai(key): return None
-    def _probe_claude(key): return None
+from cursiv_v215.chat.keys import (
+    store_key as _save_key, probe_xai as _probe_xai, probe_openai as _probe_openai, probe_claude as _probe_claude,
+)
 
 try:
     from cursiv_v215.agents.babel_agent import is_babel_command as _babel_detect, extract_babel_input as _babel_input
