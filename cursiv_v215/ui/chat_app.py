@@ -2724,7 +2724,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                           online_fn=lambda: _connectivity_probe(api_key, openai_key, anthropic_key),
                           local_fn=lambda: _ollama_running() and _resolve_ollama_model() is not None)
         _addendum = _ph.system_addendum()
-        if _ph.emergency:
+        if _ph.emergency and _ph.emergency_kind != "medical":
             # A crisis gets a short, focused prompt -- buried at the end of Cursiv's long
             # instructions, the care guidance lost out to the model's canned refusal style.
             messages[0]["content"] = (
@@ -2835,6 +2835,23 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                     yield _note + "\n\n"
         except Exception:
             pass
+
+    # Cursiv's offline reference (core/reference.py): an entry that covers the
+    # question goes into the prompt with an ID to cite, and the person sees which.
+    try:
+        _crisis = bool(locals().get("_ph") and _ph.emergency and _ph.emergency_kind != "medical")
+        if not (_self_turn or _CODING_TURN or _crisis):
+            from cursiv_v215.core import reference as _ref_data
+            _found = _ref_data.lookup(user_text)
+            if _found:
+                _ref_block = _ref_data.prompt_block(_found)
+                messages[0]["content"] += "\n\n" + _ref_block + "\n"
+                _RETRIEVED.append(_ref_block)
+                yield _ref_data.note_line(_found) + "\n\n"
+            elif _ref_data.is_safety_question(user_text):
+                messages[0]["content"] += "\n\n" + _ref_data.NO_ENTRY_NOTE + "\n"
+    except Exception:
+        pass
 
     # Safety rule, assumption ledger, and earlier ledgers. Appended last so the
     # coding-brain prompt swap above does not drop them. The check itself runs

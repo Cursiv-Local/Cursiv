@@ -32,6 +32,7 @@ class PhaseResult:
     before_reply: str = ""                                  # shown above the model's reply
     after_reply: str = ""                                   # shown below it
     emergency: bool = False
+    emergency_kind: str = ""          # "crisis", "medical" or "danger"
     trace: list[tuple[str, str]] = field(default_factory=list)
 
     def system_addendum(self) -> str:
@@ -91,7 +92,8 @@ _DANGER = [r"\b(?:he|she|they|someone)(?:'s| is| are)? (?:hurting|beating|threat
 CRISIS_TEXT = ("**If you're thinking about ending your life or hurting yourself, you don't have to face it alone.** "
                "Call or text **988** (Suicide & Crisis Lifeline, US) any time, or text **HOME** to **741741**. "
                "If you're in immediate danger, call **911**.")
-MEDICAL_TEXT = "**If this is a medical emergency, call 911 (or your local emergency number) now.**"
+MEDICAL_TEXT = ("**If this is a medical emergency, call 911 (or your local emergency number) now.** "
+                "For a poisoning, US Poison Control is **1-800-222-1222**.")
 DANGER_TEXT = ("**If you're in danger, call 911.** The National Domestic Violence Hotline is **1-800-799-7233** "
                "(or text **START** to **88788**).")
 
@@ -102,11 +104,20 @@ def _emergency(text: str, r: PhaseResult) -> None:
         hit = _has(text, patterns)
         if hit:
             r.emergency = True
+            r.emergency_kind = {"possible crisis": "crisis", "possible medical emergency": "medical"}.get(kind, "danger")
             r.before_reply = notice + "\n\n"
-            r.instructions.insert(0, "IMPORTANT: the person may be in crisis or danger. Respond with real warmth and care, "
-                                     "take them seriously, keep it simple, gently encourage reaching out to the help line "
-                                     "shown above and to someone they trust, and ask if they're safe right now. "
-                                     "Don't lecture, don't change the subject, don't give clinical detail.")
+            if r.emergency_kind == "medical":
+                # Help may be far away: give the few steps that matter while it comes.
+                r.instructions.insert(0, "IMPORTANT: this may be a medical emergency. Start by telling them to call 911 "
+                                         "(or their local emergency number) now if they haven't. Then give only the few "
+                                         "most important first-aid steps for right now, numbered, short and plain, from "
+                                         "Cursiv's offline reference when it has an entry. Stay calm and kind. No long "
+                                         "explanations, and don't guess at anything the reference doesn't cover.")
+            else:
+                r.instructions.insert(0, "IMPORTANT: the person may be in crisis or danger. Respond with real warmth and care, "
+                                         "take them seriously, keep it simple, gently encourage reaching out to the help line "
+                                         "shown above and to someone they trust, and ask if they're safe right now. "
+                                         "Don't lecture, don't change the subject, don't give clinical detail.")
             r.trace.append(("Emergency", f"{kind} (\"{hit}\") -> help lines shown first, care-first reply"))
             return
     r.trace.append(("Emergency", "none"))
