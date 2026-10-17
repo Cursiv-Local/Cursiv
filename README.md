@@ -66,7 +66,7 @@ These were not built to restrict you. Every guardrail exists to protect you — 
 
 Whoever installs Cursiv owns that copy. You have the final say over it.
 
-**What the login is — and isn't.** It keeps people at your keyboard out of your Cursiv: it never opens without it, and a new login can only be added by someone who can already log in. It is a lock on the front door, not encryption — anyone who can open this computer's files can read Cursiv's data, the same as your other documents. Set the security questions when you create your account; they're how you reset a forgotten password.
+**What the login is — and isn't.** It keeps people at your keyboard out of your Cursiv: it never opens without it, and a new login can only be added by someone who can already log in. It is a lock on the front door, not encryption — anyone who can open this computer's files can read Cursiv's memories and conversations, the same as your other documents. Your saved AI keys are the exception: they're encrypted for your Windows account, so a copied file or another Windows user gets nothing usable (a private USB copy holds them readable, so it can run on other PCs — keep that drive safe). Set the security questions when you create your account; they're how you reset a forgotten password.
 
 ---
 

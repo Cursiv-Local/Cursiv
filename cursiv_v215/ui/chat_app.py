@@ -1382,10 +1382,18 @@ _CLOUD_FILE    = Path.home() / ".cursiv" / "cursiv_cloud.json"
 
 
 def _saved_key(field: str) -> str:
+    from cursiv_v215.core import keystore
     try:
-        return json.loads(_KEYS_FILE_APP.read_text(encoding="utf-8")).get(field, "") or ""
+        return keystore.reveal(json.loads(_KEYS_FILE_APP.read_text(encoding="utf-8")).get(field, "") or "")
     except Exception:
         return ""
+
+
+try:                                     # keys saved by older versions: encrypt them once
+    from cursiv_v215.core import keystore as _keystore
+    _keystore.migrate(_KEYS_FILE_APP)
+except Exception:
+    pass
 
 
 def _text_messages(messages: list[dict]) -> list[dict]:
@@ -1650,7 +1658,8 @@ def _store_key(field: str, value: str) -> None:
         except Exception:
             data = {}
         if value:
-            data[field] = value
+            from cursiv_v215.core import keystore
+            data[field] = keystore.protect(value) if field in keystore.SECRET_FIELDS else value
         else:
             data.pop(field, None)
         _KEYS_FILE_APP.parent.mkdir(parents=True, exist_ok=True)

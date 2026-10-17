@@ -412,6 +412,14 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             raise RuntimeError(f"{len(problems)} file(s) didn't copy correctly (first: {problems[0]}). "
                                "Click Make USB again to fix them.")
 
+        if include_private:
+            # Saved keys are encrypted for this Windows account; the USB runs on
+            # other PCs, so its copy holds them readable (the note below says so).
+            from cursiv_v215.core import keystore
+            for cfg_file in (root / "Cursiv").rglob("config.json"):
+                if cfg_file.parent.name == ".cursiv":
+                    keystore.export_readable(cfg_file)
+
         (root / "Cursiv" / "portable.cursiv").write_text(
             "This copy of Cursiv runs from this drive. See README.txt.\n", encoding="utf-8")
         (root / "Home").mkdir(exist_ok=True)

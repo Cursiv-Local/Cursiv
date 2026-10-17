@@ -38,7 +38,8 @@ def _keys_file() -> Path:
 
 def load_keys() -> dict:
     try:
-        return json.loads(_keys_file().read_text(encoding="utf-8"))
+        from cursiv_v215.core import keystore
+        return keystore.reveal_all(json.loads(_keys_file().read_text(encoding="utf-8")))
     except Exception:
         return {}
 

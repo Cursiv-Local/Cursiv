@@ -604,7 +604,8 @@ _KEYS_FILE = Path(ROOT) / ".cursiv" / "config.json"
 
 def _load_saved_keys() -> dict:
     try:
-        data = json.loads(_KEYS_FILE.read_text(encoding="utf-8"))
+        from cursiv_v215.core import keystore
+        data = keystore.reveal_all(json.loads(_KEYS_FILE.read_text(encoding="utf-8")))
         return {k: v for k, v in data.items() if isinstance(v, str)}
     except Exception:
         return {}
@@ -615,7 +616,9 @@ def _save_key(field: str, value: str) -> None:
             data = json.loads(_KEYS_FILE.read_text(encoding="utf-8"))
         except Exception:
             data = {}
-        data[field] = value
+        from cursiv_v215.core import keystore
+        data[field] = keystore.protect(value) if field in keystore.SECRET_FIELDS else value
+        _KEYS_FILE.parent.mkdir(parents=True, exist_ok=True)
         _KEYS_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
     except Exception:
         pass
