@@ -60,7 +60,7 @@ Tray menu → **Make a Cursiv USB…** copies Cursiv, its AI engine and your mod
 
 ## A note on the guardrails
 
-Cursiv checks messages for jailbreak and probing attempts, has a local-only login, and has an offline mode (`offline on`) that blocks every connection off your computer.
+Cursiv has a local-only login, encrypts your saved AI keys for your Windows account, asks before every file it writes (and never touches its own keys or login files), and has an offline mode (`offline on`) that blocks every connection off your computer.
 
 These were not built to restrict you. Every guardrail exists to protect you — to keep your data from leaving without your knowledge, your identity from being impersonated, and your machine from being used against you. If the system feels locked down, that lock faces outward, toward the things that would compromise you. Not inward toward you.
 
@@ -98,7 +98,7 @@ The goal is simple: **reduce the chance that future generations lose the systems
 
 ## For developers
 
-**[TECH.md](TECH.md)** explains how Cursiv is built — the desktop app, the chat engine, memory, the council, the Guardian, training, the USB edition — and how to run it from source and build the installer.
+**[TECH.md](TECH.md)** explains how Cursiv is built — the desktop app, the chat engine, memory, the council, the login and protections, training, the USB edition — and how to run it from source and build the installer.
 
 ---
 

@@ -11,10 +11,11 @@ A .cursivpack file is:
   3. HMAC-SHA256 signed with a key derived from machine identity
   4. base85 encoded for portable text transfer
 
-Signing key = SHA-256(Guardian _RING_CORE fragment + machine hostname).
-Packs from the same machine verify cleanly. Packs from a different
-instance (same owner, different hardware) are flagged as cross-machine
-and require explicit human confirmation — the import still works.
+Signing key = a random 32-byte key made once per install and kept in
+~/.cursiv/runtime/pack_key. Packs this copy made verify cleanly; packs from
+another copy are flagged as "from another computer" and need the person's
+confirmation -- the import still works. The signature only tells your own
+packs apart from others; it isn't proof of who made a pack.
 
 Import is always gated by:
   1. HMAC checksum verification
@@ -38,19 +39,27 @@ from typing import Any
 PACK_VERSION = "1.0"
 PACK_EXT     = ".cursivpack"
 
-# ── Signing key (machine-specific, never stored) ────────────────────────────
-try:
-    import socket as _socket
-    from cursiv_v215.guardian.temple_guardian import _RING_CORE as _RC
-    _SIGN_KEY: bytes = hashlib.sha256(
-        (_RC + _socket.gethostname()).encode()
-    ).digest()
-    _SIGN_SOURCE = "guardian"
-except Exception:
-    import os as _os
-    # Deterministic fallback: hash the machine's temp dir path
-    _SIGN_KEY = hashlib.sha256(str(Path(__file__).parent).encode()).digest()
-    _SIGN_SOURCE = "fallback"
+# ── Signing key: random, made once per install ──────────────────────────────
+def _load_sign_key() -> bytes:
+    import secrets
+    key_file = Path.home() / ".cursiv" / "runtime" / "pack_key"
+    try:
+        key = key_file.read_bytes()
+        if len(key) == 32:
+            return key
+    except OSError:
+        pass
+    key = secrets.token_bytes(32)
+    try:
+        key_file.parent.mkdir(parents=True, exist_ok=True)
+        key_file.write_bytes(key)
+    except OSError:
+        pass
+    return key
+
+
+_SIGN_KEY: bytes = _load_sign_key()
+_SIGN_SOURCE = "install"
 
 
 def _sign(payload: bytes) -> str:

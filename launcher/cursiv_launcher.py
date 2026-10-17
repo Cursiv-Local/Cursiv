@@ -1,7 +1,7 @@
 """
 Cursiv Desktop — the main window (chat panel), tray menu, login gate,
-updater and the background Guardian. One copy runs at a time (local socket
-lock); aboutToQuit cleanup stops Guardian on every quit path.
+and updater. One copy runs at a time (local socket lock), released by
+aboutToQuit cleanup on every quit path.
 """
 
 from __future__ import annotations
@@ -1246,7 +1246,6 @@ class CursivLauncher(QMainWindow):
         except Exception:
             pass
         self._username   = username
-        self._guardian_stop: Optional[threading.Event] = None
 
         self.setWindowTitle("Cursiv")
         self.setWindowFlags(Qt.WindowType.FramelessWindowHint | Qt.WindowType.Window)
@@ -1284,8 +1283,7 @@ class CursivLauncher(QMainWindow):
         QTimer.singleShot(30_000, self._phone_sync)
         QTimer.singleShot(12_000, self._warm_local_model)
 
-        # Guardian (message safety checks) starts after first paint.
-        QTimer.singleShot(200, self._start_guardian)
+        QTimer.singleShot(200, lambda: self._set_status("Ready"))
 
         # First run only: show Getting Started automatically once the
         # window has had a moment to finish rendering.
@@ -1302,26 +1300,7 @@ class CursivLauncher(QMainWindow):
     # ── Cleanup (connected to aboutToQuit) ────────────────────────────────
 
     def _cleanup(self):
-        # Guardian runs as in-process daemon threads that poll this Event.
-        if self._guardian_stop is not None:
-            self._guardian_stop.set()
         _release_instance_lock()
-
-    # ── Background services ─────────────────────────────────────────────────
-
-    def _start_guardian(self):
-        # Guardian runs as in-process daemon threads -- no subprocess, no
-        # separate Python needed. Runs via QTimer.singleShot after
-        # main.py's try/except has returned, so never let it raise.
-        try:
-            from services.guardian_service import _run_guardian, _run_tracker
-            self._guardian_stop = threading.Event()
-            for target, name in ((_run_guardian, "Guardian"), (_run_tracker, "Tracker")):
-                threading.Thread(target=target, args=(self._guardian_stop,),
-                                 daemon=True, name=name).start()
-            self._set_status("Ready")
-        except Exception as e:
-            self._set_status(f"Guardian failed to start: {e}")
 
     # ── UI ────────────────────────────────────────────────────────────────
 
@@ -1570,9 +1549,8 @@ class CursivLauncher(QMainWindow):
     # ── Getting Started ──────────────────────────────────────────────────
 
     def _show_getting_started(self):
-        # Fired via QTimer.singleShot(1800, ...) on first run only -- same
-        # "runs after main.py's try/except has already returned" risk as
-        # _start_guardian above.
+        # Fired via QTimer.singleShot(1800, ...) on first run only; runs after
+        # main.py's try/except has returned, so it must never raise.
         try:
             dlg = GettingStartedDialog(self)
             dlg.exec()

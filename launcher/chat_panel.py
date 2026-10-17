@@ -52,16 +52,6 @@ _cursiv_chat = None
 _CHAT_ROOT = _ROOT
 _RATE_SENTINEL = object()
 
-# Guardian's skull-alert block is real HTML meant to render as a styled card,
-# not model-generated prose -- see _on_chunk, which detects it and routes it
-# through _append_html_block instead of the plain-text streaming path every
-# other chunk takes (deliberately plain-text, so partial HTML from a model's
-# own streamed reply never lands mid-tag).
-try:
-    from cursiv_v215.guardian.temple_guardian import SKULL_HTML as _SKULL_HTML
-except Exception:
-    _SKULL_HTML = "\x00__skull_html_unavailable__\x00"
-
 # ── Palette (matches cursiv_launcher.py exactly) ────────────────────────────
 BG     = "#0b0b12"
 BG2    = "#13131e"
@@ -688,25 +678,6 @@ class ChatPanel(QWidget):
 
     def _on_chunk(self, chunk: str) -> None:
         self._reply_text += chunk
-        if chunk.strip() == _SKULL_HTML.strip():
-            # Close the AI-reply paragraph opened by _begin_ai_reply, render
-            # the skull card as actual HTML, then reopen a fresh paragraph
-            # so anything streamed after it (the decoy response) still has
-            # somewhere valid to land -- _end_ai_reply() closes it as usual.
-            # Same scroll-preservation as _append_reply_chunk: only follow
-            # to the bottom if the user was already there.
-            at_bottom = self._at_bottom()
-            cursor = QTextCursor(self._transcript.document())
-            cursor.movePosition(QTextCursor.MoveOperation.End)
-            cursor.insertHtml("</span></p>")
-            cursor.insertHtml(chunk)
-            cursor.insertHtml(
-                f'<p style="margin:4px 0 4px 0;">'
-                f'<span style="color:#F0E9D8; white-space:pre-wrap;">'
-            )
-            if at_bottom:
-                self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
-            return
         self._append_reply_chunk(chunk)
 
     def _on_image(self, path: str) -> None:

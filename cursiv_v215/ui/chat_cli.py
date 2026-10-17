@@ -97,9 +97,9 @@ except Exception:
 # passphrase constants: this repo is public, so a "hidden" phrase hardcoded
 # in committed source was never actually secret.
 try:
-    from cursiv_v215.guardian.temple_guardian import unlock_owner_session as _unlock_cli
-    from cursiv_v215.guardian.temple_guardian import verify_owner_code    as _verify_sovereign_cli
-    from cursiv_v215.guardian.temple_guardian import set_owner_code       as _set_owner_code_cli
+    from cursiv_v215.guardian.owner import unlock_owner_session as _unlock_cli
+    from cursiv_v215.guardian.owner import verify_owner_code    as _verify_sovereign_cli
+    from cursiv_v215.guardian.owner import set_owner_code       as _set_owner_code_cli
 except Exception:
     def _verify_sovereign_cli(text: str) -> bool:
         return False

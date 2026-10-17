@@ -21,6 +21,7 @@ from pathlib import Path
 from typing import Callable, Generator
 
 from cursiv_v215.core import netgate   # installs the offline backstop; see core/netgate.py
+from cursiv_v215.guardian.protected import is_protected_path as _guardian_protected
 
 # ── Token rate limiter + scan display ──────────────────────────────────────
 try:
@@ -32,24 +33,6 @@ except Exception:
     _rate_limiter = None
     _scan         = None
     _RATE_OK      = False
-
-# ── System Guardian — front-end defense layer ──────────────────────────────
-try:
-    from cursiv_v215.guardian.temple_guardian import (
-        scan as _guardian_scan,
-        is_protected_path as _guardian_protected,
-        SKULL_HTML as _SKULL_HTML,
-    )
-    from cursiv_v215.guardian.obfuscation import session_fingerprint as _sfp
-    from cursiv_v215.guardian.decoys import get_decoy_response as _decoy_response
-    _GUARDIAN_OK = True
-except Exception:
-    _GUARDIAN_OK = False
-    def _guardian_scan(msg, sid="default"):  return (False, None)
-    def _guardian_protected(p):             return False
-    def _sfp():                             return "--------"
-    def _decoy_response(sid="default"):     return ""
-    _SKULL_HTML = ""
 
 # Session ID — stable per process, rotates on every server restart
 _GRADIO_SESSION_ID = f"gradio_{os.getpid()}"
@@ -188,21 +171,15 @@ except Exception:
     def _session_append(u, a, m="unknown"): pass
     def _load_session_ctx():                return ""
 
-# ── Sovereign verification (locally-stored owner code — never committed) ──
-# Was previously a passphrase assembled from 3 hardcoded string constants
-# split across guardian/temple_guardian.py, guardian/obfuscation.py, and
-# weave/sovereign.py. Since this repo is public, those constants were
-# readable by anyone who cloned it, so the "hidden" phrase was never
-# actually secret. Replaced with a code Joshua sets himself at runtime,
-# hashed and stored under ~/.cursiv/runtime/ — never git-committed.
+# ── Owner mode (guardian/owner.py): an owner code set at runtime, stored hashed ──
 try:
-    from cursiv_v215.guardian.temple_guardian import unlock_owner_session as _unlock_owner
-    from cursiv_v215.guardian.temple_guardian import is_owner_session     as _is_owner_session
-    from cursiv_v215.guardian.temple_guardian import verify_owner_code    as _verify_sovereign
-    from cursiv_v215.guardian.temple_guardian import set_owner_code       as _set_owner_code
-    from cursiv_v215.guardian.temple_guardian import owner_code_is_set    as _owner_code_is_set
+    from cursiv_v215.guardian.owner import unlock_owner_session as _unlock_owner
+    from cursiv_v215.guardian.owner import is_owner_session     as _is_owner_session
+    from cursiv_v215.guardian.owner import verify_owner_code    as _verify_owner_code
+    from cursiv_v215.guardian.owner import set_owner_code       as _set_owner_code
+    from cursiv_v215.guardian.owner import owner_code_is_set    as _owner_code_is_set
 except Exception:
-    def _verify_sovereign(text: str) -> bool:
+    def _verify_owner_code(text: str) -> bool:
         return False
     def _unlock_owner(sid: str):
         pass
@@ -805,114 +782,9 @@ def execute_tool(name: str, args: dict, root: Path) -> str:
 # ── Owner reveal ──────────────────────────────────────────────────────────
 
 def _build_owner_reveal() -> str:
-    from cursiv_v215.guardian.obfuscation import session_fingerprint as _sfp_inner
-    from cursiv_v215.guardian.temple_guardian import get_session_threat_level, get_strike_count
+    return ("Owner mode is on for this session: builder tools are listed in help "
+            "(help builder), and file tools treat you as the owner.")
 
-    # Vault
-    vault_agents: list[dict] = []
-    reg = ROOT / ".cursiv" / "agent_registry.json"
-    if reg.exists():
-        try:
-            data = json.loads(reg.read_text(encoding="utf-8"))
-            vault_agents = [
-                {"name": m.get("name","?"), "id": aid[:8], "state": m.get("state","?"),
-                 "pos": m.get("council_position","")[:32]}
-                for aid, m in data.get("agents", {}).items()
-            ]
-        except Exception:
-            pass
-
-    # Counts
-    tc = sum(1 for _ in open(TRAINING_JSONL, encoding="utf-8")) if TRAINING_JSONL.exists() else 0
-    gl_path = ROOT / ".cursiv" / "guardian_log.jsonl"
-    gc = sum(1 for _ in open(gl_path, encoding="utf-8")) if gl_path.exists() else 0
-
-    # Memory
-    mem_agents = 0
-    if MEMORY_FILE.exists():
-        try:
-            mem_agents = len(json.loads(MEMORY_FILE.read_text(encoding="utf-8")).get("agents", {}))
-        except Exception:
-            pass
-
-    # Guardian
-    fingerprint  = _sfp_inner() if _GUARDIAN_OK else "--------"
-    threat_level = get_session_threat_level(_GRADIO_SESSION_ID)
-    strikes      = get_strike_count(_GRADIO_SESSION_ID)
-
-    # Obsidian
-    obs_cfg  = _obs_load_config()
-    obs_line = ("ON — " + obs_cfg.get("vault_path", "")) if obs_cfg.get("enabled") else "OFF"
-
-    # Constitution
-    const_hash = "unavailable"
-    try:
-        from cursiv_v215.core.constitution import get_constitution
-        const_hash = get_constitution().hash[:16] + "..."
-    except Exception:
-        pass
-
-    # Build markdown
-    rows = ""
-    for a in vault_agents[:14]:
-        rows += f"| {a['name']} | `{a['id']}` | {a['state']} | {a['pos']} |\n"
-    if not rows:
-        rows = "| *(vault empty)* | — | — | — |\n"
-
-    return f"""## ⬡  OWNER VERIFIED
-
-**Joshua Winkler — System Owner**
-Guardian firewall suspended for this session. All system internals visible.
-
----
-
-### Identity & Session
-
-| Field | Value |
-|---|---|
-| System | Cursiv v3.0 |
-| Session ID | `{_GRADIO_SESSION_ID}` |
-| Guardian fingerprint | `{fingerprint}` |
-| Constitution hash | `{const_hash}` |
-| Interface | Gradio / port 7860 |
-
----
-
-### Active Vault — PiForge Phase Agents
-
-| Name | ID | State | Council Position |
-|---|---|---|---|
-{rows}
----
-
-### System State
-
-| Component | Value |
-|---|---|
-| Vault agents | {len(vault_agents)} |
-| Memory agents | {mem_agents} |
-| Training examples | {tc} |
-| Guardian log entries | {gc} |
-| Obsidian sync | {obs_line} |
-
----
-
-### Guardian Status (this session)
-
-| Metric | Value |
-|---|---|
-| Session threat accumulator | `{threat_level:.4f}` |
-| Trigger strikes | {strikes} |
-| Owner unlock | **ACTIVE — scans bypassed** |
-| Decoys | Meridian / Veil / Cipher (inactive — owner session) |
-| Obfuscation token | `{fingerprint}` (rotates every restart) |
-
----
-
-*The Temple recognizes its builder. The system is fully open to you.*"""
-
-
-# ── Context loaders ────────────────────────────────────────────────────────
 
 def _compact_system_for_tools(is_owner: bool = False) -> str:
     """
@@ -1186,7 +1058,7 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
                 chunk = _json.loads(line.decode())
                 token = chunk.get("response", "")
                 if token:
-                    yield _filter_identity(token)
+                    yield token
                 if chunk.get("done"):
                     break
     except Exception as e:
@@ -1194,7 +1066,7 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
 
 
 def _call_ollama(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS) -> "Generator[str, None, None]":
-    yield from _filter_stream(_call_ollama_raw(messages, max_tokens))
+    yield from _call_ollama_raw(messages, max_tokens)
 
 
 def _ollama_running() -> bool:
@@ -1454,7 +1326,7 @@ def _call_gemini_direct(messages: list[dict], key: str, max_tokens: int = RESPON
                 cand = (data.get("candidates") or [{}])[0]
                 text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
                 if text.strip():
-                    yield _filter_identity(text)
+                    yield text
                     return
                 last_err = f"empty reply ({cand.get('finishReason', 'no text')})"
                 break
@@ -1527,7 +1399,7 @@ def _call_groq_direct(messages: list[dict], key: str, max_tokens: int = RESPONSE
                                   {"Authorization": f"Bearer {key}"}, 60)
                 text = data["choices"][0]["message"].get("content") or ""
                 if text.strip():
-                    yield _filter_identity(text)
+                    yield text
                     return
                 last = "empty reply"
                 break
@@ -1597,7 +1469,7 @@ def _call_cursiv_cloud(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKE
             _save_cloud_settings(settings)
             yield ("*[No local model was ready, so this answer came from Cursiv Cloud (free, sent to "
                    "cursiv.winklers-llc.com). Type 'cloud off' to keep everything on this computer.]*\n\n")
-        yield _filter_identity(text)
+        yield text
     except urllib.error.HTTPError as e:
         try:
             detail = json.loads(e.read().decode("utf-8")).get("detail", "")
@@ -1879,15 +1751,11 @@ def cascade_stream(
 try:
     from cursiv_v215.guardian.identity_core import (
         wrap       as _identity_wrap,
-        filter_text as _filter_identity,
-        filter_stream as _filter_stream,
         CURSIV_IDENTITY as _IDENTITY_OVERRIDE,
     )
 except ImportError:
     from guardian.identity_core import (
         wrap       as _identity_wrap,
-        filter_text as _filter_identity,
-        filter_stream as _filter_stream,
         CURSIV_IDENTITY as _IDENTITY_OVERRIDE,
     )
 
@@ -1927,7 +1795,7 @@ def _call_ollama_model(
                     chunk = _json.loads(line.decode())
                     token = chunk.get("response", "")
                     if token:
-                        yield _filter_identity(token)
+                        yield token
                     if chunk.get("done"):
                         break
     except urllib.error.HTTPError as e:
@@ -2770,23 +2638,11 @@ def _chat_inner(
             yield f"Failed to save owner code: {e}"
         return
 
-    # ── Sovereign owner check (runs before Guardian — no API call, no log) ──
-    if user_text and _verify_sovereign(user_text):
+    # ── Owner code (no model call, nothing logged) ──
+    if user_text and _verify_owner_code(user_text):
         _unlock_owner(_GRADIO_SESSION_ID)
         yield _build_owner_reveal()
         return
-
-    # ── System Guardian scan (front-end defense layer) ──────────────────
-    # Runs BEFORE any API call. If a probe is detected, the skull screen
-    # is returned immediately and no API credits are consumed.
-    # The only gate this does NOT cover is human phishing / social engineering —
-    # always verify actions before approving file writes or API key requests.
-    if _GUARDIAN_OK and user_text:
-        _triggered, _skull = _guardian_scan(user_text, _GRADIO_SESSION_ID)
-        if _triggered:
-            yield _skull
-            yield "\n\n" + _decoy_response(_GRADIO_SESSION_ID)
-            return
 
     # ── Process files ───────────────────────────────────────────────────
     file_context, image_parts = process_uploaded_files(uploaded)

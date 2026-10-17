@@ -1,28 +1,9 @@
 """
-System Guardian package — Cursiv v3.0 defense layers.
+Login and protection.
 
-Modules:
-  temple_guardian  — centralized Robot Language Filter + pi-squared firewall
-  obfuscation      — session-local adaptive label shuffling (transparent to user)
-  decoys           — isolated honeytrap agents activated on detected probing
+  access_gate         -- the local login (bcrypt-hashed passwords)
+  security_questions  -- password recovery
+  owner               -- owner mode (an owner code unlocks builder tools)
+  protected           -- files the AI's write tool may never change
+  identity_core       -- the identity line for helper prompts
 """
-
-from .temple_guardian import scan, scan_cli, receive_fragment, get_session_threat_level, unlock_owner_session, is_owner_session, TempleGuardian, owner_code_is_set, set_owner_code, verify_owner_code
-from .obfuscation import session_fingerprint, get_route_label
-from .decoys import get_decoy_response
-
-__all__ = [
-    "scan",
-    "scan_cli",
-    "receive_fragment",
-    "get_session_threat_level",
-    "unlock_owner_session",
-    "is_owner_session",
-    "owner_code_is_set",
-    "set_owner_code",
-    "verify_owner_code",
-    "TempleGuardian",
-    "session_fingerprint",
-    "get_route_label",
-    "get_decoy_response",
-]

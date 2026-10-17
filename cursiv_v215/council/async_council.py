@@ -23,10 +23,9 @@ named roles through a single model in one pass.
 from __future__ import annotations
 
 try:
-    from cursiv_v215.guardian.identity_core import wrap as _identity_wrap, filter_text as _id_filter
+    from cursiv_v215.guardian.identity_core import wrap as _identity_wrap
 except ImportError:
     def _identity_wrap(s: str) -> str: return s
-    def _id_filter(s: str) -> str: return s
 
 try:
     from cursiv_v215.core.quality_scorer import score_response as _score_response, format_scores as _format_scores
@@ -238,7 +237,7 @@ def _ask(engine: dict, messages: list[dict], max_tokens: int) -> tuple[str, str 
         return "", "busy or no reply"
     if text.startswith(ca._PROVIDER_ERROR_PREFIXES):
         return "", text.strip("[]")[:160]
-    return _id_filter(text), None
+    return text, None
 
 
 # ── Seats ─────────────────────────────────────────────────────────────────────
@@ -423,7 +422,7 @@ def _synthesize(query: str, signals: dict[str, str], engines: list[dict], answer
         text = "".join(collected).strip()
         if text:
             write_fn(f"\n\n  {_DIM}synthesized via {engine['name']}{_R}")
-            return _id_filter(text)
+            return text
     msg = f"[Synthesis unavailable -- no engine could write it. The seats' answers are above.]"
     write_fn(f"  {_RED}{msg}{_R}")
     return msg

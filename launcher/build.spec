@@ -23,7 +23,6 @@ from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 ROOT = Path(SPECPATH).parent          # repo root (one level above launcher/)
 LAUNCHER = ROOT / "launcher"
 CURSIV   = ROOT / "cursiv_v215"
-SERVICES = ROOT / "services"
 
 block_cipher = None
 
@@ -33,8 +32,6 @@ datas = [
     (str(LAUNCHER / "resources" / "icons"), "launcher/resources/icons"),
     # cursiv_v215 package (everything — models, prompts, templates)
     (str(CURSIV), "cursiv_v215"),
-    # Services (guardian_service standalone runner)
-    (str(SERVICES), "services"),
 ]
 
 
@@ -55,9 +52,9 @@ hiddenimports = [
     "cursiv_v215.guardian",
     "cursiv_v215.guardian.access_gate",
     "cursiv_v215.guardian.security_questions",
-    "cursiv_v215.guardian.decoys",
-    "cursiv_v215.guardian.obfuscation",
-    "cursiv_v215.guardian.temple_guardian",
+    "cursiv_v215.guardian.owner",
+    "cursiv_v215.guardian.protected",
+    "cursiv_v215.guardian.identity_core",
     "bcrypt",
     "cursiv_v215.memory",
     "cursiv_v215.runtime",

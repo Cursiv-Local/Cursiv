@@ -13,7 +13,6 @@ where data lives, and how to run, build and release it.
 |---|---|
 | `launcher/` | The desktop app: main window, chat panel, tray menu, dialogs (Setup, Settings, Training Data, USB maker…), login, updater. `main.py` is the entry point. |
 | `cursiv_v215/` | The engine the app runs on (the folder name is historical). |
-| `services/` | The Guardian background service (in-process threads started by the app). |
 | `installer/` | Inno Setup script (`cursiv_setup.iss`) that wraps the build into `Cursiv-Setup-<version>.exe`. |
 | `scripts/` | `build.bat` (PyInstaller), `package.bat` (installer), `verify_build.bat`, `seal_family_letters.py`. |
 | `website/` | The public website and phone web app (cursiv.winklers-llc.com). |
@@ -31,7 +30,7 @@ where data lives, and how to run, build and release it.
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |
 | `agents/` | Custom agents (`agent new …`), Babel translation, coding agent, offline queue, reference brain, voice. |
 | `coding/` | The coding brain: playbooks, worked examples, error diagnosis, run-and-fix sandbox, `evolve` plugin writer. |
-| `guardian/` | Guardian checks (jailbreak and probing detection), login (bcrypt), security questions, identity rules. The login fails closed (Cursiv exits if it can't load), new logins need an existing login, and it is a front-door lock only — data on disk isn't encrypted. |
+| `guardian/` | Login (bcrypt), security questions, owner mode, the files the AI's write tool may never touch, and the identity line for helper prompts. The login fails closed (Cursiv exits if it can't load), new logins need an existing login, and it is a front-door lock only — memories on disk aren't encrypted; saved keys are (DPAPI, `core/keystore.py`). |
 | `training/` | LoRA training (`lora_trainer.py`) and merging the adapter into Ollama (`ollama_merge.py`). |
 | `family/`, `postal/` | Sealed letters: per-person letters that open with a name and birth date, and signed letters between people. |
 | `council/cursiv_facts.md`, `codex/system_prompt.md` | What Cursiv knows about itself and its persona. Keep the fact sheet accurate when features change. |
