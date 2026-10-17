@@ -44,7 +44,8 @@ def activate() -> bool:
         home.mkdir(parents=True, exist_ok=True)
     except Exception:
         return False
-    os.environ.setdefault("CURSIV_REAL_HOME", os.environ.get("USERPROFILE", str(Path.home())))
+    if not os.environ.get("CURSIV_REAL_HOME"):      # kept on a second activate(); empty counts as unset
+        os.environ["CURSIV_REAL_HOME"] = os.environ.get("USERPROFILE") or str(Path.home())
     os.environ["USERPROFILE"] = str(home)
     os.environ["HOME"] = str(home)
     os.environ["CURSIV_PORTABLE"] = "1"
