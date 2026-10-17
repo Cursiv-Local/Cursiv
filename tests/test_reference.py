@@ -47,8 +47,11 @@ def test_chat_cites_the_entry_and_tells_the_person(fresh, monkeypatch):
     monkeypatch.setattr(ca, "_call_ollama", fake_ollama)
     out = "".join(ca.chat("my son cut his leg and it is bleeding badly", [], "", None))
     assert "[medical/severe-bleeding-control]" in seen["system"]
-    assert "From Cursiv's offline reference: severe bleeding control" in out
+    assert "From Cursiv's offline reference, severe bleeding control [medical/severe-bleeding-control]" in out
+    entry = next(e for e in ref.entries() if e.id == "medical/severe-bleeding-control")
+    assert entry.text in out                         # shown word for word, numbers and all
     assert "not reviewed by a medical professional" in out
+    assert "Draft + notes" not in out and "Checked, with notes" not in out   # no check on an emergency
 
 
 def test_safety_question_without_an_entry_says_so(fresh, monkeypatch):

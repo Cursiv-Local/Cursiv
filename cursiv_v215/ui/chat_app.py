@@ -2744,6 +2744,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         elif _addendum:
             messages[0]["content"] += "\n\n" + _addendum + "\n"
         _PHASE_AFTER = _ph.after_reply
+        global _EMERGENCY_TURN
+        _EMERGENCY_TURN = bool(_ph.emergency)
         if _ph.before_reply:
             yield _ph.before_reply
     except Exception:
@@ -3226,6 +3228,7 @@ def _learn_later(message, reply: str, *, origin: str = "inferred", skip: bool = 
 
 
 _PHASE_AFTER = ""   # end-of-reply note from core/phases.py for the current message
+_EMERGENCY_TURN = False   # phases flagged a crisis / medical emergency / danger this turn
 _CODING_TURN = False  # this message went through the coding brain (cursiv_v215/coding)
 
 _SENTENCE_END = (".", "!", "?", "\n", ":", ";")
@@ -3284,8 +3287,9 @@ def chat(
     or the problems it could not clear. Lasting facts are then learned in the
     background. Casual turns skip the pass.
     """
-    global _PHASE_AFTER
+    global _PHASE_AFTER, _EMERGENCY_TURN
     _PHASE_AFTER = ""                # set by the phases for this message only
+    _EMERGENCY_TURN = False
     reply: list[str] = []
     from cursiv_v215.core import speed as _speed
     _speed.chat_started()
@@ -3300,6 +3304,8 @@ def chat(
         # Still inside this turn, so the check uses the fast router (no idle wait)
         # and background learning cannot take the local model yet.
         try:
+            if _EMERGENCY_TURN:
+                raise _SkipCheck      # no slow check (or a wall of notes) after emergency steps
             from cursiv_v215.core import verify as _verify
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
             outcome = _verify.run_pass(
@@ -3316,13 +3322,40 @@ def chat(
                 reply[:] = [final]
                 yield REPLACE_SENTINEL + final
             elif outcome.append:
-                reply.append(outcome.append)
-                yield outcome.append
+                shown = _compact_notes(outcome) if "**Draft + notes:**" in outcome.append else outcome.append
+                reply.append(shown)
+                yield shown
+        except _SkipCheck:
+            pass
         except Exception:
             pass
     finally:
         _speed.chat_finished()
     _learn_later(message, "".join(reply), origin=origin, skip=skip)
+
+
+class _SkipCheck(Exception):
+    pass
+
+
+def _compact_notes(outcome) -> str:
+    """The check's problems, readable: at most three short items. The checker's raw
+    reply (headings, repeats, "CLEAR") isn't shown as-is."""
+    items = []
+    for problem in outcome.problems:
+        for line in str(problem).splitlines():
+            line = line.strip().lstrip("-*0123456789. ").strip("* ").strip()
+            if (len(line) < 12 or line.endswith(":") or "CLEAR" in line
+                    or line.lower().startswith(("none", "final answer", "additional information"))):
+                continue
+            items.append(line if len(line) <= 160 else line[:157].rstrip() + "...")
+            break                       # one line per problem
+        if len(items) == 3:
+            break
+    if not items:
+        return ""
+    body = "\n".join(f"- {item}" for item in items)
+    return f"\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n{body}"
 
 
 def _replacement_reply(revised: str, shown: str, problems: list[str]) -> str:

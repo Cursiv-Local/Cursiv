@@ -59,3 +59,14 @@ def test_chat_panel_swaps_the_draft_in_place():
     assert view.toPlainText() == "You: question\nCursiv: the checked answer"
     assert panel._reply_text == "the checked answer"
     assert app is not None
+
+
+def test_check_notes_are_short_and_plain():
+    from types import SimpleNamespace
+    from cursiv_v215.ui import chat_app as ca
+    raw = ("- **Unsupported Claims:**\n- \"The creek quality might matter.\" This is unsupported.\n"
+           "**Answers to the Wrong Question:**\n**None**: CLEAR.")
+    text = ca._compact_notes(SimpleNamespace(problems=[raw, "Known says 50 liters, which nobody gave."]))
+    assert "Unsupported Claims:" not in text and "CLEAR" not in text
+    assert "creek quality" in text and "50 liters" in text
+    assert text.count("\n- ") <= 3

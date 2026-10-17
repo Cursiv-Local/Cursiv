@@ -162,7 +162,16 @@ NO_ENTRY_NOTE = ("## Cursiv's offline reference\nCursiv's offline reference has 
 
 
 def note_line(found: list[Entry]) -> str:
-    names = "; ".join(f"{e.title} ({e.id})" for e in found)
-    caveat = (" — written for Cursiv, not reviewed by a medical professional; call emergency services "
-              "in an emergency" if any(e.category == "medical" for e in found) else "")
-    return f"*(From Cursiv's offline reference: {names}{caveat})*"
+    """What the person sees above the answer. First-aid and survival entries are
+    shown word for word, so their numbers never depend on the model retelling
+    them (a 1.5B model turned "1 min boil" into "3 minutes"). One line per entry,
+    in Cursiv's status-line form, so it isn't fed back to the model as its words."""
+    lines = []
+    for e in found:
+        if e.category in ("medical", "survival"):
+            caveat = (" Written for Cursiv, not reviewed by a medical professional; in an emergency call 911."
+                      if e.category == "medical" else "")
+            lines.append(f"*(From Cursiv's offline reference, {e.title} [{e.id}]: {e.text}{caveat})*")
+        else:
+            lines.append(f"*(From Cursiv's offline reference: {e.title} [{e.id}])*")
+    return "\n".join(lines)

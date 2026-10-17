@@ -156,3 +156,10 @@ The Connectivity phase no longer probes 8.8.8.8 on every message. `_connectivity
 Proof: `tests/test_netgate.py` (records and refuses every outside connection with an audit hook) and `py -3.13 scripts/net_audit.py --offline` (a fresh copy of the source, an empty home, real `chat()` against the real local Ollama, logs every connection).
 
 Not changed: Cursiv Cloud is still on by default for people with no local model (`_cloud_settings` writes `enabled: True`). With the gate open and Ollama running, a missing `nomic-embed-text` is still pulled automatically. That's Ollama's traffic, not Cursiv's process.
+
+## Answer quality (2026-10-17, U61 draft)
+
+- `core/reference.py`: chat looks up `reference_data/` for each message. A match puts the entry in the prompt (cite `[category/slug]`), and first-aid and survival entries are shown word for word in a status line, because a 1.5B model misquoted the numbers live. Three unreviewed entries (`NOT_IN_CHAT`) are only shown by `ref`.
+- `phases.emergency_kind`: "medical" keeps the normal prompt plus first-aid instructions; "crisis" and "danger" keep the care-first crisis prompt.
+- `chat()` skips the verify pass on any emergency turn (`_EMERGENCY_TURN`), and shows failed-check notes compactly (`_compact_notes`: at most three one-line items, under "Checked, with notes"). `verify.py` itself is unchanged.
+- `chat(replace_draft=True)` (the chat window only): a clean revision replaces the draft on screen and in history (`REPLACE_SENTINEL`).
