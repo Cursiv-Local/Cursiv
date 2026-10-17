@@ -62,9 +62,7 @@ hiddenimports = [
     "cursiv_v215.memory",
     "cursiv_v215.runtime",
     "cursiv_v215.runtime.config",
-    "cursiv_v215.academy",
     "cursiv_v215.council",
-    "cursiv_v215.dugout",
     "cursiv_v215.forge",
     "cursiv_v215.obsidian",
     # launcher

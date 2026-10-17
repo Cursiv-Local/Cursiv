@@ -1,5 +1,22 @@
 # Changelog
 
+## v3.14-U60 — Private by default, plain language (2026-10-17)
+- **Nothing leaves your computer on its own.** On a fresh install with no keys, a chat turn makes no connection off your computer. (Checked: a fresh copy, real chat turns on the local model, every connection logged — zero.)
+- **Web search only when you ask.** Start a message with `search:`. Words like "today", "right now" or "this week" used to send your message to DuckDuckGo by themselves. `websearch on` (or Settings) brings back automatic search if you want it.
+- **Offline mode really works.** `offline on` (or Settings) blocks every connection off this computer — cloud AI, web search, update checks, model downloads — and stays on after a restart. Your local model keeps working, and your saved keys stay saved. Before, it said "all external APIs blocked" and blocked nothing.
+- **Update check is your choice.** Cursiv no longer contacts GitHub after every login. Click Check for Updates any time, or turn on `autoupdate on` (or Settings).
+- **No internet check on every message** when your local model is ready and nothing online is set up.
+- **Cursiv Cloud starts off on new installs**, as U57 intended — tick it in Setup or Settings, or type `cloud on`.
+- **Shorter, plainer help.** `help` is a short list of everyday things; `help more` shows topics (memory, family, translate, privacy, keys, coding). Builder tools are listed only on the owner's computer. Fixed: help said `remember` searches memory — it saves.
+- **Plain language throughout.** Cursiv's instructions to the AI were rewritten in plain words (a quarter of the old length, so the local model is faster too). Kept: honesty about what it can do, safety and crisis care, memory never outranks safety, and the Known / Inferred / Assumed / Unknown check.
+- **Removed:** governor, overseer, trust tiers 2 and 3 (`tier 1` is now offline mode), funforge, the public board (`blast`), substrate and grow. **Renamed:** `save this`, `notes`, `translate … into …` (the old names still work).
+- Tests: tests/test_netgate.py, tests/test_help.py; scripts/net_audit.py checks a fresh install's network traffic.
+
+## v3.14-U59 — Answers are checked (2026-10-17)
+- **A real check after each answer** on numbers, recommendations and technical claims: changed numbers, assumptions stated as facts and named sources nobody looked up are caught, with one rewrite. The check uses the local model, not your keys. Casual chat isn't checked.
+- **Known / Inferred / Assumed / Unknown** at the end of complex answers, so guesses aren't passed off as facts.
+- **Memory knows where each fact came from** (you said it, or Cursiv inferred it) and when. Conflicting memories are both shown, and no memory can override safety.
+
 ## v3.14-U58 — Trust: a login that holds, a USB that matches (2026-10-12)
 - **Cursiv never opens without its login.** If the login can't load, Cursiv says so and stops (with a problem-report button) instead of opening anyway.
 - **Only someone who can log in can add a login.** Type an existing username and password, then click Create Account. (Anyone at the login screen could add one before — and every login sees the same keys and memories.)

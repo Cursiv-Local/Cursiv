@@ -1,4 +1,4 @@
-# ⬡ Cursiv — Offline. Yours. Everywhere.
+# Cursiv — Offline. Yours. Everywhere.
 
 > Not a subscription. Not someone else's server. A private AI companion that lives on your own computer, works without the internet, and belongs to you.
 
@@ -42,7 +42,7 @@ That's it — one window, nothing else to open. Updates arrive inside the app.
 - **Helps you code** — step-by-step help with local coding models, error diagnosis, and a sandbox that runs and fixes the Python it writes.
 - **The council** — ask `council <question>` and Cursiv's advisors each answer from their own angle, then one combined answer comes back.
 - **Your own agents** — `agent new <name>: <job>` creates a specialist you talk to with `@name`.
-- **Grows new abilities** — `evolve <idea>` writes a plugin, safety-checks it, tests it in a sandbox, and installs it only when you approve.
+- **Adds new abilities** — `evolve <idea>` writes a plugin, safety-checks it, tests it in a sandbox, and installs it only when you approve.
 - **Learns your voice** — save examples in Training Data, then train a small personal model with LoRA and add it to Ollama.
 - **Phone app** — link your phone to share one conversation with your computer.
 - **Sealed letters** — write letters that only open for the right person.
@@ -60,7 +60,7 @@ Tray menu → **Make a Cursiv USB…** copies Cursiv, its AI engine and your mod
 
 ## A note on the guardrails
 
-Cursiv has a Guardian that checks messages for jailbreak and probing attempts, a local-only login, and a rule that nothing leaves your computer without your action.
+Cursiv checks messages for jailbreak and probing attempts, has a local-only login, and has an offline mode (`offline on`) that blocks every connection off your computer.
 
 These were not built to restrict you. Every guardrail exists to protect you — to keep your data from leaving without your knowledge, your identity from being impersonated, and your machine from being used against you. If the system feels locked down, that lock faces outward, toward the things that would compromise you. Not inward toward you.
 
@@ -90,7 +90,7 @@ The goal is simple: **reduce the chance that future generations lose the systems
 
 **Coding** — built to get you most of the way there and help you understand the rest.
 
-**Privacy** — when the local model answers, nothing you type leaves your computer. A key is used only when there's no local model, it can't answer, or you paste an image — and then that message goes to that provider. Optional extras — Cursiv Cloud backup, the phone link, problem reports — only send anything when you turn them on or click them. The update check reads GitHub's public release list; nothing about you is sent.
+**Privacy** — when the local model answers, nothing you type leaves your computer. A key you added is used only when there's no local model, it can't answer, or you paste an image — and then that message goes to that provider. Cursiv Cloud, a free backup that answers only when no local model is ready, is off unless you turn it on (Setup, Settings or `cloud on`). Web search happens only when you start a message with `search:`. The automatic update check is off unless you turn it on (`autoupdate on`); the Check for Updates button reads GitHub's public release list and sends nothing about you. The phone link and problem reports send only when you set them up or click them. **Offline mode** (`offline on`, or Settings) blocks every connection off your computer and stays on after a restart.
 
 **Ownership** — your data, your models, your copy. Nobody can change it or shut it off remotely.
 

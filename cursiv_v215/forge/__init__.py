@@ -1,4 +1,1 @@
-from .factory import AgentFactory
-from .router import OracleRouter
-
-__all__ = ["AgentFactory", "OracleRouter"]
+"""Leftover: funforge_meta, used only by the terminal CLI."""

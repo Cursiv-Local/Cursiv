@@ -1544,7 +1544,7 @@ def _cloud_settings() -> dict:
         data = {}
     changed = False
     if "enabled" not in data:
-        data["enabled"] = True
+        data["enabled"] = False      # off until the person ticks it in Setup / Settings or types 'cloud on'
         changed = True
     if not data.get("install_id"):
         import uuid as _uuid

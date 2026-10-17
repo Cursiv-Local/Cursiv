@@ -282,3 +282,10 @@ def test_first_model_download_is_refused_offline(fresh):
 class _NoThread:
     def start(self):
         pass
+
+
+def test_cursiv_cloud_is_off_on_a_fresh_install(fresh):
+    from cursiv_v215.ui import chat_app as ca
+    assert ca.cloud_enabled() is False
+    ca.set_cloud_enabled(True)
+    assert ca.cloud_enabled() is True
