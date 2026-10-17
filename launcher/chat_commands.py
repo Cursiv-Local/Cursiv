@@ -634,97 +634,116 @@ def _agent_command(text: str, cfg: dict, history: list[dict]):
     return TextResult(custom.listing())
 
 _HELP_TEXT = """\
-KEYS & ACCESS
-  key <xai-key>            set xAI Grok API key       (starts with xai-)
-  openai <key>              set OpenAI API key          (starts with sk-)
-  anthropic <key>          set Anthropic API key       (starts with sk-ant-)
-  gemini <key>              set a FREE Google Gemini key (starts with AIza)
-  groq <key>                set a FREE Groq key          (starts with gsk_)
-  free keys                 where to get free AI keys
-  cloud on / off / status   Cursiv Cloud backup when no local model is ready
-  files on / off            enable / disable file-system access
-  workspace <path>          sandbox root for file tools
-  mode                      toggle write mode  (auto <-> confirm)
+Just talk to me. Most things don't need a command.
 
-CODEX AGENT (offline code specialist)
-  evolve <idea>             Cursiv writes itself a new ability (a plugin) — you approve it first
-  plugins                   your plugins (plugin show/off/on/remove <name>)
-  projects                  running summaries of your ongoing projects (project show/forget <name>)
-  tone <blunt|warm|brief|playful|legacy|teacher|normal>   how Cursiv talks to you
-  style                     your tone + the rules Cursiv learned from your corrections
-  agents                    your custom agents (agent new <name>: <job>, then @name <message>)
-  agent council <question>  ask all your agents, then combine their views
-  codex <prompt>            coding help with every step listed (codex help for more)
-                            code questions in normal chat use the same coding brain
+  remember <something>        I'll keep it in mind
+  what do you remember        see what I know (forget <words> to remove)
+  babel <text> into <lang>    translate (Spanish, French, Korean, ...)
+  search: <question>          look it up online, only when you ask
+  write to <name>             a private sealed letter for family
+  mic button / voice          talk instead of typing
+  paste                       look at a picture from the clipboard
+  offline on / off            keep everything on this computer
+  Settings (gear, top right)  AI keys, privacy, updates
 
-WEB SEARCH
-  search <query>            search the web right now + AI synthesis
-  pull <url>                fetch + analyze any URL -> auto-strand the insight
+help more                     everything else"""
 
-VOICE (mic button, or type these)
-  voice / voice <seconds>   record -> speech-to-text -> Babel clean -> send
-  voice raw / listen        speech-to-text only, no cleaning pass
-  paste                     paste a clipboard image -> vision analysis
+# help <topic>. Topics in _BUILDER_TOPICS are listed only for the owner
+# (they still open for anyone who types them).
+_HELP_TOPICS = {
+    "memory": ("Memory", """\
+  remember <something>        save a fact about you (or the family)
+  what do you remember        list what I know, with when and how I learned it
+  forget <words>              remove a saved fact
+  memory learn on / off       learn from our chats on my own (on by default)
+  anchor this                 save the last answer as a note
+  strands search <words>      search saved notes
+  clear                       clear this conversation from the screen"""),
+    "family": ("Family", """\
+  write to <name>             write a sealed letter (opens a window)
+  letters                     letters waiting for you, and ones you sent
+  open letter <id>            read one letter
+  legacy                      open the family Legacy Vault
+  legacy import <file>        add a .legacypack file to the vault"""),
+    "translate": ("Translate and voice", """\
+  babel <text>                any language into English
+  babel <text> into <lang>    English into one or more languages
+  voice / voice <seconds>     record, turn speech into text, then send
+  voice raw / listen          speech to text only, no clean-up
+  paste                       look at a picture from the clipboard
+  image <description>         draw a picture (needs a paid OpenAI key)"""),
+    "privacy": ("Privacy and internet", """\
+  offline on / off            nothing leaves this computer (stays on after restart)
+  search: <question>          search the web once
+  websearch on / off          search on my own when a question sounds current (off by default)
+  pull <web address>          read a web page and summarize it
+  autoupdate on / off         check for new versions after login (off by default)
+  cloud on / off / status     Cursiv Cloud, used only when no local AI is ready
+  status                      what's on and off right now"""),
+    "keys": ("AI keys (or use Settings)", """\
+  free keys                   how to get a free Gemini or Groq key (2 minutes)
+  gemini <key> / groq <key>   add a free key
+  key <xai-key>               add an xAI Grok key
+  openai <key>                add an OpenAI key
+  anthropic <key>             add a Claude key
+  grok / claude               ask the last question again with that AI"""),
+    "style": ("How I talk", """\
+  tone <warm|brief|blunt|teacher|playful|normal>   how I talk to you
+  style                       your tone and the rules I learned from your corrections
+  rate good / bad / 1-5       tell me how the last answer was"""),
+    "coding": ("Files and coding", """\
+  codex <request>             coding help, every step listed (codex help for more)
+  files on / off              let me read and write files
+  workspace <folder>          the folder I'm allowed to use
+  mode                        writes: ask first <-> automatic"""),
+    "builder": ("Builder tools", """\
+  evolve <idea>               write a new ability (plugin); you approve it first
+  plugins                     plugin show / on / off / remove <name>
+  projects                    running summaries of projects (project show / forget <name>)
+  agents                      agent new <name>: <job>, then @name <message>
+  agent council <question>    ask all your agents, then combine their views
+  council <question>          ask every AI at once and combine the answers
+  /full <question>            council without the summary step
+  substrate / substrate status / substrate weave <query>
+  blast register / login / logout / who / blast
+  postal setup <name> / my key / add user <n> <k> / contacts / rotate
+  funforge <topic> / spike <topic> / forge extend / forge done
+  overseer on / off           Claude reviews every Grok answer
+  governor on / off           formal, rule-bound answers
+  strands / strand export / strand import <file>
+  queue list / queue add <task>
+  obsidian on / off / path / export / status"""),
+}
+_BUILDER_TOPICS = {"builder"}
 
-BABEL (universal translation)
-  babel <text>              any language -> English
-  babel <text> into <lang>  English -> one or more target languages
 
-COUNCIL (parallel multi-model deliberation)
-  council <question>        all providers fire at once, synthesis deliberates
-  /full <question>          full deliberation, no signal extraction
-  hey council <question>    inline routing prefix (same as council)
+def _is_builder() -> bool:
+    """The owner: a verified owner session, or this is one of Joshua's machines."""
+    try:
+        from cursiv_v215.ui.chat_app import _owner_active
+        if _owner_active():
+            return True
+    except Exception:
+        pass
+    try:
+        from cursiv_v215.guardian.access_gate import is_setup_complete
+        return bool(is_setup_complete())
+    except Exception:
+        return False
 
-SUBSTRATE FORK -- RUW / Curs.
-  substrate                 activate last council synthesis into RUW layer
-  substrate status          show RUW layer state
-  substrate weave <query>   find resonant nodes for a query
 
-BLAST (public board)
-  blast register / login / logout / who
-  blast                     post last council synthesis to the public board
-
-FAMILY & SEALED LETTERS -- private, PIN-protected
-  write to <name>           compose a sealed letter (opens a dialog)
-  letters                   list letters waiting for you / sent by you
-  open letter <id>          read one sealed letter
-  legacy                    open the family Legacy Vault (opens a dialog)
-  legacy import <path>      import a .legacypack file into the vault
-
-BOARD IDENTITY (Ed25519-signed public letters)
-  postal setup <name>       create your signing identity
-  postal my key             show your public key
-  postal add user <n> <k>   add a contact's public key
-  postal contacts           list known contacts
-  postal rotate             rotate your signing key
-
-STRAND ARCHIVE (persistent memory)
-  anchor this               save last exchange as a Strand
-  strands / strands <territory> / strands search <query>
-  strand export / strand export <territory>
-  strand import <file>      Guardian-verified import from a pack
-  remember <query>          pure local memory search, zero cloud
-
-FUNFORGE (bounded creative spike)
-  funforge <topic> / spike <topic>
-  forge extend               add 30 minutes
-  forge done                 close and produce artifact
-
-MODEL & TRUST
-  grok / claude              re-run last message with that model
-  overseer on / off          Claude reviews every Grok response
-  tier 1 / tier 2 / tier 3    offline-only -> local-first -> full council
-  offline on / off           block every connection off this computer (stays on after restart)
-  websearch on / off         search the web automatically for current-sounding questions (off by default)
-  autoupdate on / off        check GitHub for updates after login (off by default)
-
-OTHER
-  rate good / bad / <1-5>    rate the last response
-  image <description>        generate an image (needs paid OpenAI key)
-  queue list / queue add <task>   offline task queue
-  obsidian on/off/path/export/status
-  clear                      wipe this conversation's on-screen history
-  help                       this list"""
+def help_text(topic: str = "") -> str:
+    """`help` -> the short list; `help more` -> topics; `help <topic>` -> one topic."""
+    topic = topic.strip().lower()
+    if not topic:
+        return _HELP_TEXT
+    if topic in _HELP_TOPICS:
+        title, body = _HELP_TOPICS[topic]
+        return f"{title.upper()}\n{body}\n\nhelp more  -  all topics"
+    names = [t for t in _HELP_TOPICS if t not in _BUILDER_TOPICS or _is_builder()]
+    lines = [f"  help {t:<10} {_HELP_TOPICS[t][0]}" for t in names]
+    head = "" if topic in ("more", "all", "topics") else f"No help topic called \"{topic}\".\n\n"
+    return head + "Type one of these:\n" + "\n".join(lines)
 
 
 def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextResult | StreamResult]:
@@ -737,8 +756,10 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         return None
     cmd = text.lower()
 
-    if cmd == "help":
-        return TextResult(_HELP_TEXT)
+    # "help" / "help more" / "help family" -- but "help me write a letter" is chat.
+    _topic = cmd[5:].strip() if cmd.startswith("help ") else None
+    if cmd in ("help", "help?", "commands") or (_topic and (_topic in _HELP_TOPICS or _topic in ("more", "all", "topics"))):
+        return TextResult(help_text(_topic or ""))
 
     # ── Free-form notes → JSON training example ─────────────────────────
     # Fuzzy-matched, not a fixed command -- "translate my notes into JSON
@@ -776,7 +797,9 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         ]
         return TextResult("\n".join(lines))
 
-    if cmd in ("tier 1", "tier 2", "tier 3"):
+    if cmd == "tier 1":
+        cmd = "offline on"           # tier 1 meant "local only": the same as offline mode
+    if cmd in ("tier 2", "tier 3"):
         cfg["trust_tier"] = int(cmd[-1])
         labels = {1: "SOVEREIGN OFFLINE (Ollama only)", 2: "LOCAL + LIMITED", 3: "FULL COUNCIL"}
         return TextResult(f"Trust tier → {cfg['trust_tier']} — {labels[cfg['trust_tier']]}")
@@ -1228,7 +1251,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Strand store unavailable.")
         q = text[9:].strip()
         if not q:
-            return TextResult("Usage: remember <query>")
+            return TextResult("Type remember <something> to save it, or what do you remember to see what I know.")
         results = _strand_search(q, top_k=5, min_score=0.08)
         if not results:
             return TextResult("No matching strands found. Anchor exchanges with: anchor this")
