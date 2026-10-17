@@ -149,8 +149,12 @@ def main() -> int:
         shutil.rmtree(scratch, ignore_errors=True)
 
     summary = summarize(cases, rows)
+    import suite_hash
+    suite = suite_hash.recorded()
+    changed = suite_hash.current() != {k: suite.get(k) for k in ("cases", "scoring")}
     summary.update(label=label, model=model, date=time.strftime("%Y-%m-%d"),
-                   minutes=round((time.time() - t0) / 60, 1))
+                   minutes=round((time.time() - t0) / 60, 1),
+                   suite=(suite.get("version", "?") + ("-MODIFIED" if changed else "")), suite_hashes=suite_hash.current())
     out_dir = REPO / "bench" / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
     scope = f"-{args.only}" if args.only else ("-subset" if args.ids else "")
@@ -162,12 +166,12 @@ def main() -> int:
         if not table.exists():
             table.write_text("# Cursiv Truth Benchmark results\n\nSame cases every release (bench/truth_cases.py), "
                              "scored by code (bench/scoring.py). Higher is better except Unsupported.\n\n"
-                             "| Release | Model | Date | Cases | Accuracy | Unsupported claims | Unknown handling | "
+                             "| Release | Suite | Model | Date | Cases | Accuracy | Unsupported claims | Unknown handling | "
                              "Traps / false premises | Asks when unclear | Safety | Avg words | Avg s |\n"
-                             "|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
+                             "|---|---|---|---|---|---|---|---|---|---|---|---|---|\n", encoding="utf-8")
         s = summary
         with table.open("a", encoding="utf-8") as f:
-            f.write(f"| {label} | {model} | {s['date']} | {s['cases']} | {s['accuracy']}% | {s['unsupported_claims']}% | "
+            f.write(f"| {label} | {s['suite']} | {model} | {s['date']} | {s['cases']} | {s['accuracy']}% | {s['unsupported_claims']}% | "
                     f"{s['unknown_handling']}% | {s['false_premise_and_traps']}% | {s['asks_when_unclear']}% | "
                     f"{s['safety']}% | {s['avg_words']} | {s['avg_seconds']} |\n")
 

@@ -45,3 +45,12 @@ def test_admitting_it_cannot_know():
         assert scoring.score({"unknown": True}, text).passed, text
     r = scoring.score({"unknown": True, "none_of": [truth_cases.ANY_PERCENT]}, "Oxygen dropped 17%.")
     assert not r.passed and r.unsupported
+
+
+def test_suite_is_frozen_unless_versioned():
+    """Cases and checks can't change silently after a baseline (bench/SUITE.md)."""
+    import suite_hash
+    rec, cur = suite_hash.recorded(), suite_hash.current()
+    assert rec, "bench/SUITE.md has no 'current' line"
+    assert cur["cases"] == rec["cases"], "truth_cases.py changed: add a suite version in bench/SUITE.md"
+    assert cur["scoring"] == rec["scoring"], "scoring.py changed: add a suite version in bench/SUITE.md"
