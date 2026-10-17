@@ -10,7 +10,7 @@
 - **New default model: qwen3:4b** (Apache 2.0) on 4–6 GB graphics cards, qwen3:8b on bigger ones. The old default, qwen2.5:3b, has a research-only license; Cursiv now uses it only if nothing else is installed. Download qwen3:4b in Setup. MODELS.md lists every model's license; USB drives carry qwen3:4b or qwen2.5:1.5b.
 - **A checked answer replaces its draft.** When the check rewrites an answer, you see only the corrected answer (with a short note that it was revised), and only that is saved in the conversation.
 - Window titles say "Cursiv" instead of "Cursiv v3.0".
-- Tests now all pass (a USB test had failed for weeks), and they run on GitHub for every change.
+- All tests pass again (a USB test had failed for weeks).
 
 ## v3.14-U60 — Private by default, plain language (2026-10-17)
 - **Nothing leaves your computer on its own.** On a fresh install with no keys, a chat turn makes no connection off your computer. (Checked: a fresh copy, real chat turns on the local model, every connection logged — zero.)
