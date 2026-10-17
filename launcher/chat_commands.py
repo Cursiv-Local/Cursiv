@@ -33,6 +33,7 @@ from cursiv_v215.ui.chat_app import (
     ROOT as _CHAT_ROOT,
     RATE_SENTINEL,
     WRITE_SENTINEL,
+    REPLACE_SENTINEL,
     execute_tool as _execute_tool,
     _call_ollama,
     _call_ollama_code_council,

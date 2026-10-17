@@ -224,6 +224,9 @@ ANTHROPIC_CODE_MODEL  = "claude-sonnet-4-6"   # code generation via Anthropic
 WRITE_SENTINEL = "<<<PENDING_WRITE_JSON>>>"
 # Sentinel yielded by a provider when its 429 retries are exhausted — triggers fallback
 RATE_SENTINEL  = "<<<RATE_LIMIT_EXHAUSTED>>>"
+# chat(replace_draft=True): the rest of this chunk replaces the reply shown so far
+# (a draft the check revised). Only the desktop chat window asks for it.
+REPLACE_SENTINEL = "<<<REPLACE_REPLY>>>"
 
 def _cursiv_encode(text: str) -> str:
     """Encode text to Cursiv binary (space-separated 8-bit bytes)."""
@@ -3269,9 +3272,13 @@ def chat(
     openai_key: str = "",
     confirm_writes: bool = False,
     anthropic_key: str = "",
-    force_provider: str = "",   
+    force_provider: str = "",
+    replace_draft: bool = False,
 ) -> Generator[str, None, None]:
     """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
+
+    replace_draft: when the check revises the answer, yield REPLACE_SENTINEL +
+    the final reply instead of appending the revision under the draft (C-007).
 
     After the draft has streamed, one verification pass may append a revision
     or the problems it could not clear. Lasting facts are then learned in the
@@ -3303,7 +3310,12 @@ def chat(
                 sources="\n\n".join(_RETRIEVED),
             )
             origin, skip = outcome.learn_origin, outcome.skip_learn
-            if outcome.append:
+            revised = outcome.append.split("**Revised after check:**\n", 1)
+            if replace_draft and outcome.append and len(revised) == 2 and outcome.clear:
+                final = _replacement_reply(revised[1], "".join(reply), outcome.problems)
+                reply[:] = [final]
+                yield REPLACE_SENTINEL + final
+            elif outcome.append:
                 reply.append(outcome.append)
                 yield outcome.append
         except Exception:
@@ -3311,6 +3323,16 @@ def chat(
     finally:
         _speed.chat_finished()
     _learn_later(message, "".join(reply), origin=origin, skip=skip)
+
+
+def _replacement_reply(revised: str, shown: str, problems: list[str]) -> str:
+    """The reply that replaces a revised draft: the revision, a short note on what
+    the check found, then Cursiv's own status lines from the draft (reference
+    note, "Answered by ...")."""
+    notes = [m.group(0).strip() for m in _STATUS_LINE_RE.finditer(shown)]
+    found = "; ".join(p.rstrip(".") for p in problems[:3])
+    head = f"*(Revised after a check{': the first draft ' + found if found else ''}.)*"
+    return "\n\n".join([revised.strip(), head, *notes])
 
 
 def _check_context(history: list[dict], user_text: str) -> str:

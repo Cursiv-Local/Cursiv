@@ -100,6 +100,7 @@ def _is_ollama_installed() -> bool:
 
 class _ChatSignals(QObject):
     chunk = pyqtSignal(str)             # one streamed text fragment
+    replace = pyqtSignal(str)           # the whole reply so far is replaced (a revised draft)
     done  = pyqtSignal()                # generation finished cleanly
     error = pyqtSignal(str)             # generation raised an exception
     cancelled = pyqtSignal()            # user hit Stop mid-generation
@@ -162,6 +163,7 @@ class ChatPanel(QWidget):
         self._cancel_event: Optional[threading.Event] = None
         self._signals = _ChatSignals()
         self._signals.chunk.connect(self._on_chunk)
+        self._signals.replace.connect(self._on_replace)
         self._signals.done.connect(self._on_done)
         self._signals.error.connect(self._on_error)
         self._signals.cancelled.connect(self._on_cancelled)
@@ -458,6 +460,9 @@ class ChatPanel(QWidget):
             f'<span style="color:{GOLD}; font-weight:700;">✦ Cursiv</span><br>'
             f'<span style="color:#F0E9D8; white-space:pre-wrap;">'
         )
+        cursor = QTextCursor(self._transcript.document())
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        self._reply_start = cursor.position()
 
     def _at_bottom(self) -> bool:
         sb = self._transcript.verticalScrollBar()
@@ -584,6 +589,7 @@ class ChatPanel(QWidget):
                 confirm_writes=(self._cfg.get("confirm_mode", "confirm") == "confirm"),
                 anthropic_key=self._cfg.get("anthropic_key", ""),
                 force_provider=force_provider,
+                replace_draft=True,
             )
             self._cfg["last_user_msg"] = stripped
             cancel_event = self._cancel_event
@@ -605,6 +611,10 @@ class ChatPanel(QWidget):
                     self._signals.pending_write.emit(raw_json)
                     return   # stays "streaming" (buttons disabled) until the
                              # approval dialog resolves on the main thread
+                if chunk.startswith(cc.REPLACE_SENTINEL):
+                    full = chunk[len(cc.REPLACE_SENTINEL):]   # history keeps only the final answer
+                    self._signals.replace.emit(full)
+                    continue
                 full += chunk
                 self._signals.chunk.emit(chunk)
             if cancel_event.is_set():
@@ -679,6 +689,18 @@ class ChatPanel(QWidget):
     def _on_chunk(self, chunk: str) -> None:
         self._reply_text += chunk
         self._append_reply_chunk(chunk)
+
+    def _on_replace(self, text: str) -> None:
+        """Swap the streamed draft for the checked answer (same paragraph and style)."""
+        start = getattr(self, "_reply_start", None)
+        if start is None:
+            self._append_reply_chunk("\n\n" + text)
+            return
+        cursor = QTextCursor(self._transcript.document())
+        cursor.setPosition(start)
+        cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+        cursor.insertText(text)            # replaces the selected draft
+        self._reply_text = text
 
     def _on_image(self, path: str) -> None:
         self._append_image(path)
