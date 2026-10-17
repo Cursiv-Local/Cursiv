@@ -23,17 +23,47 @@ from typing import Callable, Generator
 from cursiv_v215.core import netgate   # installs the offline backstop; see core/netgate.py
 from cursiv_v215.guardian.protected import is_protected_path as _guardian_protected
 
-# ── Token rate limiter + scan display ──────────────────────────────────────
-try:
-    from cursiv_v215.core.rate_limiter import limiter as _rate_limiter
-    from cursiv_v215.core.scan_display import ScanDisplay as _ScanDisplay
-    _scan = _ScanDisplay(_rate_limiter)
-    _RATE_OK = True
-except Exception:
-    _rate_limiter = None
-    _scan         = None
-    _RATE_OK      = False
-
+from cursiv_v215.chat.optional import (  # noqa: E402,F401  (moved; chat_app re-exports)
+    _rate_limiter,
+    _ScanDisplay,
+    _scan,
+    _RATE_OK,
+    _codex_generate,
+    _codex_available,
+    _codex_status,
+    _CODEX_OK,
+    _hermes_run,
+    _hermes_available,
+    _hermes_status,
+    _HERMES_OK,
+    _ref_search,
+    _ref_answer,
+    _ref_available,
+    _ref_status,
+    _REF_OK,
+    _sfed_export,
+    _sfed_import,
+    _sfed_summary,
+    _SFED_OK,
+    _strand_search,
+    _strand_count,
+    _STRAND_APP_OK,
+    _queue_enqueue,
+    _queue_format,
+    _queue_count,
+    _queue_flush,
+    _QUEUE_OK,
+    _obs_load_config,
+    _obs_save_config,
+    _obs_export,
+    _obs_auto_export,
+    _obs_detect_vault,
+    _obs_livestream,
+    _OBS_OK,
+    _session_append,
+    _load_session_ctx,
+    _SESSION_OK,
+)
 # Session ID — stable per process, rotates on every server restart
 _GRADIO_SESSION_ID = f"gradio_{os.getpid()}"
 
@@ -41,135 +71,18 @@ def _owner_active() -> bool:
     """True if owner is verified in any session (Gradio or CLI)."""
     return _is_owner_session(_GRADIO_SESSION_ID)
 
-# ── Codex Agent — offline-capable coding specialist ──────────────────────
-try:
-    from cursiv_v215.agents.codex_agent import (
-        generate     as _codex_generate,
-        is_available as _codex_available,
-        status       as _codex_status,
-    )
-    _CODEX_OK = True
-except Exception:
-    _CODEX_OK = False
-    def _codex_generate(p: str) -> str:    return ""
-    def _codex_available() -> bool:        return False
-    def _codex_status() -> dict:           return {"available": False}
-
-# ── Hermes Agent — offline multi-step tool executor ───────────────────────
-try:
-    from cursiv_v215.agents.hermes_agent import (
-        run          as _hermes_run,
-        is_available as _hermes_available,
-        status       as _hermes_status,
-    )
-    _HERMES_OK = True
-except Exception:
-    _HERMES_OK = False
-    def _hermes_run(p: str) -> str:        return ""
-    def _hermes_available() -> bool:       return False
-    def _hermes_status() -> dict:          return {"available": False}
-
-# ── Reference Brain — offline SQLite knowledge base ───────────────────────
-try:
-    from cursiv_v215.agents.reference_brain import (
-        search       as _ref_search,
-        answer       as _ref_answer,
-        is_available as _ref_available,
-        status       as _ref_status,
-    )
-    _REF_OK = True
-except Exception:
-    _REF_OK = False
-    def _ref_search(q: str, limit: int = 6) -> str: return ""
-    def _ref_answer(q: str) -> str:                 return ""
-    def _ref_available() -> bool:                   return False
-    def _ref_status() -> dict:                      return {"available": False}
-
-# ── Web Search Cache — TTL cache for search results ───────────────────────
-try:
-    from cursiv_v215.core.web_cache import (
-        get_cached   as _wcache_get,
-        store        as _wcache_store,
-        evict_expired as _wcache_evict,
-    )
-    _WCACHE_OK = True
-except Exception:
-    _WCACHE_OK = False
-    def _wcache_get(q, **kw): return None  # type: ignore[misc]
-    def _wcache_store(q, r, **kw): pass
-    def _wcache_evict(): return 0
-
-# ── Strand Federation — import/export ─────────────────────────────────────
-try:
-    from cursiv_v215.core.strand_federation import (
-        export_pack as _sfed_export,
-        import_pack as _sfed_import,
-        pack_summary as _sfed_summary,
-    )
-    _SFED_OK = True
-except Exception:
-    _SFED_OK = False
-
-# ── Strand Store — persistent memory retrieval ────────────────────────────
-try:
-    from cursiv_v215.core.strand_store import (
-        search_strands as _strand_search,
-        strand_count   as _strand_count,
-    )
-    _STRAND_APP_OK = True
-except Exception:
-    _STRAND_APP_OK = False
-    def _strand_search(q, **kw): return []  # type: ignore[misc]
-    def _strand_count() -> int:  return 0
-
-# ── Offline Queue — capture tasks for later ───────────────────────────────
-try:
-    from cursiv_v215.agents.offline_queue import (
-        enqueue      as _queue_enqueue,
-        format_queue as _queue_format,
-        count        as _queue_count,
-        flush        as _queue_flush,
-    )
-    _QUEUE_OK = True
-except Exception:
-    _QUEUE_OK = False
-    def _queue_enqueue(p: str, **kw) -> dict:  return {}
-    def _queue_format() -> str:                return ""
-    def _queue_count() -> int:                 return 0
-    def _queue_flush(fn) -> list:              return []
-
-# ── Obsidian Vault Sync ────────────────────────────────────────────────────
-try:
-    from cursiv_v215.obsidian.exporter import (
-        load_config    as _obs_load_config,
-        save_config    as _obs_save_config,
-        export_today   as _obs_export,
-        auto_export_if_enabled as _obs_auto_export,
-        auto_detect_vault      as _obs_detect_vault,
-        livestream_exchange    as _obs_livestream,
-    )
-    _OBS_OK = True
-except Exception:
-    _OBS_OK = False
-    def _obs_load_config():              return {"enabled": False, "vault_path": ""}
-    def _obs_save_config(e, p):          pass
-    def _obs_export(vp, d=None):         return (False, "Obsidian module unavailable.")
-    def _obs_auto_export():              return ""
-    def _obs_detect_vault():             return ""
-    def _obs_livestream(u, a, m=""):     pass
-
-# ── Session Memory ─────────────────────────────────────────────────────────
-try:
-    from cursiv_v215.memory.session_log import (
-        append_exchange   as _session_append,
-        load_session_context as _load_session_ctx,
-    )
-    _SESSION_OK = True
-except Exception:
-    _SESSION_OK = False
-    def _session_append(u, a, m="unknown"): pass
-    def _load_session_ctx():                return ""
-
+from cursiv_v215.chat.web_search import (  # noqa: E402,F401  (moved; chat_app re-exports)
+    _wcache_get,
+    _wcache_store,
+    _wcache_evict,
+    _WCACHE_OK,
+    BRAVE_KEY,
+    _SEARCH_TRIGGERS,
+    _needs_search,
+    _ddg_search,
+    _brave_search,
+    _web_search,
+)
 # ── Owner mode (guardian/owner.py): an owner code set at runtime, stored hashed ──
 try:
     from cursiv_v215.guardian.owner import unlock_owner_session as _unlock_owner
@@ -241,148 +154,6 @@ def _cursiv_decode(binary: str) -> str:
 # ── Real-time web search (worldwide, zero API key required) ───────────────
 import urllib.parse as _urlparse
 import re as _re
-
-BRAVE_KEY = os.environ.get("BRAVE_API_KEY", "")
-
-_SEARCH_TRIGGERS = (
-    "latest ", "current ", "today ", "right now", "this week", "this month",
-    "who won", "what happened", "news ", "price of ", "weather ",
-    "search:", "search for", "look up", "find me ", "real-time", "realtime",
-    "live ", "breaking ", "recent ", "just announced", "just released",
-    "new version of", "stock price", "crypto price", "cryptocurrency",
-)
-
-def _needs_search(text: str) -> bool:
-    """Web search only when the person asks for it ("search: ..."), or when they
-    turned on automatic search ('websearch on'). Never while offline mode is on.
-    The trigger words used to fire on their own and send the message to
-    DuckDuckGo ("...the farm where we live", "right now"): AUDIT C-009."""
-    if not netgate.allowed():
-        return False
-    lower = text.lower().lstrip()
-    if lower.startswith("search:") or lower.startswith("search "):
-        return True
-    return netgate.web_search_auto() and any(t in lower for t in _SEARCH_TRIGGERS)
-
-def _ddg_search(query: str, max_results: int = 4) -> str:
-    """DuckDuckGo: Instant Answer API with Lite HTML fallback."""
-    # ── Instant Answer API (fast, structured, worldwide) ──
-    try:
-        url = (
-            f"https://api.duckduckgo.com/?q={_urlparse.quote(query)}"
-            f"&format=json&no_html=1&skip_disambig=1&t=Cursiv"
-        )
-        req = urllib.request.Request(url, headers={"User-Agent": "Cursiv/3.14 (search)"})
-        with urllib.request.urlopen(req, timeout=6) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        parts = []
-        if data.get("Answer"):
-            parts.append(f"Direct answer: {data['Answer']}")
-        if data.get("AbstractText"):
-            parts.append(f"{data['AbstractText']}\nSource: {data.get('AbstractURL', '')}")
-        for t in data.get("RelatedTopics", [])[:3]:
-            if isinstance(t, dict) and t.get("Text"):
-                parts.append(t["Text"])
-        if parts:
-            return "\n\n".join(parts)
-    except Exception:
-        pass
-
-    # ── Lite HTML fallback (catches news / current events) ──
-    try:
-        url = f"https://lite.duckduckgo.com/lite/?q={_urlparse.quote(query)}"
-        req = urllib.request.Request(url, headers={
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
-        })
-        with urllib.request.urlopen(req, timeout=7) as r:
-            html = r.read().decode("utf-8", errors="replace")
-        text  = _re.sub(r"<[^>]+>", " ", html)
-        text  = _re.sub(r"\s+", " ", text)
-        snips = _re.findall(r"[A-Z][^.!?]{30,250}[.!?]", text)
-        seen, results = set(), []
-        for s in snips:
-            s = s.strip()
-            if s not in seen and len(s) > 40:
-                seen.add(s)
-                results.append(s)
-            if len(results) >= max_results:
-                break
-        if results:
-            return "\n\n".join(results)
-    except Exception:
-        pass
-
-    return ""
-
-def _brave_search(query: str, max_results: int = 4) -> str:
-    """Brave Search API — best quality, requires BRAVE_API_KEY env var."""
-    try:
-        url = (
-            f"https://api.search.brave.com/res/v1/web/search"
-            f"?q={_urlparse.quote(query)}&count={max_results}"
-        )
-        req = urllib.request.Request(url, headers={
-            "Accept": "application/json",
-            "X-Subscription-Token": BRAVE_KEY,
-        })
-        with urllib.request.urlopen(req, timeout=6) as r:
-            data = json.loads(r.read().decode("utf-8"))
-        results = data.get("web", {}).get("results", [])
-        lines = []
-        for item in results[:max_results]:
-            title = item.get("title", "")
-            desc  = item.get("description", "")
-            src   = item.get("url", "")
-            if desc:
-                lines.append(f"{title}\n{desc}\nSource: {src}")
-        return "\n\n".join(lines) if lines else ""
-    except Exception:
-        return _ddg_search(query, max_results)
-
-def _web_search(query: str, max_results: int = 4) -> str:
-    """
-    Worldwide real-time web search with TTL cache.
-    Cache-first: returns cached result within 24h TTL.
-    Falls back to cache (marked [cached]) when offline.
-    Uses Brave Search API if BRAVE_API_KEY is set, else DuckDuckGo.
-    """
-    q = query.strip()
-    if not q:
-        return ""
-    for prefix in ("search:", "search "):
-        if q.lower().startswith(prefix):
-            q = q[len(prefix):].strip()
-            break
-
-    # Cache check (fresh hit — serve without touching network)
-    if _WCACHE_OK:
-        hit = _wcache_get(q)
-        if hit:
-            result, fresh = hit
-            if fresh:
-                return result
-
-    # Live search (never while offline mode is on)
-    live_result = ""
-    if not netgate.allowed():
-        pass
-    elif BRAVE_KEY:
-        live_result = _brave_search(q, max_results)
-    if not live_result and netgate.allowed():
-        live_result = _ddg_search(q, max_results)
-
-    if live_result and _WCACHE_OK:
-        _wcache_store(q, live_result)
-        return live_result
-
-    # Offline fallback — serve stale cache with label
-    if _WCACHE_OK and not live_result:
-        stale = _wcache_get(q, allow_stale=True)
-        if stale:
-            result, _ = stale
-            return f"[cached — offline fallback]\n{result}"
-
-    return live_result
 
 # ── File tool definitions (xAI / OpenAI tool-call schema) ─────────────────
 FILE_TOOLS = [

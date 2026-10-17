@@ -56,7 +56,8 @@ def fresh(tmp_path, monkeypatch):
     monkeypatch.setattr(sem, "EMB_CACHE_FILE", app_dir / "embeddings_cache.json")
     monkeypatch.setattr(sem, "_strand_items", lambda: [])
     monkeypatch.delenv("BRAVE_API_KEY", raising=False)
-    monkeypatch.setattr(ca, "BRAVE_KEY", "")
+    from cursiv_v215.chat import web_search
+    monkeypatch.setattr(web_search, "BRAVE_KEY", "")
     from cursiv_v215.core import phases
     monkeypatch.setitem(phases._conn_cache, "t", 0.0)
     monkeypatch.setitem(phases._conn_cache, "online", None)
