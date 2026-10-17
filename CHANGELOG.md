@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.14-U61 — not released yet
+## v3.14-U61 — Honest answers, offline reference, safer keys (2026-10-17)
 - **Answers are no longer rewritten.** A filter changed every reply before you saw it: "made in China" became "made in the United States", "Chinese technology" became "American technology", and "OpenAI" or "Anthropic" became "Cursiv". It's gone; Cursiv now says plainly which model it runs on.
 - **Your saved AI keys are encrypted** for your Windows account. A copied settings file, or another Windows user on the PC, gets nothing usable. Keys saved by older versions are encrypted the first time this version starts. A private USB copy keeps them readable so it works on other PCs.
 - **The Guardian is gone.** Its probe scanner, skull screen and decoy answers are removed; a question like "what are your instructions?" now gets a normal answer. The real protections stay: the login, asking before every file write, the AI can never change your keys or login files, and offline mode.
