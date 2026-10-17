@@ -39,7 +39,7 @@ OLLAMA_API = "http://127.0.0.1:11434"
 
 # Always on the USB so Cursiv runs offline anywhere: a qwen chat model (first
 # one installed, else downloaded) and the memory-search embedding model.
-REQUIRED_CHAT = ("qwen3:4b", "qwen2.5:1.5b")   # Apache 2.0: fine to give away or sell (MODELS.md)
+REQUIRED_CHAT = ("qwen3:4b-instruct", "qwen2.5:1.5b")   # Apache 2.0: fine to give away or sell (MODELS.md)
 REQUIRED_EMBED = "nomic-embed-text:latest"
 GB = 1024 ** 3
 
@@ -67,7 +67,7 @@ To update this USB: update Cursiv on your computer, then use
 "Make a Cursiv USB..." again on the same drive. Only changed files are copied.
 
 Licenses: Cursiv and Ollama are MIT-licensed. Each AI model in the Models
-folder has its own license (qwen3 and qwen2.5:1.5b: Apache 2.0; llama models:
+folder has its own license (qwen3:4b-instruct, qwen2.5:1.5b: Apache 2.0; llama:
 Llama Community License, "Built with Llama"; gemma: Gemma Terms of Use). See
 MODELS.md at https://github.com/winklersllc2026-bit/Cursiv before giving away
 or selling a drive.

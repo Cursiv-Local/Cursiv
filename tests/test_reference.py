@@ -76,3 +76,7 @@ def test_medical_emergency_gets_first_aid_but_a_crisis_gets_care(fresh, monkeypa
     assert "988" in out
     assert prompts[0].startswith("You are Cursiv, a caring personal assistant")
     assert "offline reference" not in prompts[0]
+
+
+def test_water_arithmetic_is_not_a_reference_question():
+    assert ref.lookup("We have 4 people and each needs 3 liters of water a day. How much for 3 days?") == []

@@ -873,7 +873,8 @@ def _build_live_status() -> str:
         sc = _strand_count()
         items.append(f"Saved notes: {sc}")
 
-    lines = ["\n\n---", f"## Available right now (Cursiv {version})", ""]
+    lines = ["\n\n---", f"## Available right now (Cursiv {version})",
+             "For your reference only: don't mention these unless the person asks what you can do.", ""]
     lines += [f"- {t}" for t in items]
     return "\n".join(lines)
 

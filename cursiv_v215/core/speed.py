@@ -90,18 +90,25 @@ def num_ctx() -> int:
 def chat_model_prefs() -> tuple[str, ...]:
     """Preferred chat models, best first, for this GPU (only installed ones are used).
 
-    Licenses (see MODELS.md): qwen3 and qwen2.5:1.5b are Apache 2.0; llama3.x and
-    gemma3 allow commercial use under their own terms. qwen2.5:3b is under Qwen's
-    research-only license, so it's last: used only if nothing else is installed."""
+    Licenses (see MODELS.md): qwen3:4b-instruct and qwen2.5:1.5b are Apache 2.0;
+    llama3.x and gemma3 allow commercial use under their own terms. qwen2.5:3b is
+    under Qwen's research-only license, so it's last: used only if nothing else is.
+
+    qwen3:4b-instruct is Qwen3's non-thinking model. Plain qwen3:4b / qwen3:8b think
+    out loud first: live on a 4 GB card a short answer took 4 minutes and showed the
+    reasoning, and neither "think": false nor /no_think turned it off."""
     if small_gpu():
-        return ("qwen3:4b", "llama3.2:3b", "qwen2.5:1.5b", "gemma3:4b", "llama3.1", "qwen2.5:3b")
-    return ("qwen3:8b", "llama3.1", "qwen3:4b", "llama3.2:3b", "gemma3:4b", "qwen2.5:1.5b", "qwen2.5:3b")
+        return ("qwen3:4b-instruct", "llama3.2:3b", "qwen2.5:1.5b", "gemma3:4b", "llama3.1",
+                "qwen3:4b", "qwen2.5:3b")
+    return ("llama3.1", "qwen3:4b-instruct", "llama3.2:3b", "gemma3:4b", "qwen2.5:1.5b",
+            "qwen3:8b", "qwen3:4b", "qwen2.5:3b")
 
 
 def no_thinking(model: str) -> dict:
     """Ollama options that turn off a thinking model's long hidden reasoning
     (qwen3 thinks by default: slower, and the reasoning isn't for the person)."""
-    return {"think": False} if (model or "").startswith("qwen3") else {}
+    m = model or ""
+    return {"think": False} if m.startswith("qwen3") and "instruct" not in m else {}
 
 
 def code_model_prefs() -> tuple[str, ...]:

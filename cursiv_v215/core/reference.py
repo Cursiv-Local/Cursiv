@@ -134,7 +134,7 @@ def lookup(question: str, limit: int = 2) -> list[Entry]:
         if _alias_hit(e.title, question):
             hit = max(hit, _need(title))   # an everyday phrase for the topic names it
         # the question names most of the topic, or one topic word plus two of the entry's words
-        if hit < _need(title) and not (hit >= 1 and len((q - title) & _words(e.text)) >= 2):
+        if hit < _need(title) and not (len(title) > 2 and hit >= 1 and len((q - title) & _words(e.text)) >= 2):
             continue
         scored.append((hit / len(title), hit, e))
     scored.sort(key=lambda t: (t[0], t[1]), reverse=True)

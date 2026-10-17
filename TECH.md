@@ -74,7 +74,7 @@ pip install -r requirements.txt
 python launcher/main.py
 ```
 
-Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b`), or use the Setup window, or add a free Gemini/Groq key.
+Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-instruct`), or use the Setup window, or add a free Gemini/Groq key.
 
 ---
 
