@@ -125,6 +125,8 @@ def required_names(models: list[dict]) -> list[str]:
 
 def pull_model(tag: str, sig, cancel: threading.Event) -> None:
     """Download a model into this computer's Ollama so it can be copied."""
+    from cursiv_v215.core import netgate
+    netgate.require(f"Downloading {tag}")
     req = urllib.request.Request(f"{OLLAMA_API}/api/pull",
                                  data=json.dumps({"name": tag, "stream": True}).encode(),
                                  headers={"Content-Type": "application/json"})

@@ -104,10 +104,20 @@ def _http(path: str, payload: dict | None = None, timeout: float = 30) -> dict:
         return json.loads(r.read().decode("utf-8"))
 
 
+def _downloads_allowed() -> bool:
+    """Ollama fetches the model from the internet: not while offline mode is on
+    (core/netgate.py). Word-overlap recall is used instead."""
+    try:
+        from cursiv_v215.core import netgate
+        return netgate.allowed()
+    except Exception:
+        return False
+
+
 def _pull_embed_model() -> None:
     """Download the small embedding model once, in the background (~270 MB)."""
     global _pulling, _embed_ok
-    if _pulling:
+    if _pulling or not _downloads_allowed():
         return
     _pulling = True
     try:
@@ -133,7 +143,7 @@ def embeddings_available() -> bool:
     except Exception:
         return False                 # Ollama not running -- check again later
     _embed_ok = any(n.split(":")[0] == EMBED_MODEL for n in names)
-    if not _embed_ok:
+    if not _embed_ok and _downloads_allowed():
         threading.Thread(target=_pull_embed_model, daemon=True).start()
     return _embed_ok
 

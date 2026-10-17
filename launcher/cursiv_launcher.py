@@ -60,6 +60,23 @@ _CURRENT_VERSION   = "3.14-U59"
 _GITHUB_API        = "https://api.github.com/repos/winklersllc2026-bit/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/winklersllc2026-bit/Cursiv/releases"
 
+
+def _auto_update_check_on() -> bool:
+    """Automatic update check after login: off unless turned on, never offline."""
+    try:
+        from cursiv_v215.core import netgate
+        return netgate.update_check_auto()
+    except Exception:
+        return False
+
+
+def _net_allowed() -> bool:
+    try:
+        from cursiv_v215.core import netgate
+        return netgate.allowed()
+    except Exception:
+        return True
+
 # ── Fleet dashboard ────────────────────────────────────────────────────────────
 _RELAY_URL    = os.environ.get("CURSIV_RELAY_URL",    "").rstrip("/")
 _FLEET_TOKEN  = os.environ.get("CURSIV_FLEET_TOKEN",  "")
@@ -1255,8 +1272,11 @@ class CursivLauncher(QMainWindow):
 
         # Cleanup hook — fires on every quit path (TitleBar X, tray Quit, etc.)
         QApplication.instance().aboutToQuit.connect(self._cleanup)
-        # Look for a newer release shortly after startup; silent unless one exists.
-        QTimer.singleShot(10_000, lambda: self._check_updates(automatic=True))
+        # Look for a newer release shortly after startup, only if the person turned
+        # that on ('autoupdate on' / Settings) and offline mode is off. Silent
+        # unless one exists. The Check for Updates button works either way.
+        if _auto_update_check_on():
+            QTimer.singleShot(10_000, lambda: self._check_updates(automatic=True))
         # Phone app <-> this person's memory: learn from phone chats, share a summary back.
         self._phone_sync_timer = QTimer(self)
         self._phone_sync_timer.timeout.connect(self._phone_sync)
@@ -1592,6 +1612,12 @@ class CursivLauncher(QMainWindow):
         """Manual (button/tray) or automatic (shortly after startup) update check.
         The automatic one stays silent unless a newer version actually exists."""
         self._update_check_auto = automatic
+        if automatic and not _auto_update_check_on():
+            return
+        if not _net_allowed():
+            if not automatic:
+                self._set_status("Offline mode is on, so Cursiv won't contact GitHub. Type 'offline off' to check for updates.")
+            return
         if not automatic:
             self._upd_btn.setEnabled(False)
             self._upd_btn.setText("Checking…")

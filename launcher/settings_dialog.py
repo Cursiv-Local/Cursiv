@@ -155,6 +155,32 @@ class SettingsDialog(QDialog):
             self._cloud.setEnabled(False)
         lay.addWidget(cloud_card)
 
+        # ── Internet (core/netgate.py) ──
+        net_card = QFrame(); net_card.setObjectName("card")
+        nv = QVBoxLayout(net_card)
+        nv.setContentsMargins(14, 10, 14, 10)
+        net_rows = (
+            ("offline_mode", "Offline mode — nothing leaves this computer (cloud AI, web search, updates, downloads)"),
+            ("web_search_auto", "Search the web automatically when a question sounds current (\"today\", \"right now\")"),
+            ("update_check_auto", "Check for updates automatically after login"),
+        )
+        try:
+            from cursiv_v215.core import netgate
+            for name, label in net_rows:
+                box = QCheckBox(label)
+                box.setChecked(netgate.setting(name))
+                box.toggled.connect(lambda on, n=name: netgate.set_setting(n, on))
+                nv.addWidget(box)
+        except Exception:
+            nv.addWidget(QLabel("Internet settings are unavailable."))
+        net_note = QLabel("Web search and update checks are off unless you turn them on. A message that starts "
+                          "with \"search:\" always searches (unless offline mode is on). The Check for Updates "
+                          "button works either way.")
+        net_note.setWordWrap(True)
+        net_note.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
+        nv.addWidget(net_note)
+        lay.addWidget(net_card)
+
         # ── Data folder ──
         data_row = QHBoxLayout()
         data_dir = Path.home() / ".cursiv"

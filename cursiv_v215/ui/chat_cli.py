@@ -39,6 +39,7 @@ if hasattr(sys.stdout, "reconfigure"):
 _HERE = Path(__file__).parent
 sys.path.insert(0, str(_HERE.parent.parent))
 
+from cursiv_v215.core import netgate as _netgate
 from cursiv_v215.ui.chat_app import (
     WRITE_SENTINEL,
     RATE_SENTINEL,
@@ -1236,8 +1237,8 @@ def main() -> None:
         "openai_live": None,
         "claude_live": None,
         # ── Sovereign architecture controls ───────────────────────────
-        "trust_tier":    3,       # 1=offline-only  2=local+1ext  3=full council
-        "offline_mode":  False,   # hard-block ALL external APIs
+        "trust_tier":    1 if _netgate.is_offline() else 3,   # 1=offline-only  2=local+1ext  3=full council
+        "offline_mode":  _netgate.is_offline(),   # core/netgate.py: blocks every connection off this computer
         "cursiv_mode":   "personal",  # "personal" | "governor"
     }
 
@@ -1390,12 +1391,14 @@ def main() -> None:
             continue
 
         elif cmd in ("offline on", "offline off"):
-            cfg["offline_mode"] = cmd == "offline on"
+            _netgate.set_offline(cmd == "offline on")
+            cfg["offline_mode"] = _netgate.is_offline()
             if cfg["offline_mode"]:
                 cfg["trust_tier"] = 1
                 print(f"  {GREEN}⬡ OFFLINE SOVEREIGN MODE{RESET}  "
-                      f"{DIM}All external APIs blocked. Tier forced to 1.{RESET}")
+                      f"{DIM}No connections off this computer. Tier forced to 1. Stays on after restart.{RESET}")
             else:
+                cfg["trust_tier"] = 3
                 print(f"  {SILV2}Offline mode OFF.{RESET}  {DIM}External routing restored.{RESET}")
             _print_header(cfg)
             continue

@@ -350,6 +350,11 @@ class StreamResult:
         self.on_complete = on_complete
 
 
+def _gate():
+    from cursiv_v215.core import netgate
+    return netgate
+
+
 def _default_cfg() -> dict:
     """Same shape as chat_cli.py's cfg dict, minus the terminal-only fields."""
     return {
@@ -360,8 +365,8 @@ def _default_cfg() -> dict:
         "obsidian_enabled": False,
         "obsidian_path":    "",
         "overseer_mode":    False,
-        "trust_tier":       3,
-        "offline_mode":     False,
+        "trust_tier":       1 if _gate().is_offline() else 3,
+        "offline_mode":     _gate().is_offline(),
         "cursiv_mode":      "personal",
         "last_user_msg":    "",
         "_last_council_synthesis": "",
@@ -709,7 +714,9 @@ MODEL & TRUST
   grok / claude              re-run last message with that model
   overseer on / off          Claude reviews every Grok response
   tier 1 / tier 2 / tier 3    offline-only -> local-first -> full council
-  offline on / off           hard-block all external APIs
+  offline on / off           block every connection off this computer (stays on after restart)
+  websearch on / off         search the web automatically for current-sounding questions (off by default)
+  autoupdate on / off        check GitHub for updates after login (off by default)
 
 OTHER
   rate good / bad / <1-5>    rate the last response
@@ -760,7 +767,9 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             f"Anthropic key: {'set' if cfg.get('anthropic_key') else 'not set'}",
             f"File access:   {'ON' if cfg.get('file_access') else 'OFF'}",
             f"Trust tier:    {cfg.get('trust_tier', 3)}",
-            f"Offline mode:  {'ON' if cfg.get('offline_mode') else 'OFF'}",
+            f"Offline mode:  {'ON' if _gate().is_offline() else 'OFF'}",
+            f"Web search:    {'automatic' if _gate().setting('web_search_auto') else 'only search:'}",
+            f"Update check:  {'automatic' if _gate().setting('update_check_auto') else 'manual'}",
             f"Cursiv mode:   {cfg.get('cursiv_mode', 'personal')}",
             f"Overseer:      {'ON' if cfg.get('overseer_mode') else 'OFF'}",
             f"Workspace:     {cfg.get('workspace', '')}",
@@ -773,11 +782,41 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         return TextResult(f"Trust tier → {cfg['trust_tier']} — {labels[cfg['trust_tier']]}")
 
     if cmd in ("offline on", "offline off"):
-        cfg["offline_mode"] = cmd == "offline on"
+        from cursiv_v215.core import netgate
+        try:
+            netgate.set_offline(cmd == "offline on")
+        except Exception as exc:
+            return TextResult(f"Couldn't save offline mode ({exc}). Nothing was changed.")
+        cfg["offline_mode"] = netgate.is_offline()
         if cfg["offline_mode"]:
             cfg["trust_tier"] = 1
-            return TextResult("Offline sovereign mode ON — all external APIs blocked, tier forced to 1.")
-        return TextResult("Offline mode OFF — external routing restored.")
+            return TextResult("Offline mode ON — Cursiv won't connect to anything outside this computer "
+                              "(cloud AI, web search, update checks, model downloads). Your local model still works. "
+                              "This stays on after a restart; type 'offline off' to undo.")
+        cfg["trust_tier"] = 3
+        return TextResult("Offline mode OFF — keys you've added, Cursiv Cloud and 'search:' can reach the internet again. "
+                          "Automatic web search and update checks stay as set ('websearch on', 'autoupdate on').")
+
+    if cmd in ("websearch on", "websearch off", "websearch"):
+        from cursiv_v215.core import netgate
+        if cmd != "websearch":
+            netgate.set_setting("web_search_auto", cmd == "websearch on")
+        on = netgate.setting("web_search_auto")
+        return TextResult(
+            ("Automatic web search ON — questions that sound current (\"today\", \"right now\") are sent to "
+             "DuckDuckGo. Type 'websearch off' to stop." if on else
+             "Automatic web search OFF — only messages that start with 'search:' go to the web.")
+            + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
+
+    if cmd in ("autoupdate on", "autoupdate off", "autoupdate"):
+        from cursiv_v215.core import netgate
+        if cmd != "autoupdate":
+            netgate.set_setting("update_check_auto", cmd == "autoupdate on")
+        on = netgate.setting("update_check_auto")
+        return TextResult(
+            ("Automatic update check ON — Cursiv asks GitHub for a new version after you log in."
+             if on else "Automatic update check OFF — use \"Check for Updates\" when you want to.")
+            + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
 
     if cmd in ("governor on", "governor off", "governor"):
         if cmd == "governor off":
@@ -1282,6 +1321,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         query = text[7:].strip()
         if not query:
             return TextResult("Usage: search <query>")
+        if _gate().is_offline():
+            return TextResult(f"Web search skipped. {_gate().OFFLINE_MESSAGE}")
         results = _web_search(query)
         if not results:
             return TextResult("No web results found. Check internet connection or try a different query.")
@@ -1295,6 +1336,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
 
     # ── Page pull ────────────────────────────────────────────────────────
     if cmd.startswith("pull "):
+        if _gate().is_offline():
+            return TextResult(f"Page pull skipped. {_gate().OFFLINE_MESSAGE}")
         url = text[5:].strip()
         if not url.startswith(("http://", "https://")):
             url = "https://" + url

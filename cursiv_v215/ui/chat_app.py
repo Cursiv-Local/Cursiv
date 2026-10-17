@@ -20,6 +20,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Generator
 
+from cursiv_v215.core import netgate   # installs the offline backstop; see core/netgate.py
+
 # ── Token rate limiter + scan display ──────────────────────────────────────
 try:
     from cursiv_v215.core.rate_limiter import limiter as _rate_limiter
@@ -273,10 +275,16 @@ _SEARCH_TRIGGERS = (
 )
 
 def _needs_search(text: str) -> bool:
-    lower = text.lower()
+    """Web search only when the person asks for it ("search: ..."), or when they
+    turned on automatic search ('websearch on'). Never while offline mode is on.
+    The trigger words used to fire on their own and send the message to
+    DuckDuckGo ("...the farm where we live", "right now"): AUDIT C-009."""
+    if not netgate.allowed():
+        return False
+    lower = text.lower().lstrip()
     if lower.startswith("search:") or lower.startswith("search "):
         return True
-    return any(t in lower for t in _SEARCH_TRIGGERS)
+    return netgate.web_search_auto() and any(t in lower for t in _SEARCH_TRIGGERS)
 
 def _ddg_search(query: str, max_results: int = 4) -> str:
     """DuckDuckGo: Instant Answer API with Lite HTML fallback."""
@@ -376,11 +384,13 @@ def _web_search(query: str, max_results: int = 4) -> str:
             if fresh:
                 return result
 
-    # Live search
+    # Live search (never while offline mode is on)
     live_result = ""
-    if BRAVE_KEY:
+    if not netgate.allowed():
+        pass
+    elif BRAVE_KEY:
         live_result = _brave_search(q, max_results)
-    if not live_result:
+    if not live_result and netgate.allowed():
         live_result = _ddg_search(q, max_results)
 
     if live_result and _WCACHE_OK:
@@ -1384,6 +1394,10 @@ def _resolve_ollama_model() -> str | None:
 
 def _pull_ollama_model(model: str) -> Generator[str, None, None]:
     """Download a model through Ollama's API, yielding short progress lines."""
+    if not netgate.allowed():
+        yield (f"\n[No local model installed yet, and offline mode is on, so {model} can't be "
+               "downloaded. Type 'offline off' to allow it.]\n")
+        return
     yield f"\n[No local model installed yet -- downloading {model} (one-time setup, a few GB)...]\n"
     last_pct = -10
     try:
@@ -1479,6 +1493,7 @@ def _text_messages(messages: list[dict]) -> list[dict]:
 
 
 def _post_json(url: str, payload: dict, headers: dict, timeout: float) -> dict:
+    netgate.require("Cloud AI")
     # A real User-Agent: Groq's API sits behind Cloudflare, which blocks Python's
     # default "Python-urllib" agent outright (HTTP 403, error code 1010).
     req = urllib.request.Request(url, data=json.dumps(payload).encode(),
@@ -1643,8 +1658,8 @@ def _save_cloud_settings(data: dict) -> None:
 
 def cloud_enabled() -> bool:
     # Off unless the person turns it on (Setup / Settings / "cloud on"): it sends
-    # their messages to cursiv.winklers-llc.com.
-    return bool(_cloud_settings().get("enabled", False))
+    # their messages to cursiv.winklers-llc.com. Never while offline mode is on.
+    return netgate.allowed() and bool(_cloud_settings().get("enabled", False))
 
 
 def set_cloud_enabled(on: bool) -> None:
@@ -1707,6 +1722,8 @@ def free_key_command(text: str) -> str | None:
             _store_key(field, key)
             return f"{name.title()} key saved and working. Cursiv will use it when your other providers aren't available."
     if cmd in ("cloud", "cloud status"):
+        if netgate.is_offline():
+            return f"Cursiv Cloud isn't used while offline mode is on. {netgate.OFFLINE_MESSAGE}"
         on = cloud_enabled()
         return (f"Cursiv Cloud is {'ON' if on else 'OFF'}. "
                 + ("It answers only when no local model is ready (Ollama not installed or no model yet), "
@@ -1743,6 +1760,8 @@ def _local_llm(messages: list[dict], max_tokens: int) -> str:
 
 def _free_key_llm(messages: list[dict], max_tokens: int) -> str:
     """The user's own free Groq/Gemini key. Only for when no local model is ready."""
+    if not netgate.allowed():
+        return ""
     for field, fn in (("groq_key", _call_groq_direct), ("gemini_key", _call_gemini_direct)):
         key = _saved_key(field)
         if key:
@@ -1862,6 +1881,8 @@ def cascade_stream(
     provider that actually answered once the generator starts producing text.
     """
     local = (lambda: local_fn(messages)) if local_fn else (lambda: _call_ollama(messages, max_tokens=max_tokens))
+    if not netgate.allowed():
+        keys = {}                 # offline mode: the local model only
     attempts: list[tuple[str, Callable[[], Generator[str, None, None]]]] = []
     if _local_model_ready():
         attempts.append(("Ollama (local)", local))     # tried like a provider: may fall through
@@ -1871,8 +1892,8 @@ def cascade_stream(
         attempts.append(("xAI", lambda: _call_xai_stream(messages, keys["api_key"], False, max_tokens)))
     if keys.get("openai_key"):
         attempts.append(("OpenAI", lambda: _call_openai_direct(messages, keys["openai_key"])))
-    gemini_key = keys.get("gemini_key") or _saved_key("gemini_key")
-    groq_key = keys.get("groq_key") or _saved_key("groq_key")
+    gemini_key = keys.get("gemini_key") or (_saved_key("gemini_key") if netgate.allowed() else "")
+    groq_key = keys.get("groq_key") or (_saved_key("groq_key") if netgate.allowed() else "")
     if groq_key:
         attempts.append(("Groq", lambda: _call_groq_direct(messages, groq_key, max_tokens)))
     if gemini_key:
@@ -2745,7 +2766,10 @@ def _call_provider_council(
 
 
 def _is_online() -> bool:
-    """TCP connect to 8.8.8.8:53 — tests internet without a DNS lookup."""
+    """TCP connect to 8.8.8.8:53 — tests internet without a DNS lookup.
+    False, without connecting, while offline mode is on."""
+    if not netgate.allowed():
+        return False
     import socket
     try:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -2754,6 +2778,26 @@ def _is_online() -> bool:
         return True
     except Exception:
         return False
+
+
+def _cloud_configured(*keys: str) -> bool:
+    """Is anything set up that could send this turn off the computer?"""
+    if any((k or "").strip() for k in keys):
+        return True
+    if any(_saved_key(f) for f in ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key")):
+        return True
+    return netgate.web_search_auto()
+
+
+def _connectivity_probe(*keys: str):
+    """For the Connectivity phase: None (not checked) when nothing would use the
+    internet -- offline mode on, or the local model ready with no cloud key or
+    cloud feature on. Otherwise the 8.8.8.8 check (AUDIT C-011)."""
+    if not netgate.allowed():
+        return None
+    if _local_model_ready() and not _cloud_configured(*keys):
+        return None
+    return _is_online()
 
 
 # ── Core chat function ────────────────────────────────────────────────────
@@ -2889,7 +2933,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             _search_q = _search_q[len(_pfx):].strip()
             break
     _web_ctx = ""
-    if _needs_search(user_text) and _is_online():
+    if netgate.is_offline() and user_text.lower().startswith(("search:", "search ")):
+        yield f"*[Web search skipped. {netgate.OFFLINE_MESSAGE}]*\n\n"
+    elif _needs_search(user_text) and _is_online():
         _web_ctx = _web_search(_search_q[:300])
     if _web_ctx:
         _RETRIEVED.append(_web_ctx)
@@ -2906,7 +2952,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _PHASE_AFTER = ""
     try:
         from cursiv_v215.core import phases as _phases
-        _ph = _phases.run(user_text, memory_fn=_build_strand_context, online_fn=_is_online,
+        _ph = _phases.run(user_text, memory_fn=_build_strand_context,
+                          online_fn=lambda: _connectivity_probe(api_key, openai_key, anthropic_key),
                           local_fn=lambda: _ollama_running() and _resolve_ollama_model() is not None)
         _addendum = _ph.system_addendum()
         if _ph.emergency:
@@ -3045,6 +3092,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     ant = (anthropic_key or "").strip()
     has_images = len(image_parts) > 0
     fp         = (force_provider or "").lower().strip()
+    if not netgate.allowed():
+        # Offline mode: saved keys stay saved but aren't used; the local model answers.
+        key = oai = ant = ""
+        if fp in ("grok", "claude", "openai", "council"):
+            yield f"*[{fp.title()} skipped. {netgate.OFFLINE_MESSAGE} Answering with the local model.]*\n\n"
+            fp = "ollama"
 
     def _workspace() -> Path:
         return (Path(root_path.strip()).expanduser().resolve()
@@ -3287,7 +3340,7 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str],
     Cursiv Cloud (if not turned off) answers before Ollama's first-time download."""
     # Groq first: it answers in under a second; Gemini is often overloaded on free keys
     for label, field, fn in (("Groq", "groq_key", _call_groq_direct), ("Gemini", "gemini_key", _call_gemini_direct)):
-        key = _saved_key(field)
+        key = _saved_key(field) if netgate.allowed() else ""
         if not key:
             continue
         tried.append(label)

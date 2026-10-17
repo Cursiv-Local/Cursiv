@@ -442,7 +442,14 @@ class SetupDialog(QDialog):
 
     def _do_pull(self, tag: str, step: str = "s2"):
         try:
-            req = urllib.request.Request(f"{OLLAMA_API}/api/pull", data=json.dumps({"name": tag, "stream": True}).encode(),
+            from cursiv_v215.core import netgate
+            if not netgate.allowed():
+                self._sig.done.emit(step, False, f"Can't download {tag}. {netgate.OFFLINE_MESSAGE}")
+                return
+        except ImportError:
+            pass
+        try:
+            req =urllib.request.Request(f"{OLLAMA_API}/api/pull", data=json.dumps({"name": tag, "stream": True}).encode(),
                                          headers={"Content-Type": "application/json"})
             with urllib.request.urlopen(req, timeout=3600) as r:
                 for line in r:

@@ -134,3 +134,25 @@ Not every turn that background-learning might touch is verified. Learning still 
 - `cascade_stream()` callers (Babel, council, codex commands) are not wrapped. Only `chat()`.
 - Conflict detection is lexical (shared content words + negation or different numbers). It will miss paraphrases embeddings would catch.
 - No browser or Qt run of the memory window. `fact_subtitle()` is what the dialog renders; that function is tested.
+
+## Network gate (Lane 2, 2026-10-17)
+
+`cursiv_v215/core/netgate.py` is the one switch for connections off this computer (AUDIT C-009, C-010, C-011). Settings live in `.cursiv/config.json` next to the keys:
+
+| Setting | Default | Command | What it does |
+|---|---|---|---|
+| `offline_mode` | off | `offline on/off` | Closes the gate. Persists across restarts. |
+| `web_search_auto` | off | `websearch on/off` | Trigger words ("today", "right now", "this week") search the web. Off: only a message starting `search:` / `search ` does. |
+| `update_check_auto` | off | `autoupdate on/off` | GitHub update check 10 s after login. The Check for Updates button always works (unless offline). |
+
+All three are also checkboxes in Settings.
+
+While the gate is closed:
+- `allowed()` is False. `_needs_search`, `_web_search`, `_is_online`, `_post_json`, `cloud_enabled`, `_free_key_llm`, the free-key fallback, `cascade_stream`, the forced providers (`grok`/`claude`/`openai`/`council` answer locally with a note), `_pull_ollama_model`, the Setup and USB model pulls, the embedding-model pull and the update check all stop first.
+- An audit hook (installed when netgate is imported, which `chat_app` does at import) raises `NetworkBlocked` (an OSError) on any non-loopback `socket.connect`, `sendto` or DNS lookup. That's the backstop for anything that forgot to ask. Ollama is on 127.0.0.1, so it keeps working. Saved keys are kept; they're just not used.
+
+The Connectivity phase no longer probes 8.8.8.8 on every message. `_connectivity_probe` returns None ("not checked") when the gate is closed, or when the local model is ready and no cloud key or `web_search_auto` is set. A None isn't cached.
+
+Proof: `tests/test_netgate.py` (records and refuses every outside connection with an audit hook) and `py -3.13 scripts/net_audit.py --offline` (a fresh copy of the source, an empty home, real `chat()` against the real local Ollama, logs every connection).
+
+Not changed: Cursiv Cloud is still on by default for people with no local model (`_cloud_settings` writes `enabled: True`). With the gate open and Ollama running, a missing `nomic-embed-text` is still pulled automatically. That's Ollama's traffic, not Cursiv's process.

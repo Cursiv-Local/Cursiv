@@ -183,19 +183,24 @@ def _connectivity(r: PhaseResult, online_fn, local_fn) -> None:
     if online_fn is None:
         r.trace.append(("Connectivity", "unknown"))
         return
-    if time.time() - _conn_cache["t"] > 60:
-        try:
-            _conn_cache["online"] = bool(online_fn())
-        except Exception:
-            _conn_cache["online"] = None
-        _conn_cache["t"] = time.time()
+    # online_fn returns None when it chose not to probe (offline mode, or nothing
+    # this turn would use the internet). That isn't cached, so turning a cloud
+    # feature on is seen on the next message.
     online = _conn_cache["online"]
+    if time.time() - _conn_cache["t"] > 60 or online is None:
+        try:
+            v = online_fn()
+        except Exception:
+            v = None
+        online = None if v is None else bool(v)
+        if online is not None:
+            _conn_cache["online"], _conn_cache["t"] = online, time.time()
     local = None
     try:
         local = bool(local_fn()) if local_fn else None
     except Exception:
         pass
-    r.trace.append(("Connectivity", f"{'online' if online else 'offline' if online is False else 'unknown'}"
+    r.trace.append(("Connectivity", f"{'online' if online else 'offline' if online is False else 'not checked'}"
                                     f", local model {'ready' if local else 'not ready' if local is False else 'unknown'}"))
 
 
