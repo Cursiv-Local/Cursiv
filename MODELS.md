@@ -25,5 +25,11 @@ have `qwen2.5:3b`, download qwen3 4B in Setup and remove the old one with
 
 Ollama itself is MIT-licensed.
 
+Every Cursiv USB drive has a `Licenses` folder: Cursiv's and Ollama's licenses, and the
+license text each model on the drive came with (read from the model, so it always matches),
+plus a `README.txt` listing them, "Built with Llama" when a Llama model is on the drive, and
+Google's prohibited-use policy link for Gemma. Keep that folder with the drive when you give
+or sell a copy.
+
 Sources: each model's page on ollama.com and huggingface.co (for example
 huggingface.co/Qwen/Qwen2.5-3B-Instruct, huggingface.co/Qwen/Qwen3-4B-Instruct-2507).

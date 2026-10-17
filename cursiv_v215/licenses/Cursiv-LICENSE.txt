@@ -1,0 +1,57 @@
+MIT License
+
+Copyright (c) 2026 Joshua Winkler. All rights reserved.
+Cursiv v3.14 — Ollama Ready Offline Edition
+
+This software was designed and built by Joshua Winkler. Every architectural
+decision, agent structure, deliberation system, Guardian firewall, and
+evolution pipeline in this codebase was conceived and directed by Joshua
+Winkler. All intellectual property rights are retained by the author.
+
+This software is shared freely with the world under the MIT License, with the
+intent that anyone may use, extend, and build upon it without restriction.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Third-Party Components
+----------------------
+
+This software bundles the following open-source components. Their respective
+licenses apply to those components:
+
+- Python 3.13          PSF License
+- PyQt6                GPL v3 / Commercial (Riverbank Computing)
+- llama3.1 (model)     Meta Llama 3 Community License
+- Ollama               MIT License
+- bcrypt               Apache License 2.0
+- sentence-transformers Apache License 2.0
+- gradio               Apache License 2.0
+- prompt_toolkit       BSD License
+- numpy                BSD License
+- pyarrow              Apache License 2.0
+- psutil               BSD License
+- Pillow               HPND License
+- pydantic             MIT License
+- anthropic SDK        MIT License
+- openai SDK           MIT License
+
+Full license texts for bundled components are included in the
+_internal/[package].dist-info/licenses/ directories of the application bundle.

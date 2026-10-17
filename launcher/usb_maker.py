@@ -66,11 +66,8 @@ computer to use this drive's models.
 To update this USB: update Cursiv on your computer, then use
 "Make a Cursiv USB..." again on the same drive. Only changed files are copied.
 
-Licenses: Cursiv and Ollama are MIT-licensed. Each AI model in the Models
-folder has its own license (qwen3:4b-instruct, qwen2.5:1.5b: Apache 2.0; llama:
-Llama Community License, "Built with Llama"; gemma: Gemma Terms of Use). See
-MODELS.md at https://github.com/winklersllc2026-bit/Cursiv before giving away
-or selling a drive.
+Licenses: the Licenses folder holds the license for Cursiv, for Ollama and for
+each AI model on this drive. Keep it with the drive when you give or sell a copy.
 """
 
 
@@ -121,6 +118,77 @@ def list_models() -> list[dict]:
         out.append({"name": name, "manifest": mf, "blobs": blobs,
                     "size": sum(b.stat().st_size for b in blobs)})
     return sorted(out, key=lambda m: m["name"])
+
+
+# ── Licenses on the drive ────────────────────────────────────────────────────
+# Every model's license travels with it: Ollama stores the text as a layer of
+# the model ("application/vnd.ollama.image.license"). Cursiv's and Ollama's own
+# licenses ship with Cursiv in cursiv_v215/licenses/.
+
+_LICENSE_LAYER = "application/vnd.ollama.image.license"
+_BUNDLED_LICENSES = Path(__file__).resolve().parent.parent / "cursiv_v215" / "licenses"
+if getattr(sys, "frozen", False):
+    _BUNDLED_LICENSES = Path(sys.executable).resolve().parent / "_internal" / "cursiv_v215" / "licenses"
+
+_EXTRA_TERMS = {
+    "llama": "Built with Llama. Meta's Acceptable Use Policy is at the end of the license file.",
+    "gemma": ("Google's Gemma Prohibited Use Policy also applies: "
+              "https://ai.google.dev/gemma/prohibited_use_policy"),
+}
+
+
+def model_license(model: dict) -> str:
+    """The license text Ollama stored with this model ("" if it has none)."""
+    try:
+        data = json.loads(Path(model["manifest"]).read_text(encoding="utf-8"))
+    except Exception:
+        return ""
+    parts = []
+    for layer in data.get("layers", []):
+        if layer.get("mediaType") == _LICENSE_LAYER and layer.get("digest"):
+            blob = models_dir() / "blobs" / layer["digest"].replace(":", "-")
+            try:
+                parts.append(blob.read_text(encoding="utf-8", errors="replace").strip())
+            except OSError:
+                pass
+    return "\n\n".join(p for p in parts if p)
+
+
+def _safe_name(name: str) -> str:
+    return "".join(c if c.isalnum() or c in "-._" else "_" for c in name)
+
+
+def write_licenses(root: Path, models: list[dict]) -> list[str]:
+    """Licenses/ on the drive: Cursiv, Ollama, and one file per model. Returns the
+    names of models that came without a license (said so in the index)."""
+    folder = root / "Licenses"
+    folder.mkdir(parents=True, exist_ok=True)
+    for old in folder.glob("*.txt"):
+        old.unlink(missing_ok=True)          # models removed from the drive drop out
+    for name in ("Cursiv-LICENSE.txt", "Ollama-LICENSE.txt"):
+        src = _BUNDLED_LICENSES / name
+        if src.exists():
+            shutil.copyfile(src, folder / name)
+    lines = ["Licenses for what's on this drive", "=================================", "",
+             "Cursiv: MIT (Cursiv-LICENSE.txt)", "Ollama, the AI engine: MIT (Ollama-LICENSE.txt)", "",
+             "AI models (each file is the license the model came with):"]
+    missing = []
+    for m in sorted(models, key=lambda m: m["name"]):
+        text = model_license(m)
+        family = m["name"].split(":")[0].split("/")[-1]
+        extra = next((v for k, v in _EXTRA_TERMS.items() if family.startswith(k)), "")
+        if text:
+            fname = f"model-{_safe_name(m['name'])}.txt"
+            (folder / fname).write_text(text + (f"\n\n{extra}\n" if extra else "\n"), encoding="utf-8")
+            lines.append(f"  {m['name']}: {fname}")
+        else:
+            missing.append(m["name"])
+            lines.append(f"  {m['name']}: no license came with this model -- check its page before sharing")
+        if extra:
+            lines.append(f"    {extra}")
+    lines += ["", "Details: MODELS.md at https://github.com/winklersllc2026-bit/Cursiv"]
+    (folder / "README.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return missing
 
 
 def required_names(models: list[dict]) -> list[str]:
@@ -425,6 +493,8 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             for cfg_file in (root / "Cursiv").rglob("config.json"):
                 if cfg_file.parent.name == ".cursiv":
                     keystore.export_readable(cfg_file)
+
+        write_licenses(root, models)
 
         (root / "Cursiv" / "portable.cursiv").write_text(
             "This copy of Cursiv runs from this drive. See README.txt.\n", encoding="utf-8")

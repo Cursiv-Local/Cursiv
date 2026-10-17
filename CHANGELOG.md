@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.14-U62 — not released yet
+- **Every Cursiv USB has a Licenses folder:** the license for Cursiv, for Ollama, and for each AI model on the drive (the exact text the model came with), with "Built with Llama" when a Llama model is included. Needed before giving away or selling a drive.
+- The old terminal chat and the modules only it used are gone (about 5,700 lines). The chat engine is being split into smaller parts in `cursiv_v215/chat/`.
+
 ## v3.14-U61 — Honest answers, offline reference, safer keys (2026-10-17)
 - **Answers are no longer rewritten.** A filter changed every reply before you saw it: "made in China" became "made in the United States", "Chinese technology" became "American technology", and "OpenAI" or "Anthropic" became "Cursiv". It's gone; Cursiv now says plainly which model it runs on.
 - **Your saved AI keys are encrypted** for your Windows account. A copied settings file, or another Windows user on the PC, gets nothing usable. Keys saved by older versions are encrypted the first time this version starts. A private USB copy keeps them readable so it works on other PCs.
