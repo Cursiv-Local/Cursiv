@@ -3346,7 +3346,7 @@ def _compact_notes(outcome) -> str:
         for line in str(problem).splitlines():
             line = line.strip().lstrip("-*0123456789. ").strip("* ").strip()
             if (len(line) < 12 or line.endswith(":") or "CLEAR" in line
-                    or line.lower().startswith(("none", "final answer", "additional information"))):
+                    or line.lower().startswith(("none", "final answer", "additional information", "a revised draft"))):
                 continue
             items.append(line if len(line) <= 160 else line[:157].rstrip() + "...")
             break                       # one line per problem
