@@ -115,7 +115,8 @@ def _downloads_allowed() -> bool:
 
 
 def _pull_embed_model() -> None:
-    """Download the small embedding model once, in the background (~270 MB)."""
+    """Download the small embedding model (~270 MB). Only Setup calls this, when the
+    person downloads a chat model: memory search never starts a download itself."""
     global _pulling, _embed_ok
     if _pulling or not _downloads_allowed():
         return
@@ -133,8 +134,8 @@ def _pull_embed_model() -> None:
 
 
 def embeddings_available() -> bool:
-    """True when Ollama is running and has the embedding model. If Ollama is
-    running without it, the model is downloaded in the background."""
+    """True when Ollama is running and has the embedding model. Without it, memory
+    search uses keyword matching; Setup downloads the model with the chat model."""
     global _embed_ok
     if _embed_ok is not None:
         return _embed_ok
@@ -143,8 +144,6 @@ def embeddings_available() -> bool:
     except Exception:
         return False                 # Ollama not running -- check again later
     _embed_ok = any(n.split(":")[0] == EMBED_MODEL for n in names)
-    if not _embed_ok and _downloads_allowed():
-        threading.Thread(target=_pull_embed_model, daemon=True).start()
     return _embed_ok
 
 

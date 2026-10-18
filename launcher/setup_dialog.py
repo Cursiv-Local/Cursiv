@@ -467,11 +467,24 @@ class SetupDialog(QDialog):
                     elif st.get("status"):
                         self._sig.progress.emit(step, -1, f"{tag}: {st['status']}")
                     if st.get("status") == "success":
+                        if step == "s2":
+                            self._pull_memory_search()
                         self._sig.done.emit(step, True, f"{tag} is ready.")
                         return
             raise RuntimeError("the download ended early — click Download to resume")
         except Exception as exc:
             self._sig.done.emit(step, False, f"Model download stopped: {exc}")
+
+    def _pull_memory_search(self):
+        """With the chat model, the small model memory search uses (~270 MB).
+        Nothing else downloads it."""
+        try:
+            from cursiv_v215.memory import semantic
+            if not semantic.embeddings_available():
+                self._sig.progress.emit("s2", -1, "Also downloading the memory-search model (about 270 MB)…")
+                semantic._pull_embed_model()
+        except Exception:
+            pass
 
     # ── Step 3 ───────────────────────────────────────────────────────────
     def _toggle_cloud(self, on: bool):

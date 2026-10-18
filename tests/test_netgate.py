@@ -291,3 +291,15 @@ def test_cursiv_cloud_is_off_on_a_fresh_install(fresh):
     assert ca.cloud_enabled() is False
     ca.set_cloud_enabled(True)
     assert ca.cloud_enabled() is True
+
+
+def test_memory_search_never_starts_a_download_even_online(fresh, monkeypatch):
+    # The embedding model comes only with Setup's model download (review 2026-10-18).
+    from cursiv_v215.memory import semantic as sem
+    monkeypatch.setattr(sem, "_embed_ok", None)
+    monkeypatch.setattr(sem, "_http", lambda path, payload=None, timeout=30: {"models": [{"name": "qwen3:4b-instruct"}]})
+    started = []
+    monkeypatch.setattr(threading, "Thread", lambda *a, **k: started.append(k.get("target")) or _NoThread())
+    netgate.set_offline(False)
+    assert sem.embeddings_available() is False
+    assert started == []
