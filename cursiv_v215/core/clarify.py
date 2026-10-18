@@ -36,6 +36,12 @@ def needs_clarifying(question: str, history: list[dict] | None) -> str:
     return m.group(1).lower() if len(content) <= 1 else ""
 
 
+def question(word: str) -> str:
+    """Cursiv's own reply: ask what the word refers to."""
+    return (f'What does "{word}" refer to? Tell me a little more (what it is, and what you want to know about it) '
+            "and I'll give you a useful answer.")
+
+
 def prompt_note(word: str) -> str:
     return (f"## Nothing says what \"{word}\" is\nThe message says \"{word}\", but nothing in it or earlier in the "
             "conversation says what that refers to. Ask one short question about what they mean. Don't guess and "

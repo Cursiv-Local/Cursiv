@@ -2634,7 +2634,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             from cursiv_v215.core import clarify as _clarify
             _vague = _clarify.needs_clarifying(user_text, history)
             if _vague:
-                messages[0]["content"] += "\n\n" + _clarify.prompt_note(_vague) + "\n"
+                # The model ignored the instruction and answered "Yes, it's safe" (site recording,
+                # 2026-10-18), so Cursiv asks the question itself.
+                global _CURSIV_REPLY
+                _CURSIV_REPLY = True
+                yield _clarify.question(_vague)
+                return
     except Exception:
         pass
 
@@ -3024,6 +3029,7 @@ def _learn_later(message, reply: str, *, origin: str = "inferred", skip: bool = 
 
 _PHASE_AFTER = ""   # end-of-reply note from core/phases.py for the current message
 _EMERGENCY_TURN = False   # phases flagged a crisis / medical emergency / danger this turn
+_CURSIV_REPLY = False     # Cursiv answered itself (no model), so there's no model answer to check
 _CODING_TURN = False  # this message went through the coding brain (cursiv_v215/coding)
 
 _SENTENCE_END = (".", "!", "?", "\n", ":", ";")
@@ -3082,9 +3088,10 @@ def chat(
     or the problems it could not clear. Lasting facts are then learned in the
     background. Casual turns skip the pass.
     """
-    global _PHASE_AFTER, _EMERGENCY_TURN
+    global _PHASE_AFTER, _EMERGENCY_TURN, _CURSIV_REPLY
     _PHASE_AFTER = ""                # set by the phases for this message only
     _EMERGENCY_TURN = False
+    _CURSIV_REPLY = False
     reply: list[str] = []
     from cursiv_v215.core import speed as _speed
     _speed.chat_started()
@@ -3112,7 +3119,7 @@ def chat(
         # Still inside this turn, so the check uses the fast router (no idle wait)
         # and background learning cannot take the local model yet.
         try:
-            if _EMERGENCY_TURN:
+            if _EMERGENCY_TURN or _CURSIV_REPLY:
                 raise _SkipCheck      # no slow check (or a wall of notes) after emergency steps
             from cursiv_v215.core import verify as _verify
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")

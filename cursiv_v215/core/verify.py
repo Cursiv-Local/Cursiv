@@ -428,6 +428,10 @@ def _authorities(sentence: str) -> list[str]:
     return names
 
 
+# A sentence saying the source isn't available isn't citing it ("I don't have a map").
+_NO_SOURCE = re.compile(r"(?i)\b(i (?:don'?t|do not) have|i have no|(?:can'?t|cannot) access|no access to|i (?:don'?t|do not) know of)\b")
+
+
 def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
     """A named source (the CDC, "the local government report") may only be cited
     when its text was actually looked up this turn, or the person brought it up."""
@@ -436,7 +440,7 @@ def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
     problems: list[str] = []
     seen: set[str] = set()
     for sentence in re.split(r"(?<=[.!?])\s+|\n+", body):
-        if not _ATTRIBUTION.search(sentence):
+        if not _ATTRIBUTION.search(sentence) or _NO_SOURCE.search(sentence):
             continue
         for name in _authorities(sentence):
             key = _authority_key(name)
@@ -473,8 +477,13 @@ def parse_verdict(text: str) -> tuple[bool, str]:
     plain = re.sub(r"[*_`#>]", "", raw).strip().lower()
     if _NO_PROBLEM.fullmatch(plain):
         return True, ""
+    lines = [ln.strip(" -•\t") for ln in plain.splitlines() if ln.strip(" -•\t")]
+    if lines and all(_EMPTY_FINDING.fullmatch(ln) for ln in lines):
+        return True, ""                      # "Unsupported claims: None" on every line
     return False, raw
 
+
+_EMPTY_FINDING = re.compile(r"[\w ,/()-]{2,60}:\s*(none|n/a|no|nothing|clear|none found|not applicable)\.?")
 
 # "CLEAR", "**CLEAR**", "None.", "No problems found.", "Clear - no problems found." (AUDIT C-002)
 _NO_PROBLEM = re.compile(

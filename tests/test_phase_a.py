@@ -163,3 +163,29 @@ def test_break_note_can_be_turned_off(fresh):
     assert phases._break_notes_on() is False
     keys.store_key("break_notes", "")
     assert phases._break_notes_on() is True
+
+
+# ── Found recording the website's answers (2026-10-18) ─────────────────────
+
+def test_vague_first_message_gets_cursivs_own_question(fresh, monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    _local_model(monkeypatch)
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))
+    out = "".join(ca.chat("Is it safe?", [], "", None))
+    assert 'What does "it" refer to?' in out and "safe" not in out.split("?")[0].lower().replace("it", "")
+
+
+def test_a_checker_listing_nothing_is_clear():
+    from cursiv_v215.core import verify
+    assert verify.parse_verdict("- Unsupported claims: None") == (True, "")
+    assert verify.parse_verdict("Unsupported claim: the CDC figure")[0] is False
+
+
+def test_saying_you_have_no_map_isnt_citing_one():
+    from cursiv_v215.core import verify
+    assert verify.citation_problems("where is it", "", "I don't have a map or location data to show where that is.") == []
+
+
+def test_no_council_hint_on_a_should_question():
+    from cursiv_v215.core import phases
+    assert "council" not in phases.run("What time should I get in bed?").after_reply

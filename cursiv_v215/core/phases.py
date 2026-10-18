@@ -162,12 +162,7 @@ def _route(text: str, r: PhaseResult) -> None:
         r.instructions.append("This is a coding question: give working code with a one-line explanation of each important part.")
         r.trace.append(("Route", "code"))
     elif _has(text, _DECISION):
-        if not _session["council_hinted"]:
-            _session["council_hinted"] = True
-            r.after_reply = "\n\n*For several perspectives on a decision like this, try:* `council " + text.strip()[:80] + "`"
-            r.trace.append(("Route", "decision -> direct answer, council suggested"))
-        else:
-            r.trace.append(("Route", "decision -> direct answer"))
+        r.trace.append(("Route", "decision -> direct answer"))
         r.instructions.append("This is a decision: give a clear recommendation and the main reason, then the strongest reason "
                               "against it.")
     else:
