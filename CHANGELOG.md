@@ -1,7 +1,16 @@
 # Changelog
 
-## v3.14-U62 — not released yet
+## v3.14-U62 — A simpler, clearer window (2026-10-17)
+- **A new, simpler window.** A clean start screen ("What can I help with?") with example questions you can click. Answers show real formatting (bold, lists), and under each one a small line says where it came from: **● Local** (this computer) or **● Online** (a service you set up).
+- **You can always see what can go online.** A pill at the top right says *Local only*, *Offline mode* or *Online features on* (with the exact list), read from the same switches the network code obeys. Click it to change them.
+- **Choose the AI model** from the menu at the top left; *Automatic* picks the best one for your computer.
+- **Everything is one click away** in the sidebar: Memory & Knowledge (what Cursiv remembers, and a searchable offline reference), Tools (letters, translate, phone, USB, coding help, council, agents; advanced tools tucked away), Settings and Help.
+- **One Settings window, in plain words.** Privacy & internet, AI model, Online AI (optional), How Cursiv answers (tone, memory learning), Appearance, Updates, Your data & account, Help & diagnostics. Every switch says what it does.
+- **Light, dark or match Windows**, and the change shows immediately.
+- **Conversations save themselves** (turn it off in Settings). No more "Save this conversation?" prompts.
+- **One calm colour scheme** across every window: one muted-gold accent, green and amber only for status, no stray blue, plain icons. The out-of-date Getting Started window is replaced by a short welcome card.
 - **Every Cursiv USB has a Licenses folder:** the license for Cursiv, for Ollama, and for each AI model on the drive (the exact text the model came with), with "Built with Llama" when a Llama model is included. Needed before giving away or selling a drive.
+- **Measured, not assumed:** the new Cursiv Truth Benchmark (116 questions, scored by code) ran on U61: 110 of 116 passed, with every answer and every failure published in `bench/`.
 - The old terminal chat and the modules only it used are gone (about 5,700 lines). The chat engine is being split into smaller parts in `cursiv_v215/chat/`.
 
 ## v3.14-U61 — Honest answers, offline reference, safer keys (2026-10-17)

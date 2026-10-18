@@ -53,7 +53,7 @@
       <p class="fine">Free · MIT license · Windows 10/11 (64-bit) · Active development</p>
     </div>
     <dl class="facts" aria-label="Current release">
-      <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">v3.14-U61</a> (October 2026)</span></div>
+      <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">v3.14-U62</a> (October 2026)</span></div>
       <div><span class="k">Runs on</span><span class="v">Your PC, through <a href="https://ollama.com">Ollama</a> (a free local model runner)</span></div>
       <div><span class="k">Default model</span><span class="v">qwen3 4B Instruct on 4–6 GB graphics cards; llama3.1 8B on 8 GB+</span></div>
       <div><span class="k">Needs internet</span><span class="v">Once, to download Ollama and a model. Not for everyday use.</span></div>
@@ -109,7 +109,7 @@
           <tr><td><b>Saved AI keys encrypted</b> (Windows DPAPI)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests. Memories and conversations are not encrypted on disk.</td></tr>
           <tr><td><b>Local login</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fails closed; new accounts need an existing login. A lock on the front door, not disk encryption.</td></tr>
           <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests. Each drive carries a Licenses folder for Cursiv, Ollama and every model on it (next release).</td></tr>
-          <tr><td><b>Truth benchmark</b> (116 cases, 9 categories)</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>First baseline (U61) in progress. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Truth benchmark</b> (116 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>First baseline run on U61: 110 of 116 passed. Every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
           <tr><td><b>Supporting tools:</b> coding help, sealed family letters, phone link, agents, plugins, LoRA training</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>Working features, outside the benchmark's scope for now.</td></tr>
           <tr><td><b>Structured observations, provenance ledger</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Records that keep "what was observed" separate from "what the AI inferred".</td></tr>
           <tr><td><b>Multiple nodes, synchronization, Mission Hub</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Only after the single-computer system is shown to be reliable. See <a href="/vision">Direction</a>.</td></tr>
@@ -135,10 +135,25 @@
       <p><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Read the cases, scoring and rules →</a></p>
     </div>
     <div class="card" id="results">
-      <h3>Results</h3>
-      <p style="margin-top:8px">The first baseline (release U61, suite 1.0, model qwen3 4B Instruct) is running. Results will be published here and in
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/RESULTS.md">bench/RESULTS.md</a> with every individual answer, including the failures.</p>
-      <p class="fine" style="margin-top:12px">No figures are shown until a complete run exists.</p>
+      <h3>First baseline: release U61</h3>
+      <p class="fine" style="margin-top:4px">Suite 1.0 · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · 17 Oct 2026</p>
+      <div class="table-wrap" style="margin-top:14px">
+        <table class="table">
+          <tbody>
+            <tr><td><b>Passed overall</b></td><td>110 of 116 (94.8%)</td></tr>
+            <tr><td><b>Accuracy</b> (answerable questions)</td><td>91.7%</td></tr>
+            <tr><td><b>Unsupported claims</b></td><td>2.6% of answers</td></tr>
+            <tr><td><b>Said "I can't know" when it couldn't</b></td><td>100% (19 cases)</td></tr>
+            <tr><td><b>False premises and traps</b></td><td>100% (16 cases)</td></tr>
+            <tr><td><b>Safety questions</b></td><td>100% (8 cases)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:12px">Of the 6 failures, 2 were real (a bedtime calculation, and a missed reference entry followed by a wrong claim)
+        and 4 were the benchmark's own checks being too strict. The published score stays as run.
+        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U61.md">Every failure and its cause →</a></p>
+      <p class="fine" style="margin-top:10px">This first suite is too easy at the top to separate future releases well; a harder version (1.1) is next.
+        Scores are only compared within the same suite version.</p>
     </div>
   </div>
 </section>
@@ -185,9 +200,10 @@
       <span class="eyebrow">The app</span>
       <h2>Real screens from the current version.</h2>
     </div>
+    <figure class="shot" style="margin:0 0 14px 0"><img src="/assets/shots/app-light.png" alt="Cursiv main window in light mode answering how to purify creek water, with the offline reference entry shown above the answer and a Local only status" loading="lazy" width="1200" height="780"><figcaption>An actual answer from the U61 benchmark run, shown in the new window (light mode). The grey box is the offline reference entry; the green pill says nothing is going online.</figcaption></figure>
     <div class="cards two">
-      <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window showing Ollama ready and installed local models" loading="lazy" width="950" height="888"><figcaption>Setup: installs Ollama and a model sized for your graphics card.</figcaption></figure>
-      <figure class="shot" style="margin:0"><img src="/assets/shots/settings.png" alt="Cursiv Settings window with optional AI keys, Cursiv Cloud, offline mode, web search and update switches" loading="lazy" width="975" height="710"><figcaption>Settings: optional keys, and the switches that control when anything goes online.</figcaption></figure>
+      <figure class="shot" style="margin:0"><img src="/assets/shots/settings-light.png" alt="Cursiv Settings window: Privacy and internet section with offline mode, automatic web search and Cursiv Cloud, each explained" loading="lazy" width="1125" height="750"><figcaption>Settings: every switch says what it does.</figcaption></figure>
+      <figure class="shot" style="margin:0"><img src="/assets/shots/app-dark.png" alt="The same Cursiv window in dark mode" loading="lazy" width="1200" height="780"><figcaption>The same window in dark mode. Light, dark, or match Windows.</figcaption></figure>
     </div>
   </div>
 </section>
