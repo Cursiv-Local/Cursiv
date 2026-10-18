@@ -4,7 +4,7 @@ Repo: `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`
 Remote: `https://github.com/winklersllc2026-bit/Cursiv.git` (branch `main`)
 This is the winklersllc checkout. Do not edit `Cursiv-v2`, Desktop `Cursiv-V3`, or `joshua1993winkler-jpg/Cursiv`.
 
-Status: **implemented in the working tree, not committed.** Read this before changing chat, memory, phases, or tests.
+Status: **committed and released** (eb8ddc1, v3.14-U59); every release since builds on it. Latest: v3.14-U70. Read this before changing chat, memory, phases, or tests.
 
 ## What the user asked for
 
@@ -130,7 +130,6 @@ Not every turn that background-learning might touch is verified. Learning still 
 
 ## Not done
 
-- Not committed or pushed.
 - `cascade_stream()` callers (Babel, council, codex commands) are not wrapped. Only `chat()`.
 - Conflict detection is lexical (shared content words + negation or different numbers). It will miss paraphrases embeddings would catch.
 - No browser or Qt run of the memory window. `fact_subtitle()` is what the dialog renders; that function is tested.
@@ -205,5 +204,31 @@ Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks 
 
 Roadmap: `docs/RESEARCH-ROADMAP.md`.
 - R1 `core/fieldlog.py` (append-only JSONL with fsync, SHA-256 chain `prev`/`hash`, `correct()` adds an entry, `verify()`, `export()` CSV/JSON/GeoJSON, `parse()`/`command()` for `log ...`); window `launcher/field_notebook.py`, first sidebar button. The AI never writes the log.
-- R2 `core/fieldcalc.py` (units, DMS/decimal, `to_utm` Snyder series tested against a Kruger series, dilution, stats with a t table); `calc.work_out` falls through to it; `calc.Worked.value/tol` checks with rounding allowed. Suite 1.3 (field cases num-019..026) is parked in the scratchpad until the U65 1.2 run finishes; add it then with its SUITE.md entry.
+- R2 `core/fieldcalc.py` (units, DMS/decimal, `to_utm` Snyder series tested against a Kruger series, dilution, stats with a t table); `calc.work_out` falls through to it; `calc.Worked.value/tol` checks with rounding allowed. Field cases are in the benchmark (suites 1.3 and 1.4).
 - R5 `core/atomic.write_text` (temp file, fsync, os.replace) for settings, keys, memories, conversations; battery saver in `speed.battery_saver()` / `keep_alive()` / `num_ctx()`, skips the model check in `chat()`; `scripts/hardware_check.py` writes docs/HARDWARE.md.
+
+## U66–U70 (2026-10-18): field teams, safer answers, ready for a research group
+
+- U66 field notebook and calculations (above). R4 sample IDs (`fieldlog.new_sample_id`, `sample_history`, `labels_html`).
+- R3 `core/documents.py`: imported PDFs/text kept offline, BM25 with a coverage threshold, answers quote pages,
+  `cited_pages_problems`, documents-only mode (never in an emergency); `ASKS_ABOUT_DOCS` + `nothing_found_*` when a
+  question about "our protocol" matches nothing.
+- R6 `core/fieldsync.py`: share/import field logs by USB or shared folder; each laptop's chain kept separately in
+  `fieldlog/team/`; changed or cut-off copies refused; differing histories kept side by side, never resolved; sample-ID
+  clashes reported; `team log`, `team log export`. Only the field log moves.
+- `fieldcalc`: Vincenty distance/bearing, `bleach_dose` from `doses.json` (the model said 16 drops/L three runs out of
+  three); `calc`: 24-hour times. `answer_check`: cloudy-water doses must be the card's or double, doses read across
+  sentences, `flip_flop` / `lead_warning` (a "Yes, it's safe … don't go" answer gets a warning above it via
+  `replace_draft`), a model citing the offline reference when none was given.
+- Benchmark suite 1.4 (153 cases): U66 145, U67 147, U68 149. `bench/FAILURES-suite1.4.md`. Known scoring defects
+  for a 1.5: num-027 ("20 + 1" in correct working), adv-016 ("eight" in words).
+- U69: dark mode by default (`theme.saved_mode()` unset = dark; "system" = match Windows).
+- U70 (MRS feedback): `status.network_status()` labels (`LOCAL ONLY · internet blocked` only when offline), model named
+  in the menu, `chat_app.sources_line()` on every answer from Cursiv's own records (`_REF_SHOWN`, `_DOCS_SHOWN`,
+  `_WORKED`, `_WEB_SEARCHED`, `_MEMORY_RECALLED`), `fieldlog.report_html` / `field report`, `core/demo.py` (sample data in
+  `~/.cursiv/demo/`; `fieldlog.log_dir()` and `documents.lib_dir()` switch while it's on), `PRIVACY.md`,
+  `docs/FIELD-DEMO.md`, installer version info + `installer/BEFORE-INSTALL.txt`, `build_release.py` writes
+  `SHA256SUMS-<version>.txt` (upload it to the release as `SHA256SUMS.txt`).
+- Open: code signing (owner's decision, costs money); professional review of first-aid entries (43 of 80 medical and
+  survival entries unsourced); SSD field-kit test (`docs/FIELD-KIT-TEST.md`); team sync not yet tried by a real team;
+  the model still opens "Yes, it's safe" on the lightning case; weekday arithmetic; small-sample comparisons.
