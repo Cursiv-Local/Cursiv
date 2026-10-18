@@ -2,7 +2,7 @@
 
 Cursiv runs on your computer. This page lists every way it can connect to anything
 outside it, so you can check rather than trust. The same summary, with your current
-settings, is in Cursiv under **Settings → Privacy**.
+settings, is in Cursiv under **Settings → Privacy & internet**.
 
 ## Stays on this computer, always
 
@@ -35,7 +35,7 @@ default: a turn the local model answered is also checked locally, never by a clo
 
 ## What offline mode blocks
 
-Turn it on with `offline on`, the switch in Settings, or the **LOCAL ONLY** badge.
+Turn it on with `offline on` or the switch in Settings → Privacy & internet (click the badge at the top of the chat to get there).
 A Cursiv USB starts with it on.
 
 - **Every connection off this computer is refused**, at the socket level, for the

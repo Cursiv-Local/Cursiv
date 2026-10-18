@@ -29,6 +29,6 @@ Privacy, in short
   Your conversations, memories, field notes and documents stay on this computer.
   Nothing leaves it unless you turn on an online feature (web search, a cloud AI
   key, update checks). Offline mode blocks every connection off this computer.
-  Details: PRIVACY.md in the source, or Settings > Privacy in Cursiv.
+  Details: PRIVACY.md in the source, or Settings > Privacy & internet in Cursiv.
 
 Uninstall any time from Windows Settings > Apps, or the Start menu entry.

@@ -96,6 +96,10 @@ The goal is simple: **reduce the chance that future generations lose the systems
 
 ---
 
+## Privacy, and a demo with sample data
+
+**[PRIVACY.md](PRIVACY.md)** lists what stays on your computer, everything that could leave it and when, and what offline mode blocks. **[docs/FIELD-DEMO.md](docs/FIELD-DEMO.md)** is a 10-minute walkthrough for showing Cursiv to a research group: type `demo` to load a sample stream survey and protocol, kept apart from your own records.
+
 ## For developers
 
 **[TECH.md](TECH.md)** explains how Cursiv is built — the desktop app, the chat engine, memory, the council, the login and protections, training, the USB edition — and how to run it from source and build the installer.
