@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased — for field teams
+
+- **Your documents** (sidebar → Your documents, or `add document <path>`): import a team's PDFs and text files, kept on this computer. Answers quote them by page ("From your documents: WS-3 protocol.pdf p. 2"), and a page the answer cites that wasn't among those supplied gets a note. Each file is fingerprinted. **Answer only from my documents** (Settings) refuses anything the documents don't cover, except in an emergency.
+- **Team sync without internet:** Field Notebook → **Share with team…** puts this laptop's field log on a USB drive or shared folder; **Import from team…** on the other laptops brings it in. Each laptop's log stays its own chain; a copy that was changed or cut off is refused, a history that differs is kept beside the earlier one and reported (never chosen silently), and the same sample ID on two laptops is reported. `team log` and `team log export` show and export everyone's entries. Only the field log is shared, never memories or documents.
+- **Sample IDs:** a New ID button (or `sample: auto`) makes IDs like NT-20261018-001; `field log sample <id>` shows a sample's history; exports include a printable sheet of labels.
+- **Distance and bearing** between two GPS points (Vincenty on WGS84, matching the published example to the millimetre), and **24-hour times** in clock arithmetic ("we leave at 14:30 for 3 h 45 min").
+- **For reviewers:** `docs/FIELD-KIT-TEST.md` (the SSD kit on clean laptops), `docs/PROFESSIONAL-REVIEW.md` and `scripts/review_sheet.py` (a printable sheet of every first-aid and survival entry, fingerprinted to the exact words). Truth benchmark suite 1.4 adds 20 harder field cases.
+
 ## v3.14-U66 — For field science (2026-10-18)
 - **Field Notebook** (sidebar, or type `log site: North transect; water temp 12.4 C; 44.12, -71.56; note: turbid`). Observations are kept exactly as typed ("12.40" stays "12.40"), apart from anything the AI says. Nothing is ever overwritten: a correction is a new entry with a reason. Every entry is fingerprinted and chained to the one before, so a changed, removed or reordered entry is detected (`field log check`). Export to CSV, JSON and GeoJSON.
 - **Field calculations done in code:** unit conversions (temperature, length, mass, volume, area, speed, pressure), degrees-minutes-seconds to decimal and back, UTM coordinates (checked against an independent method to half a metre), dilutions (C1V1 = C2V2), and mean, standard deviation and a 95% confidence interval. The answer is checked against the computed number.
