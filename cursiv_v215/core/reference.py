@@ -19,7 +19,13 @@ from dataclasses import dataclass
 from pathlib import Path
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "reference_data"
+PACK_DIR = DATA_DIR / "packs"
 CATEGORIES = ("survival", "medical", "science")
+
+# Knowledge packs (reference_data/packs/*.json): entries that carry their own
+# phrases, source, licence, check date and review status. Every field is required;
+# pack_problems() lists what's missing and a test runs it on every pack.
+PACK_LICENSES = ("public domain (U.S. government work)",)
 
 # Not cited in chat until someone qualified reviews them: home remedies without
 # warnings for children, the universal edibility test, and plant medicine.
@@ -110,16 +116,87 @@ def entries() -> list[Entry]:
     global _entries
     if _entries is None:
         out = []
+        # A pack entry replaces an older hand-written entry with the same title.
+        sourced = {item.get("title") for pack in packs() for item in pack.get("entries", [])}
         for cat in CATEGORIES:
             try:
                 data = json.loads((DATA_DIR / f"{cat}.json").read_text(encoding="utf-8"))
             except Exception:
                 continue
             for title, text in data.items():
-                if isinstance(text, str):
+                if isinstance(text, str) and title not in sourced:
                     out.append(Entry(f"{cat}/{_slug(title)}", title, cat, text))
+        for pack in packs():
+            for item in pack.get("entries", []):
+                if item.get("category") in CATEGORIES and item.get("title") and item.get("text"):
+                    out.append(Entry(f"{item['category']}/{_slug(item['title'])}", item["title"],
+                                     item["category"], item["text"]))
         _entries = out
     return _entries
+
+
+_packs: list[dict] | None = None
+
+
+def packs() -> list[dict]:
+    """Knowledge packs, loaded once. Their phrases, sources and doses are merged in."""
+    global _packs
+    if _packs is None:
+        _packs = []
+        for path in sorted(PACK_DIR.glob("*.json")) if PACK_DIR.exists() else []:
+            try:
+                pack = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            pack["_file"] = path.name
+            _packs.append(pack)
+            for item in pack.get("entries", []):
+                title = item.get("title", "")
+                ALIASES[title] = tuple(tuple(a) if isinstance(a, list) else a for a in item.get("aliases", []))
+                if isinstance(item.get("source"), dict):
+                    src = item["source"]
+                    _pack_sources[title] = {"source": src.get("name", ""), "url": src.get("url", ""),
+                                            "license": src.get("license", ""), "checked": src.get("checked", ""),
+                                            "reviewed": bool(item.get("reviewed"))}
+                if item.get("doses"):
+                    _pack_doses[title] = item["doses"]
+    return _packs
+
+
+_pack_sources: dict[str, dict] = {}
+_pack_doses: dict[str, list] = {}
+
+
+def doses(title: str) -> list | None:
+    packs()
+    return _pack_doses.get(title)
+
+
+def pack_problems() -> list[str]:
+    """What a pack entry is missing. Empty when every entry is complete."""
+    problems, seen = [], set()
+    for pack in packs():
+        for item in pack.get("entries", []):
+            where = f"{pack['_file']}: {item.get('title', '?')}"
+            for field in ("title", "category", "aliases", "text", "source"):
+                if not item.get(field):
+                    problems.append(f"{where}: no {field}")
+            src = item.get("source") or {}
+            for field in ("name", "url", "license", "checked"):
+                if not src.get(field):
+                    problems.append(f"{where}: source has no {field}")
+            if src.get("license") and src["license"] not in PACK_LICENSES:
+                problems.append(f"{where}: licence {src['license']!r} isn't one Cursiv can ship")
+            if not str(src.get("url", "")).startswith("https://"):
+                problems.append(f"{where}: source url isn't https")
+            if "reviewed" not in item:
+                problems.append(f"{where}: no reviewed flag")
+            if item.get("category") not in CATEGORIES:
+                problems.append(f"{where}: unknown category")
+            if item.get("title") in seen:
+                problems.append(f"{where}: duplicate title")
+            seen.add(item.get("title"))
+    return problems
 
 
 def _need(title: set[str]) -> int:
@@ -182,7 +259,8 @@ def source(title: str) -> dict | None:
             _sources = json.loads((DATA_DIR / "sources.json").read_text(encoding="utf-8"))
         except Exception:
             _sources = {}
-    got = _sources.get(title)
+    packs()
+    got = _pack_sources.get(title) or _sources.get(title)
     return got if isinstance(got, dict) else None
 
 

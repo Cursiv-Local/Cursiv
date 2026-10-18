@@ -157,7 +157,13 @@ class KnowledgeDialog(_Window):
             e = item.data(Qt.ItemDataRole.UserRole)
             held = ("<p style='color:%s'><b>Held back from chat</b> until someone qualified reviews it.</p>"
                     % theme.AMBER) if e.title in self._held else ""
-            self._text.setHtml(f"<h3>{e.title}</h3><p style='color:{theme.MUTED}'>{e.id}</p>{held}<p>{e.text}</p>")
+            src = reference.source(e.title)
+            where = ""
+            if src:
+                review = "reviewed by a professional" if src.get("reviewed") else "not yet reviewed by a professional"
+                where = (f"<p style='color:{theme.MUTED}'>Source: <a href='{src.get('url', '')}'>{src.get('source', '')}</a>"
+                         f" · checked {src.get('checked', '?')} · {review}</p>")
+            self._text.setHtml(f"<h3>{e.title}</h3><p style='color:{theme.MUTED}'>{e.id}</p>{held}<p>{e.text}</p>{where}")
         search.textChanged.connect(fill)
         self._list.currentItemChanged.connect(lambda cur, _prev: show(cur))
         fill()

@@ -1,0 +1,207 @@
+{
+  "pack": "weather-and-exposure",
+  "version": "1.0",
+  "about": "Heat, cold and lightning. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "entries": [
+    {
+      "title": "heat stroke",
+      "category": "medical",
+      "aliases": [
+        "heatstroke",
+        "heat stroke",
+        "overheated",
+        "stopped sweating",
+        [
+          "collapsed",
+          "heat"
+        ],
+        [
+          "confused",
+          "heat"
+        ]
+      ],
+      "text": "Heat stroke is a medical emergency: body temperature can reach 106°F or higher within 10 to 15 minutes, and delay can be fatal. Signs: confusion, slurred speech or passing out; hot, dry skin or heavy sweating; seizures; very high body temperature. 1) Call 911 and stay with the person until help arrives. 2) Move them to a cool, shaded area and remove outer clothing. 3) Cool them quickly: a cold water or ice bath if possible; otherwise wet their skin, apply cold wet cloths or soak their clothing. 4) Fan the air around them and put cold packs or cold wet cloths on the head, neck, armpits and groin.",
+      "source": {
+        "name": "CDC / NIOSH, Heat-related Illnesses",
+        "url": "https://www.cdc.gov/niosh/heat-stress/about/illnesses.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "heat exhaustion",
+      "category": "medical",
+      "aliases": [
+        "heat exhaustion",
+        [
+          "dizzy",
+          "heat"
+        ],
+        [
+          "faint",
+          "heat"
+        ],
+        [
+          "sweating",
+          "heat"
+        ],
+        [
+          "sick",
+          "heat"
+        ]
+      ],
+      "text": "Heat exhaustion is the body's response to losing too much water and salt, usually from heavy sweating. Signs: headache, nausea, dizziness, weakness, irritability, thirst, heavy sweating, raised body temperature, passing less urine. 1) Take the person to a clinic or emergency room to be checked; call 911 if medical care isn't available, and have someone stay with them. 2) Move them out of the heat and remove extra clothing, including shoes and socks. 3) Cool them with cold compresses or cool water on the head, face and neck. 4) Encourage frequent sips of cool water.",
+      "source": {
+        "name": "CDC / NIOSH, Heat-related Illnesses",
+        "url": "https://www.cdc.gov/niosh/heat-stress/about/illnesses.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "heat cramps",
+      "category": "medical",
+      "aliases": [
+        "heat cramps",
+        [
+          "cramps",
+          "heat"
+        ],
+        [
+          "cramping",
+          "heat"
+        ],
+        [
+          "cramps",
+          "sweating"
+        ]
+      ],
+      "text": "Heat cramps are painful muscle cramps or spasms in the belly, arms or legs from losing salt and water through heavy sweating; they can also be a sign of heat exhaustion. Drink water and have a snack or a sports drink that replaces salt and sugar every 15 to 20 minutes. Avoid salt tablets. Get medical help if the person has heart problems, is on a low-sodium diet, or the cramps don't stop within 1 hour.",
+      "source": {
+        "name": "CDC / NIOSH, Heat-related Illnesses",
+        "url": "https://www.cdc.gov/niosh/heat-stress/about/illnesses.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "rhabdomyolysis from heat and exertion",
+      "category": "medical",
+      "aliases": [
+        "rhabdo",
+        "rhabdomyolysis",
+        "cola-colored urine",
+        "tea-colored urine",
+        [
+          "dark",
+          "urine"
+        ]
+      ],
+      "text": "Rhabdomyolysis: heat stress and long, hard exertion can break down muscle, which releases substances that can cause an irregular heartbeat, seizures and kidney damage. Signs: muscle cramps or pain, weakness, being unable to keep going, and urine that is abnormally dark (tea- or cola-colored); some people have no symptoms. Stop the activity, drink more fluids (preferably water), and get care at the nearest medical facility right away. Ask to be checked for rhabdomyolysis (a blood test for creatine kinase).",
+      "source": {
+        "name": "CDC / NIOSH, Heat-related Illnesses",
+        "url": "https://www.cdc.gov/niosh/heat-stress/about/illnesses.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "frostbite treatment",
+      "category": "medical",
+      "aliases": [
+        "frostbite",
+        "frostbitten",
+        "frost nip",
+        "frostnip",
+        [
+          "numb",
+          "fingers",
+          "cold"
+        ],
+        [
+          "white",
+          "skin",
+          "cold"
+        ]
+      ],
+      "text": "Frostbite: the first sign may be redness or pain in a skin area. Then: a white or grayish-yellow patch, skin that feels unusually firm or waxy, and numbness. People often don't notice, because frozen skin is numb. Get medical attention as soon as possible. Until then: get them into a warm room or shelter, remove wet clothing, warm them under dry blankets and clothing, and put the frostbitten areas in warm-to-touch water. Don't use a fireplace, heat lamp, radiator, stove, heating pad or electric blanket to warm the area. Don't rub or massage it. Unless necessary, don't walk on frostbitten feet or toes.",
+      "source": {
+        "name": "CDC, Preventing Hypothermia (winter weather)",
+        "url": "https://www.cdc.gov/winter-weather/prevention/index.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "lightning safety",
+      "category": "survival",
+      "aliases": [
+        "thunderstorm",
+        "when thunder roars",
+        [
+          "lightning",
+          "safe"
+        ],
+        [
+          "lightning",
+          "storm"
+        ],
+        [
+          "lightning",
+          "tent"
+        ],
+        [
+          "lightning",
+          "outside"
+        ],
+        [
+          "lightning",
+          "shelter"
+        ],
+        [
+          "thunder",
+          "safe"
+        ],
+        [
+          "thunder",
+          "outside"
+        ],
+        [
+          "thunder",
+          "shelter"
+        ]
+      ],
+      "text": "When thunder roars, go indoors: if you can hear thunder, lightning is close enough to strike, and there is no safe place outside. Safe: a substantial building or a hard-topped vehicle. Not safe: rain shelters, small sheds, tents and open vehicles. Inside, don't touch anything plugged into an outlet, plumbing or corded phones (cell and cordless phones are fine), and stay away from exterior doors and windows. Wait 30 minutes after the last lightning or thunder before going back outside. If you can't reach a safe place: avoid open fields, hilltops and ridges; stay away from tall, isolated trees and other tall objects; stay away from water, wet items such as ropes, and metal such as fences and poles; in a group, spread out so a strike can't travel between people; if camping in the open, camp in a valley, ravine or other low area. A tent gives no protection. When storms are around, don't start a task you can't quickly stop.",
+      "source": {
+        "name": "National Weather Service, Lightning Safety (overview, outdoors, on the job)",
+        "url": "https://www.weather.gov/safety/lightning-safety-overview",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "lightning strike first aid",
+      "category": "medical",
+      "aliases": [
+        "struck by lightning",
+        "hit by lightning",
+        "lightning strike",
+        "lightning struck"
+      ],
+      "text": "People struck by lightning do not carry an electrical charge: they are safe to touch, and they need urgent medical attention. Call 911. If the person is unresponsive or not breathing, start CPR, and use an AED (automated external defibrillator) if one is available. Otherwise watch them closely until help arrives.",
+      "source": {
+        "name": "National Weather Service, Lightning Safety on the Job and Lightning Safety overview",
+        "url": "https://www.weather.gov/safety/lightning-job",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    }
+  ]
+}

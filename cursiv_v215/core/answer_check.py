@@ -26,7 +26,8 @@ KEY_STEPS = {
     "anaphylaxis severe allergic reaction": ("epinephrine", "epipen", "auto-injector", "911"),
     "burns treatment": ("cool", "running water", "911"),
     "drowning response": ("cpr", "911", "rescue breaths"),
-    "heat stroke": ("cool", "911", "water"),
+    "heat stroke": ("cool", "911"),          # not "water": nothing to drink if confused or unconscious
+    "lightning strike first aid": ("911", "cpr", "aed"),
 }
 
 _NEG = r"(?:don'?t|do not|never|avoid|shouldn'?t|should not|no need to|not recommended to|refrain from)"
@@ -118,8 +119,9 @@ _DOUBLE = re.compile(r"(?i)\b(double|twice|cloudy|colored|coloured|very cold)\b"
 
 def dose_problems(answer: str, titles: list[str]) -> list[str]:
     problems = []
+    from cursiv_v215.core import reference
     for title in titles:
-        rows = _dose_table().get(title)
+        rows = _dose_table().get(title) or reference.doses(title)
         if not isinstance(rows, list):
             continue
         for sentence in _SENTENCE.findall(answer or ""):
