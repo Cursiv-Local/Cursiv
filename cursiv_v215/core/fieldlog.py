@@ -273,11 +273,108 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
     geo_path.write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=2,
                                    ensure_ascii=False), encoding="utf-8")
     paths = {"csv": csv_path, "json": json_path, "geojson": geo_path}
+    report = folder / "field-report.html"
+    report.write_text(report_html(rows, all_entries=entries() if everything is None else everything),
+                      encoding="utf-8")
+    paths["report"] = report
     if any(e.get("sample_id") for e in rows):
         labels = folder / "sample-labels.html"
         labels.write_text(labels_html(rows), encoding="utf-8")
         paths["labels"] = labels
     return paths
+
+
+# ── Field report: a printable summary of what was recorded ────────────────
+
+def select(rows: list[dict], site: str = "", day: str = "") -> list[dict]:
+    """Entries for one site (case-insensitive, part of the name is enough) and/or one
+    local day ("2026-10-18" or "today")."""
+    if day == "today":
+        day = datetime.now().strftime("%Y-%m-%d")
+    out = rows
+    if site:
+        out = [e for e in out if site.lower() in (e.get("site") or "").lower()]
+    if day:
+        out = [e for e in out if (e.get("recorded_local") or "").startswith(day)]
+    return out
+
+
+def site_summary(rows: list[dict]) -> list[dict]:
+    """Per site and measurement: count, mean, min, max (numeric values only), unit."""
+    import statistics
+    groups: dict[tuple, dict] = {}
+    for e in rows:
+        for m in e.get("measurements") or []:
+            if m.get("number") is None:
+                continue
+            key = (e.get("site") or "(no site)", m["name"].lower(), m.get("unit", ""))
+            g = groups.setdefault(key, {"site": key[0], "measurement": m["name"], "unit": key[2], "values": []})
+            g["values"].append(m["number"])
+    out = []
+    for g in groups.values():
+        v = g.pop("values")
+        out.append({**g, "n": len(v), "mean": statistics.fmean(v), "min": min(v), "max": max(v)})
+    return sorted(out, key=lambda g: (g["site"], g["measurement"].lower()))
+
+
+def report_html(rows: list[dict], title: str = "Field report", all_entries: list[dict] | None = None,
+                app_version: str = "") -> str:
+    """A printable report of these entries (the current view: corrections applied).
+    all_entries: the full log, to list the corrections that apply to these entries."""
+    import html
+    esc = html.escape
+    everything = all_entries if all_entries is not None else entries()
+    problems = verify()
+    times = sorted(e["recorded_local"] for e in rows)
+    span = (f"{times[0][:16].replace('T', ' ')} to {times[-1][:16].replace('T', ' ')}" if times else "no entries")
+    ids = {e["id"] for e in rows}
+    replaced = {e["corrects"]: e for e in everything if e.get("corrects")}
+    corrections = [(c, next((o for o in everything if o["id"] == old), None))
+                   for old, c in replaced.items() if c["id"] in ids]
+
+    def num(v: float) -> str:
+        return f"{v:.4g}"
+
+    summary = "".join(
+        f"<tr><td>{esc(g['site'])}</td><td>{esc(g['measurement'])}</td><td>{esc(g['unit'])}</td>"
+        f"<td class=r>{g['n']}</td><td class=r>{num(g['mean'])}</td><td class=r>{num(g['min'])}</td>"
+        f"<td class=r>{num(g['max'])}</td></tr>" for g in site_summary(rows))
+    body = []
+    for e in rows:
+        meas = "<br>".join(esc(f"{m['name']} {m['value']}{(' ' + m['unit']) if m['unit'] else ''}")
+                           for m in e["measurements"])
+        where = f"{e['lat']}, {e['lon']}" if e.get("lat") is not None else ""
+        body.append(
+            f"<tr><td>{e['seq']}</td><td>{esc(e['recorded_local'][:16].replace('T', ' '))}</td>"
+            f"<td>{esc(e.get('sample_id', ''))}</td><td>{esc(e.get('site', ''))}</td><td>{esc(where)}</td>"
+            f"<td>{meas}</td><td>{esc(e.get('note', ''))}</td><td>{esc(e.get('observer', ''))}</td>"
+            f"<td class=fp>{e['hash'][:12]}</td></tr>")
+    fixes = "".join(
+        f"<li>Entry {c['seq']} corrects entry {o['seq'] if o else '?'}: {esc(c['reason'])}</li>"
+        for c, o in corrections)
+    integrity = ("Every entry in the log is intact and in order (fingerprints checked when this report was made)."
+                 if not problems else "THE LOG HAS PROBLEMS: " + esc("; ".join(problems)))
+    return (
+        "<!doctype html><meta charset='utf-8'><title>" + esc(title) + "</title><style>"
+        "body{font-family:Arial,sans-serif;margin:14mm;color:#111;font-size:10pt}"
+        "h1{font-size:17pt;margin:0 0 2mm}h2{font-size:12pt;margin:7mm 0 2mm}"
+        "table{border-collapse:collapse;width:100%}td,th{border:1px solid #bbb;padding:1.2mm 2mm;"
+        "vertical-align:top;text-align:left}th{background:#eee}.r{text-align:right}"
+        ".fp{font-family:Consolas,monospace;font-size:8.5pt;color:#444}.meta{color:#333}"
+        ".bad{color:#b00;font-weight:bold}.foot{margin-top:6mm;color:#555;font-size:9pt}"
+        "@media print{tr{break-inside:avoid}}</style>"
+        f"<h1>{esc(title)}</h1>"
+        f"<p class=meta>{len(rows)} entries · {esc(span)} · made "
+        f"{datetime.now().strftime('%Y-%m-%d %H:%M')}{(' · Cursiv ' + esc(app_version)) if app_version else ''}</p>"
+        f"<p class='{'meta' if not problems else 'bad'}'>{integrity}</p>"
+        + (f"<h2>Summary by site</h2><table><tr><th>Site</th><th>Measurement</th><th>Unit</th><th>n</th>"
+           f"<th>Mean</th><th>Min</th><th>Max</th></tr>{summary}</table>" if summary else "")
+        + "<h2>Entries</h2><table><tr><th>#</th><th>Recorded</th><th>Sample</th><th>Site</th><th>Location</th>"
+          "<th>Measurements</th><th>Note</th><th>Observer</th><th>Fingerprint</th></tr>" + "".join(body) + "</table>"
+        + (f"<h2>Corrections</h2><ul>{fixes}</ul><p>The corrected entries stay in the log and in the JSON export.</p>"
+           if fixes else "")
+        + "<p class=foot>Observations as recorded by people in Cursiv's field notebook. Nothing in this report was "
+          "written or changed by the AI. Values are shown exactly as typed; the summary uses numeric values only.</p>")
 
 
 # ── Typed entries: "log ..." ───────────────────────────────────────────────
@@ -371,6 +468,20 @@ def command(text: str, observer: str = "") -> str | None:
         if not hist:
             return f"No entries for sample {m.group(1)}."
         return f"Sample {m.group(1)}:\n" + "\n".join(summary(e) for e in hist)
+    m = re.match(r"(?i)^field ?(?:log )?report(?:\s+site\s+(.+?))?(?:\s+(today))?\s*$", t)
+    if m:
+        site, day = (m.group(1) or "").strip(), (m.group(2) or "").lower()
+        rows = select(current(), site, day)
+        if not rows:
+            return "No field entries match" + (f" site '{site}'" if site else "") + (" today" if day else "") + "."
+        folder = log_dir() / "reports"
+        folder.mkdir(parents=True, exist_ok=True)
+        name = "field-report" + (f"-{re.sub(r'[^A-Za-z0-9]+', '-', site).strip('-')}" if site else "") + \
+               (f"-{datetime.now():%Y-%m-%d}" if day else "") + f"-{datetime.now():%H%M%S}.html"
+        title = "Field report" + (f": {site}" if site else "") + (" (today)" if day else "")
+        path = folder / name
+        path.write_text(report_html(rows, title), encoding="utf-8")
+        return f"Field report saved ({len(rows)} entr{'y' if len(rows) == 1 else 'ies'}): {path}\nOpen it in a browser to read or print it."
     if low in ("field log check", "fieldlog check", "check field log"):
         problems = verify()
         n = len(entries())

@@ -176,3 +176,20 @@ def test_notebook_window_sample_id(log):
     w._save_entry()
     sid = log.entries()[0]["sample_id"]
     assert sid.startswith("PT-") and sid in w._table.item(0, 2).text()
+
+
+def test_field_report_summarises_by_site_and_lists_corrections(log, tmp_path):
+    a = log.add(observer="Ana", site="North transect", measurements=[{"name": "pH", "value": "7.2"}])
+    log.add(observer="Ana", site="North transect", measurements=[{"name": "pH", "value": "7.4"}])
+    log.add(observer="Ben", site="South pool", measurements=[{"name": "pH", "value": "6.9"},
+                                                             {"name": "water temp", "value": "12.40", "unit": "C"}])
+    log.correct(a["id"], "meter not calibrated", measurements=[{"name": "pH", "value": "7.0"}])
+    g = {(r["site"], r["measurement"]): r for r in log.site_summary(log.current())}
+    assert g[("North transect", "pH")]["n"] == 2 and abs(g[("North transect", "pH")]["mean"] - 7.2) < 1e-9
+    page = log.report_html(log.current())
+    assert "meter not calibrated" in page and "12.40" in page and "intact and in order" in page
+    assert "Nothing in this report was written or changed by the AI" in page
+    assert len(log.select(log.current(), site="north")) == 2
+    out = log.command("field report site north")
+    assert "Field report saved (2 entries)" in out
+    assert "report" in log.export(tmp_path / "exp")

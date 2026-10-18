@@ -114,10 +114,11 @@ class FieldNotebookDialog(QDialog):
         fix = QPushButton("Correct selected…"); fix.setStyleSheet(theme.ghost_button()); fix.clicked.connect(self._start_correction)
         check = QPushButton("Check integrity"); check.setStyleSheet(theme.ghost_button()); check.clicked.connect(self._check)
         exp = QPushButton("Export…"); exp.setStyleSheet(theme.ghost_button()); exp.clicked.connect(self._export)
+        rep = QPushButton("Report…"); rep.setStyleSheet(theme.ghost_button()); rep.clicked.connect(self._report)
         share = QPushButton("Share with team…"); share.setStyleSheet(theme.ghost_button()); share.clicked.connect(self._share)
         imp = QPushButton("Import from team…"); imp.setStyleSheet(theme.ghost_button()); imp.clicked.connect(self._import)
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
-        for b in (fix, check, exp, share, imp):
+        for b in (fix, check, exp, rep, share, imp):
             foot.addWidget(b)
         foot.addStretch(1); foot.addWidget(close)
         outer.addLayout(foot)
@@ -238,6 +239,22 @@ class FieldNotebookDialog(QDialog):
             return
         paths = fieldlog.export(Path(folder) / "Cursiv field log")
         QMessageBox.information(self, "Exported", "Saved:\n" + "\n".join(str(p) for p in paths.values()))
+
+    def _report(self):
+        """A printable report of the current entries, opened in the browser."""
+        from pathlib import Path
+        from PyQt6.QtCore import QUrl
+        from PyQt6.QtGui import QDesktopServices
+        rows = fieldlog.current()
+        if not rows:
+            QMessageBox.information(self, "Field report", "The field log is empty.")
+            return
+        folder = fieldlog.log_dir() / "reports"
+        folder.mkdir(parents=True, exist_ok=True)
+        from datetime import datetime
+        path = Path(folder) / f"field-report-{datetime.now():%Y-%m-%d_%H%M%S}.html"
+        path.write_text(fieldlog.report_html(rows), encoding="utf-8")
+        QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     # ── team sync (core/fieldsync.py): a USB drive or a shared folder, no internet ──
     def _share(self):
