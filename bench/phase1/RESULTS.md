@@ -29,4 +29,4 @@ Also found by the replays and fixed: pasted text losing its line breaks; "1. Ste
 ## Open
 
 1. **Coop advice (1):** needs a sourced entry. Federal sources on poultry housing and barn fire safety are still to be found; university extension guides are copyrighted.
-2. **Claimed database check (8):** extend `answer_check.unsupported_actions` to "no record ... in (verified|public) databases".
+2. ~~**Claimed database check (8)**~~: fixed after U65. `unsupported_actions` now flags "no record ... in verified public databases" (`test_stated_database_lookups_are_flagged`).

@@ -47,3 +47,13 @@ def test_chat_flags_a_contradiction_on_an_emergency_turn(fresh, monkeypatch):
     out = "".join(ca.chat("my son cut his leg and it is bleeding badly", [], "", None))
     assert "From Cursiv's offline reference, severe bleeding control" in out
     assert 'Cursiv\'s check: this answer advises against "tourniquet"' in out
+
+
+@pytest.mark.parametrize("reply, flagged", [
+    ("(No record of such a study in verified public databases or my training data.)", True),   # Phase 1, U65
+    ("There is no record of this in the academic literature.", True),
+    ("That study is not in my knowledge base.", False),
+    ("No record of it in what you've told me.", False),
+])
+def test_stated_database_lookups_are_flagged(reply, flagged):
+    assert bool(ac.unsupported_actions(reply, searched=False)) is flagged

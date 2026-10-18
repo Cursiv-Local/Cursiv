@@ -60,7 +60,11 @@ _CLAIMS = re.compile(
     r"(?i)\b(I(?:'ve| have)? (?:searched|looked (?:it )?up|checked|scanned|reviewed|consulted|queried)"
     r"(?: [\w-]+){0,4}? (?:databases?|the web|the internet|online|pubmed|google scholar|journals?|records|sources|literature)"
     r"|(?:my|a) (?:search|review) of (?:the )?(?:databases?|literature|journals?|pubmed)"
-    r"|after (?:searching|checking) (?:the )?(?:databases?|web|internet|literature|journals?))"
+    r"|after (?:searching|checking) (?:the )?(?:databases?|web|internet|literature|journals?)"
+    # "No record of such a study in verified public databases" (Phase 1 replay, U65): a lookup
+    # stated as done. "Not in my knowledge base" isn't a claim to have searched anything.
+    r"|no (?:record|trace|mention|evidence)s? (?:of [^.]{0,60}? )?in (?:any |the )?(?:verified |public |academic |scientific |medical |major )*"
+    r"(?:databases?|journals?|literature|records|registries|pubmed|google scholar))"
 )
 
 
