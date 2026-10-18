@@ -1377,8 +1377,6 @@ def sources_line() -> str:
     """What this turn's answer was actually given, from Cursiv's own records, never the
     model's say-so: the offline reference, the person's documents, Cursiv's calculations,
     web results, saved memories. Nothing given: model knowledge, not checked."""
-    if _CURSIV_REPLY:
-        return "Sources: Cursiv itself (no AI model)"
     parts = []
     if _REF_SHOWN:
         parts.append("Cursiv Offline Reference (" + ", ".join(dict.fromkeys(_REF_SHOWN)) + ")")
@@ -1393,9 +1391,35 @@ def sources_line() -> str:
         parts.append("web search results")
     if _MEMORY_RECALLED:
         parts.append("your saved memories")
+    if _CURSIV_REPLY:
+        return ("Sources: " + "; ".join(parts) + ". Written by Cursiv, no AI model") if parts \
+            else "Sources: Cursiv itself (no AI model)"
     if not parts:
         return "Source: model knowledge (not checked against a source)"
     return "Sources: " + "; ".join(parts) + ". Wording by the AI model"
+
+
+def _without_model():
+    """The local model isn't answering (and nothing online may answer): what Cursiv can give
+    on its own -- its calculation, the reference card already shown, the matching pages of
+    the person's documents -- said plainly, instead of "Answered by Ollama" over an error."""
+    global _CURSIV_REPLY
+    _CURSIV_REPLY = True
+    _set_answered("")
+    lines = ["**The local AI model isn't answering, so this is what Cursiv has without it.**"]
+    if _WORKED:
+        lines.append(f"Worked out by Cursiv's code: {_WORKED.statement}")
+    if _REF_SHOWN:
+        lines.append("Follow the offline reference shown above. In an emergency, call 911.")
+    for p in _DOCS_SHOWN[:2]:
+        text = " ".join(p.text.split())
+        lines.append(f"From your documents, {p.name} p. {p.page}: \"{text[:700]}{'…' if len(text) > 700 else ''}\"")
+    if not (_WORKED or _REF_SHOWN or _DOCS_SHOWN):
+        lines.append("Nothing in Cursiv's reference, its calculations or your documents covers this, so there's no "
+                     "answer without the model. Your field notebook, documents and reference all still work.")
+    lines.append("To bring the AI back: Settings → Help & diagnostics → Setup and engine → Restart Ollama "
+                 "(or open Setup to install a model).")
+    yield "\n\n".join(lines)
 
 
 _NOTES_BLOCK_RE = _re.compile(r"\n*-{3,}\n\*\*(Checked, with notes|Draft \+ notes)\*\*[\s\S]*$")
@@ -2833,12 +2857,16 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             yield from _lgen
             return
 
+    # Nothing online is set up either (no keys, no Cursiv Cloud): the same as offline.
+    if not (_cloud_configured(key, oai, ant) or cloud_enabled()) and (_local_tried or not _local_model_ready()):
+        yield from _without_model()
+        return
+
     # ── Offline detection — skip all cloud providers immediately ────────
     if not _is_online():
-        if _local_tried:
-            yield "*[Offline, and the local model didn't answer.]*\n\n"
+        if _local_tried or not _local_model_ready():
+            yield from _without_model()
             return
-        yield "*[Offline — all cloud providers unreachable. Routing to Ollama (no token limits).]*\n\n"
         _set_answered(_ollama_label())
         yield from _call_ollama(_text_msgs_all)
         return
