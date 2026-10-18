@@ -50,6 +50,9 @@ cases = [c for c in truth_cases.CASES if c["id"] in set(json.loads(sys.argv[1]))
 if len(sys.argv) > 2 and sys.argv[2]:
     from cursiv_v215.chat import keys
     keys.store_key("chat_model", sys.argv[2])
+if len(sys.argv) > 3 and sys.argv[3] == "deep":
+    from cursiv_v215.chat import keys
+    keys.store_key("answer_mode", "deep")
 model = ca._resolve_ollama_model()
 print(json.dumps({"model": model}), flush=True)
 for c in cases:
@@ -115,6 +118,7 @@ def main() -> int:
     ap.add_argument("--ids", help="comma-separated case ids")
     ap.add_argument("--label", help="results label (default: version from the launcher)")
     ap.add_argument("--model", default="", help="local model to answer with (default: Cursiv's own choice)")
+    ap.add_argument("--deep", action="store_true", help="answer in Deep Think (reasoning on)")
     ap.add_argument("--source", default="", help="git ref whose cursiv_v215 and launcher code to run (default: this tree)")
     args = ap.parse_args()
 
@@ -147,7 +151,7 @@ def main() -> int:
         for k in ("BRAVE_API_KEY", "CURSIV_RELAY_URL", "CURSIV_FLEET_TOKEN"):
             env.pop(k, None)
         t0 = time.time()
-        proc = subprocess.Popen([sys.executable, "-c", CHILD, json.dumps(chosen), args.model], cwd=scratch / "app", env=env,
+        proc = subprocess.Popen([sys.executable, "-c", CHILD, json.dumps(chosen), args.model, "deep" if args.deep else ""], cwd=scratch / "app", env=env,
                                 stdout=subprocess.PIPE, text=True, encoding="utf-8")
         for line in proc.stdout:
             try:

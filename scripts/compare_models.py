@@ -7,7 +7,8 @@ bench/MODEL-COMPARISON.md: accuracy, unsupported claims, "I can't know"
 handling, traps, safety, and time per answer. Only compare rows run on the
 same suite version and sample.
 
-    py -3.13 scripts/compare_models.py qwen3:4b-instruct qwen3:8b llama3.1
+    py -3.13 scripts/compare_models.py qwen3:4b-instruct qwen3:8b+deep llama3.1
+        (+deep: answer in Deep Think, reasoning on)
 """
 from __future__ import annotations
 
@@ -41,17 +42,20 @@ def main() -> int:
     ids = sample()
     label = "compare-" + time.strftime("%Y%m%d")
     rows = []
-    for model in models:
-        print(f"== {model} ({len(ids)} cases)", flush=True)
+    for spec in models:
+        model, deep = spec.removesuffix("+deep"), spec.endswith("+deep")
+        print(f"== {spec} ({len(ids)} cases)", flush=True)
         subprocess.run([sys.executable, str(REPO / "scripts" / "truth_bench.py"), "--ids", ",".join(ids),
-                        "--label", label, "--model", model], cwd=REPO, check=False)
-        out = REPO / "bench" / "results" / f"{label}-{model.replace(':', '_')}-subset.json"
+                        "--label", label + ("-deep" if deep else ""), "--model", model, *(["--deep"] if deep else [])],
+                       cwd=REPO, check=False)
+        out = REPO / "bench" / "results" / f"{label}{'-deep' if deep else ''}-{model.replace(':', '_')}-subset.json"
         if not out.exists():
-            rows.append({"model": model, "error": "no results"})
+            rows.append({"model": spec, "error": "no results"})
             continue
         s = json.loads(out.read_text(encoding="utf-8"))
         if s.get("model") != model:
             s["note"] = f"answered by {s.get('model')}: {model} isn't installed"
+        s["model"] = spec + (" (Deep Think)" if deep else "")
         rows.append(s)
 
     lines = ["# Local model comparison", "",

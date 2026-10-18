@@ -767,7 +767,8 @@ def process_uploaded_files(files: list | None) -> tuple[str, list[dict]]:
 
 # ── LLM callers ───────────────────────────────────────────────────────────
 
-def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS) -> Generator[str, None, None]:
+def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS,
+                     standard: bool = False) -> Generator[str, None, None]:
     """Stream from local Ollama with full system prompt injection."""
     import json as _json
 
@@ -797,7 +798,7 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
     if _ollama_tags() is None:
         yield "\n[Ollama unavailable: it isn't responding right now -- it may be busy downloading a model. Try again in a minute.]"
         return
-    model = _resolve_ollama_model()
+    model = _resolve_ollama_model(standard)
     if model is None and _models_on_disk():
         # Seen for real: Ollama started with the wrong settings mid-reinstall and
         # listed nothing while 22 GB of models sat on disk. Re-downloading won't help.
@@ -808,20 +809,25 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
         # Ollama is running but has no models at all -- download the default
         # once (progress shown in the reply) instead of failing with a 404.
         yield from _pull_ollama_model(_speed.chat_model_prefs()[0])
-        model = _resolve_ollama_model()
+        model = _resolve_ollama_model(standard)
         if model is None:
             yield f"\n[No local model available. Run: ollama pull {_speed.chat_model_prefs()[0]}]"
             return
+    deep = not standard and model == _speed.DEEP_THINK_MODEL and _speed.deep_think_on()
+    if deep:
+        yield "*(Deep Think: working it through first. On this computer that can take a minute or two.)*\n\n"
+        max_tokens += _speed.DEEP_THINK_EXTRA_TOKENS
     payload = json.dumps({
         "model": model,
         "system": system_str,
         "prompt": turns,
         "stream": True,
         "keep_alive": _speed.KEEP_ALIVE,          # stay loaded: a cold load took ~100 s
-        **_speed.no_thinking(model),
+        **_speed.think_options(model, deep),      # Deep Think's reasoning comes back separately, not in "response"
         "options": {
             "num_predict": max_tokens,
             "num_ctx": _speed.num_ctx(),
+            **_speed.gpu_options(model),
         },
     }).encode()
     try:
@@ -840,8 +846,9 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
         yield f"\n[Ollama unavailable: {e}]"
 
 
-def _call_ollama(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS) -> "Generator[str, None, None]":
-    yield from _call_ollama_raw(messages, max_tokens)
+def _call_ollama(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS,
+                 standard: bool = False) -> "Generator[str, None, None]":
+    yield from _call_ollama_raw(messages, max_tokens, standard)
 
 
 def _ollama_running() -> bool:
@@ -928,16 +935,19 @@ def _models_on_disk() -> bool:
         return False
 
 
-def _resolve_ollama_model() -> str | None:
-    """Pick an installed Ollama model for general chat, or None if none are pulled."""
+def _resolve_ollama_model(standard: bool = False) -> str | None:
+    """Pick an installed Ollama model for general chat, or None if none are pulled.
+    standard: the everyday model even when Deep Think is on (checks, background jobs)."""
     tags = _ollama_tags()
     if tags is None:
         return None
     available = set(tags) | {t.split(":")[0] for t in tags}
-    _chosen = _saved_key("chat_model")            # picked in the window's model menu
-    if _chosen and _chosen in available:
-        return _chosen
     from cursiv_v215.core import speed as _speed
+    if not standard and _speed.deep_think_on() and _speed.DEEP_THINK_MODEL in available:
+        return _speed.DEEP_THINK_MODEL
+    _chosen = _saved_key("chat_model")            # picked under Advanced in the model menu
+    if _chosen and _chosen in available and not (standard and _chosen == _speed.DEEP_THINK_MODEL):
+        return _chosen
     # Fastest good model for this GPU first (e.g. a 3B model on a 4 GB card), if installed
     for name in (*_speed.chat_model_prefs(), OLLAMA_MODEL, *_OLLAMA_FALLBACK_MODELS):
         if name in available:
@@ -1289,7 +1299,8 @@ def free_key_command(text: str) -> str | None:
 
 def _local_llm(messages: list[dict], max_tokens: int) -> str:
     """One call to the local model. "" on an error."""
-    out = "".join(c for c in _call_ollama(messages, max_tokens=max_tokens) if c != RATE_SENTINEL).strip()
+    # The answer check and background jobs use the fast Standard model, even in Deep Think.
+    out = "".join(c for c in _call_ollama(messages, max_tokens=max_tokens, standard=True) if c != RATE_SENTINEL).strip()
     return "" if out.startswith(("[Ollama", "\n[Ollama")) else out
 
 

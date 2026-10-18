@@ -111,6 +111,61 @@ def no_thinking(model: str) -> dict:
     return {"think": False} if m.startswith("qwen3") and "instruct" not in m else {}
 
 
+# ── Deep Think ──────────────────────────────────────────────────────────────
+# The person picks Standard (the fast model above) or Deep Think: a bigger model
+# that reasons before it answers. Ollama returns the reasoning separately, so the
+# answer stays clean. Which model is Deep Think should follow bench/MODEL-COMPARISON.md.
+
+DEEP_THINK_MODEL = "qwen3:8b"
+DEEP_THINK_EXTRA_TOKENS = 4096        # the reasoning counts against num_predict
+
+
+def deep_think_on() -> bool:
+    try:
+        from cursiv_v215.chat import keys
+        return keys.saved_key("answer_mode") == "deep"
+    except Exception:
+        return False
+
+
+def think_options(model: str, deep: bool) -> dict:
+    return {"think": True} if deep else no_thinking(model)
+
+
+# ── GPU layers ──────────────────────────────────────────────────────────────
+# For a model bigger than the card, Ollama put only 39% of qwen3:8b on a 4 GB
+# RTX 2050 (2.2 GB used). 30 of 37 layers there nearly doubled the speed
+# (6.5 -> 13.4 tokens/s); 32 spilled into shared memory and was slower.
+
+_layers: dict[str, dict] = {}
+
+
+def gpu_options(model: str) -> dict:
+    """{"num_gpu": layers} for a model that doesn't fit the card, else {} (Ollama decides)."""
+    if model in _layers:
+        return _layers[model]
+    out: dict = {}
+    try:
+        import json
+        import urllib.request
+        vram = gpu_vram_mb()
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=3) as r:
+            size = next((m.get("size", 0) for m in json.loads(r.read()).get("models", [])
+                         if m.get("name") in (model, f"{model}:latest")), 0) / 2**20
+        req = urllib.request.Request("http://127.0.0.1:11434/api/show", data=json.dumps({"model": model}).encode(),
+                                     headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=5) as r:
+            info = json.loads(r.read()).get("model_info", {})
+        blocks = next((v for k, v in info.items() if k.endswith(".block_count")), 0)
+        if vram and size and blocks and size > vram * 0.85:
+            # Layers whose weights fill the card, as measured above (30 of 37 for qwen3:8b on 4 GB).
+            out = {"num_gpu": max(1, min(blocks + 1, int((blocks + 1) * vram / size)))}
+    except Exception:
+        out = {}
+    _layers[model] = out
+    return out
+
+
 def code_model_prefs() -> tuple[str, ...]:
     if gpu_vram_mb() >= 12000:
         return ("qwen2.5-coder:14b", "qwen2.5-coder:7b", "qwen2.5-coder:3b")
