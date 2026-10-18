@@ -133,15 +133,23 @@ def think_options(model: str, deep: bool) -> dict:
 
 
 # ── GPU layers ──────────────────────────────────────────────────────────────
-# For a model bigger than the card, Ollama put only 39% of qwen3:8b on a 4 GB
-# RTX 2050 (2.2 GB used). 30 of 37 layers there nearly doubled the speed
-# (6.5 -> 13.4 tokens/s); 32 spilled into shared memory and was slower.
+# Ollama is cautious on small cards. Measured on a 4 GB RTX 2050 (2026-10-18):
+#   qwen3:4b-instruct  45% on the CPU by default, 16 tokens/s; all layers on the card 37
+#   gemma3:4b          14 -> 36;   llama3.1  7.3 -> 15.7 (28 of 33 layers)
+#   qwen3:8b           6.5 -> 13.4 (30 of 37); 32 spilled into shared memory and was slower
+# A model whose file fits in 90% of the card goes on it whole; a bigger one gets the
+# share of layers its file size allows. If a load fails, chat_app retries once with
+# Ollama's own choice and gpu_fallback() remembers that for this session.
 
 _layers: dict[str, dict] = {}
 
 
+def gpu_fallback(model: str) -> None:
+    _layers[model] = {}
+
+
 def gpu_options(model: str) -> dict:
-    """{"num_gpu": layers} for a model that doesn't fit the card, else {} (Ollama decides)."""
+    """{"num_gpu": layers} for how much of the model the card can hold, or {} (Ollama decides)."""
     if model in _layers:
         return _layers[model]
     out: dict = {}
@@ -157,9 +165,9 @@ def gpu_options(model: str) -> dict:
         with urllib.request.urlopen(req, timeout=5) as r:
             info = json.loads(r.read()).get("model_info", {})
         blocks = next((v for k, v in info.items() if k.endswith(".block_count")), 0)
-        if vram and size and blocks and size > vram * 0.85:
-            # Layers whose weights fill the card, as measured above (30 of 37 for qwen3:8b on 4 GB).
-            out = {"num_gpu": max(1, min(blocks + 1, int((blocks + 1) * vram / size)))}
+        if vram and size and blocks:
+            layers = blocks + 1 if size <= vram * 0.9 else int((blocks + 1) * vram / size)
+            out = {"num_gpu": max(1, min(blocks + 1, layers))}
     except Exception:
         out = {}
     _layers[model] = out

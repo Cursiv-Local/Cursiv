@@ -830,20 +830,31 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
             **_speed.gpu_options(model),
         },
     }).encode()
-    try:
-        req = urllib.request.Request(OLLAMA_URL, data=payload,
-                                     headers={"Content-Type": "application/json"})
-        # 600 s: loading a model that doesn't fit the GPU can take ~2 minutes
-        with urllib.request.urlopen(req, timeout=600) as resp:
-            for line in resp:
-                chunk = _json.loads(line.decode())
-                token = chunk.get("response", "")
-                if token:
-                    yield token
-                if chunk.get("done"):
-                    break
-    except Exception as e:
-        yield f"\n[Ollama unavailable: {e}]"
+    for attempt in (1, 2):
+        try:
+            req = urllib.request.Request(OLLAMA_URL, data=payload,
+                                         headers={"Content-Type": "application/json"})
+            # 600 s: loading a model that doesn't fit the GPU can take ~2 minutes
+            with urllib.request.urlopen(req, timeout=600) as resp:
+                for line in resp:
+                    chunk = _json.loads(line.decode())
+                    token = chunk.get("response", "")
+                    if token:
+                        yield token
+                    if chunk.get("done"):
+                        break
+            return
+        except Exception as e:
+            # More layers on the card than it has room for right now (another program
+            # using it): once more with Ollama's own split.
+            if attempt == 1 and _speed.gpu_options(model):
+                _speed.gpu_fallback(model)
+                body = _json.loads(payload)
+                body["options"].pop("num_gpu", None)
+                payload = json.dumps(body).encode()
+                continue
+            yield f"\n[Ollama unavailable: {e}]"
+            return
 
 
 def _call_ollama(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS,
@@ -1542,7 +1553,7 @@ def _call_ollama_model(
         # silently dropped the start of the prompt (the instructions).
         "keep_alive": "30m",
         **_speed.no_thinking(model),
-        "options": {"num_predict": max_tokens, "num_ctx": _num_ctx()},
+        "options": {"num_predict": max_tokens, "num_ctx": _num_ctx(), **_speed.gpu_options(model)},
     }).encode()
     try:
         req = urllib.request.Request(

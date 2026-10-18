@@ -80,3 +80,33 @@ def test_clear_messages_do_not_ask(question):
 
 def test_earlier_message_supplies_what_it_is():
     assert clarify.needs_clarifying("Is it safe?", [{"role": "user", "content": "I found mushrooms in my yard"}]) == ""
+
+
+# ── GPU layers (core/speed.gpu_options) ────────────────────────────────────
+
+def _fake_ollama(monkeypatch, size_mb, blocks, vram):
+    import io
+    import json
+    from cursiv_v215.core import speed
+    monkeypatch.setattr(speed, "_layers", {})
+    monkeypatch.setattr(speed, "gpu_vram_mb", lambda: vram)
+
+    def urlopen(req, timeout=0):
+        url = req if isinstance(req, str) else req.full_url
+        body = ({"models": [{"name": "m:1", "size": size_mb * 2**20}]} if url.endswith("/api/tags")
+                else {"model_info": {"x.block_count": blocks}})
+        return io.BytesIO(json.dumps(body).encode())
+    monkeypatch.setattr("urllib.request.urlopen", urlopen)
+    return speed
+
+
+def test_a_model_that_fits_goes_on_the_card_whole(monkeypatch):
+    speed = _fake_ollama(monkeypatch, 2500, 36, 4096)
+    assert speed.gpu_options("m:1") == {"num_gpu": 37}
+
+
+def test_a_bigger_model_gets_its_share(monkeypatch):
+    speed = _fake_ollama(monkeypatch, 5000, 36, 4096)
+    assert speed.gpu_options("m:1") == {"num_gpu": 30}
+    speed.gpu_fallback("m:1")
+    assert speed.gpu_options("m:1") == {}
