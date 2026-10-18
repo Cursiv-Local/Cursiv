@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.14-U70 — Ready to show a research group (2026-10-18)
+- **LOCAL ONLY badge:** the top of the chat says *LOCAL ONLY · internet blocked* when offline mode is on, and *Local answers · internet not blocked* otherwise. The model menu names the model answering on this computer. `status` leads with both.
+- **A source line on every answer**, written by Cursiv from what it actually gave the model: Cursiv Offline Reference (entries), your documents (pages), Cursiv's calculations, web results, saved memories, or *model knowledge (not checked against a source)*. A model citing the offline reference when none was given gets a note. A question about "our protocol" that the documents don't cover gets "searched your documents: nothing covers this", not "I have no access to any protocol".
+- **Field report:** Field Notebook → Report…, or `field report` (`site <name>`, `today`): a printable summary by site, every entry with its fingerprint, corrections with reasons. Exports include it.
+- **Field demo:** type `demo` (or ⋯ → Field demo) for a sample stream survey and a sample protocol, kept apart from your real notebook and documents and marked SAMPLE DATA everywhere; `demo questions` lists what to try; `demo off` brings your records back. Walkthrough: `docs/FIELD-DEMO.md`.
+- **Privacy:** `PRIVACY.md`, and a summary in Settings → Privacy & internet: what stays here, what can leave and when, what offline mode blocks.
+- **Installer:** publisher, version and source details in the file properties, a before-you-install page (what it does, why Windows warns, how to check the download), and a SHA-256 checksum published with every release.
+
 ## v3.14-U69 — Dark by default (2026-10-18)
 - **Cursiv starts in dark mode** on every install and every Cursiv USB, whatever Windows is set to. Settings → Appearance: Dark, Light or Match Windows.
 
