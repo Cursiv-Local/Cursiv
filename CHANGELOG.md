@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.14-U71 — Field work first (2026-10-18)
+- **Research profile by default.** `help`, Tools, the welcome card and the empty chat lead with field work: the notebook, reports, documents, calculations, LOCAL ONLY and the demo (`help field`, `help documents`). Family letters, the legacy vault, the phone app, coding help, the council, agents and builder tools are hidden unless Settings → Appearance → **Show personal features** is on; their commands still work if typed.
+- **When the AI engine is down**, Cursiv says so and gives what it has without it: its own calculation, the reference card (with 911 for emergencies), and the matching pages of your documents, plus how to restart the engine. The source line says "Written by Cursiv, no AI model". It no longer claims "Answered by Ollama" over an error.
+- The Help window uses the current badge names and explains the Sources line.
+
 ## v3.14-U70 — Ready to show a research group (2026-10-18)
 - **LOCAL ONLY badge:** the top of the chat says *LOCAL ONLY · internet blocked* when offline mode is on, and *Local answers · internet not blocked* otherwise. The model menu names the model answering on this computer. `status` leads with both.
 - **A source line on every answer**, written by Cursiv from what it actually gave the model: Cursiv Offline Reference (entries), your documents (pages), Cursiv's calculations, web results, saved memories, or *model knowledge (not checked against a source)*. A model citing the offline reference when none was given gets a note. A question about "our protocol" that the documents don't cover gets "searched your documents: nothing covers this", not "I have no access to any protocol".
