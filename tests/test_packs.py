@@ -62,6 +62,11 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("how do I use an AED", "medical/sudden-cardiac-arrest"),
     ("my coworker is having a seizure", "medical/seizure-first-aid"),
     ("headache and nausea at high altitude on the climb", "medical/altitude-sickness-recognition"),
+    # disasters
+    ("the creek is rising fast near our camp", "survival/flood-safety"),
+    ("can I drive through water on the road", "survival/flood-safety"),
+    ("the wildfire smoke is bad, should I go outside", "survival/wildfire-smoke"),
+    ("there's a tornado warning, where do we go", "survival/tornado-safety"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -85,6 +90,8 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "I lost track of time",
     "what's the altitude of Denver",
     "my laptop has a seizure-inducing screen flicker",
+    "my basement smells like smoke from the fireplace, is that normal",
+    "flood fill a shape in photoshop",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}

@@ -1,0 +1,106 @@
+{
+  "pack": "disasters",
+  "version": "1.0",
+  "about": "Floods, wildfire smoke and tornadoes. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a professional.",
+  "entries": [
+    {
+      "title": "flood safety",
+      "category": "survival",
+      "aliases": [
+        "flooding",
+        "flash flood",
+        "floodwater",
+        "flood water",
+        "flooded",
+        "flood warning",
+        "turn around don't drown",
+        [
+          "flood",
+          "road"
+        ],
+        [
+          "flood",
+          "camp"
+        ],
+        [
+          "flood",
+          "house"
+        ],
+        [
+          "flood",
+          "car"
+        ],
+        [
+          "water",
+          "road",
+          "drive"
+        ],
+        [
+          "creek",
+          "rising"
+        ],
+        [
+          "river",
+          "rising"
+        ]
+      ],
+      "text": "Turn Around, Don't Drown: water may be deeper than it looks and can hide hazards. Just 6 inches of moving water can knock you off your feet; 12 inches can float a car or small SUV; 18 inches can carry away large vehicles, and a vehicle caught in swift water can be swept away in seconds. Don't walk through floodwater. Don't drive into flooded roads or around a barricade. If you're in a flood-prone or low-lying area, including a campsite, get to higher ground right away. If moving water traps you, get to the highest possible point and call 911 if you can. Don't go into a basement or any room where water covers the electrical outlets or cords are under water.",
+      "source": {
+        "name": "National Weather Service, During a Flood",
+        "url": "https://www.weather.gov/safety/flood-during",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "wildfire smoke",
+      "category": "survival",
+      "aliases": [
+        "wildfire smoke",
+        "smoke from the fire",
+        "smoky air",
+        "air quality",
+        "wildfire",
+        [
+          "smoke",
+          "breathe"
+        ],
+        [
+          "smoke",
+          "outside"
+        ],
+        [
+          "smoke",
+          "mask"
+        ]
+      ],
+      "text": "Staying inside is best. Check your outdoor air quality at airnow.gov or in a phone weather app. Pick a room you can close off from outside air and run a portable air cleaner or filter in it; with central air, use a high-efficiency filter and set it to recirculate. Avoid burning anything indoors (candles, gas, propane, incense, wood), smoking, frying, and vacuuming. If you must go outside, wear a well-fitting respirator: an N95 or P100 fits tightly and is most protective. Smoke irritates the eyes, nose, throat and lungs and can cause coughing, wheezing and trouble breathing. Children, pregnant people, and people with asthma, COPD, heart disease, diabetes or chronic kidney disease need to be especially careful. Get medical help for any new or worsening symptoms. Follow instructions from local emergency officials, including to evacuate or to stay inside.",
+      "source": {
+        "name": "CDC, Safety Guidelines: Wildfires and Wildfire Smoke",
+        "url": "https://www.cdc.gov/wildfires/safety/how-to-safely-stay-safe-during-a-wildfire.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "tornado safety",
+      "category": "survival",
+      "aliases": [
+        "tornado",
+        "twister",
+        "tornado warning",
+        "funnel cloud"
+      ],
+      "text": "In a house or building: the safest place is underground, in a basement, in a small interior room or under something sturdy. With no basement, go to an interior room such as a closet or bathroom on the lowest floor. Shield your body with blankets, pillows or cushions, and stay away from windows, which can shatter in high winds. Leave a mobile home for a nearby stronger building. In a vehicle: in rural areas you may be able to drive away from the tornado; in towns it's best to park and get into a modern, enclosed building. Outdoors with no shelter, as a last resort: go to a low spot, get down, and cover your head with your hands.",
+      "source": {
+        "name": "National Weather Service, basic tornado safety rules",
+        "url": "https://www.weather.gov/pub/pnstornadosafety",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    }
+  ]
+}

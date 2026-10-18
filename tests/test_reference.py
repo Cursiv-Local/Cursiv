@@ -59,7 +59,7 @@ def test_safety_question_without_an_entry_says_so(fresh, monkeypatch):
     seen = {}
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda m, **kw: seen.setdefault("s", m[0]["content"]) and iter(["ok"]))
-    "".join(ca.chat("we got hit by a tornado what now", [], "", None))
+    "".join(ca.chat("there was an earthquake, what do we do now", [], "", None))
     assert "has no entry for this question" in seen["s"]
 
 
