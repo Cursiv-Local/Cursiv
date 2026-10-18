@@ -97,7 +97,7 @@ def _coord(value, low: float, high: float):
 
 def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
         measurements=None, note: str = "", photos=None, corrects: str = "", reason: str = "",
-        app_version: str = "") -> dict:
+        app_version: str = "", sample_id: str = "") -> dict:
     """Append one entry and return it. Coordinates are decimal degrees (WGS84)."""
     if corrects and not reason.strip():
         raise ValueError("a correction needs a reason")
@@ -105,7 +105,10 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
     if (lat_v is None) != (lon_v is None):
         raise ValueError("give both latitude and longitude, or neither")
     meas = _clean_measurements(measurements)
-    if not (meas or note.strip() or photos):
+    sample_id = (sample_id or "").strip()
+    if sample_id and not _SAMPLE_OK.fullmatch(sample_id):
+        raise ValueError("a sample ID can use letters, numbers, '-', '_' and '.' (up to 40)")
+    if not (meas or note.strip() or photos or sample_id):
         raise ValueError("an entry needs at least a measurement, a note or a photo")
     with _lock:
         existing, _bad = _read()
@@ -118,6 +121,7 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
             "recorded_utc": datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
             "recorded_local": datetime.fromtimestamp(now).astimezone().isoformat(timespec="seconds"),
             "observer": observer.strip(),
+            "sample_id": sample_id,
             "site": site.strip(),
             "lat": lat_v, "lon": lon_v,
             "location_source": location_source if lat_v is not None else "",
@@ -147,7 +151,8 @@ def correct(entry_id: str, reason: str, **fields) -> dict:
     if old is None:
         raise ValueError(f"no entry {entry_id} to correct")
     base = {k: old.get(k) for k in ("observer", "site", "lat", "lon", "location_source", "measurements",
-                                    "note", "photos")}
+                                    "note", "photos", "sample_id")}
+    base["sample_id"] = base.get("sample_id") or ""
     base.update(fields)
     return add(**base, corrects=entry_id, reason=reason)
 
@@ -175,9 +180,55 @@ def verify() -> list[str]:
     return problems
 
 
+# ── Sample IDs (research roadmap R4) ───────────────────────────────────────
+
+_SAMPLE_OK = re.compile(r"[A-Za-z0-9][A-Za-z0-9._-]{0,39}")
+
+
+def new_sample_id(site: str = "") -> str:
+    """Site initials, today's date, and the next free number: 'NT-20261018-001'."""
+    words = re.findall(r"[A-Za-z0-9]+", site or "")
+    prefix = ("".join(w[0] for w in words[:3]).upper() or "S")
+    day = datetime.now().strftime("%Y%m%d")
+    taken = {e.get("sample_id") for e in entries()}
+    n = 1
+    while f"{prefix}-{day}-{n:03d}" in taken:
+        n += 1
+    return f"{prefix}-{day}-{n:03d}"
+
+
+def sample_history(sample_id: str) -> list[dict]:
+    """Every entry recorded for a sample, oldest first, including corrected ones."""
+    return [e for e in entries() if e.get("sample_id") == sample_id]
+
+
+def labels_html(rows: list[dict]) -> str:
+    """A printable sheet of sample labels (ID, site, time, observer, coordinates, fingerprint)."""
+    import html
+    cells = []
+    for e in rows:
+        if not e.get("sample_id"):
+            continue
+        where = f"{e['lat']}, {e['lon']}" if e.get("lat") is not None else ""
+        cells.append(
+            '<div class="label"><div class="id">' + html.escape(e["sample_id"]) + "</div>"
+            f'<div>{html.escape(e.get("site", ""))}</div>'
+            f'<div>{html.escape(e["recorded_local"][:16].replace("T", " "))} · {html.escape(e.get("observer", ""))}</div>'
+            f'<div>{html.escape(where)}</div>'
+            f'<div class="fp">#{e["seq"]} · {e["hash"][:12]}</div></div>')
+    return ("<!doctype html><meta charset='utf-8'><title>Sample labels</title><style>"
+            "body{font-family:Arial,sans-serif;margin:10mm}"
+            ".sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:4mm}"
+            ".label{border:1px dashed #999;padding:3mm;font-size:9pt;line-height:1.3;break-inside:avoid}"
+            ".id{font-size:13pt;font-weight:bold;font-family:Consolas,monospace}"
+            ".fp{color:#555;font-family:Consolas,monospace;font-size:8pt}"
+            "@media print{.label{border-color:#bbb}}</style>"
+            "<div class='sheet'>" + "".join(cells) + "</div>")
+
+
 # ── Export ─────────────────────────────────────────────────────────────────
 
-CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "site", "lat", "lon",
+CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "sample_id", "site", "lat", "lon",
               "location_source", "measurement", "value", "unit", "note", "photos", "corrects", "reason",
               "fingerprint")
 
@@ -194,7 +245,8 @@ def export(folder: Path | None = None, include_corrected: bool = False) -> dict[
         w = csv.writer(f)
         w.writerow(CSV_FIELDS)
         for e in rows:
-            common = [e["id"], e["seq"], e["recorded_utc"], e["recorded_local"], e["observer"], e["site"],
+            common = [e["id"], e["seq"], e["recorded_utc"], e["recorded_local"], e["observer"],
+                      e.get("sample_id", ""), e["site"],
                       "" if e["lat"] is None else e["lat"], "" if e["lon"] is None else e["lon"],
                       e["location_source"]]
             tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"]]
@@ -210,17 +262,23 @@ def export(folder: Path | None = None, include_corrected: bool = False) -> dict[
 
     geo_path = folder / "observations.geojson"
     features = [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
-                 "properties": {k: e[k] for k in ("id", "seq", "recorded_utc", "observer", "site",
-                                                  "measurements", "note", "hash")}}
+                 "properties": {**{k: e[k] for k in ("id", "seq", "recorded_utc", "observer", "site",
+                                                     "measurements", "note", "hash")},
+                                "sample_id": e.get("sample_id", "")}}
                 for e in rows if e["lat"] is not None]
     geo_path.write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=2,
                                    ensure_ascii=False), encoding="utf-8")
-    return {"csv": csv_path, "json": json_path, "geojson": geo_path}
+    paths = {"csv": csv_path, "json": json_path, "geojson": geo_path}
+    if any(e.get("sample_id") for e in rows):
+        labels = folder / "sample-labels.html"
+        labels.write_text(labels_html(rows), encoding="utf-8")
+        paths["labels"] = labels
+    return paths
 
 
 # ── Typed entries: "log ..." ───────────────────────────────────────────────
 
-_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|lat|lon|latitude|longitude)\s*[:=]\s*(.+)$")
+_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|lat|lon|latitude|longitude|sample|sample id)\s*[:=]\s*(.+)$")
 _PAIR = re.compile(r"^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$")
 _MEASURE = re.compile(r"^\s*([A-Za-z][\w ./()%-]*?)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*([^\d\s][^;]*)?\s*$")
 
@@ -229,7 +287,7 @@ def parse(text: str) -> dict:
     """'site: North transect; water temp 12.4 C; pH 7.2; 44.1234, -71.5678; note: turbid'
     -> fields for add(). Parts are split on ';' or new lines. Anything that isn't a
     field, a coordinate pair or 'name number unit' goes into the note, word for word."""
-    out = {"site": "", "observer": "", "lat": None, "lon": None, "measurements": [], "note": ""}
+    out = {"site": "", "observer": "", "lat": None, "lon": None, "measurements": [], "note": "", "sample_id": ""}
     notes = []
     for part in re.split(r"[;\n]", text or ""):
         part = part.strip()
@@ -244,6 +302,8 @@ def parse(text: str) -> dict:
                 out["lat"] = float(value)
             elif key in ("lon", "longitude"):
                 out["lon"] = float(value)
+            elif key in ("sample", "sample id"):
+                out["sample_id"] = value
             else:
                 out[key] = value
             continue
@@ -263,6 +323,8 @@ def parse(text: str) -> dict:
 
 def summary(e: dict) -> str:
     bits = [f"#{e['seq']}", e["recorded_local"].replace("T", " ")]
+    if e.get("sample_id"):
+        bits.append(f"sample {e['sample_id']}")
     if e["site"]:
         bits.append(e["site"])
     if e["lat"] is not None:
@@ -287,6 +349,8 @@ def command(text: str, observer: str = "") -> str | None:
             if fields["lat"] is not None:
                 fields["location_source"] = "typed"
             fields["observer"] = fields["observer"] or observer
+            if fields["sample_id"].lower() in ("auto", "new", "next"):
+                fields["sample_id"] = new_sample_id(fields["site"])
             e = add(**fields)
         except ValueError as exc:
             return f"Not saved: {exc}."
@@ -297,6 +361,12 @@ def command(text: str, observer: str = "") -> str | None:
         if not rows:
             return "The field log is empty. Add an entry with: log site: …; water temp 12.4 C; note: …"
         return "Field log (latest 15):\n" + "\n".join(summary(e) for e in rows[-15:])
+    m = re.match(r"(?i)^field ?log sample\s+(\S+)$", t)
+    if m:
+        hist = sample_history(m.group(1))
+        if not hist:
+            return f"No entries for sample {m.group(1)}."
+        return f"Sample {m.group(1)}:\n" + "\n".join(summary(e) for e in hist)
     if low in ("field log check", "fieldlog check", "check field log"):
         problems = verify()
         n = len(entries())

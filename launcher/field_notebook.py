@@ -55,6 +55,14 @@ class FieldNotebookDialog(QDialog):
         coords.setContentsMargins(0, 0, 0, 0)
         form.addRow("Observer", self._observer)
         form.addRow("Site", self._site)
+        sample_row = QHBoxLayout(); sample_row.setContentsMargins(0, 0, 0, 0)
+        self._sample = QLineEdit(); self._sample.setPlaceholderText("Optional, e.g. a vial or bag label")
+        new_id = QPushButton("New ID"); new_id.setStyleSheet(theme.ghost_button())
+        new_id.setToolTip("Site initials, today's date and the next free number")
+        new_id.clicked.connect(lambda: self._sample.setText(fieldlog.new_sample_id(self._site.text())))
+        sample_row.addWidget(self._sample, 1); sample_row.addWidget(new_id)
+        sw = QWidget(); sw.setLayout(sample_row); sw.setStyleSheet("background: transparent;")
+        form.addRow("Sample ID", sw)
         form.addRow("Location (decimal degrees)", cw)
         form_box.addLayout(form)
 
@@ -128,7 +136,7 @@ class FieldNotebookDialog(QDialog):
         self._form_title.setText("New entry")
         self._cancel.setVisible(False)
         self._save.setText("Save entry")
-        for w in (self._site, self._lat, self._lon):
+        for w in (self._site, self._sample, self._lat, self._lon):
             w.clear()
         for row in self._rows:
             for w in row:
@@ -143,6 +151,7 @@ class FieldNotebookDialog(QDialog):
             "measurements": [{"name": n.text(), "value": v.text(), "unit": u.text()}
                              for n, v, u in self._rows if n.text().strip()],
             "note": self._note.toPlainText(),
+            "sample_id": self._sample.text(),
         }
 
     def _save_entry(self):
@@ -177,6 +186,7 @@ class FieldNotebookDialog(QDialog):
         self._save.setText("Save correction")
         self._cancel.setVisible(True)
         self._observer.setText(e["observer"]); self._site.setText(e["site"])
+        self._sample.setText(e.get("sample_id", ""))
         self._lat.setText("" if e["lat"] is None else str(e["lat"]))
         self._lon.setText("" if e["lon"] is None else str(e["lon"]))
         while len(self._rows) < len(e["measurements"]):
@@ -191,7 +201,8 @@ class FieldNotebookDialog(QDialog):
         self._table.setRowCount(len(rows))
         for r, e in enumerate(reversed(rows)):
             meas = ", ".join(f"{m['name']} {m['value']}{(' ' + m['unit']) if m['unit'] else ''}" for m in e["measurements"])
-            cells = [str(e["seq"]), e["recorded_local"].replace("T", " ")[:19], e["site"], meas,
+            site = e["site"] + (f"  [{e['sample_id']}]" if e.get("sample_id") else "")
+            cells = [str(e["seq"]), e["recorded_local"].replace("T", " ")[:19], site, meas,
                      e["note"] + (f"  (corrects an earlier entry: {e['reason']})" if e.get("corrects") else "")]
             for c, text in enumerate(cells):
                 item = QTableWidgetItem(text)

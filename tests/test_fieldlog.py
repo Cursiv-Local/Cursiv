@@ -132,3 +132,47 @@ def test_notebook_window_saves_corrects_and_shows_integrity(log, monkeypatch):
     w._save_entry()
     assert len(log.entries()) == 2 and w._table.rowCount() == 1           # original kept, correction shown
     assert "intact" in w._integrity.text()
+
+
+# ── Sample IDs (R4) ────────────────────────────────────────────────────────
+
+def test_sample_ids_are_generated_unique_and_traceable(log, tmp_path):
+    first = log.command("log site: North transect; sample: auto; water temp 12.40 C", "Dana")
+    sid = log.entries()[0]["sample_id"]
+    assert sid.startswith("NT-") and sid.endswith("-001") and sid in first
+    log.command("log site: North transect; sample: auto; pH 7.2", "Dana")
+    assert log.entries()[1]["sample_id"].endswith("-002")
+    log.correct(log.entries()[0]["id"], "re-read", measurements=[{"name": "water temp", "value": "12.10", "unit": "C"}])
+    hist = log.command(f"field log sample {sid}")
+    assert hist.count("sample " + sid) == 2                      # the original and its correction
+    paths = log.export(tmp_path / "out")
+    labels = paths["labels"].read_text(encoding="utf-8")
+    assert sid in labels and "North transect" in labels
+
+
+def test_bad_sample_ids_are_refused(log):
+    with pytest.raises(ValueError):
+        log.add(note="x", sample_id="has spaces and /slashes/")
+
+
+def test_entries_from_before_sample_ids_still_verify(log):
+    import json
+    e = log.add(note="old entry")
+    line = json.loads(log.log_file().read_text(encoding="utf-8"))
+    del line["sample_id"]                                         # as written by U66
+    line["hash"] = log._fingerprint(line)
+    log.log_file().write_text(json.dumps(line) + "\n", encoding="utf-8")
+    assert log.verify() == [] and log.current()[0]["note"] == "old entry" and e
+
+
+def test_notebook_window_sample_id(log):
+    from PyQt6.QtWidgets import QApplication
+    app = QApplication.instance() or QApplication([])
+    import field_notebook
+    w = field_notebook.FieldNotebookDialog(None, observer="Dana")
+    w._site.setText("Pond Two")
+    w._sample.setText(log.new_sample_id("Pond Two"))
+    w._note.setPlainText("water sample, 250 mL")
+    w._save_entry()
+    sid = log.entries()[0]["sample_id"]
+    assert sid.startswith("PT-") and sid in w._table.item(0, 2).text()
