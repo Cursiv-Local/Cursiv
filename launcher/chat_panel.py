@@ -361,8 +361,8 @@ class ChatPanel(QWidget):
         self._input = _ChatInput(self._send, self._handle_pasted_image)
         row.addWidget(self._input, 1)
 
-        self._voice_btn = QPushButton("🎙")
-        self._voice_btn.setFixedSize(44, 64)
+        self._voice_btn = QPushButton("Voice")
+        self._voice_btn.setFixedSize(64, 64)
         self._voice_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._voice_btn.setToolTip("Record 5s of audio and transcribe it into the input box")
         self._voice_btn.setStyleSheet(self._icon_btn_style())
@@ -395,7 +395,7 @@ class ChatPanel(QWidget):
         lay.addWidget(self._status)
 
     def _icon_btn_style(self) -> str:
-        return theme.ghost_button(10) + "QPushButton { font-size: 16px; padding: 0; }"
+        return theme.ghost_button(10) + "QPushButton { font-size: 13px; padding: 0; }"
 
     # ── Status pill and model picker ─────────────────────────────────────
 
@@ -1119,7 +1119,7 @@ class ChatPanel(QWidget):
         self._voice_btn.setEnabled(False)
         self._send_btn.setEnabled(False)
         self._streaming = True
-        self._status.setText(f"🎙 Listening {duration:.0f}s… speak now")
+        self._status.setText(f"Listening for {duration:.0f} seconds… speak now")
         threading.Thread(
             target=self._run_voice, args=(duration, raw_mode, auto_send), daemon=True,
         ).start()

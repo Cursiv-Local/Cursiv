@@ -27,7 +27,7 @@ class MemoryDialog(QDialog):
             QLabel {{ color: {SILVER}; background: transparent; }}
             QListWidget {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 6px; font-size: 13px; }}
             QListWidget::item {{ padding: 7px 6px; border-bottom: 1px solid {BORDER}; }}
-            QListWidget::item:selected {{ background: #1d2a4a; }}
+            QListWidget::item:selected {{ background: #1b1f2a; }}
             QLineEdit, QComboBox {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 4px; padding: 6px; }}
             QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 6px 14px; font-weight: 600; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}

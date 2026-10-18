@@ -112,7 +112,7 @@ class PhoneDialog(QDialog):
         lay = QVBoxLayout(self)
         lay.setContentsMargins(18, 16, 18, 14)
         lay.setSpacing(10)
-        title = QLabel("📱  Phone")
+        title = QLabel("Phone")
         title.setStyleSheet(f"color: {GOLD}; font-size: 16px; font-weight: 700;")
         lay.addWidget(title)
         self._status = QLabel("")
@@ -139,7 +139,7 @@ class PhoneDialog(QDialog):
         self._photo_label.setStyleSheet(f"color: {GREEN}; font-size: 12px;")
         lay.addWidget(self._photo_label)
         send_row = QHBoxLayout()
-        self._attach = QPushButton("📎 Photo")
+        self._attach = QPushButton("Add photo")
         self._attach.setObjectName("ghost")
         self._attach.clicked.connect(self._pick_photo)
         send_row.addWidget(self._attach)
@@ -261,7 +261,7 @@ class PhoneDialog(QDialog):
         parts = []
         for m in sorted(self._msgs.values(), key=lambda x: x["created"]):
             who = "CURSIV" if m["role"] == "assistant" else ("You (phone)" if m.get("source") == "phone" else "You (computer)")
-            color = GOLD if m["role"] == "assistant" else "#8fb0ff"
+            color = GOLD if m["role"] == "assistant" else "#d8d2c4"
             img = self._images.get(m["id"])
             img_html = f'<br><img src="{img}" width="320"><br>' if img else ("<br><i>[photo loading…]</i><br>" if m.get("has_image") else "")
             text = "" if m["text"] == "(photo)" else _fmt(m["text"])

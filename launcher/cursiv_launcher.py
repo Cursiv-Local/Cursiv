@@ -999,7 +999,7 @@ class TitleBar(QWidget):
             row.addWidget(u)
 
         for symbol, tip, slot, col in [
-            ("📱", "Phone — link the phone app and see the shared conversation",
+            ("☏", "Phone — link the phone app and see the shared conversation",
              lambda: parent._open_phone() if hasattr(parent, "_open_phone") else None, GOLD),
             ("⚙", "Settings — AI keys, Cursiv Cloud, data folder",
              lambda: parent._open_settings() if hasattr(parent, "_open_settings") else None, GOLD),
@@ -1485,7 +1485,7 @@ class CursivLauncher(QMainWindow):
 
             self._fleet_lbl = QLabel("⬢  Fleet — connecting…")
             self._fleet_lbl.setStyleSheet(
-                "color: #5566aa; font-size: 11px; background: transparent; border: none;"
+                "color: #9a9586; font-size: 11px; background: transparent; border: none;"
             )
             fleet_lay.addWidget(self._fleet_lbl, 1)
 
@@ -1495,12 +1495,12 @@ class CursivLauncher(QMainWindow):
             fleet_btn.setToolTip("Open the Fleet Dashboard — see all your machines")
             fleet_btn.setStyleSheet("""
                 QPushButton {
-                    background: #1a1a3a; color: #8899cc;
+                    background: #151821; color: #e6e2d8;
                     font-size: 10px; font-weight: 600;
-                    border: 1px solid #2a2a5a; border-radius: 4px;
+                    border: 1px solid #262b38; border-radius: 4px;
                     padding: 1px 8px;
                 }
-                QPushButton:hover   { background: #2a2a5a; }
+                QPushButton:hover   { background: #1b1f2a; }
                 QPushButton:pressed { background: #0a0a1a; }
             """)
             fleet_btn.clicked.connect(self._show_fleet)

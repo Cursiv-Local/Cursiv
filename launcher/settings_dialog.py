@@ -77,7 +77,7 @@ class SettingsDialog(QDialog):
             QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 5px 12px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
-            QPushButton#link {{ background: transparent; color: #6f9bff; border: none; font-weight: 400; padding: 2px 4px; }}
+            QPushButton#link {{ background: transparent; color: #d8d2c4; text-decoration: underline; border: none; font-weight: 400; padding: 2px 4px; }}
             QCheckBox {{ color: {SILVER}; }}
         """)
         self._sig = _Signals()

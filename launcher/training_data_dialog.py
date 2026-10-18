@@ -54,7 +54,7 @@ class TrainingDataDialog(QDialog):
         lay.setContentsMargins(20, 20, 20, 20)
         lay.setSpacing(10)
 
-        header = QLabel("🗂  Training Data")
+        header = QLabel("Training data")
         header.setStyleSheet(f'color: {GOLD}; font-size: 18px; font-weight: 700; font-family: "Segoe UI", "Segoe UI Historic";')
         lay.addWidget(header)
         lay.addWidget(self._note_label(
