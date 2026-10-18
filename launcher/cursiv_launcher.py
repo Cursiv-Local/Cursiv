@@ -1628,6 +1628,10 @@ class CursivLauncher(QMainWindow):
         open_report(self, context)
 
     def _open_usb_maker(self):
+        if sys.platform != "win32":
+            QMessageBox.information(self, "Cursiv USB", "The Cursiv USB drive is Windows-only for now. "
+                                    "On a Mac, install Cursiv from the .dmg on the download page.")
+            return
         try:
             from usb_maker import UsbMakerDialog
             UsbMakerDialog(self).exec()
@@ -1745,9 +1749,10 @@ class CursivLauncher(QMainWindow):
         setup_act.triggered.connect(self._open_setup)
         menu.addAction(setup_act)
 
-        usb_act = QAction("Make a Cursiv USB…", self)
-        usb_act.triggered.connect(lambda: self._open_usb_maker())
-        menu.addAction(usb_act)
+        if sys.platform == "win32":              # the USB edition is Windows-only for now
+            usb_act = QAction("Make a Cursiv USB…", self)
+            usb_act.triggered.connect(lambda: self._open_usb_maker())
+            menu.addAction(usb_act)
 
         report_act = QAction("Send problem report…", self)
         report_act.triggered.connect(lambda: self._send_problem_report())

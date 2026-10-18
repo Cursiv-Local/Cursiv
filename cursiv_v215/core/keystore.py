@@ -1,5 +1,9 @@
 """
-Saved AI keys, encrypted for the Windows account that saved them.
+Saved AI keys, encrypted for the account that saved them.
+
+On macOS each key goes into the user's login Keychain (service "Cursiv"), and
+config.json keeps only "keychain:<id>". The key reaches Apple's `security` tool on
+its standard input, never on its command line.
 
 Keys live in .cursiv/config.json. On Windows each key is stored as
 "dpapi:<base64>", encrypted with DPAPI (CryptProtectData): only the same
@@ -22,11 +26,43 @@ from pathlib import Path
 
 SECRET_FIELDS = ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key", "cf_api_token")
 PREFIX = "dpapi:"
+KC_PREFIX = "keychain:"
+KC_SERVICE = "Cursiv"
 _ENTROPY = b"Cursiv saved key"
 
 
 def _dpapi_available() -> bool:
     return sys.platform == "win32" and os.environ.get("CURSIV_PORTABLE") != "1"
+
+
+def _keychain_available() -> bool:
+    import shutil
+    return sys.platform == "darwin" and os.environ.get("CURSIV_PORTABLE") != "1" and bool(shutil.which("security"))
+
+
+def _keychain_put(secret: str) -> str | None:
+    """Store a secret in the login Keychain; its id, or None."""
+    import subprocess
+    import uuid
+    if any(c in secret for c in "\"\\\n\r"):
+        return None                       # keep the stdin command unambiguous
+    item = uuid.uuid4().hex
+    cmd = f'add-generic-password -U -s {KC_SERVICE} -a {item} -w "{secret}"\n'
+    try:
+        rc = subprocess.run(["security", "-i"], input=cmd, capture_output=True, text=True, timeout=15).returncode
+    except Exception:
+        return None
+    return item if rc == 0 else None
+
+
+def _keychain_get(item: str) -> str:
+    import subprocess
+    try:
+        r = subprocess.run(["security", "find-generic-password", "-s", KC_SERVICE, "-a", item, "-w"],
+                           capture_output=True, text=True, timeout=15)
+    except Exception:
+        return ""
+    return r.stdout.rstrip("\n") if r.returncode == 0 else ""
 
 
 def _blob(data: bytes):
@@ -59,7 +95,12 @@ def _crypt(data: bytes, protect: bool) -> bytes:
 def protect(value: str) -> str:
     """The stored form of a key. Unchanged when empty, already protected, or
     when DPAPI isn't available (USB copy, not Windows)."""
-    if not value or value.startswith(PREFIX) or not _dpapi_available():
+    if not value or value.startswith((PREFIX, KC_PREFIX)):
+        return value
+    if _keychain_available():
+        item = _keychain_put(value)
+        return KC_PREFIX + item if item else value
+    if not _dpapi_available():
         return value
     try:
         return PREFIX + base64.b64encode(_crypt(value.encode("utf-8"), True)).decode("ascii")
@@ -69,6 +110,8 @@ def protect(value: str) -> str:
 
 def reveal(value: str) -> str:
     """The usable key. "" if it was encrypted for another Windows account or PC."""
+    if isinstance(value, str) and value.startswith(KC_PREFIX):
+        return _keychain_get(value[len(KC_PREFIX):]) if sys.platform == "darwin" else ""
     if not isinstance(value, str) or not value.startswith(PREFIX):
         return value if isinstance(value, str) else ""
     if sys.platform != "win32":
@@ -102,7 +145,7 @@ def _rewrite(path: Path, fn) -> bool:
 
 def migrate(path: Path) -> bool:
     """Encrypt any plain keys in config.json. True if the file changed."""
-    if not _dpapi_available():
+    if not (_dpapi_available() or _keychain_available()):
         return False
     return _rewrite(path, protect)
 

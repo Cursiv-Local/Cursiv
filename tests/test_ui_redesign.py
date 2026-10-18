@@ -159,7 +159,9 @@ def test_tools_hides_advanced_and_help_explains(app, settings):
     from cursiv_v215.core import profile
     t = nav_windows.ToolsDialog()                       # research profile (the default)
     text = _labels(t)
-    assert "Field Notebook" in text and "Field demo" in text and "Make a Cursiv USB" in text
+    assert "Field Notebook" in text and "Field demo" in text
+    import sys
+    assert ("Make a Cursiv USB" in text) == (sys.platform == "win32")     # the USB edition is Windows-only
     assert "Write a family letter" not in text and "Coding help" not in text and "Personal features are hidden" in text
     h = nav_windows.HelpDialog()
     from PyQt6.QtWidgets import QTextBrowser

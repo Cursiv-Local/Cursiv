@@ -252,8 +252,10 @@ class ToolsDialog(_Window):
         if personal:
             self.entry("Phone app", "Link your phone so you can ask about photos and continue the chat here.",
                        "Open", self._window("_open_phone"))
-        self.entry("Make a Cursiv USB", "Copy Cursiv, its AI engine and models to a USB drive to run on any Windows PC.",
-                   "Open", self._window("_open_usb_maker"))
+        import sys as _sys
+        if _sys.platform == "win32":             # the USB edition is Windows-only for now
+            self.entry("Make a Cursiv USB", "Copy Cursiv, its AI engine and models to a USB drive to run on any "
+                       "Windows PC.", "Open", self._window("_open_usb_maker"))
         if not personal:
             self.body.addWidget(self._explain("Personal features are hidden: Settings → Appearance."))
             return

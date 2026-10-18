@@ -19,6 +19,7 @@ import json
 import os
 import re
 import subprocess
+import sys
 import threading
 import time
 import urllib.request
@@ -95,8 +96,26 @@ def num_ctx() -> int:
 # of 30, and no second model call to check answers (the checks done in code, such
 # as arithmetic, doses and the reference card, still run).
 
+_batt_cache: dict = {"t": 0.0, "on": False}
+
+
+def _mac_on_battery() -> bool:
+    """macOS: `pmset -g batt` says "Battery Power" or "AC Power" (checked at most every 30 s)."""
+    if time.monotonic() - _batt_cache["t"] < 30:
+        return _batt_cache["on"]
+    try:
+        out = subprocess.run(["pmset", "-g", "batt"], capture_output=True, text=True, timeout=3).stdout
+        on = "Battery Power" in out
+    except Exception:
+        on = False
+    _batt_cache.update(t=time.monotonic(), on=on)
+    return on
+
+
 def on_battery() -> bool:
-    """True when this Windows laptop is running on its battery."""
+    """True when this laptop is running on its battery (Windows or macOS)."""
+    if sys.platform == "darwin":
+        return _mac_on_battery()
     try:
         import ctypes
 
