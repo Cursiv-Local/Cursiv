@@ -81,3 +81,20 @@ def test_answer_check_allows_rounding_but_not_wrong_numbers():
     w = calc.work_out("Convert 12.4 C to F")
     assert calc.check("It's about 54.3 °F.", w) == ""
     assert "54.32" in calc.check("It's 50 °F.", w)
+
+
+def test_distance_and_bearing_match_the_published_vincenty_example():
+    d, brg = fc.distance_bearing(-37.95103341666667, 144.42486788888888, -37.65282113888889, 143.92649552777778)
+    assert d == pytest.approx(54972.271, abs=0.001)                     # Flinders Peak to Buninyong
+    assert brg == pytest.approx(306.86816, abs=1e-4)                     # 306 52 05.37
+    r = fc.work_out("What is the distance and bearing from 44.1234, -71.5678 to 44.1300, -71.5600?")
+    assert "963.1 m" in r.statement and "40.4" in r.statement and "(NE)" in r.statement
+    assert fc.distance("what is the distance to town") is None
+
+
+def test_24_hour_clock_times():
+    w = calc.work_out("We leave at 14:30 for a 3 h 45 min hike with a 20 min break. What time will we arrive?")
+    assert "18:35" in w.statement
+    assert "01:30 (the next day)" in calc.work_out("we leave at 23:30 and the drive takes 2 hours, "
+                                                    "what time will we arrive").statement
+    assert calc.work_out("The ratio was 3:45 in the sample") is None

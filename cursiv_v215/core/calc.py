@@ -19,8 +19,10 @@ _WORDNUM = {"a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 
             "thirty": 30, "forty": 40, "forty-five": 45, "fifty": 50, "sixty": 60, "ninety": 90}
 _NUMW = r"(\d+(?:\.\d+)?|" + "|".join(sorted(_WORDNUM, key=len, reverse=True)) + r")"
 
-_TIME = re.compile(r"(?i)\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)(?![a-z])|\b(noon|midnight)\b")
-_DURATION = re.compile(r"(?i)\b" + _NUMW + r"(?:\s+and\s+a\s+half)?\s*(hours?|hrs?|minutes?|mins?)\b"
+# 6:00 AM / 6 pm / noon, or a 24-hour time (14:30), which field teams often use
+_TIME = re.compile(r"(?i)\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)(?![a-z])|\b(noon|midnight)\b"
+                   r"|(?<![\d:.])([01]?\d|2[0-3]):([0-5]\d)(?![\d:])(?!\s*[ap]\.?m)")
+_DURATION = re.compile(r"(?i)\b" + _NUMW + r"(?:\s+and\s+a\s+half)?\s*(hours?|hrs?|h|minutes?|mins?)\b"
                        r"|\b(half an hour|an hour and a half|a half hour)\b")
 # "What time should I go to bed / leave / start" with a time to be done by: count back.
 _BACK = re.compile(r"(?i)\bwhat time (?:should|do|must|would) (?:i|we|he|she|they) (?:go to bed|get in(?:to)? bed|"
@@ -53,6 +55,8 @@ def _minutes(m: re.Match) -> int:
 
 
 def _clock(m: re.Match) -> int:
+    if m.group(5):
+        return int(m.group(5)) * 60 + int(m.group(6))
     if m.group(4):
         return 12 * 60 if m.group(4).lower() == "noon" else 0
     h, mins, ampm = int(m.group(1)), int(m.group(2) or 0), m.group(3).lower()
@@ -62,10 +66,12 @@ def _clock(m: re.Match) -> int:
     return h * 60 + mins
 
 
-def _fmt(total: int) -> tuple[str, int]:
+def _fmt(total: int, clock24: bool = False) -> tuple[str, int]:
     day = total // (24 * 60)
     total %= 24 * 60
     h, m = divmod(total, 60)
+    if clock24:
+        return f"{h:02d}:{m:02d}", day
     return f"{(h % 12) or 12}:{m:02d} {'AM' if h < 12 else 'PM'}", day
 
 
@@ -88,7 +94,7 @@ def clock_arithmetic(question: str) -> Worked | None:
         return None
     total = sum(_minutes(d) for d in durations)
     end = start - total if back else start + total
-    shown, day = _fmt(end)
+    shown, day = _fmt(end, clock24=bool(times[0].group(5)))
     when = " (the day before)" if day < 0 else (" (the next day)" if day > 0 else "")
     if back and day < 0 and end % (24 * 60) >= 12 * 60:
         when = " (the night before)"

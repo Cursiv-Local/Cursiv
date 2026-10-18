@@ -150,6 +150,59 @@ def to_utm(lat: float, lon: float) -> tuple[int, str, float, float]:
     return zone, hemi, easting, northing
 
 
+def distance_bearing(lat1: float, lon1: float, lat2: float, lon2: float) -> tuple[float, float]:
+    """Distance in metres and initial bearing in degrees between two WGS84 points
+    (Vincenty's inverse formula; millimetre accuracy, iterates to convergence)."""
+    a, f = 6378137.0, 1 / 298.257223563
+    b = (1 - f) * a
+    if (lat1, lon1) == (lat2, lon2):
+        return 0.0, 0.0
+    L = math.radians(lon2 - lon1)
+    u1, u2 = math.atan((1 - f) * math.tan(math.radians(lat1))), math.atan((1 - f) * math.tan(math.radians(lat2)))
+    su1, cu1, su2, cu2 = math.sin(u1), math.cos(u1), math.sin(u2), math.cos(u2)
+    lam = L
+    for _ in range(200):
+        sl, cl = math.sin(lam), math.cos(lam)
+        ss = math.hypot(cu2 * sl, cu1 * su2 - su1 * cu2 * cl)
+        cs = su1 * su2 + cu1 * cu2 * cl
+        sigma = math.atan2(ss, cs)
+        sa = cu1 * cu2 * sl / ss
+        c2a = 1 - sa * sa
+        c2sm = cs - 2 * su1 * su2 / c2a if c2a else 0.0
+        c = f / 16 * c2a * (4 + f * (4 - 3 * c2a))
+        prev = lam
+        lam = L + (1 - c) * f * sa * (sigma + c * ss * (c2sm + c * cs * (-1 + 2 * c2sm * c2sm)))
+        if abs(lam - prev) < 1e-12:
+            break
+    else:
+        raise ValueError("points are nearly opposite each other on the globe")
+    u_sq = c2a * (a * a - b * b) / (b * b)
+    big_a = 1 + u_sq / 16384 * (4096 + u_sq * (-768 + u_sq * (320 - 175 * u_sq)))
+    big_b = u_sq / 1024 * (256 + u_sq * (-128 + u_sq * (74 - 47 * u_sq)))
+    ds = big_b * ss * (c2sm + big_b / 4 * (cs * (-1 + 2 * c2sm * c2sm)
+                                         - big_b / 6 * c2sm * (-3 + 4 * ss * ss) * (-3 + 4 * c2sm * c2sm)))
+    dist = b * big_a * (sigma - ds)
+    bearing = math.degrees(math.atan2(cu2 * math.sin(lam), cu1 * su2 - su1 * cu2 * math.cos(lam))) % 360
+    return dist, bearing
+
+
+_COMPASS = ("N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW")
+
+
+def distance(question: str) -> Result | None:
+    q = question or ""
+    if not re.search(r"(?i)\b(distance|how far|bearing|heading|direction)\b", q):
+        return None
+    pairs = [(float(a), float(b)) for a, b in _DECIMAL_PAIR.findall(q)]
+    if len(pairs) < 2 or not all(-90 <= la <= 90 and -180 <= lo <= 180 for la, lo in pairs[:2]):
+        return None
+    (la1, lo1), (la2, lo2) = pairs[:2]
+    d, brg = distance_bearing(la1, lo1, la2, lo2)
+    shown = f"{d:,.0f} m ({d / 1000:.3f} km, {d / 1609.344:.3f} miles)" if d >= 1000 else f"{d:,.1f} m"
+    return Result(f"From {la1}, {lo1} to {la2}, {lo2} is {shown}, initial bearing {brg:.1f}° "
+                  f"({_COMPASS[int((brg + 11.25) // 22.5) % 16]}), on the WGS84 ellipsoid.", d, max(d * 0.005, 1.0))
+
+
 def coordinates(question: str) -> Result | None:
     q = question or ""
     low = q.lower()
@@ -240,7 +293,7 @@ def stats(question: str) -> Result | None:
 
 
 def work_out(question: str) -> Result | None:
-    for fn in (coordinates, dilution, stats, units):
+    for fn in (distance, coordinates, dilution, stats, units):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):
