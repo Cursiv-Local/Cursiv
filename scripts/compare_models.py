@@ -55,7 +55,9 @@ def main() -> int:
                         "--label", label + ("-deep" if deep else ""), "--model", model, *(["--deep"] if deep else []),
                         *(["--source", source] if source else [])],
                        cwd=REPO, check=False)
-        out = REPO / "bench" / "results" / f"{label}{'-deep' if deep else ''}-{model.replace(':', '_')}-subset.json"
+        found = sorted((REPO / "bench" / "results").glob(f"{label}{'-deep' if deep else ''}-{model.replace(':', '_')}-subset*.json"),
+                       key=lambda p: p.stat().st_mtime)
+        out = found[-1] if found else REPO / "bench" / "results" / "missing.json"
         if not out.exists():
             rows.append({"model": spec, "error": "no results"})
             continue

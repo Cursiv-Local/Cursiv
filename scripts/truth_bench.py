@@ -194,7 +194,7 @@ def main() -> int:
     out_dir = REPO / "bench" / "results"
     out_dir.mkdir(parents=True, exist_ok=True)
     scope = f"-{args.only}" if args.only else ("-subset" if args.ids else "")
-    out = out_dir / f"{label}-{(model or 'none').replace(':', '_')}{scope}.json"
+    out = out_dir / f"{label}-{(model or 'none').replace(':', '_')}{scope}-suite{summary['suite']}.json"   # one file per suite
     out.write_text(json.dumps(summary, indent=2, ensure_ascii=False), encoding="utf-8")
 
     if not args.only and not args.ids:
