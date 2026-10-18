@@ -281,10 +281,22 @@ class ChatPanel(QWidget):
 
     # ── Empty state ─────────────────────────────────────────────────────
 
+    # The research profile (core/profile.py, the default); EXAMPLES with personal features shown.
+    FIELD_EXAMPLES = ("What is the distance and bearing from 44.1234, -71.5678 to 44.1371, -71.5512?",
+                      "log site: North transect; water temp 12.40 C; pH 7.2; note: first visit",
+                      "How much 1 M stock do I need to make 500 mL of 0.1 M solution?",
+                      ("Try everything with sample data: demo", "demo"))
     EXAMPLES = ("How do I purify creek water so it's safe to drink?",
                 "Help me plan meals for a week on a tight budget.",
                 "Explain how a well pump works, simply.",
                 "What should go in a 72-hour emergency kit for a family of four?")
+
+    def _examples(self) -> tuple:
+        try:
+            from cursiv_v215.core import profile as _profile
+            return self.EXAMPLES if _profile.personal() else self.FIELD_EXAMPLES
+        except Exception:
+            return self.FIELD_EXAMPLES
 
     def _show_empty_state(self, setup_needed: bool = False) -> None:
         """What a new chat looks like: a question, how Cursiv works in one line, examples to click."""
@@ -296,9 +308,9 @@ class ChatPanel(QWidget):
                     f'computer, or add a free Gemini or Groq key in Settings.</span></p>')
         else:
             body = "".join(
-                f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(e)}" '
-                f'style="color:{theme.TEXT}; text-decoration:none;">→&nbsp;&nbsp;{self._escape(e)}</a></p>'
-                for e in self.EXAMPLES)
+                f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(text)}" '
+                f'style="color:{theme.TEXT}; text-decoration:none;">→&nbsp;&nbsp;{self._escape(label)}</a></p>'
+                for label, text in ((e, e) if isinstance(e, str) else e for e in self._examples()))
         self._transcript.setHtml(theme.live(
             f'<div style="margin-top:40px;">'
             f'<p style="font-size:22px; font-weight:600; color:{theme.TEXT};">What can I help with?</p>'

@@ -160,7 +160,7 @@ def test_tools_hides_advanced_and_help_explains(app, settings):
     t = nav_windows.ToolsDialog()                       # research profile (the default)
     text = _labels(t)
     assert "Field Notebook" in text and "Field demo" in text and "Make a Cursiv USB" in text
-    assert "Write a family letter" not in text and "Coding help" not in text and "Show personal features" in text
+    assert "Write a family letter" not in text and "Coding help" not in text and "Personal features are hidden" in text
     h = nav_windows.HelpDialog()
     from PyQt6.QtWidgets import QTextBrowser
     guide = h.findChildren(QTextBrowser)[0].toPlainText()

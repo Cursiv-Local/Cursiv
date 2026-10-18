@@ -255,8 +255,7 @@ class ToolsDialog(_Window):
         self.entry("Make a Cursiv USB", "Copy Cursiv, its AI engine and models to a USB drive to run on any Windows PC.",
                    "Open", self._window("_open_usb_maker"))
         if not personal:
-            self.body.addWidget(self._explain("Family letters, the phone app, coding help and builder tools are hidden. "
-                                           "Settings → Appearance → Show personal features brings them back."))
+            self.body.addWidget(self._explain("Personal features are hidden: Settings → Appearance."))
             return
         self.section("CODING AND BIG QUESTIONS")
         self.entry("Coding help", "Step-by-step help with code; uses local coding models if installed.",
