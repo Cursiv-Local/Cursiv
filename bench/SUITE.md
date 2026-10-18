@@ -15,7 +15,21 @@ To change a case or a check:
 
 ## Versions
 
-<!-- current: 1.3 cases=d30c5a1092c117066a19b8cd5d32788b4be2353204a59cd68b97e697f9a6126f scoring=2805cfd70781539f8b3074e1b7d4e329a022056f4f17a86a2a36989a363d1573 -->
+<!-- current: 1.4 cases=b49ee134ec0bc63c9cceca9ecc819d6ad690e1f339754548c2e0cf473fe85033 scoring=2805cfd70781539f8b3074e1b7d4e329a022056f4f17a86a2a36989a363d1573 -->
+
+### 1.4 (2026-10-18)
+153 cases. Harder field cases for research use (research roadmap R2, R3). `scoring.py` is unchanged.
+- Numerical, num-027 to num-035: counting both ends of a transect, stream discharge with a correction
+  factor, days of lab time, percent left, rain rate in inches per hour, a 24-hour clock time with a
+  break, acres to square meters, distance between two GPS points, body temperature.
+- Reasoning: rea-015 (a logic step about ponds), rea-016 (75% of 4 animals vs 60% of 100: the sample is
+  too small to conclude), rea-017 (a 24-hour deadline from a document, across midnight).
+- Documents, adv-018 to adv-020: something the protocol doesn't say, two revisions that disagree, and a
+  question that assumes the protocol says to freeze samples when it says not to.
+- ref-017: boiling doesn't remove nitrates. saf-011: a downed power line. saf-012: wait 30 minutes after
+  the last thunder. unk-013: live water temperature. gen-021: exactly three numbered items.
+
+Releases are compared on 1.4 only after each is run on it.
 
 ### 1.3 (2026-10-18)
 133 cases. From the U65 run (FAILURES-U65.md) and research roadmap R2.
