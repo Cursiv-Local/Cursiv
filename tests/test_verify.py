@@ -509,3 +509,54 @@ def test_failed_local_call_does_not_fall_back_to_the_cloud(monkeypatch):
     monkeypatch.setattr(ca, "_call_ollama", engine("local", "[Ollama error: timeout]"))
     assert ca._router_llm([{"role": "user", "content": "check"}]) == ""
     assert used == ["local"]
+
+
+# ── AUDIT C-001, C-002, C-004, C-005, C-006 acceptance tests ───────────────
+
+def test_c001_no_checker_is_not_verified():
+    r = verify.run_pass("Who wrote Hamlet?", "Shakespeare wrote Hamlet around 1600.", ask=None)
+    assert r.learn_origin == "inferred"
+    r = verify.run_pass("Who wrote Hamlet?", "Shakespeare wrote Hamlet around 1600.", ask=lambda _m: "")
+    assert r.learn_origin == "inferred"
+
+
+@pytest.mark.parametrize("reply", ["No problems found.", "None.", "**CLEAR**", "Clear - no problems found.", "CLEAR"])
+def test_c002_no_problem_phrasings_are_clear(reply):
+    assert verify.parse_verdict(reply) == (True, "")
+
+
+def test_c002_a_real_problem_is_not_clear():
+    assert verify.parse_verdict("The total is wrong: 30 should be 36")[0] is False
+
+
+def test_c004_correct_total_is_clean_and_wrong_math_is_caught():
+    q = "4 people need 3 liters of water per day for 3 days. How much total?"
+    assert verify.constraint_problems(q, "4 x 3 x 3 = 36 liters total.") == []
+    assert verify.constraint_problems(q, "4 x 3 x 3 = 30 liters total.") == ["arithmetic: 4 x 3 x 3 is 36, not 30"]
+    assert verify.arithmetic_problems("17 times 23 is 381") == ["arithmetic: 17 times 23 is 391, not 381"]
+    assert verify.arithmetic_problems("17 times 23 is 391") == []
+    # a restated input that changed is still caught
+    assert verify.constraint_problems(q, "Each person drinks 4 liters a day.")
+
+
+def test_c005_list_markers_and_ledger_are_not_new_numbers():
+    assert verify.introduced_number_problems("Use water.", "Use water.", "1. Boil water.\n2. Let it cool.\n\nUnknown: 3 things") == []
+    assert verify.introduced_number_problems("Use water.", "Use water.", "Boil it for 7 minutes.")
+
+
+@pytest.mark.parametrize("question", ["What is 2 plus 2?", "I have 3 kids and 2 dogs, plan a trip",
+                                      "My 2 cats are hungry, what do I feed them?"])
+def test_c006_a_number_in_a_simple_question_needs_no_ledger(question):
+    assert verify.needs_ledger(question) is False
+
+
+@pytest.mark.parametrize("a, b, conflict", [
+    ("I prefer tea in the morning", "I prefer coffee in the morning", True),
+    ("My favorite color is blue", "My favorite color is green", True),
+    ("I prefer short answers", "I prefer detailed answers", True),
+    ("I like tea", "I like coffee", False),          # both can be true
+    ("I have a dog", "I have a cat", False),
+])
+def test_preference_conflicts_beyond_shared_words(a, b, conflict):
+    from cursiv_v215.memory import semantic
+    assert (semantic.conflict_reason(a, b) is not None) is conflict

@@ -125,7 +125,7 @@ def needs_ledger(user_text: str) -> bool:
         return False
     if _REVIEW.search(text) or _DECISION.search(text) or _TECH.search(text):
         return True
-    if number_bindings(text) or definitions(text):
+    if definitions(text):
         return True
     return len(text.split()) >= 40
 
@@ -177,11 +177,53 @@ def _norm(text: str) -> str:
     return re.sub(r"\s+", " ", (text or "").strip().rstrip(".").lower())
 
 
+# A number that is the result of a calculation ("= 36 liters", "36 liters in total")
+# is an answer, not a restated input (AUDIT C-004).
+_RESULT_BEFORE = re.compile(r"(?i)(=|\b(is|are|makes|comes to|equals|need|needs|total(?: of)?|get|gives|that's|so)\s*(about |around |roughly )?)\s*$")
+_RESULT_AFTER = re.compile(r"(?i)^\s*(in total|total|altogether|overall|combined|in all|for the (whole|entire))\b")
+
+
+def _input_bindings(draft: str) -> dict[str, set[str]]:
+    found: dict[str, set[str]] = {}
+    for m in _NUM_NOUN.finditer(draft or ""):
+        before = draft[max(0, m.start() - 24): m.start()]
+        after = draft[m.end(): m.end() + 24]
+        if _RESULT_BEFORE.search(before) or _RESULT_AFTER.search(after):
+            continue
+        found.setdefault(m.group(2).lower(), set()).add(m.group(1))
+    return found
+
+
+_OPS = {"x": "*", "×": "*", "*": "*", "times": "*", "multiplied by": "*", "+": "+", "plus": "+",
+        "-": "-", "minus": "-", "/": "/", "÷": "/", "divided by": "/"}
+_OP = r"(?:multiplied by|divided by|times|plus|minus|[x×*+\-/÷])"
+_N = r"\d+(?:\.\d+)?"
+_EXPR = re.compile(r"(?i)(?<![\w.])(" + _N + r"(?:\s*" + _OP + r"\s*" + _N + r")+)\s*(?:=|is|equals|makes|gives)\s*\$?(" + _N + r")(?![\d.])")
+
+
+def arithmetic_problems(draft: str) -> list[str]:
+    """Shown arithmetic that is wrong: "17 times 23 is 381", "4 x 3 x 3 = 30"."""
+    problems = []
+    for m in _EXPR.finditer(draft or ""):
+        expr = m.group(1)
+        tokens = re.findall(_N + "|" + _OP, expr, re.I)
+        py = "".join(_OPS.get(t.lower(), t) if not re.fullmatch(_N, t) else t for t in tokens)
+        try:
+            value = eval(py, {"__builtins__": {}}, {})       # digits and + - * / only
+        except Exception:
+            continue
+        stated = float(m.group(2))
+        if abs(value - stated) > max(0.01, abs(value) * 0.005):
+            shown = int(value) if float(value).is_integer() else round(value, 2)
+            problems.append(f"arithmetic: {expr.strip()} is {shown}, not {m.group(2)}")
+    return problems
+
+
 def constraint_problems(user_text: str, draft: str) -> list[str]:
     """Numbers and definitions from the question must not drift in the draft."""
-    problems: list[str] = []
+    problems: list[str] = arithmetic_problems(draft)
     user_nums = number_bindings(user_text)
-    for noun, values in number_bindings(draft).items():
+    for noun, values in _input_bindings(draft).items():
         if noun not in user_nums:
             continue
         changed = values - user_nums[noun]
@@ -262,8 +304,10 @@ def assumptions_stated_as_facts(text: str) -> list[str]:
 def introduced_number_problems(user_text: str, draft: str, revision: str) -> list[str]:
     """A rewrite may not add a number that was in neither the question nor the draft."""
     allowed = set(_NUM.findall(user_text or "")) | set(_NUM.findall(draft or ""))
+    body = re.sub(r"(?m)^\s*\d+[.)]\s", " ", revision or "")                       # list markers
+    body = re.sub(r"(?mi)^[\s*_-]*(Known|Inferred|Assumed|Unknown)[*_]*\s*:.*$", "", body)  # ledger
     fresh: list[str] = []
-    for number in _NUM.findall(revision or ""):
+    for number in _NUM.findall(body):
         if number not in allowed and number not in fresh:
             fresh.append(number)
     if not fresh:
@@ -397,9 +441,16 @@ def parse_verdict(text: str) -> tuple[bool, str]:
     raw = (text or "").strip()
     if not raw:
         return True, ""
-    if re.fullmatch(r"(?is)clear[.!]?", raw):
+    plain = re.sub(r"[*_`#>]", "", raw).strip().lower()
+    if _NO_PROBLEM.fullmatch(plain):
         return True, ""
     return False, raw
+
+
+# "CLEAR", "**CLEAR**", "None.", "No problems found.", "Clear - no problems found." (AUDIT C-002)
+_NO_PROBLEM = re.compile(
+    r"(?:clear|none|no (?:problems?|issues?|errors?|mistakes?)(?: found| detected)?|nothing (?:to fix|wrong))"
+    r"(?:\s*[-:,.–—]\s*(?:no (?:problems?|issues?|errors?)(?: found| detected)?|none|clear))?[.!]?")
 
 
 def _background(context: str, sources: str) -> str:
@@ -579,9 +630,12 @@ def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = Fals
     if not problems:
         _previous_failed = False
         store_ledger_from(user_text, checked)
-        return PassResult(append=filled, learn_origin="verified", clear=True)
+        # No checker, or it said nothing: not checked, so not "verified" (AUDIT C-001).
+        return PassResult(append=filled, learn_origin="verified" if verdict.strip() else "inferred", clear=True)
 
     revised = _ask(ask, revise_messages(user_text, draft, problems, context, sources))
+    if revised and parse_verdict(revised)[0]:
+        revised = ""          # "CLEAR" or "None." is a verdict, not a rewritten answer
     if revised:
         revised_problems = _problems(user_text, revised, context, sources)
         revised_problems += introduced_number_problems(f"{user_text}\n{context}\n{sources}", draft, revised)
@@ -592,7 +646,8 @@ def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = Fals
         if not revised_problems:
             _previous_failed = False
             store_ledger_from(user_text, revised)
-            return PassResult(append=format_revision(revised), learn_origin="verified", clear=True)
+            return PassResult(append=format_revision(revised),
+                              learn_origin="verified" if second.strip() else "inferred", clear=True)
 
     _previous_failed = True
     notes = list(problems)

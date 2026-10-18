@@ -258,6 +258,8 @@ def preference_overrides_safety(text: str) -> bool:
 
 def conflict_reason(a: str, b: str) -> str | None:
     """Why two facts cannot both be used quietly, or None when they can."""
+    if _swapped_choice(a, b):
+        return "they name different choices for the same thing"
     wa, wb = _content_words(a), _content_words(b)
     if len(wa) < 2 or len(wb) < 2:
         return None
@@ -270,6 +272,20 @@ def conflict_reason(a: str, b: str) -> str | None:
     if nums_a and nums_b and nums_a != nums_b:
         return "they give different numbers"
     return None
+
+
+# Statements with one answer at a time: "I prefer tea" and "I prefer coffee" can't
+# both be current, while "I like tea" and "I like coffee" can.
+_EXCLUSIVE = re.compile(r"\b(prefer|prefers|favorite|favourite|name|live|lives|rather|birthday|born)\b", re.IGNORECASE)
+
+
+def _swapped_choice(a: str, b: str) -> bool:
+    """The same exclusive statement with one word changed."""
+    xa, xb = _WORD.findall((a or "").lower()), _WORD.findall((b or "").lower())
+    if len(xa) != len(xb) or len(xa) < 2 or not _EXCLUSIVE.search(a or ""):
+        return False
+    diff = [i for i, (p, q) in enumerate(zip(xa, xb)) if p != q]
+    return len(diff) == 1 and not _EXCLUSIVE.fullmatch(xa[diff[0]])
 
 
 _CONTENT_STOP = frozenset(
