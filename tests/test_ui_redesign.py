@@ -273,3 +273,13 @@ def test_ledger_and_check_notes_go_behind_a_link_but_the_answer_stays():
     assert "Known: creek water" in details and "Assumed:** no chemicals" not in details
     assert "Assumed: no chemicals" in details and "omits altitude" in details
     assert chat_panel.ChatPanel.split_details(["Just an answer."]) == (["Just an answer."], "")
+
+
+def test_emoji_ledger_with_items_below_goes_behind_the_link():
+    import chat_panel
+    text = ("I don't know of that study.\n\n✅ Known:\nThe user asks about a study.\nInferred:\nResearch.\n"
+            "Assumed:\nIt exists.\nUnknown:\nWhether it exists.\n\nNote: check Google Scholar.")
+    main, details = chat_panel.ChatPanel.split_details(text.split("\n"))
+    assert "Known: The user asks about a study." in details
+    assert "\n".join(main).strip().startswith("I don't know of that study.")
+    assert "Note: check Google Scholar." in "\n".join(main) and "Inferred" not in "\n".join(main)

@@ -190,6 +190,8 @@ def list_facts(person: str | None = None) -> list[dict[str, Any]]:
         facts = [json.loads(l) for l in FACTS_FILE.read_text(encoding="utf-8").splitlines() if l.strip()]
     except Exception:
         facts = []
+    if facts and not _settings().get(REPAIR_KEY):
+        facts = repair_learned(facts)
     if person:
         facts = [f for f in facts if f.get("person") in (person, SHARED)]
     return facts
@@ -198,6 +200,39 @@ def list_facts(person: str | None = None) -> list[dict[str, Any]]:
 def _write_facts(facts: list[dict]) -> None:
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
     FACTS_FILE.write_text("".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts), encoding="utf-8")
+
+
+REMOVED_FILE_NAME = "memory_facts.removed.jsonl"
+REPAIR_KEY = "learned_repair_2026_10_18"
+
+
+def repair_learned(facts: list[dict]) -> list[dict]:
+    """Once: memories the learner saved before 2026-10-18 were stamped "verified"
+    whenever no checker answered (AUDIT C-001), and some were Cursiv's own words.
+    Learned ones become "inferred"; ones that aren't facts about the person move
+    to memory_facts.removed.jsonl (kept, not deleted). What the person saved with
+    "remember" is untouched."""
+    kept, removed = [], []
+    for f in facts:
+        if (f.get("source") or "") not in ("learned", "verified"):
+            kept.append(f)
+            continue
+        name = "the family" if f.get("person") == SHARED else (f.get("person") or "")
+        if learnable(f.get("text", ""), name):
+            kept.append({**f, "source": "learned", "origin": "inferred"})
+        else:
+            removed.append(f)
+    try:
+        if removed:
+            with (CURSIV_DIR / REMOVED_FILE_NAME).open("a", encoding="utf-8") as out:
+                out.write("".join(json.dumps(f, ensure_ascii=False) + "\n" for f in removed))
+        _write_facts(kept)
+        st = _settings()
+        st[REPAIR_KEY] = {"kept": len(kept), "moved": len(removed)}
+        SETTINGS_FILE.write_text(json.dumps(st, indent=2), encoding="utf-8")
+    except Exception:
+        return facts                       # try again next time; nothing lost
+    return kept
 
 
 ORIGINS = ("user_said", "inferred", "verified")
@@ -381,17 +416,20 @@ def recall(query: str, person: str | None = None, top_k: int = 6) -> list[tuple[
     if not items or not query.strip():
         return []
     vecs = embed([query] + [t for _, t in items])
+    inferred = {f["text"] for f in list_facts(person) if origin_of(f) == "inferred"}
     scored: list[tuple[float, str, str]] = []
+    # A guessed memory must be clearly about this question to be used (farm guesses
+    # were recalled for "what's 17% of 2,450").
     if vecs:
         q = vecs[0]
         for (kind, text), v in zip(items, vecs[1:]):
             score = _cos(q, v) + (0.05 if kind == "fact" else 0.0)
-            if score >= 0.55:
+            if score >= (0.68 if text in inferred else 0.55):
                 scored.append((score, kind, text))
     else:
         for kind, text in items:
             score = _overlap(query, text)
-            if score >= 0.12:
+            if score >= (0.25 if text in inferred else 0.12):
                 scored.append((score, kind, text))
     scored.sort(key=lambda x: x[0], reverse=True)
     return scored[:top_k]
@@ -442,7 +480,9 @@ def build_context(query: str, person: str | None = None) -> str:
     out = [SAFETY_PRECEDENCE]
     if fact_hits:
         lines = "\n".join(_fact_line(text, by_text) for text in fact_hits)
-        out.append(f"What you remember about {who} (use it naturally; don't recite it):\n" + lines)
+        out.append(f"What you remember about {who}. Use it only if it changes the answer, and don't recite it. "
+                   "Lines marked [inferred] are guesses from earlier conversations, not facts: never list them as "
+                   "Known and never state them as true.\n" + lines)
     if conflicts:
         rows = ["These memories conflict — do not silently prefer one. Tell the person:"]
         for left, right, reason in conflicts:
@@ -493,14 +533,30 @@ def learn_from_exchange(user_text: str, reply: str, ask: Callable[[list[dict]], 
         items = json.loads(m.group(0)) if m else []
     except Exception:
         return []
-    if origin not in ("inferred", "verified"):
-        origin = "inferred"
-    source = "verified" if origin == "verified" else "learned"
+    # A check passing on the answer doesn't make a guess about the person true:
+    # learned facts are always "inferred". Only "remember ..." is "you said".
     saved = []
     for it in items[:5]:
-        if isinstance(it, str) and add_fact(it, person, source=source, origin=origin):
+        if isinstance(it, str) and learnable(it, name) and add_fact(it, person, source="learned", origin="inferred"):
             saved.append(it)
     return saved
+
+
+# What the learner must not save: Cursiv's own words, ledger lines, notes about the
+# conversation. All were found in a real memory file (2026-10-18): "Known: Detailed
+# Experimental Plan ...", a 400-character paragraph of soil advice, "Jw did not
+# explicitly tell you about ...".
+_NOT_A_FACT = re.compile(
+    r"(?i)^\s*(known|inferred|assumed|unknown)\s*:|^\s*(you|the assistant|cursiv|i)\b|"
+    r"\b(did not|didn't) (explicitly )?(tell|say|mention)|\bin this conversation\b")
+
+
+def learnable(text: str, name: str = "") -> bool:
+    t = (text or "").strip()
+    if not 8 <= len(t) <= 200 or _NOT_A_FACT.search(t):
+        return False
+    who = [w for w in ((name or "").lower(), "the user", "the family", "they", "their", "he ", "she ") if w]
+    return any(w in t.lower() for w in who)
 
 
 # ── Commands ────────────────────────────────────────────────────────────────

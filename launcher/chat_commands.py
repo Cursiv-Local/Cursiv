@@ -1215,20 +1215,27 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not raw_input:
             return TextResult("Usage: babel <text in any language>  ·  babel <text> into <language(s)>")
         into_match = re.search(r"\s+into\s+(.+)$", raw_input, re.IGNORECASE)
-        if into_match and not re.match(r"^i\s+am\b", raw_input, re.IGNORECASE):
+        # "translate into Spanish hello ..." names the language first (it was labelled
+        # "Translate → English" and sent with the to-English prompt).
+        lead = re.match(r"(?i)^(?:in)?to\s+([a-z]+)\s*[:,-]?\s+(.+)$", raw_input, re.S)
+        src, targets = "", []
+        if lead and lead.group(1).lower() in _LANG_NAMES:
+            src, targets = _babel_source(lead.group(2)), [lead.group(1).title()]
+        elif into_match and not re.match(r"^i\s+am\b", raw_input, re.IGNORECASE):
             src = _babel_source(raw_input[:into_match.start()])
             targets = _babel_targets(into_match.group(1))
-            if src and targets:
-                gen, label = _cascade_gen(cfg, [
-                    {"role": "system", "content": (
-                        "You are a precise translation engine. Translate the user's text "
-                        "into each requested language. For each, output a header line "
-                        "exactly like:\n  ── [Language Name] ──\nfollowed by the translation. "
-                        "Return translations only, no explanations."
-                    )},
-                    {"role": "user", "content": f"Text to translate:\n{src}\n\nTranslate into: {', '.join(targets)}"},
-                ], max_tokens=800)
-                return StreamResult(f"Translate — English → {', '.join(targets)}", gen)
+        if src and targets:
+            gen, label = _cascade_gen(cfg, [
+                {"role": "system", "content": (
+                    "You are a precise translation engine. Translate the user's text "
+                    "into each requested language, naturally and grammatically, as a native "
+                    "speaker would say it. For each, output a header line "
+                    "exactly like:\n  ── [Language Name] ──\nfollowed by the translation. "
+                    "Return translations only, no explanations."
+                )},
+                {"role": "user", "content": f"Text to translate:\n{src}\n\nTranslate into: {', '.join(targets)}"},
+            ], max_tokens=800)
+            return StreamResult(f"Translate — English → {', '.join(targets)}", gen)
         gen, label = _cascade_gen(cfg, [
             {"role": "system", "content": "Translate the following text to English. Return only the translation, nothing else."},
             {"role": "user", "content": raw_input},

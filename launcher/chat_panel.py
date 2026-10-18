@@ -364,7 +364,8 @@ class ChatPanel(QWidget):
         # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
         self._model_box = QComboBox()
         self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
-        self._model_box.setMinimumWidth(240)
+        self._model_box.setMinimumWidth(320)
+        self._model_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         self._model_box.addItem("Looking for local models…", "")
         self._model_box.setEnabled(False)
         self._model_box.activated.connect(self._on_model_chosen)
@@ -539,8 +540,22 @@ class ChatPanel(QWidget):
             body = body[:notes_at]
             while body and body[-1].strip() in ("", "---"):
                 body = body[:-1]
-        ledger = [ln.replace("**", "").strip().strip("*_-> ") for ln in body if cls._LEDGER_LINE.match(ln)]
-        main = [ln for ln in body if not cls._LEDGER_LINE.match(ln)]
+        ledger: list[str] = []
+        try:
+            # The same reader the check uses: "✅ Known:" and items on the lines below count too.
+            from cursiv_v215.core import verify
+            text = "\n".join(body)
+            found = verify._ledger_span(text)
+            if found:
+                start, end, parts = found
+                ledger = [f"{k}: {parts[k] or 'none'}" for k in ("Known", "Inferred", "Assumed", "Unknown")]
+                body = (text[:start].rstrip() + "\n" + text[end:]).split("\n")
+        except Exception:
+            pass
+        if not ledger:
+            ledger = [ln.replace("**", "").strip().strip("*_-> ") for ln in body if cls._LEDGER_LINE.match(ln)]
+            body = [ln for ln in body if not cls._LEDGER_LINE.match(ln)]
+        main = list(body)
         while main and main[-1].strip() in ("", "---"):
             main.pop()
         if ledger:
@@ -661,8 +676,16 @@ class ChatPanel(QWidget):
         self._append_html_block(
             f'<p style="margin:10px 0 4px 0;">'
             f'<span style="color:{theme.MUTED}; font-weight:600;">You</span><br>'
-            f'<span style="color:{SILVER};">{self._escape(text)}</span></p>'
+            f'<span style="color:{SILVER};">{self._keep_shape(text)}</span></p>'
         )
+
+    @classmethod
+    def _keep_shape(cls, text: str) -> str:
+        """Escaped text that keeps its line breaks, indents and spacing, so a pasted
+        list or table doesn't run together into one paragraph."""
+        out = cls._escape(text.replace("\r\n", "\n").replace("\r", "\n").replace("\t", "    "))
+        out = out.replace("  ", "&nbsp; ")
+        return out.replace("\n", "<br>")
 
     def _begin_ai_reply(self) -> None:
         # Opens a paragraph the streamed chunks get appended into; closed in _on_done.

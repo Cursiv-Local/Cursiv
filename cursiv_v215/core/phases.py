@@ -87,7 +87,12 @@ _CRISIS = [r"\b(?:kill|hurt|harm)\s+my\s?self\b", r"\bsuicid(?:e|al)\b", r"\bend
 _MEDICAL = [r"\bchest pain\b", r"\bcan'?t breathe\b", r"\bhaving a (?:stroke|seizure|heart attack)\b",
             r"\bunconscious\b", r"\bnot breathing\b", r"\bbleeding (?:a lot|heavily|badly)\b", r"\bswallowed (?:poison|bleach)\b",
             r"\b(?:spurting|gushing|pouring|squirting) blood\b", r"\bblood (?:is )?(?:spurting|gushing|pouring|everywhere)\b",
-            r"\bwon'?t stop bleeding\b", r"\bbleeding (?:won'?t|will not|doesn'?t|isn'?t) stop", r"\bbleeding out\b"]
+            r"\bwon'?t stop bleeding\b", r"\bbleeding (?:won'?t|will not|doesn'?t|isn'?t) stop", r"\bbleeding out\b",
+            # "I think my husband has hypothermia" got the slow check and a wrong note (Phase 1, 2026-10-18)
+            r"\bhypotherm\w*\b", r"\bheat ?stroke\b", r"\bchoking\b", r"\bunresponsive\b",
+            r"\b(?:won'?t|can'?t|cannot) (?:wake (?:him|her|them) up|be woken)\b", r"\ballergic reaction\b",
+            r"\b(?:throat|tongue|face) is swelling\b", r"\banaphyla\w*\b", r"\b(?:snake ?bite|bitten by a snake|snake bit)\b",
+            r"\bdrown\w*\b", r"\belectrocuted\b", r"\bhaving a seizure\b|\bseizing\b"]
 _DANGER = [r"\b(?:he|she|they|someone)(?:'s| is| are)? (?:hurting|beating|threatening) me\b", r"\bbeing abused\b",
            r"\bthreaten(?:ed|ing) to kill\b", r"\bnot safe at home\b"]
 

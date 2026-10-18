@@ -239,17 +239,46 @@ def constraint_problems(user_text: str, draft: str) -> list[str]:
     return problems
 
 
+# A ledger heading line, with any bullet, emoji or bold around it: "✅ Known:", "**Assumed:**".
+_LEDGER_HEAD = re.compile(r"(?im)^[^\w\n]*(Known|Inferred|Assumed|Unknown)[*_]*\s*:[*_]*[ \t]*(.*)$")
+_LEDGER_ORDER = ("Known", "Inferred", "Assumed", "Unknown")
+
+
+def _ledger_span(text: str) -> tuple[int, int, dict[str, str]] | None:
+    """Where the last complete ledger starts and ends, and its four parts. The items may be on
+    the heading line or on the lines under it (a model wrote "✅ Known:" then a list,
+    and the check called the ledger missing)."""
+    heads = list(_LEDGER_HEAD.finditer(text or ""))
+    for i in range(len(heads) - 4, -1, -1):
+        group = heads[i:i + 4]
+        if tuple(h.group(1).title() for h in group) != _LEDGER_ORDER:
+            continue
+        parts, stop = {}, len(text)
+        for j, h in enumerate(group):
+            end = group[j + 1].start() if j < 3 else len(text)
+            body = [h.group(2).strip()] + text[h.end():end].split("\n")
+            if j == 3:                     # Unknown runs to the first blank line after its items
+                lines, seen, pos = [], False, h.end()
+                for n, line in enumerate(body):
+                    if n:
+                        pos += len(line) + 1
+                    if not line.strip():
+                        if seen:
+                            stop = pos
+                            break
+                        continue
+                    seen = True
+                    lines.append(line)
+                body = lines
+            items = [re.sub(r"^[\s*•-]+", "", line).strip() for line in body]
+            parts[h.group(1).title()] = "; ".join(x for x in items if x)
+        return group[0].start(), min(stop, len(text)), parts
+    return None
+
+
 def extract_ledger(text: str) -> dict[str, str] | None:
-    matches = list(_LEDGER.finditer(text or ""))
-    if not matches:
-        return None
-    match = matches[-1]
-    return {
-        "Known": match.group(1).strip(),
-        "Inferred": match.group(2).strip(),
-        "Assumed": match.group(3).strip(),
-        "Unknown": match.group(4).strip(),
-    }
+    found = _ledger_span(text or "")
+    return found[2] if found else None
 
 
 def ledger_block(ledger: dict[str, str]) -> str:
@@ -262,10 +291,10 @@ def ledger_block(ledger: dict[str, str]) -> str:
 
 
 def answer_body(text: str) -> str:
-    match = _LEDGER.search(text or "")
-    if not match:
+    found = _ledger_span(text or "")
+    if not found:
         return text or ""
-    return (text or "")[:match.start()].strip()
+    return (text or "")[:found[0]].strip()
 
 
 def _sentence_around(text: str, index: int) -> str:

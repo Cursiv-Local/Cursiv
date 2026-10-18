@@ -146,7 +146,8 @@ def test_repeating_a_claim_does_not_upgrade_its_origin(memory):
     assert memory.origin_of(saved[0]) == "user_said"
 
 
-def test_verified_learning_tags_the_new_fact(memory):
+def test_learned_facts_stay_inferred_even_after_a_clean_check(memory):
+    # A check passing on the answer doesn't make a guess about the person true (2026-10-18).
     saved = memory.learn_from_exchange(
         "I have been practicing piano every evening",
         "Glad the practice is steady.",
@@ -155,7 +156,18 @@ def test_verified_learning_tags_the_new_fact(memory):
         origin="verified",
     )
     assert saved == ["Bob is learning piano"]
-    assert memory.list_facts("bob")[0]["origin"] == "verified"
+    assert memory.list_facts("bob")[0]["origin"] == "inferred"
+
+
+def test_learner_skips_cursivs_own_words(memory):
+    saved = memory.learn_from_exchange(
+        "Tell me how to look after the soil in my garden beds",
+        "Check moisture weekly.",
+        ask=lambda _m: '["Known: Detailed plan, data collection", "You can observe the soil moisture levels.", '
+                       '"Bob did not explicitly tell you his soil type", "Bob keeps raised garden beds"]',
+        person="bob",
+    )
+    assert saved == ["Bob keeps raised garden beds"]
 
 
 def test_conflicting_memories_are_both_shown(memory):
@@ -560,3 +572,20 @@ def test_c006_a_number_in_a_simple_question_needs_no_ledger(question):
 def test_preference_conflicts_beyond_shared_words(a, b, conflict):
     from cursiv_v215.memory import semantic
     assert (semantic.conflict_reason(a, b) is not None) is conflict
+
+
+def test_one_time_repair_of_learned_memories(memory):
+    import json
+    rows = [
+        {"id": "a", "person": "bob", "text": "Bob keeps chickens", "source": "verified", "origin": "verified"},
+        {"id": "b", "person": "bob", "text": "Known: Detailed plan, data collection", "source": "verified", "origin": "verified"},
+        {"id": "c", "person": "bob", "text": "Our well is 180 feet deep", "source": "manual", "origin": "user_said"},
+    ]
+    memory.FACTS_FILE.parent.mkdir(parents=True, exist_ok=True)
+    memory.FACTS_FILE.write_text("".join(json.dumps(r) + "\n" for r in rows), encoding="utf-8")
+    facts = {f["id"]: f for f in memory.list_facts("bob")}
+    assert facts["a"]["origin"] == "inferred"            # was wrongly "verified"
+    assert "b" not in facts                               # a ledger line isn't a fact
+    assert facts["c"]["origin"] == "user_said"            # what the person said is untouched
+    moved = (memory.CURSIV_DIR / memory.REMOVED_FILE_NAME).read_text(encoding="utf-8")
+    assert "Detailed plan" in moved                       # kept, not deleted

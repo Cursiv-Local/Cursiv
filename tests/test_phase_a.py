@@ -110,3 +110,30 @@ def test_a_bigger_model_gets_its_share(monkeypatch):
     assert speed.gpu_options("m:1") == {"num_gpu": 30}
     speed.gpu_fallback("m:1")
     assert speed.gpu_options("m:1") == {}
+
+
+# ── Phase 1 replay findings (2026-10-18) ───────────────────────────────────
+
+@pytest.mark.parametrize("question", ["I think my husband has hypothermia after falling in the creek.",
+                                      "My daughter is choking", "He's unresponsive and I can't wake him up",
+                                      "a snake bit my son's ankle"])
+def test_more_medical_emergencies_are_recognised(question):
+    from cursiv_v215.core import phases
+    assert phases.run(question).emergency_kind == "medical"
+
+
+def test_translate_with_the_language_first(monkeypatch):
+    import chat_commands
+    seen = {}
+    monkeypatch.setattr(chat_commands, "_cascade_gen",
+                        lambda cfg, msgs, max_tokens=0: (seen.setdefault("msgs", msgs) and iter(["Hola"]), "x"))
+    res = chat_commands.handle_command("translate into Spanish hello my name is joshua winkler and i made cursiv", {}, [])
+    assert "English → Spanish" in res.intro
+    assert "hello my name is joshua winkler" in seen["msgs"][1]["content"]
+    assert "Spanish" in seen["msgs"][1]["content"]
+
+
+def test_pasted_text_keeps_its_shape():
+    import chat_panel
+    shown = chat_panel.ChatPanel._keep_shape("Part 1:\n  1. Tank <100 L>\n\n\tB) eggs")
+    assert shown == "Part 1:<br>&nbsp; 1. Tank &lt;100 L&gt;<br><br>&nbsp; &nbsp; B) eggs"
