@@ -79,6 +79,8 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("my diabetic coworker is shaky and sweaty, I think his blood sugar is low", "medical/low-blood-sugar"),
     ("what is the 15-15 rule for hypoglycemia", "medical/low-blood-sugar"),
     ("could this infection be turning into sepsis", "medical/sepsis-recognition"),
+    ("there's been a car crash and the driver is unconscious but breathing", "medical/helping-an-injured-person-until-help-arrives"),
+    ("how do I put someone in the recovery position", "medical/helping-an-injured-person-until-help-arrives"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]

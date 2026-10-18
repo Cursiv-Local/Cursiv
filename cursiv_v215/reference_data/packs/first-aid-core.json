@@ -328,6 +328,41 @@
         "checked": "2026-10-18"
       },
       "reviewed": false
+    },
+    {
+      "title": "helping an injured person until help arrives",
+      "category": "medical",
+      "aliases": [
+        "recovery position",
+        "unconscious but breathing",
+        "until help arrives",
+        "injured person",
+        "car accident",
+        "car crash",
+        "someone is hurt",
+        "someone is injured",
+        "passed out but breathing",
+        [
+          "unconscious",
+          "breathing"
+        ],
+        [
+          "accident",
+          "injured"
+        ],
+        [
+          "crash",
+          "hurt"
+        ]
+      ],
+      "text": "Always call 911, even if you think someone else already has. Operators are trained to help: lean on them, answer what you can (first: where the emergency is), give specifics such as the floor you're on or nearby signs and landmarks, and follow their instructions. Stay safe: before helping, look, listen and smell for danger (fumes, fire, traffic); you can't help anyone if you get hurt. If you must move someone away from danger, use what's around you (other people, a cart, a blanket) and do whatever you can. Position them: if they're awake, let them sit or lie however feels best and don't force them to lie down or sit up. If they're unconscious and breathing, roll them onto their side (the recovery position) to keep the airway open and prevent choking. If they aren't breathing and you're able, clear obstructions and do CPR. Comfort them: say your name and ask how you can help; keep them calm, and tell them what's happening and that help is coming. Keep a seriously injured person warm: cover them and put something between them and the ground, even if it seems warm out. That helps blood clot, reduces stress and lowers the risk of shock.",
+      "source": {
+        "name": "Ready.gov (FEMA), Until Help Arrives, version 1.0",
+        "url": "https://www.ready.gov/sites/default/files/2020-07/until-help-arrives-web-tutorial.pdf",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
     }
   ]
 }
