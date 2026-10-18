@@ -54,19 +54,23 @@ _LIGHT_REMAP = {
 _HEX = _re.compile(r"#(?:[0-9a-fA-F]{6}|[0-9a-fA-F]{3})\b")
 
 
+MODES = ("dark", "light", "system")     # "system" = match Windows
+
+
 def saved_mode() -> str:
-    """"light", "dark", or "" (match Windows)."""
+    """"dark", "light" or "system" (match Windows). Dark until the person picks
+    something else in Settings, on every install and every Cursiv USB."""
     try:
         from cursiv_v215.chat import keys
         mode = keys.saved_key("ui_theme")
-        return mode if mode in ("light", "dark") else ""
+        return mode if mode in MODES else "dark"
     except Exception:
-        return ""
+        return "dark"
 
 
 def set_mode(mode: str) -> None:
     from cursiv_v215.chat import keys
-    keys.store_key("ui_theme", mode if mode in ("light", "dark") else "")
+    keys.store_key("ui_theme", mode if mode in MODES else "")
 
 
 def windows_prefers_light() -> bool:
@@ -80,8 +84,11 @@ def windows_prefers_light() -> bool:
 
 
 def resolve_mode() -> str:
+    """The colours to show: "light" or "dark"."""
     mode = saved_mode()
-    return mode or ("light" if windows_prefers_light() else "dark")
+    if mode == "system":
+        return "light" if windows_prefers_light() else "dark"
+    return mode
 
 
 MODE = resolve_mode()
@@ -165,11 +172,11 @@ def install() -> None:
 
 
 def switch_live(mode_setting: str) -> str:
-    """Save the choice ("light", "dark" or "" for Windows) and recolour everything open.
+    """Save the choice ("dark", "light" or "system" for Windows) and recolour everything open.
     Returns the mode now showing."""
     global CURRENT
     set_mode(mode_setting)
-    new = mode_setting or ("light" if windows_prefers_light() else "dark")
+    new = resolve_mode()
     old = CURRENT
     if new == old:
         return new

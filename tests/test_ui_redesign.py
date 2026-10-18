@@ -213,11 +213,13 @@ def test_welcome_card(app, settings):
 
 def test_theme_modes_and_light_translation(settings):
     import theme
-    assert theme.saved_mode() == ""
+    assert theme.saved_mode() == "dark" and theme.resolve_mode() == "dark"     # dark until chosen otherwise
     theme.set_mode("light")
     assert theme.saved_mode() == "light" and theme.resolve_mode() == "light"
+    theme.set_mode("system")
+    assert theme.saved_mode() == "system" and theme.resolve_mode() in ("light", "dark")
     theme.set_mode("bogus")
-    assert theme.saved_mode() == ""
+    assert theme.saved_mode() == "dark"
     qss = "QPushButton { background: #d4b04c; color: #17120a; border: 1px solid #262b38; }"
     out = theme.light_qss(qss)
     assert "#9a7417" in out and "#fffdf7" in out and "#e2ddd2" in out

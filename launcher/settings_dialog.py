@@ -349,7 +349,7 @@ class SettingsDialog(QDialog):
         v = self._card(lay)
         t = QLabel("Colours"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
         self._mode = QComboBox()
-        for label, mode in (("Match Windows", ""), ("Light", "light"), ("Dark", "dark")):
+        for label, mode in (("Dark", "dark"), ("Light", "light"), ("Match Windows", "system")):
             self._mode.addItem(label, mode)
         self._mode.setCurrentIndex(max(0, self._mode.findData(theme.saved_mode())))
         note = self._explain("")
@@ -363,8 +363,8 @@ class SettingsDialog(QDialog):
                 note.setText("Close and reopen Cursiv to see the change.")
         self._mode.activated.connect(chosen)
         v.addWidget(self._mode)
-        v.addWidget(self._explain("Match Windows follows your Windows light or dark setting. "
-                                  "Light is a warm off-white; Dark is easier on the eyes at night."))
+        v.addWidget(self._explain("Dark is the default and easier on the eyes at night. Light is a warm "
+                                  "off-white. Match Windows follows your Windows light or dark setting."))
         v.addWidget(note)
 
     def _page_updates(self, lay):
