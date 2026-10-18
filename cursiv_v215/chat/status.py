@@ -31,9 +31,10 @@ def _cloud_on() -> bool:
 def network_status() -> dict:
     """{"level": "offline" | "local" | "online", "label": short text, "details": [lines]}"""
     if netgate.is_offline():
-        return {"level": "offline", "label": "Offline mode",
-                "details": ["Cursiv makes no internet connections: no cloud AI, web search, updates or downloads.",
-                            "The local model, memory and reference still work."]}
+        return {"level": "offline", "label": "LOCAL ONLY · internet blocked",
+                "details": ["Offline mode is on: every connection off this computer is refused.",
+                            "No cloud AI, web search, updates or downloads.",
+                            "The local model, memory, reference, field notebook and documents still work."]}
     from cursiv_v215.chat import keys
     online = [name for field, name in KEY_NAMES if keys.saved_key(field)]
     if _cloud_on():
@@ -43,9 +44,10 @@ def network_status() -> dict:
     if netgate.setting("update_check_auto"):
         online.append("automatic update check")
     if not online:
-        return {"level": "local", "label": "Local only",
-                "details": ["Answers come from the model on this computer.",
-                            "Only a message you start with search: goes online."]}
+        return {"level": "local", "label": "Local answers · internet not blocked",
+                "details": ["Answers come from the model on this computer, and no online feature is on.",
+                            "A message you start with search: would still go online.",
+                            "Click and turn on offline mode to block the internet completely (LOCAL ONLY)."]}
     return {"level": "online", "label": "Online features on",
             "details": ["Can go online: " + ", ".join(online) + ".",
                         "Keys are used only when the local model can't answer, or for images.",
@@ -102,7 +104,9 @@ def set_show_all_models(on: bool) -> None:
 def menu_choices(installed: list[str]) -> list[tuple[str, str, bool]]:
     """(label, choice, enabled) for the model menu. choice: "standard", "deep" or "model:<name>"."""
     from cursiv_v215.core import speed
-    out = [("Standard  ·  quick everyday answers", "standard", True)]
+    model = automatic_model(installed)
+    out = [((f"Standard  ·  {model}, on this computer" if model else "Standard  ·  quick everyday answers"),
+            "standard", True)]
     if speed.DEEP_THINK_OFFERED:
         deep = speed.DEEP_THINK_MODEL
         have_deep = deep in installed or f"{deep}:latest" in installed

@@ -40,7 +40,7 @@ def test_status_pill_follows_the_real_switches(settings):
     st = status.network_status()
     assert st["level"] == "online" and "Groq key" in st["details"][0]
     netgate.set_offline(True)
-    assert status.network_status()["label"] == "Offline mode"
+    assert status.network_status()["label"] == "LOCAL ONLY · internet blocked"
     netgate.set_offline(False)
     keys.store_key("groq_key", "")
     (settings / ".cursiv").mkdir(exist_ok=True)
@@ -49,10 +49,10 @@ def test_status_pill_follows_the_real_switches(settings):
 
 
 def test_pill_shows_in_the_window(panel, settings):
-    assert "Local only" in panel._net_pill.text()
+    assert "internet not blocked" in panel._net_pill.text() and "LOCAL ONLY" not in panel._net_pill.text()
     netgate.set_offline(True)
     panel._refresh_status_pill()
-    assert "Offline mode" in panel._net_pill.text()
+    assert "LOCAL ONLY" in panel._net_pill.text()
 
 
 def test_model_picker_offers_standard_only(panel, settings, app, monkeypatch):
@@ -139,10 +139,10 @@ def test_settings_switches_change_the_real_setting(app, settings):
     import settings_dialog
     from PyQt6.QtWidgets import QCheckBox
     d = settings_dialog.SettingsDialog()
-    box = next(b for b in d.findChildren(QCheckBox) if b.text() == "Offline mode")
+    box = next(b for b in d.findChildren(QCheckBox) if b.text() == "Offline mode (LOCAL ONLY)")
     box.setChecked(True)
     assert netgate.is_offline()
-    assert "Offline mode" in d._status_lbl.text()
+    assert "LOCAL ONLY" in d._status_lbl.text()
 
 
 def test_knowledge_window_browses_the_reference(app, settings):

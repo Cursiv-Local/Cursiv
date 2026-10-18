@@ -182,15 +182,27 @@ class SettingsDialog(QDialog):
         self._status_lbl.setStyleSheet("font-size: 14px;")
         lay.addWidget(self._status_lbl)
         self._refresh_status()
+        v = self._card(lay)
+        t = QLabel("What stays here, and what can leave"); t.setStyleSheet("font-size: 14px; font-weight: 600;")
+        v.addWidget(t)
+        v.addWidget(self._explain(
+            "<b>Always stays on this computer:</b> conversations, memories, the field notebook, your documents, "
+            "your login, the offline reference, and the AI model itself.<br>"
+            "<b>Can leave, only when you turn it on:</b> web search (search: …), reading a web page (pull …), "
+            "a cloud AI key you saved (used only if you choose that AI, paste an image, or no local model is "
+            "ready), Cursiv Cloud (only with no local model), update checks, and Setup's downloads.<br>"
+            "<b>Offline mode</b> refuses all of it at the connection level, for the whole program.<br>"
+            "The full list: PRIVACY.md at github.com/winklersllc2026-bit/Cursiv."))
 
         def setting(name):
             def apply(on):
                 netgate.set_setting(name, on)
                 self._refresh_status()
             return apply
-        self._switch(lay, "Offline mode",
-                     "Cursiv makes no internet connections: no online AI, web search, updates or downloads. "
-                     "Your local model, memory and reference keep working, and it stays on after a restart.",
+        self._switch(lay, "Offline mode (LOCAL ONLY)",
+                     "Blocks every connection off this computer: no online AI, web search, updates or downloads. "
+                     "Your local model, memory, reference, field notebook and documents keep working, and it "
+                     "stays on after a restart.",
                      netgate.setting("offline_mode"), setting("offline_mode"))
         self._switch(lay, "Search the web automatically",
                      "When a question sounds current (\"today\", \"right now\"), Cursiv sends it to DuckDuckGo. "
