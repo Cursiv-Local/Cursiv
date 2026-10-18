@@ -57,7 +57,7 @@ _ICONS = (
 _LOCK_PORT       = 17_860        # local socket port for single-instance lock
 
 # ── Update checker ─────────────────────────────────────────────────────────────
-_CURRENT_VERSION   = "3.14-U67"
+_CURRENT_VERSION   = "3.14-U68"
 _GITHUB_API        = "https://api.github.com/repos/winklersllc2026-bit/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/winklersllc2026-bit/Cursiv/releases"
 

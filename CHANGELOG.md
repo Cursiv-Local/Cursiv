@@ -1,5 +1,10 @@
 # Changelog
 
+## v3.14-U68 — Safer doses and warnings (2026-10-18)
+- **Bleach doses are worked out by Cursiv from the reference card** (U.S. EPA), not by the AI model: strength, liters, quarts or gallons, doubled for cloudy, colored or very cold water. In the U67 benchmark run the model said "16 drops per liter" for cloudy water (the right number is 4); with this change it said 4 in 3 of 3 live tries.
+- **An answer that opens "Yes, it's safe" and then says not to go gets a warning above it**, where it's read first. The model did this on "is it safe to go back on the lake 10 minutes after the last thunder?" in 3 of 3 benchmark runs.
+- The dose check reads across sentences ("For 8.25% bleach … That means 16 drops per liter"), and a doubling said one sentence earlier counts.
+
 ## v3.14-U67 — For field teams (2026-10-18)
 
 - **Your documents** (sidebar → Your documents, or `add document <path>`): import a team's PDFs and text files, kept on this computer. Answers quote them by page ("From your documents: WS-3 protocol.pdf p. 2"), and a page the answer cites that wasn't among those supplied gets a note. Each file is fingerprinted. **Answer only from my documents** (Settings) refuses anything the documents don't cover, except in an emergency.
