@@ -3,460 +3,282 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cursiv — Your Own AI, On Your Own Computer</title>
-<meta name="description" content="Cursiv is a free personal AI for Windows that runs on your own computer, remembers each person in your family, helps you code, and comes with a phone app. Works offline. No account, no ads, no tracking.">
-<meta property="og:title" content="Cursiv — Your Own AI, On Your Own Computer">
-<meta property="og:description" content="Free, private, works offline. Remembers each person, helps you code, and has a phone app for photos and questions on the go.">
+<title>Cursiv — Local intelligence, even without the internet</title>
+<meta name="description" content="Cursiv is an open-source, local-first AI platform for Windows: local model inference, persistent memory, a bundled offline reference, answer checking, and a repeatable truth benchmark. Connectivity is optional. Trust is not.">
+<meta property="og:title" content="Cursiv — Local intelligence, even without the internet">
+<meta property="og:description" content="Open-source, local-first AI for Windows. Connectivity is optional. Trust is not.">
 <meta property="og:image" content="https://cursiv.winklers-llc.com/assets/og-image.png">
 <meta property="og:url" content="https://cursiv.winklers-llc.com">
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cursiv — Your Own AI, On Your Own Computer">
-<meta name="twitter:description" content="Free, private, works offline. Remembers each person, helps you code, and has a phone app.">
-<meta name="twitter:image" content="https://cursiv.winklers-llc.com/assets/og-image.png">
 <meta name="theme-color" content="#07090e">
 <link rel="icon" type="image/png" href="/assets/cursiv_256.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,500;0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg: #07090e;
-  --bg2: #0c1018;
-  --card: #10141e;
-  --card2: #141a26;
-  --line: rgba(216, 208, 192, .09);
-  --line2: rgba(216, 208, 192, .16);
-  --text: #e9e3d6;
-  --muted: #a49d8c;
-  --faint: #6f6a5f;
-  --gold: #d4b04c;
-  --gold2: #f0d27a;
-  --gold-soft: rgba(212, 176, 76, .12);
-  --blue: #6fa8ff;
-  --green: #6fd39b;
-  --serif: "EB Garamond", Georgia, serif;
-  --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --mono: ui-monospace, "Cascadia Code", Consolas, monospace;
-  --radius: 16px;
-  --wrap: 1120px;
-}
-* { box-sizing: border-box; }
-html { scroll-behavior: smooth; }
-body {
-  margin: 0; background: var(--bg); color: var(--text);
-  font-family: var(--sans); font-size: 16px; line-height: 1.6;
-  -webkit-font-smoothing: antialiased; overflow-x: hidden;
-}
-body::before {               /* soft glow behind the top of the page */
-  content: ""; position: fixed; inset: -20% -10% auto -10%; height: 90vh; z-index: -1; pointer-events: none;
-  background:
-    radial-gradient(600px 380px at 78% 18%, rgba(212,176,76,.13), transparent 70%),
-    radial-gradient(700px 420px at 12% 8%, rgba(111,168,255,.08), transparent 70%);
-}
-a { color: var(--gold2); }
-img { max-width: 100%; display: block; }
-.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 20px; }
-.serif { font-family: var(--serif); }
-h1, h2, h3 { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; margin: 0; }
-h2 { font-size: clamp(30px, 4.2vw, 46px); line-height: 1.1; }
-h3 { font-size: 21px; line-height: 1.25; }
-p { margin: 0; }
-.eyebrow {
-  display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; color: var(--gold);
-}
-.lede { color: var(--muted); font-size: 18px; max-width: 640px; }
-section { padding: 96px 0; }
-.section-head { display: grid; gap: 14px; margin-bottom: 44px; }
-.section-head.center { text-align: center; justify-items: center; }
-
-/* ── buttons ── */
-.btn {
-  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
-  padding: 14px 22px; border-radius: 12px; font-weight: 600; font-size: 15px;
-  text-decoration: none; border: 1px solid transparent; cursor: pointer; transition: transform .15s, background .15s, border-color .15s;
-}
-.btn:hover { transform: translateY(-1px); }
-.btn-gold { background: linear-gradient(180deg, var(--gold2), var(--gold)); color: #1a1406; box-shadow: 0 8px 30px rgba(212,176,76,.25); }
-.btn-ghost { background: rgba(255,255,255,.03); color: var(--text); border-color: var(--line2); }
-.btn-ghost:hover { border-color: var(--gold); }
-
-/* ── nav ── */
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: rgba(7,9,14,.78); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid var(--line);
-}
-.nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
-.brand { display: flex; align-items: center; gap: 10px; color: var(--text); text-decoration: none; font-family: var(--serif); font-size: 22px; font-weight: 600; }
-.brand img { width: 28px; height: 28px; border-radius: 7px; }
-.nav-links { display: flex; align-items: center; gap: 26px; }
-.nav-links a { color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 500; }
-.nav-links a:hover { color: var(--text); }
-.nav-links .btn { padding: 9px 16px; font-size: 14px; color: #1a1406; }
-.menu-btn { display: none; background: none; border: 1px solid var(--line2); color: var(--text); border-radius: 10px; padding: 8px 12px; font-size: 15px; }
-@media (max-width: 860px) {
-  .menu-btn { display: block; }
-  .nav-links {
-    display: none; position: absolute; top: 64px; left: 0; right: 0; flex-direction: column; align-items: stretch; gap: 0;
-    background: var(--bg2); border-bottom: 1px solid var(--line); padding: 8px 20px 18px;
-  }
-  .nav-links.open { display: flex; }
-  .nav-links a { padding: 12px 0; border-bottom: 1px solid var(--line); font-size: 16px; }
-  .nav-links .btn { margin-top: 12px; border: 0; }
-}
-
-/* ── hero ── */
-.hero { padding: 72px 0 64px; }
-.hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
-.hero h1 { font-size: clamp(42px, 6.4vw, 76px); line-height: 1.02; margin: 18px 0 20px; }
-.hero h1 em { font-style: italic; color: var(--gold2); font-weight: 500; }
-.hero .lede { font-size: 19px; }
-.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 30px 0 16px; }
-.fine { color: var(--faint); font-size: 13.5px; }
-.pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 26px; }
-.pill { font-size: 13px; color: var(--muted); border: 1px solid var(--line2); border-radius: 999px; padding: 6px 12px; background: rgba(255,255,255,.02); }
-.pill b { color: var(--text); font-weight: 600; }
-@media (max-width: 920px) { .hero .wrap { grid-template-columns: 1fr; gap: 44px; } }
-
-/* app window mock */
-.window {
-  background: linear-gradient(180deg, #121826, #0d121c); border: 1px solid var(--line2); border-radius: 18px;
-  box-shadow: 0 40px 90px rgba(0,0,0,.55), 0 0 0 1px rgba(212,176,76,.06); overflow: hidden;
-}
-.window-bar { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; border-bottom: 1px solid var(--line); background: rgba(0,0,0,.18); }
-.window-bar .t { font-family: var(--serif); font-size: 15px; color: var(--muted); }
-.dots { display: flex; gap: 6px; }
-.dots i { width: 10px; height: 10px; border-radius: 50%; background: #2a3142; display: block; }
-.window-body { padding: 18px; display: grid; gap: 12px; font-size: 14.5px; }
-.msg { padding: 11px 14px; border-radius: 12px; max-width: 88%; line-height: 1.5; }
-.msg.me { justify-self: end; background: #1d3456; color: #e6eefc; border-bottom-right-radius: 4px; }
-.msg.ai { background: var(--card2); border: 1px solid var(--line); border-bottom-left-radius: 4px; }
-.msg.ai .who { font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); font-weight: 600; margin-bottom: 4px; }
-.msg code { font-family: var(--mono); font-size: 12.5px; background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 5px; color: var(--gold2); }
-.step-list { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
-.step-list li { margin: 3px 0; }
-.memory-chip { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; color: var(--green); margin-top: 8px; }
-
-/* ── new strip ── */
-.strip { padding: 0 0 24px; }
-.strip-inner {
-  display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 0; border: 1px solid var(--line2); border-radius: var(--radius);
-  background: linear-gradient(180deg, rgba(212,176,76,.06), rgba(255,255,255,.01)); overflow: hidden;
-}
-.strip-inner > div { padding: 18px 22px; border-left: 1px solid var(--line); }
-.strip-inner > div:first-child { border-left: 0; display: flex; align-items: center; }
-.strip .tag { font-size: 12px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); white-space: nowrap; }
-.strip b { display: block; font-size: 15px; margin-bottom: 2px; }
-.strip span { color: var(--muted); font-size: 14px; }
-@media (max-width: 860px) {
-  .strip-inner { grid-template-columns: 1fr; }
-  .strip-inner > div { border-left: 0; border-top: 1px solid var(--line); }
-  .strip-inner > div:first-child { border-top: 0; }
-}
-
-/* ── feature grid ── */
-.grid { display: grid; gap: 16px; }
-.grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
-.grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
-.grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
-@media (max-width: 1000px) { .grid.cols-4 { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 820px) { .grid.cols-3 { grid-template-columns: 1fr 1fr; } }
-@media (max-width: 600px) { .grid.cols-4, .grid.cols-3, .grid.cols-2 { grid-template-columns: 1fr; } }
-.card {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px;
-  transition: border-color .2s, transform .2s;
-}
-.card:hover { border-color: var(--line2); }
-.card .icon {
-  width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 22px;
-  background: var(--gold-soft); border: 1px solid rgba(212,176,76,.22); margin-bottom: 16px;
-}
-.card h3 { margin-bottom: 8px; }
-.card p { color: var(--muted); font-size: 15px; }
-.card .more { display: inline-block; margin-top: 12px; font-size: 14px; font-weight: 600; text-decoration: none; }
-
-/* ── demo ── */
-.demo { display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; align-items: center; }
-@media (max-width: 920px) { .demo { grid-template-columns: 1fr; } }
-.chat-box { display: flex; flex-direction: column; height: 460px; }
-.chat-log { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; }
-.chat-log .msg { white-space: pre-wrap; }
-.chat-form { display: flex; gap: 10px; padding: 14px; border-top: 1px solid var(--line); background: rgba(0,0,0,.18); }
-.chat-form input {
-  flex: 1; min-width: 0; background: var(--bg); border: 1px solid var(--line2); color: var(--text);
-  border-radius: 10px; padding: 12px 14px; font: inherit; font-size: 15px;
-}
-.chat-form input:focus { outline: none; border-color: var(--gold); }
-.chat-form .btn { padding: 12px 18px; }
-.suggest { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
-.suggest button {
-  background: rgba(255,255,255,.03); border: 1px solid var(--line2); color: var(--muted); border-radius: 999px;
-  padding: 8px 14px; font: inherit; font-size: 13.5px; cursor: pointer;
-}
-.suggest button:hover { color: var(--text); border-color: var(--gold); }
-
-/* ── phone ── */
-.phone-sec { display: grid; grid-template-columns: 1fr .8fr; gap: 56px; align-items: center; }
-@media (max-width: 920px) { .phone-sec { grid-template-columns: 1fr; } }
-.phone {
-  width: 290px; max-width: 100%; margin: 0 auto; border-radius: 40px; padding: 12px; background: #1a1f2b;
-  border: 1px solid var(--line2); box-shadow: 0 40px 90px rgba(0,0,0,.55);
-}
-.phone-screen { border-radius: 30px; background: #0b0f17; overflow: hidden; min-height: 520px; display: flex; flex-direction: column; }
-.phone-top { padding: 16px 18px 10px; font-family: var(--serif); font-size: 18px; border-bottom: 1px solid var(--line); display: flex; justify-content: space-between; align-items: center; }
-.phone-top span { font-family: var(--sans); font-size: 11px; color: var(--green); }
-.phone-body { padding: 14px; display: grid; gap: 10px; font-size: 13.5px; align-content: start; }
-.photo {
-  justify-self: end; width: 72%; aspect-ratio: 4/3; border-radius: 12px; border: 1px solid var(--line2);
-  background:
-    repeating-linear-gradient(0deg, rgba(60,45,20,.0) 0 9px, rgba(60,45,20,.35) 9px 10px),
-    linear-gradient(135deg, #e8dcc0, #cdbb93);
-  position: relative;
-}
-.photo::after { content: "John 1:1–5"; position: absolute; left: 10px; top: 8px; font-family: var(--serif); font-size: 12px; color: #4a3a1c; font-weight: 600; }
-.steps { counter-reset: s; display: grid; gap: 16px; margin-top: 28px; }
-.steps li { list-style: none; display: grid; grid-template-columns: 36px 1fr; gap: 14px; align-items: start; }
-.steps li::before {
-  counter-increment: s; content: counter(s); width: 36px; height: 36px; border-radius: 50%; display: grid; place-items: center;
-  background: var(--gold-soft); border: 1px solid rgba(212,176,76,.3); color: var(--gold2); font-weight: 600; font-size: 15px;
-}
-.steps b { display: block; margin-bottom: 2px; }
-.steps span b { display: inline; margin: 0; }
-.steps span { color: var(--muted); font-size: 15px; }
-.steps ol, .steps { padding: 0; margin-left: 0; }
-
-/* ── start ── */
-.start-grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 20px; }
-@media (max-width: 920px) { .start-grid { grid-template-columns: 1fr; } }
-.keys a { font-weight: 600; }
-.key-row { display: flex; justify-content: space-between; gap: 12px; padding: 14px 0; border-bottom: 1px solid var(--line); align-items: center; }
-.key-row:last-child { border-bottom: 0; }
-.key-row small { color: var(--muted); display: block; font-size: 13.5px; }
-
-/* ── hardware table ── */
-.table { width: 100%; border-collapse: separate; border-spacing: 0; border: 1px solid var(--line2); border-radius: var(--radius); overflow: hidden; }
-.table th, .table td { text-align: left; padding: 16px 18px; border-bottom: 1px solid var(--line); vertical-align: top; font-size: 15px; }
-.table th { background: var(--card2); font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--gold); font-weight: 600; }
-.table tr:last-child td { border-bottom: 0; }
-.table td:first-child { font-weight: 600; white-space: nowrap; }
-.table td { color: var(--muted); }
-.table td b { color: var(--text); font-weight: 600; }
-.table-wrap { overflow-x: auto; }
-@media (max-width: 640px) {
-  .table thead { display: none; }
-  .table, .table tbody, .table tr, .table td { display: block; width: 100%; }
-  .table tr { border-bottom: 1px solid var(--line2); padding: 8px 0; }
-  .table td { border: 0; padding: 6px 16px; }
-}
-
-/* ── privacy ── */
-.privacy { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 820px) { .privacy { grid-template-columns: 1fr; } }
-.privacy ul { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; }
-.privacy li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--muted); font-size: 15px; }
-.privacy li b { color: var(--text); }
-.privacy .ok::before { content: "✓"; color: var(--green); font-weight: 700; }
-.privacy .net::before { content: "↗"; color: var(--blue); font-weight: 700; }
-.privacy .head { display: flex; align-items: center; gap: 10px; }
-
-/* ── letters ── */
-.letters {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center; padding: 44px;
-  border-radius: 24px; border: 1px solid rgba(212,176,76,.22);
-  background: radial-gradient(500px 260px at 90% 10%, rgba(212,176,76,.12), transparent 70%), var(--card);
-}
-@media (max-width: 820px) { .letters { grid-template-columns: 1fr; padding: 28px; } }
-.envelope {
-  aspect-ratio: 16/10; border-radius: 14px; position: relative; overflow: hidden;
-  background: linear-gradient(160deg, #efe4c8, #d7c49a); box-shadow: 0 24px 60px rgba(0,0,0,.45);
-}
-.envelope::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom right, transparent 49.6%, rgba(90,70,30,.25) 50%, transparent 50.4%), linear-gradient(to bottom left, transparent 49.6%, rgba(90,70,30,.25) 50%, transparent 50.4%); }
-.seal {
-  position: absolute; left: 50%; top: 50%; translate: -50% -50%; width: 66px; height: 66px; border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #c2443a, #7e1d17); display: grid; place-items: center;
-  color: #f6d9c9; font-family: var(--serif); font-size: 26px; box-shadow: 0 6px 16px rgba(0,0,0,.35);
-}
-
-/* ── faq ── */
-.faq { max-width: 820px; margin: 0 auto; display: grid; gap: 10px; }
-.faq details { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 0 20px; }
-.faq summary { cursor: pointer; list-style: none; padding: 18px 0; font-weight: 600; display: flex; justify-content: space-between; gap: 16px; }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after { content: "+"; color: var(--gold); font-size: 20px; line-height: 1; }
-.faq details[open] summary::after { content: "–"; }
-.faq details p { color: var(--muted); padding: 0 0 18px; }
-
-/* ── final cta + footer ── */
-.final { text-align: center; padding: 100px 0; }
-.final h2 { font-size: clamp(34px, 5vw, 56px); margin: 14px 0 16px; }
-.final .lede { margin: 0 auto; }
-.final .cta-row { justify-content: center; }
-footer { border-top: 1px solid var(--line); padding: 48px 0 36px; color: var(--muted); font-size: 14px; }
-.foot { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 28px; }
-@media (max-width: 820px) { .foot { grid-template-columns: 1fr 1fr; } }
-.foot h4 { margin: 0 0 12px; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--text); }
-.foot ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.foot a { color: var(--muted); text-decoration: none; }
-.foot a:hover { color: var(--text); }
-.foot .tagline { font-family: var(--serif); font-style: italic; font-size: 17px; margin-top: 10px; max-width: 300px; }
-.copy { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: var(--faint); font-size: 13px; }
-
-/* ── motion ── */
-.reveal { opacity: 0; transform: translateY(14px); transition: opacity .6s ease, transform .6s ease; }
-.reveal.in { opacity: 1; transform: none; }
-@media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
-  .reveal { opacity: 1; transform: none; transition: none; }
-  .btn:hover { transform: none; }
-}
-</style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
 
-<!-- ═══ NAV ═══ -->
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv_256.png" alt=""> Cursiv</a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
     <nav class="nav-links" id="navLinks">
-      <a href="#features">Features</a>
-      <a href="#try">Try it</a>
-      <a href="#phone">Phone app</a>
-      <a href="#start">Get started</a>
-      <a href="#privacy">Privacy</a>
-      <a href="/start">Help</a>
-      <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download</a>
+      <a href="#today">Overview</a>
+      <a href="#capabilities">Capabilities</a>
+      <a href="#testing">Testing</a>
+      <a href="#architecture">Architecture</a>
+      <a href="#limitations">Limitations</a>
+      <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a>
+      <a class="btn btn-gold" href="/start">Download</a>
     </nav>
   </div>
 </header>
 
 <main>
-<!-- ═══ HERO ═══ -->
+<!-- Hero -->
 <section class="hero">
-  <div class="wrap">
+  <div class="wrap grid2">
     <div>
-      <span class="eyebrow">⬡ Free personal AI for Windows</span>
-      <h1>Your own AI.<br><em>On your own computer.</em></h1>
-      <p class="lede">Cursiv runs on your PC, remembers each person in your family, helps you write and fix code step by step, and comes with a phone app for photos and questions on the go. It keeps working with no internet.</p>
+      <span class="eyebrow">Open-source · local-first AI for Windows</span>
+      <h1>Local intelligence. Even without the internet.</h1>
+      <p class="lede">Cursiv runs an AI model on your own computer, keeps its memory and reference material there, and checks
+        its answers before giving them. Online AI services are optional extras you turn on, not a requirement.</p>
+      <p class="principle">Connectivity is optional. Trust is not.</p>
       <div class="cta-row">
-        <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">⬇ Download for Windows</a>
-        <a class="btn btn-ghost" href="#try">Try it in your browser</a>
+        <a class="btn btn-gold" href="/start">Download for Windows</a>
+        <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv">View the source on GitHub</a>
       </div>
-      <p class="fine">Free &amp; open source · Windows 10/11 · No account needed · Updates itself</p>
-      <div class="pills">
-        <span class="pill"><b>0</b> ads or tracking</span>
-        <span class="pill"><b>~2 s</b> answers with a free key</span>
-        <span class="pill"><b>Works offline</b> with a local model</span>
-      </div>
+      <p class="fine">Free · MIT license · Windows 10/11 (64-bit) · Active development</p>
     </div>
-
-    <div class="window reveal" aria-hidden="true">
-      <div class="window-bar"><div class="dots"><i></i><i></i><i></i></div><span class="t">⬡ Cursiv</span><span></span></div>
-      <div class="window-body">
-        <div class="msg me">How do I install pybullet? I keep getting “externally-managed-environment”.</div>
-        <div class="msg ai">
-          <div class="who">Cursiv</div>
-          That error means Ubuntu protects its own Python. Use a virtual environment:
-          <ol class="step-list">
-            <li><code>python3 -m venv ~/robot</code> (once)</li>
-            <li><code>source ~/robot/bin/activate</code> <em>(every new terminal)</em></li>
-            <li><code>pip install pybullet</code> — no sudo</li>
-          </ol>
-          <div class="memory-chip">● Remembered: your venv is ~/robot</div>
-        </div>
-      </div>
-    </div>
+    <dl class="facts" aria-label="Current release">
+      <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">v3.14-U61</a> (October 2026)</span></div>
+      <div><span class="k">Runs on</span><span class="v">Your PC, through <a href="https://ollama.com">Ollama</a> (a free local model runner)</span></div>
+      <div><span class="k">Default model</span><span class="v">qwen3 4B Instruct on 4–6 GB graphics cards; llama3.1 8B on 8 GB+</span></div>
+      <div><span class="k">Needs internet</span><span class="v">Once, to download Ollama and a model. Not for everyday use.</span></div>
+      <div><span class="k">Status</span><span class="v">In active development and testing. Not certified for medical, safety-critical or spaceflight use.</span></div>
+    </dl>
   </div>
 </section>
 
-<!-- ═══ WHAT'S NEW ═══ -->
-<div class="strip">
-  <div class="wrap">
-    <div class="strip-inner">
-      <div><span class="tag">New in v3.14</span></div>
-      <div><b>Much faster</b><span>About 2 seconds per answer with a free key</span></div>
-      <div><b>Coding helper</b><span>Every step listed, errors explained, code tested</span></div>
-      <div><b>Phone app</b><span>Snap a photo, ask about it, linked to your PC</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ═══ FEATURES ═══ -->
-<section id="features">
+<!-- What it is today -->
+<section id="today">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">What it does</span>
-      <h2>One assistant for the whole family.</h2>
-      <p class="lede">Everything lives in one plain window. Just talk to it.</p>
+      <span class="eyebrow">What Cursiv is today</span>
+      <h2>A desktop AI that works on your own computer.</h2>
+      <p class="lede">The current product is a Windows app for individuals and families. The engineering focus right now is
+        making its answers reliable and measurable, before anything larger is built on top of it.</p>
     </div>
-    <div class="grid cols-4">
-      <article class="card reveal">
-        <div class="icon">🧠</div>
-        <h3>Remembers each person</h3>
-        <p>Cursiv learns lasting things about whoever is talking — separately for each family member. See, add or forget memories any time in “What I remember”.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">🔌</div>
-        <h3>Works without internet</h3>
-        <p>With a local AI model installed, Cursiv answers on your own computer. The Setup window downloads one for you with a progress bar — no command line.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">⚡</div>
-        <h3>Fast free AI keys</h3>
-        <p>Add a free Groq or Google Gemini key and answers come back in about two seconds. Cursiv switches between them automatically if one is busy.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">💻</div>
-        <h3>Coding, step by step</h3>
-        <p>Every setup step, the full code, and how to tell it worked. Paste an error and it explains it. It learns your setup and test-runs the Python it writes.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">📱</div>
-        <h3>A phone app too</h3>
-        <p>Take pictures of a page, a plant, a part — and ask about them. Link it to your computer and both share the same conversation and memory.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">🗂️</div>
-        <h3>Saved conversations</h3>
-        <p>Keep the chats that matter. Each one gets a short title about its topic automatically, and you can pick up right where you left off.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">⚖️</div>
-        <h3>A council for big questions</h3>
-        <p>For decisions that deserve more than one answer, Cursiv asks several AI “seats” and brings their views together — checked against what it knows.</p>
-      </article>
-      <article class="card reveal">
-        <div class="icon">✉️</div>
-        <h3>Sealed family letters</h3>
-        <p>Write private letters for the people you love, each opened only with the code you set. Something to pass down.</p>
-      </article>
+    <div class="cards">
+      <article class="card"><h3>Local model first</h3><p>Every message goes to the model on your computer first. AI keys you add (Gemini, Groq, OpenAI, Claude, xAI) are only fallbacks, and every reply says which model answered.</p></article>
+      <article class="card"><h3>Answers that show their basis</h3><p>Complex answers end with what was <b>known</b>, <b>inferred</b>, <b>assumed</b> and <b>unknown</b>. Numbers and named sources are checked after the draft, and Cursiv says when it can't know something.</p></article>
+      <article class="card"><h3>Offline reference</h3><p>A small built-in reference (survival, first aid, science). When a question matches an entry, the entry is shown word for word above the answer, with its ID.</p></article>
+      <article class="card"><h3>Memory with an origin</h3><p>Each remembered fact is tagged with where it came from (you said it, or Cursiv inferred it) and when. Conflicting memories are both shown; no memory can override safety rules.</p></article>
+      <article class="card"><h3>Offline mode</h3><p>One switch blocks every connection off the computer and stays on after a restart. Your local model, memory and reference keep working.</p></article>
+      <article class="card"><h3>Your data stays yours</h3><p>Conversations and memories are ordinary files on your PC. Saved AI keys are encrypted for your Windows account. There is no telemetry.</p></article>
     </div>
   </div>
 </section>
 
-<!-- ═══ TRY IT ═══ -->
-<section id="try" style="padding-top:40px">
-  <div class="wrap demo">
-    <div>
-      <span class="eyebrow">Try it now</span>
-      <h2 style="margin:14px 0 16px">Talk to Cursiv right here.</h2>
-      <p class="lede">A small public preview — no sign-up, no download. The desktop app has memory, coding help, the phone link and everything else.</p>
+<!-- Capabilities with status -->
+<section id="capabilities">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Capabilities and evidence</span>
+      <h2>What's implemented, and how it's been tested.</h2>
+      <p class="lede">Each capability is labeled by the evidence behind it, not by how good it sounds.</p>
+    </div>
+    <div class="legend">
+      <span><span class="badge b-tested">Tested</span> automated tests plus a live check on a real model</span>
+      <span><span class="badge b-partial">Partly validated</span> tested in parts; a full demonstration is still to come</span>
+      <span><span class="badge b-impl">Implemented</span> working, with limited or no automated testing</span>
+      <span><span class="badge b-planned">Planned</span> not built yet</span>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Capability</th><th>Status</th><th>Evidence and notes</th></tr></thead>
+        <tbody>
+          <tr><td><b>Local chat through Ollama</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Live runs on qwen3 4B Instruct; the truth benchmark runs real chat turns on the local model.</td></tr>
+          <tr><td><b>No connections off the computer on a fresh install</b> (default settings, no keys)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Chat turns with "this week" / "right now": zero outside connections, recorded by a socket-level audit (<code>scripts/net_audit.py</code>). App start-up watched for 30 s: none. Packet-level capture not done yet.</td></tr>
+          <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Unit tests and a live chat-turn audit with offline mode on: zero outside connections. The full feature-by-feature offline demonstration (<code>scripts/offline_demo.py</code>) is written and still to be run.</td></tr>
+          <tr><td><b>Answer checking</b> (numbers, named sources, assumptions, one rewrite)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Rule-based checks are unit-tested. How much it improves real answers is what the truth benchmark is now measuring.</td></tr>
+          <tr><td><b>Offline reference in chat</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Retrieval is unit-tested; first-aid and survival entries are shown word for word. The entries were written for Cursiv and <b>not reviewed by a medical professional</b>; three are held back until reviewed.</td></tr>
+          <tr><td><b>Memory with origin, date and conflict notes</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests; memory survived a restart in a live run.</td></tr>
+          <tr><td><b>Saved AI keys encrypted</b> (Windows DPAPI)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests. Memories and conversations are not encrypted on disk.</td></tr>
+          <tr><td><b>Local login</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fails closed; new accounts need an existing login. A lock on the front door, not disk encryption.</td></tr>
+          <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests. Each drive carries a Licenses folder for Cursiv, Ollama and every model on it (next release).</td></tr>
+          <tr><td><b>Truth benchmark</b> (116 cases, 9 categories)</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>First baseline (U61) in progress. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Supporting tools:</b> coding help, sealed family letters, phone link, agents, plugins, LoRA training</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>Working features, outside the benchmark's scope for now.</td></tr>
+          <tr><td><b>Structured observations, provenance ledger</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Records that keep "what was observed" separate from "what the AI inferred".</td></tr>
+          <tr><td><b>Multiple nodes, synchronization, Mission Hub</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Only after the single-computer system is shown to be reliable. See <a href="/vision">Direction</a>.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- Testing -->
+<section id="testing">
+  <div class="wrap grid2">
+    <div class="stack">
+      <span class="eyebrow">Testing and results</span>
+      <h2>Measured, not assumed.</h2>
+      <p class="lede">The Cursiv Truth Benchmark asks the same fixed questions on every release and scores the answers with code, not with another AI.</p>
+      <ul class="checks">
+        <li><span><b>116 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
+        <li><span><b>Scored by fixed rules:</b> the right answer or number, invented details, admitting "I can't know", asking when the question is unclear, using the right reference entry.</span></li>
+        <li><span><b>Run clean:</b> a fresh copy, no keys, no memories, offline mode on.</span></li>
+        <li><span><b>Frozen:</b> the questions and checks are versioned (suite 1.0) and can't be changed to improve a score.</span></li>
+      </ul>
+      <p><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Read the cases, scoring and rules →</a></p>
+    </div>
+    <div class="card" id="results">
+      <h3>Results</h3>
+      <p style="margin-top:8px">The first baseline (release U61, suite 1.0, model qwen3 4B Instruct) is running. Results will be published here and in
+        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/RESULTS.md">bench/RESULTS.md</a> with every individual answer, including the failures.</p>
+      <p class="fine" style="margin-top:12px">No figures are shown until a complete run exists.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Architecture</span>
+      <h2>How a question is answered today.</h2>
+      <p class="lede">Everything inside the gold boxes runs on your computer. Dashed boxes are optional and only used if you turn them on.</p>
+    </div>
+    <div class="arch" aria-label="Cursiv architecture diagram">
+      <div class="row"><div class="box"><b>Desktop app</b><span>Windows window (PyQt). Local login. Settings and offline switch.</span></div></div>
+      <div class="arrow">▼</div>
+      <div class="row r4">
+        <div class="box core"><b>Network gate</b><span>Offline mode; blocks outside connections at the socket</span></div>
+        <div class="box core"><b>Memory</b><span>Facts with origin and date; conflicts shown</span></div>
+        <div class="box core"><b>Offline reference</b><span>Survival, first aid, science; cited by ID</span></div>
+        <div class="box core"><b>Safety rules</b><span>Crisis and medical emergencies handled first</span></div>
+      </div>
+      <div class="arrow">▼ prompt</div>
+      <div class="row r2">
+        <div class="box core"><b>Local model (Ollama)</b><span>qwen3 4B Instruct, llama3.1 8B, … on your GPU or CPU</span></div>
+        <div class="box opt"><b>Optional providers</b><span>Your own Gemini, Groq, OpenAI, Claude or xAI key; Cursiv Cloud backup (off by default)</span></div>
+      </div>
+      <div class="arrow">▼ draft</div>
+      <div class="row"><div class="box core"><b>Answer check</b><span>Numbers, named sources, assumptions stated as facts; one rewrite; notes if problems remain</span></div></div>
+      <div class="arrow">▼</div>
+      <div class="row"><div class="box"><b>Answer</b><span>With "Answered by …", the reference entry used, and Known / Inferred / Assumed / Unknown on complex questions</span></div></div>
+    </div>
+    <div class="card" style="margin-top:22px">
+      <h3>Where it's going <span class="badge b-planned">Planned</span></h3>
+      <p>Structured observations and a provenance record, then several Cursiv computers working together with or without a connection, then a local hub.
+        Each step depends on the one below it being reliable first. <a href="/vision">Read the direction →</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- Screenshots -->
+<section id="screens">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">The app</span>
+      <h2>Real screens from the current version.</h2>
+    </div>
+    <div class="cards two">
+      <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window showing Ollama ready and installed local models" loading="lazy" width="950" height="888"><figcaption>Setup: installs Ollama and a model sized for your graphics card.</figcaption></figure>
+      <figure class="shot" style="margin:0"><img src="/assets/shots/settings.png" alt="Cursiv Settings window with optional AI keys, Cursiv Cloud, offline mode, web search and update switches" loading="lazy" width="975" height="710"><figcaption>Settings: optional keys, and the switches that control when anything goes online.</figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- Privacy -->
+<section id="privacy">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">When information can leave your computer</span>
+      <h2>Online only when you turn something on.</h2>
+      <p class="lede">With default settings and no keys, everyday chat stays on your computer. These are the only things that send data, and each is off or manual until you use it.</p>
+    </div>
+    <div class="cards two">
+      <div class="card">
+        <h3>Sends data only when you use it</h3>
+        <ul class="checks net">
+          <li><span><b>AI keys you add:</b> your message goes to that provider when the local model can't answer, or for images.</span></li>
+          <li><span><b>Cursiv Cloud:</b> off by default; if turned on, used only when no local model is ready.</span></li>
+          <li><span><b>Web search:</b> only for messages starting with <code>search:</code>, or if you turn on automatic search.</span></li>
+          <li><span><b>Update check:</b> when you choose Check for Updates (tray icon), or if you turn on automatic checks.</span></li>
+          <li><span><b>Phone app:</b> its conversation and photos are kept in your space on this website.</span></li>
+          <li><span><b>Problem reports:</b> sent only when you click Send.</span></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>Offline mode</h3>
+        <ul class="checks ok">
+          <li><span>Blocks all of the above and any other connection off the computer, at the network-socket level.</span></li>
+          <li><span>Stays on after a restart until you turn it off.</span></li>
+          <li><span>Keeps the local model, memory, reference, letters and saved conversations working.</span></li>
+        </ul>
+        <p class="fine" style="margin-top:14px">Evidence: automated tests and a live chat-turn audit with zero outside connections. A full feature-by-feature offline demonstration and packet-level capture are still to be published.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Limitations -->
+<section id="limitations">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Known limitations</span>
+      <h2>What Cursiv can't do yet.</h2>
+    </div>
+    <div class="cards">
+      <div class="card"><h3>Small local models make mistakes</h3><p>A 4B model running on a home PC can be confidently wrong. The answer check catches some errors, not all. Check anything that matters.</p></div>
+      <div class="card"><h3>Not a medical or safety system</h3><p>The first-aid reference was written for Cursiv and hasn't been reviewed by a medical professional. In an emergency, call emergency services.</p></div>
+      <div class="card"><h3>Not certified</h3><p>Cursiv is not certified for medical, safety-critical, aerospace or spaceflight use. Those would need independent evaluation and validation.</p></div>
+      <div class="card"><h3>Disk encryption</h3><p>The login keeps people at the keyboard out; it doesn't encrypt memories or conversations on disk. Saved AI keys are encrypted.</p></div>
+      <div class="card"><h3>Windows only, unsigned</h3><p>No Mac or Linux desktop version yet. The installer isn't code-signed, so Windows warns about an unknown publisher.</p></div>
+      <div class="card"><h3>Speed depends on hardware</h3><p>On a 4 GB graphics card a typical answer takes 10–60 seconds. Without a GPU it's slower.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Everyday use -->
+<section id="uses">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Built for real life</span>
+      <h2>Especially where the internet isn't reliable.</h2>
+      <p class="lede">Farms and homesteads, homeschooling, small businesses, study, DIY projects and code.</p>
+    </div>
+    <div class="cards">
+      <div class="card"><h3>Sealed family letters</h3><p>Write private letters that open only with the code you set for each person. <a href="/letters">More →</a></p></div>
+      <div class="card"><h3>Phone app</h3><p>Ask about a photo on your phone and pick up the conversation on your PC. This part uses this website. <a href="/app">Open it →</a></p></div>
+      <div class="card"><h3>Cursiv on a USB</h3><p>Copy Cursiv, its AI engine and models to a USB drive and run it on any Windows PC without installing.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- Demo -->
+<section id="try">
+  <div class="wrap grid2">
+    <div class="stack">
+      <span class="eyebrow">Web preview</span>
+      <h2>Try a few questions in your browser.</h2>
+      <p class="lede">This preview runs on this website's server (Google Gemini, or Cloudflare Workers AI when busy), not on your computer, so what you type here is sent to the server. It's limited and has no memory. The desktop app is where Cursiv runs locally.</p>
       <div class="suggest" id="suggest">
         <button type="button">Plan a week of easy dinners</button>
         <button type="button">Explain compound interest simply</button>
         <button type="button">What's a good first coding project?</button>
-        <button type="button">Help me write a thank-you note</button>
       </div>
     </div>
-    <div class="window chat-box reveal">
-      <div class="window-bar"><div class="dots"><i></i><i></i><i></i></div><span class="t">Cursiv — web preview</span><span class="fine">Public · limited</span></div>
+    <div class="chat-box">
+      <div class="chat-bar"><span>Cursiv web preview</span><span>server-hosted · limited</span></div>
       <div class="chat-log" id="chatLog" aria-live="polite">
-        <div class="msg ai"><div class="who">Cursiv</div>Hi! Ask me anything — a question, a plan, something you're working through.</div>
+        <div class="msg ai"><span class="who">Cursiv preview</span>Hi! Ask me something. (This preview runs online, not on your computer.)</div>
       </div>
       <form class="chat-form" id="chatForm">
-        <label for="chatIn" class="sr-only" style="position:absolute;left:-9999px">Message</label>
+        <label for="chatIn" style="position:absolute;left:-9999px">Message</label>
         <input id="chatIn" autocomplete="off" maxlength="1000" placeholder="Type a message…">
         <button class="btn btn-gold" id="chatSend" type="submit">Send</button>
       </form>
@@ -464,224 +286,66 @@ footer { border-top: 1px solid var(--line); padding: 48px 0 36px; color: var(--m
   </div>
 </section>
 
-<!-- ═══ PHONE ═══ -->
-<section id="phone">
-  <div class="wrap phone-sec">
-    <div>
-      <span class="eyebrow">Cursiv on your phone</span>
-      <h2 style="margin:14px 0 16px">Snap it. Ask it. Pick it up later on your PC.</h2>
-      <p class="lede">Photograph a page from one of your Bibles, a recipe card, a leaf, a broken part — and ask about it. Linked to your computer, the conversation and what Cursiv knows about you go both ways.</p>
-      <ol class="steps">
-        <li><div><b>Open the app on your phone</b><span>Go to <a href="/app">cursiv.winklers-llc.com/app</a>, then “Add to Home Screen” so it opens like an app.</span></div></li>
-        <li><div><b>Tap Start</b><span>You'll get a short linking code.</span></div></li>
-        <li><div><b>Link your computer</b><span>In desktop Cursiv, click <b>📱</b> at the top and type the code. Done — both share the conversation.</span></div></li>
-      </ol>
-      <div class="cta-row"><a class="btn btn-ghost" href="/app">Open the phone app →</a></div>
-    </div>
-    <div class="phone reveal" aria-hidden="true">
-      <div class="phone-screen">
-        <div class="phone-top">⬡ Cursiv <span>● linked to PC</span></div>
-        <div class="phone-body">
-          <div class="photo"></div>
-          <div class="msg me">How does this verse read in the NASB compared to the KJV?</div>
-          <div class="msg ai"><div class="who">Cursiv</div>Both open “In the beginning was the Word…”. The main difference is in verse 5: the KJV says the darkness “comprehended it not”, while the NASB says it “did not grasp it”…</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ GET STARTED ═══ -->
-<section id="start">
+<!-- Source -->
+<section id="source">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">Get started</span>
-      <h2>Up and running in a few minutes.</h2>
+      <span class="eyebrow">Source code and documentation</span>
+      <h2>Everything is public.</h2>
     </div>
-    <div class="start-grid">
-      <div class="card">
-        <ol class="steps" style="margin-top:0">
-          <li><div><b>Download and install</b><span>Run <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Cursiv-Setup</a>. Windows may say it's from an unknown publisher — click “More info” → “Run anyway”.</span></div></li>
-          <li><div><b>Follow the one-screen Setup</b><span>It installs Ollama (the local AI engine) and lets you pick a model sized for your computer, with progress bars. Optional, but it's what makes Cursiv work offline.</span></div></li>
-          <li><div><b>Add a free key (recommended)</b><span>Paste a free Groq or Gemini key in ⚙ Settings for fast answers while you're online.</span></div></li>
-          <li><div><b>Just talk to it</b><span>Say hello. Cursiv updates itself when a new version comes out.</span></div></li>
-        </ol>
-      </div>
-      <div class="card keys">
-        <div class="icon">🔑</div>
-        <h3>Free AI keys</h3>
-        <p style="color:var(--muted);margin:8px 0 6px">Both are free and take about a minute. Each key stays on your computer.</p>
-        <div class="key-row"><div>Groq <small>Fastest — about a second</small></div><a href="https://console.groq.com/keys" target="_blank" rel="noopener">Get a key ↗</a></div>
-        <div class="key-row"><div>Google Gemini <small>Great backup, very capable</small></div><a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Get a key ↗</a></div>
-        <p class="fine" style="margin-top:12px">Paid Claude, ChatGPT or Grok keys work too, if you already have one.</p>
-      </div>
+    <div class="cards">
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv"><h3>Repository</h3><p>Full source, MIT license.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/TECH.md"><h3>How it's built</h3><p>TECH.md: the app, chat engine, memory, checks and build.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench"><h3>Truth benchmark</h3><p>Cases, scoring rules and results.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/MODELS.md"><h3>Model licenses</h3><p>Which models Cursiv uses and their terms.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/CHANGELOG.md"><h3>Changelog</h3><p>Every release, including past defects and fixes.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/releases"><h3>Releases</h3><p>Installers for every version.</p></a>
     </div>
   </div>
 </section>
 
-<!-- ═══ HARDWARE ═══ -->
-<section id="hardware" style="padding-top:20px">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Runs on what you have</span>
-      <h2>Offline speed depends on your graphics card.</h2>
-      <p class="lede">With a free key, any PC is fast. For offline use, Cursiv checks your graphics card's memory (NVIDIA or AMD) and picks models that fit.</p>
-    </div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>Graphics memory</th><th>Recommended models</th><th>What to expect offline</th></tr></thead>
-        <tbody>
-          <tr><td>No GPU / under 4 GB</td><td><b>qwen2.5 1.5B</b></td><td>Works, but slower. A free key is the better everyday choice.</td></tr>
-          <tr><td>4–6 GB</td><td><b>qwen2.5 3B</b> · <b>qwen2.5-coder 3B</b></td><td>Quick everyday answers and solid coding help.</td></tr>
-          <tr><td>8 GB</td><td><b>llama3.1 8B</b> · <b>qwen2.5-coder 7B</b></td><td>Fast, high-quality answers.</td></tr>
-          <tr><td>12–16 GB+</td><td><b>llama3.1</b> · <b>qwen2.5-coder 14B</b></td><td>The strongest offline coding, plus a second model that reviews the code.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="fine" style="margin-top:14px">Also needed: Windows 10 or 11 (64-bit), 8 GB RAM (16 GB recommended), and 3–15 GB of free disk space depending on the models you choose. Internet is needed once, for the downloads.</p>
-  </div>
-</section>
-
-<!-- ═══ PRIVACY ═══ -->
-<section id="privacy">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Privacy, plainly</span>
-      <h2>Yours by default. Online only when you choose.</h2>
-      <p class="lede">No ads, no tracking, no selling anything. Here's exactly what stays put and what can go online.</p>
-    </div>
-    <div class="privacy">
-      <div class="card">
-        <div class="head"><div class="icon" style="margin:0">🏠</div><h3>Stays on your computer</h3></div>
-        <ul>
-          <li class="ok"><span><b>Your conversations, memories and letters</b> — ordinary files on your PC.</span></li>
-          <li class="ok"><span><b>Your login and your keys</b> — saved locally, never sent to us.</span></li>
-          <li class="ok"><span><b>Answers from a local model</b> — computed on your own hardware.</span></li>
-          <li class="ok"><span><b>No telemetry</b> — nothing about how you use Cursiv is collected.</span></li>
-        </ul>
-      </div>
-      <div class="card">
-        <div class="head"><div class="icon" style="margin:0">🌐</div><h3>Goes online only if you use it</h3></div>
-        <ul>
-          <li class="net"><span><b>Free or paid AI keys</b> — your message goes to that provider (Groq, Google, etc.) to be answered.</span></li>
-          <li class="net"><span><b>Cursiv Cloud</b> — a backup AI on this site, used only when no local model is ready yet. Turn it off in ⚙ Settings.</span></li>
-          <li class="net"><span><b>The phone app</b> — its conversation, photos, and (if you allow it) a short memory summary are kept in your private space on this site.</span></li>
-          <li class="net"><span><b>Updates and problem reports</b> — Cursiv checks GitHub for new versions; a problem report is sent only when you click Send.</span></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ EVERYDAY USES ═══ -->
-<section id="uses" style="padding-top:20px">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Built for real life</span>
-      <h2>Especially where the internet isn't reliable.</h2>
-    </div>
-    <div class="grid cols-3">
-      <article class="card reveal"><div class="icon">🌾</div><h3>Farm &amp; homestead</h3><p>Planting schedules, livestock records, yields and expenses, seasonal checklists.</p></article>
-      <article class="card reveal"><div class="icon">📚</div><h3>Homeschool &amp; study</h3><p>Lesson plans, explanations, practice problems, and hands-on skills like mechanics or first aid.</p></article>
-      <article class="card reveal"><div class="icon">🧾</div><h3>Small business</h3><p>Invoices, proposals, inventory, customer notes and grant applications.</p></article>
-      <article class="card reveal"><div class="icon">📖</div><h3>Faith &amp; study</h3><p>Compare translations, keep study notes, and ask about photos of the pages you're reading.</p></article>
-      <article class="card reveal"><div class="icon">🔨</div><h3>DIY &amp; projects</h3><p>Plan a shed, a water system or a solar setup, and think the build through before you start.</p></article>
-      <article class="card reveal"><div class="icon">⚙️</div><h3>Automation &amp; code</h3><p>Scripts for data logging, robots and devices, explained step by step, with no cloud needed.</p></article>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ LETTERS ═══ -->
-<section id="letters">
-  <div class="wrap">
-    <div class="letters">
-      <div>
-        <span class="eyebrow">Something to pass down</span>
-        <h2 style="margin:14px 0 16px">Sealed letters for the people you love.</h2>
-        <p class="lede">Write private messages for a spouse, your kids, close friends. Each opens only with the code you set for that person. And because everything is ordinary files, the whole of Cursiv — letters, memories and all — can be copied to a new computer and keeps working.</p>
-        <p class="fine" style="margin-top:14px">A place for care — never for threats or anything meant to harm.</p>
-        <div class="cta-row"><a class="btn btn-ghost" href="/letters">Open the letters vault →</a></div>
-      </div>
-      <div class="envelope reveal" aria-hidden="true"><div class="seal">⬡</div></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FAQ ═══ -->
+<!-- FAQ -->
 <section id="faq">
   <div class="wrap">
-    <div class="section-head center">
-      <span class="eyebrow">Questions</span>
-      <h2>Good to know.</h2>
-    </div>
+    <div class="section-head"><span class="eyebrow">Questions</span><h2>Good to know.</h2></div>
     <div class="faq">
-      <details><summary>Is Cursiv really free?</summary><p>Yes. It's free and open source (MIT license). Free AI keys from Groq and Google are optional and cost nothing; paid keys are only if you want them.</p></details>
-      <details><summary>Do I need to be online?</summary><p>Only for the first download. After that, with a local model installed, Cursiv answers offline. When you are online, a free key makes it much faster.</p></details>
-      <details><summary>Windows warned me about the installer. Is it safe?</summary><p>The installer isn't code-signed yet (signing costs money), so Windows shows “unknown publisher”. Click “More info” → “Run anyway”. The full source code is public on GitHub.</p></details>
-      <details><summary>How does it know who's talking?</summary><p>Each family member signs in with their own account on the computer, and Cursiv keeps separate memories for each person. Anyone can see or delete what it remembers about them.</p></details>
+      <details><summary>Is Cursiv free?</summary><p>Yes. Cursiv is open source under the MIT license. Free Gemini and Groq keys are optional; paid keys only if you want them.</p></details>
+      <details><summary>Do I need to be online?</summary><p>Once, to download Ollama and a model during setup. After that, with a local model installed, everyday use works without internet.</p></details>
+      <details><summary>Windows warned me about the installer. Is it safe?</summary><p>The installer isn't code-signed yet, so Windows shows "unknown publisher". Click More info → Run anyway. The source code it's built from is public.</p></details>
+      <details><summary>Is the AI always right?</summary><p>No. It can be confidently wrong, especially with a small local model. Cursiv checks numbers and sources and says when it can't know, but check anything important, especially health, money and legal questions.</p></details>
       <details><summary>Does it work on Mac or Linux?</summary><p>Not yet. The desktop app is Windows-only today. The phone app works on any phone.</p></details>
-      <details><summary>Is the AI always right?</summary><p>No. Like any AI, it can be confidently wrong. Treat answers as a strong starting point and check anything that matters, especially health, money and legal questions.</p></details>
-    </div>
-  </div>
-</section>
-
-<!-- ═══ FINAL CTA ═══ -->
-<section class="final">
-  <div class="wrap">
-    <span class="eyebrow">⬡ Cursiv</span>
-    <h2>Teach it who you are. Then hand it down.</h2>
-    <p class="lede">Free for Windows. Updates itself. Yours to keep.</p>
-    <div class="cta-row">
-      <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">⬇ Download Cursiv</a>
-      <a class="btn btn-ghost" href="/start">Read the plain-language guide</a>
     </div>
   </div>
 </section>
 </main>
 
-<!-- ═══ FOOTER ═══ -->
 <footer>
   <div class="wrap">
     <div class="foot">
-      <div>
-        <a class="brand" href="/"><img src="/assets/cursiv_256.png" alt=""> Cursiv</a>
-        <p class="tagline">The world's knowledge should not live in one place.</p>
-      </div>
-      <div>
-        <h4>Use</h4>
-        <ul>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download</a></li>
-          <li><a href="/app">Phone app</a></li>
-          <li><a href="/start">Start here guide</a></li>
-          <li><a href="/letters">Letters vault</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Learn</h4>
-        <ul>
-          <li><a href="/story">The story so far</a></li>
-          <li><a href="/vision">Vision &amp; roadmap</a></li>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/CHANGELOG.md">What's new</a></li>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/TECH.md">How it works</a></li>
-        </ul>
-      </div>
-      <div>
-        <h4>Project</h4>
-        <ul>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv">Source code</a></li>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv/releases">All releases</a></li>
-          <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/LICENSE">MIT license</a></li>
-          <li><a href="https://winklers-llc.com">Winkler's LLC</a></li>
-        </ul>
-      </div>
+      <div><a class="brand" href="/"><img src="/assets/cursiv_256.png" alt=""> Cursiv</a><p style="margin-top:10px;max-width:300px">Connectivity is optional. Trust is not.</p></div>
+      <div><h4>Use</h4><ul>
+        <li><a href="/start">Download and setup</a></li>
+        <li><a href="/app">Phone app</a></li>
+        <li><a href="/letters">Letters</a></li>
+      </ul></div>
+      <div><h4>Learn</h4><ul>
+        <li><a href="/vision">Direction</a></li>
+        <li><a href="/story">Development history</a></li>
+        <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/TECH.md">How it's built</a></li>
+        <li><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Truth benchmark</a></li>
+      </ul></div>
+      <div><h4>Project</h4><ul>
+        <li><a href="https://github.com/winklersllc2026-bit/Cursiv">Source code</a></li>
+        <li><a href="https://github.com/winklersllc2026-bit/Cursiv/releases">All releases</a></li>
+        <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/LICENSE">MIT license</a></li>
+      </ul></div>
     </div>
-    <div class="copy"><span>Built by Joshua Winkler · Winkler's LLC</span><span>Cursiv v3.14 · MIT License</span></div>
+    <div class="copy"><span>Built by Joshua Winkler</span><span>Cursiv v3.14 · MIT License</span></div>
   </div>
 </footer>
 
 <script>
 'use strict';
-// Mobile menu
 (() => {
   const btn = document.getElementById('menuBtn'), links = document.getElementById('navLinks');
   btn.addEventListener('click', () => {
@@ -694,34 +358,20 @@ footer { border-top: 1px solid var(--line); padding: 48px 0 36px; color: var(--m
   });
 })();
 
-// Reveal on scroll
-(() => {
-  const els = document.querySelectorAll('.reveal');
-  if (!('IntersectionObserver' in window)) { els.forEach(e => e.classList.add('in')); return; }
-  const io = new IntersectionObserver(entries => entries.forEach(en => {
-    if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); }
-  }), { threshold: .12 });
-  els.forEach(e => io.observe(e));
-})();
-
-// Web preview chat (public, rate-limited: /api/demo/chat)
+// Web preview chat (server-hosted, rate-limited: /api/demo/chat)
 (() => {
   const log = document.getElementById('chatLog'), form = document.getElementById('chatForm');
   const input = document.getElementById('chatIn'), send = document.getElementById('chatSend');
   const session = 'sess_' + Math.random().toString(36).slice(2, 10);
   let busy = false;
-
   function add(role, text) {
     const div = document.createElement('div');
     div.className = 'msg ' + (role === 'user' ? 'me' : 'ai');
-    if (role !== 'user') {
-      const who = document.createElement('div'); who.className = 'who'; who.textContent = 'Cursiv'; div.appendChild(who);
-    }
+    if (role !== 'user') { const who = document.createElement('span'); who.className = 'who'; who.textContent = 'Cursiv preview'; div.appendChild(who); }
     const body = document.createElement('span'); body.textContent = text; div.appendChild(body);
     log.appendChild(div); log.scrollTop = log.scrollHeight;
     return body;
   }
-
   async function ask(text) {
     if (!text || busy) return;
     busy = true; send.disabled = true;
@@ -732,8 +382,8 @@ footer { border-top: 1px solid var(--line); padding: 48px 0 36px; color: var(--m
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text, session_id: session }),
       });
-      if (res.status === 429) out.textContent = "That's the limit for this preview — download Cursiv for unlimited use.";
-      else if (!res.ok) out.textContent = "I couldn't reach the preview right now — please try again in a moment.";
+      if (res.status === 429) out.textContent = "That's the limit for this preview. The desktop app has no limit.";
+      else if (!res.ok) out.textContent = "I couldn't reach the preview right now. Please try again in a moment.";
       else { const data = await res.json(); out.textContent = data.reply || '…'; }
     } catch (e) {
       out.textContent = 'The preview is offline right now. The desktop app works without it.';
@@ -741,10 +391,9 @@ footer { border-top: 1px solid var(--line); padding: 48px 0 36px; color: var(--m
     log.scrollTop = log.scrollHeight;
     busy = false; send.disabled = false; input.focus();
   }
-
   form.addEventListener('submit', e => { e.preventDefault(); ask(input.value.trim()); });
   document.getElementById('suggest').addEventListener('click', e => {
-    if (e.target.tagName === 'BUTTON') { ask(e.target.textContent); document.getElementById('try').scrollIntoView({ behavior: 'smooth' }); }
+    if (e.target.tagName === 'BUTTON') ask(e.target.textContent);
   });
 })();
 </script>

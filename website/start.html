@@ -1,498 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-
-
-
-
-
-
-
-
-
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cursiv — Start Here</title>
-<meta name="description" content="New to Cursiv? A plain-language walkthrough: try the demo, see what it does, and get the free desktop app.">
-<meta property="og:title" content="Cursiv — Start Here">
-<meta property="og:description" content="A plain-language walkthrough of everything on this site.">
+<title>Cursiv — Download and setup</title>
+<meta name="description" content="Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.">
+<meta property="og:title" content="Cursiv — Download and setup">
+<meta property="og:description" content="Install Cursiv on Windows and run an AI model on your own computer.">
+<meta property="og:image" content="https://cursiv.winklers-llc.com/assets/og-image.png">
+<meta name="theme-color" content="#07090e">
 <link rel="icon" type="image/png" href="/assets/cursiv_256.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:      #08090C;
-  --bg2:     #0D0F15;
-  --bg3:     #111318;
-  --border:  #1A1D2E;
-  --border2: #252840;
-  --gold:    #C9A227;
-  --gold2:   #FFD700;
-  --gold-dim: rgba(201,162,39,0.14);
-  --gold-glow: rgba(201,162,39,0.28);
-  --silver:  #EDE8DC;
-  --silver2: #9A9480;
-  --silver3: #6B6F7A;
-  --green:   #27C97A;
-  --mono:    'JetBrains Mono', 'Cascadia Code', 'Consolas', monospace;
-  --serif:   'EB Garamond', Georgia, serif;
-}
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; }
-body {
-  background: var(--bg);
-  color: var(--silver);
-  font-family: var(--mono);
-  font-size: 15px;
-  line-height: 1.7;
-  min-height: 100vh;
-}
-::selection { background: var(--gold-dim); color: var(--silver); }
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--bg); }
-::-webkit-scrollbar-thumb { background: var(--border2); }
-
-a { color: var(--gold); }
-
-/* ══ NAV ══ */
-nav {
-  position: fixed; top: 0; inset-inline: 0; z-index: 100;
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 0 clamp(20px, 5vw, 40px); height: 56px;
-  background: rgba(8,9,12,0.85); backdrop-filter: blur(14px);
-  border-bottom: 1px solid var(--border);
-}
-.nav-logo { display: flex; align-items: center; gap: 9px; text-decoration: none; color: var(--gold); font-size: 12px; font-weight: 500; letter-spacing: 3px; }
-.nav-logo .hex { font-size: 18px; filter: drop-shadow(0 0 5px var(--gold)); }
-.nav-links { display: flex; align-items: center; gap: 24px; }
-.nav-links a { color: var(--silver2); text-decoration: none; font-size: 11px; letter-spacing: .6px; transition: color .2s; }
-.nav-links a:hover, .nav-links a.active { color: var(--gold); }
-@media (max-width: 640px) { .nav-links { display: none; } }
-
-/* ══ LAYOUT ══ */
-.wrap { max-width: 900px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 32px); }
-
-/* ══ HERO ══ */
-.hero {
-  padding: clamp(120px, 18vw, 160px) 0 60px;
-  text-align: center;
-}
-.eyebrow {
-  font-size: 11px; letter-spacing: 4px; color: var(--gold);
-  text-transform: uppercase; opacity: .85; margin-bottom: 14px;
-}
-.hero h1 {
-  font-family: var(--serif); font-weight: 600;
-  font-size: clamp(36px, 6vw, 56px); color: var(--silver);
-  letter-spacing: .3px; margin-bottom: 18px;
-}
-.hero p {
-  max-width: 620px; margin: 0 auto 34px;
-  color: var(--silver2); font-size: 16px; line-height: 1.75;
-}
-.hero-ctas { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
-.btn {
-  display: inline-block; text-decoration: none; font-family: var(--mono);
-  font-size: 13px; font-weight: 600; letter-spacing: .5px;
-  padding: 13px 28px; border-radius: 4px; transition: all .2s;
-}
-.btn-gold { background: var(--gold); color: #08090C; }
-.btn-gold:hover { background: var(--gold2); transform: translateY(-1px); }
-.btn-ghost { background: transparent; color: var(--silver); border: 1px solid var(--border2); }
-.btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
-
-/* ══ JUMP NAV ══ */
-.jumpnav {
-  display: flex; gap: 8px; flex-wrap: wrap; justify-content: center;
-  padding: 0 0 70px;
-}
-.jumpnav a {
-  text-decoration: none; color: var(--silver2); font-size: 11px;
-  letter-spacing: .5px; padding: 7px 14px;
-  border: 1px solid var(--border); border-radius: 20px;
-  transition: all .2s;
-}
-.jumpnav a:hover { border-color: var(--gold); color: var(--gold); }
-
-/* ══ SECTION SCAFFOLD ══ */
-section.block { padding: 10px 0 76px; scroll-margin-top: 76px; }
-.block-head { margin-bottom: 34px; }
-.block-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--gold); text-transform: uppercase; opacity: .8; margin-bottom: 8px; }
-.block-title { font-family: var(--serif); font-size: clamp(26px, 4vw, 34px); color: var(--silver); font-weight: 600; }
-.block-lede { color: var(--silver2); font-size: 14.5px; max-width: 620px; margin-top: 10px; line-height: 1.75; }
-
-hr.rule { border: none; border-top: 1px solid var(--border); margin: 0 0 76px; }
-
-/* ══ WHAT IS THIS — two-column ══ */
-.what-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
-@media (max-width: 720px) { .what-grid { grid-template-columns: 1fr; } }
-.what-card {
-  background: var(--bg2); border: 1px solid var(--border);
-  padding: 24px 26px; border-radius: 6px;
-}
-.what-card .tag { font-size: 10px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase; margin-bottom: 10px; }
-.what-card h3 { font-family: var(--serif); font-size: 19px; color: var(--silver); margin-bottom: 10px; font-weight: 600; }
-.what-card p { color: var(--silver2); font-size: 13.5px; line-height: 1.75; }
-
-/* ══ STEPPER ══ */
-.stepper { position: relative; }
-.step {
-  position: relative; display: grid; grid-template-columns: 44px 1fr;
-  gap: 20px; padding-bottom: 40px;
-}
-.step:last-child { padding-bottom: 0; }
-.step-node {
-  width: 44px; height: 44px; border-radius: 50%;
-  background: var(--bg2); border: 1px solid var(--gold);
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--serif); font-size: 17px; font-weight: 600; color: var(--gold);
-  z-index: 1; flex-shrink: 0;
-}
-.step:not(:last-child)::before {
-  content: ""; position: absolute; left: 21px; top: 44px; bottom: -0px;
-  width: 1px; background: linear-gradient(var(--border2), var(--border));
-}
-.step-body { padding-top: 6px; }
-.step-body h3 { font-family: var(--serif); font-size: 19px; color: var(--silver); margin-bottom: 8px; font-weight: 600; }
-.step-body p { color: var(--silver2); font-size: 13.5px; line-height: 1.75; margin-bottom: 10px; }
-.step-body .step-link { font-size: 12px; font-weight: 600; text-decoration: none; }
-.step-body .step-link::after { content: " →"; }
-.step-optional {
-  display: inline-block; font-size: 10px; letter-spacing: 1px; color: var(--silver3);
-  border: 1px solid var(--border2); padding: 2px 8px; border-radius: 3px;
-  margin-left: 10px; text-transform: uppercase; vertical-align: middle;
-}
-
-/* ══ SITE MAP GRID ══ */
-.map-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px; }
-.map-card {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-  padding: 20px 22px; transition: border-color .2s;
-}
-.map-card:hover { border-color: var(--border2); }
-.map-card .glyph { font-size: 20px; color: var(--gold); margin-bottom: 10px; display: block; }
-.map-card h4 { font-size: 13px; color: var(--silver); margin-bottom: 6px; letter-spacing: .3px; }
-.map-card h4 a { color: inherit; text-decoration: none; }
-.map-card h4 a:hover { color: var(--gold); }
-.map-card p { color: var(--silver2); font-size: 12.5px; line-height: 1.65; }
-
-/* ══ CHECKLIST ══ */
-.checklist { display: flex; flex-direction: column; gap: 14px; }
-.check-item {
-  display: grid; grid-template-columns: 22px 1fr; gap: 14px;
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 6px;
-  padding: 16px 18px;
-}
-.check-item .dot { color: var(--green); font-size: 15px; line-height: 1.5; }
-.check-item .label { color: var(--silver); font-size: 13.5px; margin-bottom: 3px; }
-.check-item .detail { color: var(--silver2); font-size: 12.5px; line-height: 1.65; }
-
-/* ══ FAQ ══ */
-details.faq {
-  border-bottom: 1px solid var(--border);
-  padding: 18px 0;
-}
-details.faq summary {
-  cursor: pointer; list-style: none; color: var(--silver);
-  font-size: 14px; font-weight: 500; display: flex; align-items: center;
-  justify-content: space-between; gap: 12px;
-}
-details.faq summary::-webkit-details-marker { display: none; }
-details.faq summary::after {
-  content: "+"; color: var(--gold); font-size: 18px; font-weight: 300;
-  transition: transform .2s; flex-shrink: 0;
-}
-details.faq[open] summary::after { transform: rotate(45deg); }
-details.faq .faq-a {
-  color: var(--silver2); font-size: 13.5px; line-height: 1.75;
-  padding-top: 12px; max-width: 640px;
-}
-
-/* ══ CLOSING CTA ══ */
-.closing {
-  background: var(--bg2); border: 1px solid var(--border); border-radius: 8px;
-  padding: 46px clamp(24px, 6vw, 60px); text-align: center; margin-bottom: 90px;
-}
-.closing h2 { font-family: var(--serif); font-size: clamp(24px, 3.5vw, 30px); color: var(--silver); margin-bottom: 12px; font-weight: 600; }
-.closing p { color: var(--silver2); font-size: 14px; margin-bottom: 26px; }
-
-footer.foot {
-  border-top: 1px solid var(--border); padding: 30px clamp(20px, 5vw, 32px) 50px;
-  text-align: center; color: var(--silver3); font-size: 11px;
-}
-footer.foot a { color: var(--silver3); text-decoration: none; }
-footer.foot a:hover { color: var(--gold); }
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 </head>
 <body>
 
-<nav>
-  <a class="nav-logo" href="/"><span class="hex">⬡</span> CURSIV</a>
-  <div class="nav-links">
-    <a href="/start" class="active">start here</a>
-    <a href="/chat">chat</a>
-    <a href="/profile">profile</a>
+<header class="nav">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv_256.png" alt=""> Cursiv</a>
+    <nav class="nav-links" style="display:flex">
+      <a href="/">← Home</a>
+    </nav>
   </div>
-</nav>
+</header>
 
-<div class="wrap">
-
-  <section class="hero">
-    <div class="eyebrow">New here?</div>
-    <h1>Start here.</h1>
-    <p>
-      Cursiv is two things: this website, where you can try a free live demo — and a
-      downloadable desktop app that runs a private AI entirely on your own computer.
-      Nothing below requires prior knowledge.
-    </p>
-    <div class="hero-ctas">
-      <a href="/#try" class="btn btn-gold">Try the Demo — No Account Needed</a>
-      <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe" class="btn btn-ghost">Download the App</a>
+<main>
+<section class="hero">
+  <div class="wrap grid2">
+    <div>
+      <span class="eyebrow">Download and setup</span>
+      <h1>Install Cursiv on Windows.</h1>
+      <p class="lede">About ten minutes, most of it downloading. You need internet once, for the downloads. After that, everyday use works without it.</p>
+      <div class="cta-row">
+        <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv-Setup.exe</a>
+        <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">Release notes</a>
+      </div>
+      <p class="fine">Latest release: v3.14-U61 · about 81 MB · from GitHub · MIT license</p>
     </div>
-  </section>
+    <dl class="facts" aria-label="Requirements">
+      <div><span class="k">System</span><span class="v">Windows 10 or 11, 64-bit</span></div>
+      <div><span class="k">Memory</span><span class="v">8 GB RAM (16 GB recommended)</span></div>
+      <div><span class="k">Disk</span><span class="v">About 4–8 GB free for Ollama and one model; more for extra models</span></div>
+      <div><span class="k">Graphics</span><span class="v">Optional. A 4 GB+ NVIDIA or AMD card makes answers much faster.</span></div>
+    </dl>
+  </div>
+</section>
 
-  <nav class="jumpnav">
-    <a href="#what">What This Is</a>
-    <a href="#steps">Getting Started</a>
-    <a href="#map">Map of the Site</a>
-    <a href="#desktop">The Desktop App</a>
-    <a href="#keys">Your Own API Keys</a>
-    <a href="#faq">FAQ</a>
-  </nav>
-
-  <!-- ══ WHAT THIS IS ══ -->
-  <section class="block" id="what">
-    <div class="block-head">
-      <div class="block-eyebrow">In Plain Language</div>
-      <div class="block-title">What This Actually Is</div>
+<section id="steps">
+  <div class="wrap grid2">
+    <div>
+      <div class="section-head"><span class="eyebrow">Steps</span><h2>From download to first answer.</h2></div>
+      <ol class="steps">
+        <li><div><b>Run the installer</b><span>Open <code>Cursiv-Setup-latest.exe</code>. The installer isn't code-signed yet, so Windows may say "Windows protected your PC": click <b>More info</b>, then <b>Run anyway</b>.</span></div></li>
+        <li><div><b>Create your login</b><span>Pick a username and password, and answer the security questions; they're how you reset a forgotten password. Both stay on this computer. Cursiv doesn't open without this login.</span></div></li>
+        <li><div><b>Let Setup install the local AI</b><span>The Setup window installs Ollama, the free engine that runs AI models on your computer, then downloads the model you pick (it suggests one for your graphics card). Progress bars show how far along it is.</span></div></li>
+        <li><div><b>Start asking</b><span>Type a question. Type <code>help</code> to see what Cursiv can do, and <code>offline on</code> if you want nothing to leave this computer.</span></div></li>
+      </ol>
     </div>
-    <div class="what-grid">
-      <div class="what-card">
-        <div class="tag">On This Website</div>
-        <h3>Try it first</h3>
-        <p>
-          A soft chat demo you can try without an account — no signup, no install. Everything
-          else — the community board, sealed family letters, and the rest of what Cursiv does —
-          lives in the free desktop app.
-        </p>
-      </div>
-      <div class="what-card">
-        <div class="tag">On Your Computer</div>
-        <h3>A private AI you own</h3>
-        <p>
-          The full desktop app runs an AI model directly on your machine — no subscription, no
-          cloud dependency, nothing you type sent anywhere unless you choose to add your own
-          API key. It works fully offline.
-        </p>
-      </div>
+    <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window: Ollama ready, AI model ready, optional coding and image models" width="950" height="888"><figcaption>The Setup window on a computer with everything installed.</figcaption></figure>
+  </div>
+</section>
+
+<section id="models">
+  <div class="wrap">
+    <div class="section-head">
+      <span class="eyebrow">Which model</span>
+      <h2>Setup suggests one for your graphics card.</h2>
     </div>
-  </section>
-
-  <hr class="rule">
-
-  <!-- ══ GETTING STARTED STEPPER ══ -->
-  <section class="block" id="steps">
-    <div class="block-head">
-      <div class="block-eyebrow">A Few Things To Try</div>
-      <div class="block-title">Getting Started</div>
-      <p class="block-lede">Roughly in order, but skip around — nothing here is sequential-only.</p>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Graphics memory</th><th>Model Setup offers</th><th>Download</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td><b>No GPU or under 4 GB</b></td><td><b>qwen2.5 1.5B</b></td><td>1 GB</td><td>Works on most PCs, slower and less capable.</td></tr>
+          <tr><td><b>4–6 GB</b></td><td><b>qwen3 4B Instruct</b></td><td>2.5 GB</td><td>The default. About 10–60 seconds per answer on a 4 GB card.</td></tr>
+          <tr><td><b>8 GB and up</b></td><td><b>llama3.1 8B</b></td><td>4.9 GB</td><td>Stronger answers on bigger cards.</td></tr>
+        </tbody>
+      </table>
     </div>
+    <p class="fine" style="margin-top:12px">Optional extras in Setup: a coding model and an image-reading model. Each model has its own license; see <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/MODELS.md">MODELS.md</a>.</p>
+  </div>
+</section>
 
-    <div class="stepper">
-      <div class="step">
-        <div class="step-node">1</div>
-        <div class="step-body">
-          <h3>Try the demo — no account needed</h3>
-          <p>Head to the homepage and talk to the soft demo chat. It's public, rate-limited, and doesn't ask you to sign up first.</p>
-          <a class="step-link" href="/#try">Try the demo</a>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-node">2</div>
-        <div class="step-body">
-          <h3>See what it can actually do</h3>
-          <p>The community board, sealed family letters, the 14-agent council, offline operation — the full feature list is on the homepage.</p>
-          <a class="step-link" href="/#features">See the features</a>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-node">3</div>
-        <div class="step-body">
-          <h3>Get the full desktop app <span class="step-optional">optional, but the real thing</span></h3>
-          <p>The website is a preview. The desktop app is where the real AI system lives — see "The Desktop App" below before you download, so you know what to expect.</p>
-          <a class="step-link" href="#desktop">What to expect</a>
-        </div>
-      </div>
-
-      <div class="step">
-        <div class="step-node">4</div>
-        <div class="step-body">
-          <h3>Add your own API keys <span class="step-optional">optional power-up</span></h3>
-          <p>Once you're in the desktop app, you can add your own xAI, OpenAI, or Anthropic key for larger cloud models — entirely optional, on top of the offline model that ships by default.</p>
-          <a class="step-link" href="#keys">How keys work</a>
-        </div>
-      </div>
+<section id="online">
+  <div class="wrap grid2">
+    <div class="stack">
+      <span class="eyebrow">Optional online extras</span>
+      <h2>Off unless you turn them on.</h2>
+      <p class="lede">You can add your own AI keys in ⚙ Settings: free Google Gemini or Groq keys, or paid OpenAI, Claude or xAI keys. Keys are encrypted for your Windows account.</p>
+      <ul class="checks net">
+        <li><span>When the local model can't answer (or for images), your message goes to the provider of a key you added.</span></li>
+        <li><span>Cursiv Cloud, a free backup on this website, is off by default.</span></li>
+        <li><span>Web search runs only for messages starting with <code>search:</code>.</span></li>
+        <li><span>Updates: tray icon → <b>Check for Updates</b>, or turn on automatic checks in Settings.</span></li>
+      </ul>
+      <p>Free keys: <a href="https://aistudio.google.com/apikey">Google Gemini</a> · <a href="https://console.groq.com/keys">Groq</a></p>
     </div>
-  </section>
+    <figure class="shot" style="margin:0"><img src="/assets/shots/settings.png" alt="Cursiv Settings: optional keys, Cursiv Cloud, offline mode, web search and update switches" width="975" height="710" loading="lazy"><figcaption>Settings: keys, and the switches that control what goes online.</figcaption></figure>
+  </div>
+</section>
 
-  <hr class="rule">
-
-  <!-- ══ SITE MAP ══ -->
-  <section class="block" id="map">
-    <div class="block-head">
-      <div class="block-eyebrow">Demystified</div>
-      <div class="block-title">A Map of This Site</div>
-      <p class="block-lede">What each page actually does, without the mythology.</p>
-    </div>
-    <div class="map-grid">
-      <div class="map-card">
-        <span class="glyph">⬡</span>
-        <h4><a href="/">Home</a></h4>
-        <p>The main page. What Cursiv does, a live demo chat, the full feature list, and links to everything else.</p>
-      </div>
-      <div class="map-card">
-        <span class="glyph">✎</span>
-        <h4><a href="/letters">Babel Letters</a></h4>
-        <p>A separate, curated vault of letters written by Cursiv's creator for specific people in his life. Most visitors will see it sealed — that's expected.</p>
-      </div>
-      <div class="map-card">
-        <span class="glyph">◉</span>
-        <h4><a href="/chat">Chat</a></h4>
-        <p>A chat client that talks to Ollama running on <em>your own</em> computer — only useful if you already have Ollama installed locally. The desktop app is the easier path.</p>
-      </div>
-      <div class="map-card">
-        <span class="glyph">⚙</span>
-        <h4><a href="/profile">Profile</a></h4>
-        <p>Settings and memory for the local Chat page above. The community board and sealed letters live in the desktop app, not here.</p>
-      </div>
-      <div class="map-card">
-        <span class="glyph">◈</span>
-        <h4><a href="/vision">The Vision</a></h4>
-        <p>Background on the project and where it's headed. Nothing to do — just read, if you're curious.</p>
-      </div>
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <!-- ══ DESKTOP APP ══ -->
-  <section class="block" id="desktop">
-    <div class="block-head">
-      <div class="block-eyebrow">Before You Download</div>
-      <div class="block-title">Installing the Desktop App</div>
-      <p class="block-lede">Setting real expectations, so nothing on install day is a surprise.</p>
-    </div>
-    <div class="checklist">
-      <div class="check-item">
-        <div class="dot">●</div>
-        <div>
-          <div class="label">Windows only, for now</div>
-          <div class="detail">64-bit Windows 10 or 11. ~6 GB free disk space minimum, 8 GB RAM minimum.</div>
-        </div>
-      </div>
-      <div class="check-item">
-        <div class="dot">●</div>
-        <div>
-          <div class="label">It downloads more after the installer finishes</div>
-          <div class="detail">The installer itself is a few hundred MB. After it finishes, it automatically downloads Ollama (~90 MB) and the llama3.1 AI model (~4.7 GB) — this is the biggest chunk, and it needs a real internet connection.</div>
-        </div>
-      </div>
-      <div class="check-item">
-        <div class="dot">●</div>
-        <div>
-          <div class="label">You'll see real terminal windows during setup</div>
-          <div class="detail">Each step (Git, Python, Ollama, the model, packages) opens its own titled window so you can watch progress. This is expected — it's not an error.</div>
-        </div>
-      </div>
-      <div class="check-item">
-        <div class="dot">●</div>
-        <div>
-          <div class="label">One optional prompt: "Download the Offline Code Council?"</div>
-          <div class="detail">You'll be asked [y/N] whether to also download two coding-specialist models (~18 GB total). Type N and press Enter to skip it — Cursiv works fully without it. Say Y only if you plan to use it for coding help and have the bandwidth/disk space to spare.</div>
-        </div>
-      </div>
-      <div class="check-item">
-        <div class="dot">●</div>
-        <div>
-          <div class="label">First launch</div>
-          <div class="detail">Double-click Cursiv on your desktop. First time in, you'll create a local username and password — stored only on your machine, never sent anywhere.</div>
-        </div>
-      </div>
-    </div>
-    <div style="margin-top: 28px; text-align: center;">
-      <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download the Installer</a>
-    </div>
-  </section>
-
-  <hr class="rule">
-
-  <!-- ══ API KEYS ══ -->
-  <section class="block" id="keys">
-    <div class="block-head">
-      <div class="block-eyebrow">Optional Power-Up</div>
-      <div class="block-title">Adding Your Own API Keys</div>
-    </div>
-    <p class="block-lede" style="margin-bottom: 0;">
-      Cursiv works fully offline out of the box, using llama3.1 running on your own machine
-      through Ollama. If you want access to larger cloud models, you can add your own key from
-      xAI, OpenAI, or Anthropic directly inside the desktop app's chat interface — this is a
-      desktop-app feature, not something you configure on this website. The system always tries
-      your local model first; a cloud key only gets used if you specifically ask for it, or if
-      the local model isn't available. No key, no problem — nothing is required to use Cursiv.
-    </p>
-  </section>
-
-  <hr class="rule">
-
-  <!-- ══ FAQ ══ -->
-  <section class="block" id="faq">
-    <div class="block-head">
-      <div class="block-eyebrow">Quick Answers</div>
-      <div class="block-title">Frequently Asked</div>
-    </div>
-
-    <details class="faq" open>
-      <summary>Do I need to install anything to use this website?</summary>
-      <div class="faq-a">No. The demo chat works straight from your browser. Only the Chat page (the one that talks to your own local Ollama) assumes you already have software running on your machine — everything else needs nothing installed.</div>
-    </details>
-
-    <details class="faq">
-      <summary>Is my data private?</summary>
-      <div class="faq-a">The demo chat on this website is a limited, rate-limited public preview. The desktop app is fully private by design: nothing you type there is sent anywhere unless you add your own API key. That's also where the community board and sealed family letters live.</div>
-    </details>
-
-    <details class="faq">
-      <summary>Why does the Chat page ask about Ollama and CORS?</summary>
-      <div class="faq-a">The Chat page on this website talks directly to an Ollama instance running on your own computer, not to a server. If you haven't installed Ollama yourself, that page won't do much — the desktop app is the much easier way to get a working local AI without dealing with any of that manually.</div>
-    </details>
-
-    <details class="faq">
-      <summary>Does the desktop app really work with no internet?</summary>
-      <div class="faq-a">Yes, once installed. It needs an internet connection during setup to download Ollama and the model. After that, day-to-day use works fully offline — nothing you type is sent anywhere unless you've added a cloud API key yourself.</div>
-    </details>
-  </section>
-
-  <div class="closing">
-    <h2>Ready when you are.</h2>
-    <p>Pick any of the above — nothing here has a wrong order.</p>
-    <div class="hero-ctas">
-      <a href="/#try" class="btn btn-gold">Try the Demo</a>
-      <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe" class="btn btn-ghost">Download the App</a>
-      <a href="/" class="btn btn-ghost">Back to Home</a>
+<section id="faq">
+  <div class="wrap">
+    <div class="section-head"><span class="eyebrow">Help</span><h2>Common questions.</h2></div>
+    <div class="faq">
+      <details><summary>Where is my data kept?</summary><p>In a <code>.cursiv</code> folder in your Windows user folder and in Cursiv's program folder: ordinary files. ⚙ Settings has an "Open folder" button. Saved AI keys are encrypted; conversations and memories aren't encrypted on disk.</p></details>
+      <details><summary>How do I update?</summary><p>Right-click the Cursiv icon in the Windows tray (by the clock) and choose <b>Check for Updates</b>. If a newer version exists, Cursiv downloads its installer from GitHub and runs it. Your data is kept.</p></details>
+      <details><summary>Can I run it from a USB drive?</summary><p>Yes: tray icon → <b>Make a Cursiv USB…</b> copies Cursiv, Ollama and your models to a 64 GB+ exFAT drive. Leave "Include my memories, keys and settings" unticked for a copy you give to someone else.</p></details>
+      <details><summary>How do I uninstall?</summary><p>Windows Settings → Apps → Cursiv → Uninstall. Ollama and its models are separate; uninstall Ollama the same way to remove them.</p></details>
+      <details><summary>Something went wrong.</summary><p>Use tray icon → <b>Send problem report…</b> (it shows you what will be sent before sending), or open an issue on <a href="https://github.com/winklersllc2026-bit/Cursiv/issues">GitHub</a>.</p></details>
     </div>
   </div>
+</section>
+</main>
 
-</div>
-
-<footer class="foot">
-  <a href="/">⬡ cursiv</a> &nbsp;·&nbsp;
-  <a href="/chat">chat</a> &nbsp;·&nbsp;
-  <a href="https://github.com/winklersllc2026-bit/Cursiv">source</a>
+<footer>
+  <div class="wrap">
+    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a> · <a href="/vision">Direction</a></span><span>MIT License</span></div>
+  </div>
 </footer>
-
 </body>
 </html>
