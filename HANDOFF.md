@@ -200,3 +200,10 @@ Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks 
 - Model: `speed.chat_model_prefs()` is the same on every card (qwen3:4b-instruct first); `DEEP_THINK_OFFERED = False` (`CURSIV_DEEP_THINK=1` for the benchmark). Evidence: `bench/MODEL-COMPARISON.md`.
 - `chat()`: a vague first message gets `clarify.question()` without the model (`_CURSIV_REPLY` skips the check). `verify.parse_verdict` treats all-"X: none" replies as clear; `citation_problems` skips "I don't have a ..." sentences.
 - Website screenshots: `scripts/site_shots.py ask|draw|windows` (real answers saved in `website/assets/shots/answers.json`).
+
+## Field science (after U65): research roadmap R1, R2, R5
+
+Roadmap: `docs/RESEARCH-ROADMAP.md`.
+- R1 `core/fieldlog.py` (append-only JSONL with fsync, SHA-256 chain `prev`/`hash`, `correct()` adds an entry, `verify()`, `export()` CSV/JSON/GeoJSON, `parse()`/`command()` for `log ...`); window `launcher/field_notebook.py`, first sidebar button. The AI never writes the log.
+- R2 `core/fieldcalc.py` (units, DMS/decimal, `to_utm` Snyder series tested against a Kruger series, dilution, stats with a t table); `calc.work_out` falls through to it; `calc.Worked.value/tol` checks with rounding allowed. Suite 1.3 (field cases num-019..026) is parked in the scratchpad until the U65 1.2 run finishes; add it then with its SUITE.md entry.
+- R5 `core/atomic.write_text` (temp file, fsync, os.replace) for settings, keys, memories, conversations; battery saver in `speed.battery_saver()` / `keep_alive()` / `num_ctx()`, skips the model check in `chat()`; `scripts/hardware_check.py` writes docs/HARDWARE.md.
