@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.14-U72 — Mac (early) and a tidier USB (2026-10-18)
+- **Cursiv for Mac, early:** a `.dmg` for Apple Silicon Macs (M1 or newer, macOS 12+), built and tested on Apple hardware at GitHub: the full test suite and a self-test of the built app. Setup installs Ollama into your Applications folder without an admin password. Saved AI keys go into the macOS Keychain; settings and memories live in ~/Library/Application Support/Cursiv. Not signed by Apple yet (first open: System Settings → Privacy & Security → Open Anyway), and not yet used by anyone on their own Mac. The USB drive stays Windows-only.
+- **USB drive:** the top of the drive shows only `Start Cursiv.bat`, a start-here `README.txt` and the folders; the drive icon lives in the Cursiv folder. The README covers the first run, what to try, what each folder holds, and how to remove the accounts.
+- **One model:** Setup and Cursiv USBs offer only qwen3 4B, the model Cursiv has tested. Models already installed still work.
+- `Cursiv --selftest` checks that every part loads and works, without the AI model. The Windows app now finds its own icons (the tray showed a placeholder). The automatic tests run on Windows and macOS, and install the app's own package list.
+
 ## v3.14-U71 — Field work first (2026-10-18)
 - **Research profile by default.** `help`, Tools, the welcome card and the empty chat lead with field work: the notebook, reports, documents, calculations, LOCAL ONLY and the demo (`help field`, `help documents`). Family letters, the legacy vault, the phone app, coding help, the council, agents and builder tools are hidden unless Settings → Appearance → **Show personal features** is on; their commands still work if typed.
 - **When the AI engine is down**, Cursiv says so and gives what it has without it: its own calculation, the reference card (with 911 for emergencies), and the matching pages of your documents, plus how to restart the engine. The source line says "Written by Cursiv, no AI model". It no longer claims "Answered by Ollama" over an error.
