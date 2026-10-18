@@ -16,7 +16,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v=u64-2">
 </head>
 <body>
 
@@ -47,50 +47,81 @@
         its answers before giving them. Online AI services are optional extras you turn on, not a requirement.</p>
       <p class="principle">Connectivity is optional. Trust is not.</p>
       <div class="cta-row">
-        <a class="btn btn-gold" href="/start">Download for Windows</a>
-        <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv">View the source on GitHub</a>
+        <a class="btn btn-gold" href="#tour">Take the 5-minute tour</a>
+        <a class="btn btn-ghost" href="/start">Download for Windows</a>
       </div>
       <p class="fine">Free · MIT license · Windows 10/11 (64-bit) · Active development</p>
     </div>
     <dl class="facts" aria-label="Current release">
       <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">v3.14-U64</a> (October 2026)</span></div>
       <div><span class="k">Runs on</span><span class="v">Your PC, through <a href="https://ollama.com">Ollama</a> (a free local model runner)</span></div>
-      <div><span class="k">Default model</span><span class="v">qwen3 4B Instruct on 4–6 GB graphics cards; llama3.1 8B on 8 GB+</span></div>
+      <div><span class="k">Default model</span><span class="v">qwen3 4B Instruct (Apache 2.0), chosen by side-by-side tests</span></div>
       <div><span class="k">Needs internet</span><span class="v">Once, to download Ollama and a model. Not for everyday use.</span></div>
       <div><span class="k">Status</span><span class="v">In active development and testing. Not certified for medical, safety-critical or spaceflight use.</span></div>
     </dl>
   </div>
 </section>
 
-<!-- What it is today -->
-<section id="today">
+<!-- Five-minute tour -->
+<section id="tour">
   <div class="wrap">
     <div class="section-head">
-      <span class="eyebrow">What Cursiv is today</span>
-      <h2>A desktop AI that works on your own computer.</h2>
-      <p class="lede">The current product is a Windows app for individuals and families. The engineering focus right now is
-        making its answers reliable and measurable, before anything larger is built on top of it.</p>
+      <span class="eyebrow">Cursiv in five minutes</span>
+      <h2>Six things it does, shown on real answers.</h2>
+      <p class="lede">Each screen below is an unedited answer from the current release, running offline on a laptop with a
+        4 GB graphics card. Nothing was typed in afterwards.</p>
     </div>
-    <div class="cards">
-      <article class="card"><h3>Local model first</h3><p>Every message goes to the model on your computer first. AI keys you add (Gemini, Groq, OpenAI, Claude, xAI) are only fallbacks, and every reply says which model answered.</p></article>
-      <article class="card"><h3>Answers that show their basis</h3><p>Complex answers end with what was <b>known</b>, <b>inferred</b>, <b>assumed</b> and <b>unknown</b>. Numbers and named sources are checked after the draft, and Cursiv says when it can't know something.</p></article>
-      <article class="card"><h3>Offline reference</h3><p>A small built-in reference (survival, first aid, science). When a question matches an entry, the entry is shown word for word above the answer, with its ID.</p></article>
-      <article class="card"><h3>Memory with an origin</h3><p>Each remembered fact is tagged with where it came from (you said it, or Cursiv inferred it) and when. Conflicting memories are both shown; no memory can override safety rules.</p></article>
-      <article class="card"><h3>Offline mode</h3><p>One switch blocks every connection off the computer and stays on after a restart. Your local model, memory and reference keep working.</p></article>
-      <article class="card"><h3>Your data stays yours</h3><p>Conversations and memories are ordinary files on your PC. Saved AI keys are encrypted for your Windows account. There is no telemetry.</p></article>
-    </div>
+    <ol class="tour">
+      <li>
+        <div class="tour-text"><span class="step">1</span><h3>Works offline, and shows its source</h3>
+          <p>The green pill says <b>Offline mode</b>: Cursiv makes no internet connections. For a survival or first-aid
+            question, the reference entry it's using is shown word for word above the answer, with where it comes from
+            (here, the U.S. EPA) and when that was last checked.</p></div>
+        <figure class="shot"><a href="/assets/shots/water.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/water.png" alt="Cursiv in offline mode answering how to purify creek water, with the EPA-based reference entry shown above a numbered answer" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+      <li>
+        <div class="tour-text"><span class="step">2</span><h3>Emergencies come first</h3>
+          <p>A medical emergency gets "call 911" before anything else, then the few steps that matter, from the reference
+            card. If an answer ever contradicts the card, Cursiv flags it under the answer.</p></div>
+        <figure class="shot"><a href="/assets/shots/bleeding.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/bleeding.png" alt="Cursiv answering a bleeding emergency with a call-911 notice, the bleeding-control reference card and numbered first-aid steps" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+      <li>
+        <div class="tour-text"><span class="step">3</span><h3>Says "I don't know" instead of inventing</h3>
+          <p>Asked about a study that doesn't exist, or something it can't know, it says so plainly. It doesn't make up a
+            summary or claim to have searched a database.</p></div>
+        <figure class="shot"><a href="/assets/shots/unknown.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/unknown.png" alt="Cursiv saying it doesn't know about a made-up study and can't know a neighbor's name" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+      <li>
+        <div class="tour-text"><span class="step">4</span><h3>Exact numbers and exact formats</h3>
+          <p>Clock times and sums are worked out by Cursiv itself, not guessed by the model. Ask for exactly four steps,
+            one sentence each, and that's what you get.</p></div>
+        <figure class="shot"><a href="/assets/shots/math.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/math.png" alt="Cursiv working out a bedtime exactly and giving exactly four one-sentence steps" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+      <li>
+        <div class="tour-text"><span class="step">5</span><h3>Notes that come back</h3>
+          <p>Say "remember …" and Cursiv keeps it on the computer, marked as something you said, with the date. It's still
+            there after a restart; an automated test checks that on every change.</p></div>
+        <figure class="shot"><a href="/assets/shots/memory.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/memory.png" alt="Cursiv saving a field note and answering from it" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+      <li>
+        <div class="tour-text"><span class="step">6</span><h3>Asks when a question is unclear</h3>
+          <p>"Is it safe?" with nothing to say what "it" is gets a short question back, not a guess. (Shown in dark mode;
+            Cursiv can follow Windows' light or dark setting.)</p></div>
+        <figure class="shot"><a href="/assets/shots/dark.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/dark.png" alt="Cursiv in dark mode asking what 'it' refers to" width="1475" height="1025" loading="lazy"></a></figure>
+      </li>
+    </ol>
+    <p class="fine" style="margin-top:10px">Recorded with <code>scripts/site_shots.py</code>: the questions run through Cursiv on a fresh,
+      offline copy and the replies are saved unedited in
+      <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/website/assets/shots/answers.json">answers.json</a>, with the release and date.</p>
   </div>
 </section>
 
 <!-- Capabilities with status -->
 <section id="capabilities">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Capabilities and evidence</span>
-      <h2>What's implemented, and how it's been tested.</h2>
-      <p class="lede">Each capability is labeled by the evidence behind it, not by how good it sounds.</p>
-    </div>
-    <div class="legend">
+    <details class="more">
+      <summary><span><span class="eyebrow">Capabilities and evidence</span><br><b>Every feature, and the evidence behind it</b></span></summary>
+      <div class="legend">
       <span><span class="badge b-tested">Tested</span> automated tests plus a live check on a real model</span>
       <span><span class="badge b-partial">Partly validated</span> tested in parts; a full demonstration is still to come</span>
       <span><span class="badge b-impl">Implemented</span> working, with limited or no automated testing</span>
@@ -104,18 +135,20 @@
           <tr><td><b>No connections off the computer on a fresh install</b> (default settings, no keys)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Chat turns with "this week" / "right now": zero outside connections, recorded by a socket-level audit (<code>scripts/net_audit.py</code>). App start-up watched for 30 s: none. Packet-level capture not done yet.</td></tr>
           <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Unit tests and a live chat-turn audit with offline mode on: zero outside connections. The full feature-by-feature offline demonstration (<code>scripts/offline_demo.py</code>) is written and still to be run.</td></tr>
           <tr><td><b>Answer checking</b> (numbers, named sources, assumptions, one rewrite)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Rule-based checks are unit-tested. How much it improves real answers is what the truth benchmark is now measuring.</td></tr>
-          <tr><td><b>Offline reference in chat</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Retrieval is unit-tested; first-aid and survival entries are shown word for word. The entries were written for Cursiv and <b>not reviewed by a medical professional</b>; three are held back until reviewed.</td></tr>
-          <tr><td><b>Memory with origin, date and conflict notes</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests; memory survived a restart in a live run.</td></tr>
+          <tr><td><b>Offline reference in chat</b> (112 entries)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>37 entries are written from named public-domain U.S. government sources (CDC, NIOSH, EPA, National Weather Service, National Park Service, FEMA), each showing its source and check date; the rest say they have no published source yet. <b>None has been reviewed by a medical professional yet.</b> Every entry is listed with its source in <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/docs/REFERENCE.md">REFERENCE.md</a>.</td></tr>
+          <tr><td><b>Memory with origin, date and conflict notes</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests, and an automated test that a saved note and offline mode survive a restart. Things Cursiv picks up from conversations are always marked as guesses.</td></tr>
           <tr><td><b>Saved AI keys encrypted</b> (Windows DPAPI)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests. Memories and conversations are not encrypted on disk.</td></tr>
           <tr><td><b>Local login</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fails closed; new accounts need an existing login. A lock on the front door, not disk encryption.</td></tr>
-          <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests. Each drive carries a Licenses folder for Cursiv, Ollama and every model on it (next release).</td></tr>
-          <tr><td><b>Truth benchmark</b> (116 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>First baseline run on U61: 110 of 116 passed. Every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests; each drive carries a Licenses folder for Cursiv, Ollama and every model on it. A "field copy" starts in offline mode. Not yet tried end to end on a second, clean PC.</td></tr>
+          <tr><td><b>Truth benchmark</b> (125 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Run on every release; every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Exact arithmetic and clock times</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Worked out in code and given to the model; an answer that disagrees gets a note. Unit tests and a live check.</td></tr>
           <tr><td><b>Supporting tools:</b> coding help, sealed family letters, phone link, agents, plugins, LoRA training</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>Working features, outside the benchmark's scope for now.</td></tr>
           <tr><td><b>Structured observations, provenance ledger</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Records that keep "what was observed" separate from "what the AI inferred".</td></tr>
-          <tr><td><b>Multiple nodes, synchronization, Mission Hub</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Only after the single-computer system is shown to be reliable. See <a href="/vision">Direction</a>.</td></tr>
+          <tr><td><b>Several Cursiv computers sharing approved knowledge</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Only after the single-computer system is shown to be reliable. See <a href="/vision">Direction</a>.</td></tr>
         </tbody>
       </table>
     </div>
+    </details>
   </div>
 </section>
 
@@ -127,33 +160,36 @@
       <h2>Measured, not assumed.</h2>
       <p class="lede">The Cursiv Truth Benchmark asks the same fixed questions on every release and scores the answers with code, not with another AI.</p>
       <ul class="checks">
-        <li><span><b>116 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
+        <li><span><b>125 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
         <li><span><b>Scored by fixed rules:</b> the right answer or number, invented details, admitting "I can't know", asking when the question is unclear, using the right reference entry.</span></li>
         <li><span><b>Run clean:</b> a fresh copy, no keys, no memories, offline mode on.</span></li>
-        <li><span><b>Frozen:</b> the questions and checks are versioned (suite 1.0) and can't be changed to improve a score.</span></li>
+        <li><span><b>Frozen:</b> the questions and checks are versioned (now suite 1.2). A check is only changed when it was wrong, the change is written down, and earlier releases are scored again on the new version.</span></li>
       </ul>
       <p><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Read the cases, scoring and rules →</a></p>
     </div>
     <div class="card" id="results">
-      <h3>First baseline: release U61</h3>
-      <p class="fine" style="margin-top:4px">Suite 1.0 · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · 17 Oct 2026</p>
+      <h3>Latest results: suite 1.2</h3>
+      <p class="fine" style="margin-top:4px">Same 125 questions, same scoring · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · 18 Oct 2026</p>
       <div class="table-wrap" style="margin-top:14px">
         <table class="table">
+          <thead><tr><th></th><th>U61</th><th>U63</th></tr></thead>
           <tbody>
-            <tr><td><b>Passed overall</b></td><td>110 of 116 (94.8%)</td></tr>
-            <tr><td><b>Accuracy</b> (answerable questions)</td><td>91.7%</td></tr>
-            <tr><td><b>Unsupported claims</b></td><td>2.6% of answers</td></tr>
-            <tr><td><b>Said "I can't know" when it couldn't</b></td><td>100% (19 cases)</td></tr>
-            <tr><td><b>False premises and traps</b></td><td>100% (16 cases)</td></tr>
-            <tr><td><b>Safety questions</b></td><td>100% (8 cases)</td></tr>
+            <tr><td><b>Passed overall</b></td><td>114 of 125 (91.2%)</td><td>119 of 125 (95.2%)</td></tr>
+            <tr><td><b>Accuracy</b> (answerable questions)</td><td>89.7%</td><td>94.9%</td></tr>
+            <tr><td><b>Safety questions</b></td><td>90%</td><td>100%</td></tr>
+            <tr><td><b>Unsupported claims</b></td><td>0.8% of answers</td><td>0.8% of answers</td></tr>
+            <tr><td><b>Average answer time</b></td><td>32 s</td><td>25 s</td></tr>
           </tbody>
         </table>
       </div>
-      <p style="margin-top:12px">Of the 6 failures, 2 were real (a bedtime calculation, and a missed reference entry followed by a wrong claim)
-        and 4 were the benchmark's own checks being too strict. The published score stays as run.
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U61.md">Every failure and its cause →</a></p>
-      <p class="fine" style="margin-top:10px">This first suite is too easy at the top to separate future releases well; a harder version (1.1) is next.
-        Scores are only compared within the same suite version.</p>
+      <p style="margin-top:12px">Of U63's 6 failures, 3 were real: a bedtime calculation, mixing up two bleach doses, and answering
+        "Is it safe?" without asking what "it" was. U64 adds fixes for all three (exact arithmetic in code, a dose check against
+        the reference card, a clarifying question). The other 3 were the benchmark's own checks being too strict; they're fixed in
+        the next suite version, never in the scored one.
+        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U63-pre.md">Every failure and its cause →</a></p>
+      <p class="fine" style="margin-top:10px">The first published baseline (U61 on suite 1.0, 110 of 116) stays as run. Reading those answers
+        later showed some checks were too lenient and some too strict; suite 1.2 corrects both, and both releases were rescored
+        from their saved answers. <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/SUITE.md">What changed in each suite →</a></p>
     </div>
   </div>
 </section>
@@ -161,12 +197,10 @@
 <!-- Architecture -->
 <section id="architecture">
   <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Architecture</span>
-      <h2>How a question is answered today.</h2>
-      <p class="lede">Everything inside the gold boxes runs on your computer. Dashed boxes are optional and only used if you turn them on.</p>
-    </div>
-    <div class="arch" aria-label="Cursiv architecture diagram">
+    <details class="more">
+      <summary><span><span class="eyebrow">Architecture</span><br><b>How a question is answered</b></span></summary>
+      <p class="lede" style="margin:6px 0 14px">Everything inside the gold boxes runs on your computer. Dashed boxes are optional and only used if you turn them on.</p>
+      <div class="arch" aria-label="Cursiv architecture diagram">
       <div class="row"><div class="box"><b>Desktop app</b><span>Windows window (PyQt). Local login. Settings and offline switch.</span></div></div>
       <div class="arrow">▼</div>
       <div class="row r4">
@@ -190,21 +224,8 @@
       <p>Structured observations and a provenance record, then several Cursiv computers working together with or without a connection, then a local hub.
         Each step depends on the one below it being reliable first. <a href="/vision">Read the direction →</a></p>
     </div>
-  </div>
-</section>
-
-<!-- Screenshots -->
-<section id="screens">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">The app</span>
-      <h2>Real screens from the current version.</h2>
-    </div>
-    <figure class="shot" style="margin:0 0 14px 0"><img src="/assets/shots/app-light.png" alt="Cursiv main window in light mode answering how to purify creek water, with the offline reference entry shown above the answer and a Local only status" loading="lazy" width="1200" height="780"><figcaption>An actual answer from the U61 benchmark run, shown in the new window (light mode). The grey box is the offline reference entry; the green pill says nothing is going online.</figcaption></figure>
-    <div class="cards two">
-      <figure class="shot" style="margin:0"><img src="/assets/shots/settings-light.png" alt="Cursiv Settings window: Privacy and internet section with offline mode, automatic web search and Cursiv Cloud, each explained" loading="lazy" width="1125" height="750"><figcaption>Settings: every switch says what it does.</figcaption></figure>
-      <figure class="shot" style="margin:0"><img src="/assets/shots/app-dark.png" alt="The same Cursiv window in dark mode" loading="lazy" width="1200" height="780"><figcaption>The same window in dark mode. Light, dark, or match Windows.</figcaption></figure>
-    </div>
+  
+    </details>
   </div>
 </section>
 
@@ -250,11 +271,11 @@
     </div>
     <div class="cards">
       <div class="card"><h3>Small local models make mistakes</h3><p>A 4B model running on a home PC can be confidently wrong. The answer check catches some errors, not all. Check anything that matters.</p></div>
-      <div class="card"><h3>Not a medical or safety system</h3><p>The first-aid reference was written for Cursiv and hasn't been reviewed by a medical professional. In an emergency, call emergency services.</p></div>
+      <div class="card"><h3>Not a medical or safety system</h3><p>About a third of the reference is written from public U.S. government guidance; the rest has no published source yet. None of it has been reviewed by a medical professional. In an emergency, call emergency services.</p></div>
       <div class="card"><h3>Not certified</h3><p>Cursiv is not certified for medical, safety-critical, aerospace or spaceflight use. Those would need independent evaluation and validation.</p></div>
       <div class="card"><h3>Disk encryption</h3><p>The login keeps people at the keyboard out; it doesn't encrypt memories or conversations on disk. Saved AI keys are encrypted.</p></div>
       <div class="card"><h3>Windows only, unsigned</h3><p>No Mac or Linux desktop version yet. The installer isn't code-signed, so Windows warns about an unknown publisher.</p></div>
-      <div class="card"><h3>Speed depends on hardware</h3><p>On a 4 GB graphics card a typical answer takes 10–60 seconds. Without a GPU it's slower.</p></div>
+      <div class="card"><h3>Speed depends on hardware</h3><p>On a laptop with a 4 GB graphics card, a typical everyday answer takes 5–30 seconds (benchmark average: 25 s on U63, before U64 roughly doubled the speed); Deep Think takes a minute or two. Without a graphics card it's slower.</p></div>
     </div>
   </div>
 </section>

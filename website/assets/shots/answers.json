@@ -1,0 +1,64 @@
+{
+  "commit": "ec0b105",
+  "date": "2026-10-18",
+  "offline": true,
+  "conversations": {
+    "water": [
+      {
+        "ask": "How do I purify creek water so it's safe to drink?",
+        "reply": "*(From Cursiv's offline reference, water purification [survival/water-purification]: FIRST: boiling and bleach kill germs but do NOT remove chemicals, fuel, salts or heavy metals. If the water may have those (floodwater, near fields, roads, mines or spills), find another source. CLOUDY WATER: let it settle, then filter it through a clean cloth, paper towel or coffee filter before treating. BOILING (most reliable): a rolling boil for at least 1 minute; above 5,000 feet (about 1,500 m) boil for 3 minutes. Let it cool and store it covered. BLEACH (if you can't boil): only regular, unscented chlorine bleach labeled for disinfection, 6% or 8.25% sodium hypochlorite; never scented, color-safe or bleach with added cleaners. Per 1 liter or quart: 2 drops (6% or 8.25%). Per gallon: 8 drops of 6% or 6 drops of 8.25%. DOUBLE the dose if the water is cloudy, colored or very cold. Stir and wait 30 minutes; it should smell slightly of chlorine. If it doesn't, repeat the dose and wait 15 more minutes. Don't use water with floating material, a dark color or a strange smell. Tablets or iodine: follow the label. Questions: EPA Safe Drinking Water Hotline 1-800-426-4791. Based on U.S. EPA, Emergency Disinfection of Drinking Water (checked 2026-10-18).)*\n\n1. Let the water sit for 30 minutes to let particles settle, especially if it's cloudy. (offline reference: survival/water-purification)\n\n2. Filter the water through a clean cloth, paper towel, or coffee filter to remove sediment. (offline reference: survival/water-purification)\n\n3. Boil the water for at least 1 minute (or 3 minutes if you're at elevation over 5,000 feet). This kills germs. (offline reference: survival/water-purification)\n\n4. Store the boiled water in a clean, covered container to keep it safe. (offline reference: survival/water-purification)\n\n⚠️ Important: Boiling and filtering kill germs but do NOT remove chemicals, heavy metals, fuel, or salts. If the creek water came from near roads, fields, mines, or spills, it may have harmful chemicals. In that case, don't drink it—find another safe water source. (offline reference: survival/water-purification)\n\nIf you're unsure, contact the EPA Safe Drinking Water Hotline at 1-800-426-4791.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      }
+    ],
+    "bleeding": [
+      {
+        "ask": "My son cut his leg and it's bleeding badly.",
+        "reply": "**If this is a medical emergency, call 911 (or your local emergency number) now.** For a poisoning, US Poison Control is **1-800-222-1222**.\n\n*(From Cursiv's offline reference, severe bleeding control [medical/severe-bleeding-control]: 1) Call 911 now, or have someone call, and follow the dispatcher's instructions. 2) Press firmly and steadily on the wound with both hands, using a clean cloth, gauze or bandage if you have one (bare hands if not). Keep pressing; don't lift to check. 3) If the cloth soaks through, don't remove it: add more on top and keep pressing. For a deep wound, pack gauze or clean cloth firmly into it and keep pressing. 4) For an arm or leg that keeps bleeding despite pressure, use a tourniquet (a commercial one if you have it): 2-3 inches above the wound, toward the body, not over a joint, tightened until the bleeding stops. Note the time and leave it on until medical help takes over. Thin cords, shoelaces, chargers or wire don't work as tourniquets. 5) Keep the person lying down and warm. A hands-on Stop the Bleed class is the best preparation. Based on Stop the Bleed course guidance (American College of Surgeons program), as published by course hosts (checked 2026-10-18). Not reviewed by a medical professional; in an emergency call 911.)*\n\nCall 911 now if you haven't already. (offline reference: medical/severe-bleeding-control)\n\nWhile waiting for help, press firmly and steadily on the wound with both hands. Use a clean cloth, gauze, or bandage if you have one — if not, use your bare hands. Keep pressing without lifting to check if it's stopping. If the cloth soaks through, don’t remove it — just add more on top and keep pressing. For a deep wound, pack gauze or clean cloth firmly into it and keep pressing.\n\nIf the bleeding continues and the leg is still bleeding despite pressure, you can use a tourniquet (like a commercial one) 2–3 inches above the wound, toward the body — not over a joint. Tighten it until the bleeding stops. Note the time and leave it on until medical help arrives. Do not use thin cords, shoelaces, chargers, or wire — they won’t work.\n\nKeep your son lying down and warm. Do not move him unless necessary.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      }
+    ],
+    "unknown": [
+      {
+        "ask": "What did Dr. Harold Finchley's 1987 study on cattle and creek bacteria find?",
+        "reply": "I don't know of any study by Dr. Harold Finchley from 1987 on cattle and creek bacteria. There is no record or credible source that matches this detail. It's possible the name or study is fictional or confused with another.\n\nIf you have more context—like where you heard this or what field it's from—I’d be happy to help clarify.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      },
+      {
+        "ask": "What's my neighbor's name?",
+        "reply": "I don’t know your neighbor’s name. That information isn’t stored or accessible to me. If you’d like, you can tell me and I can help you remember it or keep it in your personal notes. But I can’t access or recall names of people I haven’t been told about.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      }
+    ],
+    "math": [
+      {
+        "ask": "I have to wake up at 6:00 AM, I want 8 hours of sleep, and it takes me 30 minutes to fall asleep. What time should I get in bed?",
+        "reply": "You should get in bed at 9:30 PM.\n\nHere’s why:  \n- You need 8 hours of sleep to wake up at 6:00 AM.  \n- It takes you 30 minutes to fall asleep, so you need to be in bed 30 minutes before your actual sleep time starts.  \n- 8 hours before 6:00 AM is 10:00 PM.  \n- Since it takes 30 minutes to fall asleep, you need to be in bed 30 minutes before 10:00 PM, which is 9:30 PM.\n\nKnown:  \n- Wake time: 6:00 AM  \n- Sleep duration: 8 hours  \n- Time to fall asleep: 30 minutes  \n\nInferred:  \n- Bedtime is 30 minutes before the start of actual sleep (which begins at 10:00 PM)  \n\nAssumed:  \n- You don’t have any nighttime interruptions or irregular sleep patterns  \n\nUnknown:  \n- Whether your sleep schedule changes due to daily activities or environment (e.g., work, stress, screen use)  \n- Whether you fall asleep consistently in 30 minutes — if not, the bedtime might need adjustment  \n- Whether you wake up at exactly 6:00 AM (if not, the calculation changes)  \n\nBut based on your stated needs, 9:30 PM is correct.\n\n*[Answered by Ollama · qwen3:4b-instruct]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- Assumed: You don’t have any nighttime interruptions or irregular sleep patterns → **presented as a fact in the draft answer",
+        "kind": "chat"
+      },
+      {
+        "ask": "Give me exactly 4 steps to check a well pump that stopped working, one sentence each.",
+        "reply": "1. Turn off the power to the well pump at the circuit breaker to avoid electrical shock.  \n2. Locate the well pump and check if it is physically damaged or leaking water or fluid.  \n3. Listen for any sound from the pump when you gently tap it or try to manually rotate the impeller (if accessible).  \n4. If the pump does not respond, test the voltage at the pump’s terminals using a multimeter to confirm power is reaching it.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      }
+    ],
+    "memory": [
+      {
+        "ask": "remember the north transect marker is 40 m past the culvert",
+        "reply": "Got it — I'll remember: the north transect marker is 40 m past the culvert",
+        "kind": "command"
+      },
+      {
+        "ask": "where is the north transect marker?",
+        "reply": "The north transect marker is 40 meters past the culvert.  \n\nThat’s all I know from what you told me. I don’t have a map or GPS to show you where it is — only your description. If you want, I can help you measure or mark it if you're on the ground with a tape measure or a phone app. Just say the word.\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "kind": "chat"
+      }
+    ],
+    "dark": [
+      {
+        "ask": "Is it safe?",
+        "reply": "What does \"it\" refer to? Tell me a little more (what it is, and what you want to know about it) and I'll give you a useful answer.",
+        "kind": "chat"
+      }
+    ]
+  }
+}

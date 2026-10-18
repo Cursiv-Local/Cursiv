@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Optional
 
 from PyQt6.QtCore import Qt, QObject, QTimer, pyqtSignal
-from PyQt6.QtGui import QKeyEvent, QTextCursor, QGuiApplication
+from PyQt6.QtGui import QKeyEvent, QTextBlockFormat, QTextCharFormat, QTextCursor, QGuiApplication
 from PyQt6.QtWidgets import (
     QComboBox, QMenu,
     QWidget, QVBoxLayout, QHBoxLayout, QTextBrowser, QPlainTextEdit,
@@ -644,12 +644,25 @@ class ChatPanel(QWidget):
             cursor.insertMarkdown(md)
         if details:
             from urllib.parse import quote
-            cursor.insertBlock()
+            self._plain_block(cursor)
             cursor.insertHtml(f'<p style="margin:6px 0 0 0; font-size:12px;"><a href="cursiv://details/'
                               f'{quote(details)}" style="color:{theme.MUTED};">Show reasoning and checks</a></p>')
         for inner in bottom:
-            cursor.insertBlock()
+            self._plain_block(cursor)
             cursor.insertHtml(theme.live(self._chip_html(inner)))
+        self._plain_block(cursor)               # the next turn starts outside any list
+
+    @staticmethod
+    def _plain_block(cursor: QTextCursor) -> None:
+        """A new block that isn't part of the list an answer may end with. Qt carries the
+        list on, so the "Local" line became item 5 and the next "You" was indented."""
+        cursor.insertBlock(QTextBlockFormat(), QTextCharFormat())
+        lst = cursor.currentList()
+        if lst is not None:
+            lst.remove(cursor.block())
+        fmt = cursor.blockFormat()
+        fmt.setIndent(0)
+        cursor.setBlockFormat(fmt)
 
     # ── Transcript rendering ─────────────────────────────────────────────
 

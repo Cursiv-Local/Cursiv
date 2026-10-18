@@ -109,6 +109,7 @@ class SettingsDialog(QDialog):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(0)
         self._nav = QListWidget(); self._nav.setObjectName("nav"); self._nav.setFixedWidth(210)
+        self._nav.setFocusPolicy(Qt.FocusPolicy.NoFocus)          # no focus rectangle around the selected section
         self._pages = QStackedWidget()
         outer.addWidget(self._nav)
         right = QVBoxLayout(); right.setContentsMargins(26, 22, 26, 18); right.setSpacing(14)

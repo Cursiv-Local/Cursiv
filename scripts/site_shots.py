@@ -3,6 +3,7 @@ Website screenshots of real answers, drawn sharp (2x).
 
     py -3.13 scripts/site_shots.py ask      # run the questions through Cursiv (needs the local model)
     py -3.13 scripts/site_shots.py draw     # draw the saved answers in the real window
+    py -3.13 scripts/site_shots.py windows  # the Settings and Setup windows, as they open on this PC
 
 `ask` copies this tree into an empty folder with an empty home folder, turns
 offline mode on, and sends each conversation below through the same path as the
@@ -121,6 +122,49 @@ app.exec()
 '''
 
 
+WINDOW_CHILD = r'''
+import sys
+sys.path[:0] = [".", "launcher"]
+for m in ("codex_tool_bridge", "knowledge_brain"):
+    sys.modules.setdefault(m, None)
+from cursiv_v215.chat import keys
+keys.store_key("ui_theme", "light")
+from PyQt6.QtWidgets import QApplication
+from PyQt6.QtCore import QTimer
+app = QApplication(sys.argv[:1])
+import theme
+theme.install()
+app.setStyleSheet(theme.live(theme.APP_QSS))
+which, dest = sys.argv[1], sys.argv[2]
+if which == "settings":
+    from settings_dialog import SettingsDialog
+    w = SettingsDialog(None)
+    w.resize(1000, 680)
+else:
+    from setup_dialog import SetupDialog
+    w = SetupDialog(None)
+    w.resize(860, 760)
+w.show()
+QTimer.singleShot(4000, lambda: (w.grab().save(dest), app.quit()))
+app.exec()
+'''
+
+
+def windows() -> None:
+    """Settings (Privacy & internet) and Setup, drawn at 2x. Setup shows this PC's real
+    state: Ollama and the models installed here."""
+    for which, name in (("settings", "settings-light.png"), ("setup", "setup.png")):
+        scratch, env = _fresh_copy()
+        env["QT_SCALE_FACTOR"] = "2"
+        try:
+            dest = OUT / name
+            subprocess.run([sys.executable, "-c", WINDOW_CHILD, which, str(dest)], cwd=scratch / "app",
+                           env=env, timeout=120)
+            print(f"saved {dest}")
+        finally:
+            shutil.rmtree(scratch, ignore_errors=True)
+
+
 def _fresh_copy() -> tuple[Path, dict]:
     scratch = Path(tempfile.mkdtemp(prefix="cursiv_shots_"))
     for part in ("cursiv_v215", "launcher"):
@@ -168,4 +212,4 @@ def draw() -> None:
 
 
 if __name__ == "__main__":
-    {"ask": ask, "draw": draw}[sys.argv[1] if len(sys.argv) > 1 else "draw"]()
+    {"ask": ask, "draw": draw, "windows": windows}[sys.argv[1] if len(sys.argv) > 1 else "draw"]()

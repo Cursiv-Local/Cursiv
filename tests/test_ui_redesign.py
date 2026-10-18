@@ -296,3 +296,20 @@ def test_a_step_with_text_under_it_keeps_its_number(app):
             numbered.append(blk.text())
         blk = blk.next()
     assert numbered == ["Let it settle", "Filter it"]          # 4 steps showed as 7 before
+
+
+def test_lines_after_an_answer_ending_in_a_list_are_not_list_items(panel):
+    panel._begin_turn()
+    panel._reply_is_chat = True
+    panel._on_chunk("1. Turn off the power.\n2. Check the tank.\n\n*[Answered by Ollama · qwen3:4b-instruct]*")
+    panel._on_done()
+    panel._append_user("next question")
+    doc = panel._transcript.document()
+    blk = doc.begin()
+    in_list = {}
+    while blk.isValid():
+        if blk.text().strip():
+            in_list[blk.text().strip()] = blk.textList() is not None
+        blk = blk.next()
+    assert in_list["Check the tank."] is True
+    assert not any(v for k, v in in_list.items() if "Local" in k or "next question" in k)

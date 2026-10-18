@@ -13,7 +13,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css">
+<link rel="stylesheet" href="/assets/site.css?v=u64-2">
 </head>
 <body>
 
@@ -59,7 +59,7 @@
         <li><div><b>Start asking</b><span>Type a question. Type <code>help</code> to see what Cursiv can do, and <code>offline on</code> if you want nothing to leave this computer.</span></div></li>
       </ol>
     </div>
-    <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window: Ollama ready, AI model ready, optional coding and image models" width="950" height="888"><figcaption>The Setup window on a computer with everything installed.</figcaption></figure>
+    <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window: Ollama ready, AI model ready, optional coding and image models" width="963" height="887"><figcaption>The Setup window on a computer with everything installed.</figcaption></figure>
   </div>
 </section>
 
@@ -67,15 +67,14 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Which model</span>
-      <h2>Setup suggests one for your graphics card.</h2>
+      <h2>Setup suggests the model that tested best.</h2>
     </div>
     <div class="table-wrap">
       <table class="table">
-        <thead><tr><th>Graphics memory</th><th>Model Setup offers</th><th>Download</th><th>Notes</th></tr></thead>
+        <thead><tr><th>Model</th><th>Download</th><th>When</th></tr></thead>
         <tbody>
-          <tr><td><b>No GPU or under 4 GB</b></td><td><b>qwen2.5 1.5B</b></td><td>1 GB</td><td>Works on most PCs, slower and less capable.</td></tr>
-          <tr><td><b>4–6 GB</b></td><td><b>qwen3 4B Instruct</b></td><td>2.5 GB</td><td>The default. About 10–60 seconds per answer on a 4 GB card.</td></tr>
-          <tr><td><b>8 GB and up</b></td><td><b>llama3.1 8B</b></td><td>4.9 GB</td><td>Stronger answers on bigger cards.</td></tr>
+          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Recommended for every computer. It did best on Cursiv's side-by-side tests: 40 of 40, about 10 seconds an answer on a 4 GB graphics card. Without a graphics card it's slower (not yet measured).</td></tr>
+          <tr><td><b>qwen2.5 1.5B</b> (Apache 2.0)</td><td>1 GB</td><td>Only for computers too slow for qwen3 4B. Not yet tested by Cursiv's benchmark.</td></tr>
         </tbody>
       </table>
     </div>
@@ -97,7 +96,7 @@
       </ul>
       <p>Free keys: <a href="https://aistudio.google.com/apikey">Google Gemini</a> · <a href="https://console.groq.com/keys">Groq</a></p>
     </div>
-    <figure class="shot" style="margin:0"><img src="/assets/shots/settings-light.png" alt="Cursiv Settings: Privacy and internet section with offline mode, automatic web search and Cursiv Cloud" width="1125" height="750" loading="lazy"><figcaption>Settings → Privacy &amp; internet: the switches that control what goes online.</figcaption></figure>
+    <figure class="shot" style="margin:0"><img src="/assets/shots/settings-light.png" alt="Cursiv Settings: Privacy and internet section with offline mode, automatic web search and Cursiv Cloud" width="963" height="650" loading="lazy"><figcaption>Settings → Privacy &amp; internet: the switches that control what goes online.</figcaption></figure>
   </div>
 </section>
 

@@ -179,7 +179,7 @@ class SetupDialog(QDialog):
         title.setStyleSheet(f"color: {GOLD}; font-size: 16px; font-weight: 700;")
         lay.addWidget(title)
         sub = QLabel("Cursiv runs on your own computer through Ollama, a free local AI engine. "
-                     "Nothing you type leaves this computer unless you choose a cloud option below.")
+                     "Answers come from this computer unless you turn on an online option below.")
         sub.setWordWrap(True)
         sub.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
         lay.addWidget(sub)
@@ -363,7 +363,7 @@ class SetupDialog(QDialog):
 
         ready = running and bool(models)
         self._set_status(self._s3, True if ready else None,
-                         "All set — Cursiv runs fully on this computer." if ready else self._s3_intro)
+                         "All set: answers come from this computer." if ready else self._s3_intro)
         self._footer.setText("Everything is ready." if ready else "You can close this and come back any time "
                                                                   "(launcher → Setup, or the tray menu).")
 

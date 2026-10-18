@@ -181,3 +181,21 @@ footer { border-top: 1px solid var(--line); padding: 44px 0 32px; color: var(--m
 .copy { margin-top: 30px; padding-top: 18px; border-top: 1px solid var(--line); display: flex; justify-content: space-between;
         flex-wrap: wrap; gap: 10px; color: var(--faint); font-size: 13px; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+/* Five-minute tour */
+.tour { list-style: none; padding: 0; margin: 0; display: grid; gap: 44px; }
+.tour li { display: grid; gap: 14px; }
+.tour-text { max-width: 760px; }
+.tour-text h3 { display: inline; font-size: 20px; }
+.tour-text p { color: var(--muted); margin-top: 6px; }
+.tour .step { display: inline-grid; place-items: center; width: 28px; height: 28px; margin-right: 10px; border-radius: 50%;
+  background: var(--gold); color: #17120a; font-weight: 700; font-size: 14px; vertical-align: 2px; }
+.tour .shot img { display: block; width: 100%; height: auto; }
+/* Long sections behind "Show" */
+.more { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0 18px 4px; }
+.more > summary { cursor: pointer; list-style: none; padding: 16px 0; display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+.more > summary::-webkit-details-marker { display: none; }
+.more > summary::after { content: "Show"; color: var(--gold); font-size: 14px; font-weight: 600; }
+.more[open] > summary::after { content: "Hide"; }
+.tour figure { margin: 0; }
+.tour .shot a { display: block; }
