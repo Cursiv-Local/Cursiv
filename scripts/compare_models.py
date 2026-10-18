@@ -9,6 +9,8 @@ same suite version and sample.
 
     py -3.13 scripts/compare_models.py qwen3:4b-instruct qwen3:8b+deep llama3.1
         (+deep: answer in Deep Think, reasoning on)
+    py -3.13 scripts/compare_models.py --source 48f7674 qwen3:4b-instruct gemma3:4b
+        (every model runs that commit's code, so edits during the run can't change it)
 """
 from __future__ import annotations
 
@@ -35,7 +37,11 @@ def sample() -> list[str]:
 
 
 def main() -> int:
-    models = sys.argv[1:]
+    args = sys.argv[1:]
+    source = ""
+    if args[:1] == ["--source"] and len(args) > 1:
+        source, args = args[1], args[2:]
+    models = args
     if not models:
         print(__doc__)
         return 1
@@ -46,7 +52,8 @@ def main() -> int:
         model, deep = spec.removesuffix("+deep"), spec.endswith("+deep")
         print(f"== {spec} ({len(ids)} cases)", flush=True)
         subprocess.run([sys.executable, str(REPO / "scripts" / "truth_bench.py"), "--ids", ",".join(ids),
-                        "--label", label + ("-deep" if deep else ""), "--model", model, *(["--deep"] if deep else [])],
+                        "--label", label + ("-deep" if deep else ""), "--model", model, *(["--deep"] if deep else []),
+                        *(["--source", source] if source else [])],
                        cwd=REPO, check=False)
         out = REPO / "bench" / "results" / f"{label}{'-deep' if deep else ''}-{model.replace(':', '_')}-subset.json"
         if not out.exists():
@@ -60,7 +67,7 @@ def main() -> int:
 
     lines = ["# Local model comparison", "",
              f"Same {len(ids)} truth-benchmark cases for every model (scripts/compare_models.py), offline, "
-             "same Cursiv code, scored by bench/scoring.py. Compare rows only with the same suite and sample.", "",
+             f"same Cursiv code{' (commit ' + source + ')' if source else ''}, scored by bench/scoring.py. Compare rows only with the same suite and sample.", "",
              "| Model | Suite | Date | Passed | Accuracy | Unsupported claims | Says when it can't know | "
              "Traps | Safety | Avg words | Avg s per answer | Note |",
              "|---|---|---|---|---|---|---|---|---|---|---|---|"]
