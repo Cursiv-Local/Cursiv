@@ -179,7 +179,7 @@ From a review of real answers (a bleeding answer said not to bandage or use a to
 
 ## Releases
 
-Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks that the version in `core/selfknow.py`, `launcher/cursiv_launcher.py` and `installer/cursiv_setup.iss` matches the tag, builds in a fresh git worktree of the tag, and copies the installer to `installer/Output/`. Don't build from the working tree (U59 was built from uncommitted code; U63's first build picked up edits made during the build). `tests/test_versions.py` keeps the three version strings equal; CI runs the tests on every push to main and every PR. A release needs a GitHub release with `Cursiv-Setup-<version>.exe` and `Cursiv-Setup-latest.exe`, not just a push.
+Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks that the version in `core/selfknow.py`, `launcher/cursiv_launcher.py` and `installer/cursiv_setup.iss` matches the tag, builds in a fresh git worktree of the tag, and copies the installer to `installer/Output/`. Don't build from the working tree (U59 was built from uncommitted code; U63's first build picked up edits made during the build). `tests/test_versions.py` keeps the three version strings equal; CI runs the tests on every push to main and every PR. A release needs a GitHub release with `Cursiv-Setup-<version>.exe` and `Cursiv-Setup-latest.exe`, not just a push. Before tagging, check CI is green on the commit (`gh run list --workflow tests.yml --limit 1`): U67–U71 were tagged while CI was red because the workflow's own package list lacked pypdf; it now installs from `requirements.txt`. Upload `SHA256SUMS-<version>.txt` as `SHA256SUMS.txt`.
 
 ## U64 (2026-10-18): speed, Standard / Deep Think, Phase A fixes
 
