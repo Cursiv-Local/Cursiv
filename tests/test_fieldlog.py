@@ -115,3 +115,20 @@ def test_the_log_survives_a_restart(tmp_path):
     subprocess.run([sys.executable, "-c", write], cwd=root, env=env, check=True)
     out = subprocess.run([sys.executable, "-c", read], cwd=root, env=env, check=True, capture_output=True, text=True)
     assert out.stdout.strip() == "[1, []]"
+
+
+def test_notebook_window_saves_corrects_and_shows_integrity(log, monkeypatch):
+    from PyQt6.QtWidgets import QApplication, QInputDialog
+    app = QApplication.instance() or QApplication([])
+    import field_notebook
+    w = field_notebook.FieldNotebookDialog(None, observer="Dana")
+    w._site.setText("Pond 2"); w._lat.setText("44.5"); w._lon.setText("-71.1")
+    n, v, u = w._rows[0]; n.setText("water temp"); v.setText("12.40"); u.setText("C")
+    w._save_entry()
+    assert log.entries()[0]["measurements"][0]["value"] == "12.40" and w._table.rowCount() == 1
+    w._table.selectRow(0); w._start_correction()
+    w._rows[0][1].setText("12.10")
+    monkeypatch.setattr(QInputDialog, "getText", lambda *a, **k: ("misread the thermometer", True))
+    w._save_entry()
+    assert len(log.entries()) == 2 and w._table.rowCount() == 1           # original kept, correction shown
+    assert "intact" in w._integrity.text()

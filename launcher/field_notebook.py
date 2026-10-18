@@ -1,0 +1,227 @@
+"""
+Field Notebook window (research roadmap R1): record observations, see them,
+correct one (a new entry with a reason), check the log is intact, export.
+All storage and checks are in cursiv_v215/core/fieldlog.py.
+"""
+from __future__ import annotations
+
+from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import (
+    QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout, QInputDialog, QLabel, QLineEdit,
+    QMessageBox, QPlainTextEdit, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
+    QAbstractItemView, QHeaderView,
+)
+
+import theme
+from cursiv_v215.core import fieldlog
+
+ROWS = 2      # measurement rows shown at first; "+ Another measurement" adds more
+
+
+class FieldNotebookDialog(QDialog):
+    def __init__(self, parent=None, observer: str = ""):
+        super().__init__(parent)
+        self.setWindowTitle("Cursiv — Field Notebook")
+        self.resize(1000, 860)
+        self._correcting: str = ""
+        outer = QVBoxLayout(self)
+        outer.setContentsMargins(24, 20, 24, 16)
+        outer.setSpacing(10)
+
+        title = QLabel("Field Notebook")
+        title.setStyleSheet("font-size: 20px; font-weight: 600;")
+        outer.addWidget(title)
+        intro = QLabel("Observations you record here are kept exactly as typed, apart from anything the AI says. "
+                       "Nothing is ever overwritten: a correction is added as a new entry with a reason, and every "
+                       "entry is fingerprinted so later changes can be detected.")
+        intro.setWordWrap(True)
+        intro.setStyleSheet(f"color: {theme.MUTED};")
+        outer.addWidget(intro)
+
+        # ── New entry ──────────────────────────────────────────────────
+        card = QFrame(); card.setObjectName("card")
+        card.setStyleSheet(f"QFrame#card {{ background: {theme.SURFACE}; border: 1px solid {theme.BORDER}; border-radius: 10px; }}")
+        form_box = QVBoxLayout(card); form_box.setContentsMargins(16, 12, 16, 12)
+        self._form_title = QLabel("New entry"); self._form_title.setStyleSheet("font-weight: 600;")
+        form_box.addWidget(self._form_title)
+        form = QFormLayout(); form.setHorizontalSpacing(12)
+        self._observer = QLineEdit(observer); self._observer.setPlaceholderText("Who recorded it")
+        self._site = QLineEdit(); self._site.setPlaceholderText("Site or station name")
+        coords = QHBoxLayout()
+        self._lat = QLineEdit(); self._lat.setPlaceholderText("Latitude, e.g. 44.1234")
+        self._lon = QLineEdit(); self._lon.setPlaceholderText("Longitude, e.g. -71.5678")
+        coords.addWidget(self._lat); coords.addWidget(self._lon)
+        cw = QWidget(); cw.setLayout(coords); cw.setStyleSheet("background: transparent;")
+        coords.setContentsMargins(0, 0, 0, 0)
+        form.addRow("Observer", self._observer)
+        form.addRow("Site", self._site)
+        form.addRow("Location (decimal degrees)", cw)
+        form_box.addLayout(form)
+
+        grid = QGridLayout(); grid.setHorizontalSpacing(8)
+        for col, head in enumerate(("Measurement", "Value (kept exactly as typed)", "Unit")):
+            h = QLabel(head); h.setStyleSheet(f"color: {theme.MUTED}; font-size: 12px;"); grid.addWidget(h, 0, col)
+        self._rows: list[tuple[QLineEdit, QLineEdit, QLineEdit]] = []
+        self._grid = grid
+        for _ in range(ROWS):
+            self._add_row()
+        form_box.addLayout(grid)
+        more = QPushButton("+ Another measurement"); more.setStyleSheet(theme.ghost_button())
+        more.clicked.connect(self._add_row)
+        form_box.addWidget(more, 0, Qt.AlignmentFlag.AlignLeft)
+
+        self._note = QPlainTextEdit(); self._note.setPlaceholderText("Notes (conditions, what you saw, anything else)")
+        self._note.setFixedHeight(52)
+        form_box.addWidget(self._note)
+        buttons = QHBoxLayout()
+        self._save = QPushButton("Save entry"); self._save.setStyleSheet(theme.primary_button())
+        self._save.clicked.connect(self._save_entry)
+        self._cancel = QPushButton("Cancel correction"); self._cancel.setStyleSheet(theme.ghost_button())
+        self._cancel.clicked.connect(self._clear_form); self._cancel.setVisible(False)
+        buttons.addWidget(self._save); buttons.addWidget(self._cancel); buttons.addStretch(1)
+        self._status = QLabel(""); self._status.setWordWrap(True)
+        buttons.addWidget(self._status, 2)
+        form_box.addLayout(buttons)
+        outer.addWidget(card)
+
+        # ── Entries ────────────────────────────────────────────────────
+        self._integrity = QLabel("")
+        outer.addWidget(self._integrity)
+        self._table = QTableWidget(0, 5)
+        self._table.setHorizontalHeaderLabels(["#", "Recorded", "Site", "Measurements", "Note"])
+        self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
+        self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
+        self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self._table.verticalHeader().setVisible(False)
+        hh = self._table.horizontalHeader()
+        hh.setSectionResizeMode(0, QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(1, QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(2, QHeaderView.ResizeMode.ResizeToContents)
+        hh.setSectionResizeMode(3, QHeaderView.ResizeMode.Stretch)
+        hh.setSectionResizeMode(4, QHeaderView.ResizeMode.Stretch)
+        self._table.setMinimumHeight(220)
+        outer.addWidget(self._table, 1)
+
+        foot = QHBoxLayout()
+        fix = QPushButton("Correct selected…"); fix.setStyleSheet(theme.ghost_button()); fix.clicked.connect(self._start_correction)
+        check = QPushButton("Check integrity"); check.setStyleSheet(theme.ghost_button()); check.clicked.connect(self._check)
+        exp = QPushButton("Export…"); exp.setStyleSheet(theme.ghost_button()); exp.clicked.connect(self._export)
+        close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
+        for b in (fix, check, exp):
+            foot.addWidget(b)
+        foot.addStretch(1); foot.addWidget(close)
+        outer.addLayout(foot)
+        self.refresh()
+
+    # ── form ───────────────────────────────────────────────────────────
+    def _add_row(self):
+        r = len(self._rows) + 1
+        name, value, unit = QLineEdit(), QLineEdit(), QLineEdit()
+        if r == 1:
+            name.setPlaceholderText("e.g. water temp"); value.setPlaceholderText("12.40"); unit.setPlaceholderText("°C")
+        for col, w in enumerate((name, value, unit)):
+            self._grid.addWidget(w, r, col)
+        self._rows.append((name, value, unit))
+
+    def _clear_form(self):
+        self._correcting = ""
+        self._form_title.setText("New entry")
+        self._cancel.setVisible(False)
+        self._save.setText("Save entry")
+        for w in (self._site, self._lat, self._lon):
+            w.clear()
+        for row in self._rows:
+            for w in row:
+                w.clear()
+        self._note.clear()
+
+    def _fields(self) -> dict:
+        lat, lon = self._lat.text().strip(), self._lon.text().strip()
+        return {
+            "observer": self._observer.text(), "site": self._site.text(),
+            "lat": lat or None, "lon": lon or None, "location_source": "typed" if lat else "",
+            "measurements": [{"name": n.text(), "value": v.text(), "unit": u.text()}
+                             for n, v, u in self._rows if n.text().strip()],
+            "note": self._note.toPlainText(),
+        }
+
+    def _save_entry(self):
+        f = self._fields()
+        try:
+            if self._correcting:
+                reason, ok = QInputDialog.getText(self, "Reason for the correction",
+                                                  "Why is this entry being corrected? (kept with both entries)")
+                if not ok:
+                    return
+                e = fieldlog.correct(self._correcting, reason, **f)
+            else:
+                e = fieldlog.add(**f)
+        except ValueError as exc:
+            self._status.setText(f"Not saved: {exc}.")
+            self._status.setStyleSheet(f"color: {theme.RED};")
+            return
+        self._status.setText(f"Saved #{e['seq']} · fingerprint {e['hash'][:12]}")
+        self._status.setStyleSheet(f"color: {theme.GREEN};")
+        self._clear_form()
+        self.refresh()
+
+    def _start_correction(self):
+        row = self._table.currentRow()
+        if row < 0:
+            self._status.setText("Select the entry to correct first.")
+            return
+        e = self._table.item(row, 0).data(Qt.ItemDataRole.UserRole)
+        self._clear_form()
+        self._correcting = e["id"]
+        self._form_title.setText(f"Correcting #{e['seq']} (the original stays in the log)")
+        self._save.setText("Save correction")
+        self._cancel.setVisible(True)
+        self._observer.setText(e["observer"]); self._site.setText(e["site"])
+        self._lat.setText("" if e["lat"] is None else str(e["lat"]))
+        self._lon.setText("" if e["lon"] is None else str(e["lon"]))
+        while len(self._rows) < len(e["measurements"]):
+            self._add_row()
+        for (n, v, u), m in zip(self._rows, e["measurements"]):
+            n.setText(m["name"]); v.setText(m["value"]); u.setText(m["unit"])
+        self._note.setPlainText(e["note"])
+
+    # ── list, checks, export ───────────────────────────────────────────
+    def refresh(self):
+        rows = fieldlog.current()
+        self._table.setRowCount(len(rows))
+        for r, e in enumerate(reversed(rows)):
+            meas = ", ".join(f"{m['name']} {m['value']}{(' ' + m['unit']) if m['unit'] else ''}" for m in e["measurements"])
+            cells = [str(e["seq"]), e["recorded_local"].replace("T", " ")[:19], e["site"], meas,
+                     e["note"] + (f"  (corrects an earlier entry: {e['reason']})" if e.get("corrects") else "")]
+            for c, text in enumerate(cells):
+                item = QTableWidgetItem(text)
+                if c == 0:
+                    item.setData(Qt.ItemDataRole.UserRole, e)
+                self._table.setItem(r, c, item)
+        self._show_integrity()
+
+    def _show_integrity(self):
+        problems = fieldlog.verify()
+        n = len(fieldlog.entries())
+        if problems:
+            self._integrity.setText(f"⚠ The log has {len(problems)} problem(s). Click Check integrity for details.")
+            self._integrity.setStyleSheet(f"color: {theme.RED};")
+        else:
+            self._integrity.setText(f"● {n} entries recorded, all intact and in order.")
+            self._integrity.setStyleSheet(f"color: {theme.GREEN};")
+
+    def _check(self):
+        problems = fieldlog.verify()
+        if not problems:
+            QMessageBox.information(self, "Field log", f"All {len(fieldlog.entries())} entries are intact and in order.")
+        else:
+            QMessageBox.warning(self, "Field log", "\n".join(problems))
+        self._show_integrity()
+
+    def _export(self):
+        from pathlib import Path
+        folder = QFileDialog.getExistingDirectory(self, "Export the field log to…")
+        if not folder:
+            return
+        paths = fieldlog.export(Path(folder) / "Cursiv field log")
+        QMessageBox.information(self, "Exported", "Saved:\n" + "\n".join(str(p) for p in paths.values()))

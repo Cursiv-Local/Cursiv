@@ -1584,6 +1584,14 @@ class CursivLauncher(QMainWindow):
         except Exception as e:
             self._set_status(f"Memory & Knowledge failed to open: {e}")
 
+    def _open_field_notebook(self):
+        try:
+            from field_notebook import FieldNotebookDialog
+            from cursiv_v215.memory.semantic import current_person
+            FieldNotebookDialog(self, observer=current_person().title()).exec()
+        except Exception as e:
+            self._set_status(f"Field Notebook failed to open: {e}")
+
     def _open_tools(self):
         try:
             from nav_windows import ToolsDialog

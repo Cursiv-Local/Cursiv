@@ -98,6 +98,7 @@ class ConversationSidebar(QWidget):
         # Where everything else lives (docs/UI-REDESIGN-PLAN.md): one plain button each.
         nav = QVBoxLayout(); nav.setSpacing(4)
         for label, tip, method in (
+                ("Field Notebook", "Record observations: kept exactly as typed, never overwritten, exportable", "_open_field_notebook"),
                 ("Memory && Knowledge", "What Cursiv remembers, saved notes and the offline reference", "_open_knowledge"),
                 ("Tools", "Letters, translation, coding help, USB, phone and more", "_open_tools"),
                 ("Settings", "Privacy, model, online AI, updates and your data", "_open_settings"),
