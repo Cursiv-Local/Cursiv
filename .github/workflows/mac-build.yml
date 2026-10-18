@@ -1,0 +1,82 @@
+name: mac-build
+
+# Builds the macOS app (Apple Silicon) from a release tag: PyInstaller .app, a self-test of
+# the built app, screenshots of its windows, an unsigned .dmg with its SHA-256. On a
+# published release it attaches the .dmg to that release. Run by hand (Actions > mac-build >
+# Run workflow) to build any branch or tag without publishing.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or tag to build"
+        default: "main"
+      upload:
+        description: "Attach the .dmg to the release with this tag (tags only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: macos-latest          # Apple Silicon
+    timeout-minutes: 45
+    env:
+      REF: ${{ github.event.release.tag_name || inputs.ref }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ env.REF }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+      - name: Tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python -m pip install pytest
+          python -m pytest tests -q
+      - name: Build Cursiv.app
+        run: python -m PyInstaller --noconfirm --clean launcher/build.spec
+      - name: Self-test the built app
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          ./dist/Cursiv.app/Contents/MacOS/Cursiv --selftest selftest.txt
+          cat selftest.txt
+      - name: Screenshots of the windows
+        run: python scripts/mac_shots.py mac-shots || QT_QPA_PLATFORM=offscreen python scripts/mac_shots.py mac-shots
+      - name: Make the .dmg
+        run: |
+          VERSION=$(python -c "import re;print(re.search(r'VERSION\s*=\s*\"([^\"]+)\"',open('cursiv_v215/core/selfknow.py').read()).group(1))")
+          DMG="Cursiv-${VERSION}-mac-arm64.dmg"
+          mkdir -p dmg
+          cp -R dist/Cursiv.app dmg/
+          ln -s /Applications dmg/Applications
+          cp installer/mac/HOW-TO-OPEN.txt "dmg/How to open Cursiv.txt"
+          hdiutil create -volname "Cursiv ${VERSION}" -srcfolder dmg -ov -format UDZO "$DMG"
+          shasum -a 256 "$DMG" | tee SHA256SUMS-mac.txt
+          echo "DMG=$DMG" >> "$GITHUB_ENV"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cursiv-mac
+          path: |
+            ${{ env.DMG }}
+            SHA256SUMS-mac.txt
+            selftest.txt
+            mac-shots/
+      - name: Attach to the release
+        if: github.event_name == 'release' || (inputs.upload && startsWith(inputs.ref, 'v'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release upload "$REF" "$DMG" SHA256SUMS-mac.txt --clobber

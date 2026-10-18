@@ -116,6 +116,10 @@ if sys.platform == "win32":
 
 
 def main():
+    if "--selftest" in sys.argv:            # Cursiv --selftest [report-file]: check, report, exit
+        import selftest
+        i = sys.argv.index("--selftest")
+        sys.exit(selftest.run(sys.argv[i + 1] if len(sys.argv) > i + 1 else None))
     try:
         from PyQt6.QtWidgets import QApplication, QMessageBox
         from PyQt6.QtCore import Qt

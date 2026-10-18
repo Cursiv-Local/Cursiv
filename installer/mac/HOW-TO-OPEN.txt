@@ -1,0 +1,30 @@
+CURSIV FOR MAC: HOW TO OPEN IT
+
+For Macs with Apple Silicon (M1 or newer), macOS 12 or later.
+
+1. Drag Cursiv into the Applications folder (in this window).
+
+2. The first time only: this build isn't signed by Apple yet, so macOS will say
+   "Cursiv can't be opened" or "Apple could not verify Cursiv". To open it:
+     - Try to open Cursiv once, and click Done (or OK).
+     - Open System Settings > Privacy & Security, scroll down, and click
+       "Open Anyway" next to Cursiv. Confirm with your password.
+   After that it opens normally.
+
+   (Or, in Terminal: xattr -dr com.apple.quarantine /Applications/Cursiv.app )
+
+3. In Cursiv, the Setup window offers to install Ollama, the free engine that runs
+   the AI model on your Mac, and to download the model (about 2.5 GB). That needs
+   internet once. After that everything works offline.
+
+How to check this download: the release page lists its SHA-256 checksum
+(SHA256SUMS-mac.txt). In Terminal:
+    shasum -a 256 ~/Downloads/Cursiv-*-mac-arm64.dmg
+
+Status: the Mac version is built and tested automatically on Apple's hardware at
+GitHub, but hasn't yet been tried by a person on their own Mac. The Cursiv USB drive
+is Windows-only. Please report anything that doesn't work:
+https://github.com/winklersllc2026-bit/Cursiv/issues
+
+Source code: https://github.com/winklersllc2026-bit/Cursiv (MIT licence)
+Privacy: everything stays on your Mac unless you turn on an online feature; see PRIVACY.md.

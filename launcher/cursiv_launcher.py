@@ -48,8 +48,10 @@ else:
     _ROOT = _HERE.parent
     _DATA_ROOT = _ROOT
 
+# Frozen: the bundle's data folder (_internal on Windows, Contents/Resources in the Mac
+# app), where build.spec puts launcher/resources/icons -- not next to the executable.
 _ICONS = (
-    _HERE / "launcher" / "resources" / "icons"
+    Path(getattr(sys, "_MEIPASS", _HERE)) / "launcher" / "resources" / "icons"
     if getattr(sys, "frozen", False)
     else _HERE / "resources" / "icons"
 )

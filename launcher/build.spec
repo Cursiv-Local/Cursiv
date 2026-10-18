@@ -6,6 +6,7 @@ Usage (from repo root):
     pyinstaller launcher/build.spec
 
 Output: dist/Cursiv/Cursiv.exe  (one-dir bundle, windowed)
+macOS:  dist/Cursiv.app (built on a Mac; .github/workflows/mac-build.yml makes the .dmg)
 """
 
 import sys
@@ -21,6 +22,10 @@ _extra_hidden: list   = []
 from PyInstaller.utils.hooks import collect_data_files, collect_submodules
 
 ROOT = Path(SPECPATH).parent          # repo root (one level above launcher/)
+MAC = sys.platform == "darwin"
+import re as _re
+VERSION = _re.search(r'VERSION\s*=\s*"([^"]+)"',
+                     (ROOT / "cursiv_v215" / "core" / "selfknow.py").read_text(encoding="utf-8")).group(1)
 LAUNCHER = ROOT / "launcher"
 CURSIV   = ROOT / "cursiv_v215"
 
@@ -70,6 +75,7 @@ hiddenimports = [
     "theme",
     "nav_windows",
     "field_notebook",
+    "selftest",
     "chat_commands",
     "legacy_vault_dialog",
     "postal_compose_dialog",
@@ -141,14 +147,15 @@ exe = EXE(
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
-    upx=True,
+    upx=not MAC,                            # UPX breaks macOS binaries
     console=False,                          # no terminal window
     disable_windowed_traceback=False,
     argv_emulation=False,
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=str(LAUNCHER / "resources" / "icons" / "cursiv.ico"),
+    # macOS: PyInstaller turns the PNG into the app's .icns (needs Pillow)
+    icon=str(LAUNCHER / "resources" / "icons" / ("cursiv_256.png" if MAC else "cursiv.ico")),
 )
 
 coll = COLLECT(
@@ -157,7 +164,26 @@ coll = COLLECT(
     a.zipfiles,
     a.datas,
     strip=False,
-    upx=True,
+    upx=not MAC,
     upx_exclude=[],
     name="Cursiv",                          # output: dist\Cursiv\
 )
+if MAC:
+    app = BUNDLE(
+        coll,
+        name="Cursiv.app",
+        icon=str(LAUNCHER / "resources" / "icons" / "cursiv_256.png"),
+        bundle_identifier="com.cursiv.desktop",
+        version=VERSION.replace("-U", "."),          # 3.14-U71 -> 3.14.71
+        info_plist={
+            "CFBundleDisplayName": "Cursiv",
+            "CFBundleShortVersionString": VERSION.replace("-U", "."),
+            "CFBundleVersion": VERSION,
+            "NSHighResolutionCapable": True,
+            "LSMinimumSystemVersion": "12.0",
+            "LSApplicationCategoryType": "public.app-category.productivity",
+            "NSMicrophoneUsageDescription": "Cursiv turns your voice into text on this Mac when you use Voice.",
+            "NSHumanReadableCopyright": "Copyright (c) 2026 Joshua Winkler. MIT License.",
+        },
+    )
+
