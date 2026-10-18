@@ -586,14 +586,31 @@ class ChatPanel(QWidget):
     def _keep_line_breaks(md: str) -> str:
         """In Markdown a single newline joins lines; the model's single newlines
         (Known: / Inferred: lines, addresses, short steps) are meant as line breaks."""
-        out, in_code = [], False
+        out, in_code, under_item = [], False, False
         lines = md.split("\n")
+        item = _re.compile(r"\s*([-*+]|\d+[.)])\s")
         for i, line in enumerate(lines):
             if line.lstrip().startswith("```"):
                 in_code = not in_code
             nxt = lines[i + 1] if i + 1 < len(lines) else ""
-            if (not in_code and line.strip() and nxt.strip() and not line.endswith("  ")
-                    and not _re.match(r"\s*([-*+]|\d+[.)]|#|>|\|)", nxt)):
+            if in_code or not line.strip():
+                under_item = False if not line.strip() else under_item
+                out.append(line)
+                continue
+            if item.match(line):
+                under_item = False
+                if nxt.strip() and not _re.match(r"\s*([-*+]|\d+[.)]|#|>|\|)", nxt):
+                    # "1. Step\nWhat to do" — Qt numbers a line break inside an item as a new
+                    # item (4 steps showed as 7), so the text under it becomes its own
+                    # indented paragraph.
+                    out += [line, ""]
+                    under_item = True
+                    continue
+                out.append(line)
+                continue
+            if under_item:
+                line = "   " + line.lstrip()
+            if nxt.strip() and not line.endswith("  ") and not _re.match(r"\s*([-*+]|\d+[.)]|#|>|\|)", nxt):
                 line += "  "
             out.append(line)
         return "\n".join(out)

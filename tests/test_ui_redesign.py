@@ -283,3 +283,18 @@ def test_emoji_ledger_with_items_below_goes_behind_the_link():
     assert "Known: The user asks about a study." in details
     assert "\n".join(main).strip().startswith("I don't know of that study.")
     assert "Note: check Google Scholar." in "\n".join(main) and "Inferred" not in "\n".join(main)
+
+
+def test_a_step_with_text_under_it_keeps_its_number(app):
+    from PyQt6.QtGui import QTextCursor
+    from PyQt6.QtWidgets import QTextBrowser
+    import chat_panel
+    md = chat_panel.ChatPanel._keep_line_breaks("1. Let it settle\nLet it sit 30 minutes.\n\n2. Filter it\nUse a cloth.")
+    b = QTextBrowser()
+    QTextCursor(b.document()).insertMarkdown(md)
+    numbered, blk = [], b.document().begin()
+    while blk.isValid():
+        if blk.textList():
+            numbered.append(blk.text())
+        blk = blk.next()
+    assert numbered == ["Let it settle", "Filter it"]          # 4 steps showed as 7 before
