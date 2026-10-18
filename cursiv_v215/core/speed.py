@@ -144,6 +144,25 @@ def think_options(model: str, deep: bool) -> dict:
 _layers: dict[str, dict] = {}
 
 
+def make_room(model: str) -> None:
+    """Unload other models from the card before loading one sized to fill it. With
+    gemma3:4b still loaded (Ollama keeps models 30 minutes), llama3.1 forced into the
+    rest spilled into shared memory: 230+ s an answer instead of about 20."""
+    try:
+        import json
+        import urllib.request
+        with urllib.request.urlopen("http://127.0.0.1:11434/api/ps", timeout=3) as r:
+            loaded = [m.get("name", "") for m in json.loads(r.read()).get("models", [])]
+        for other in loaded:
+            if other and other not in (model, f"{model}:latest"):
+                req = urllib.request.Request("http://127.0.0.1:11434/api/generate",
+                                             data=json.dumps({"model": other, "keep_alive": 0}).encode(),
+                                             headers={"Content-Type": "application/json"})
+                urllib.request.urlopen(req, timeout=30).read()
+    except Exception:
+        pass
+
+
 def gpu_fallback(model: str) -> None:
     _layers[model] = {}
 

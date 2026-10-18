@@ -813,6 +813,8 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
         if model is None:
             yield f"\n[No local model available. Run: ollama pull {_speed.chat_model_prefs()[0]}]"
             return
+    if _speed.gpu_options(model):
+        _speed.make_room(model)                 # one model on a small card at a time
     deep = not standard and model == _speed.DEEP_THINK_MODEL and _speed.deep_think_on()
     if deep:
         yield "*(Deep Think: working it through first. On this computer that can take a minute or two.)*\n\n"

@@ -36,7 +36,7 @@ DEFAULTS = {
     "update_check_auto": False,
 }
 
-OFFLINE_MESSAGE = "Offline mode is on, so nothing leaves this computer. Type 'offline off' to allow it."
+OFFLINE_MESSAGE = "Offline mode is on, so Cursiv won't connect to the internet. Type 'offline off' to allow it."
 
 
 class NetworkBlocked(ConnectionRefusedError):
