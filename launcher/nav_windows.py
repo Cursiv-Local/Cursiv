@@ -224,18 +224,40 @@ class ToolsDialog(_Window):
         super().__init__(parent, "Tools",
                          "Extra things Cursiv can do. Each one opens its own window or puts a starting command in the chat box.",
                          width=760, height=680)
+        try:
+            from cursiv_v215.core import profile as _profile
+            personal = _profile.personal()
+        except Exception:
+            personal = False
+        self.section("FIELD WORK")
+        self.entry("Field Notebook", "Record observations with sample IDs and coordinates; corrections never overwrite.",
+                   "Open", self._window("_open_field_notebook"))
+        self.entry("Field report", "A printable summary of what was recorded, by site, with every entry's fingerprint.",
+                   "Make", self._send("field report"))
+        self.entry("Your documents", "Import a protocol or SOP; answers quote it by page.", "Start",
+                   self._prefill("add document "))
+        self.entry("Calculations", "Units, coordinates and UTM, distance and bearing, dilutions, statistics: worked "
+                   "out in code.", "Start", self._prefill("distance from 44.1234, -71.5678 to 44.1300, -71.5600"))
+        self.entry("Field demo", "Try everything with sample data, kept apart from your own records (demo off to end).",
+                   "Start", self._send("demo"))
         self.section("EVERYDAY")
-        self.entry("Write a family letter", "A private letter that opens only with the code you set for that person.",
-                   "Write", self._window("_open_postal_compose", ""))
-        self.entry("Read letters", "Letters waiting for you, and ones you've sent.", "Show", self._send("letters"))
-        self.entry("Legacy Vault", "Keep family stories and messages for later, behind a PIN.", "Open",
-                   self._window("_open_legacy_vault"))
+        if personal:
+            self.entry("Write a family letter", "A private letter that opens only with the code you set for that person.",
+                       "Write", self._window("_open_postal_compose", ""))
+            self.entry("Read letters", "Letters waiting for you, and ones you've sent.", "Show", self._send("letters"))
+            self.entry("Legacy Vault", "Keep family stories and messages for later, behind a PIN.", "Open",
+                       self._window("_open_legacy_vault"))
         self.entry("Translate", "Type your text, then the language: translate good morning into Spanish.",
                    "Start", self._prefill("translate  into Spanish"))
-        self.entry("Phone app", "Link your phone so you can ask about photos and continue the chat here.",
-                   "Open", self._window("_open_phone"))
+        if personal:
+            self.entry("Phone app", "Link your phone so you can ask about photos and continue the chat here.",
+                       "Open", self._window("_open_phone"))
         self.entry("Make a Cursiv USB", "Copy Cursiv, its AI engine and models to a USB drive to run on any Windows PC.",
                    "Open", self._window("_open_usb_maker"))
+        if not personal:
+            self.body.addWidget(self._explain("Family letters, the phone app, coding help and builder tools are hidden. "
+                                           "Settings → Appearance → Show personal features brings them back."))
+            return
         self.section("CODING AND BIG QUESTIONS")
         self.entry("Coding help", "Step-by-step help with code; uses local coding models if installed.",
                    "Start", self._prefill("codex "))
@@ -276,10 +298,15 @@ class HelpDialog(_Window):
             "## The basics",
             "Just type a question and press **Enter**. Cursiv answers with an AI model that runs on this computer.",
             "",
-            "- The **pill at the top right** shows what can go online: *Local only*, *Offline mode*, or *Online features on*. Click it to change.",
-            "- The **menu at the top left** picks the AI model. *Automatic* chooses one that fits your computer.",
-            "- Under each answer, **● Local** means it came from your computer; **● Online** means it came from a service you set up.",
+            "- The **badge at the top right** shows what can go online: *LOCAL ONLY · internet blocked* when offline "
+            "mode is on. Click it to change.",
+            "- The **menu at the top left** shows the AI model answering on this computer.",
+            "- Under each answer, a **Sources** line says what the answer was given: Cursiv Offline Reference, your "
+            "documents (with pages), Cursiv's own calculations, or *model knowledge (not checked against a source)*. "
+            "Cursiv writes that line from its own records, never the AI.",
+            "- **● Local** means the answer came from your computer; **● Online** means a service you set up.",
             "- A grey box above an answer is Cursiv's **offline reference**, shown word for word.",
+            "- **Field Notebook** (sidebar) records observations; type `demo` to try it with sample data.",
             "- Complex answers end with **Known / Inferred / Assumed / Unknown**, so you can see what's a fact and what's a guess.",
             "",
             "## Keeping things private",
@@ -295,6 +322,8 @@ class HelpDialog(_Window):
             parts += ["```", cc.help_text("").strip(), "```", ""]
             for key, (title, body) in cc._HELP_TOPICS.items():
                 if key in cc._BUILDER_TOPICS and not cc._is_builder():
+                    continue
+                if key in cc._PERSONAL_TOPICS and not cc._personal():
                     continue
                 parts += [f"**{title}**", "```", body.rstrip(), "```", ""]
         except Exception:
@@ -313,9 +342,23 @@ class WelcomeDialog(_Window):
     """First run (and tray → Getting Started): what Cursiv is, in four lines."""
 
     def __init__(self, parent=None, setup_needed: bool = False):
+        try:
+            from cursiv_v215.core import profile as _profile
+            personal = _profile.personal()
+        except Exception:
+            personal = False
         super().__init__(parent, "Welcome to Cursiv",
-                         "A personal AI assistant that runs on this computer.", width=600, height=520)
+                         "A personal AI assistant that runs on this computer." if personal else
+                         "An AI assistant for field research that runs on this computer.", width=600, height=520)
         points = (
+            ("It runs here", "Answers come from an AI model on this computer. The badge at the top right always "
+                             "shows what, if anything, can go online; LOCAL ONLY blocks the internet."),
+            ("It says where answers come from", "Each answer ends with its sources: the offline reference, your "
+                                                "documents, Cursiv's own calculations, or model knowledge."),
+            ("A field notebook", "Observations kept exactly as typed, fingerprinted, never overwritten, exported "
+                                 "to CSV, JSON and GeoJSON. Type demo to try it with sample data."),
+            ("Help is one click away", "The sidebar has Field Notebook, Tools, Settings and Help. Or just type."),
+        ) if not personal else (
             ("It runs here", "Answers come from an AI model on this computer. The pill at the top right always "
                              "shows what, if anything, can go online."),
             ("It tells you how sure it is", "Complex answers end with what's known, inferred, assumed and unknown. "

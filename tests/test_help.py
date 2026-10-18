@@ -2,8 +2,9 @@
 import chat_commands as cc
 
 
-def _help(text, monkeypatch, builder=False):
+def _help(text, monkeypatch, builder=False, personal=False):
     monkeypatch.setattr(cc, "_is_builder", lambda: builder)
+    monkeypatch.setattr(cc, "_personal", lambda: personal)
     r = cc.handle_command(text, cc._default_cfg(), [])
     return None if r is None else r.text
 
@@ -16,14 +17,24 @@ def test_help_is_short_and_plain(monkeypatch):
     assert "help more" in text
 
 
+def test_research_help_leads_with_field_work(monkeypatch):
+    text = _help("help", monkeypatch)
+    assert "log site:" in text and "field report" in text and "add document" in text and "demo" in text
+    assert "letter" not in text and "family" not in text.lower()
+    topics = _help("help more", monkeypatch, builder=True)
+    assert "help field" in topics and "help family" not in topics and "help builder" not in topics
+    assert "write to <name>" in _help("help", monkeypatch, personal=True)
+    assert "help family" in _help("help more", monkeypatch, personal=True)
+
+
 def test_remember_is_described_as_saving(monkeypatch):
     assert "remember <something>" in _help("help", monkeypatch)
     assert "remember <query>" not in _help("help memory", monkeypatch)
 
 
 def test_builder_topic_listed_only_for_the_owner(monkeypatch):
-    assert "help builder" not in _help("help more", monkeypatch, builder=False)
-    assert "help builder" in _help("help more", monkeypatch, builder=True)
+    assert "help builder" not in _help("help more", monkeypatch, builder=False, personal=True)
+    assert "help builder" in _help("help more", monkeypatch, builder=True, personal=True)
     assert "evolve" in _help("help builder", monkeypatch)       # still opens if typed
 
 

@@ -43,6 +43,7 @@ hiddenimports = [
     "cursiv_v215.core.documents",
     "cursiv_v215.core.fieldsync",
     "cursiv_v215.core.demo",
+    "cursiv_v215.core.profile",
     "cursiv_v215.ui",
     "cursiv_v215.ui.chat_app",
     "cursiv_v215.core",

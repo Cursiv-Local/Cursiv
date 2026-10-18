@@ -1004,9 +1004,14 @@ class TitleBar(QWidget):
             u.setStyleSheet(f"color: {SILV2}; font-size: 12px; padding-right: 6px;")
             row.addWidget(u)
 
+        try:
+            from cursiv_v215.core import profile as _profile
+            _show_phone = _profile.personal()
+        except Exception:
+            _show_phone = False
         for symbol, tip, slot, col in [
-            ("☏", "Phone — link the phone app and see the shared conversation",
-             lambda: parent._open_phone() if hasattr(parent, "_open_phone") else None, GOLD),
+            *([("☏", "Phone — link the phone app and see the shared conversation",
+                lambda: parent._open_phone() if hasattr(parent, "_open_phone") else None, GOLD)] if _show_phone else []),
             ("⚙", "Settings — AI keys, Cursiv Cloud, data folder",
              lambda: parent._open_settings() if hasattr(parent, "_open_settings") else None, GOLD),
             ("☰", "Show or hide saved conversations",

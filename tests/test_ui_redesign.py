@@ -156,13 +156,20 @@ def test_knowledge_window_browses_the_reference(app, settings):
 
 def test_tools_hides_advanced_and_help_explains(app, settings):
     import nav_windows
-    t = nav_windows.ToolsDialog()
-    assert t._adv.isHidden()
-    assert "Write a family letter" in _labels(t) and "Make a Cursiv USB" in _labels(t)
+    from cursiv_v215.core import profile
+    t = nav_windows.ToolsDialog()                       # research profile (the default)
+    text = _labels(t)
+    assert "Field Notebook" in text and "Field demo" in text and "Make a Cursiv USB" in text
+    assert "Write a family letter" not in text and "Coding help" not in text and "Show personal features" in text
     h = nav_windows.HelpDialog()
     from PyQt6.QtWidgets import QTextBrowser
     guide = h.findChildren(QTextBrowser)[0].toPlainText()
-    assert "The basics" in guide and "offline on" in guide
+    assert "The basics" in guide and "offline on" in guide and "Sources" in guide
+    assert "write to <name>" not in guide
+    profile.set_personal(True)
+    t = nav_windows.ToolsDialog()
+    assert t._adv.isHidden()
+    assert "Write a family letter" in _labels(t) and "Coding help" in _labels(t)
 
 
 def test_sidebar_navigation_and_prefill(panel):

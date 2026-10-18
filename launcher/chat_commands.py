@@ -590,6 +590,22 @@ def _agent_command(text: str, cfg: dict, history: list[dict]):
         return None            # a lone "@something" -- let normal chat handle it
     return TextResult(custom.listing())
 
+# The research profile (core/profile.py, the default): field work first.
+_FIELD_HELP_TEXT = """\
+Just type a question. These are for field work:
+
+  log site: North; pH 7.2; 44.12, -71.56   save an observation (or open Field Notebook)
+  field log / field log check            see entries / check nothing was changed
+  field report / field log export        a printable report / CSV, JSON, GeoJSON
+  add document <path>                    a protocol or SOP to answer from, by page
+  distance from 44.1, -71.5 to 44.2, -71.4   worked out in code (units, UTM, dilutions too)
+  remember <something>                   I'll keep it in mind
+  offline on / off                       LOCAL ONLY: block the internet
+  status                                 what's on, and which model answers
+  demo                                   try all of it with sample data
+
+help more                                everything else"""
+
 _HELP_TEXT = """\
 Just talk to me. Most things don't need a command.
 
@@ -608,6 +624,26 @@ help more                     everything else"""
 # help <topic>. Topics in _BUILDER_TOPICS are listed only for the owner
 # (they still open for anyone who types them).
 _HELP_TOPICS = {
+    "field": ("Field notebook", """\
+  log site: <name>; <measurement> <value> <unit>; <lat>, <lon>; note: <text>
+                              save an observation, values kept exactly as typed
+  log ...; sample: auto       give it a new sample ID (NT-20261018-001)
+  field log                   the latest entries
+  field log sample <id>       one sample's history
+  field log check             check that no entry was changed, removed or reordered
+  field report [site <name>] [today]   a printable report
+  field log export            CSV, JSON, GeoJSON, the report and sample labels
+  field log share <folder>    put this laptop's log on a USB drive or shared folder
+  field log import <folder>   bring in other laptops' logs (team log, team log export)
+  Corrections: Field Notebook -> Correct selected. The original always stays.
+  demo / demo off             sample data to try it with, kept apart from yours"""),
+    "documents": ("Your documents and calculations", """\
+  add document <path>         import a PDF or text file (protocol, SOP, permit)
+  documents                   what's imported
+  Answer only from my documents: Settings -> How Cursiv answers
+  Worked out in code, not guessed: units (convert 12.4 C to F), degrees-minutes-seconds,
+  UTM (what is 44.1234, -71.5678 in UTM), distance and bearing between two points,
+  dilutions (C1V1 = C2V2), mean / standard deviation, clock times, bleach doses"""),
     "memory": ("Memory", """\
   remember <something>        save a fact about you (or the family)
   what do you remember        list what I know, with when and how I learned it
@@ -667,6 +703,15 @@ _HELP_TOPICS = {
   obsidian on / off / path / export / status"""),
 }
 _BUILDER_TOPICS = {"builder"}
+_PERSONAL_TOPICS = {"family", "coding", "builder"}     # listed only with personal features shown
+
+
+def _personal() -> bool:
+    try:
+        from cursiv_v215.core import profile
+        return profile.personal()
+    except Exception:
+        return False
 
 
 def _is_builder() -> bool:
@@ -688,11 +733,12 @@ def help_text(topic: str = "") -> str:
     """`help` -> the short list; `help more` -> topics; `help <topic>` -> one topic."""
     topic = topic.strip().lower()
     if not topic:
-        return _HELP_TEXT
+        return _HELP_TEXT if _personal() else _FIELD_HELP_TEXT
     if topic in _HELP_TOPICS:
         title, body = _HELP_TOPICS[topic]
         return f"{title.upper()}\n{body}\n\nhelp more  -  all topics"
-    names = [t for t in _HELP_TOPICS if t not in _BUILDER_TOPICS or _is_builder()]
+    names = [t for t in _HELP_TOPICS
+             if (t not in _BUILDER_TOPICS or _is_builder()) and (t not in _PERSONAL_TOPICS or _personal())]
     lines = [f"  help {t:<10} {_HELP_TOPICS[t][0]}" for t in names]
     head = "" if topic in ("more", "all", "topics") else f"No help topic called \"{topic}\".\n\n"
     return head + "Type one of these:\n" + "\n".join(lines)

@@ -358,6 +358,12 @@ class SettingsDialog(QDialog):
                                   "otherwise adds a short note. Small local models still make mistakes."))
 
     def _page_appearance(self, lay):
+        from cursiv_v215.core import profile as _profile
+        self._switch(lay, "Show personal features",
+                     "Family letters, the legacy vault, the phone app, coding help, the council and builder tools. "
+                     "Off keeps Cursiv focused on field work; their commands still work if typed. "
+                     "Tools and help change right away; the title bar the next time Cursiv opens.",
+                     _profile.personal(), _profile.set_personal)
         v = self._card(lay)
         t = QLabel("Colours"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
         self._mode = QComboBox()

@@ -395,7 +395,12 @@ class ChatPanel(QWidget):
         more.setStyleSheet(theme.icon_button(30) + "QPushButton { font-size: 18px; }")
         more.setCursor(Qt.CursorShape.PointingHandCursor)
         menu = QMenu(more)
-        menu.addAction("Training data…", lambda: self._open_training_data())
+        try:
+            from cursiv_v215.core import profile as _profile
+            if _profile.personal():
+                menu.addAction("Training data…", lambda: self._open_training_data())
+        except Exception:
+            pass
         menu.addAction("Settings…", self._open_settings_from_pill)
         menu.addAction("Help (commands)", lambda: self._quick_send("help"))
         menu.addAction("Field demo (sample data)", lambda: self._quick_send("demo"))
