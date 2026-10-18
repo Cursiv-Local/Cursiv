@@ -245,3 +245,14 @@ def test_switching_mode_recolours_open_windows(app, settings):
     finally:
         theme.switch_live("")
         theme.CURRENT = start
+
+
+def test_ledger_and_check_notes_go_behind_a_link_but_the_answer_stays():
+    import chat_panel
+    body = ["Boil it for 1 minute.", "", "Known: creek water", "**Assumed:** no chemicals", "",
+            "---", "**Checked, with notes** (the answer above wasn't changed):", "- the answer omits altitude"]
+    main, details = chat_panel.ChatPanel.split_details(body)
+    assert main == ["Boil it for 1 minute."]
+    assert "Known: creek water" in details and "Assumed:** no chemicals" not in details
+    assert "Assumed: no chemicals" in details and "omits altitude" in details
+    assert chat_panel.ChatPanel.split_details(["Just an answer."]) == (["Just an answer."], "")

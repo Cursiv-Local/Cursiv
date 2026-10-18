@@ -317,6 +317,13 @@ class ChatPanel(QWidget):
         if url.scheme() == "cursiv":
             if url.host() == "prompt":
                 self.prefill(unquote(url.path().lstrip("/")))
+            elif url.host() == "details":
+                from PyQt6.QtWidgets import QMessageBox
+                box = QMessageBox(self)
+                box.setWindowTitle("Reasoning and checks")
+                box.setTextFormat(Qt.TextFormat.MarkdownText)
+                box.setText(unquote(url.path().lstrip("/")))
+                box.exec()
             elif url.host() == "setup":
                 win = self.window()
                 if hasattr(win, "_open_setup"):
@@ -519,6 +526,29 @@ class ChatPanel(QWidget):
     # ── Rendering a finished answer ─────────────────────────────────────
 
     _STATUS_LINE = _re.compile(r"^\s*\*([\[(])(.*)[\])]\*\s*$")
+    _LEDGER_LINE = _re.compile(r"^[\s>*_-]*(Known|Inferred|Assumed|Unknown)[*_]*\s*:", _re.I)
+
+    @classmethod
+    def split_details(cls, body: list[str]) -> tuple[list[str], str]:
+        """The answer, and what goes behind "Show reasoning and checks": the
+        Known / Inferred / Assumed / Unknown lines and the check's notes. The
+        answer and the reference card stay in view."""
+        main, details = [], []
+        notes_at = next((i for i, ln in enumerate(body)
+                         if ln.strip().startswith("**Checked, with notes**")), None)
+        if notes_at is not None:
+            details.extend(ln for ln in body[notes_at:] if ln.strip())
+            body = body[:notes_at]
+            while body and body[-1].strip() in ("", "---"):
+                body = body[:-1]
+        ledger = [ln.replace("**", "").strip().strip("*_-> ") for ln in body if cls._LEDGER_LINE.match(ln)]
+        main = [ln for ln in body if not cls._LEDGER_LINE.match(ln)]
+        while main and main[-1].strip() in ("", "---"):
+            main.pop()
+        if ledger:
+            details = ["**What this answer is based on**", *("- " + ln for ln in ledger)] + (
+                [""] + details if details else [])
+        return main, "\n".join(details)
 
     def _chip_html(self, inner: str) -> str:
         """One of Cursiv's own status lines, as a small line under (or above) the answer."""
@@ -529,10 +559,14 @@ class ChatPanel(QWidget):
             col = theme.GREEN if local else theme.AMBER
             label = ("Local · " + self._escape(engine.split("·", 1)[-1].strip())) if local else ("Online · " + self._escape(engine))
             return f'<p style="margin:6px 0 0 0; font-size:12px; color:{col};">● {label}</p>'
+        if inner.startswith("Cursiv's check:"):
+            return f'<p style="margin:8px 0 0 0; font-size:13px; color:{theme.AMBER};">⚠ {esc}</p>'
         if inner.startswith("From Cursiv's offline reference"):
+            urgent = "[medical/" in inner or "[survival/" in inner
+            style = (f"font-size:13px; color:{theme.TEXT};" if urgent else f"font-size:12px; color:{theme.MUTED};")
             return (f'<table width="100%" cellpadding="10" cellspacing="0" style="margin:2px 0 10px 0;'
                     f' background-color:{theme.SURFACE2}; border:1px solid {theme.BORDER};"><tr><td>'
-                    f'<span style="font-size:12px; color:{theme.MUTED};">{esc}</span></td></tr></table>')
+                    f'<span style="{style}">{esc}</span></td></tr></table>')
         return f'<p style="margin:4px 0; font-size:12px; color:{theme.MUTED};">{esc}</p>'
 
     @staticmethod
@@ -566,6 +600,7 @@ class ChatPanel(QWidget):
                 (top if not body else bottom).append(m.group(2))
             else:
                 body.append(line)
+        body, details = self.split_details(body)
         md = self._keep_line_breaks("\n".join(body).strip())
         cursor = QTextCursor(self._transcript.document())
         cursor.setPosition(start)
@@ -577,6 +612,11 @@ class ChatPanel(QWidget):
             if top:
                 cursor.insertBlock()
             cursor.insertMarkdown(md)
+        if details:
+            from urllib.parse import quote
+            cursor.insertBlock()
+            cursor.insertHtml(f'<p style="margin:6px 0 0 0; font-size:12px;"><a href="cursiv://details/'
+                              f'{quote(details)}" style="color:{theme.MUTED};">Show reasoning and checks</a></p>')
         for inner in bottom:
             cursor.insertBlock()
             cursor.insertHtml(theme.live(self._chip_html(inner)))

@@ -56,6 +56,25 @@ _CRISIS = re.compile(
 _MEMORY_UPDATE = re.compile(
     r"(?i)\b(remember that|remember this|my name is|i prefer|from now on|i always want)\b"
 )
+# The person named the shape of the answer: give exactly that, nothing added.
+_EXACT_FORMAT = re.compile(
+    r"(?i)\b(exactly (?:\d+|one|two|three|four|five|six|seven|eight|nine|ten) (?:numbered )?"
+    r"(?:steps|bullets|bullet points|items|points|words|sentences|lines|tips|reasons|examples|ideas|things|names)\b|"
+    r"(?:one|a single|1) (?:sentence|word|line) (?:each|per|only)|in (?:one|a single|\d+) (?:sentence|word|line)s?\b|"
+    r"(?:just|only) (?:the|a|one) |no explanation|nothing else|yes or no|"
+    r"\d+ (?:numbered )?(?:steps|bullets|bullet points|items|words|sentences|lines)\b|"
+    r"translate\b)"
+)
+
+FORMAT_RULE = ("The person asked for a specific format. Give exactly that format and nothing else: "
+               "no headings, no extra sections, no Known / Inferred / Assumed / Unknown lines, "
+               "no follow-up questions, no offers of more help. Count the items before you answer.")
+
+
+def exact_format(user_text: str) -> bool:
+    return bool(_EXACT_FORMAT.search(user_text or ""))
+
+
 _DECISION = re.compile(r"(?i)\b(should i|should we|which is better|pros and cons|help me decide)\b")
 _NUM_NOUN = re.compile(r"(?i)\b(\d+(?:\.\d+)?)\s+([a-z][a-z0-9-]{2,})\b")
 _DEF = re.compile(
@@ -102,7 +121,7 @@ def looks_like_memory_update(user_text: str) -> bool:
 def needs_ledger(user_text: str) -> bool:
     """Complex or high-stakes questions must carry the four-line ledger."""
     text = user_text or ""
-    if _CRISIS.search(text):
+    if _CRISIS.search(text) or exact_format(text):
         return False
     if _REVIEW.search(text) or _DECISION.search(text) or _TECH.search(text):
         return True
@@ -489,6 +508,8 @@ def prompt_addendum(user_text: str) -> str:
     if _CRISIS.search(user_text or ""):
         return ""
     parts = ["## Verification rules\n" + SAFETY_RULE]
+    if exact_format(user_text):
+        parts.append(FORMAT_RULE)
     if needs_ledger(user_text):
         parts.append(LEDGER_INSTRUCTION)
     prior = prior_ledger_block()

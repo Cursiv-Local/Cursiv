@@ -1338,6 +1338,8 @@ _STATUS_LINE_RE = _re.compile(r"(?m)^[ \t]*\*[\[(][^\n]*[\])]\*[ \t]*(?:\r?\n|$)
 _TOOL_NOTE = "(Checked on this computer"
 _REAL_TOOL_NOTES: set[str] = set()     # notes this code emitted for the current turn
 _RETRIEVED: list[str] = []             # text actually looked up this turn (web, plugins, tools)
+_REF_SHOWN: list[str] = []             # titles of the offline reference entries shown this turn
+_WEB_SEARCHED = False                  # a web search ran for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
 
 
@@ -2455,6 +2457,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     elif _needs_search(user_text) and _is_online():
         _web_ctx = _web_search(_search_q[:300])
     if _web_ctx:
+        global _WEB_SEARCHED
+        _WEB_SEARCHED = True
         _RETRIEVED.append(_web_ctx)
         messages[0]["content"] += (
             "\n\n## Live Web Search Results\n"
@@ -2595,6 +2599,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             from cursiv_v215.core import reference as _ref_data
             _found = _ref_data.lookup(user_text)
             if _found:
+                _REF_SHOWN[:] = [e.title for e in _found]
                 _ref_block = _ref_data.prompt_block(_found)
                 messages[0]["content"] += "\n\n" + _ref_block + "\n"
                 _RETRIEVED.append(_ref_block)
@@ -3044,6 +3049,15 @@ def chat(
         if _PHASE_AFTER:             # Route / Recovery notes from the phases
             reply.append(_PHASE_AFTER)
             yield _PHASE_AFTER
+        # No model call, so it runs on emergency turns too (core/answer_check.py).
+        try:
+            from cursiv_v215.core import answer_check as _ac
+            _flag = _ac.notes(draft, list(_REF_SHOWN), _WEB_SEARCHED)
+            if _flag:
+                reply.append(_flag)
+                yield _flag
+        except Exception:
+            pass
         # Still inside this turn, so the check uses the fast router (no idle wait)
         # and background learning cannot take the local model yet.
         try:
@@ -3139,8 +3153,11 @@ def _check_context(history: list[dict], user_text: str) -> str:
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
                  confirm_writes, anthropic_key, force_provider, reply: list[str]):
     from cursiv_v215.core import selfknow as _sk
+    global _WEB_SEARCHED
     _REAL_TOOL_NOTES.clear()
     _RETRIEVED.clear()
+    _REF_SHOWN.clear()
+    _WEB_SEARCHED = False
     _set_answered("")
     for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):
         if isinstance(chunk, str) and chunk not in (RATE_SENTINEL,) and not chunk.startswith(WRITE_SENTINEL):

@@ -297,7 +297,12 @@ def test_system_prompt_states_the_safety_rule():
     prompt = Path(__file__).resolve().parent.parent.joinpath(
         "cursiv_v215", "codex", "system_prompt.md").read_text(encoding="utf-8")
     assert "Memory never outranks safety." in prompt
-    assert "Known:" in prompt and "Assumed:" in prompt
+    # The four-line ledger is asked for only when needs_ledger() says so (prompt_addendum),
+    # not on every answer by the persona.
+    assert "Known:" not in prompt
+    assert "Known:" in verify.prompt_addendum("The retry limit is exactly 3 retries. Is this correct?")
+    assert "Known:" not in verify.prompt_addendum("Give me exactly 5 steps, one sentence each.")
+    assert "Only claim what happened." in prompt and "Never contradict the offline reference." in prompt
 
 
 # ── chat() appends the revision after the draft ────────────────────────────

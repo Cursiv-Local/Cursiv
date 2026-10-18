@@ -1,0 +1,85 @@
+"""
+Two checks on a finished answer that need no model call, so they run on every
+turn, emergencies included (the model-based check in verify.py skips those).
+
+1. The answer tells the person to avoid a step the offline reference entry
+   shown above it recommends ("don't use a tourniquet unless trained" under the
+   bleeding card). A ChatGPT review of Cursiv's answers found exactly that.
+2. The answer claims something Cursiv didn't do this turn: searched the web,
+   checked a database, looked at a study.
+
+Each problem becomes one line under the answer, so the person sees it.
+"""
+from __future__ import annotations
+
+import re
+
+# Steps each entry recommends, as words an answer would use. An answer that
+# negates one of them contradicts the entry.
+KEY_STEPS = {
+    "severe bleeding control": ("tourniquet", "pressure", "press", "bandage", "gauze", "cloth", "pack", "911"),
+    "tourniquet application": ("tourniquet",),
+    "hypothermia treatment": ("911", "warm", "blanket", "skin-to-skin", "cpr", "wet clothing"),
+    "water purification": ("boil", "bleach"),
+    "CPR adult": ("cpr", "compressions", "911", "aed"),
+    "choking adult Heimlich": ("abdominal thrusts", "back blows", "heimlich", "911"),
+    "anaphylaxis severe allergic reaction": ("epinephrine", "epipen", "auto-injector", "911"),
+    "burns treatment": ("cool", "running water", "911"),
+    "drowning response": ("cpr", "911", "rescue breaths"),
+    "heat stroke": ("cool", "911", "water"),
+}
+
+_NEG = r"(?:don'?t|do not|never|avoid|shouldn'?t|should not|no need to|not recommended to|refrain from)"
+# Negating these verbs agrees with the entries ("don't remove the cloth"), so they don't count.
+_OK_VERBS = re.compile(r"\b(remove|removing|lift|lifting|take|taking|loosen|loosening|peel|check|wait|delay|put off)\b", re.I)
+_UNLESS_TRAINED = re.compile(r"\b(?:unless|only if|if) (?:you(?:'re| are)? )?(?:properly |formally )?trained\b", re.I)
+
+
+def contradictions(answer: str, titles: list[str]) -> list[str]:
+    """Steps from the shown entries that the answer tells the person to avoid."""
+    text = answer or ""
+    found = []
+    for title in titles:
+        for step in KEY_STEPS.get(title, ()):
+            pat = re.compile(_NEG + r"((?:\s+[\w'-]+){0,6}?)\s+(?:a |an |the )?" + re.escape(step) + r"\b", re.I)
+            for m in pat.finditer(text):
+                if _OK_VERBS.search(m.group(1) or ""):
+                    continue
+                found.append(step)
+                break
+            # "use a tourniquet only if trained" / "unless you're trained" next to a key step
+            for m in _UNLESS_TRAINED.finditer(text):
+                window = text[max(0, m.start() - 120): m.end()].lower()
+                if step in window and step not in found:
+                    found.append(step)
+    return found
+
+
+_CLAIMS = re.compile(
+    r"(?i)\b(I(?:'ve| have)? (?:searched|looked (?:it )?up|checked|scanned|reviewed|consulted|queried)"
+    r"(?: [\w-]+){0,4}? (?:databases?|the web|the internet|online|pubmed|google scholar|journals?|records|sources|literature)"
+    r"|(?:my|a) (?:search|review) of (?:the )?(?:databases?|literature|journals?|pubmed)"
+    r"|after (?:searching|checking) (?:the )?(?:databases?|web|internet|literature|journals?))"
+)
+
+
+def unsupported_actions(answer: str, searched: bool) -> list[str]:
+    """Things the answer says Cursiv did that it didn't do this turn."""
+    if searched:
+        return []
+    return [m.group(0) for m in _CLAIMS.finditer(answer or "")][:2]
+
+
+def notes(answer: str, titles: list[str], searched: bool) -> str:
+    """The lines to show under the answer, or ""."""
+    lines = []
+    steps = contradictions(answer, titles)
+    if steps:
+        urgent = " and call 911 in an emergency" if any(t != "water purification" for t in titles) else ""
+        lines.append("*(Cursiv's check: this answer advises against " + ", ".join(f'"{s}"' for s in steps)
+                     + f", which the reference above recommends. Follow the reference{urgent}.)*")
+    claims = unsupported_actions(answer, searched)
+    if claims:
+        lines.append(f'*(Cursiv\'s check: the answer says "{claims[0]}", but nothing was searched or looked up '
+                     "for this answer. It comes from the model's own knowledge.)*")
+    return ("\n\n" + "\n".join(lines)) if lines else ""
