@@ -55,23 +55,40 @@ def test_pill_shows_in_the_window(panel, settings):
     assert "Offline mode" in panel._net_pill.text()
 
 
-def test_model_picker_lists_and_saves_the_choice(panel, settings, app, monkeypatch):
+def test_model_picker_offers_standard_and_deep_think(panel, settings, app, monkeypatch):
     for _ in range(50):
         app.processEvents()
         if panel._model_box.isEnabled():
             break
         import time; time.sleep(0.02)
-    items = [panel._model_box.itemText(i) for i in range(panel._model_box.count())]
-    assert items[0].startswith("Automatic") and "llama3.1:latest" in items
-    panel._on_model_chosen(panel._model_box.findData("llama3.1:latest"))
+    box = panel._model_box
+    items = [box.itemText(i) for i in range(box.count())]
+    assert items[0].startswith("Standard") and items[1].startswith("Deep Think")
+    assert not any(t.startswith("Model:") for t in items)          # no model names unless Advanced is on
     from cursiv_v215.chat import status
-    assert status.preferred_model() == "llama3.1:latest"
+    from cursiv_v215.core import speed
     from cursiv_v215.ui import chat_app as ca
-    monkeypatch.setattr(ca, "_ollama_tags", lambda: ["qwen3:4b-instruct", "llama3.1:latest"])
-    assert ca._resolve_ollama_model() == "llama3.1:latest"       # the engine honours the choice
-    panel._on_model_chosen(0)                                     # back to Automatic
-    assert ca._resolve_ollama_model() == "qwen3:4b-instruct" or ca._resolve_ollama_model() == "llama3.1:latest"
-    assert status.preferred_model() == ""
+    monkeypatch.setattr(ca, "_ollama_tags", lambda: ["qwen3:4b-instruct", "llama3.1:latest", speed.DEEP_THINK_MODEL])
+    status.choose("deep")
+    assert ca._resolve_ollama_model() == speed.DEEP_THINK_MODEL
+    assert ca._resolve_ollama_model(standard=True) == "qwen3:4b-instruct"   # checks stay on the quick model
+    status.choose("standard")
+    assert ca._resolve_ollama_model() == "qwen3:4b-instruct"
+
+
+def test_advanced_lists_every_model_and_honours_the_pick(panel, monkeypatch):
+    from cursiv_v215.chat import status
+    from cursiv_v215.ui import chat_app as ca
+    installed = ["qwen3:4b-instruct", "llama3.1:latest"]
+    assert [c for _, c, _ in status.menu_choices(installed)] == ["standard", "deep"]
+    assert status.menu_choices(installed)[1][2] is False             # Deep Think model not installed
+    status.set_show_all_models(True)
+    assert "model:llama3.1:latest" in [c for _, c, _ in status.menu_choices(installed)]
+    monkeypatch.setattr(ca, "_ollama_tags", lambda: installed)
+    status.choose("model:llama3.1:latest")
+    assert ca._resolve_ollama_model() == "llama3.1:latest" and status.current_choice() == "model:llama3.1:latest"
+    status.set_show_all_models(False)                                 # Advanced off: back to Standard's model
+    assert ca._resolve_ollama_model() == "qwen3:4b-instruct"
 
 
 def test_finished_answer_is_rendered_with_chips(panel):

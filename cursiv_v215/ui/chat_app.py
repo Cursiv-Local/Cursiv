@@ -956,7 +956,7 @@ def _resolve_ollama_model(standard: bool = False) -> str | None:
     from cursiv_v215.core import speed as _speed
     if not standard and _speed.deep_think_on() and _speed.DEEP_THINK_MODEL in available:
         return _speed.DEEP_THINK_MODEL
-    _chosen = _saved_key("chat_model")            # picked under Advanced in the model menu
+    _chosen = _saved_key("chat_model") if _saved_key("show_all_models") == "on" else ""   # Advanced menu pick
     if _chosen and _chosen in available and not (standard and _chosen == _speed.DEEP_THINK_MODEL):
         return _chosen
     # Fastest good model for this GPU first (e.g. a 3B model on a 4 GB card), if installed

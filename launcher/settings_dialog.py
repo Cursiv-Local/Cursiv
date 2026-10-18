@@ -221,24 +221,39 @@ class SettingsDialog(QDialog):
     def _page_model(self, lay):
         from cursiv_v215.chat import status
         lay.addWidget(self._explain("Cursiv answers with an AI model that runs on this computer through Ollama. "
-                                    "Automatic picks the best one your graphics card can run."))
+                                    "Standard is quick and fine for most questions. Deep Think uses a bigger model "
+                                    "that reasons before it answers: better for hard, multi-step questions, but it "
+                                    "can take a minute or two."))
         v = self._card(lay)
-        v.addWidget(QLabel("Model"))
+        v.addWidget(QLabel("How Cursiv answers"))
         self._model = QComboBox()
         models = status.local_models() or []
+
+        def fill():
+            self._model.clear()
+            for label, choice, enabled in status.menu_choices(models):
+                self._model.addItem(label, choice)
+                self._model.model().item(self._model.count() - 1).setEnabled(enabled)
+            self._model.setCurrentIndex(max(0, self._model.findData(status.current_choice())))
         if models:
-            self._model.addItem(f"Automatic  ·  {status.automatic_model(models)}", "")
-            for m in models:
-                self._model.addItem(m, m)
-            chosen = status.preferred_model()
-            if chosen in models:
-                self._model.setCurrentIndex(self._model.findData(chosen))
-            self._model.activated.connect(lambda i: status.set_preferred_model(self._model.itemData(i) or ""))
+            fill()
+            self._model.activated.connect(lambda i: status.choose(self._model.itemData(i) or "standard"))
         else:
             self._model.addItem("No local model found — Ollama may not be running", "")
             self._model.setEnabled(False)
         v.addWidget(self._model)
-        v.addWidget(self._explain("Bigger models answer better but more slowly. The choice also shows above the chat."))
+        v.addWidget(self._explain("The choice also shows above the chat."))
+
+        def show_all(on):
+            status.set_show_all_models(on)
+            if not on and status.current_choice() == "standard":
+                status.choose("standard")
+            if models:
+                fill()
+        self._switch(lay, "Advanced: show every model",
+                     "Lists each installed model by name in the menu, to pick one yourself. "
+                     "Most people don't need this.",
+                     status.show_all_models(), show_all)
         self._action(lay, "Download or change models",
                      "Opens Setup, which installs Ollama and downloads models sized for your computer.",
                      lambda: self._call_window("_open_setup"))

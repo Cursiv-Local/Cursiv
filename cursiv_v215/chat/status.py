@@ -79,3 +79,48 @@ def automatic_model(installed: list[str]) -> str | None:
         if name in have:
             return next((n for n in installed if n == name or n.split(":")[0] == name), name)
     return installed[0] if installed else None
+
+
+# ── The model menu: Standard and Deep Think; every model only under Advanced ──
+# People pick what they want done, not a model name. "Show every model" in
+# Settings -> AI model (Advanced) lists each installed model as well.
+
+SHOW_ALL_MODELS = "show_all_models"      # "on" lists every installed model too
+
+
+def show_all_models() -> bool:
+    from cursiv_v215.chat import keys
+    return keys.saved_key(SHOW_ALL_MODELS) == "on"
+
+
+def set_show_all_models(on: bool) -> None:
+    from cursiv_v215.chat import keys
+    keys.store_key(SHOW_ALL_MODELS, "on" if on else "")
+
+
+def menu_choices(installed: list[str]) -> list[tuple[str, str, bool]]:
+    """(label, choice, enabled) for the model menu. choice: "standard", "deep" or "model:<name>"."""
+    from cursiv_v215.core import speed
+    deep = speed.DEEP_THINK_MODEL
+    have_deep = deep in installed or f"{deep}:latest" in installed
+    out = [("Standard  ·  quick everyday answers", "standard", True),
+           (("Deep Think  ·  slower, for harder questions" if have_deep
+             else f"Deep Think  ·  download {deep} in Setup first"), "deep", have_deep)]
+    if show_all_models():
+        out += [(f"Model: {m}", f"model:{m}", True) for m in installed]
+    return out
+
+
+def current_choice() -> str:
+    from cursiv_v215.chat import keys
+    if keys.saved_key("answer_mode") == "deep":
+        return "deep"
+    chosen = preferred_model()
+    return f"model:{chosen}" if chosen and show_all_models() else "standard"
+
+
+def choose(choice: str) -> None:
+    """Save a menu choice. Standard clears a specific model; Deep Think turns on answer_mode."""
+    from cursiv_v215.chat import keys
+    keys.store_key("answer_mode", "deep" if choice == "deep" else "")
+    set_preferred_model(choice[len("model:"):] if choice.startswith("model:") else "")

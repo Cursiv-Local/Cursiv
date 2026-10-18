@@ -50,6 +50,7 @@ cases = [c for c in truth_cases.CASES if c["id"] in set(json.loads(sys.argv[1]))
 if len(sys.argv) > 2 and sys.argv[2]:
     from cursiv_v215.chat import keys
     keys.store_key("chat_model", sys.argv[2])
+    keys.store_key("show_all_models", "on")       # a specific model is an Advanced choice
 if len(sys.argv) > 3 and sys.argv[3] == "deep":
     from cursiv_v215.chat import keys
     keys.store_key("answer_mode", "deep")

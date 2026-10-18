@@ -363,7 +363,7 @@ class ChatPanel(QWidget):
         header_row.setSpacing(8)
         # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
         self._model_box = QComboBox()
-        self._model_box.setToolTip("Which AI model on this computer answers")
+        self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
         self._model_box.setMinimumWidth(240)
         self._model_box.addItem("Looking for local models…", "")
         self._model_box.setEnabled(False)
@@ -497,17 +497,15 @@ class ChatPanel(QWidget):
             box.addItem("No local model yet — open Setup" if models == [] else "Ollama isn't running", "")
             box.setEnabled(False)
             return
-        chosen = _st.preferred_model()
-        auto = _st.automatic_model(models)
-        box.addItem(f"Automatic  ·  {auto}", "")
-        for m in models:
-            box.addItem(m, m)
-        box.setCurrentIndex(max(0, box.findData(chosen)) if chosen in models else 0)
+        for label, choice, enabled in _st.menu_choices(models):
+            box.addItem(label, choice)
+            box.model().item(box.count() - 1).setEnabled(enabled)
+        box.setCurrentIndex(max(0, box.findData(_st.current_choice())))
         box.setEnabled(True)
 
     def _on_model_chosen(self, index: int) -> None:
         from cursiv_v215.chat import status as _st
-        _st.set_preferred_model(self._model_box.itemData(index) or "")
+        _st.choose(self._model_box.itemData(index) or "standard")
 
     def prefill(self, text: str) -> None:
         """Put a starting command in the input box (Tools buttons), cursor at the end."""
