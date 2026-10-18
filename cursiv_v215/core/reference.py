@@ -161,6 +161,22 @@ NO_ENTRY_NOTE = ("## Cursiv's offline reference\nCursiv's offline reference has 
                  "suggest checking with a professional or official source when possible.")
 
 
+_sources: dict | None = None
+
+
+def source(title: str) -> dict | None:
+    """Where an entry comes from (reference_data/sources.json): source, url,
+    the date it was last checked against it, and whether a professional reviewed it."""
+    global _sources
+    if _sources is None:
+        try:
+            _sources = json.loads((DATA_DIR / "sources.json").read_text(encoding="utf-8"))
+        except Exception:
+            _sources = {}
+    got = _sources.get(title)
+    return got if isinstance(got, dict) else None
+
+
 def note_line(found: list[Entry]) -> str:
     """What the person sees above the answer. First-aid and survival entries are
     shown word for word, so their numbers never depend on the model retelling
@@ -169,9 +185,11 @@ def note_line(found: list[Entry]) -> str:
     lines = []
     for e in found:
         if e.category in ("medical", "survival"):
-            caveat = (" Written for Cursiv, not reviewed by a medical professional; in an emergency call 911."
+            src = source(e.title)
+            based = f" Based on {src['source']} (checked {src['checked']})." if src else ""
+            caveat = (" Not reviewed by a medical professional; in an emergency call 911."
                       if e.category == "medical" else "")
-            lines.append(f"*(From Cursiv's offline reference, {e.title} [{e.id}]: {e.text}{caveat})*")
+            lines.append(f"*(From Cursiv's offline reference, {e.title} [{e.id}]: {e.text}{based}{caveat})*")
         else:
             lines.append(f"*(From Cursiv's offline reference: {e.title} [{e.id}])*")
     return "\n".join(lines)

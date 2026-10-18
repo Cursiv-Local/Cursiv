@@ -50,7 +50,7 @@ def test_chat_cites_the_entry_and_tells_the_person(fresh, monkeypatch):
     assert "From Cursiv's offline reference, severe bleeding control [medical/severe-bleeding-control]" in out
     entry = next(e for e in ref.entries() if e.id == "medical/severe-bleeding-control")
     assert entry.text in out                         # shown word for word, numbers and all
-    assert "not reviewed by a medical professional" in out
+    assert "Not reviewed by a medical professional" in out and "Based on Stop the Bleed" in out
     assert "Draft + notes" not in out and "Checked, with notes" not in out   # no check on an emergency
 
 
@@ -80,3 +80,54 @@ def test_medical_emergency_gets_first_aid_but_a_crisis_gets_care(fresh, monkeypa
 
 def test_water_arithmetic_is_not_a_reference_question():
     assert ref.lookup("We have 4 people and each needs 3 liters of water a day. How much for 3 days?") == []
+
+
+# ── Entries rewritten from published guidance (review 2026-10-18) ───────────
+
+def _text(title):
+    return next(e.text for e in ref.entries() if e.title == title)
+
+
+def test_bleeding_entry_says_pressure_then_tourniquet_not_avoid_them():
+    t = _text("severe bleeding control").lower()
+    assert "call 911" in t and "press firmly" in t and "tourniquet" in t
+    assert "2-3 inches above the wound" in t and "note the time" in t
+    assert "unless trained" not in t
+
+
+def test_tourniquet_entry_matches_the_bleeding_entry():
+    t = _text("tourniquet application").lower()
+    assert "2-3 inches above the wound" in t and "not over a joint" in t
+    assert "5-7cm" not in t and "2 hours" not in t
+
+
+def test_water_entry_has_epa_doses_and_limits():
+    t = _text("water purification")
+    for fact in ("at least 1 minute", "3 minutes", "6% or 8.25%", "2 drops", "8 drops of 6%",
+                 "6 drops of 8.25%", "DOUBLE", "30 minutes", "do NOT remove chemicals", "1-800-426-4791"):
+        assert fact in t, fact
+
+
+def test_hypothermia_entry_follows_cdc_without_temperature_bands():
+    t = _text("hypothermia treatment")
+    assert "95°F (35°C)" in t and "call 911" in t and "CPR" in t
+    assert "MODERATE" not in t and "28" not in t
+
+
+def test_rewritten_entries_name_their_source_in_the_card():
+    found = [e for e in ref.entries() if e.title in ("water purification", "severe bleeding control")]
+    line = ref.note_line(found)
+    assert "Based on U.S. EPA" in line and "Based on Stop the Bleed" in line and "checked 2026-10-18" in line
+    for title in ("water purification", "severe bleeding control", "tourniquet application", "hypothermia treatment"):
+        assert ref.source(title)["url"].startswith("https://")
+
+
+@pytest.mark.parametrize("question", [
+    "how do I write a cover letter", "best breakfast for energy", "tie up tomato plants",
+])
+def test_reference_tool_for_online_models_is_as_strict_as_chat(question):
+    # The online-AI tool used to return the top 3 entries sharing any word,
+    # which put water purification and tourniquets under a cover-letter question.
+    from cursiv_v215.agents import reference_brain
+    assert reference_brain._bundled_search(question) == []
+    assert "water purification" in [k for k, _, _ in reference_brain._bundled_search("how do I purify creek water")]

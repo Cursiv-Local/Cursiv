@@ -25,7 +25,6 @@ from __future__ import annotations
 
 import json
 import os
-import re
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -87,21 +86,11 @@ def bundled_available() -> bool:
 
 
 def _bundled_search(query: str, limit: int = 3) -> list[tuple[str, str, str]]:
-    """Keyword-overlap search over the bundled entries -- there are only
-    ~85 of them, so this doesn't need to be cleverer than that."""
-    q_words = set(re.findall(r"[a-z]+", query.lower()))
-    if not q_words:
-        return []
-    scored = []
-    for key, (category, content) in _bundled_entries.items():
-        entry_words = set(re.findall(r"[a-z]+", (key + " " + content).lower()))
-        overlap = len(q_words & entry_words)
-        key_bonus = sum(1 for w in q_words if w in key.lower())
-        score = overlap + key_bonus * 2
-        if score > 0:
-            scored.append((score, key, category, content))
-    scored.sort(key=lambda x: x[0], reverse=True)
-    return [(k, c, txt) for _, k, c, txt in scored[:limit]]
+    """The same strict matching chat uses (core/reference.lookup): an entry
+    only when the question names its topic. Any-shared-word scoring returned
+    water purification for "how do I write a cover letter"."""
+    from cursiv_v215.core import reference
+    return [(e.title, e.category, e.text) for e in reference.lookup(query, limit=limit)]
 
 
 def _bundled_answer(query: str) -> str:

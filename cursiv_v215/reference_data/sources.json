@@ -1,0 +1,27 @@
+{
+  "_about": "Where each reference entry comes from. 'reviewed' means checked by a qualified professional; none are yet.",
+  "water purification": {
+    "source": "U.S. EPA, Emergency Disinfection of Drinking Water",
+    "url": "https://www.epa.gov/ground-water-and-drinking-water/emergency-disinfection-drinking-water",
+    "checked": "2026-10-18",
+    "reviewed": false
+  },
+  "severe bleeding control": {
+    "source": "Stop the Bleed course guidance (American College of Surgeons program), as published by course hosts",
+    "url": "https://www.stopthebleed.org/",
+    "checked": "2026-10-18",
+    "reviewed": false
+  },
+  "hypothermia treatment": {
+    "source": "U.S. CDC, Preventing hypothermia (winter weather)",
+    "url": "https://www.cdc.gov/winter-weather/prevention/index.html",
+    "checked": "2026-10-18",
+    "reviewed": false
+  },
+  "tourniquet application": {
+    "source": "Stop the Bleed course guidance (American College of Surgeons program), as published by course hosts",
+    "url": "https://www.stopthebleed.org/",
+    "checked": "2026-10-18",
+    "reviewed": false
+  }
+}
