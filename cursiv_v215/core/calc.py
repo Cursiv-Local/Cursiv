@@ -35,6 +35,8 @@ _FORWARD = re.compile(r"(?i)\b(?:what time|when) (?:will|would) (?:it|i|we|they|
 class Worked:
     statement: str      # "6:00 AM minus 8 hours 30 minutes is 9:30 PM (the night before)."
     answer: str         # what the reply must contain: "9:30"
+    value: float | None = None   # for field calculations: a number the reply must contain, within tol
+    tol: float = 0.0
 
 
 def _num(text: str) -> float:
@@ -126,7 +128,13 @@ def plain_arithmetic(question: str) -> Worked | None:
 
 
 def work_out(question: str) -> Worked | None:
-    return clock_arithmetic(question) or plain_arithmetic(question)
+    w = clock_arithmetic(question) or plain_arithmetic(question)
+    if w:
+        return w
+    # Units, coordinates, dilutions, statistics (core/fieldcalc.py, research roadmap R2)
+    from cursiv_v215.core import fieldcalc
+    r = fieldcalc.work_out(question)
+    return Worked(r.statement, "", r.value, r.tol) if r else None
 
 
 def prompt_note(w: Worked) -> str:
@@ -134,9 +142,19 @@ def prompt_note(w: Worked) -> str:
             " Use this result as given; don't redo the calculation differently.")
 
 
+def _decimals(number: str) -> int:
+    """Rounding allowed for a number written with this many decimals: 54.3 may stand for 54.32."""
+    return len(number.split(".")[1]) - 1 if "." in number else -1
+
+
 def check(answer: str, w: Worked) -> str:
     """A line for under the answer when it doesn't contain the worked-out result, else ""."""
     text = (answer or "").replace(",", "")
-    if re.search(r"(?<![\d:.])" + re.escape(w.answer.replace(",", "")) + r"(?![\d])", text):
+    if w.value is not None:
+        # rounding is fine ("about 54.3" for 54.32); a different number isn't
+        if any(abs(float(n) - w.value) <= max(w.tol, 0.051 * 10 ** -_decimals(n))
+               for n in re.findall(r"-?\d+(?:\.\d+)?", text)):
+            return ""
+    elif re.search(r"(?<![\d:.])" + re.escape(w.answer.replace(",", "")) + r"(?![\d])", text):
         return ""
     return f"*(Cursiv's check: worked out exactly, {w.statement[0].lower() + w.statement[1:]})*"
