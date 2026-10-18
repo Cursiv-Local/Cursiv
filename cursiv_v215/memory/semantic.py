@@ -28,6 +28,7 @@ import urllib.request
 import uuid
 from pathlib import Path
 from typing import Any, Callable
+from cursiv_v215.core import atomic as _atomic
 
 ROOT = Path(__file__).parent.parent.parent
 CURSIV_DIR = ROOT / ".cursiv"
@@ -74,7 +75,7 @@ def set_learning(on: bool) -> None:
     s = _settings()
     s["learn"] = bool(on)
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-    SETTINGS_FILE.write_text(json.dumps(s, indent=2), encoding="utf-8")
+    _atomic.write_text(SETTINGS_FILE, json.dumps(s, indent=2))
 
 
 # ── Embeddings (local, through Ollama) ──────────────────────────────────────
@@ -92,7 +93,7 @@ def _load_cache() -> dict[str, list[float]]:
 def _save_cache() -> None:
     try:
         CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-        EMB_CACHE_FILE.write_text(json.dumps(_load_cache()), encoding="utf-8")
+        _atomic.write_text(EMB_CACHE_FILE, json.dumps(_load_cache()))
     except Exception:
         pass
 
@@ -199,7 +200,7 @@ def list_facts(person: str | None = None) -> list[dict[str, Any]]:
 
 def _write_facts(facts: list[dict]) -> None:
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-    FACTS_FILE.write_text("".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts), encoding="utf-8")
+    _atomic.write_text(FACTS_FILE, "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts))
 
 
 REMOVED_FILE_NAME = "memory_facts.removed.jsonl"
@@ -229,7 +230,7 @@ def repair_learned(facts: list[dict]) -> list[dict]:
         _write_facts(kept)
         st = _settings()
         st[REPAIR_KEY] = {"kept": len(kept), "moved": len(removed)}
-        SETTINGS_FILE.write_text(json.dumps(st, indent=2), encoding="utf-8")
+        _atomic.write_text(SETTINGS_FILE, json.dumps(st, indent=2))
     except Exception:
         return facts                       # try again next time; nothing lost
     return kept

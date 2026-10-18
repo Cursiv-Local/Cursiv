@@ -14,6 +14,7 @@ import time
 import uuid
 from pathlib import Path
 from typing import Callable, Optional
+from cursiv_v215.core import atomic as _atomic
 
 DIR = Path.home() / ".cursiv" / "conversations"
 
@@ -86,7 +87,7 @@ def _smart_title(conv_id: str, messages: list[dict], on_done: Optional[Callable[
         return                                   # renamed by hand meanwhile -- keep theirs
     d["title"] = title
     d["titled_at"] = len(messages)
-    (DIR / f"{conv_id}.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+    _atomic.write_text((DIR / f"{conv_id}.json"), json.dumps(d, ensure_ascii=False))
     if on_done:
         try:
             on_done()
@@ -165,10 +166,10 @@ def retitle_old(on_done: Optional[Callable[[], None]] = None) -> None:
             msgs = d.get("messages") or []
             if d.get("title") != _old_style_title(msgs) or len(msgs) < 2:
                 d["title_auto"] = d.get("title") == _old_style_title(msgs)
-                f.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+                _atomic.write_text(f, json.dumps(d, ensure_ascii=False))
                 continue
             d["title"], d["title_auto"] = title_from(msgs), True
-            f.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+            _atomic.write_text(f, json.dumps(d, ensure_ascii=False))
             if on_done:
                 on_done()
             _smart_title(d["id"], msgs, on_done)
@@ -180,7 +181,7 @@ def rename(conv_id: str, title: str) -> None:
     if d and title.strip():
         d["title"] = title.strip()[:80]
         d["title_auto"] = False
-        (DIR / f"{conv_id}.json").write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+        _atomic.write_text((DIR / f"{conv_id}.json"), json.dumps(d, ensure_ascii=False))
 
 
 def delete(conv_id: str) -> None:

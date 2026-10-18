@@ -92,3 +92,19 @@ def test_a_field_copy_starts_offline_quiet_and_not_learning(tmp_path):
     assert out.returncode == 0, out.stderr[-2000:]
     assert json.loads(out.stdout.strip().splitlines()[-1]) == {"offline": True, "breaks": False, "learning": False}
     assert (home / ".cursiv" / "field_defaults_applied").exists()      # once only
+
+
+def test_a_failed_save_leaves_the_old_file_intact(tmp_path, monkeypatch):
+    import os
+    from cursiv_v215.core import atomic
+    f = tmp_path / "memory_facts.jsonl"
+    atomic.write_text(f, "old\n")
+
+    def power_cut(*a, **k):
+        raise OSError("power cut before the swap")
+    monkeypatch.setattr(os, "replace", power_cut)
+    try:
+        atomic.write_text(f, "new, half writ")
+    except OSError:
+        pass
+    assert f.read_text(encoding="utf-8") == "old\n"            # never half of each

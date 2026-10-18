@@ -13,6 +13,7 @@ import urllib.request
 from pathlib import Path
 
 from cursiv_v215.core import keystore
+from cursiv_v215.core import atomic as _atomic
 
 KEYS_FILE = Path(__file__).resolve().parent.parent.parent / ".cursiv" / "config.json"
 
@@ -37,7 +38,7 @@ def store_key(field: str, value: str) -> None:
         else:
             data.pop(field, None)
         KEYS_FILE.parent.mkdir(parents=True, exist_ok=True)
-        KEYS_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        _atomic.write_text(KEYS_FILE, json.dumps(data, indent=2))
     except Exception:
         pass
 

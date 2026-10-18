@@ -27,6 +27,7 @@ import os
 import sys
 import threading
 from pathlib import Path
+from cursiv_v215.core import atomic as _atomic
 
 CONFIG_FILE = Path(__file__).resolve().parent.parent.parent / ".cursiv" / "config.json"
 
@@ -79,7 +80,7 @@ def set_setting(name: str, on: bool) -> None:
             data = {}
         data[name] = bool(on)
         CONFIG_FILE.parent.mkdir(parents=True, exist_ok=True)
-        CONFIG_FILE.write_text(json.dumps(data, indent=2), encoding="utf-8")
+        _atomic.write_text(CONFIG_FILE, json.dumps(data, indent=2))
         _cache["mtime"] = None
 
 
