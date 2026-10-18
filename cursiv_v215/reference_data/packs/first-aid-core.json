@@ -1,0 +1,110 @@
+{
+  "pack": "first-aid-core",
+  "version": "1.0",
+  "about": "Head injury danger signs, sudden cardiac arrest, seizures and altitude illness. Written from CDC pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "entries": [
+    {
+      "title": "concussion assessment",
+      "category": "medical",
+      "aliases": [
+        "concussion",
+        "hit his head",
+        "hit her head",
+        "hit my head",
+        "head injury",
+        "bumped his head",
+        "bumped her head",
+        "blow to the head",
+        [
+          "fell",
+          "head"
+        ]
+      ],
+      "text": "After a bump, blow or jolt to the head, call 911 or go to an emergency department right away if the person: has a headache that gets worse and doesn't go away; has weakness, numbness, poor coordination, convulsions or seizures; vomits repeatedly; has slurred speech or unusual behavior; has one pupil larger than the other; can't recognize people or places, or becomes confused, restless or agitated; passes out, looks very drowsy or can't be woken. For a child, also if they won't stop crying and can't be consoled, or won't nurse or eat. Common concussion symptoms otherwise: headache, dizziness or balance problems, nausea or vomiting early on, being bothered by light or noise, vision problems, tiredness, feeling foggy or slowed down, trouble concentrating or remembering, irritability, sadness or anxiety, and sleeping more or less than usual.",
+      "source": {
+        "name": "CDC, Symptoms of Mild TBI and Concussion",
+        "url": "https://www.cdc.gov/traumatic-brain-injury/signs-symptoms/index.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "sudden cardiac arrest",
+      "category": "medical",
+      "aliases": [
+        "cardiac arrest",
+        "heart stopped",
+        "no pulse",
+        "not breathing",
+        "isn't breathing",
+        "stopped breathing",
+        "not responding",
+        "collapsed",
+        "gasping",
+        "defibrillator",
+        "aed"
+      ],
+      "text": "Signs of sudden cardiac arrest (the same in children and adults): sudden collapse and loss of consciousness; not breathing, or only gasping; no response to shouting or shaking; no pulse. Call 911 immediately and start CPR. Send someone to find an AED (automated external defibrillator), or get one yourself when it's safe; most AEDs can be used on adults and on children over 8. Keep doing CPR until medical professionals take over or the person starts breathing on their own.",
+      "source": {
+        "name": "CDC, About Sudden Cardiac Arrest in Children and Youth",
+        "url": "https://www.cdc.gov/heart-disease/about/sudden-cardiac-arrest-in-children-and-youth.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "seizure first aid",
+      "category": "medical",
+      "aliases": [
+        "a seizure",
+        "having a seizure",
+        "had a seizure",
+        "seizing",
+        "convulsing",
+        "convulsions",
+        "epileptic fit"
+      ],
+      "text": "During a seizure: keep yourself and others calm and stay with the person. Clear away anything nearby that could hurt them. If they're lying down, turn them gently on their side with the mouth pointing to the ground. Time the seizure. Don't hold them down or stop their movements, don't put anything in their mouth, don't give mouth-to-mouth breaths, and don't give food or water until they're fully alert. Call 911 if: the seizure lasts longer than 5 minutes; another seizure follows soon after; they have trouble breathing or waking afterwards; it happens in water; they're injured; it's their first seizure; they have diabetes and lose consciousness; or they're pregnant.",
+      "source": {
+        "name": "CDC, First Aid for Seizures",
+        "url": "https://www.cdc.gov/epilepsy/first-aid-for-seizures/index.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "altitude sickness recognition",
+      "category": "medical",
+      "aliases": [
+        "altitude sickness",
+        "mountain sickness",
+        "high altitude",
+        "hace",
+        "hape",
+        [
+          "altitude",
+          "headache"
+        ],
+        [
+          "altitude",
+          "breath"
+        ],
+        [
+          "elevation",
+          "sick"
+        ]
+      ],
+      "text": "Acute mountain sickness, the mildest form: headache, tiredness, poor appetite, nausea, vomiting. High-altitude cerebral edema (HACE), more serious: extreme tiredness, drowsiness, confusion, loss of coordination. High-altitude pulmonary edema (HAPE), which can quickly become life-threatening: shortness of breath, weakness, cough. Anyone with altitude illness shouldn't go higher until the symptoms are gone. If symptoms get worse while resting, go to a lower elevation. With HACE or HAPE, the person must immediately move, or be moved, to a lower elevation; HAPE will likely need oxygen. Prevention: don't go from low elevation to above 9,000 feet (2,750 m) in one day; if possible spend a few days at 8,000-9,000 feet first; above 9,000 feet, raise where you sleep by no more than 1,600 feet a day; and for every 3,300 feet you climb, spend an extra day at that elevation.",
+      "source": {
+        "name": "CDC Travelers' Health, Travel to High Altitudes",
+        "url": "https://wwwnc.cdc.gov/travel/page/travel-to-high-altitudes",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    }
+  ]
+}

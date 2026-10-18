@@ -56,6 +56,12 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("the power went out, is the food in the fridge still ok", "survival/food-safety-after-a-power-outage"),
     ("how long is the freezer safe without power", "survival/food-safety-after-a-power-outage"),
     ("I'm lost in the woods and can't find the trail", "survival/lost-outdoors"),
+    # first aid core
+    ("my son fell and hit his head, now he's throwing up", "medical/concussion-assessment"),
+    ("he collapsed and isn't breathing", "medical/sudden-cardiac-arrest"),
+    ("how do I use an AED", "medical/sudden-cardiac-arrest"),
+    ("my coworker is having a seizure", "medical/seizure-first-aid"),
+    ("headache and nausea at high altitude on the climb", "medical/altitude-sickness-recognition"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -77,6 +83,8 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "what is a chemical reaction",
     "my power bill is high",
     "I lost track of time",
+    "what's the altitude of Denver",
+    "my laptop has a seizure-inducing screen flicker",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}

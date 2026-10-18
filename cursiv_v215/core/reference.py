@@ -67,7 +67,8 @@ ALIASES = {
 def _alias_hit(title: str, question: str) -> bool:
     ql = question.lower()
     def has(phrase: str) -> bool:
-        return bool(re.search(r"\b" + re.escape(phrase) + r"\b", ql))
+        # whole words, and not the start of a hyphenated word ("seizure-inducing")
+        return bool(re.search(r"(?<![\w-])" + re.escape(phrase) + r"(?![\w-])", ql))
     return any(all(has(w) for w in p) if isinstance(p, tuple) else has(p) for p in ALIASES.get(title, ()))
 
 
