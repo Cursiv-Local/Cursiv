@@ -1,7 +1,7 @@
 {
   "pack": "first-aid-core",
   "version": "1.0",
-  "about": "Head injury danger signs, sudden cardiac arrest, seizures, altitude illness and burns. Written from CDC and Ready.gov pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "about": "Head injury danger signs, sudden cardiac arrest, seizures, altitude illness, burns, low blood sugar and sepsis. Written from CDC and Ready.gov pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
   "entries": [
     {
       "title": "concussion assessment",
@@ -258,6 +258,72 @@
       "source": {
         "name": "Ready.gov (FEMA), Preventing and Treating Burns",
         "url": "https://www.ready.gov/preventing-and-treating-burns",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "low blood sugar",
+      "category": "medical",
+      "aliases": [
+        "low blood sugar",
+        "hypoglycemia",
+        "blood sugar is low",
+        "sugar is low",
+        "sugar crashed",
+        "glucagon",
+        [
+          "blood sugar",
+          "low"
+        ],
+        [
+          "diabetic",
+          "shaky"
+        ],
+        [
+          "diabetic",
+          "confused"
+        ],
+        [
+          "diabetic",
+          "sweaty"
+        ]
+      ],
+      "text": "Blood sugar below 70 mg/dL is low; below 55 mg/dL is severely low. The 15-15 rule: have 15 grams of carbs, wait 15 minutes, and check blood sugar again; if it's still below 70 mg/dL, repeat. 15 grams of carbs is: 4 ounces (half a cup) of juice or regular (not diet) soda; 1 tablespoon of sugar, honey or syrup; 3-4 glucose tablets or 1 dose of glucose gel (follow the instructions); or hard candies, jellybeans or gumdrops (see the label for how many). Once it's back up, eat a snack or meal with protein and carbs. Young children, especially infants and toddlers, may need less than 15 grams; ask their doctor how much. Injectable glucagon is the best treatment for severely low blood sugar: someone who has passed out usually wakes within 15 minutes; if not, give one more dose. Contact a doctor for emergency treatment immediately after a glucagon injection.",
+      "source": {
+        "name": "CDC, Treatment of Low Blood Sugar (Hypoglycemia)",
+        "url": "https://www.cdc.gov/diabetes/treatment/treatment-low-blood-sugar-hypoglycemia.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "sepsis recognition",
+      "category": "medical",
+      "aliases": [
+        "sepsis",
+        "septic",
+        "blood infection",
+        [
+          "infection",
+          "confused"
+        ],
+        [
+          "infection",
+          "clammy"
+        ],
+        [
+          "infection",
+          "worse",
+          "fever"
+        ]
+      ],
+      "text": "Sepsis is the body's extreme response to an infection, and a life-threatening medical emergency: without fast treatment it can quickly lead to tissue damage, organ failure and death, so act fast. A person with sepsis might have one or more of: clammy or sweaty skin; confusion or disorientation; extreme pain or discomfort; fever, shivering or feeling very cold; a high heart rate or weak pulse; shortness of breath. Anyone can develop sepsis.",
+      "source": {
+        "name": "CDC, About Sepsis",
+        "url": "https://www.cdc.gov/sepsis/about/index.html",
         "license": "public domain (U.S. government work)",
         "checked": "2026-10-18"
       },

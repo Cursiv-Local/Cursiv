@@ -76,6 +76,9 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("can I put permethrin on my skin", "survival/mosquito-bite-prevention"),
     ("our well flooded, is the water safe", "survival/flooded-well"),
     ("how do I disinfect a well", "survival/flooded-well"),
+    ("my diabetic coworker is shaky and sweaty, I think his blood sugar is low", "medical/low-blood-sugar"),
+    ("what is the 15-15 rule for hypoglycemia", "medical/low-blood-sugar"),
+    ("could this infection be turning into sepsis", "medical/sepsis-recognition"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]

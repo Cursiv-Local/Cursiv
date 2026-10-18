@@ -53,7 +53,7 @@ ALIASES = {
                               "bumped his head", "bumped her head"),
     "dehydration assessment treatment": ("dehydrated", "dehydration"),
     "drowning response": ("drowning", "drowned", "pulled from the water"),
-    "diabetic emergency field": ("diabetic", "low blood sugar", "insulin"),
+    "diabetic emergency field": ("diabetic", "insulin"),     # low blood sugar: its own sourced entry (packs)
     "frostbite treatment": ("frostbite",),
     "water purification": ("purify", "purifying", "safe to drink", "boil water", "disinfect water", "treat water",
                            ("bleach", "liter"), ("bleach", "litre"), ("bleach", "gallon"), ("bleach", "quart"),
@@ -274,7 +274,8 @@ def note_line(found: list[Entry]) -> str:
     for e in found:
         if e.category in ("medical", "survival"):
             src = source(e.title)
-            based = f" Based on {src['source']} (checked {src['checked']})." if src else ""
+            based = (f" Based on {src['source']} (checked {src['checked']})." if src
+                     else " Written for Cursiv; no published source attached yet.")
             caveat = (" Not reviewed by a medical professional; in an emergency call 911."
                       if e.category == "medical" else "")
             lines.append(f"*(From Cursiv's offline reference, {e.title} [{e.id}]: {e.text}{based}{caveat})*")
