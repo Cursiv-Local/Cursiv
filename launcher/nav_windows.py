@@ -253,3 +253,38 @@ class HelpDialog(_Window):
             "- Still stuck: Settings → Help & diagnostics → Send a problem report.",
         ]
         return "\n".join(parts)
+
+
+class WelcomeDialog(_Window):
+    """First run (and tray → Getting Started): what Cursiv is, in four lines."""
+
+    def __init__(self, parent=None, setup_needed: bool = False):
+        super().__init__(parent, "Welcome to Cursiv",
+                         "A personal AI assistant that runs on this computer.", width=600, height=520)
+        points = (
+            ("It runs here", "Answers come from an AI model on this computer. The pill at the top right always "
+                             "shows what, if anything, can go online."),
+            ("It tells you how sure it is", "Complex answers end with what's known, inferred, assumed and unknown. "
+                                            "It can still be wrong, so check what matters."),
+            ("It remembers what you tell it", "Say \"remember …\" and it keeps it. Memory & Knowledge shows "
+                                              "everything it knows, and you can remove anything."),
+            ("Help is one click away", "The sidebar has Tools, Settings and Help. Or just type your question."),
+        )
+        for name, text in points:
+            card = QFrame(); card.setObjectName("card")
+            v = QVBoxLayout(card); v.setContentsMargins(16, 12, 16, 12); v.setSpacing(2)
+            n = QLabel(name); n.setObjectName("name"); v.addWidget(n)
+            v.addWidget(self._explain(text))
+            self.body.addWidget(card)
+        self._again = QCheckBox("Don't show this again")
+        self._again.setChecked(True)
+        self.body.addWidget(self._again)
+        if setup_needed:
+            self.body.addWidget(self._explain("Cursiv still needs an AI model. Setup installs the free local engine "
+                                              "and a model sized for this computer."))
+            go = QPushButton("Open Setup"); go.setStyleSheet(theme.primary_button())
+            go.clicked.connect(lambda: (self.accept(), self._window("_open_setup")()))
+            self.body.addWidget(go, 0, Qt.AlignmentFlag.AlignLeft)
+
+    def dont_show_again(self) -> bool:
+        return self._again.isChecked()

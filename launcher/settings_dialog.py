@@ -331,6 +331,15 @@ class SettingsDialog(QDialog):
                      f"Memories, conversations and settings are ordinary files in {data_dir}. "
                      "Saved keys are encrypted; the rest isn't encrypted on disk.",
                      lambda: os.startfile(str(data_dir)) if data_dir.exists() else None)
+        try:
+            from cursiv_v215.chat import keys as _keys
+            self._switch(lay, "Save conversations automatically",
+                         "Each conversation is kept in the sidebar so you can come back to it. Off means you choose "
+                         "what to keep with the Save button. Right-click a conversation to delete it.",
+                         _keys.saved_key("autosave_chats") != "off",
+                         lambda on: _keys.store_key("autosave_chats", "" if on else "off"))
+        except Exception:
+            pass
         self._action(lay, "Security questions",
                      "Set the questions that let you reset a forgotten password.",
                      lambda: self._call_window("_setup_sq"))

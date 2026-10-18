@@ -71,6 +71,15 @@ def _load_saved_keys() -> dict:
         return {}
 
 
+def autosave_enabled() -> bool:
+    """Conversations save themselves unless turned off in Settings → Your data & account."""
+    try:
+        from cursiv_v215.chat import keys
+        return keys.saved_key("autosave_chats") != "off"
+    except Exception:
+        return True
+
+
 def _iter_cancellable(gen, cancel_event: threading.Event):
     """Wraps a generator so the consuming loop can notice a Stop click
     between chunks. gen.close() (not just letting it fall out of scope)
@@ -224,18 +233,10 @@ class ChatPanel(QWidget):
             self._voice_btn.setEnabled(True)
             # Replace "Getting Cursiv ready…" with one line -- unless the
             # person already opened a saved conversation while it loaded.
-            if not self._history and not self._conv_id:
-                self._transcript.clear()
             has_key = any(keys.get(k) for k in
                           ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key"))
-            if has_key or _is_ollama_installed():
-                self._append_system("Ready. Ask me anything — or type help to see what I can do.")
-            else:
-                self._append_system(
-                    "Almost ready — Cursiv needs an AI to talk through. Open Setup "
-                    "(tray menu → Setup…) to install the free local engine, or add a "
-                    "free Gemini or Groq key in Settings."
-                )
+            if not self._history and not self._conv_id:
+                self._show_empty_state(setup_needed=not (has_key or _is_ollama_installed()))
         else:
             _CHAT_IMPORT_ERROR = error
             self._append_system(
@@ -248,7 +249,7 @@ class ChatPanel(QWidget):
     # ── Saved conversations ──────────────────────────────────────────────
     def _after_turn(self) -> None:
         self._dirty = True
-        if self._conv_id:                       # saved once -> keep it current
+        if self._conv_id or autosave_enabled():    # new chats save themselves; saved ones stay current
             self.save_conversation()
 
     def has_unsaved(self) -> bool:
@@ -275,7 +276,54 @@ class ChatPanel(QWidget):
         self._history = []
         self._conv_id = None
         self._dirty = False
+        self._show_empty_state()
         self.conversation_changed.emit()
+
+    # ── Empty state ─────────────────────────────────────────────────────
+
+    EXAMPLES = ("How do I purify creek water so it's safe to drink?",
+                "Help me plan meals for a week on a tight budget.",
+                "Explain how a well pump works, simply.",
+                "What should go in a 72-hour emergency kit for a family of four?")
+
+    def _show_empty_state(self, setup_needed: bool = False) -> None:
+        """What a new chat looks like: a question, how Cursiv works in one line, examples to click."""
+        from urllib.parse import quote
+        if setup_needed:
+            body = (f'<p style="color:{theme.AMBER};">Cursiv needs an AI model before it can answer.</p>'
+                    f'<p><a href="cursiv://setup" style="color:{theme.ACCENT};">Open Setup</a>'
+                    f'<span style="color:{theme.MUTED};"> to install the free local engine and a model sized for this '
+                    f'computer, or add a free Gemini or Groq key in Settings.</span></p>')
+        else:
+            body = "".join(
+                f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(e)}" '
+                f'style="color:{theme.TEXT}; text-decoration:none;">→&nbsp;&nbsp;{self._escape(e)}</a></p>'
+                for e in self.EXAMPLES)
+        self._transcript.setHtml(
+            f'<div style="margin-top:40px;">'
+            f'<p style="font-size:22px; font-weight:600; color:{theme.TEXT};">What can I help with?</p>'
+            f'<p style="color:{theme.MUTED}; margin:6px 0 18px 0;">Cursiv answers with an AI model on this computer. '
+            f'It can be wrong, so check anything that matters. Type <b>help</b> to see everything it can do.</p>'
+            f'{body}</div>')
+        self._empty_shown = True
+
+    def _clear_empty_state(self) -> None:
+        if getattr(self, "_empty_shown", False):
+            self._transcript.clear()
+            self._empty_shown = False
+
+    def _on_link(self, url) -> None:
+        from urllib.parse import unquote
+        if url.scheme() == "cursiv":
+            if url.host() == "prompt":
+                self.prefill(unquote(url.path().lstrip("/")))
+            elif url.host() == "setup":
+                win = self.window()
+                if hasattr(win, "_open_setup"):
+                    win._open_setup()
+            return
+        from PyQt6.QtGui import QDesktopServices
+        QDesktopServices.openUrl(url)
 
     def open_conversation(self, conv_id: str) -> bool:
         import conversations
@@ -283,6 +331,7 @@ class ChatPanel(QWidget):
         if not data:
             return False
         self._transcript.setHtml(data.get("html", ""))
+        self._empty_shown = False
         self._history = list(data.get("messages", []))
         self._conv_id = conv_id
         self._dirty = False
@@ -341,7 +390,8 @@ class ChatPanel(QWidget):
         self._pill_timer.start(15_000)
 
         self._transcript = QTextBrowser()
-        self._transcript.setOpenExternalLinks(True)
+        self._transcript.setOpenLinks(False)
+        self._transcript.anchorClicked.connect(self._on_link)
         self._transcript.setStyleSheet(f"""
             QTextBrowser {{
                 background: {theme.SURFACE}; color: {theme.TEXT};
@@ -635,6 +685,7 @@ class ChatPanel(QWidget):
         text = self._input.toPlainText().strip()
         if not text:
             return
+        self._clear_empty_state()
         if not _CHAT_OK:
             self._append_system("Chat core isn't available -- see the message above.")
             return
@@ -645,7 +696,6 @@ class ChatPanel(QWidget):
         if text.strip().lower() == "clear":
             self._input.clear()
             self.new_conversation()
-            self._append_system("History cleared.")
             return
 
         # A handful of commands need a real dialog, not a single line of

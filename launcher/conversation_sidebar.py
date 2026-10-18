@@ -87,7 +87,11 @@ class ConversationSidebar(QWidget):
         self._list.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._list.customContextMenuRequested.connect(self._menu)
         lay.addWidget(self._list, 1)
-        self._empty = QLabel("Nothing saved yet.\nClick Save to keep a conversation.")
+        from chat_panel import autosave_enabled
+        self._autosave = autosave_enabled()
+        self._save.setVisible(not self._autosave)      # conversations save themselves unless turned off
+        self._empty = QLabel("Your conversations will appear here." if self._autosave
+                             else "Nothing saved yet.\nClick Save to keep a conversation.")
         self._empty.setWordWrap(True)
         self._empty.setStyleSheet(f"color: {SILV2}; font-size: 12px; letter-spacing: 0; padding: 6px 2px;")
         lay.addWidget(self._empty)

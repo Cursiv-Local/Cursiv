@@ -137,6 +137,12 @@ def _hieroglyph_font(size: int, weight: QFont.Weight = QFont.Weight.Normal) -> Q
 _GETTING_STARTED_FLAG = Path.home() / ".cursiv" / "runtime" / "getting_started_shown.flag"
 
 
+def _is_ollama_installed_quick() -> bool:
+    exe = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+    import shutil
+    return bool(shutil.which("ollama")) or exe.exists()
+
+
 def _getting_started_seen() -> bool:
     return _GETTING_STARTED_FLAG.exists()
 
@@ -1091,131 +1097,6 @@ class _ResizeRoot(QWidget):
         super().mousePressEvent(e)
 
 
-class GettingStartedDialog(QDialog):
-    """
-    Shown automatically the first time the launcher opens after login, and
-    reachable afterward any time via the main window's "Getting Started"
-    button. Answers the two things a new install doesn't make obvious on
-    its own: how to actually reach the AI (three ways, not one), and how to
-    get the local models that make it useful.
-    """
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self._launcher = parent
-        self.setWindowTitle("Cursiv — Getting Started")
-        self.setFixedWidth(480)
-        self.setStyleSheet(f"background: {BG}; color: {SILVER};")
-        self._build()
-
-    def _section_label(self, text: str) -> QLabel:
-        lbl = QLabel(text)
-        lbl.setStyleSheet(
-            f"color: {GOLD}; font-size: 12px; font-weight: 700; letter-spacing: 1px;"
-        )
-        return lbl
-
-    def _body_label(self, text: str) -> QLabel:
-        lbl = QLabel(text)
-        lbl.setWordWrap(True)
-        lbl.setStyleSheet(f"color: {SILVER}; font-size: 12px; line-height: 1.4;")
-        return lbl
-
-    def _build(self):
-        vlay = QVBoxLayout(self)
-        vlay.setSpacing(14)
-        vlay.setContentsMargins(24, 22, 24, 20)
-
-        _ensure_hieroglyph_font()   # mixed hieroglyph + Latin text below
-        header = QLabel("\U00013062  Getting Started")
-        header.setStyleSheet(
-            f'color: {GOLD}; font-size: 18px; font-weight: 700;'
-            f' font-family: "Segoe UI", "Segoe UI Historic";'
-        )
-        vlay.addWidget(header)
-
-        intro = self._body_label(
-            "Talk to Cursiv right here — the chat panel fills this window. "
-            "No terminal to open, nothing extra to launch. Here's what to "
-            "know, and what to download so it can actually think locally."
-        )
-        vlay.addWidget(intro)
-
-        # ── Reaching the chat ────────────────────────────────────────────
-        vlay.addWidget(self._section_label("TALKING TO CURSIV"))
-        vlay.addWidget(self._body_label(
-            "Just type in the chat panel on the right and press Enter. "
-            "It's part of this window — closing it closes Cursiv itself, "
-            "the same as any other tab here."
-        ))
-        # ── Models ────────────────────────────────────────────────────────
-        vlay.addWidget(self._section_label("LOCAL MODELS"))
-        vlay.addWidget(self._body_label(
-            "Cursiv runs fully offline on Ollama. Two downloads make it "
-            "useful — both one-time, both optional if you'd rather add a "
-            "free Gemini or Groq key instead (Settings, or type "
-            "gemini <key> in the chat)."
-        ))
-
-        btn_style = f"""
-            QPushButton {{
-                background: transparent; color: {GOLD};
-                font-size: 12px; font-weight: 600;
-                border: 1px solid {LGOLD}; border-radius: 6px;
-                padding: 8px 14px; text-align: left;
-            }}
-            QPushButton:hover   {{ background: rgba(212,175,55,0.08); border-color: {GOLD}; }}
-            QPushButton:pressed {{ background: rgba(212,175,55,0.15); }}
-        """
-
-        llama_btn = QPushButton("Download llama3.1  (~4.7 GB — Cursiv's default model)")
-        llama_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        llama_btn.setStyleSheet(btn_style)
-        # QPushButton.clicked emits clicked(bool checked=False) -- connecting
-        # it directly to _download_llama_model would bind that bool to its
-        # on_done parameter, and on_done=False (not None) then reaches
-        # QTimer.singleShot(500, False) at the end of that method, which
-        # raises a TypeError for a non-callable slot and crashes the whole
-        # app (PyQt6 aborts the process on an unhandled exception crossing
-        # back into Qt's C++ event loop). The lambda discards the argument
-        # so on_done stays at its real default of None.
-        llama_btn.clicked.connect(lambda: self._launcher._download_llama_model())
-        vlay.addWidget(llama_btn)
-
-        codex_btn = QPushButton("Download Winkler-Codex  (~18 GB — coding specialist pair)")
-        codex_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        codex_btn.setStyleSheet(btn_style)
-        codex_btn.clicked.connect(self._launcher._download_codex_models)
-        vlay.addWidget(codex_btn)
-
-        vlay.addWidget(self._body_label(
-            "Both open the Setup window, which shows the download "
-            "progress. You can keep chatting while it runs."
-        ))
-
-        # ── Footer ────────────────────────────────────────────────────────
-        dont_show = QCheckBox("Don't show this automatically again")
-        dont_show.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
-        dont_show.setChecked(True)
-        vlay.addWidget(dont_show)
-        self._dont_show = dont_show
-
-        close_btn = QPushButton("Got it")
-        close_btn.setFixedHeight(36)
-        close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        close_btn.setStyleSheet(
-            "background: #d4b04c; color: #17120a; border: none; border-radius: 8px;"
-            " font-size: 13px; font-weight: 600;"
-        )
-        close_btn.clicked.connect(self.accept)
-        vlay.addWidget(close_btn)
-
-    def dont_show_again(self) -> bool:
-        return self._dont_show.isChecked()
-
-
-# ── Main window ───────────────────────────────────────────────────────────────
-
 class CursivLauncher(QMainWindow):
     def __init__(self, username: str = "Joshua"):
         super().__init__()
@@ -1534,7 +1415,8 @@ class CursivLauncher(QMainWindow):
         # Fired via QTimer.singleShot(1800, ...) on first run only; runs after
         # main.py's try/except has returned, so it must never raise.
         try:
-            dlg = GettingStartedDialog(self)
+            from nav_windows import WelcomeDialog
+            dlg = WelcomeDialog(self, setup_needed=not _is_ollama_installed_quick())
             dlg.exec()
             if dlg.dont_show_again():
                 _mark_getting_started_seen()

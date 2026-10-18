@@ -159,3 +159,38 @@ def test_sidebar_navigation_and_prefill(panel):
         assert want in names
     panel.prefill("translate  into Spanish")
     assert panel._input.toPlainText() == "translate  into Spanish"
+
+
+def test_empty_state_and_example_links(panel, app):
+    from PyQt6.QtCore import QUrl
+    panel._show_empty_state()
+    assert "What can I help with?" in panel._transcript.toPlainText()
+    panel._on_link(QUrl("cursiv://prompt/" + "How%20deep%20is%20a%20well%3F"))
+    assert panel._input.toPlainText() == "How deep is a well?"
+    panel._clear_empty_state()
+    assert panel._transcript.toPlainText().strip() == ""
+    panel._show_empty_state(setup_needed=True)
+    assert "needs an AI model" in panel._transcript.toPlainText()
+
+
+def test_conversations_save_themselves_unless_turned_off(panel, settings, monkeypatch):
+    import chat_panel
+    saved = []
+    monkeypatch.setattr(panel, "save_conversation", lambda title=None: saved.append(1) or "c1")
+    panel._history = [{"role": "user", "content": "hi"}, {"role": "assistant", "content": "hello"}]
+    panel._after_turn()
+    assert saved == [1]
+    from cursiv_v215.chat import keys
+    keys.store_key("autosave_chats", "off")
+    assert chat_panel.autosave_enabled() is False
+    panel._conv_id = None
+    panel._after_turn()
+    assert saved == [1]
+
+
+def test_welcome_card(app, settings):
+    import nav_windows
+    w = nav_windows.WelcomeDialog(setup_needed=True)
+    text = _labels(w)
+    assert "It runs here" in text and "needs an AI model" in text
+    assert w.dont_show_again() is True
