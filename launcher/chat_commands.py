@@ -827,6 +827,15 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         _mem_reply = None
     if _mem_reply is not None:
         return TextResult(_mem_reply)
+    # Field notebook: log ..., field log, field log check, field log export (core/fieldlog.py)
+    try:
+        from cursiv_v215.core import fieldlog as _fieldlog
+        from cursiv_v215.memory.semantic import current_person as _person
+        _log_reply = _fieldlog.command(text, observer=_person().title())
+    except Exception as _exc:
+        _log_reply = f"The field log couldn't be written: {_exc}" if cmd.startswith("log ") else None
+    if _log_reply is not None:
+        return TextResult(_log_reply)
     if cmd in ("phases", "phase", "why that answer", "how did you decide"):
         from cursiv_v215.core.phases import last_trace_text
         return TextResult(last_trace_text())
