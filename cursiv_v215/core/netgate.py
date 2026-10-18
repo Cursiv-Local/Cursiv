@@ -28,8 +28,9 @@ import sys
 import threading
 from pathlib import Path
 from cursiv_v215.core import atomic as _atomic
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
-CONFIG_FILE = Path(__file__).resolve().parent.parent.parent / ".cursiv" / "config.json"
+CONFIG_FILE = APP_DATA / "config.json"
 
 DEFAULTS = {
     "offline_mode":      False,

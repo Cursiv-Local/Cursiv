@@ -34,6 +34,7 @@ from pathlib import Path
 from typing import Any
 
 from cursiv_v215.postal.postal_key import derive_letter_keys, derive_keystream
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 try:
     from cursiv_v215.postal.postal_sign import (
         sign_letter         as _sign_letter,
@@ -46,7 +47,7 @@ except Exception:
     def _verify_with_history(*a, **kw):  return (False, "none")  # type: ignore[misc]
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
-_POSTAL_DIR  = Path(__file__).parent.parent.parent / ".cursiv" / "postal"
+_POSTAL_DIR  = APP_DATA / "postal"
 _SEALED_DIR  = _POSTAL_DIR / "sealed"
 _INDEX_FILE  = _POSTAL_DIR / "index.json"
 _EXPORT_DEST = None   # resolved lazily

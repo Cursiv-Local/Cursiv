@@ -13,9 +13,10 @@ import math
 import time
 from pathlib import Path
 from typing import Any
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 
-MEMORY_DIR = Path(".cursiv")
+MEMORY_DIR = APP_DATA
 MEMORY_FILE = MEMORY_DIR / "memory.json"
 
 DEFAULT_HALF_LIFE_HOURS = 72.0   # Events decay over 3 days

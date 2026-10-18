@@ -26,10 +26,11 @@ import urllib.request
 import wave
 import zipfile
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 _ROOT      = Path(__file__).parent.parent.parent
-_VOICE_DIR = _ROOT / ".cursiv" / "voice"
+_VOICE_DIR = APP_DATA / "voice"
 SAMPLE_RATE = 16_000   # all backends expect 16 kHz mono
 
 # Vosk small-en model (fallback)

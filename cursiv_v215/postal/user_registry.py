@@ -35,6 +35,7 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 from cursiv_v215.postal.postal_sign import (
     identity_exists,
@@ -46,7 +47,7 @@ from cursiv_v215.postal.postal_sign import (
 )
 
 # ── Storage ───────────────────────────────────────────────────────────────────
-_POSTAL_DIR    = Path(__file__).parent.parent.parent / ".cursiv" / "postal"
+_POSTAL_DIR    = APP_DATA / "postal"
 _CONTACTS_FILE = _POSTAL_DIR / "contacts.json"
 _IDENTITY_FILE = _POSTAL_DIR / "identity_meta.json"
 

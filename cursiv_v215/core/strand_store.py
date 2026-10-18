@@ -32,6 +32,7 @@ from pathlib import Path
 from typing import Any
 
 from cursiv_v215.core.strand import encode as _strand_encode
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 # ── Optional NumPy acceleration ───────────────────────────────────────────────
 try:
@@ -42,7 +43,7 @@ except ImportError:
     _NUMPY_OK = False
 
 ROOT             = Path(__file__).parent.parent.parent
-CURSIV_DIR       = ROOT / ".cursiv"
+CURSIV_DIR       = APP_DATA
 STRANDS_FILE     = CURSIV_DIR / "strands.jsonl"
 TERRITORIES_FILE = CURSIV_DIR / "territories.json"
 

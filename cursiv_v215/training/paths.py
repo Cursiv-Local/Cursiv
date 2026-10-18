@@ -6,7 +6,8 @@ window (images, notes, pasted JSON), or the chat's notes-to-JSON command.
 from __future__ import annotations
 
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 ROOT           = Path(__file__).parent.parent.parent
-CURSIV_DIR     = ROOT / ".cursiv"
+CURSIV_DIR     = APP_DATA
 TRAINING_JSONL = CURSIV_DIR / "training_data.jsonl"

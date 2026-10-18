@@ -62,8 +62,8 @@ _RATE_SENTINEL = object()
 
 def _load_saved_keys() -> dict:
     import json
-    keys_file = Path(_CHAT_ROOT) / ".cursiv" / "config.json"
     try:
+        from cursiv_v215.chat.keys import KEYS_FILE as keys_file     # the one settings file
         from cursiv_v215.core import keystore
         data = keystore.reveal_all(json.loads(keys_file.read_text(encoding="utf-8")))
         return {k: v for k, v in data.items() if isinstance(v, str)}

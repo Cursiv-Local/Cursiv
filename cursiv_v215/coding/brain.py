@@ -19,11 +19,12 @@ from pathlib import Path
 from typing import Callable
 
 from cursiv_v215.coding import playbook
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 try:
     from cursiv_v215.memory.semantic import CURSIV_DIR
 except Exception:                                   # pragma: no cover
-    CURSIV_DIR = Path(__file__).parent.parent.parent / ".cursiv"
+    CURSIV_DIR = APP_DATA
 
 PROFILE_FILE = CURSIV_DIR / "coding_profile.json"
 LESSONS_FILE = CURSIV_DIR / "coding_lessons.jsonl"

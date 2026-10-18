@@ -39,9 +39,10 @@ from cryptography.hazmat.primitives.asymmetric.ed25519 import (
 )
 from cryptography.hazmat.primitives import serialization
 from cryptography.exceptions import InvalidSignature
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 # ── Storage ───────────────────────────────────────────────────────────────────
-_POSTAL_DIR    = Path(__file__).parent.parent.parent / ".cursiv" / "postal"
+_POSTAL_DIR    = APP_DATA / "postal"
 _PRIVKEY_PEM   = _POSTAL_DIR / "identity.pem"
 _HISTORY_DIR   = _POSTAL_DIR / "key_history"
 _HISTORY_INDEX = _POSTAL_DIR / "key_history.json"

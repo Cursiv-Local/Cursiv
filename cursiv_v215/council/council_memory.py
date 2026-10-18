@@ -17,8 +17,9 @@ import re
 import time
 from pathlib import Path
 from typing import Any
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
-_MEMORY_PATH = Path(".cursiv") / "council_memory.json"
+_MEMORY_PATH = APP_DATA / "council_memory.json"
 _MAX_ENTRIES  = 300
 _HALF_LIFE_H  = 168.0   # 7 days — council wisdom persists longer than run events
 

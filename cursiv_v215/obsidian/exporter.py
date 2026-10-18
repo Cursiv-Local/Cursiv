@@ -14,9 +14,10 @@ from __future__ import annotations
 import json
 from datetime import datetime, date
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 ROOT            = Path(__file__).parent.parent.parent
-CURSIV_DIR      = ROOT / ".cursiv"
+CURSIV_DIR      = APP_DATA
 CONFIG_FILE     = CURSIV_DIR / "obsidian_config.json"
 TRAINING_JSONL  = CURSIV_DIR / "training_data.jsonl"
 VAULT_SUBFOLDER = "Cursiv"

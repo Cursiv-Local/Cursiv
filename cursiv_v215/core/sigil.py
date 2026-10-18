@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 # ── Option A: Custom 64-character alphabet ────────────────────────────────────
 CURSIV_ALPHABET = (
@@ -84,7 +85,7 @@ def _system_uuid() -> str:
     A source-only copy (no .cursiv/ dir) produces a different key than a real
     installation, causing encoded constants to decode silently wrong.
     """
-    uuid_path = Path(__file__).parent.parent.parent / ".cursiv" / "system.uuid"
+    uuid_path = APP_DATA / "system.uuid"
     try:
         if uuid_path.exists():
             return uuid_path.read_text(encoding="utf-8").strip()

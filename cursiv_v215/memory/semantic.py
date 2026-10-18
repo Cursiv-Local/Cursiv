@@ -29,9 +29,10 @@ import uuid
 from pathlib import Path
 from typing import Any, Callable
 from cursiv_v215.core import atomic as _atomic
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 ROOT = Path(__file__).parent.parent.parent
-CURSIV_DIR = ROOT / ".cursiv"
+CURSIV_DIR = APP_DATA
 FACTS_FILE = CURSIV_DIR / "memory_facts.jsonl"
 EMB_CACHE_FILE = CURSIV_DIR / "embeddings_cache.json"
 SETTINGS_FILE = CURSIV_DIR / "memory_settings.json"

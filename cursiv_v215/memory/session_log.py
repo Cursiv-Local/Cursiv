@@ -14,9 +14,10 @@ import json
 import time
 from datetime import datetime, date
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 ROOT         = Path(__file__).parent.parent.parent
-CURSIV_DIR   = ROOT / ".cursiv"
+CURSIV_DIR   = APP_DATA
 SESSIONS_DIR = CURSIV_DIR / "sessions"
 MEMORY_FILE  = CURSIV_DIR / "memory.json"
 RATED_JSONL  = CURSIV_DIR / "rated_exchanges.jsonl"

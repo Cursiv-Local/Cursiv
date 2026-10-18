@@ -105,8 +105,9 @@ except Exception:
 # ── Paths ──────────────────────────────────────────────────────────────────
 ROOT               = Path(__file__).parent.parent.parent
 SYSTEM_PROMPT_FILE = ROOT / "cursiv_v215" / "codex" / "system_prompt.md"
-MEMORY_FILE        = ROOT / ".cursiv" / "memory.json"
-TRAINING_JSONL     = ROOT / ".cursiv" / "training_data.jsonl"
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
+MEMORY_FILE        = APP_DATA / "memory.json"
+TRAINING_JSONL     = APP_DATA / "training_data.jsonl"
 
 # ── xAI endpoint ───────────────────────────────────────────────────────────
 XAI_URL        = "https://api.x.ai/v1/chat/completions"
@@ -665,8 +666,8 @@ def load_system_prompt() -> str:
 
 def load_vault_context() -> str:
     """Inject PiForge phase agent knowledge from vault into every conversation."""
-    registry_path = ROOT / ".cursiv" / "agent_registry.json"
-    vault_dir     = ROOT / ".cursiv" / "vault"
+    registry_path = APP_DATA / "agent_registry.json"
+    vault_dir     = APP_DATA / "vault"
     if not registry_path.exists():
         return ""
     try:

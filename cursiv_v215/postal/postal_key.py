@@ -30,9 +30,10 @@ from __future__ import annotations
 import hashlib
 import uuid as _uuid_mod
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 # ── Storage ───────────────────────────────────────────────────────────────────
-_POSTAL_DIR    = Path(__file__).parent.parent.parent / ".cursiv" / "postal"
+_POSTAL_DIR    = APP_DATA / "postal"
 _SEAL_UUID_FILE = _POSTAL_DIR / "seal.uuid"
 
 # ── Derivation constants — do not change; altering breaks all existing seals ─

@@ -11,9 +11,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Callable, Optional
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 _CURSIV_ROOT = Path(__file__).resolve().parent.parent.parent
-_QUEUE_FILE  = _CURSIV_ROOT / ".cursiv" / "offline_queue.jsonl"
+_QUEUE_FILE  = APP_DATA / "offline_queue.jsonl"
 
 
 def _ensure_dir() -> None:

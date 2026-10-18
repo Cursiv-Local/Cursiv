@@ -15,9 +15,10 @@ from __future__ import annotations
 import sqlite3
 import time
 from pathlib import Path
+from cursiv_v215.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
 ROOT      = Path(__file__).parent.parent.parent
-CACHE_DB  = ROOT / ".cursiv" / "search_cache.db"
+CACHE_DB  = APP_DATA / "search_cache.db"
 DEFAULT_TTL = 86_400.0  # 24 h in seconds
 
 
