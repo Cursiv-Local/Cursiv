@@ -91,6 +91,21 @@ class ConversationSidebar(QWidget):
         self._empty.setWordWrap(True)
         self._empty.setStyleSheet(f"color: {SILV2}; font-size: 12px; letter-spacing: 0; padding: 6px 2px;")
         lay.addWidget(self._empty)
+        # Where everything else lives (docs/UI-REDESIGN-PLAN.md): one plain button each.
+        nav = QVBoxLayout(); nav.setSpacing(4)
+        for label, tip, method in (
+                ("Memory && Knowledge", "What Cursiv remembers, saved notes and the offline reference", "_open_knowledge"),
+                ("Tools", "Letters, translation, coding help, USB, phone and more", "_open_tools"),
+                ("Settings", "Privacy, model, online AI, updates and your data", "_open_settings"),
+                ("Help", "How Cursiv works, commands and troubleshooting", "_open_help")):
+            b = QPushButton(label)
+            b.setToolTip(tip)
+            b.setCursor(Qt.CursorShape.PointingHandCursor)
+            b.setStyleSheet("QPushButton { border: none; padding: 8px 10px; font-size: 13px; }"
+                            "QPushButton:hover { background: #1b1f2a; }")
+            b.clicked.connect(lambda _=False, m=method: getattr(self.window(), m, lambda: None)())
+            nav.addWidget(b)
+        lay.addLayout(nav)
         panel.conversation_changed.connect(self.refresh)
         self.refresh()
         # older chats named after their first line get a 3-5 word topic title (signal -> refresh on the UI thread)

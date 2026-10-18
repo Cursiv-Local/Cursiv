@@ -1695,10 +1695,41 @@ class CursivLauncher(QMainWindow):
         except Exception as e:
             self._set_status(f"Memory window failed to open: {e}")
 
-    def _open_settings(self):
+    def _open_knowledge(self):
+        try:
+            from nav_windows import KnowledgeDialog
+            KnowledgeDialog(self).exec()
+        except Exception as e:
+            self._set_status(f"Memory & Knowledge failed to open: {e}")
+
+    def _open_tools(self):
+        try:
+            from nav_windows import ToolsDialog
+            ToolsDialog(self).exec()
+        except Exception as e:
+            self._set_status(f"Tools failed to open: {e}")
+
+    def _open_help(self):
+        try:
+            from nav_windows import HelpDialog
+            HelpDialog(self).exec()
+        except Exception as e:
+            self._set_status(f"Help failed to open: {e}")
+
+    # Tools buttons reach the chat panel's dialogs through the main window.
+    def _open_postal_compose(self, hint: str = ""):
+        self._chat_panel._open_postal_compose(hint)
+
+    def _open_legacy_vault(self):
+        self._chat_panel._open_legacy_vault()
+
+    def _open_training_data(self):
+        self._chat_panel._open_training_data()
+
+    def _open_settings(self, section: str = ""):
         try:
             from settings_dialog import SettingsDialog
-            dlg = SettingsDialog(self)
+            dlg = SettingsDialog(self, section)
             panel = getattr(self, "_chat_panel", None)
             if panel is not None and hasattr(panel, "reload_keys"):
                 dlg.keys_changed.connect(panel.reload_keys)

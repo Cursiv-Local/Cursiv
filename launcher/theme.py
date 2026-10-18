@@ -58,7 +58,7 @@ QComboBox {{ background: {SURFACE}; color: {TEXT}; border: 1px solid {BORDER}; b
 QComboBox:hover {{ border-color: {BORDER2}; }}
 QComboBox QAbstractItemView {{ background: {SURFACE}; color: {TEXT}; border: 1px solid {BORDER2};
     selection-background-color: {SURFACE2}; selection-color: {TEXT}; }}
-QCheckBox {{ spacing: 8px; }}
+QCheckBox, QRadioButton {{ spacing: 8px; background: transparent; }}
 """
 
 

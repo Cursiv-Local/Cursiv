@@ -63,6 +63,7 @@ hiddenimports = [
     "login_dialog",
     "chat_panel",
     "theme",
+    "nav_windows",
     "chat_commands",
     "legacy_vault_dialog",
     "postal_compose_dialog",

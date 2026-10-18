@@ -102,3 +102,60 @@ def test_theme_is_shared():
     import settings_dialog, setup_dialog, memory_dialog
     for mod in (settings_dialog, setup_dialog, memory_dialog):
         assert mod.BG == theme.BG and mod.GOLD == theme.ACCENT
+
+
+def _labels(widget):
+    from PyQt6.QtWidgets import QCheckBox, QLabel
+    return " ".join(w.text() for cls in (QLabel, QCheckBox) for w in widget.findChildren(cls))
+
+
+def test_settings_has_every_section_and_no_load_errors(app, settings):
+    import settings_dialog
+    d = settings_dialog.SettingsDialog()
+    assert [d._nav.item(i).text() for i in range(d._nav.count())] == list(settings_dialog.SettingsDialog.SECTIONS)
+    text = _labels(d)
+    assert "couldn't load" not in text
+    assert "Offline mode" in text and "Learn from our conversations" in text and "Security questions" in text
+    d2 = settings_dialog.SettingsDialog(section="Updates")
+    assert d2._pages.currentIndex() == settings_dialog.SettingsDialog.SECTIONS.index("Updates")
+
+
+def test_settings_switches_change_the_real_setting(app, settings):
+    import settings_dialog
+    from PyQt6.QtWidgets import QCheckBox
+    d = settings_dialog.SettingsDialog()
+    box = next(b for b in d.findChildren(QCheckBox) if b.text() == "Offline mode")
+    box.setChecked(True)
+    assert netgate.is_offline()
+    assert "Offline mode" in d._status_lbl.text()
+
+
+def test_knowledge_window_browses_the_reference(app, settings):
+    import nav_windows
+    from cursiv_v215.core import reference
+    k = nav_windows.KnowledgeDialog()
+    assert k._list.count() == len(reference.entries())
+    k.findChildren(nav_windows.QLineEdit)[0].setText("bleeding")
+    assert 0 < k._list.count() < len(reference.entries())
+
+
+def test_tools_hides_advanced_and_help_explains(app, settings):
+    import nav_windows
+    t = nav_windows.ToolsDialog()
+    assert t._adv.isHidden()
+    assert "Write a family letter" in _labels(t) and "Make a Cursiv USB" in _labels(t)
+    h = nav_windows.HelpDialog()
+    from PyQt6.QtWidgets import QTextBrowser
+    guide = h.findChildren(QTextBrowser)[0].toPlainText()
+    assert "The basics" in guide and "offline on" in guide
+
+
+def test_sidebar_navigation_and_prefill(panel):
+    import conversation_sidebar
+    from PyQt6.QtWidgets import QPushButton
+    side = conversation_sidebar.ConversationSidebar(panel)
+    names = [b.text().replace("&&", "&") for b in side.findChildren(QPushButton)]
+    for want in ("Memory & Knowledge", "Tools", "Settings", "Help"):
+        assert want in names
+    panel.prefill("translate  into Spanish")
+    assert panel._input.toPlainText() == "translate  into Spanish"

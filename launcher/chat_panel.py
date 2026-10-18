@@ -452,6 +452,14 @@ class ChatPanel(QWidget):
         from cursiv_v215.chat import status as _st
         _st.set_preferred_model(self._model_box.itemData(index) or "")
 
+    def prefill(self, text: str) -> None:
+        """Put a starting command in the input box (Tools buttons), cursor at the end."""
+        self._input.setPlainText(text)
+        cur = self._input.textCursor()
+        cur.movePosition(QTextCursor.MoveOperation.End)
+        self._input.setTextCursor(cur)
+        self._input.setFocus()
+
     def _quick_send(self, text: str) -> None:
         if self._streaming:
             return
