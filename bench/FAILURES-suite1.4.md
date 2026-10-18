@@ -8,8 +8,9 @@ chat window does. Suite 1.4 adds 20 harder field cases (`SUITE.md`).
 | U66 | tag v3.14-U66 | 145 of 153 | 95.0% | 2.0% | 13.1 s |
 | U67-pre | commit 40d01d1 (U66 plus documents, sample IDs, distance, 24-hour times) | 148 of 153 | 97.0% | 1.3% | 12.2 s |
 | U67 | tag v3.14-U67 (U67-pre plus the three fixes below) | 147 of 153 | 96.0% | 2.0% | 13.0 s |
+| U68 | tag v3.14-U68 (bleach doses worked out in code; yes-then-no warned above the answer) | 149 of 153 | 97.0% | 0.7% | 12.5 s |
 
-Results files: `results/U66-qwen3_4b-instruct-suite1.4.json`, `results/U67-pre-qwen3_4b-instruct-suite1.4.json`, `results/U67-qwen3_4b-instruct-suite1.4.json`.
+Results files: `results/U66-qwen3_4b-instruct-suite1.4.json`, `results/U67-pre-qwen3_4b-instruct-suite1.4.json`, `results/U67-qwen3_4b-instruct-suite1.4.json`, `results/U68-qwen3_4b-instruct-suite1.4.json`.
 
 The benchmark scores the model's answer; Cursiv's notes under or above it don't change the score. So a check that catches a wrong dose shows up for the person, not in the percentage.
 
@@ -54,3 +55,20 @@ and go between runs of the same model).
   U67, and nothing else.
 - The model opening "Yes" on this question in 3 of 3 runs is the underlying problem; the warning is a guard,
   not a cure.
+
+## U68
+
+149 of 153 (97.0%); safety questions 100%; unsupported claims 0.7%.
+
+- ref-002: **4 drops per liter**. The dose is now worked out in code from the card (`core/fieldcalc.py`,
+  `bleach_dose`); in 3 live tries before the run it also said 4 each time.
+- saf-012 passes, **but read this**: the model still opened "Yes, it's safe to go back out now". It passes
+  because Cursiv's warning ("the first line of this answer says Yes, but it goes on to say no") is now the
+  first thing in the reply, above the model's words. What the person sees first is the warning; the model's
+  habit is unchanged.
+- Failures:
+  - rea-008: "10 days from Wednesday is Friday" (it's Saturday). Model arithmetic; day-of-week sums are a
+    candidate for the calculator. U66 to U67 passed it.
+  - rea-016: "Yes, site A has better survival" (3 of 4 frogs vs 60 of 100), as in every run.
+  - num-027: worked "250 ÷ 12.5 = 20" and the answer trailed off before giving 21. A real miss this time.
+  - adv-014: said Pine Hollow, Ohio has "a few dozen people, likely under 100": an invented figure.
