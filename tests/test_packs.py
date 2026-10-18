@@ -36,6 +36,18 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("there's a thunderstorm coming and we're on the ridge", "survival/lightning-safety"),
     ("is it safe to stay in a tent during lightning", "survival/lightning-safety"),
     ("my friend was struck by lightning", "medical/lightning-strike-first-aid"),
+    # wildlife and plants
+    ("there's a tick stuck in my leg, how do I get it out", "medical/tick-removal"),
+    ("I found a deer tick attached to my arm", "medical/tick-removal"),
+    ("a rattlesnake bit my coworker on the ankle", "medical/snakebite-management"),
+    ("what do I do for a snake bite", "medical/snakebite-management"),
+    ("I got stung by a wasp on my hand", "medical/bee-wasp-and-hornet-stings"),
+    ("how do I get a bee stinger out", "medical/bee-wasp-and-hornet-stings"),
+    ("I stepped in fire ants", "medical/fire-ant-bites"),
+    ("my daughter was stung by a scorpion", "medical/scorpion-sting"),
+    ("I touched poison ivy while clearing brush", "medical/poison-ivy-oak-and-sumac"),
+    ("a black bear is near our camp", "survival/bear-encounter"),
+    ("what do I do if a grizzly charges me", "survival/bear-encounter"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -48,6 +60,11 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "explain the dark matter theory",
     "how do I make my tent more comfortable",
     "write a poem about thunder in the mountains",
+    "set a timer to tick every second",
+    "how do rattlesnakes find their prey",
+    "my teddy bear needs a name",
+    "the stock market is a bear market",
+    "the bee population is declining, why",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}

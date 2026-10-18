@@ -1,0 +1,63 @@
+{
+  "pack": "wildlife-and-plants",
+  "version": "1.0",
+  "about": "Ticks, snakes, stinging insects, scorpions, poisonous plants and bears. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "entries": [
+    {
+      "title": "tick removal",
+      "category": "medical",
+      "aliases": ["tick bite", "remove a tick", "removing a tick", "embedded tick", "deer tick", ["tick", "skin"], ["tick", "bit"], ["tick", "stuck"], ["tick", "attached"]],
+      "text": "Remove a tick right away; don't wait for a healthcare provider. 1) With clean fine-tipped tweezers, grasp the tick as close to the skin's surface as possible. 2) Pull it away from the skin with steady, even pressure. Don't twist or jerk it. 3) Get rid of it: put it in a sealed container, wrap it tightly in tape, flush it down the toilet, or put it in alcohol. Don't crush it with your fingers. Don't use petroleum jelly, heat, nail polish or other substances to make it let go: they can agitate the tick and force infected fluid into the skin. If you get a rash or fever within several weeks, see a doctor and tell them about the bite, when it happened and where you likely picked up the tick.",
+      "source": {"name": "CDC, What to Do After a Tick Bite", "url": "https://www.cdc.gov/ticks/after-a-tick-bite/index.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "snakebite management",
+      "category": "medical",
+      "aliases": ["snakebite", "snake bite", "snake bit", "bitten by a snake", ["rattlesnake", "bit"], ["rattlesnake", "bitten"], ["copperhead", "bit"], ["cottonmouth", "bit"], ["snake", "bitten"]],
+      "text": "Venomous snakebite: get emergency medical care as soon as possible, so antivenom can be started if needed. Don't wait for symptoms. Don't drive yourself: the bite can make you dizzy or pass out. Keep calm. Lie or sit down with the bite in a neutral, comfortable position. Take off rings and watches before swelling starts. Wash the bite with soap and water and cover it with a clean, dry dressing. Mark the leading edge of tenderness or swelling on the skin and write the time next to it. If it's safe, photograph the snake from a distance. Don't: pick up or trap the snake (never handle one, even a dead one or its head); use a tourniquet, electric shock or folk remedies; cut the wound; try to suck out venom; apply ice or put the wound in water; drink alcohol or take pain relievers such as aspirin, ibuprofen or naproxen.",
+      "source": {"name": "CDC / NIOSH, Venomous Snakes at Work", "url": "https://www.cdc.gov/niosh/outdoor-workers/about/venomous-snakes.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "bee wasp and hornet stings",
+      "category": "medical",
+      "aliases": ["bee sting", "wasp sting", "hornet sting", "yellow jacket", "stinger", ["stung", "bee"], ["stung", "wasp"], ["stung", "hornet"]],
+      "text": "Bee, wasp or hornet sting: have someone stay with the person to watch for an allergic reaction. Wash the site with soap and water. Remove the stinger by wiping gauze or scraping a fingernail over the area; never squeeze it or use tweezers. Apply ice to reduce swelling. Don't scratch the sting. A severe allergic reaction (anaphylaxis) can be life-threatening and needs emergency care right away; people who have had severe reactions should carry an epinephrine auto-injector (EpiPen) and wear a medical ID.",
+      "source": {"name": "CDC / NIOSH, Insects and Scorpions at Work", "url": "https://www.cdc.gov/niosh/outdoor-workers/about/insects-and-scorpions.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "fire ant bites",
+      "category": "medical",
+      "aliases": ["fire ant", "fire ants", ["ants", "bit"], ["ants", "stung"]],
+      "text": "Fire ants: rub them off briskly, because they hold on to the skin with their jaws. Antihistamines may help; follow the package directions, as they can cause drowsiness. Go to an emergency medical facility immediately for severe chest pain, nausea, severe sweating, loss of breath, serious swelling or slurred speech.",
+      "source": {"name": "CDC / NIOSH, Insects and Scorpions at Work", "url": "https://www.cdc.gov/niosh/outdoor-workers/about/insects-and-scorpions.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "scorpion sting",
+      "category": "medical",
+      "aliases": ["scorpion sting", "stung by a scorpion", ["scorpion", "sting"], ["scorpion", "stung"]],
+      "text": "Scorpion sting: contact a healthcare provider or poison control (US: 1-800-222-1222). Apply ice, but don't put the area in ice water. Stay relaxed and calm, and don't take sedatives. If it's safe, capture the scorpion so it can be identified. Get emergency care for severe chest pain, nausea, severe sweating, loss of breath, serious swelling or slurred speech.",
+      "source": {"name": "CDC / NIOSH, Insects and Scorpions at Work", "url": "https://www.cdc.gov/niosh/outdoor-workers/about/insects-and-scorpions.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "poison ivy oak and sumac",
+      "category": "medical",
+      "aliases": ["poison ivy", "poison oak", "poison sumac", "urushiol"],
+      "text": "After touching poison ivy, oak or sumac: rinse the skin right away with rubbing alcohol, a poison-plant wash or dishwashing soap and lots of water, rinsing often so the wash doesn't dry and spread the oil (urushiol). Scrub under the nails with a brush. Clean tools with rubbing alcohol or soap and lots of water, and wash exposed clothing separately in hot water with detergent. For itching and blisters: wet compresses, calamine lotion or hydrocortisone cream; an antihistamine such as diphenhydramine (Benadryl) can help the itch. Never burn these plants: breathing the smoke can cause severe breathing problems. Call 911 or go to an emergency room for a severe allergic reaction (swelling, trouble breathing) or if the person has reacted severely before. Get medical help for severe cases or a rash on the face or genitals.",
+      "source": {"name": "CDC / NIOSH, Poisonous Plants and Work", "url": "https://www.cdc.gov/niosh/outdoor-workers/about/poisonous-plants.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "bear encounter",
+      "category": "survival",
+      "aliases": ["bear encounter", "bear spray", "grizzly", "black bear", "brown bear", ["bear", "attack"], ["bear", "charging"], ["bear", "camp"], ["bear", "hiking"], ["bear", "trail"], ["bear", "see"]],
+      "text": "Avoid surprising bears: make noise so they hear you coming; most bears avoid people who do. If a bear approaches: stay calm, talk calmly so it knows you're a person, stand still and slowly wave your arms. Don't run; if it follows, stop and hold your ground. If it's not moving, move away sideways. Don't climb a tree. Always leave the bear an escape route, and never get between a mother and her cubs. Keep your pack on and never let a bear get your food. If a brown or grizzly bear attacks: keep your pack on and play dead, lying flat on your stomach with your hands clasped behind your neck; stay still until it leaves, and fight back, hitting its face with whatever you have, only if the attack continues. If a black bear attacks: don't play dead; try to get to a secure place such as a car or building; if you can't, fight back, aiming kicks and blows at its face and muzzle. Bear spray (an EPA-approved product made for bears) is for stopping a charging or attacking bear; it isn't a repellent, so don't put it on yourself or your gear.",
+      "source": {"name": "U.S. National Park Service, Staying Safe Around Bears", "url": "https://www.nps.gov/subjects/bears/safety.htm", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    }
+  ]
+}
