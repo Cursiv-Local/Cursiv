@@ -243,6 +243,19 @@ class SettingsDialog(QDialog):
         v.addWidget(self._model)
         v.addWidget(self._explain("The choice also shows above the chat."))
 
+        b = self._card(lay)
+        b.addWidget(QLabel("Battery saver"))
+        saver = QComboBox()
+        for label, value in (("Automatic: on while the laptop is unplugged", ""), ("Always on", "on"), ("Off", "off")):
+            saver.addItem(label, value)
+        from cursiv_v215.chat import keys as _keys
+        saver.setCurrentIndex(max(0, saver.findData(_keys.saved_key("battery_saver"))))
+        saver.activated.connect(lambda i: _keys.store_key("battery_saver", saver.itemData(i) or ""))
+        b.addWidget(saver)
+        b.addWidget(self._explain("Uses less power: a smaller working memory for the model, the model unloaded after "
+                                  "2 minutes idle, and answers checked only by Cursiv's own code (arithmetic, doses, "
+                                  "the reference card) rather than by a second AI call."))
+
         def show_all(on):
             status.set_show_all_models(on)
             if not on and status.current_choice() == "standard":

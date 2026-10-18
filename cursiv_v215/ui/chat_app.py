@@ -824,7 +824,7 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
         "system": system_str,
         "prompt": turns,
         "stream": True,
-        "keep_alive": _speed.KEEP_ALIVE,          # stay loaded: a cold load took ~100 s
+        "keep_alive": _speed.keep_alive(),        # stay loaded: a cold load took ~100 s (2 min on battery saver)
         **_speed.think_options(model, deep),      # Deep Think's reasoning comes back separately, not in "response"
         "options": {
             "num_predict": max_tokens,
@@ -3119,7 +3119,7 @@ def chat(
         # Still inside this turn, so the check uses the fast router (no idle wait)
         # and background learning cannot take the local model yet.
         try:
-            if _EMERGENCY_TURN or _CURSIV_REPLY:
+            if _EMERGENCY_TURN or _CURSIV_REPLY or _speed.battery_saver():
                 raise _SkipCheck      # no slow check (or a wall of notes) after emergency steps
             from cursiv_v215.core import verify as _verify
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")

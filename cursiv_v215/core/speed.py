@@ -83,8 +83,50 @@ def big_gpu() -> bool:
 
 def num_ctx() -> int:
     """Context window. Every extra token of context costs GPU memory; on small
-    cards 16k pushed more of the model onto the CPU."""
+    cards 16k pushed more of the model onto the CPU. Battery saver: 4k."""
+    if battery_saver():
+        return 4096
     return 16384 if not small_gpu() else 8192
+
+
+# ── Battery saver (research roadmap R5) ─────────────────────────────────────
+# Setting "battery_saver": "" automatic (on while unplugged), "on", "off". While on:
+# a smaller context, the model released from memory after 2 minutes idle instead
+# of 30, and no second model call to check answers (the checks done in code, such
+# as arithmetic, doses and the reference card, still run).
+
+def on_battery() -> bool:
+    """True when this Windows laptop is running on its battery."""
+    try:
+        import ctypes
+
+        class _Power(ctypes.Structure):
+            _fields_ = [("ACLineStatus", ctypes.c_byte), ("BatteryFlag", ctypes.c_byte),
+                        ("BatteryLifePercent", ctypes.c_byte), ("SystemStatusFlag", ctypes.c_byte),
+                        ("BatteryLifeTime", ctypes.c_ulong), ("BatteryFullLifeTime", ctypes.c_ulong)]
+        st = _Power()
+        if not ctypes.windll.kernel32.GetSystemPowerStatus(ctypes.byref(st)):
+            return False
+        return st.ACLineStatus == 0
+    except Exception:
+        return False
+
+
+def battery_saver() -> bool:
+    try:
+        from cursiv_v215.chat import keys
+        mode = keys.saved_key("battery_saver")
+    except Exception:
+        mode = ""
+    if mode == "on":
+        return True
+    if mode == "off":
+        return False
+    return on_battery()
+
+
+def keep_alive() -> str:
+    return "2m" if battery_saver() else KEEP_ALIVE
 
 
 def chat_model_prefs() -> tuple[str, ...]:

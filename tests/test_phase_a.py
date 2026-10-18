@@ -189,3 +189,32 @@ def test_saying_you_have_no_map_isnt_citing_one():
 def test_no_council_hint_on_a_should_question():
     from cursiv_v215.core import phases
     assert "council" not in phases.run("What time should I get in bed?").after_reply
+
+
+# ── Battery saver (research roadmap R5) ────────────────────────────────────
+
+def test_battery_saver_settings(fresh, monkeypatch):
+    from cursiv_v215.chat import keys
+    from cursiv_v215.core import speed
+    monkeypatch.setattr(speed, "on_battery", lambda: True)
+    assert speed.battery_saver() and speed.keep_alive() == "2m" and speed.num_ctx() == 4096   # automatic, unplugged
+    keys.store_key("battery_saver", "off")
+    assert not speed.battery_saver() and speed.keep_alive() == speed.KEEP_ALIVE
+    monkeypatch.setattr(speed, "on_battery", lambda: False)
+    keys.store_key("battery_saver", "on")
+    assert speed.battery_saver()
+
+
+def test_battery_saver_skips_the_second_model_call(fresh, monkeypatch):
+    from cursiv_v215.chat import keys
+    from cursiv_v215.ui import chat_app as ca
+    keys.store_key("battery_saver", "on")
+    _local_model(monkeypatch)
+    calls = []
+
+    def fake(messages, **kw):
+        calls.append(messages[0]["content"][:40])
+        return iter(["A well 180 feet deep needs a submersible pump, recommend one rated for 200 feet."])
+    monkeypatch.setattr(ca, "_call_ollama", fake)
+    out = "".join(ca.chat("What pump do I need for a 180 foot well? Should I get a 1 hp one?", [], "", None))
+    assert len(calls) == 1 and "submersible" in out          # the answer, and no check call after it
