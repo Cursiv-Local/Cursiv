@@ -110,3 +110,23 @@ def test_yes_its_safe_then_dont_go_gets_a_warning_on_top(fresh, monkeypatch):
     assert out.index("contradicts itself") < out.index("Yes, it's safe")
     assert out.count("contradicts itself") == 1
     assert ac.flip_flop("Yes, it's safe. Boil it for one minute first.") is None
+
+
+def test_citing_the_reference_when_none_was_given_is_flagged():
+    note = ac.notes("Wait 30 minutes (offline reference: lightning-safety).", [], False)
+    assert "no reference entry was given" in note
+    assert "no reference entry" not in ac.notes("Wait 30 minutes (offline reference: lightning-safety).",
+                                                ["lightning safety"], False)
+
+
+def test_every_answer_says_what_it_was_given(fresh, monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    _local_model(monkeypatch)
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: iter(["Canberra is the capital of Australia."]))
+    out = "".join(ca.chat("What is the capital of Australia?", [], "", None))
+    assert "*[Source: model knowledge (not checked against a source)]*" in out
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: iter(["Press hard on the wound and call 911."]))
+    out = "".join(ca.chat("my coworker cut his arm and it's bleeding badly", [], "", None))
+    assert "Sources: Cursiv Offline Reference (" in out and "model knowledge" not in out
+    out = "".join(ca.chat("Convert 12.4 C to F", [], "", None))
+    assert "worked out by Cursiv's code" in out

@@ -99,6 +99,11 @@ def flip_flop(answer: str) -> tuple[str, str] | None:
     return None
 
 
+# "(offline reference: survival/water-purification)" written by the model when Cursiv gave it
+# no entry: a source it didn't consult.
+_CITES_REFERENCE = re.compile(r"(?i)\(?\s*offline reference\s*:|according to (?:cursiv'?s |the )?offline reference")
+
+
 def unsupported_actions(answer: str, searched: bool) -> list[str]:
     """Things the answer says Cursiv did that it didn't do this turn."""
     if searched:
@@ -131,6 +136,9 @@ def notes(answer: str, titles: list[str], searched: bool, flip_above: bool = Fal
     if flip:
         lines.append(f"*(Cursiv's check: this answer starts with \"{flip[0]}\" and later says \"{flip[1]}\". "
                      "It contradicts itself: read all of it, and when safety is involved, take the safer choice.)*")
+    if not titles and _CITES_REFERENCE.search(answer or ""):
+        lines.append("*(Cursiv's check: the answer cites Cursiv's offline reference, but no reference entry was "
+                     "given for this question. That part comes from the model's own knowledge.)*")
     claims = unsupported_actions(answer, searched)
     if claims:
         lines.append(f'*(Cursiv\'s check: the answer says "{claims[0]}", but nothing was searched or looked up '

@@ -588,6 +588,8 @@ def _build_strand_context(query: str, top_k: int = 2) -> str:
         from cursiv_v215.memory import semantic as _sem
         ctx = _sem.build_context(query)
         if ctx:
+            global _MEMORY_RECALLED
+            _MEMORY_RECALLED = True
             return ctx
     except Exception:
         pass
@@ -1367,6 +1369,30 @@ _DOCS_SHOWN: list = []                 # core.documents.Passage objects supplied
 _WEB_SEARCHED = False                  # a web search ran for this turn
 _WORKED = None                         # core/calc.Worked: arithmetic Cursiv computed for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
+_MEMORY_RECALLED = False               # saved memories were put in front of the model this turn
+
+
+def sources_line() -> str:
+    """What this turn's answer was actually given, from Cursiv's own records, never the
+    model's say-so: the offline reference, the person's documents, Cursiv's calculations,
+    web results, saved memories. Nothing given: model knowledge, not checked."""
+    if _CURSIV_REPLY:
+        return "Sources: Cursiv itself (no AI model)"
+    parts = []
+    if _REF_SHOWN:
+        parts.append("Cursiv Offline Reference (" + ", ".join(dict.fromkeys(_REF_SHOWN)) + ")")
+    if _DOCS_SHOWN:
+        pages = dict.fromkeys(f"{p.name} p. {p.page}" for p in _DOCS_SHOWN)
+        parts.append("Your documents (" + ", ".join(pages) + ")")
+    if _WORKED:
+        parts.append("worked out by Cursiv's code")
+    if _WEB_SEARCHED:
+        parts.append("web search results")
+    if _MEMORY_RECALLED:
+        parts.append("your saved memories")
+    if not parts:
+        return "Source: model knowledge (not checked against a source)"
+    return "Sources: " + "; ".join(parts) + ". Wording by the AI model"
 
 
 _NOTES_BLOCK_RE = _re.compile(r"\n*-{3,}\n\*\*(Checked, with notes|Draft \+ notes)\*\*[\s\S]*$")
@@ -3258,8 +3284,9 @@ def _check_context(history: list[dict], user_text: str) -> str:
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
                  confirm_writes, anthropic_key, force_provider, reply: list[str]):
     from cursiv_v215.core import selfknow as _sk
-    global _WEB_SEARCHED, _WORKED
+    global _WEB_SEARCHED, _WORKED, _MEMORY_RECALLED
     _WORKED = None
+    _MEMORY_RECALLED = False
     _REAL_TOOL_NOTES.clear()
     _RETRIEVED.clear()
     _REF_SHOWN.clear()
@@ -3270,8 +3297,12 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
         if isinstance(chunk, str) and chunk not in (RATE_SENTINEL,) and not chunk.startswith(WRITE_SENTINEL):
             reply.append(chunk)
         yield chunk
+    if _ANSWERED_BY or _CURSIV_REPLY:   # what the answer was given (Cursiv's records, not the model's)
+        note = f"\n\n*[{sources_line()}]*"
+        reply.append(note)
+        yield note
     if _ANSWERED_BY:     # say which engine answered (written by Cursiv, not the model)
-        note = f"\n\n*[Answered by {_ANSWERED_BY}]*"
+        note = f"\n*[Answered by {_ANSWERED_BY}]*"
         reply.append(note)
         yield note
 
