@@ -9,6 +9,7 @@ local_models() lists the chat models Ollama has, for the model picker.
 from __future__ import annotations
 
 import json
+import re
 import urllib.request
 from pathlib import Path
 
@@ -126,3 +127,26 @@ def choose(choice: str) -> None:
     from cursiv_v215.chat import keys
     keys.store_key("answer_mode", "deep" if choice == "deep" else "")
     set_preferred_model(choice[len("model:"):] if choice.startswith("model:") else "")
+
+
+# ── "Are you offline?" answered from the real state, not by the model ─────────
+# The model said "I am completely offline right now" as fact (benchmark gen-020, U65).
+
+_NET_QUESTION = re.compile(r"(?i)\b(are you|is cursiv|is this|am i)\b[^?.]{0,40}\b(offline|online|connected|"
+                           r"on the internet|using the internet|sending)\b|\bprove (?:it|you'?re) (?:is )?offline\b")
+
+
+def answers_network_question(text: str) -> bool:
+    t = (text or "").strip()
+    return bool(_NET_QUESTION.search(t)) and len(t.split()) <= 25
+
+
+def network_answer() -> str:
+    st = network_status()
+    head = {"offline": "Offline mode is on.", "local": "Offline mode is off, but nothing online is turned on.",
+            "online": "Some online features are turned on."}[st["level"]]
+    lines = [head, *st["details"]]
+    lines.append("What I can show you is the state of Cursiv's own switches and its network block (the pill at "
+                 "the top right). I can't watch other programs on this computer, so for proof that nothing leaves "
+                 "the machine, unplug it or turn off Wi-Fi, or check with a network monitor.")
+    return "\n\n".join(lines)

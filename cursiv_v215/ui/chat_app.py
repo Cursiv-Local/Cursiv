@@ -2629,6 +2629,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             _WORKED = _calc.work_out(user_text)
             if _WORKED:
                 messages[0]["content"] += "\n\n" + _calc.prompt_note(_WORKED) + "\n"
+        # "Are you offline?" is answered from the real switches and gate, not by the model,
+        # which said "I am completely offline" as fact (benchmark gen-020, U65).
+        from cursiv_v215.chat import status as _net_status
+        if not _CODING_TURN and _net_status.answers_network_question(user_text):
+            global _CURSIV_REPLY
+            _CURSIV_REPLY = True
+            yield _net_status.network_answer()
+            return
         # "Is it safe?" with nothing earlier saying what "it" is: ask, don't guess (core/clarify.py).
         if not (_self_turn or _CODING_TURN or (locals().get("_ph") and _ph.emergency)):
             from cursiv_v215.core import clarify as _clarify
@@ -2636,7 +2644,6 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             if _vague:
                 # The model ignored the instruction and answered "Yes, it's safe" (site recording,
                 # 2026-10-18), so Cursiv asks the question itself.
-                global _CURSIV_REPLY
                 _CURSIV_REPLY = True
                 yield _clarify.question(_vague)
                 return

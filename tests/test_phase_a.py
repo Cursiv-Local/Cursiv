@@ -218,3 +218,14 @@ def test_battery_saver_skips_the_second_model_call(fresh, monkeypatch):
     monkeypatch.setattr(ca, "_call_ollama", fake)
     out = "".join(ca.chat("What pump do I need for a 180 foot well? Should I get a 1 hp one?", [], "", None))
     assert len(calls) == 1 and "submersible" in out          # the answer, and no check call after it
+
+
+@pytest.mark.parametrize("offline, expect", [(True, "Offline mode is on."), (False, "Offline mode is off")])
+def test_are_you_offline_is_answered_from_the_real_state(fresh, monkeypatch, offline, expect):
+    from cursiv_v215.core import netgate
+    from cursiv_v215.ui import chat_app as ca
+    netgate.set_offline(offline)
+    _local_model(monkeypatch)
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))
+    out = "".join(ca.chat("Are you completely offline right now? Prove it.", [], "", None))
+    assert out.startswith(expect) and "can't watch other programs" in out
