@@ -1,7 +1,7 @@
 {
   "pack": "first-aid-core",
   "version": "1.0",
-  "about": "Head injury danger signs, sudden cardiac arrest, seizures and altitude illness. Written from CDC pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "about": "Head injury danger signs, sudden cardiac arrest, seizures, altitude illness and burns. Written from CDC and Ready.gov pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
   "entries": [
     {
       "title": "concussion assessment",
@@ -101,6 +101,163 @@
       "source": {
         "name": "CDC Travelers' Health, Travel to High Altitudes",
         "url": "https://wwwnc.cdc.gov/travel/page/travel-to-high-altitudes",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "burns treatment",
+      "category": "medical",
+      "aliases": [
+        "scalded",
+        "scald",
+        "burn blister",
+        "burn on my",
+        "burn on his",
+        "burn on her",
+        "chemical burn",
+        [
+          "burned",
+          "hand"
+        ],
+        [
+          "burned",
+          "arm"
+        ],
+        [
+          "burned",
+          "leg"
+        ],
+        [
+          "burned",
+          "foot"
+        ],
+        [
+          "burned",
+          "finger"
+        ],
+        [
+          "burned",
+          "fingers"
+        ],
+        [
+          "burned",
+          "face"
+        ],
+        [
+          "burned",
+          "skin"
+        ],
+        [
+          "burned",
+          "stove"
+        ],
+        [
+          "burned",
+          "oven"
+        ],
+        [
+          "burned",
+          "fire"
+        ],
+        [
+          "burned",
+          "grill"
+        ],
+        [
+          "burned",
+          "iron"
+        ],
+        [
+          "burned",
+          "pan"
+        ],
+        [
+          "burned",
+          "oil"
+        ],
+        [
+          "burned",
+          "water"
+        ],
+        [
+          "burned",
+          "steam"
+        ],
+        [
+          "burnt",
+          "hand"
+        ],
+        [
+          "burnt",
+          "arm"
+        ],
+        [
+          "burnt",
+          "leg"
+        ],
+        [
+          "burnt",
+          "foot"
+        ],
+        [
+          "burnt",
+          "finger"
+        ],
+        [
+          "burnt",
+          "fingers"
+        ],
+        [
+          "burnt",
+          "face"
+        ],
+        [
+          "burnt",
+          "skin"
+        ],
+        [
+          "burnt",
+          "stove"
+        ],
+        [
+          "burnt",
+          "oven"
+        ],
+        [
+          "burnt",
+          "fire"
+        ],
+        [
+          "burnt",
+          "grill"
+        ],
+        [
+          "burnt",
+          "iron"
+        ],
+        [
+          "burnt",
+          "pan"
+        ],
+        [
+          "burnt",
+          "oil"
+        ],
+        [
+          "burnt",
+          "water"
+        ],
+        [
+          "burnt",
+          "steam"
+        ]
+      ],
+      "text": "Minor burns: hold the burned skin under cool running water (not cold water or ice, which can injure it more) for 10 to 15 minutes, until it's less painful, especially for a chemical burn. Without running water, soak it in a cool water bath for five minutes. Remove clothing, diapers, jewelry and metal from the burned area. Don't break blisters; an opened blister can get infected. You may put on a thin layer of petroleum jelly or aloe vera, but not cream, lotion, oil, cortisone, butter or egg white. Cover it with sterile non-stick gauze, lightly taped or wrapped, and change the dressing once a day. See a doctor, call 911 or go to the hospital if the burn is larger than two inches; if it's dark red and glossy with a lot of blistering, or dry and leathery with white, brown or black patches; or if it came from a fire, an electrical wire or socket, or chemicals. These need immediate medical attention. Contact a provider for signs of infection: more pain, redness, swelling, discharge, fever, swollen lymph nodes or a red streak from the burn.",
+      "source": {
+        "name": "Ready.gov (FEMA), Preventing and Treating Burns",
+        "url": "https://www.ready.gov/preventing-and-treating-burns",
         "license": "public domain (U.S. government work)",
         "checked": "2026-10-18"
       },

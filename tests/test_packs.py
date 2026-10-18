@@ -67,6 +67,9 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("can I drive through water on the road", "survival/flood-safety"),
     ("the wildfire smoke is bad, should I go outside", "survival/wildfire-smoke"),
     ("there's a tornado warning, where do we go", "survival/tornado-safety"),
+    ("the ground is shaking, is it an earthquake, what do I do", "survival/earthquake-safety"),
+    ("I burned my hand on the stove", "medical/burns-treatment"),
+    ("my son got scalded by hot coffee", "medical/burns-treatment"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -92,6 +95,8 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "my laptop has a seizure-inducing screen flicker",
     "my basement smells like smoke from the fireplace, is that normal",
     "flood fill a shape in photoshop",
+    "burn a CD of my photos",
+    "I got burned on that deal",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}

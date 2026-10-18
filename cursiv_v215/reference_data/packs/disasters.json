@@ -1,7 +1,7 @@
 {
   "pack": "disasters",
   "version": "1.0",
-  "about": "Floods, wildfire smoke and tornadoes. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a professional.",
+  "about": "Floods, wildfire smoke, tornadoes and earthquakes. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a professional.",
   "entries": [
     {
       "title": "flood safety",
@@ -97,6 +97,26 @@
       "source": {
         "name": "National Weather Service, basic tornado safety rules",
         "url": "https://www.weather.gov/pub/pnstornadosafety",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "earthquake safety",
+      "category": "survival",
+      "aliases": [
+        "earthquake",
+        "earthquakes",
+        "aftershock",
+        "aftershocks",
+        "drop cover and hold on",
+        "ground is shaking"
+      ],
+      "text": "During an earthquake, protect yourself right away: drop onto your hands and knees, cover your head and neck with one arm and hand, and hold on until the shaking stops. If you're inside, stay inside and don't run out; avoid doorways. In bed: turn face down and cover your head and neck with a pillow. In a car: pull over, stop and set the parking brake. Outside: stay outside and move to an open area away from buildings, trees, streetlights and power lines. In a wheelchair: lock the wheels, bend over and cover your head and neck with your arms, a book or a pillow. Afterwards: expect aftershocks and drop, cover and hold on again when they come. In a tsunami area, go inland or to higher ground as soon as the shaking stops. If you're in a damaged building, go outside and quickly move away from it; don't enter damaged buildings. Watch for leaking gas and water lines and downed power lines.",
+      "source": {
+        "name": "Ready.gov (FEMA), Earthquakes",
+        "url": "https://www.ready.gov/earthquakes",
         "license": "public domain (U.S. government work)",
         "checked": "2026-10-18"
       },
