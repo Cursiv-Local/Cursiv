@@ -49,11 +49,10 @@ VISION_MODEL = ("gemma3 4B — reads and describes images offline (3.3 GB)", "ge
 VISION_FAMILIES = ("gemma3", "qwen2.5vl", "llama3.2-vision", "minicpm-v", "llava", "moondream")
 
 # (label, model tag, approximate download size)
-# qwen3 4B is the model that did best on Cursiv's own tests (bench/MODEL-COMPARISON.md);
-# qwen2.5 1.5B is only for computers too slow for it, and hasn't been benchmarked yet.
+# qwen3 4B is the model that did best on Cursiv's own tests (bench/MODEL-COMPARISON.md) and the
+# only one offered: nothing else has been measured the same way.
 MODELS = [
-    ("qwen3 4B — recommended (2.5 GB)", "qwen3:4b-instruct", "2.5 GB"),
-    ("qwen2.5 1.5B — only for very slow computers; not yet tested by Cursiv (1 GB)", "qwen2.5:1.5b", "1 GB"),
+    ("qwen3 4B — tested by Cursiv (2.5 GB)", "qwen3:4b-instruct", "2.5 GB"),
 ]
 
 

@@ -37,7 +37,7 @@ OLLAMA_API = "http://127.0.0.1:11434"
 
 # Always on the USB so Cursiv runs offline anywhere: a qwen chat model (first
 # one installed, else downloaded) and the memory-search embedding model.
-REQUIRED_CHAT = ("qwen3:4b-instruct", "qwen2.5:1.5b")   # Apache 2.0: fine to give away or sell (MODELS.md)
+REQUIRED_CHAT = ("qwen3:4b-instruct",)   # the tested model; Apache 2.0: fine to give away or sell (MODELS.md)
 REQUIRED_EMBED = "nomic-embed-text:latest"
 GB = 1024 ** 3
 
