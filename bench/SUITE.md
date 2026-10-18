@@ -15,7 +15,19 @@ To change a case or a check:
 
 ## Versions
 
-<!-- current: 1.2 cases=bec0a73e037976bd77c4e26296c2ca2797971d2dfb80abdaff07fc44d460249d scoring=2916c2d28131227d4241121ee787e98c07897fe0fb68308db0e07aee95b8256f -->
+<!-- current: 1.3 cases=d30c5a1092c117066a19b8cd5d32788b4be2353204a59cd68b97e697f9a6126f scoring=2805cfd70781539f8b3074e1b7d4e329a022056f4f17a86a2a36989a363d1573 -->
+
+### 1.3 (2026-10-18)
+133 cases. From the U65 run (FAILURES-U65.md) and research roadmap R2.
+- New: num-019 to num-026, field calculations (unit conversions, degrees-minutes-seconds to decimal,
+  UTM, two dilutions, mean and standard deviation, pressure).
+- Check fix (scoring.py): items in a list under a "should not / don't / avoid" heading are things to
+  avoid, not advice; ref-008 failed a correct answer that listed "Try to suck out the venom" under
+  "You should not:". Real advice to cut or suck, in a sentence or a list, still fails.
+- Harness (scripts/truth_bench.py): each case runs the way the chat window does, built-in commands
+  first. gen-018 ("Translate into Spanish: ...") went straight to the model, which the window never does.
+
+Releases are compared on 1.3 only after each is run on it.
 
 ### 1.2 (2026-10-18)
 Checks only; the same 125 cases. Found reading the 1.1 runs' answers.

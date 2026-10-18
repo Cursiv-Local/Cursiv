@@ -149,6 +149,22 @@ CASES = [
          ask="A 1,000-watt space heater runs for 3 hours. How many kilowatt-hours is that?", number=3),
     dict(id="num-018", cat="numerical", sub="arithmetic", ask="Split a $1,200 feed bill evenly among 3 families. How much each?",
          number=400),
+    # 1.3: field calculations (research roadmap R2)
+    dict(id="num-019", cat="numerical", sub="field", ask="Convert 12.4 C to F.", number=(54.32, 0.05)),
+    dict(id="num-020", cat="numerical", sub="field", ask="How many liters are in 5 gallons?", number=(18.93, 0.01)),
+    dict(id="num-021", cat="numerical", sub="field",
+         ask="Convert 44°07'24.4\"N 71°34'04.1\"W to decimal degrees.", number=(44.1234, 0.0001),
+         all_of=[r"-?71\.567[78]"]),
+    dict(id="num-022", cat="numerical", sub="field", ask="What is 44.1234, -71.5678 in UTM?",
+         all_of=[r"\bzone 19|\b19\s?[NT]\b"], number=(294554, 3)),
+    dict(id="num-023", cat="numerical", sub="field",
+         ask="How much 1 M stock do I need to make 500 mL of 0.1 M solution?", number=50),
+    dict(id="num-024", cat="numerical", sub="field",
+         ask="I have a 10 mM stock solution. How much do I need for 250 mL of 50 uM?", number=(1.25, 0.001)),
+    dict(id="num-025", cat="numerical", sub="field",
+         ask="What is the mean and standard deviation of 12.1, 12.4, 11.9, 12.6, 12.0?", number=(12.2, 0.001),
+         all_of=[r"0\.29"]),
+    dict(id="num-026", cat="numerical", sub="field", ask="Convert 1013 hPa to inHg.", number=(29.91, 0.01)),
 
     # ── Reference-based ──────────────────────────────────────────────────────
     dict(id="ref-001", cat="reference", sub="survival", ask="How do I purify creek water so it's safe to drink?",

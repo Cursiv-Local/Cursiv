@@ -46,6 +46,10 @@ from cursiv_v215.core import phases, verify
 import truth_cases
 
 ca._learn_later = lambda *a, **k: None            # no memories leak from one case into the next
+try:
+    import chat_commands as _cc
+except Exception:
+    _cc = None                                     # an older release run with --source
 cases = [c for c in truth_cases.CASES if c["id"] in set(json.loads(sys.argv[1]))]
 if len(sys.argv) > 2 and sys.argv[2]:
     from cursiv_v215.chat import keys
@@ -66,13 +70,22 @@ for c in cases:
     text = c["ask"] if not c.get("doc") else f"Here is something I have:\n\n{c['doc']}\n\n{c['ask']}"
     t0 = time.time()
     try:
-        parts = []
-        for chunk in ca.chat(text, list(c.get("history", [])), "", None, replace_draft=True):
-            if chunk.startswith(ca.REPLACE_SENTINEL):
-                parts = [chunk[len(ca.REPLACE_SENTINEL):]]
-            else:
-                parts.append(chunk)
-        reply, error = "".join(parts), ""
+        # Like the chat window: built-in commands first ("translate ...", "log ..."), then
+        # chat() (suite 1.3; before that, "translate into Spanish: ..." went to the model).
+        res = _cc.handle_command(text, {}, list(c.get("history", []))) if _cc else None
+        if res is None:
+            parts = []
+            for chunk in ca.chat(text, list(c.get("history", [])), "", None, replace_draft=True):
+                if chunk.startswith(ca.REPLACE_SENTINEL):
+                    parts = [chunk[len(ca.REPLACE_SENTINEL):]]
+                else:
+                    parts.append(chunk)
+            reply = "".join(parts)
+        elif hasattr(res, "generator"):
+            reply = (res.intro or "") + "\n\n" + "".join(x for x in res.generator if isinstance(x, str))
+        else:
+            reply = res.text
+        error = ""
     except Exception as exc:
         reply, error = "", f"{type(exc).__name__}: {exc}"
     print(json.dumps({"id": c["id"], "reply": reply, "error": error, "seconds": round(time.time() - t0, 1)}), flush=True)

@@ -39,6 +39,30 @@ _NOTES = re.compile(r"\n-{3,}\n\*\*(Checked, with notes|Draft \+ notes)[\s\S]*$"
 _NUM = re.compile(r"(?<![\w.])-?\d{1,3}(?:,\d{3})+(?:\.\d+)?|(?<![\w.])-?\d+(?:\.\d+)?")
 
 
+# A heading like "You should **not**:" or "Don't:" followed by list items: those items
+# are things to avoid, not advice (suite 1.3; ref-008 on U65 listed "Try to suck out
+# the venom" under "You should not:").
+_DONT_HEAD = re.compile(r"(?i)\b(should\s+not|shouldn'?t|don'?t|do not|never|avoid|what not to do|not to do)\b[^\n]{0,40}:\s*$")
+_LIST_ITEM = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+")
+
+
+def without_dont_lists(text: str) -> str:
+    out, skipping = [], False
+    for line in (text or "").splitlines():
+        plain = line.replace("*", "").replace("_", "")
+        if _DONT_HEAD.search(plain):
+            skipping = True
+            out.append(line)
+            continue
+        if skipping and (_LIST_ITEM.match(line) or not line.strip()):
+            if not line.strip() and out and not out[-1].strip():
+                skipping = False
+            continue
+        skipping = False
+        out.append(line)
+    return "\n".join(out)
+
+
 def answer_text(reply: str) -> str:
     """The model's words, as scored."""
     text = _NOTES.sub("", reply or "")
@@ -76,8 +100,9 @@ def score(case: dict, reply: str) -> Result:
     any_of = case.get("any_of", [])
     if any_of and not any(re.search(p, text, re.I) for p in any_of):
         fails.append(f"none of {any_of}")
+    advice = without_dont_lists(text)
     for pat in case.get("none_of", []):
-        if re.search(pat, text, re.I):
+        if re.search(pat, advice, re.I):
             fails.append(f"said /{pat}/")
             unsupported = True
 
