@@ -1,11 +1,13 @@
 # Changelog
 
-## Unreleased — for field science
+## v3.14-U66 — For field science (2026-10-18)
 - **Field Notebook** (sidebar, or type `log site: North transect; water temp 12.4 C; 44.12, -71.56; note: turbid`). Observations are kept exactly as typed ("12.40" stays "12.40"), apart from anything the AI says. Nothing is ever overwritten: a correction is a new entry with a reason. Every entry is fingerprinted and chained to the one before, so a changed, removed or reordered entry is detected (`field log check`). Export to CSV, JSON and GeoJSON.
 - **Field calculations done in code:** unit conversions (temperature, length, mass, volume, area, speed, pressure), degrees-minutes-seconds to decimal and back, UTM coordinates (checked against an independent method to half a metre), dilutions (C1V1 = C2V2), and mean, standard deviation and a 95% confidence interval. The answer is checked against the computed number.
 - **Power-loss-safe saving** for memories, settings, keys, offline mode and conversations: after a crash a file is either the old version or the new one, never half of each.
 - **Battery saver** (Settings → AI model), automatic while the laptop is unplugged: less memory, the model unloaded sooner, and answers checked by Cursiv's own code only.
 - An answer claiming "no record in verified public databases" now gets a note that nothing was looked up.
+- **"Are you offline?"** is answered by Cursiv from its real switches, and says what it can't see, instead of the model claiming it.
+- **Measured:** the offline demonstration passes all 15 checks with every outside connection refused (`OFFLINE-DEMO.md`); answer speed with and without a graphics card is in `docs/HARDWARE.md` (13 s for a 120-word answer on the processor alone).
 
 ## v3.14-U65 — A sourced reference, one tested model (2026-10-18)
 - **The offline reference names its sources.** 37 entries are now written from public U.S. government guidance (CDC, NIOSH, EPA, National Weather Service, National Park Service, FEMA): heat illness, frostbite, lightning, ticks, snakebites, stings, poison ivy, bears, rabies, mosquitoes, carbon monoxide, chemical exposure, food after a power outage, getting lost, concussion, cardiac arrest, seizures, altitude sickness, burns, low blood sugar, sepsis, helping an injured person, floods, wildfire smoke, tornadoes, earthquakes and flooded wells. Each card shows its source and the date it was checked; entries without a published source say so. None has been reviewed by a medical professional yet. `docs/REFERENCE.md` lists every entry.
