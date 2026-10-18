@@ -194,3 +194,33 @@ def test_welcome_card(app, settings):
     text = _labels(w)
     assert "It runs here" in text and "needs an AI model" in text
     assert w.dont_show_again() is True
+
+
+def test_theme_modes_and_light_translation(settings):
+    import theme
+    assert theme.saved_mode() == ""
+    theme.set_mode("light")
+    assert theme.saved_mode() == "light" and theme.resolve_mode() == "light"
+    theme.set_mode("bogus")
+    assert theme.saved_mode() == ""
+    qss = "QPushButton { background: #d4b04c; color: #17120a; border: 1px solid #262b38; }"
+    out = theme.light_qss(qss)
+    assert "#9a7417" in out and "#ffffff" in out and "#e2ddd2" in out
+
+
+def test_every_hard_coded_colour_has_a_light_version():
+    """A dark colour written directly into a window would stay dark in light mode."""
+    import re
+    from pathlib import Path
+    import theme
+    root = Path(__file__).resolve().parent.parent / "launcher"
+    tokens = {v.lower() for p in (theme.DARK, theme.LIGHT) for v in p.values() if str(v).startswith("#")}
+    missing = set()
+    for f in root.glob("*.py"):
+        if f.name == "theme.py":
+            continue
+        for h in re.findall(r"#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b(?![0-9a-fA-F])", f.read_text(encoding="utf-8")):
+            h = h.lower()
+            if h not in theme._LIGHT_REMAP and h not in tokens and h not in ("#fff", "#ffffff", "#000", "#000000"):
+                missing.add(f"{f.name}:{h}")
+    assert not missing, sorted(missing)

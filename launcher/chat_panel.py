@@ -632,7 +632,7 @@ class ChatPanel(QWidget):
         self._append_html_block(
             f'<p style="margin:4px 0 4px 0;">'
             f'<span style="color:{theme.ACCENT}; font-weight:600;">Cursiv</span><br>'
-            f'<span style="color:#F0E9D8; white-space:pre-wrap;">'
+            f'<span style="color:{theme.TEXT}; white-space:pre-wrap;">'
         )
         cursor = QTextCursor(self._transcript.document())
         cursor.movePosition(QTextCursor.MoveOperation.End)

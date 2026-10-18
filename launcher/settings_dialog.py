@@ -70,7 +70,7 @@ class SettingsDialog(QDialog):
     keys_changed = pyqtSignal()
 
     SECTIONS = ("Privacy & internet", "AI model", "Online AI (optional)", "How Cursiv answers",
-                "Updates", "Your data & account", "Help & diagnostics")
+                "Appearance", "Updates", "Your data & account", "Help & diagnostics")
 
     def __init__(self, parent=None, section: str = ""):
         super().__init__(parent)
@@ -119,7 +119,7 @@ class SettingsDialog(QDialog):
         outer.addLayout(right, 1)
 
         builders = (self._page_privacy, self._page_model, self._page_keys, self._page_answers,
-                    self._page_updates, self._page_data, self._page_help)
+                    self._page_appearance, self._page_updates, self._page_data, self._page_help)
         for name, build in zip(self.SECTIONS, builders):
             self._nav.addItem(name)
             page = QWidget(); lay = QVBoxLayout(page); lay.setContentsMargins(0, 0, 0, 0); lay.setSpacing(12)
@@ -306,6 +306,26 @@ class SettingsDialog(QDialog):
         v.addWidget(self._explain("Always on. After an answer with numbers, advice or technical claims, Cursiv checks "
                                   "the numbers, named sources and assumptions, fixes the answer once if needed, and "
                                   "otherwise adds a short note. Small local models still make mistakes."))
+
+    def _page_appearance(self, lay):
+        v = self._card(lay)
+        t = QLabel("Colours"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
+        self._mode = QComboBox()
+        for label, mode in (("Match Windows", ""), ("Light", "light"), ("Dark", "dark")):
+            self._mode.addItem(label, mode)
+        self._mode.setCurrentIndex(max(0, self._mode.findData(theme.saved_mode())))
+        note = self._explain("")
+
+        def chosen(i):
+            mode = self._mode.itemData(i)
+            theme.set_mode(mode)
+            now = mode or ("light" if theme.windows_prefers_light() else "dark")
+            note.setText("" if now == theme.MODE else "Close and reopen Cursiv to see the change.")
+        self._mode.activated.connect(chosen)
+        v.addWidget(self._mode)
+        v.addWidget(self._explain("Match Windows follows your Windows light or dark setting. "
+                                  "Light is a warm off-white; Dark is easier on the eyes at night."))
+        v.addWidget(note)
 
     def _page_updates(self, lay):
         from cursiv_v215.core import netgate

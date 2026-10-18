@@ -261,7 +261,7 @@ class PhoneDialog(QDialog):
         parts = []
         for m in sorted(self._msgs.values(), key=lambda x: x["created"]):
             who = "CURSIV" if m["role"] == "assistant" else ("You (phone)" if m.get("source") == "phone" else "You (computer)")
-            color = GOLD if m["role"] == "assistant" else "#d8d2c4"
+            color = GOLD if m["role"] == "assistant" else SILVER
             img = self._images.get(m["id"])
             img_html = f'<br><img src="{img}" width="320"><br>' if img else ("<br><i>[photo loading…]</i><br>" if m.get("has_image") else "")
             text = "" if m["text"] == "(photo)" else _fmt(m["text"])

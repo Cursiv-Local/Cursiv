@@ -134,6 +134,7 @@ def main():
     app = QApplication.instance() or QApplication(sys.argv)
     try:
         import theme
+        theme.install()                        # light mode: older windows' colours follow too
         app.setStyleSheet(theme.APP_QSS)       # one look for every window
     except Exception:
         pass
