@@ -115,3 +115,13 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}
     assert not [e.title for e in ref.lookup(question) if e.title in pack_titles]
+
+
+def test_reference_list_in_docs_is_current():
+    import sys
+    from pathlib import Path
+    root = Path(__file__).resolve().parent.parent
+    sys.path.insert(0, str(root / "scripts"))
+    import reference_report
+    assert (root / "docs" / "REFERENCE.md").read_text(encoding="utf-8") == reference_report.render(), \
+        "run: py -3.13 scripts/reference_report.py"
