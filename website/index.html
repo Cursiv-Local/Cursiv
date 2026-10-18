@@ -67,7 +67,7 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Cursiv in five minutes</span>
-      <h2>Six things it does, shown on real answers.</h2>
+      <h2>Seven things it does, shown on the real app.</h2>
       <p class="lede">Each screen below is an unedited answer from the current release, running offline on a laptop with a
         4 GB graphics card. Nothing was typed in afterwards.</p>
     </div>
@@ -109,6 +109,13 @@
             Cursiv can follow Windows' light or dark setting.)</p></div>
         <figure class="shot"><a href="/assets/shots/dark.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/dark.png" alt="Cursiv in dark mode asking what 'it' refers to" width="1475" height="1025" loading="lazy"></a></figure>
       </li>
+      <li>
+        <div class="tour-text"><span class="step">7</span><h3>A field notebook that can't be quietly changed</h3>
+          <p>Observations are kept exactly as typed ("12.40" stays "12.40"), apart from anything the AI says. A correction
+            is a new entry with a reason; the original stays. Every entry is fingerprinted and chained to the one before,
+            so any later change is detected. Export to CSV, JSON or GeoJSON. (Example entries.)</p></div>
+        <figure class="shot"><a href="/assets/shots/notebook.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/notebook.png" alt="Cursiv Field Notebook with an entry form, three example entries including a correction with its reason, and a green 'all intact and in order' line" width="963" height="1037" loading="lazy"></a></figure>
+      </li>
     </ol>
     <p class="fine" style="margin-top:10px">Recorded with <code>scripts/site_shots.py</code>: the questions run through Cursiv on a fresh,
       offline copy and the replies are saved unedited in
@@ -133,7 +140,7 @@
         <tbody>
           <tr><td><b>Local chat through Ollama</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Live runs on qwen3 4B Instruct; the truth benchmark runs real chat turns on the local model.</td></tr>
           <tr><td><b>No connections off the computer on a fresh install</b> (default settings, no keys)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Chat turns with "this week" / "right now": zero outside connections, recorded by a socket-level audit (<code>scripts/net_audit.py</code>). App start-up watched for 30 s: none. Packet-level capture not done yet.</td></tr>
-          <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Unit tests and a live chat-turn audit with offline mode on: zero outside connections. The full feature-by-feature offline demonstration (<code>scripts/offline_demo.py</code>) is written and still to be run.</td></tr>
+          <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit and restart tests, and a full offline demonstration: 15 of 15 checks pass with every outside connection refused and none attempted (<a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/OFFLINE-DEMO.md">OFFLINE-DEMO.md</a>). Packet-level capture not done yet.</td></tr>
           <tr><td><b>Answer checking</b> (numbers, named sources, assumptions, one rewrite)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Rule-based checks are unit-tested. How much it improves real answers is what the truth benchmark is now measuring.</td></tr>
           <tr><td><b>Offline reference in chat</b> (112 entries)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>37 entries are written from named public-domain U.S. government sources (CDC, NIOSH, EPA, National Weather Service, National Park Service, FEMA), each showing its source and check date; the rest say they have no published source yet. <b>None has been reviewed by a medical professional yet.</b> Every entry is listed with its source in <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/docs/REFERENCE.md">REFERENCE.md</a>.</td></tr>
           <tr><td><b>Memory with origin, date and conflict notes</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests, and an automated test that a saved note and offline mode survive a restart. Things Cursiv picks up from conversations are always marked as guesses.</td></tr>
@@ -142,6 +149,9 @@
           <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests; each drive carries a Licenses folder for Cursiv, Ollama and every model on it. A "field copy" starts in offline mode. Not yet tried end to end on a second, clean PC.</td></tr>
           <tr><td><b>Truth benchmark</b> (125 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Run on every release; every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
           <tr><td><b>Exact arithmetic and clock times</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Worked out in code and given to the model; an answer that disagrees gets a note. Unit tests and a live check.</td></tr>
+          <tr><td><b>Field notebook</b> (append-only, fingerprinted, CSV/JSON/GeoJSON export)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Tests for exact values, corrections, detection of changed, removed or reordered entries and of a write cut off by power loss, exports, and surviving a restart; included in the offline demonstration. Not yet used by a field team.</td></tr>
+          <tr><td><b>Field calculations</b> (units, coordinates, UTM, dilutions, statistics)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Computed in code. UTM checked against an independent method to half a metre at seven places; conversions against reference values.</td></tr>
+          <tr><td><b>Battery saver and power-loss-safe saving</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Automatic while unplugged. A crash during a save leaves the old file or the new one, never half. Speeds with and without a graphics card: <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/docs/HARDWARE.md">HARDWARE.md</a>.</td></tr>
           <tr><td><b>Supporting tools:</b> coding help, sealed family letters, phone link, agents, plugins, LoRA training</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>Working features, outside the benchmark's scope for now.</td></tr>
           <tr><td><b>Structured observations, provenance ledger</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Records that keep "what was observed" separate from "what the AI inferred".</td></tr>
           <tr><td><b>Several Cursiv computers sharing approved knowledge</b></td><td class="st"><span class="badge b-planned">Planned</span></td><td>Only after the single-computer system is shown to be reliable. See <a href="/vision">Direction</a>.</td></tr>

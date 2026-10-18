@@ -22,3 +22,12 @@ R6 when a team has several laptops, R9 last.
 
 Not claimed: certification of any kind; professional review of the reference (none yet);
 code signing (not yet). Personal memory stays on the computer and never syncs.
+
+## Status (2026-10-18, U66)
+
+- **R1 Field notebook: built and tested** (U66). Not yet used by a field team.
+- **R2 Calculations: built and tested** (U66). Field cases added to the truth benchmark (suite 1.3).
+- **R4 Integrity: started.** Every field-log entry is fingerprinted and chained; sample IDs, labels and signed exports are next.
+- **R5 Hardware: started.** Battery saver, power-loss-safe saves, speed measured with and without a graphics card (`docs/HARDWARE.md`). Still to do: the SSD kit on two clean laptops, a full day on battery, full-disk behaviour.
+- **R7 Safety pack: started.** 37 entries from public U.S. government sources (`docs/REFERENCE.md`); none professionally reviewed yet.
+- R3, R6, R8, R9, R10: not started.

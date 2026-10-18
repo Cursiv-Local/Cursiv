@@ -140,6 +140,20 @@ if which == "settings":
     from settings_dialog import SettingsDialog
     w = SettingsDialog(None)
     w.resize(1000, 680)
+elif which == "notebook":
+    # Example entries (the caption on the site says so), recorded through the real field log.
+    from cursiv_v215.core import fieldlog as fl
+    a = fl.add(observer="Dana", site="North transect", lat=44.1234, lon=-71.5678, location_source="typed",
+               measurements=[{"name": "water temp", "value": "12.40", "unit": "°C"},
+                             {"name": "pH", "value": "7.9", "unit": ""}], note="turbid after rain")
+    fl.add(observer="Dana", site="Culvert", lat=44.1251, lon=-71.5702, location_source="typed",
+           measurements=[{"name": "frogs counted", "value": "14", "unit": ""}], note="heron near the culvert")
+    fl.correct(a["id"], "pH meter not calibrated; re-read after calibration",
+               measurements=[{"name": "water temp", "value": "12.40", "unit": "°C"},
+                             {"name": "pH", "value": "7.2", "unit": ""}])
+    from field_notebook import FieldNotebookDialog
+    w = FieldNotebookDialog(None, observer="Dana")
+    w.resize(1000, 860)
 else:
     from setup_dialog import SetupDialog
     w = SetupDialog(None)
@@ -153,7 +167,7 @@ app.exec()
 def windows() -> None:
     """Settings (Privacy & internet) and Setup, drawn at 2x. Setup shows this PC's real
     state: Ollama and the models installed here."""
-    for which, name in (("settings", "settings-light.png"), ("setup", "setup.png")):
+    for which, name in (("settings", "settings-light.png"), ("setup", "setup.png"), ("notebook", "notebook.png")):
         scratch, env = _fresh_copy()
         env["QT_SCALE_FACTOR"] = "2"
         try:

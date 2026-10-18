@@ -74,7 +74,7 @@
         <thead><tr><th>Goal</th><th>Status</th><th>Where it stands</th></tr></thead>
         <tbody>
           <tr><td><b>1. Reliable answers</b><br>A repeatable benchmark shows how often Cursiv is right, when it invents things, and whether it recognizes missing evidence.</td><td class="st"><span class="badge b-tested">Baseline done</span></td><td>Truth benchmark: 125 cases, versioned suite. On suite 1.2: U61 114/125, U63 119/125, every failure explained; U64 fixes the three real U63 failures.</td></tr>
-          <tr><td><b>2. Genuine offline operation</b><br>Disconnect the computer and show what still works.</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Offline mode and zero-connection audits done; a full feature-by-feature offline demonstration is written and still to be run.</td></tr>
+          <tr><td><b>2. Genuine offline operation</b><br>Disconnect the computer and show what still works.</td><td class="st"><span class="badge b-tested">Demonstrated</span></td><td>Full offline demonstration run: 15 of 15 features work or are refused as they should be, with every outside connection blocked and none attempted.</td></tr>
           <tr><td><b>3. Traceable knowledge</b><br>Tell a recorded observation from an AI inference, and show where claims came from.</td><td class="st"><span class="badge b-impl">Started</span></td><td>Memory origin tags; 37 reference entries written from named public sources, each showing its source and check date. Observation records and a provenance ledger are planned.</td></tr>
           <tr><td><b>4. Resilience</b><br>Survive interrupted connections, restarts, conflicting records and sync failures without silently corrupting information.</td><td class="st"><span class="badge b-planned">Planned</span></td><td>Not yet tested.</td></tr>
           <tr><td><b>5. A field demonstration</b><br>Someone who didn't build Cursiv uses it to solve a real problem and evaluates the result independently.</td><td class="st"><span class="badge b-planned">Planned</span></td><td>After 1–4.</td></tr>
@@ -115,11 +115,11 @@
       <table class="table">
         <thead><tr><th>Step</th><th>What</th><th>Status</th></tr></thead>
         <tbody>
-          <tr><td><b>Field notebook</b></td><td>Structured observations kept apart from AI inferences; corrections never overwrite; export to CSV, JSON, GeoJSON.</td><td class="st"><span class="badge b-impl">In progress</span></td></tr>
-          <tr><td><b>Calculations in code</b></td><td>Units, dilutions, coordinates, statistics: computed, not guessed.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
+          <tr><td><b>Field notebook</b></td><td>Structured observations kept apart from AI inferences; corrections never overwrite; export to CSV, JSON, GeoJSON.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
+          <tr><td><b>Calculations in code</b></td><td>Units, dilutions, coordinates, statistics: computed, not guessed.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
           <tr><td><b>The team's documents</b></td><td>Protocols and field guides offline, answers quoting the page.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
-          <tr><td><b>Integrity and chain of custody</b></td><td>Tamper-evident entries, sample IDs, signed exports.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
-          <tr><td><b>Hardware and endurance</b></td><td>Battery, no-GPU laptops, power loss, the SSD kit on clean machines.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
+          <tr><td><b>Integrity and chain of custody</b></td><td>Tamper-evident entries, sample IDs, signed exports.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
+          <tr><td><b>Hardware and endurance</b></td><td>Battery, no-GPU laptops, power loss, the SSD kit on clean machines.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
           <tr><td><b>Team sync without internet</b></td><td>Several laptops merge observations by USB or local network; personal memory never syncs.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
           <tr><td><b>Safety and discipline packs</b></td><td>Sourced expedition safety, then ecology, geology, hydrology and atmospheric references from open sources.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
           <tr><td><b>Field pilot</b></td><td>A real team on a real trip, with the results published, including failures.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
