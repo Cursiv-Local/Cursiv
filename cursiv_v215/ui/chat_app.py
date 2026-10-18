@@ -1351,6 +1351,7 @@ _REAL_TOOL_NOTES: set[str] = set()     # notes this code emitted for the current
 _RETRIEVED: list[str] = []             # text actually looked up this turn (web, plugins, tools)
 _REF_SHOWN: list[str] = []             # titles of the offline reference entries shown this turn
 _WEB_SEARCHED = False                  # a web search ran for this turn
+_WORKED = None                         # core/calc.Worked: arithmetic Cursiv computed for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
 
 
@@ -2602,6 +2603,24 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         except Exception:
             pass
 
+    # Clock times and plain sums are worked out in code (core/calc.py); the model
+    # gets the result, and chat() checks the answer used it.
+    try:
+        if not (_self_turn or _CODING_TURN):
+            from cursiv_v215.core import calc as _calc
+            global _WORKED
+            _WORKED = _calc.work_out(user_text)
+            if _WORKED:
+                messages[0]["content"] += "\n\n" + _calc.prompt_note(_WORKED) + "\n"
+        # "Is it safe?" with nothing earlier saying what "it" is: ask, don't guess (core/clarify.py).
+        if not (_self_turn or _CODING_TURN or (locals().get("_ph") and _ph.emergency)):
+            from cursiv_v215.core import clarify as _clarify
+            _vague = _clarify.needs_clarifying(user_text, history)
+            if _vague:
+                messages[0]["content"] += "\n\n" + _clarify.prompt_note(_vague) + "\n"
+    except Exception:
+        pass
+
     # Cursiv's offline reference (core/reference.py): an entry that covers the
     # question goes into the prompt with an ID to cite, and the person sees which.
     try:
@@ -3064,6 +3083,10 @@ def chat(
         try:
             from cursiv_v215.core import answer_check as _ac
             _flag = _ac.notes(draft, list(_REF_SHOWN), _WEB_SEARCHED)
+            if _WORKED:
+                from cursiv_v215.core import calc as _calc
+                _miss = _calc.check(draft, _WORKED)
+                _flag += ("\n\n" + _miss) if _miss else ""
             if _flag:
                 reply.append(_flag)
                 yield _flag
@@ -3164,7 +3187,8 @@ def _check_context(history: list[dict], user_text: str) -> str:
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
                  confirm_writes, anthropic_key, force_provider, reply: list[str]):
     from cursiv_v215.core import selfknow as _sk
-    global _WEB_SEARCHED
+    global _WEB_SEARCHED, _WORKED
+    _WORKED = None
     _REAL_TOOL_NOTES.clear()
     _RETRIEVED.clear()
     _REF_SHOWN.clear()

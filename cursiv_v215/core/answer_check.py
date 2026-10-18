@@ -78,8 +78,58 @@ def notes(answer: str, titles: list[str], searched: bool) -> str:
         urgent = " and call 911 in an emergency" if any(t != "water purification" for t in titles) else ""
         lines.append("*(Cursiv's check: this answer advises against " + ", ".join(f'"{s}"' for s in steps)
                      + f", which the reference above recommends. Follow the reference{urgent}.)*")
+    doses = dose_problems(answer, titles)
+    if doses:
+        lines.append("*(Cursiv's check: " + "; ".join(doses) + ". Use the numbers in the reference above.)*")
     claims = unsupported_actions(answer, searched)
     if claims:
         lines.append(f'*(Cursiv\'s check: the answer says "{claims[0]}", but nothing was searched or looked up '
                      "for this answer. It comes from the model's own knowledge.)*")
     return ("\n\n" + "\n".join(lines)) if lines else ""
+
+
+# ── Doses checked against the card (reference_data/doses.json) ─────────────
+# The answer to "bleach per gallon" said "6 drops ... (6% or 8.25%)"; 6% needs 8
+# (benchmark ref-015). A sentence that names a drop count, a strength and a volume
+# must match the card, unless it's about doubling for cloudy water.
+
+_doses: dict | None = None
+
+
+def _dose_table() -> dict:
+    global _doses
+    if _doses is None:
+        import json
+        from pathlib import Path
+        try:
+            _doses = json.loads((Path(__file__).resolve().parent.parent / "reference_data" / "doses.json")
+                                .read_text(encoding="utf-8"))
+        except Exception:
+            _doses = {}
+    return _doses
+
+
+_SENTENCE = re.compile(r"[^.!?\n]+(?:\.\d+[^.!?\n]*)*")
+_DROPS = re.compile(r"(?i)\b(\d+)\s+drops?\b")
+_STRENGTH = re.compile(r"(\d+(?:\.\d+)?)\s?%")
+_VOLUME = re.compile(r"(?i)\b(liters?|litres?|quarts?|gallons?)\b")
+_DOUBLE = re.compile(r"(?i)\b(double|twice|cloudy|colored|coloured|very cold)\b")
+
+
+def dose_problems(answer: str, titles: list[str]) -> list[str]:
+    problems = []
+    for title in titles:
+        rows = _dose_table().get(title)
+        if not isinstance(rows, list):
+            continue
+        for sentence in _SENTENCE.findall(answer or ""):
+            drops, vols = _DROPS.findall(sentence), _VOLUME.findall(sentence)
+            strengths = [s + "%" for s in _STRENGTH.findall(sentence)]
+            if len(drops) != 1 or len(vols) != 1 or not strengths or _DOUBLE.search(sentence):
+                continue
+            n, per = int(drops[0]), vols[0].lower().rstrip("s").replace("litre", "liter")
+            for strength in strengths:
+                want = next((r["amount"] for r in rows if r["of"] == strength and r["per"] == per), None)
+                if want is not None and want != n:
+                    problems.append(f"for {strength} bleach the reference says {want} drops per {per}, not {n}")
+    return list(dict.fromkeys(problems))

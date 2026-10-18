@@ -1,0 +1,11 @@
+{
+  "_about": "Doses from reference entries as data, so an answer's numbers can be checked against the card (core/answer_check.py). Same source as the entry (sources.json).",
+  "water purification": [
+    {"amount": 2, "unit": "drops", "of": "6%", "per": "liter"},
+    {"amount": 2, "unit": "drops", "of": "8.25%", "per": "liter"},
+    {"amount": 2, "unit": "drops", "of": "6%", "per": "quart"},
+    {"amount": 2, "unit": "drops", "of": "8.25%", "per": "quart"},
+    {"amount": 8, "unit": "drops", "of": "6%", "per": "gallon"},
+    {"amount": 6, "unit": "drops", "of": "8.25%", "per": "gallon"}
+  ]
+}
