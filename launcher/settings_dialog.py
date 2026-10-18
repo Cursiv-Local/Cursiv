@@ -221,9 +221,7 @@ class SettingsDialog(QDialog):
     def _page_model(self, lay):
         from cursiv_v215.chat import status
         lay.addWidget(self._explain("Cursiv answers with an AI model that runs on this computer through Ollama. "
-                                    "Standard is quick and fine for most questions. Deep Think uses a bigger model "
-                                    "that reasons before it answers: better for hard, multi-step questions, but it "
-                                    "can take a minute or two."))
+                                    "Standard picks the model that did best on Cursiv's own tests for this computer."))
         v = self._card(lay)
         v.addWidget(QLabel("How Cursiv answers"))
         self._model = QComboBox()

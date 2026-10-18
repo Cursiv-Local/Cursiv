@@ -152,6 +152,8 @@ def main() -> int:
         for k in ("BRAVE_API_KEY", "CURSIV_RELAY_URL", "CURSIV_FLEET_TOKEN"):
             env.pop(k, None)
         t0 = time.time()
+        if args.deep:
+            env["CURSIV_DEEP_THINK"] = "1"
         proc = subprocess.Popen([sys.executable, "-c", CHILD, json.dumps(chosen), args.model, "deep" if args.deep else ""], cwd=scratch / "app", env=env,
                                 stdout=subprocess.PIPE, text=True, encoding="utf-8")
         for line in proc.stdout:

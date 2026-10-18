@@ -101,11 +101,12 @@ def set_show_all_models(on: bool) -> None:
 def menu_choices(installed: list[str]) -> list[tuple[str, str, bool]]:
     """(label, choice, enabled) for the model menu. choice: "standard", "deep" or "model:<name>"."""
     from cursiv_v215.core import speed
-    deep = speed.DEEP_THINK_MODEL
-    have_deep = deep in installed or f"{deep}:latest" in installed
-    out = [("Standard  ·  quick everyday answers", "standard", True),
-           (("Deep Think  ·  slower, for harder questions" if have_deep
-             else f"Deep Think  ·  download {deep} in Setup first"), "deep", have_deep)]
+    out = [("Standard  ·  quick everyday answers", "standard", True)]
+    if speed.DEEP_THINK_OFFERED:
+        deep = speed.DEEP_THINK_MODEL
+        have_deep = deep in installed or f"{deep}:latest" in installed
+        out.append((("Deep Think  ·  slower, for harder questions" if have_deep
+                     else f"Deep Think  ·  download {deep} in Setup first"), "deep", have_deep))
     if show_all_models():
         out += [(f"Model: {m}", f"model:{m}", True) for m in installed]
     return out
@@ -113,7 +114,8 @@ def menu_choices(installed: list[str]) -> list[tuple[str, str, bool]]:
 
 def current_choice() -> str:
     from cursiv_v215.chat import keys
-    if keys.saved_key("answer_mode") == "deep":
+    from cursiv_v215.core import speed
+    if keys.saved_key("answer_mode") == "deep" and speed.deep_think_on():
         return "deep"
     chosen = preferred_model()
     return f"model:{chosen}" if chosen and show_all_models() else "standard"

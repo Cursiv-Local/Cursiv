@@ -117,10 +117,16 @@ def no_thinking(model: str) -> dict:
 # answer stays clean. Which model is Deep Think should follow bench/MODEL-COMPARISON.md.
 
 DEEP_THINK_MODEL = "qwen3:8b"
+# Not offered (2026-10-18): on the model comparison qwen3:8b was five times slower than
+# Standard, no more accurate, and invented a treaty (bench/MODEL-COMPARISON.md). The
+# benchmark can still try a candidate with CURSIV_DEEP_THINK=1 (truth_bench --deep).
+DEEP_THINK_OFFERED = False
 DEEP_THINK_EXTRA_TOKENS = 4096        # the reasoning counts against num_predict
 
 
 def deep_think_on() -> bool:
+    if not (DEEP_THINK_OFFERED or os.environ.get("CURSIV_DEEP_THINK") == "1"):
+        return False                # a Deep Think choice saved by U64 falls back to Standard
     try:
         from cursiv_v215.chat import keys
         return keys.saved_key("answer_mode") == "deep"

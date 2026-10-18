@@ -55,7 +55,7 @@ def test_pill_shows_in_the_window(panel, settings):
     assert "Offline mode" in panel._net_pill.text()
 
 
-def test_model_picker_offers_standard_and_deep_think(panel, settings, app, monkeypatch):
+def test_model_picker_offers_standard_only(panel, settings, app, monkeypatch):
     for _ in range(50):
         app.processEvents()
         if panel._model_box.isEnabled():
@@ -63,25 +63,23 @@ def test_model_picker_offers_standard_and_deep_think(panel, settings, app, monke
         import time; time.sleep(0.02)
     box = panel._model_box
     items = [box.itemText(i) for i in range(box.count())]
-    assert items[0].startswith("Standard") and items[1].startswith("Deep Think")
-    assert not any(t.startswith("Model:") for t in items)          # no model names unless Advanced is on
-    from cursiv_v215.chat import status
+    assert items[0].startswith("Standard")
+    assert not any("Deep Think" in t or t.startswith("Model:") for t in items)   # Deep Think not offered (comparison)
+    from cursiv_v215.chat import keys, status
     from cursiv_v215.core import speed
     from cursiv_v215.ui import chat_app as ca
     monkeypatch.setattr(ca, "_ollama_tags", lambda: ["qwen3:4b-instruct", "llama3.1:latest", speed.DEEP_THINK_MODEL])
-    status.choose("deep")
+    keys.store_key("answer_mode", "deep")                 # chosen in U64
+    assert ca._resolve_ollama_model() == "qwen3:4b-instruct" and status.current_choice() == "standard"
+    monkeypatch.setenv("CURSIV_DEEP_THINK", "1")          # the benchmark can still try it
     assert ca._resolve_ollama_model() == speed.DEEP_THINK_MODEL
-    assert ca._resolve_ollama_model(standard=True) == "qwen3:4b-instruct"   # checks stay on the quick model
-    status.choose("standard")
-    assert ca._resolve_ollama_model() == "qwen3:4b-instruct"
 
 
 def test_advanced_lists_every_model_and_honours_the_pick(panel, monkeypatch):
     from cursiv_v215.chat import status
     from cursiv_v215.ui import chat_app as ca
     installed = ["qwen3:4b-instruct", "llama3.1:latest"]
-    assert [c for _, c, _ in status.menu_choices(installed)] == ["standard", "deep"]
-    assert status.menu_choices(installed)[1][2] is False             # Deep Think model not installed
+    assert [c for _, c, _ in status.menu_choices(installed)] == ["standard"]
     status.set_show_all_models(True)
     assert "model:llama3.1:latest" in [c for _, c, _ in status.menu_choices(installed)]
     monkeypatch.setattr(ca, "_ollama_tags", lambda: installed)
