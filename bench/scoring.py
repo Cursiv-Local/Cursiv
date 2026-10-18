@@ -16,7 +16,8 @@ from dataclasses import dataclass, field
 # Saying it can't know, or doesn't have the information.
 UNKNOWN_RE = re.compile(
     r"(don'?t|do not|can'?t|cannot|couldn'?t|could not|won'?t be able to|am not able to|'m not able to|unable to)"
-    r"\s+(?:\w+\s+){0,2}(know|tell|say|determine|establish|confirm|verify|find|access|see|predict|guess|answer)"
+    r"\s+(?:\w+\s+){0,2}(know|tell|say|determine|establish|confirm|verify|find|access|see|predict|guess|answer|check)"
+    r"|\b(isn'?t|is not) available to me"
     r"|\bno (way to (know|tell)|record|records|data|information|evidence|access|reliable)"
     r"|\bnot (sure|certain|enough information|possible to (know|say|tell))"
     r"|\bi don'?t have (any |that |the |enough )?(information|access|data|details|way|records?)"
@@ -32,6 +33,8 @@ CLARIFY_RE = re.compile(r"\?\s*$|\?\s|(could|can) you (tell|clarify|share|say|le
                         r"which (one|kind|type)|do you mean|more (details|information|context)|it depends", re.I | re.M)
 
 _STATUS_LINE = re.compile(r"(?m)^[ \t]*\*[\[(][^\n]*[\])]\*[ \t]*(?:\r?\n|$)")
+# Known / Inferred / Assumed / Unknown lines. "Unknown: none" isn't the answer saying it can't know.
+_LEDGER_LINES = re.compile(r"(?mi)^[ \t>*_-]*(Known|Inferred|Assumed|Unknown)[*_]*[ \t]*:.*$")
 _NOTES = re.compile(r"\n-{3,}\n\*\*(Checked, with notes|Draft \+ notes)[\s\S]*$")
 _NUM = re.compile(r"(?<![\w.])-?\d{1,3}(?:,\d{3})+(?:\.\d+)?|(?<![\w.])-?\d+(?:\.\d+)?")
 
@@ -40,7 +43,7 @@ def answer_text(reply: str) -> str:
     """The model's words, as scored."""
     text = _NOTES.sub("", reply or "")
     text = _STATUS_LINE.sub("", text)
-    return text.strip()
+    return text.replace("\u2019", "'").replace("\u2018", "'").strip()   # curly apostrophes, as the model often writes them
 
 
 def numbers(text: str) -> list[float]:
@@ -87,7 +90,7 @@ def score(case: dict, reply: str) -> Result:
             fails.append(f"gave wrong number {bad}")
             unsupported = True
 
-    admitted = bool(UNKNOWN_RE.search(text))
+    admitted = bool(UNKNOWN_RE.search(_LEDGER_LINES.sub("", text)))
     if case.get("unknown") and not admitted:
         fails.append("didn't say it can't know")
     if case.get("clarify") and not (CLARIFY_RE.search(text) or admitted):
