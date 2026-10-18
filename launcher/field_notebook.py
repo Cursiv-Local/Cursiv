@@ -114,8 +114,10 @@ class FieldNotebookDialog(QDialog):
         fix = QPushButton("Correct selected…"); fix.setStyleSheet(theme.ghost_button()); fix.clicked.connect(self._start_correction)
         check = QPushButton("Check integrity"); check.setStyleSheet(theme.ghost_button()); check.clicked.connect(self._check)
         exp = QPushButton("Export…"); exp.setStyleSheet(theme.ghost_button()); exp.clicked.connect(self._export)
+        share = QPushButton("Share with team…"); share.setStyleSheet(theme.ghost_button()); share.clicked.connect(self._share)
+        imp = QPushButton("Import from team…"); imp.setStyleSheet(theme.ghost_button()); imp.clicked.connect(self._import)
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
-        for b in (fix, check, exp):
+        for b in (fix, check, exp, share, imp):
             foot.addWidget(b)
         foot.addStretch(1); foot.addWidget(close)
         outer.addLayout(foot)
@@ -236,3 +238,34 @@ class FieldNotebookDialog(QDialog):
             return
         paths = fieldlog.export(Path(folder) / "Cursiv field log")
         QMessageBox.information(self, "Exported", "Saved:\n" + "\n".join(str(p) for p in paths.values()))
+
+    # ── team sync (core/fieldsync.py): a USB drive or a shared folder, no internet ──
+    def _share(self):
+        from pathlib import Path
+        from cursiv_v215.core import fieldsync
+        folder = QFileDialog.getExistingDirectory(self, "Share the field log to (a USB drive or shared folder)…")
+        if not folder:
+            return
+        try:
+            out = fieldsync.share(Path(folder), self._observer.text().strip())
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, "Not shared", str(exc))
+            return
+        QMessageBox.information(self, "Shared", f"This laptop's field log is in:\n{out}\n\n"
+                                "On each other laptop: Import from team… and pick the same drive. "
+                                "Only the field log is shared; memories and documents stay on this computer.")
+
+    def _import(self):
+        from pathlib import Path
+        from cursiv_v215.core import fieldsync
+        folder = QFileDialog.getExistingDirectory(self, "Import field logs from…")
+        if not folder:
+            return
+        try:
+            text = fieldsync.report_text(fieldsync.import_folder(Path(folder)))
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, "Not imported", str(exc))
+            return
+        problem = any(w in text for w in ("CONFLICT", "NOT IMPORTED", "CHECK"))
+        (QMessageBox.warning if problem else QMessageBox.information)(
+            self, "Team field logs", text + "\n\nFor the whole team: type 'team log' or 'team log export' in the chat.")

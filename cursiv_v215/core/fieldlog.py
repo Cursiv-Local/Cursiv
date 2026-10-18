@@ -230,14 +230,17 @@ def labels_html(rows: list[dict]) -> str:
 
 CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "sample_id", "site", "lat", "lon",
               "location_source", "measurement", "value", "unit", "note", "photos", "corrects", "reason",
-              "fingerprint")
+              "fingerprint", "device")
 
 
-def export(folder: Path | None = None, include_corrected: bool = False) -> dict[str, Path]:
-    """Write CSV, JSON and GeoJSON; returns their paths. JSON always has every entry."""
+def export(folder: Path | None = None, include_corrected: bool = False, *,
+           rows: list[dict] | None = None, everything: list[dict] | None = None) -> dict[str, Path]:
+    """Write CSV, JSON and GeoJSON; returns their paths. JSON always has every entry.
+    rows / everything: other entries to export (the team log, fieldsync.team_export)."""
     folder = folder or (log_dir() / "exports" / datetime.now().strftime("%Y-%m-%d_%H%M%S"))
     folder.mkdir(parents=True, exist_ok=True)
-    rows = entries() if include_corrected else current()
+    if rows is None:
+        rows = entries() if include_corrected else current()
     problems = verify()
 
     csv_path = folder / "observations.csv"
@@ -249,7 +252,8 @@ def export(folder: Path | None = None, include_corrected: bool = False) -> dict[
                       e.get("sample_id", ""), e["site"],
                       "" if e["lat"] is None else e["lat"], "" if e["lon"] is None else e["lon"],
                       e["location_source"]]
-            tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"]]
+            tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"],
+                    e.get("device", "")]
             for m in e["measurements"] or [{"name": "", "value": "", "unit": ""}]:
                 w.writerow(common + [m["name"], m["value"], m["unit"]] + tail)
 
@@ -257,7 +261,7 @@ def export(folder: Path | None = None, include_corrected: bool = False) -> dict[
     json_path.write_text(json.dumps({
         "exported_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "integrity": "intact" if not problems else problems,
-        "entries": entries(),
+        "entries": entries() if everything is None else everything,
     }, indent=2, ensure_ascii=False), encoding="utf-8")
 
     geo_path = folder / "observations.geojson"

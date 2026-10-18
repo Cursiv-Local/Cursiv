@@ -41,6 +41,7 @@ hiddenimports = [
     "cursiv_v215",
     "pypdf",                         # core/documents.py reads PDFs page by page
     "cursiv_v215.core.documents",
+    "cursiv_v215.core.fieldsync",
     "cursiv_v215.ui",
     "cursiv_v215.ui.chat_app",
     "cursiv_v215.core",

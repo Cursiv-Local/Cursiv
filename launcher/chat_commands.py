@@ -832,6 +832,10 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         from cursiv_v215.core import fieldlog as _fieldlog
         from cursiv_v215.memory.semantic import current_person as _person
         _log_reply = _fieldlog.command(text, observer=_person().title())
+        if _log_reply is None:
+            # Team sync: field log share/import <folder>, team log (core/fieldsync.py)
+            from cursiv_v215.core import fieldsync as _fieldsync
+            _log_reply = _fieldsync.command(text, observer=_person().title())
     except Exception as _exc:
         _log_reply = f"The field log couldn't be written: {_exc}" if cmd.startswith("log ") else None
     if _log_reply is not None:

@@ -23,11 +23,19 @@ R6 when a team has several laptops, R9 last.
 Not claimed: certification of any kind; professional review of the reference (none yet);
 code signing (not yet). Personal memory stays on the computer and never syncs.
 
-## Status (2026-10-18, U66)
+## Status (2026-10-18, after U66; not yet released)
 
 - **R1 Field notebook: built and tested** (U66). Not yet used by a field team.
-- **R2 Calculations: built and tested** (U66). Field cases added to the truth benchmark (suite 1.3).
-- **R4 Integrity: started.** Every field-log entry is fingerprinted and chained; sample IDs, labels and signed exports are next.
+- **R2 Calculations: built and tested** (U66). Since then: distance and bearing between GPS points
+  (Vincenty, WGS84) and 24-hour clock times. Field cases in the truth benchmark (suites 1.3 and 1.4).
+- **R3 The team's documents: built and tested.** PDFs and text imported offline, answers quote the page,
+  a check that cited pages were among those supplied, and a documents-only mode (never during an emergency).
+- **R4 Integrity: started.** Entries are fingerprinted and chained; sample IDs, per-sample history and
+  printable labels are built. Signed exports are next.
 - **R5 Hardware: started.** Battery saver, power-loss-safe saves, speed measured with and without a graphics card (`docs/HARDWARE.md`). Still to do: the SSD kit on two clean laptops, a full day on battery, full-disk behaviour.
+- **R6 Team sync: built and tested** with three simulated laptops on one USB drive (`tests/test_fieldsync.py`):
+  nothing lost or duplicated, changed or cut-off copies refused, differing histories kept side by side,
+  the same sample ID on two laptops reported. Not yet tried by a team on real laptops. Upload to an
+  institution is not built.
 - **R7 Safety pack: started.** 37 entries from public U.S. government sources (`docs/REFERENCE.md`); none professionally reviewed yet.
-- R3, R6, R8, R9, R10: not started.
+- R8, R9, R10: not started.
