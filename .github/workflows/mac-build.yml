@@ -64,7 +64,8 @@ jobs:
           ln -s /Applications dmg/Applications
           cp installer/mac/HOW-TO-OPEN.txt "dmg/How to open Cursiv.txt"
           hdiutil create -volname "Cursiv ${VERSION}" -srcfolder dmg -ov -format UDZO "$DMG"
-          shasum -a 256 "$DMG" | tee SHA256SUMS-mac.txt
+          cp "$DMG" Cursiv-mac-latest.dmg          # a fixed name for the website's download button
+          shasum -a 256 "$DMG" Cursiv-mac-latest.dmg | tee SHA256SUMS-mac.txt
           echo "DMG=$DMG" >> "$GITHUB_ENV"
       - uses: actions/upload-artifact@v4
         if: always()
@@ -79,4 +80,4 @@ jobs:
         if: github.event_name == 'release' || (inputs.upload && startsWith(inputs.ref, 'v'))
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$REF" "$DMG" SHA256SUMS-mac.txt --clobber
+        run: gh release upload "$REF" "$DMG" Cursiv-mac-latest.dmg SHA256SUMS-mac.txt --clobber

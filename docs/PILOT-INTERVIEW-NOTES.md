@@ -134,7 +134,10 @@ re-run on U71 yet.
 - **No live GPS.** Coordinates are typed or pasted. Distance, bearing and UTM are computed.
 - **No photos in the notebook window yet** (the data format has a place for them).
 - **Voice input** exists (local speech-to-text) but hasn't been tested for field use.
-- **Windows only.** No Mac, Linux, tablet or phone version for field use.
+- **Windows first; Mac is early.** The Mac version (Apple Silicon, macOS 12+) is built and tested automatically
+  on Apple hardware at GitHub (the full test suite plus a self-test of the built app), but nobody has used it on
+  their own Mac yet, and it isn't signed by Apple (first open needs "Open Anyway"). The USB drive is Windows-only.
+  No Linux, tablet or phone version for field use.
 - **Not code-signed.** Windows warns "unknown publisher". The SHA-256 of every installer is published
   and the installer is built from the public source at the release tag.
 - **Not certified** for anything, and not a medical device. No HIPAA/clinical claims.
@@ -215,7 +218,8 @@ re-run on U71 yet.
 - **"Who maintains it?"** One developer today. Open source, so the group can keep a copy of the exact
   version they used (every release is tagged and checksummed).
 - **"What does it run on?"** Windows laptops; a USB drive version needs no install.
-- **"Mac?"** Not today.
+- **"Mac?"** An early version for Apple Silicon Macs. It passes the same tests on Apple hardware, but a pilot
+  would be its first real use on a person's Mac. Unsigned for now.
 
 ---
 

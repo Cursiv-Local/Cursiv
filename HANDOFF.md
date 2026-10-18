@@ -232,3 +232,18 @@ Roadmap: `docs/RESEARCH-ROADMAP.md`.
 - Open: code signing (owner's decision, costs money); professional review of first-aid entries (43 of 80 medical and
   survival entries unsourced); SSD field-kit test (`docs/FIELD-KIT-TEST.md`); team sync not yet tried by a real team;
   the model still opens "Yes, it's safe" on the lightning case; weekday arithmetic; small-sample comparisons.
+
+## macOS (early, after U71)
+
+- Apple Silicon only, unsigned (owner's decision, 2026-10-18; an Apple Developer account would allow signing and
+  notarization). No Mac in hand: everything is checked on GitHub's macOS runners.
+- `core/ollama_host.py`: finds/starts/restarts/installs Ollama on Windows and macOS (Ollama-darwin.zip into
+  ~/Applications with `ditto`, no admin). `core/paths.py`: program data in ~/Library/Application Support/Cursiv inside
+  the Mac app (a Mac app is replaced whole on update); unchanged elsewhere. Keys in the login Keychain
+  (`keystore` "keychain:<id>", secret passed on stdin). Battery from `pmset`. USB maker is Windows-only.
+- `.github/workflows/tests.yml` runs on Windows and macOS. `.github/workflows/mac-build.yml` builds Cursiv.app on a
+  published release (or by hand): tests, `Cursiv --selftest`, `scripts/mac_shots.py` screenshots, an unsigned .dmg
+  plus `Cursiv-mac-latest.dmg` and `SHA256SUMS-mac.txt`, attached to the release. Check that run after publishing.
+- Not verified by a person: the first-open Gatekeeper flow, Ollama install on a real Mac, Keychain prompts, the
+  frameless window's feel on macOS, voice input.
+
