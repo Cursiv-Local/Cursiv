@@ -1,0 +1,112 @@
+{
+  "pack": "outdoor-health",
+  "version": "1.0",
+  "about": "Animal bites and rabies, and mosquito bites. Written from CDC pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "entries": [
+    {
+      "title": "animal bites and rabies",
+      "category": "medical",
+      "aliases": [
+        "rabies",
+        "rabid",
+        "bitten by a dog",
+        "dog bite",
+        "bitten by a raccoon",
+        "bitten by a bat",
+        "bat bite",
+        "animal bite",
+        "bitten by a fox",
+        "bitten by a skunk",
+        [
+          "bit",
+          "raccoon"
+        ],
+        [
+          "bit",
+          "bat"
+        ],
+        [
+          "bit",
+          "fox"
+        ],
+        [
+          "bit",
+          "skunk"
+        ],
+        [
+          "bit",
+          "dog"
+        ],
+        [
+          "scratched",
+          "raccoon"
+        ],
+        [
+          "scratched",
+          "bat"
+        ],
+        [
+          "bitten",
+          "animal"
+        ]
+      ],
+      "text": "If an animal bites or scratches you, wash the wound right away with soap and water for 15 minutes to flush out any virus. Then talk with a healthcare or public health professional about whether you need rabies care; people exposed to rabies should get medical care urgently. If the animal might have rabies, contact your health department immediately. Any mammal can get rabies; in the U.S. the most common rabid animals are raccoons, skunks, bats and foxes. Be careful around animals that are usually active at night, such as bats and raccoons, if you see them out during the day.",
+      "source": {
+        "name": "CDC, Rabies Prevention and Control",
+        "url": "https://www.cdc.gov/rabies/prevention/index.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "mosquito bite prevention",
+      "category": "survival",
+      "aliases": [
+        "bug spray",
+        "insect repellent",
+        "deet",
+        "picaridin",
+        "permethrin",
+        "mosquito bites",
+        "mosquito repellent",
+        [
+          "mosquito",
+          "bite"
+        ],
+        [
+          "mosquitoes",
+          "bite"
+        ],
+        [
+          "mosquitoes",
+          "bites"
+        ],
+        [
+          "mosquitoes",
+          "repel"
+        ],
+        [
+          "mosquitoes",
+          "away"
+        ],
+        [
+          "mosquitoes",
+          "spray"
+        ],
+        [
+          "mosquito",
+          "spray"
+        ]
+      ],
+      "text": "Use an EPA-registered insect repellent (look for an EPA registration number on the label) with one of these active ingredients: DEET, picaridin, IR3535, oil of lemon eucalyptus (OLE), para-menthane-diol (PMD) or 2-undecanone. Always follow the label. With sunscreen, put sunscreen on first and repellent second. Don't use OLE or PMD products on children under 3. Don't put repellent on a child's hands, eyes, mouth, cuts or irritated skin; spray it on your hands and then apply it to the child's face. Wear loose, long-sleeved shirts and pants, and clothing and gear treated with permethrin; never put permethrin directly on skin. Around the home: use screens on windows and doors and repair holes, and once a week empty and scrub, turn over, cover or throw out anything that holds water.",
+      "source": {
+        "name": "CDC, Preventing Mosquito Bites",
+        "url": "https://www.cdc.gov/mosquitoes/prevention/index.html",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    }
+  ]
+}

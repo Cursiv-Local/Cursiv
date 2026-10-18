@@ -1,7 +1,7 @@
 {
   "pack": "disasters",
   "version": "1.0",
-  "about": "Floods, wildfire smoke, tornadoes and earthquakes. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a professional.",
+  "about": "Floods, wildfire smoke, tornadoes, earthquakes and wells after flooding. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a professional.",
   "entries": [
     {
       "title": "flood safety",
@@ -117,6 +117,38 @@
       "source": {
         "name": "Ready.gov (FEMA), Earthquakes",
         "url": "https://www.ready.gov/earthquakes",
+        "license": "public domain (U.S. government work)",
+        "checked": "2026-10-18"
+      },
+      "reviewed": false
+    },
+    {
+      "title": "flooded well",
+      "category": "survival",
+      "aliases": [
+        "flooded well",
+        "well flooded",
+        "well water after a flood",
+        "disinfect a well",
+        "shock the well",
+        "shock chlorinate",
+        [
+          "well",
+          "flood"
+        ],
+        [
+          "well",
+          "contaminated"
+        ],
+        [
+          "well",
+          "disinfect"
+        ]
+      ],
+      "text": "If there's been extensive flooding, or you think the well may be contaminated, don't drink the water; use bottled water until it's known to be safe. Disinfecting a well: use only unscented household liquid chlorine bleach, mixed with water, added to the well and circulated through it; run each indoor faucet until there's a strong smell of chlorine, then let the solution sit in the well and plumbing for at least 12 hours. Drain the chlorinated water onto an area without plants, such as a driveway, not into streams or ponds, and run all indoor faucets until the chlorine smell is gone. Wait at least 7 to 10 days after disinfecting, then have the water sampled (it can't be sampled until all the chlorine is flushed out). Until it's been tested, boil the water at a rolling boil for one minute before using it, or use bottled water.",
+      "source": {
+        "name": "CDC, How to Disinfect Wells After an Emergency",
+        "url": "https://www.cdc.gov/water-emergency/about/how-to-disinfect-wells-after-an-emergency.html",
         "license": "public domain (U.S. government work)",
         "checked": "2026-10-18"
       },

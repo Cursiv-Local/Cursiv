@@ -70,6 +70,12 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("the ground is shaking, is it an earthquake, what do I do", "survival/earthquake-safety"),
     ("I burned my hand on the stove", "medical/burns-treatment"),
     ("my son got scalded by hot coffee", "medical/burns-treatment"),
+    ("a raccoon bit me while I was checking the traps", "medical/animal-bites-and-rabies"),
+    ("there might have been a bat in the cabin, could it have rabies", "medical/animal-bites-and-rabies"),
+    ("what bug spray works best for mosquitoes", "survival/mosquito-bite-prevention"),
+    ("can I put permethrin on my skin", "survival/mosquito-bite-prevention"),
+    ("our well flooded, is the water safe", "survival/flooded-well"),
+    ("how do I disinfect a well", "survival/flooded-well"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -97,6 +103,9 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "flood fill a shape in photoshop",
     "burn a CD of my photos",
     "I got burned on that deal",
+    "I'm doing well, thanks",
+    "the dog's bark is worse than its bite",
+    "how do mosquitoes find people, the biology",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}
