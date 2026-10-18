@@ -101,6 +101,7 @@ def test_duplicate_fact_is_not_saved_twice(memory):
 
 # ── USB edition: data stays on the drive ────────────────────────────────────
 
+@pytest.mark.skipif(sys.platform != "win32", reason="the Cursiv USB edition is Windows-only for now")
 def test_portable_mode_points_home_models_and_ollama_at_the_drive(tmp, monkeypatch):
     import portable
     drive = tmp / "drive"

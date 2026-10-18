@@ -86,17 +86,10 @@ _MACHINE_ID   = hashlib.sha256(
     f"cursiv.local.{_MACHINE_NAME}.{os.environ.get('USERNAME', '')}".encode()
 ).hexdigest()[:24]
 
-# ── Ollama ────────────────────────────────────────────────────────────────────
-_OLLAMA_INSTALLER_URL = "https://ollama.com/download/OllamaSetup.exe"
-_OLLAMA_EXE_PATH      = (
-    Path(os.environ.get("LOCALAPPDATA", ""))
-    / "Programs" / "Ollama" / "ollama.exe"
-)
-
-
+# ── Ollama (core/ollama_host.py: Windows and macOS) ──────────────────────────
 def _is_ollama_installed() -> bool:
-    import shutil
-    return bool(shutil.which("ollama")) or _OLLAMA_EXE_PATH.exists()
+    from cursiv_v215.core import ollama_host
+    return ollama_host.installed()
 
 
 # Windows' default UI font (Segoe UI) has no Egyptian Hieroglyphs glyphs, and
@@ -138,9 +131,7 @@ _GETTING_STARTED_FLAG = Path.home() / ".cursiv" / "runtime" / "getting_started_s
 
 
 def _is_ollama_installed_quick() -> bool:
-    exe = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
-    import shutil
-    return bool(shutil.which("ollama")) or exe.exists()
+    return _is_ollama_installed()
 
 
 def _getting_started_seen() -> bool:

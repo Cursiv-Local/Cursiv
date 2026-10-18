@@ -876,33 +876,17 @@ def _ollama_running() -> bool:
 
 def _ensure_ollama() -> bool:
     """Start Ollama in the background if it isn't running. Returns True once reachable."""
-    import subprocess as _sp
-    import time as _time
-    import shutil as _sh
-
     if _ollama_running():
         return True
 
-    if not _sh.which("ollama"):
+    from cursiv_v215.core import ollama_host as _host
+    if not _host.installed():
         return False  # not installed — nothing to start
-
     try:
         from cursiv_v215.core import speed as _speed
-        _sp.Popen(
-            ["ollama", "serve"],
-            env=_speed.ollama_env(),          # flash attention + compact cache, this server only
-            stdout=_sp.DEVNULL,
-            stderr=_sp.DEVNULL,
-            creationflags=_sp.CREATE_NO_WINDOW if hasattr(_sp, "CREATE_NO_WINDOW") else 0,
-        )
+        return _host.start(_speed.ollama_env(), wait=15)   # flash attention + compact cache, this server only
     except Exception:
         return False
-
-    for _ in range(15):
-        _time.sleep(1)
-        if _ollama_running():
-            return True
-    return False
 
 
 def _ollama_pulled_models() -> set[str]:

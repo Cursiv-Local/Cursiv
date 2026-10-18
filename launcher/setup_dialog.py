@@ -32,9 +32,10 @@ from PyQt6.QtWidgets import (
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
 
 
-OLLAMA_INSTALLER_URL = "https://ollama.com/download/OllamaSetup.exe"
-OLLAMA_EXE = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
-OLLAMA_API = "http://127.0.0.1:11434"
+from cursiv_v215.core import ollama_host   # where Ollama lives on Windows and macOS
+
+OLLAMA_INSTALLER_URL = ollama_host.INSTALLER_URL
+OLLAMA_API = ollama_host.API
 
 # Coding models for Cursiv's offline code council: (label, tag)
 CODE_MODELS = [
@@ -65,15 +66,11 @@ _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 # ── Checks (plain functions, safe to call from any thread) ───────────────────
 
 def ollama_installed() -> bool:
-    return bool(shutil.which("ollama")) or OLLAMA_EXE.exists()
+    return ollama_host.installed()
 
 
 def ollama_running() -> bool:
-    try:
-        urllib.request.urlopen(f"{OLLAMA_API}/api/tags", timeout=2)
-        return True
-    except Exception:
-        return False
+    return ollama_host.running()
 
 
 def installed_models() -> list[str]:
@@ -85,48 +82,22 @@ def installed_models() -> list[str]:
         return []
 
 
+def _engine_env():
+    try:
+        from cursiv_v215.core import speed
+        return speed.ollama_env()          # flash attention + compact cache for this server
+    except Exception:
+        return None
+
+
 def start_ollama() -> bool:
     """Start the Ollama server in the background if it isn't running."""
-    if ollama_running():
-        return True
-    exe = shutil.which("ollama") or (str(OLLAMA_EXE) if OLLAMA_EXE.exists() else None)
-    if not exe:
-        return False
-    try:
-        try:
-            from cursiv_v215.core import speed
-            env = speed.ollama_env()          # flash attention + compact cache for this server
-        except Exception:
-            env = None
-        subprocess.Popen([exe, "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         creationflags=_NO_WINDOW, env=env)
-    except Exception:
-        return False
-    for _ in range(30):
-        time.sleep(1)
-        if ollama_running():
-            return True
-    return False
+    return ollama_host.start(_engine_env())
 
 
 def restart_ollama() -> bool:
     """Quit and restart Ollama (fixes it not seeing downloaded models)."""
-    for name in ("ollama app.exe", "ollama.exe"):
-        subprocess.run(["taskkill", "/F", "/IM", name], capture_output=True, creationflags=_NO_WINDOW)
-    time.sleep(2)
-    app = OLLAMA_EXE.with_name("ollama app.exe")
-    try:
-        if app.exists():
-            subprocess.Popen([str(app)], creationflags=_NO_WINDOW)
-        else:
-            return start_ollama()
-    except Exception:
-        return False
-    for _ in range(30):
-        time.sleep(1)
-        if ollama_running():
-            return True
-    return False
+    return ollama_host.restart(_engine_env())
 
 
 def needs_setup() -> bool:
@@ -377,21 +348,8 @@ class SetupDialog(QDialog):
     def _do_install(self):
         try:
             if not ollama_installed():
-                dest = Path(tempfile.gettempdir()) / "OllamaSetup.exe"
-                req = urllib.request.Request(OLLAMA_INSTALLER_URL, headers={"User-Agent": "Cursiv-Setup"})
-                with urllib.request.urlopen(req, timeout=60) as r, open(dest, "wb") as out:
-                    total = int(r.headers.get("Content-Length") or 0)
-                    got = 0
-                    while chunk := r.read(1 << 20):
-                        out.write(chunk)
-                        got += len(chunk)
-                        pct = int(got * 100 / total) if total else -1
-                        self._sig.progress.emit("s1", pct, f"Downloading Ollama… {got >> 20} MB"
-                                                + (f" of {total >> 20} MB" if total else ""))
-                self._sig.progress.emit("s1", -1, "Installing Ollama (a small progress window may appear)…")
-                rc = subprocess.run([str(dest), "/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART"]).returncode
-                if rc != 0 or not ollama_installed():
-                    raise RuntimeError(f"the Ollama installer stopped (code {rc})")
+                ollama_host.install(Path(tempfile.gettempdir()),
+                                    lambda pct, text: self._sig.progress.emit("s1", pct, text))
             self._sig.progress.emit("s1", -1, "Starting Ollama…")
             if not start_ollama():
                 raise RuntimeError("Ollama is installed but didn't start. Try restarting the computer.")
