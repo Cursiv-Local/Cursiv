@@ -177,3 +177,7 @@ From a review of real answers (a bleeding answer said not to bandage or use a to
 - `verify.py` changed only by adding `exact_format` / `FORMAT_RULE`; the pass itself is unchanged.
 - Benchmark: suites 1.1 (new cases, 4 defective checks fixed) and 1.2 (checks only: curly apostrophes, ledger "Unknown:" lines no longer count as admitting it can't know, negations before unsafe phrases). `truth_bench.py --model / --source <ref>`, `truth_rescore.py`, `compare_models.py`. Open failures: `bench/FAILURES-U63-pre.md` (rea-009 arithmetic, ref-015 dose merge, amb-002 assumed "it").
 - Not done: the six Phase 1 prompts need to be re-run once the owner supplies them; a dose-number comparison against the card; the model comparison run.
+
+## Releases
+
+Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks that the version in `core/selfknow.py`, `launcher/cursiv_launcher.py` and `installer/cursiv_setup.iss` matches the tag, builds in a fresh git worktree of the tag, and copies the installer to `installer/Output/`. Don't build from the working tree (U59 was built from uncommitted code; U63's first build picked up edits made during the build). `tests/test_versions.py` keeps the three version strings equal; CI runs the tests on every push to main and every PR. A release needs a GitHub release with `Cursiv-Setup-<version>.exe` and `Cursiv-Setup-latest.exe`, not just a push.

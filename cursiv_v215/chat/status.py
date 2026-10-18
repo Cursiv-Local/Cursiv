@@ -31,7 +31,7 @@ def network_status() -> dict:
     """{"level": "offline" | "local" | "online", "label": short text, "details": [lines]}"""
     if netgate.is_offline():
         return {"level": "offline", "label": "Offline mode",
-                "details": ["Nothing leaves this computer: no cloud AI, web search, updates or downloads.",
+                "details": ["Cursiv makes no internet connections: no cloud AI, web search, updates or downloads.",
                             "The local model, memory and reference still work."]}
     from cursiv_v215.chat import keys
     online = [name for field, name in KEY_NAMES if keys.saved_key(field)]

@@ -629,7 +629,7 @@ _HELP_TOPICS = {
   paste                       look at a picture from the clipboard
   image <description>         draw a picture (needs a paid OpenAI key)"""),
     "privacy": ("Privacy and internet", """\
-  offline on / off            nothing leaves this computer (stays on after restart)
+  offline on / off            Cursiv makes no internet connections (stays on after restart)
   search: <question>          search the web once
   websearch on / off          search on my own when a question sounds current (off by default)
   pull <web address>          read a web page and summarize it

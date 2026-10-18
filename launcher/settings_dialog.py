@@ -188,7 +188,7 @@ class SettingsDialog(QDialog):
                 self._refresh_status()
             return apply
         self._switch(lay, "Offline mode",
-                     "Nothing leaves this computer: no online AI, web search, updates or downloads. "
+                     "Cursiv makes no internet connections: no online AI, web search, updates or downloads. "
                      "Your local model, memory and reference keep working, and it stays on after a restart.",
                      netgate.setting("offline_mode"), setting("offline_mode"))
         self._switch(lay, "Search the web automatically",

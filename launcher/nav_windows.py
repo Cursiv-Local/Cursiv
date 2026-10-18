@@ -106,7 +106,7 @@ class _Window(QDialog):
 class KnowledgeDialog(_Window):
     def __init__(self, parent=None):
         super().__init__(parent, "Memory & Knowledge",
-                         "What Cursiv knows about you, and the reference material it can quote. All of it stays on this computer.",
+                         "What Cursiv knows about you, and the reference material it can quote. It's stored on this computer; an online AI, if you use one, gets the memories relevant to each message.",
                          width=820, height=680)
         self.section("MEMORY")
         self.entry("What Cursiv remembers",
@@ -229,7 +229,7 @@ class HelpDialog(_Window):
             "- Complex answers end with **Known / Inferred / Assumed / Unknown**, so you can see what's a fact and what's a guess.",
             "",
             "## Keeping things private",
-            "Turn on **Offline mode** in Settings (or type `offline on`) and nothing leaves this computer. "
+            "Turn on **Offline mode** in Settings (or type `offline on`) and Cursiv makes no internet connections. "
             "Web search happens only when you start a message with `search:`.",
             "",
             "## Typed commands",

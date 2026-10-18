@@ -36,7 +36,7 @@ That's it — one window, nothing else to open. Updates arrive inside the app.
 
 - **Chats offline** through Ollama on your own computer. Cursiv picks the right model for your graphics card.
 - **Local first.** When your computer has a model, it answers — your messages stay on your PC. A free [Gemini](https://aistudio.google.com/apikey) or [Groq](https://console.groq.com/keys) key is a backup for when there's no local model or it can't answer, and the way to read images. Paid keys (OpenAI, Anthropic, xAI) are optional, never required. Every reply ends with **"Answered by …"** so you always know which one answered.
-- **Remembers you** — lasting facts about each person, learned from conversations or added with *"remember …"*. Everything stays on your computer. *"What I remember"* lets you see, edit and delete it.
+- **Remembers you** — lasting facts about each person, learned from conversations or added with *"remember …"*. Memories are stored on your computer. If you use an online AI, the memories relevant to a message are sent with it. *"What I remember"* lets you see, edit and delete them.
 - **Reads images** you paste in — offline with the free Gemma 3 model, or with a key.
 - **Makes images** with a free Cloudflare account or a paid OpenAI key (type `image a lighthouse at dawn`). Offline models can't make images, and Cursiv tells you how to turn it on.
 - **Helps you code** — step-by-step help with local coding models, error diagnosis, and a sandbox that runs and fixes the Python it writes.
