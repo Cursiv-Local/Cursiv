@@ -1,0 +1,34 @@
+CURSIV: BEFORE YOU INSTALL
+
+What this is
+  Cursiv is an AI assistant that runs on this computer, built for field research:
+  a field notebook, calculations done in code, an offline reference, and your
+  team's documents. Made by Joshua Winkler. MIT licence.
+  Source code: https://github.com/winklersllc2026-bit/Cursiv
+  Website:     https://cursiv.winklers-llc.com
+
+What the installer does
+  - Copies Cursiv into your user folder (no administrator rights needed).
+  - Adds a Start menu entry, and a desktop shortcut only if you tick the box.
+  - Nothing else: no services, no drivers, no browser changes.
+  - On first start, the Setup window offers to install Ollama (the free engine
+    that runs AI models locally) and download one model. That needs internet
+    once. After that, everyday use works without it.
+
+Why Windows may warn you
+  The installer isn't code-signed yet, so Windows SmartScreen may say "Windows
+  protected your PC" or "unknown publisher". Click More info, then Run anyway.
+
+How to check this file is the real one
+  Each release on GitHub lists the SHA-256 checksum of the installer
+  (SHA256SUMS.txt). In PowerShell:
+      Get-FileHash .\Cursiv-Setup-<version>.exe -Algorithm SHA256
+  The result must match the line for that file in SHA256SUMS.txt.
+
+Privacy, in short
+  Your conversations, memories, field notes and documents stay on this computer.
+  Nothing leaves it unless you turn on an online feature (web search, a cloud AI
+  key, update checks). Offline mode blocks every connection off this computer.
+  Details: PRIVACY.md in the source, or Settings > Privacy in Cursiv.
+
+Uninstall any time from Windows Settings > Apps, or the Start menu entry.

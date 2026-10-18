@@ -7,12 +7,14 @@ Build a release installer from a tagged commit, never from the working tree.
    (core/selfknow.py, launcher/cursiv_launcher.py, installer/cursiv_setup.iss).
 2. Checks out the tag into a temporary git worktree (uncommitted edits here can't
    get in), runs PyInstaller and Inno Setup there.
-3. Copies the installer to installer/Output/ and removes the worktree.
+3. Copies the installer to installer/Output/, writes its SHA-256 (SHA256SUMS-<version>.txt,
+   published with the release), and removes the worktree.
 
 The audit found U59 built from an uncommitted tree; this is the fix.
 """
 from __future__ import annotations
 
+import hashlib
 import re
 import shutil
 import subprocess
@@ -72,6 +74,11 @@ def main() -> int:
         out.mkdir(parents=True, exist_ok=True)
         shutil.copy2(work / "installer" / "Output" / name, out / name)
         print(f"saved {out / name}")
+        # Published with the release so anyone can check the download (installer/BEFORE-INSTALL.txt).
+        digest = hashlib.sha256((out / name).read_bytes()).hexdigest()
+        sums = out / f"SHA256SUMS-{want}.txt"
+        sums.write_text(f"{digest}  {name}\n{digest}  Cursiv-Setup-latest.exe\n", encoding="utf-8")
+        print(f"sha256 {digest}\nsaved {sums} (upload it to the release as SHA256SUMS.txt)")
     finally:
         git("worktree", "remove", "--force", str(work))
     return 0

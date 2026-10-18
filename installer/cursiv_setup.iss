@@ -13,7 +13,9 @@
 #define AppName      "Cursiv"
 #define AppVer       "3.14-U69"
 #define AppPublisher "Joshua Winkler"
-#define AppURL       "https://github.com/winklersllc2026-bit/Cursiv"
+#define AppURL       "https://cursiv.winklers-llc.com"
+#define SourceURL    "https://github.com/winklersllc2026-bit/Cursiv"
+#define AppVerNum    StringChange(AppVer, "-U", ".")
 #define AppExe       "Cursiv.exe"
 #define AppID        "{{A7B1C2D3-E4F5-4A6B-9C7D-8E0F1A2B3C4D}}"
 
@@ -24,12 +26,21 @@ AppVersion={#AppVer}
 AppVerName={#AppName} {#AppVer}
 AppPublisher={#AppPublisher}
 AppPublisherURL={#AppURL}
-AppSupportURL={#AppURL}
-AppUpdatesURL={#AppURL}
+AppSupportURL={#SourceURL}/issues
+AppUpdatesURL={#SourceURL}/releases
+VersionInfoVersion={#AppVerNum}
+VersionInfoProductVersion={#AppVerNum}
+VersionInfoTextVersion={#AppVer}
+VersionInfoProductTextVersion={#AppVer}
+VersionInfoCompany={#AppPublisher}
+VersionInfoProductName={#AppName}
+VersionInfoDescription={#AppName} Setup: an offline AI assistant for field research
+VersionInfoCopyright=Copyright (c) 2026 {#AppPublisher}. MIT License. Source: {#SourceURL}
 DefaultDirName={autopf}\{#AppName}
 DefaultGroupName={#AppName}
 AllowNoIcons=yes
 LicenseFile=..\LICENSE
+InfoBeforeFile=BEFORE-INSTALL.txt
 InfoAfterFile=..\CHANGELOG.md
 AppComments=A personal AI assistant that runs on your own computer. The local model answers first; online features are optional, and offline mode blocks every connection off this computer.
 OutputDir=Output
