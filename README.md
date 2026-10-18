@@ -30,6 +30,17 @@ That's it — one window, nothing else to open. Updates arrive inside the app.
 **Needs:** Windows 10 or 11 (64-bit) · 8 GB RAM · about 6 GB free disk for one model (more for extras).
 **No download wanted?** Paste a free Gemini or Groq key in Setup and Cursiv answers right away.
 
+### On a Mac (early)
+
+For Apple Silicon Macs (M1 or newer), macOS 12+. Download `Cursiv-<version>-mac-arm64.dmg` from the
+[latest release](https://github.com/winklersllc2026-bit/Cursiv/releases/latest) and drag Cursiv into Applications.
+This build isn't signed by Apple yet, so the first time: try to open it, then **System Settings → Privacy & Security →
+Open Anyway**. Setup installs Ollama into your Applications folder (no admin password) and downloads the model.
+
+Honest status: the Mac version is built and tested automatically on Apple hardware at GitHub (the full test suite and
+a self-test of the built app), but nobody has used it on their own Mac yet. The Cursiv USB drive is Windows-only.
+Saved AI keys go into the macOS Keychain.
+
 ---
 
 ## What it does

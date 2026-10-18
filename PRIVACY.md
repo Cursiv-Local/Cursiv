@@ -55,7 +55,7 @@ pass, 0 attempts). `scripts/net_audit.py` logs every connection a fresh install 
 
 - Cursiv's login keeps people at your keyboard out. It is not encryption: anyone who can
   open this computer's files can read Cursiv's data, like your other documents. Saved
-  AI keys are the exception (encrypted for your Windows account).
+  AI keys are the exception (encrypted for your Windows account, or kept in the macOS Keychain).
 - A private copy on a USB drive (made with "include my memories, keys and settings") holds
   your data readable, so it can run on other PCs. Keep that drive safe.
 - When you use a cloud AI or web search, that company's own privacy policy applies to
