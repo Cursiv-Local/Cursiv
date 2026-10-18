@@ -147,7 +147,7 @@
           <tr><td><b>Saved AI keys encrypted</b> (Windows DPAPI)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests. Memories and conversations are not encrypted on disk.</td></tr>
           <tr><td><b>Local login</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fails closed; new accounts need an existing login. A lock on the front door, not disk encryption.</td></tr>
           <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests; each drive carries a Licenses folder for Cursiv, Ollama and every model on it. A "field copy" starts in offline mode. Not yet tried end to end on a second, clean PC.</td></tr>
-          <tr><td><b>Truth benchmark</b> (125 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Run on every release; every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Truth benchmark</b> (133 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Run on every release; every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
           <tr><td><b>Exact arithmetic and clock times</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Worked out in code and given to the model; an answer that disagrees gets a note. Unit tests and a live check.</td></tr>
           <tr><td><b>Field notebook</b> (append-only, fingerprinted, CSV/JSON/GeoJSON export)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Tests for exact values, corrections, detection of changed, removed or reordered entries and of a write cut off by power loss, exports, and surviving a restart; included in the offline demonstration. Not yet used by a field team.</td></tr>
           <tr><td><b>Field calculations</b> (units, coordinates, UTM, dilutions, statistics)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Computed in code. UTM checked against an independent method to half a metre at seven places; conversions against reference values.</td></tr>
@@ -170,36 +170,36 @@
       <h2>Measured, not assumed.</h2>
       <p class="lede">The Cursiv Truth Benchmark asks the same fixed questions on every release and scores the answers with code, not with another AI.</p>
       <ul class="checks">
-        <li><span><b>125 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
+        <li><span><b>133 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
         <li><span><b>Scored by fixed rules:</b> the right answer or number, invented details, admitting "I can't know", asking when the question is unclear, using the right reference entry.</span></li>
         <li><span><b>Run clean:</b> a fresh copy, no keys, no memories, offline mode on.</span></li>
-        <li><span><b>Frozen:</b> the questions and checks are versioned (now suite 1.2). A check is only changed when it was wrong, the change is written down, and earlier releases are scored again on the new version.</span></li>
+        <li><span><b>Frozen:</b> the questions and checks are versioned (now suite 1.3). A check is only changed when it was wrong, the change is written down, and earlier releases are scored again on the new version.</span></li>
       </ul>
       <p><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Read the cases, scoring and rules →</a></p>
     </div>
     <div class="card" id="results">
-      <h3>Latest results: suite 1.2</h3>
-      <p class="fine" style="margin-top:4px">Same 125 questions, same scoring · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · 18 Oct 2026</p>
+      <h3>Latest results: suite 1.3</h3>
+      <p class="fine" style="margin-top:4px">Same 133 questions, same scoring · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · run from each release · 18 Oct 2026</p>
       <div class="table-wrap" style="margin-top:14px">
         <table class="table">
-          <thead><tr><th></th><th>U61</th><th>U63</th></tr></thead>
+          <thead><tr><th></th><th>U65</th><th>U66</th></tr></thead>
           <tbody>
-            <tr><td><b>Passed overall</b></td><td>114 of 125 (91.2%)</td><td>119 of 125 (95.2%)</td></tr>
-            <tr><td><b>Accuracy</b> (answerable questions)</td><td>89.7%</td><td>94.9%</td></tr>
-            <tr><td><b>Safety questions</b></td><td>90%</td><td>100%</td></tr>
-            <tr><td><b>Unsupported claims</b></td><td>0.8% of answers</td><td>0.8% of answers</td></tr>
-            <tr><td><b>Average answer time</b></td><td>32 s</td><td>25 s</td></tr>
+            <tr><td><b>Passed overall</b></td><td>126 of 133 (94.7%)</td><td>132 of 133 (99.2%)</td></tr>
+            <tr><td><b>Accuracy</b> (answerable questions, incl. field calculations)</td><td>93.0%</td><td>100%</td></tr>
+            <tr><td><b>Safety questions</b></td><td>100%</td><td>100%</td></tr>
+            <tr><td><b>Unsupported claims</b></td><td>0%</td><td>0%</td></tr>
+            <tr><td><b>Average answer time</b></td><td>11.7 s</td><td>11.8 s</td></tr>
           </tbody>
         </table>
       </div>
-      <p style="margin-top:12px">Of U63's 6 failures, 3 were real: a bedtime calculation, mixing up two bleach doses, and answering
-        "Is it safe?" without asking what "it" was. U64 adds fixes for all three (exact arithmetic in code, a dose check against
-        the reference card, a clarifying question). The other 3 were the benchmark's own checks being too strict; they're fixed in
-        the next suite version, never in the scored one.
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U63-pre.md">Every failure and its cause →</a></p>
-      <p class="fine" style="margin-top:10px">The first published baseline (U61 on suite 1.0, 110 of 116) stays as run. Reading those answers
-        later showed some checks were too lenient and some too strict; suite 1.2 corrects both, and both releases were rescored
-        from their saved answers. <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/SUITE.md">What changed in each suite →</a></p>
+      <p style="margin-top:12px">U66's one failure: given two sheets with different bleach doses, it compared them and chose the
+        right dose from the EPA card, but added a claim that one sheet "references an EPA guideline", which it doesn't.
+        U65 missed four of the new field calculations, which U66 does in code.
+        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U66.md">Every failure and its cause →</a></p>
+      <p class="fine" style="margin-top:10px">Earlier suites stay as run (U61 on suite 1.0: 110 of 116; on suite 1.2: U61 114, U63 119, U65 120 of 125).
+        A suite version only changes when a check was wrong or a case is added, and earlier releases are run again on the new version.
+        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/SUITE.md">What changed in each suite →</a>
+        The questions are mostly short; a harder set is the next step, because a near-perfect score here doesn't mean Cursiv is always right.</p>
     </div>
   </div>
 </section>
