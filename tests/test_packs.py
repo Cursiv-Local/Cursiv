@@ -48,6 +48,14 @@ def test_a_pack_entry_replaces_the_older_unsourced_one():
     ("I touched poison ivy while clearing brush", "medical/poison-ivy-oak-and-sumac"),
     ("a black bear is near our camp", "survival/bear-encounter"),
     ("what do I do if a grizzly charges me", "survival/bear-encounter"),
+    # home and workplace
+    ("we've been running the generator in the garage and everyone has a headache", "medical/carbon-monoxide-poisoning"),
+    ("our carbon monoxide alarm keeps beeping", "medical/carbon-monoxide-poisoning"),
+    ("I splashed a chemical in my eye at the lab", "medical/chemical-exposure-first-aid"),
+    ("acid got on my skin", "medical/chemical-exposure-first-aid"),
+    ("the power went out, is the food in the fridge still ok", "survival/food-safety-after-a-power-outage"),
+    ("how long is the freezer safe without power", "survival/food-safety-after-a-power-outage"),
+    ("I'm lost in the woods and can't find the trail", "survival/lost-outdoors"),
 ])
 def test_everyday_questions_find_the_pack_entry(question, entry):
     assert entry in [e.id for e in ref.lookup(question)]
@@ -65,6 +73,10 @@ def test_everyday_questions_find_the_pack_entry(question, entry):
     "my teddy bear needs a name",
     "the stock market is a bear market",
     "the bee population is declining, why",
+    "I lost my keys",
+    "what is a chemical reaction",
+    "my power bill is high",
+    "I lost track of time",
 ])
 def test_unrelated_questions_dont_pull_in_a_pack_entry(question):
     pack_titles = {i["title"] for p in ref.packs() for i in p["entries"]}

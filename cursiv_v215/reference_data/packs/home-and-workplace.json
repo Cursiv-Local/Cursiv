@@ -1,0 +1,39 @@
+{
+  "pack": "home-and-workplace",
+  "version": "1.0",
+  "about": "Carbon monoxide, chemical exposure, food after a power outage, and getting lost outdoors. Written from U.S. government pages (public domain), in plain words, adding nothing the source doesn't say. Not reviewed by a medical professional.",
+  "entries": [
+    {
+      "title": "carbon monoxide poisoning",
+      "category": "medical",
+      "aliases": ["carbon monoxide", "co alarm", "co detector", "co poisoning", ["generator", "headache"], ["generator", "dizzy"], ["generator", "indoors"], ["generator", "garage"]],
+      "text": "Carbon monoxide (CO) has no color or smell. Symptoms: headache, dizziness or passing out, nausea, confusion, tiredness, seizures. If anyone has symptoms: turn off the equipment and get everyone outdoors or to fresh air right away, then call 911. Don't drive yourself to get care; have someone else drive. Prevention: never run gasoline engines or tools (generators, pressure washers, air compressors) inside buildings or in partly enclosed areas; keep them outside. Install a battery-operated CO detector and test it often.",
+      "source": {"name": "CDC / NIOSH, Carbon Monoxide Hazards at Work", "url": "https://www.cdc.gov/niosh/carbon-monoxide/about/index.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "chemical exposure first aid",
+      "category": "medical",
+      "aliases": ["chemical in my eye", "chemical splash", "splashed in the eye", "chemical burn", ["chemical", "eye"], ["chemical", "skin"], ["chemical", "swallowed"], ["chemical", "breathed"], ["fumes", "dizzy"], ["solvent", "skin"], ["acid", "skin"], ["acid", "eye"]],
+      "text": "Chemical in the eyes: wash them right away with large amounts of water for at least 15 minutes, now and then lifting the upper and lower lids, and get medical attention right away. On the skin: flush with water or wash with soap and water; get medical care if irritation appears or doesn't go away. Breathed in: move the person to fresh air at once; if breathing has stopped, give rescue breaths; keep them warm and at rest and get medical attention as soon as possible. Swallowed: get medical attention immediately. Poison control (US): 1-800-222-1222. Frostbite from a cold chemical: don't rub the area or flush it with water, and don't try to remove frozen clothing; if the eye tissue is frozen, get medical help immediately.",
+      "source": {"name": "CDC / NIOSH, First Aid Procedures for Chemical Hazards (Pocket Guide)", "url": "https://www.cdc.gov/niosh/npg/firstaid.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "food safety after a power outage",
+      "category": "survival",
+      "aliases": ["power outage", "power went out", "power is out", "lost power", ["fridge", "power"], ["refrigerator", "power"], ["freezer", "power"], ["food", "flood"], ["food", "safe", "outage"]],
+      "text": "Keep the refrigerator and freezer doors closed. Food stays safe about 4 hours in a refrigerator, 48 hours in a full freezer and 24 hours in a half-full freezer. Keep appliance thermometers in both: the refrigerator should be at 40°F or below, the freezer at 0°F or below. If the power has been out 4 hours and you have a cooler and ice, put refrigerated perishable food in the cooler. Throw out perishable refrigerator food after about 4 hours without power or a cold source, and food that has thawed or is above 40°F. Frozen food that still has ice crystals or is at 40°F or below can be refrozen or cooked. Throw out food that may have touched floodwater or stormwater, and home-canned food or cans and containers that are bulging, open or damaged. Never taste food to find out if it's safe. When in doubt, throw it out.",
+      "source": {"name": "CDC, Keep Food Safe After a Disaster or Emergency", "url": "https://www.cdc.gov/food-safety/foods/keep-food-safe-after-emergency.html", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    },
+    {
+      "title": "lost outdoors",
+      "category": "survival",
+      "aliases": ["i'm lost", "we're lost", "got lost", "lost hiking", "lost in the woods", "can't find the trail", "lost the trail", ["lost", "trail"], ["lost", "woods"], ["lost", "hike"]],
+      "text": "If you're lost: stay calm and try to find your way with your map, compass, GPS or landmarks; retrace your steps if it's safe. If you can't, call 911 and give: GPS coordinates from your phone if you have them, the trail or area name, your last known location, nearby landmarks, what you're wearing and carrying, and any medical conditions. Then stay put: moving makes it harder for searchers to find you. Move only if your life is threatened. Find a place that protects you from the weather, take stock of your supplies and conserve them. Signal: blow a whistle (it saves your voice and energy), flash a mirror at aircraft, and use a flashlight sparingly. Lay out your shelter or arrange rocks so aircraft can see you. Wait patiently for help. Before any trip, leave a trip plan with someone who isn't going.",
+      "source": {"name": "U.S. National Park Service, Outdoor Emergency Plan", "url": "https://www.nps.gov/articles/gtgemergencyplan.htm", "license": "public domain (U.S. government work)", "checked": "2026-10-18"},
+      "reviewed": false
+    }
+  ]
+}
