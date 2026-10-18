@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v3.14-U69 — Dark by default (2026-10-18)
 - **Cursiv starts in dark mode** on every install and every Cursiv USB, whatever Windows is set to. Settings → Appearance: Dark, Light or Match Windows.
 
 ## v3.14-U68 — Safer doses and warnings (2026-10-18)
