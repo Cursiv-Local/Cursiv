@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.14-U65 — A sourced reference, one tested model (2026-10-18)
+- **The offline reference names its sources.** 37 entries are now written from public U.S. government guidance (CDC, NIOSH, EPA, National Weather Service, National Park Service, FEMA): heat illness, frostbite, lightning, ticks, snakebites, stings, poison ivy, bears, rabies, mosquitoes, carbon monoxide, chemical exposure, food after a power outage, getting lost, concussion, cardiac arrest, seizures, altitude sickness, burns, low blood sugar, sepsis, helping an injured person, floods, wildfire smoke, tornadoes, earthquakes and flooded wells. Each card shows its source and the date it was checked; entries without a published source say so. None has been reviewed by a medical professional yet. `docs/REFERENCE.md` lists every entry.
+- **One model, chosen by testing.** In a side-by-side test on the same 40 questions, qwen3 4B passed all 40 in about 10 seconds an answer; llama3.1 and gemma3 passed 35, and qwen3 8B ("Deep Think") passed 38 at five times the time and invented a treaty. So qwen3 4B is used on every computer, Setup offers only it (plus a small model for very slow PCs), and Deep Think is removed for now. Other installed models are still listed under Settings → AI model → Advanced.
+- **"Is it safe?"** with nothing to say what "it" is now always gets a question back, asked by Cursiv itself.
+- **Fewer false notes under answers:** "Unsupported claims: None" is no longer shown as a problem, and "I don't have a map" isn't treated as citing one. The "try council" suggestion is gone.
+- **Lists display properly:** after an answer that ends in a list, the next lines are no longer numbered as part of it.
+- Setup's wording says answers come from this computer unless you turn on an online option.
+
 ## v3.14-U64 — Faster, steadier, ready for the field (2026-10-18)
 - **About twice as fast on small graphics cards.** Ollama was leaving much of each model on the processor. Cursiv now puts as much as fits on the card, and clears other models off it first: on a 4 GB card, the everyday model went from 16 to 37 words-pieces a second.
 - **Standard or Deep Think.** The menu above the chat now offers two choices instead of model names. Standard is quick; Deep Think (qwen3 8B, when it's downloaded) reasons before it answers and takes a minute or two. Every installed model is listed only if you turn on "Advanced: show every model" in Settings.
