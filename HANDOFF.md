@@ -61,7 +61,7 @@ Two deterministic checks were added (C-025): `known_problems` (a Known item with
 
 ### 2. Ledger
 
-Complex / high-stakes questions (`needs_ledger`) get this block appended to the system prompt, after the coding-brain swap so it is not dropped:
+Complex / high-stakes questions (`needs_ledger`) get this block appended (since U63 the persona no longer asks for it on every answer, and `verify.exact_format()` requests skip it and get `FORMAT_RULE` instead) to the system prompt, after the coding-brain swap so it is not dropped:
 
 ```
 Known: ...
@@ -163,3 +163,17 @@ Not changed: Cursiv Cloud is still on by default for people with no local model 
 - `phases.emergency_kind`: "medical" keeps the normal prompt plus first-aid instructions; "crisis" and "danger" keep the care-first crisis prompt.
 - `chat()` skips the verify pass on any emergency turn (`_EMERGENCY_TURN`), and shows failed-check notes compactly (`_compact_notes`: at most three one-line items, under "Checked, with notes"). `verify.py` itself is unchanged.
 - `chat(replace_draft=True)` (the chat window only): a clean revision replaces the draft on screen and in history (`REPLACE_SENTINEL`).
+
+## Answer safety (2026-10-18, U63)
+
+From a review of real answers (a bleeding answer said not to bandage or use a tourniquet) and the first-time-user findings.
+
+- `reference_data/sources.json`: source, URL, check date and `reviewed` (all false) per entry; `reference.source()`; `note_line` shows "Based on ... (checked ...)". Bleeding, tourniquet, water, hypothermia rewritten from Stop the Bleed / EPA / CDC.
+- `reference.ALIASES` entries may be tuples: all words needed (`("bleach", "gallon")`), so cleaning questions don't get the water card.
+- `agents/reference_brain._bundled_search` (the online-AI tool) uses `reference.lookup`. Its old any-shared-word scoring was the cause of unrelated cards.
+- `phases._MEDICAL` covers spurting / pouring blood, bleeding out, won't stop bleeding. Persona rule 3 separates crisis care from medical emergencies.
+- `core/answer_check.py`: no model call, runs on every turn including emergencies, from `chat()` right after the draft. `contradictions()` (a negated `KEY_STEPS` step for a shown entry; "unless trained") and `unsupported_actions()` (claimed database/web search when `_WEB_SEARCHED` is false). Lines start "Cursiv's check:" and render amber.
+- `chat_panel.split_details`: ledger lines and "Checked, with notes" go behind a "Show reasoning and checks" link (`cursiv://details/<text>`, opens a dialog). Medical and survival cards render at normal size.
+- `verify.py` changed only by adding `exact_format` / `FORMAT_RULE`; the pass itself is unchanged.
+- Benchmark: suites 1.1 (new cases, 4 defective checks fixed) and 1.2 (checks only: curly apostrophes, ledger "Unknown:" lines no longer count as admitting it can't know, negations before unsafe phrases). `truth_bench.py --model / --source <ref>`, `truth_rescore.py`, `compare_models.py`. Open failures: `bench/FAILURES-U63-pre.md` (rea-009 arithmetic, ref-015 dose merge, amb-002 assumed "it").
+- Not done: the six Phase 1 prompts need to be re-run once the owner supplies them; a dose-number comparison against the card; the model comparison run.

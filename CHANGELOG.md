@@ -1,5 +1,15 @@
 # Changelog
 
+## v3.14-U63 — Safer, more accurate answers (2026-10-18)
+- **Corrected first-aid and water entries.** Severe bleeding, tourniquet, water purification and hypothermia are rewritten from published guidance (U.S. EPA, U.S. CDC, Stop the Bleed). Each card names its source and the date it was checked. An earlier answer told someone not to bandage a wound or use a tourniquet; the bleeding card now says: call 911, press firmly, pack the wound, then a tourniquet 2–3 inches above it, and note the time. The water card gives EPA bleach doses and says boiling and bleach don't remove chemicals.
+- **Heavy bleeding is treated as a medical emergency.** "Spurting blood" or "blood everywhere" used to get no first-aid card and a reply meant for a mental-health crisis. Now it gets 911 and the bleeding steps. Cursiv's instructions no longer treat a medical emergency like a crisis.
+- **Cursiv flags its own risky answers.** If an answer advises against a step the reference card above it recommends, or claims it searched databases when nothing was searched, a warning appears under it. This works during emergencies too.
+- **Asks for an exact format get exactly that.** "Exactly 5 steps, one sentence each" gets 5 steps, no extra sections.
+- **Less clutter under answers.** The Known / Inferred / Assumed / Unknown lines and check notes are behind "Show reasoning and checks". They appear far less often: only for checks and high-stakes questions, not every answer with a number in it.
+- **No more unrelated reference cards.** When an online AI answered, Cursiv could attach entries that only shared a word with the question (water purification under a cover-letter question). It now uses the same strict matching as normal chat.
+- **Fewer made-up details.** Cursiv is told not to invent your circumstances, to ask at most one follow-up question, and to say plainly that it can't set reminders or prove for itself that the computer is offline.
+- **Measured:** truth benchmark suite 1.2 (125 questions). This version: 119 of 125 (95.2%). U61's code on the same questions and model: 114 of 125 (91.2%). Every answer and failure cause is in `bench/`.
+
 ## v3.14-U62 — A simpler, clearer window (2026-10-17)
 - **A new, simpler window.** A clean start screen ("What can I help with?") with example questions you can click. Answers show real formatting (bold, lists), and under each one a small line says where it came from: **● Local** (this computer) or **● Online** (a service you set up).
 - **You can always see what can go online.** A pill at the top right says *Local only*, *Offline mode* or *Online features on* (with the exact list), read from the same switches the network code obeys. Click it to change them.
