@@ -98,3 +98,14 @@ def test_24_hour_clock_times():
     assert "01:30 (the next day)" in calc.work_out("we leave at 23:30 and the drive takes 2 hours, "
                                                     "what time will we arrive").statement
     assert calc.work_out("The ratio was 3:45 in the sample") is None
+
+
+def test_bleach_dose_comes_from_the_card():
+    # benchmark ref-002: the model said 16 drops per liter three runs out of three
+    r = fc.work_out("How many drops of 8.25% bleach do I add per liter of cloudy water?")
+    assert r.value == 4 and "doubled" in r.statement
+    assert fc.work_out("How much 6% bleach for 5 gallons of cloudy water?").value == 80
+    assert fc.work_out("how many drops of 8.25% bleach per gallon").value == 6
+    assert fc.bleach_dose("How much bleach for 5 gallons of water?") is None      # 6% and 8.25% differ per gallon
+    assert fc.bleach_dose("How many drops of 5% bleach per gallon?") is None       # not on the card
+    assert fc.bleach_dose("Bleach and ammonia make a stronger cleaner, right? What ratio?") is None

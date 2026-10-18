@@ -292,8 +292,56 @@ def stats(question: str) -> Result | None:
                   f"(t distribution, {n - 1} degrees of freedom).", mean, max(abs(mean) * 0.0005, 0.001))
 
 
+# ── Bleach for drinking water, from the reference card's own table ─────────
+# The model turned "2 drops per liter, double for cloudy" into 16 drops per liter
+# (benchmark ref-002 on U66, U67-pre and U67): the per-gallon 8, doubled. The
+# dose is now worked out from reference_data/doses.json (U.S. EPA).
+
+_BLEACH = re.compile(r"(?i)\bbleach\b")
+_HOW_MUCH = re.compile(r"(?i)\b(how (many|much)|drops?|dose|amount)\b")
+_BLEACH_VOL = re.compile(r"(?i)(?:(\d+(?:\.\d+)?)\s*|\b(a|one|per|each|every)\s+)(liters?|litres?|quarts?|gallons?)\b")
+_BLEACH_STRENGTH = re.compile(r"(\d+(?:\.\d+)?)\s?%")
+_DOUBLE_IT = re.compile(r"(?i)\b(cloudy|murky|colou?red|very cold|ice[- ]cold|turbid)\b")
+
+
+def bleach_dose(question: str) -> Result | None:
+    q = question or ""
+    if not (_BLEACH.search(q) and _HOW_MUCH.search(q)):
+        return None
+    vol = _BLEACH_VOL.search(q)
+    if not vol:
+        return None
+    import json
+    from pathlib import Path
+    try:
+        rows = json.loads((Path(__file__).resolve().parent.parent / "reference_data" / "doses.json")
+                          .read_text(encoding="utf-8"))["water purification"]
+    except (OSError, ValueError, KeyError):
+        return None
+    amount = float(vol.group(1)) if vol.group(1) else 1.0
+    per = vol.group(3).lower().rstrip("s").replace("litre", "liter")
+    strengths = [s + "%" for s in _BLEACH_STRENGTH.findall(q)]
+    known = sorted({r["of"] for r in rows})
+    if strengths and any(st not in known for st in strengths):
+        return None                     # a strength the card doesn't cover: no number from us
+    use = strengths[:1] or known
+    doses = {st: next(r["amount"] for r in rows if r["of"] == st and r["per"] == per) for st in use}
+    if len(set(doses.values())) != 1:
+        return None                     # strength not given and the card's numbers differ (per gallon)
+    base = next(iter(doses.values()))
+    double = bool(_DOUBLE_IT.search(q))
+    drops = base * amount * (2 if double else 1)
+    what = " or ".join(use)
+    vol_text = f"{_fmt(amount)} {per}{'' if amount == 1 else 's'}"
+    statement = (f"Bleach for drinking water, from the reference card (U.S. EPA): {what} bleach, {base} drops per {per}"
+                 + (f", times {_fmt(amount)}" if amount != 1 else "")
+                 + (", doubled because the water is cloudy, colored or very cold" if double else "")
+                 + f" = {_fmt(drops)} drops for {vol_text}. Stir, wait 30 minutes; it should smell slightly of chlorine.")
+    return Result(statement, drops, 0.0)
+
+
 def work_out(question: str) -> Result | None:
-    for fn in (distance, coordinates, dilution, stats, units):
+    for fn in (bleach_dose, distance, coordinates, dilution, stats, units):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):
