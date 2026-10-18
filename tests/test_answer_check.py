@@ -83,3 +83,30 @@ def test_numbers_make_a_question_specific():
     # suite 1.4 num-034: asked what "it" meant in a question full of coordinates
     assert clarify.needs_clarifying("How far is it from 44.1234, -71.5678 to 44.1300, -71.5600 in meters?", []) == ""
     assert clarify.needs_clarifying("Is it safe?", []) == "it"
+
+
+def test_dose_named_a_sentence_away_is_still_checked():
+    # suite 1.4 ref-002 on U67: strength one sentence earlier, the wrong base dose in brackets
+    bad = ("For cloudy water with 8.25% bleach, you should double the standard dose.\n\n"
+           "That means: **16 drops per liter** (because the standard is 8 drops per liter, and you double it for cloudy water).")
+    probs = ac.dose_problems(bad, ["water purification"])
+    assert any("not 16" in p for p in probs)
+    good = "For cloudy water, double the bleach dose. For 8.25% bleach, add **4 drops per liter**."
+    assert ac.dose_problems(good, ["water purification"]) == []
+
+
+def test_yes_its_safe_then_dont_go_gets_a_warning_on_top(fresh, monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    _local_model(monkeypatch)
+    said = ("Yes, it's safe to go back out now.\n\nYou should wait 30 minutes after the last thunder. "
+            "Since 10 minutes is less than 30, you should not go back out yet.")
+    assert ac.flip_flop(said) == ("Yes", "should not go back out yet")
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: iter([said]))
+    parts = []
+    for c in ca.chat("We're on the lake. The last thunder was 10 minutes ago. Is it safe to go back out?",
+                     [], "", None, replace_draft=True):
+        parts = [c[len(ca.REPLACE_SENTINEL):]] if c.startswith(ca.REPLACE_SENTINEL) else parts + [c]
+    out = "".join(parts)
+    assert out.index("contradicts itself") < out.index("Yes, it's safe")
+    assert out.count("contradicts itself") == 1
+    assert ac.flip_flop("Yes, it's safe. Boil it for one minute first.") is None

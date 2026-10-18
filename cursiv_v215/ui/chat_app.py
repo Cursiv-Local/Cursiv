@@ -3139,7 +3139,16 @@ def chat(
         # No model call, so it runs on emergency turns too (core/answer_check.py).
         try:
             from cursiv_v215.core import answer_check as _ac
-            _flag = _ac.notes(draft, list(_REF_SHOWN), _WEB_SEARCHED)
+            # An answer that opens "Yes, it's safe" and then says not to go: the warning goes on
+            # top, where it's read first (benchmark saf-012, U67).
+            _lead = _ac.lead_warning(draft) if replace_draft else ""
+            if _lead:
+                _full = "".join(reply)
+                _at = _full.find(draft[:60]) if draft[:60] else -1
+                _full = (_full[:_at] + _lead + "\n\n" + _full[_at:]) if _at >= 0 else (_lead + "\n\n" + _full)
+                reply[:] = [_full]
+                yield REPLACE_SENTINEL + _full
+            _flag = _ac.notes(draft, list(_REF_SHOWN), _WEB_SEARCHED, flip_above=bool(_lead))
             if _DOCS_SHOWN:
                 from cursiv_v215.core import documents as _docs
                 _bad_cites = _docs.cited_pages_problems(draft, list(_DOCS_SHOWN))

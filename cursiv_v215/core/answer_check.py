@@ -86,7 +86,17 @@ def flip_flop(answer: str) -> tuple[str, str] | None:
     # A concluding "So, no" / "Therefore, yes", or "no —": not a passing "yes" inside a sentence.
     later = re.search(r"(?:^|[.!?]\s+|\n\s*)(?:(?:so|therefore|actually|in short|to be clear),?\s*(" + other
                       + r")\b|(" + other + r")\s*[—–]|(" + other + r")\s+-\s)", body[m.end():], re.I)
-    return (first, next(g for g in later.groups() if g).lower()) if later else None
+    if later:
+        return first, next(g for g in later.groups() if g).lower()
+    # "Yes, it's safe to go back out now. ... you should not go back out yet." (saf-012 on U67)
+    opening = re.split(r"(?<=[.!?])\s", body, maxsplit=1)[0]
+    if first == "Yes" and re.search(r"(?i)\b(safe|okay|ok|fine|all right)\b", opening):
+        rest = body[len(opening):]
+        no = re.search(r"(?i)\b(not (yet )?safe|unsafe|(?:should|must|do) not|shouldn'?t|don'?t|never)\b"
+                       r"[^.!?\n]{0,40}\b(yet|go|going|back|outside|out|swim|enter)\b", rest)
+        if no:
+            return first, no.group(0)
+    return None
 
 
 def unsupported_actions(answer: str, searched: bool) -> list[str]:
@@ -96,7 +106,17 @@ def unsupported_actions(answer: str, searched: bool) -> list[str]:
     return [m.group(0) for m in _CLAIMS.finditer(answer or "")][:2]
 
 
-def notes(answer: str, titles: list[str], searched: bool) -> str:
+def lead_warning(answer: str) -> str:
+    """A line to put ABOVE an answer that opens with yes/no and then says the opposite,
+    because people act on the first line. "" if it doesn't."""
+    flip = flip_flop(answer)
+    if not flip:
+        return ""
+    return (f"**Cursiv's check: the first line of this answer says \"{flip[0]}\", but it goes on to say "
+            f"\"{flip[1]}\". It contradicts itself. Go by the reference and take the safer choice.**")
+
+
+def notes(answer: str, titles: list[str], searched: bool, flip_above: bool = False) -> str:
     """The lines to show under the answer, or ""."""
     lines = []
     steps = contradictions(answer, titles)
@@ -107,7 +127,7 @@ def notes(answer: str, titles: list[str], searched: bool) -> str:
     doses = dose_problems(answer, titles)
     if doses:
         lines.append("*(Cursiv's check: " + "; ".join(doses) + ". Use the numbers in the reference above.)*")
-    flip = flip_flop(answer)
+    flip = None if flip_above else flip_flop(answer)
     if flip:
         lines.append(f"*(Cursiv's check: this answer starts with \"{flip[0]}\" and later says \"{flip[1]}\". "
                      "It contradicts itself: read all of it, and when safety is involved, take the safer choice.)*")
@@ -153,13 +173,16 @@ def dose_problems(answer: str, titles: list[str]) -> list[str]:
         rows = _dose_table().get(title) or reference.doses(title)
         if not isinstance(rows, list):
             continue
+        prev = ""
         for sentence in _SENTENCE.findall(answer or ""):
+            prev, before = sentence, prev
             drops, vols = _DROPS.findall(sentence), _VOLUME.findall(sentence)
             strengths = [s + "%" for s in _STRENGTH.findall(sentence)]
             if len(drops) != 1 or len(vols) != 1 or not strengths:
                 continue
             n, per = int(drops[0]), vols[0].lower().rstrip("s").replace("litre", "liter")
-            doubled = bool(_DOUBLE.search(sentence))
+            # "For cloudy water, double the dose. For 8.25% bleach, add 4 drops per liter."
+            doubled = bool(_DOUBLE.search(sentence) or _DOUBLE.search(before))
             for strength in strengths:
                 want = next((r["amount"] for r in rows if r["of"] == strength and r["per"] == per), None)
                 if want is None:
@@ -171,4 +194,41 @@ def dose_problems(answer: str, titles: list[str]) -> list[str]:
                                     f"per {per} (double the usual {want}), not {n}")
                 elif not doubled and want != n:
                     problems.append(f"for {strength} bleach the reference says {want} drops per {per}, not {n}")
+    problems += _dose_phrases(answer, rows_for=[(_dose_table().get(t) or reference.doses(t)) for t in titles])
     return list(dict.fromkeys(problems))
+
+
+_PER = re.compile(r"(?i)\b(\d+)\s+drops?\b[^.!?\n]{0,40}?\b(?:per|a|each|of|for every|in (?:a|1|one|each))\s+"
+                  r"(?:1\s+)?(liters?|litres?|quarts?|gallons?)\b")
+
+
+def _dose_phrases(answer: str, rows_for: list) -> list[str]:
+    """Every "N drops per liter/gallon" in the answer, with the strength named in its sentence or
+    the one before, or the only strength in the answer (U67 ref-002: "16 drops per liter", the
+    strength one sentence earlier, the reason in brackets)."""
+    text = answer or ""
+    every = list(dict.fromkeys(s + "%" for s in _STRENGTH.findall(text)))
+    sentences = [(m.start(), m.end(), m.group(0)) for m in _SENTENCE.finditer(text)]
+    out = []
+    for rows in rows_for:
+        if not isinstance(rows, list):
+            continue
+        for m in _PER.finditer(text):
+            k = next((i for i, (a, b, _) in enumerate(sentences) if a <= m.start() < b), None)
+            near = sentences[k][2] if k is not None else ""
+            before = sentences[k - 1][2] if k else ""
+            strengths = ([s + "%" for s in _STRENGTH.findall(near)] or [s + "%" for s in _STRENGTH.findall(before)]
+                         or (every if len(every) == 1 else []))
+            if len(strengths) != 1:
+                continue
+            n, per = int(m.group(1)), m.group(2).lower().rstrip("s").replace("litre", "liter")
+            want = next((r["amount"] for r in rows if r["of"] == strengths[0] and r["per"] == per), None)
+            if want is None:
+                continue
+            if _DOUBLE.search(near) or _DOUBLE.search(before):
+                if n not in (want, 2 * want):
+                    out.append(f"for cloudy water and {strengths[0]} bleach the reference says {2 * want} drops "
+                               f"per {per} (double the usual {want}), not {n}")
+            elif n != want:
+                out.append(f"for {strengths[0]} bleach the reference says {want} drops per {per}, not {n}")
+    return out
