@@ -48,20 +48,17 @@ VISION_MODEL = ("gemma3 4B — reads and describes images offline (3.3 GB)", "ge
 VISION_FAMILIES = ("gemma3", "qwen2.5vl", "llama3.2-vision", "minicpm-v", "llava", "moondream")
 
 # (label, model tag, approximate download size)
+# qwen3 4B is the model that did best on Cursiv's own tests (bench/MODEL-COMPARISON.md);
+# qwen2.5 1.5B is only for computers too slow for it, and hasn't been benchmarked yet.
 MODELS = [
-    ("llama3.1 — best answers, for 8 GB+ graphics cards (4.9 GB)", "llama3.1", "4.9 GB"),
-    ("qwen3 4B — good answers on 4–6 GB graphics cards (2.5 GB)", "qwen3:4b-instruct", "2.5 GB"),
-    ("qwen2.5 1.5B — smallest and fastest (1 GB)", "qwen2.5:1.5b", "1 GB"),
+    ("qwen3 4B — recommended (2.5 GB)", "qwen3:4b-instruct", "2.5 GB"),
+    ("qwen2.5 1.5B — only for very slow computers; not yet tested by Cursiv (1 GB)", "qwen2.5:1.5b", "1 GB"),
 ]
 
 
 def recommended_index(options: list, small: bool) -> int:
-    """Which entry to preselect for this PC's graphics card."""
-    want = ":4b-instruct" if small else None
-    for i, opt in enumerate(options):
-        if want and opt[1].endswith(want):
-            return i
-    return 0 if not small else min(1, len(options) - 1)
+    """Which entry to preselect: qwen3 4B on every card (the model comparison)."""
+    return next((i for i, opt in enumerate(options) if opt[1] == "qwen3:4b-instruct"), 0)
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 

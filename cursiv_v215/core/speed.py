@@ -96,12 +96,14 @@ def chat_model_prefs() -> tuple[str, ...]:
 
     qwen3:4b-instruct is Qwen3's non-thinking model. Plain qwen3:4b / qwen3:8b think
     out loud first: live on a 4 GB card a short answer took 4 minutes and showed the
-    reasoning, and neither "think": false nor /no_think turned it off."""
-    if small_gpu():
-        return ("qwen3:4b-instruct", "llama3.2:3b", "qwen2.5:1.5b", "gemma3:4b", "llama3.1",
-                "qwen3:4b", "qwen2.5:3b")
-    return ("llama3.1", "qwen3:4b-instruct", "llama3.2:3b", "gemma3:4b", "qwen2.5:1.5b",
-            "qwen3:8b", "qwen3:4b", "qwen2.5:3b")
+    reasoning, and neither "think": false nor /no_think turned it off.
+
+    The same order on every card: on the model comparison (bench/MODEL-COMPARISON.md,
+    2026-10-18) qwen3:4b-instruct passed 40 of 40, llama3.1 and gemma3:4b 35. Accuracy
+    doesn't depend on the card, so a bigger card doesn't change the pick. The others are
+    used only if nothing above them is installed."""
+    return ("qwen3:4b-instruct", "qwen2.5:1.5b", "llama3.2:3b", "gemma3:4b", "llama3.1",
+            "qwen3:4b", "qwen3:8b", "qwen2.5:3b")
 
 
 def no_thinking(model: str) -> dict:

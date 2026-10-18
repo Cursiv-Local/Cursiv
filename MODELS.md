@@ -18,7 +18,8 @@ selling anything that includes a model.
 | `qwen2.5:3b`, `qwen2.5-coder:3b` | No longer offered | **Qwen Research License: research or evaluation only** | **Not allowed for commercial use.** Cursiv uses it only if nothing else is installed. |
 
 Up to v3.14-U60, Cursiv's default model for 4–6 GB graphics cards was
-`qwen2.5:3b`. From U61 it's `qwen3:4b-instruct` (llama3.1 on 8 GB+ cards), and
+`qwen2.5:3b`. From U61 it's `qwen3:4b-instruct`, on every card from U64 (it beat llama3.1 and gemma3:4b in
+[MODEL-COMPARISON.md](bench/MODEL-COMPARISON.md)), and
 Cursiv USB drives include `qwen3:4b-instruct` (or `qwen2.5:1.5b`) instead. If you
 have `qwen2.5:3b`, download qwen3 4B in Setup and remove the old one with
 `ollama rm qwen2.5:3b`.

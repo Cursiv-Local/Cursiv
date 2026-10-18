@@ -114,7 +114,7 @@ XAI_MODEL      = "grok-3-latest"
 XAI_MODEL_VIS  = "grok-2-vision-1212"   # vision-capable model for images
 OLLAMA_URL         = "http://127.0.0.1:11434/api/generate"
 OLLAMA_TAGS_URL    = "http://127.0.0.1:11434/api/tags"
-OLLAMA_MODEL       = "llama3.1"
+OLLAMA_MODEL       = "qwen3:4b-instruct"
 # Answers are limited by time, not length (see _time_boxed): the token cap is
 # only a generous safety net so a thought is never cut off mid-sentence.
 RESPONSE_MAX_TOKENS  = int(os.environ.get("CURSIV_MAX_TOKENS", "4096"))
