@@ -375,6 +375,18 @@ class ChatPanel(QWidget):
         self._net_pill = QPushButton("")
         self._net_pill.setCursor(Qt.CursorShape.PointingHandCursor)
         self._net_pill.clicked.connect(self._open_settings_from_pill)
+        # While the field demo is on: the notebook and documents hold sample data (core/demo.py).
+        self._demo_pill = QPushButton("SAMPLE DATA · demo on")
+        self._demo_pill.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._demo_pill.setToolTip("The field notebook and documents hold the demo's sample data.\n"
+                                   "Your real records are set aside. Click to see what to try; "
+                                   "type 'demo off' to end it.")
+        self._demo_pill.setStyleSheet(
+            f"QPushButton {{ background: transparent; color: {theme.AMBER}; border: 1px dashed {theme.AMBER};"
+            f" border-radius: 13px; padding: 4px 12px; font-size: 12px; font-weight: 700; }}")
+        self._demo_pill.clicked.connect(lambda: self._quick_send("demo questions"))
+        self._demo_pill.setVisible(False)
+        header_row.addWidget(self._demo_pill)
         header_row.addWidget(self._net_pill)
         # More: things that used to sit in the header (still reachable).
         more = QPushButton("⋯")
@@ -386,6 +398,8 @@ class ChatPanel(QWidget):
         menu.addAction("Training data…", lambda: self._open_training_data())
         menu.addAction("Settings…", self._open_settings_from_pill)
         menu.addAction("Help (commands)", lambda: self._quick_send("help"))
+        menu.addAction("Field demo (sample data)", lambda: self._quick_send("demo"))
+        menu.addAction("End the field demo", lambda: self._quick_send("demo off"))
         more.setMenu(menu)
         more.setStyleSheet(more.styleSheet() + "QPushButton::menu-indicator { image: none; width: 0; }")
         header_row.addWidget(more)
@@ -474,6 +488,11 @@ class ChatPanel(QWidget):
             f" padding: 4px 12px; font-size: 12px; font-weight: 600; }}"
             f"QPushButton:hover {{ border-color: {fg}; }}")
         self._net_status = st
+        try:
+            from cursiv_v215.core import demo as _demo
+            self._demo_pill.setVisible(_demo.active())
+        except Exception:
+            self._demo_pill.setVisible(False)
 
     def _open_settings_from_pill(self) -> None:
         win = self.window()

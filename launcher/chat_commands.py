@@ -746,16 +746,38 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
 
     # ── Simple state toggles ────────────────────────────────────────────
     if cmd == "status":
+        # What a reviewer asks first: is it local only, and which model answers (MRS feedback, 2026-10-18).
+        try:
+            from cursiv_v215.chat import status as _status
+            mode = _status.network_status()["label"]
+        except Exception:
+            mode = "unknown"
+        try:
+            from cursiv_v215.ui.chat_app import _resolve_ollama_model
+            model = _resolve_ollama_model()
+        except Exception:
+            model = None
         lines = [
-            f"xAI key:       {'set' if cfg.get('api_key') else 'not set'}",
-            f"OpenAI key:    {'set' if cfg.get('openai_key') else 'not set'}",
-            f"Anthropic key: {'set' if cfg.get('anthropic_key') else 'not set'}",
-            f"File access:   {'ON' if cfg.get('file_access') else 'OFF'}",
+            f"Mode:          {mode}",
+            f"AI model:      {(model + ', on this computer (Ollama)') if model else 'no local model running'}",
             f"Offline mode:  {'ON' if _gate().is_offline() else 'OFF'}",
             f"Web search:    {'automatic' if _gate().setting('web_search_auto') else 'only search:'}",
             f"Update check:  {'automatic' if _gate().setting('update_check_auto') else 'manual'}",
-            f"Workspace:     {cfg.get('workspace', '')}",
+            f"Cloud AI keys: {', '.join(n for n, k in (('xAI', 'api_key'), ('OpenAI', 'openai_key'), ('Anthropic', 'anthropic_key')) if cfg.get(k)) or 'none set'}",
+            f"File access:   {'ON' if cfg.get('file_access') else 'OFF'}",
         ]
+        try:
+            from cursiv_v215.core import demo as _demo, documents as _documents, fieldlog as _fieldlog
+            n, bad = len(_fieldlog.entries()), _fieldlog.verify()
+            lines.append(f"Field notebook: {n} entr{'y' if n == 1 else 'ies'}, "
+                         + ("intact" if not bad else f"{len(bad)} problem(s): type field log check"))
+            lines.append(f"Documents:     {len(_documents.library())} imported")
+            if _demo.active():
+                lines.insert(0, "FIELD DEMO ON: the notebook and documents hold sample data (demo off to end it)")
+        except Exception:
+            pass
+        if cfg.get("file_access"):
+            lines.append(f"Workspace:     {cfg.get('workspace', '')}")
         return TextResult("\n".join(lines))
 
     if cmd in _RETIRED:
@@ -827,6 +849,14 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         _mem_reply = None
     if _mem_reply is not None:
         return TextResult(_mem_reply)
+    # The field demo: demo, demo off, demo questions (core/demo.py)
+    try:
+        from cursiv_v215.core import demo as _demo
+        _demo_reply = _demo.command(text)
+    except Exception as _exc:
+        _demo_reply = f"The demo couldn't load: {_exc}" if cmd.strip() in ("demo", "load demo", "demo on") else None
+    if _demo_reply is not None:
+        return TextResult(_demo_reply)
     # Field notebook: log ..., field log, field log check, field log export (core/fieldlog.py)
     try:
         from cursiv_v215.core import fieldlog as _fieldlog

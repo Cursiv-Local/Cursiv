@@ -1370,6 +1370,7 @@ _WEB_SEARCHED = False                  # a web search ran for this turn
 _WORKED = None                         # core/calc.Worked: arithmetic Cursiv computed for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
 _MEMORY_RECALLED = False               # saved memories were put in front of the model this turn
+_DOCS_SEARCHED_EMPTY: list = []        # document names searched this turn with nothing matching
 
 
 def sources_line() -> str:
@@ -1384,6 +1385,8 @@ def sources_line() -> str:
     if _DOCS_SHOWN:
         pages = dict.fromkeys(f"{p.name} p. {p.page}" for p in _DOCS_SHOWN)
         parts.append("Your documents (" + ", ".join(pages) + ")")
+    elif _DOCS_SEARCHED_EMPTY:
+        parts.append("your documents searched, nothing on this; the rest is model knowledge (not checked)")
     if _WORKED:
         parts.append("worked out by Cursiv's code")
     if _WEB_SEARCHED:
@@ -2717,6 +2720,11 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                     _CURSIV_REPLY = True
                     yield _docs.NOT_IN_DOCS
                     return
+                elif _docs.ASKS_ABOUT_DOCS.search(user_text):
+                    _names = [d["name"] for d in _docs.library()]
+                    _DOCS_SEARCHED_EMPTY[:] = _names
+                    messages[0]["content"] += "\n\n" + _docs.nothing_found_block(_names) + "\n"
+                    yield _docs.nothing_found_note(_names) + "\n\n"
     except Exception:
         pass
 
@@ -3201,7 +3209,8 @@ def chat(
                 ask=lambda msgs: _router_llm(msgs, max_tokens=500),
                 memory_update=_verify.looks_like_memory_update(user_text),
                 context=_check_context(history, user_text),
-                sources="\n\n".join(_RETRIEVED),
+                sources="\n\n".join(_RETRIEVED + ([f"Worked out by Cursiv's code (exact): {_WORKED.statement}"]
+                                                    if _WORKED else [])),
             )
             origin, skip = outcome.learn_origin, outcome.skip_learn
             revised = outcome.append.split("**Revised after check:**\n", 1)
@@ -3291,6 +3300,7 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
     _RETRIEVED.clear()
     _REF_SHOWN.clear()
     _DOCS_SHOWN.clear()
+    _DOCS_SEARCHED_EMPTY.clear()
     _WEB_SEARCHED = False
     _set_answered("")
     for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):

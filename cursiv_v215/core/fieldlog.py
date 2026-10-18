@@ -32,6 +32,9 @@ _lock = threading.Lock()
 
 
 def log_dir() -> Path:
+    from cursiv_v215.core import demo
+    if demo.active():                     # the field demo's sample data, apart from real records
+        return demo.root() / "fieldlog"
     return Path.home() / ".cursiv" / "fieldlog"
 
 

@@ -26,7 +26,29 @@ TEXT_TYPES = (".txt", ".md", ".csv")
 TYPES = (".pdf",) + TEXT_TYPES
 
 
+# "What does our protocol say about phosphorus?" with nothing about phosphorus in it: the
+# model said "I don't have access to any protocol" (field demo, 2026-10-18). Cursiv
+# searched them, so it says that instead.
+ASKS_ABOUT_DOCS = re.compile(
+    r"(?i)\b(?:our|the|my|this|that|your)\s+(?:\w+\s+)?(?:protocols?|sops?|procedures?|manuals?|documents?|"
+    r"field guides?|permits?|handbooks?|SOP)\b|\baccording to (?:our|the|my) ")
+
+
+def nothing_found_note(names: list[str]) -> str:
+    return "*(Searched your documents (" + ", ".join(names) + "): nothing in them covers this.)*"
+
+
+def nothing_found_block(names: list[str]) -> str:
+    return ("## The person's documents were searched\nCursiv searched the person's imported documents ("
+            + ", ".join(names) + ") for this question and found nothing that covers it. Say plainly that their "
+            "documents don't cover it, naming them. Don't say you have no access to their documents or protocol. "
+            "If you add general knowledge, say it isn't from their documents.")
+
+
 def lib_dir() -> Path:
+    from cursiv_v215.core import demo
+    if demo.active():                     # the field demo's sample protocol, apart from real documents
+        return demo.root() / "documents"
     return Path.home() / ".cursiv" / "documents"
 
 
