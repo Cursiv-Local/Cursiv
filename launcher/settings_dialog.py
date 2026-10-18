@@ -317,10 +317,12 @@ class SettingsDialog(QDialog):
         note = self._explain("")
 
         def chosen(i):
-            mode = self._mode.itemData(i)
-            theme.set_mode(mode)
-            now = mode or ("light" if theme.windows_prefers_light() else "dark")
-            note.setText("" if now == theme.MODE else "Close and reopen Cursiv to see the change.")
+            try:
+                theme.switch_live(self._mode.itemData(i))   # recolours every open window now
+                note.setText("")
+            except Exception:
+                theme.set_mode(self._mode.itemData(i))
+                note.setText("Close and reopen Cursiv to see the change.")
         self._mode.activated.connect(chosen)
         v.addWidget(self._mode)
         v.addWidget(self._explain("Match Windows follows your Windows light or dark setting. "

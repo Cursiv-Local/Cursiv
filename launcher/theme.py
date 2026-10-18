@@ -30,7 +30,7 @@ DARK = dict(
 LIGHT = dict(
     BG="#f7f5f0", SURFACE="#ffffff", SURFACE2="#efebe3", BORDER="#e2ddd2", BORDER2="#cfc8ba",
     TEXT="#26231e", MUTED="#6b655a", FAINT="#8f887b",
-    ACCENT="#9a7417", ACCENT_HOVER="#ad8420", ACCENT_DOWN="#7f5f12", ACCENT_TEXT="#ffffff",
+    ACCENT="#9a7417", ACCENT_HOVER="#ad8420", ACCENT_DOWN="#7f5f12", ACCENT_TEXT="#fffdf7",
     ACCENT_SOFT="rgba(154,116,23,0.10)", LINK="#4a4438", GREEN="#2f8a57", AMBER="#9a6a12", RED="#c0392b",
     LGOLD="#c9b37a",
 )
@@ -42,7 +42,7 @@ _LIGHT_REMAP = {
     "#262b38": "#e2ddd2", "#2a2a3f": "#e2ddd2", "#0a0a1a": "#e2ddd2", "#343a4a": "#cfc8ba", "#444466": "#cfc8ba",
     "#e6e2d8": "#26231e", "#f0e9d8": "#26231e", "#c8c8d4": "#26231e", "#d8d2c4": "#4a4438",
     "#9a9586": "#6b655a", "#6c6a62": "#8f887b", "#666680": "#8f887b",
-    "#d4b04c": "#9a7417", "#e2c062": "#ad8420", "#b8963a": "#7f5f12", "#17120a": "#ffffff", "#7a6630": "#c9b37a",
+    "#d4b04c": "#9a7417", "#e2c062": "#ad8420", "#b8963a": "#7f5f12", "#17120a": "#fffdf7", "#7a6630": "#c9b37a",
     "#ffd700": "#9a7417", "#9b7b20": "#c9b37a",
     "#6fd39b": "#2f8a57", "#44cc66": "#2f8a57", "#3ecf6e": "#2f8a57", "#44cc88": "#2f8a57",
     "#e8b45a": "#9a6a12", "#e8a020": "#9a6a12",
@@ -97,25 +97,102 @@ BG2, GOLD, LGOLD, SILVER, SILV2 = SURFACE, ACCENT, _P["LGOLD"], TEXT, FAINT
 
 def light_qss(qss: str) -> str:
     """A style written with dark colours, translated to the light palette."""
-    return _HEX.sub(lambda m: _LIGHT_REMAP.get(m.group(0).lower(), m.group(0)), qss)
+    return translate(qss, "dark", "light")
+
+
+# ── Switching while Cursiv is open ───────────────────────────────────────────
+# Module constants (BG, ACCENT, …) keep the palette Cursiv started with (START).
+# Every style a window sets, and rich text in labels, passes through live(), which
+# translates START colours to the CURRENT mode. switch_live() re-translates what's
+# already on screen, so a change in Settings shows at once.
+
+START = MODE
+CURRENT = MODE
+
+_D2L = {DARK[k].lower(): LIGHT[k] for k in DARK if str(DARK[k]).startswith("#")}
+_D2L.update(_LIGHT_REMAP)
+_L2D = {LIGHT[k].lower(): DARK[k] for k in LIGHT if str(LIGHT[k]).startswith("#")}
+for _d, _l in _LIGHT_REMAP.items():
+    _L2D.setdefault(_l.lower(), _d)
+_RGBA = {("dark", "light"): {DARK["ACCENT_SOFT"]: LIGHT["ACCENT_SOFT"], "rgba(111,211,155,0.10)": "rgba(47,138,87,0.10)",
+                             "rgba(232,180,90,0.10)": "rgba(154,106,18,0.10)"}}
+_RGBA[("light", "dark")] = {v: k for k, v in _RGBA[("dark", "light")].items()}
+
+
+def translate(text: str, src: str, dst: str) -> str:
+    """Colours written for the src palette, rewritten for dst."""
+    if not text or src == dst:
+        return text
+    table = _D2L if (src, dst) == ("dark", "light") else _L2D
+    out = _HEX.sub(lambda m: table.get(m.group(0).lower(), m.group(0)), text)
+    for a, b in _RGBA[(src, dst)].items():
+        out = out.replace(a, b)
+    return out
+
+
+def to_current(html: str) -> str:
+    """HTML saved in either mode (an older conversation), in the current mode."""
+    return translate(html, "dark" if CURRENT == "light" else "light", CURRENT)
+
+
+def live(text: str) -> str:
+    """A style or HTML written with the palette Cursiv started with, in the current mode."""
+    return translate(text, START, CURRENT)
 
 
 _installed = False
+_ORIG = {}
 
 
 def install() -> None:
-    """Call once at start-up. In light mode, every widget's setStyleSheet goes
-    through light_qss(), so older windows that write colours directly follow too."""
+    """Call once at start-up: every setStyleSheet, and rich text set on a label,
+    goes through live(), so all windows follow the current mode."""
     global _installed
-    if _installed or MODE != "light":
+    if _installed:
         return
-    from PyQt6.QtWidgets import QWidget
-    original = QWidget.setStyleSheet
+    from PyQt6.QtWidgets import QLabel, QWidget
+    _ORIG["style"] = QWidget.setStyleSheet
+    _ORIG["text"] = QLabel.setText
 
-    def themed(self, qss):
-        return original(self, light_qss(qss or ""))
-    QWidget.setStyleSheet = themed
+    def themed_style(self, qss):
+        return _ORIG["style"](self, live(qss or ""))
+
+    def themed_text(self, text):
+        return _ORIG["text"](self, live(text) if text and "#" in text and "<" in text else text)
+    QWidget.setStyleSheet = themed_style
+    QLabel.setText = themed_text
     _installed = True
+
+
+def switch_live(mode_setting: str) -> str:
+    """Save the choice ("light", "dark" or "" for Windows) and recolour everything open.
+    Returns the mode now showing."""
+    global CURRENT
+    set_mode(mode_setting)
+    new = mode_setting or ("light" if windows_prefers_light() else "dark")
+    old = CURRENT
+    if new == old:
+        return new
+    CURRENT = new
+    from PyQt6.QtWidgets import QApplication, QLabel, QTextBrowser
+    app = QApplication.instance()
+    if app is None:
+        return new
+    set_style = _ORIG.get("style")
+    set_text = _ORIG.get("text")
+    app.setStyleSheet(live(APP_QSS))
+    for w in app.allWidgets():
+        ss = w.styleSheet()
+        if ss:
+            (set_style or type(w).setStyleSheet)(w, translate(ss, old, new))
+        if isinstance(w, QLabel) and set_text and "#" in w.text() and "<" in w.text():
+            set_text(w, translate(w.text(), old, new))
+        if isinstance(w, QTextBrowser):
+            bar = w.verticalScrollBar()
+            pos = bar.value()
+            w.setHtml(translate(w.toHtml(), old, new))
+            bar.setValue(pos)
+    return new
 
 
 # Application-wide base style (set once on QApplication in main.py).

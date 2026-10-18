@@ -299,12 +299,12 @@ class ChatPanel(QWidget):
                 f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(e)}" '
                 f'style="color:{theme.TEXT}; text-decoration:none;">→&nbsp;&nbsp;{self._escape(e)}</a></p>'
                 for e in self.EXAMPLES)
-        self._transcript.setHtml(
+        self._transcript.setHtml(theme.live(
             f'<div style="margin-top:40px;">'
             f'<p style="font-size:22px; font-weight:600; color:{theme.TEXT};">What can I help with?</p>'
             f'<p style="color:{theme.MUTED}; margin:6px 0 18px 0;">Cursiv answers with an AI model on this computer. '
             f'It can be wrong, so check anything that matters. Type <b>help</b> to see everything it can do.</p>'
-            f'{body}</div>')
+            f'{body}</div>'))
         self._empty_shown = True
 
     def _clear_empty_state(self) -> None:
@@ -330,7 +330,7 @@ class ChatPanel(QWidget):
         data = conversations.load(conv_id)
         if not data:
             return False
-        self._transcript.setHtml(data.get("html", ""))
+        self._transcript.setHtml(theme.to_current(data.get("html", "")))
         self._empty_shown = False
         self._history = list(data.get("messages", []))
         self._conv_id = conv_id
@@ -572,14 +572,14 @@ class ChatPanel(QWidget):
         cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         cursor.removeSelectedText()
         for inner in top:
-            cursor.insertHtml(self._chip_html(inner))
+            cursor.insertHtml(theme.live(self._chip_html(inner)))
         if md:
             if top:
                 cursor.insertBlock()
             cursor.insertMarkdown(md)
         for inner in bottom:
             cursor.insertBlock()
-            cursor.insertHtml(self._chip_html(inner))
+            cursor.insertHtml(theme.live(self._chip_html(inner)))
 
     # ── Transcript rendering ─────────────────────────────────────────────
 
@@ -609,7 +609,7 @@ class ChatPanel(QWidget):
 
     def _append_html_block(self, html: str) -> None:
         self._transcript.moveCursor(QTextCursor.MoveOperation.End)
-        self._transcript.insertHtml(html)
+        self._transcript.insertHtml(theme.live(html))
         self._transcript.moveCursor(QTextCursor.MoveOperation.End)
 
     def _append_system(self, text: str) -> None:

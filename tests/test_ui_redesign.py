@@ -205,7 +205,7 @@ def test_theme_modes_and_light_translation(settings):
     assert theme.saved_mode() == ""
     qss = "QPushButton { background: #d4b04c; color: #17120a; border: 1px solid #262b38; }"
     out = theme.light_qss(qss)
-    assert "#9a7417" in out and "#ffffff" in out and "#e2ddd2" in out
+    assert "#9a7417" in out and "#fffdf7" in out and "#e2ddd2" in out
 
 
 def test_every_hard_coded_colour_has_a_light_version():
@@ -224,3 +224,24 @@ def test_every_hard_coded_colour_has_a_light_version():
             if h not in theme._LIGHT_REMAP and h not in tokens and h not in ("#fff", "#ffffff", "#000", "#000000"):
                 missing.add(f"{f.name}:{h}")
     assert not missing, sorted(missing)
+
+
+def test_switching_mode_recolours_open_windows(app, settings):
+    import theme
+    from PyQt6.QtWidgets import QLabel, QPushButton
+    theme.install()
+    start = theme.CURRENT
+    other = "light" if start == "dark" else "dark"
+    btn = QPushButton("x"); btn.setStyleSheet(theme.primary_button())
+    lbl = QLabel(); lbl.setText(f'<span style="color:{theme.TEXT}">hi</span>')
+    before = btn.styleSheet()
+    try:
+        assert theme.switch_live(other) == other
+        assert btn.styleSheet() != before
+        assert (theme.LIGHT if other == "light" else theme.DARK)["ACCENT"] in btn.styleSheet()
+        assert (theme.LIGHT if other == "light" else theme.DARK)["TEXT"] in lbl.text()
+        theme.switch_live(start)
+        assert btn.styleSheet() == before
+    finally:
+        theme.switch_live("")
+        theme.CURRENT = start
