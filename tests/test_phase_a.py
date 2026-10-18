@@ -137,3 +137,29 @@ def test_pasted_text_keeps_its_shape():
     import chat_panel
     shown = chat_panel.ChatPanel._keep_shape("Part 1:\n  1. Tank <100 L>\n\n\tB) eggs")
     assert shown == "Part 1:<br>&nbsp; 1. Tank &lt;100 L&gt;<br><br>&nbsp; &nbsp; B) eggs"
+
+
+def test_thousands_separators_in_shown_arithmetic():
+    from cursiv_v215.core import verify
+    assert verify.arithmetic_problems("2,450 × 0.17 = 416.5") == []      # was read as 450 x 0.17 (Phase 1 replay)
+    assert verify.arithmetic_problems("2,450 × 0.17 = 41.65")
+
+
+def test_check_notes_stay_out_of_the_conversation():
+    from cursiv_v215.ui import chat_app as ca
+    reply = "416.5\n\n*[Answered by Ollama]*\n\n---\n**Checked, with notes** (x):\n- wrong note"
+    assert ca._strip_status_lines(reply) == "416.5"
+
+
+def test_no_warm_drinks_if_unconscious_agrees_with_the_card():
+    assert answer_check.contradictions("Do not give him warm drinks if he is unconscious.",
+                                       ["hypothermia treatment"]) == []
+
+
+def test_break_note_can_be_turned_off(fresh):
+    from cursiv_v215.chat import keys
+    from cursiv_v215.core import phases
+    keys.store_key("break_notes", "off")
+    assert phases._break_notes_on() is False
+    keys.store_key("break_notes", "")
+    assert phases._break_notes_on() is True

@@ -316,6 +316,12 @@ class SettingsDialog(QDialog):
                      "Cursiv picks out lasting facts about you (marked \"inferred\") so it can help better. "
                      "Off means it only remembers what you tell it with \"remember …\".",
                      semantic.learning_enabled(), semantic.set_learning)
+        from cursiv_v215.chat import keys as _keys
+        self._switch(lay, "Suggest a break late at night or after long sessions",
+                     "A one-line reminder to take a break, once per session. Turn it off for work or "
+                     "field use.",
+                     _keys.saved_key("break_notes") != "off",
+                     lambda on: _keys.store_key("break_notes", "" if on else "off"))
         v = self._card(lay)
         t = QLabel("Answer checking"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
         v.addWidget(self._explain("Always on. After an answer with numbers, advice or technical claims, Cursiv checks "

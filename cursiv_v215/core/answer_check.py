@@ -19,7 +19,7 @@ import re
 KEY_STEPS = {
     "severe bleeding control": ("tourniquet", "pressure", "press", "bandage", "gauze", "cloth", "pack", "911"),
     "tourniquet application": ("tourniquet",),
-    "hypothermia treatment": ("911", "warm", "blanket", "skin-to-skin", "cpr", "wet clothing"),
+    "hypothermia treatment": ("911", "skin-to-skin", "cpr", "wet clothing"),
     "water purification": ("boil", "bleach"),
     "CPR adult": ("cpr", "compressions", "911", "aed"),
     "choking adult Heimlich": ("abdominal thrusts", "back blows", "heimlich", "911"),

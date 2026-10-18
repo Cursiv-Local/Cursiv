@@ -197,8 +197,8 @@ def _input_bindings(draft: str) -> dict[str, set[str]]:
 _OPS = {"x": "*", "×": "*", "*": "*", "times": "*", "multiplied by": "*", "+": "+", "plus": "+",
         "-": "-", "minus": "-", "/": "/", "÷": "/", "divided by": "/"}
 _OP = r"(?:multiplied by|divided by|times|plus|minus|[x×*+\-/÷])"
-_N = r"\d+(?:\.\d+)?"
-_EXPR = re.compile(r"(?i)(?<![\w.])(" + _N + r"(?:\s*" + _OP + r"\s*" + _N + r")+)\s*(?:=|is|equals|makes|gives)\s*\$?(" + _N + r")(?![\d.])")
+_N = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"      # "2,450" is one number
+_EXPR = re.compile(r"(?i)(?<![\w.,])(" + _N + r"(?:\s*" + _OP + r"\s*" + _N + r")+)\s*(?:=|is|equals|makes|gives)\s*\$?(" + _N + r")(?![\d.])")
 
 
 def arithmetic_problems(draft: str) -> list[str]:
@@ -207,12 +207,12 @@ def arithmetic_problems(draft: str) -> list[str]:
     for m in _EXPR.finditer(draft or ""):
         expr = m.group(1)
         tokens = re.findall(_N + "|" + _OP, expr, re.I)
-        py = "".join(_OPS.get(t.lower(), t) if not re.fullmatch(_N, t) else t for t in tokens)
+        py = "".join(_OPS.get(t.lower(), t) if not re.fullmatch(_N, t) else t.replace(",", "") for t in tokens)
         try:
             value = eval(py, {"__builtins__": {}}, {})       # digits and + - * / only
         except Exception:
             continue
-        stated = float(m.group(2))
+        stated = float(m.group(2).replace(",", ""))
         if abs(value - stated) > max(0.01, abs(value) * 0.005):
             shown = int(value) if float(value).is_integer() else round(value, 2)
             problems.append(f"arithmetic: {expr.strip()} is {shown}, not {m.group(2)}")

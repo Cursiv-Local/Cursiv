@@ -240,12 +240,21 @@ def _future(text: str, r: PhaseResult) -> None:
 
 
 # ── 8. Recovery ─────────────────────────────────────────────────────────────
+def _break_notes_on() -> bool:
+    """Settings -> How Cursiv answers -> "Suggest a break late at night or after long sessions"."""
+    try:
+        from cursiv_v215.chat import keys
+        return keys.saved_key("break_notes") != "off"
+    except Exception:
+        return True
+
+
 def _recovery(now: time.struct_time, r: PhaseResult) -> None:
     _session["messages"] += 1
     minutes = (time.time() - _session["start"]) / 60
     late = 0 <= now.tm_hour < 5
     due = (_session["messages"] >= 30 or minutes >= 120 or (late and _session["messages"] >= 8))
-    if due and not _session["break_suggested"] and not r.emergency:
+    if due and not _session["break_suggested"] and not r.emergency and _break_notes_on():
         _session["break_suggested"] = True
         why = "it's late" if late else f"we've been at it for {int(minutes)} minutes" if minutes >= 120 else f"that's {_session['messages']} messages"
         r.after_reply += f"\n\n*({why} — a short break, some water or a stretch might help. I'll be right here.)*"

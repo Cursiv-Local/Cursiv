@@ -1368,8 +1368,12 @@ _WORKED = None                         # core/calc.Worked: arithmetic Cursiv com
 _ANSWERED_BY = ""                      # engine that answered the current turn
 
 
+_NOTES_BLOCK_RE = _re.compile(r"\n*-{3,}\n\*\*(Checked, with notes|Draft \+ notes)\*\*[\s\S]*$")
+
+
 def _strip_status_lines(text: str) -> str:
-    return _STATUS_LINE_RE.sub("", text or "").strip()
+    """The model's words only: no status lines, no check notes."""
+    return _NOTES_BLOCK_RE.sub("", _STATUS_LINE_RE.sub("", text or "")).strip()
 
 
 def _set_answered(label: str) -> None:
