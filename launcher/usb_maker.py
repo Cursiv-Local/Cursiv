@@ -42,30 +42,59 @@ REQUIRED_EMBED = "nomic-embed-text:latest"
 GB = 1024 ** 3
 
 START_BAT = '@echo off\r\nstart "" "%~dp0Cursiv\\Cursiv.exe"\r\n'
-README = """Cursiv on a USB
-================
+README = """CURSIV ON A USB DRIVE: START HERE
+===================================
 
-To start: double-click "Start Cursiv".
+TO START
+  Double-click "Start Cursiv" (Start Cursiv.bat). That's all.
+  Nothing is installed on the computer. Cursiv, its AI engine (Ollama) and the AI
+  model all run from this drive, and everything Cursiv saves stays on this drive.
+  Works on Windows 10 and 11 (64-bit).
 
-Nothing gets installed on the computer. Cursiv, its AI engine (Ollama) and
-the AI models all run from this drive, and everything Cursiv saves stays on
-this drive (in the Home folder).
+THE FIRST TIME
+  1. Windows may ask whether to run it ("Windows protected your PC"): click
+     More info, then Run anyway. Cursiv isn't code-signed yet.
+  2. Create an account: a username, a password and security questions. They stay
+     on this drive. Only someone signed in can add another account later.
+  3. Cursiv opens. The badge at the top right says LOCAL ONLY when the internet is
+     blocked (a "Field copy" drive starts that way; otherwise type: offline on).
+     Just type a question.
+  The first answer takes longer while the model loads from the drive.
 
-Works on Windows 10 and 11 (64-bit). Answers are slower than from an internal
-drive while a model first loads.
+WHAT TO TRY
+  help                     what Cursiv can do
+  demo                     the field notebook, documents and calculations with
+                           sample data, kept apart from your own (demo off to end)
+  Field Notebook           (sidebar) record observations; nothing is ever overwritten
+  status                   what's on and off, and which AI model is answering
 
-If Cursiv is already installed and open on the computer, close it first --
-only one Cursiv runs at a time.
+WHAT'S ON THIS DRIVE
+  Start Cursiv.bat         starts Cursiv
+  Cursiv\\                  the program
+  Home\\                    everything Cursiv saves: accounts, memories, field
+                           notebook, documents, settings (Home\\.cursiv)
+  Models\\                  the AI models
+  Ollama\\                  the AI engine
+  Licenses\\                licences for Cursiv, Ollama and each model; keep them
+                           with the drive if you give or sell a copy
 
-If the computer already runs its own Ollama, Cursiv uses that one and its
-models instead of the ones on this drive. Quit Ollama from the tray on that
-computer to use this drive's models.
+START OVER (REMOVE THE ACCOUNTS)
+  Close Cursiv, then delete the folder Home\\.cursiv\\runtime. The next start asks
+  you to create an account. Your notebook, memories and documents stay.
+  To remove everything, delete Home\\.cursiv entirely.
 
-To update this USB: update Cursiv on your computer, then use
-"Make a Cursiv USB..." again on the same drive. Only changed files are copied.
+IF SOMETHING ISN'T RIGHT
+  - Cursiv is already open on this computer: close it first (one at a time).
+  - The computer runs its own Ollama: Cursiv uses that one and its models. Quit
+    Ollama from the tray on that computer to use this drive's models.
+  - Slow: normal on computers without a graphics card (about 15 s an answer).
+  - Settings > Help & diagnostics has a problem report.
 
-Licenses: the Licenses folder holds the license for Cursiv, for Ollama and for
-each AI model on this drive. Keep it with the drive when you give or sell a copy.
+UPDATING THIS DRIVE
+  Update Cursiv on your computer, then use "Make a Cursiv USB..." again on the same
+  drive. Only changed files are copied.
+
+More: https://cursiv.winklers-llc.com  ·  Source: https://github.com/winklersllc2026-bit/Cursiv
 """
 
 
@@ -505,13 +534,7 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         (root / "Home").mkdir(exist_ok=True)
         (root / "Start Cursiv.bat").write_bytes(START_BAT.encode("ascii"))
         (root / "README.txt").write_text(README, encoding="utf-8")
-        ico = next((root / "Cursiv").rglob("cursiv.ico"), None)
-        if ico:
-            try:
-                shutil.copy2(ico, root / "cursiv.ico")
-                (root / "autorun.inf").write_text("[autorun]\r\nlabel=Cursiv\r\nicon=cursiv.ico\r\n", encoding="utf-8")
-            except Exception:
-                pass
+        tidy_root(root)
         if tmp_zip_dir:
             shutil.rmtree(tmp_zip_dir, ignore_errors=True)
         note = (" Your memories, keys and settings are on it — keep it safe."
@@ -524,6 +547,24 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         sig.done.emit(False, "Stopped. Click Make USB again to pick up where it left off.")
     except Exception as exc:
         sig.done.emit(False, f"Couldn't finish: {exc}")
+
+
+def tidy_root(root: Path) -> None:
+    """The drive's top level shows only Start Cursiv.bat, README.txt and the folders.
+    The drive icon stays inside the Cursiv folder; autorun.inf (the drive's name and
+    icon in File Explorer) is hidden. Older USBs had a cursiv.ico at the top: removed."""
+    (root / "cursiv.ico").unlink(missing_ok=True)
+    ico = next((root / "Cursiv").rglob("cursiv.ico"), None)
+    inf = root / "autorun.inf"
+    try:
+        if inf.exists():
+            ctypes.windll.kernel32.SetFileAttributesW(str(inf), 0x80)     # normal, so it can be rewritten
+        if ico:
+            rel = str(ico.relative_to(root)).replace("/", "\\")
+            inf.write_text(f"[autorun]\r\nlabel=Cursiv\r\nicon={rel}\r\n", encoding="utf-8")
+            ctypes.windll.kernel32.SetFileAttributesW(str(inf), 0x02)     # hidden
+    except Exception:
+        pass
 
 
 # ── Dialog ───────────────────────────────────────────────────────────────────
