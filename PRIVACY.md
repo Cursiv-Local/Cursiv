@@ -29,6 +29,8 @@ Each of these is off, or never used, unless you act:
 | **Cloud AI keys** (OpenAI, Anthropic, xAI, Groq, Gemini) | Only if you saved a key, **and** you choose that AI by name, paste an image, give the AI file-writing access, or no local model is ready | That conversation, to that company |
 | **Cursiv Cloud** | Only if you turn it on in Settings, and then only when no local model is ready | That message, to Cursiv's server (cursiv.winklers-llc.com) |
 | **Update check** | When you click Check for updates, or turn on automatic checks (off by default) | A request to GitHub for the latest release |
+| **Problem report** | Only when you click Report a problem | Cursiv's error logs (never chats, letters or keys) |
+| **Fleet heartbeat** (developer feature) | Only if the `CURSIV_RELAY_URL` and `CURSIV_FLEET_TOKEN` environment variables are set on that computer; never on a normal install | The machine's name, user name, version and "active", once a minute, to that relay |
 
 The local model answers first whenever it can. A saved key is a fallback, not the
 default: a turn the local model answered is also checked locally, never by a cloud AI.
