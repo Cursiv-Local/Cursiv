@@ -296,33 +296,6 @@
   </div>
 </section>
 
-<!-- Demo -->
-<section id="try">
-  <div class="wrap grid2">
-    <div class="stack">
-      <span class="eyebrow">Web preview</span>
-      <h2>Try a few questions in your browser.</h2>
-      <p class="lede">This preview runs on this website's server (Google Gemini, or Cloudflare Workers AI when busy), not on your computer, so what you type here is sent to the server. It's limited and has no memory. The desktop app is where Cursiv runs locally.</p>
-      <div class="suggest" id="suggest">
-        <button type="button">Plan a week of easy dinners</button>
-        <button type="button">Explain compound interest simply</button>
-        <button type="button">What's a good first coding project?</button>
-      </div>
-    </div>
-    <div class="chat-box">
-      <div class="chat-bar"><span>Cursiv web preview</span><span>server-hosted · limited</span></div>
-      <div class="chat-log" id="chatLog" aria-live="polite">
-        <div class="msg ai"><span class="who">Cursiv preview</span>Hi! Ask me something. (This preview runs online, not on your computer.)</div>
-      </div>
-      <form class="chat-form" id="chatForm">
-        <label for="chatIn" style="position:absolute;left:-9999px">Message</label>
-        <input id="chatIn" autocomplete="off" maxlength="1000" placeholder="Type a message…">
-        <button class="btn btn-gold" id="chatSend" type="submit">Send</button>
-      </form>
-    </div>
-  </div>
-</section>
-
 <!-- Source -->
 <section id="source">
   <div class="wrap">
@@ -392,45 +365,6 @@
   });
   links.addEventListener('click', e => {
     if (e.target.tagName === 'A') { links.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); btn.textContent = 'Menu'; }
-  });
-})();
-
-// Web preview chat (server-hosted, rate-limited: /api/demo/chat)
-(() => {
-  const log = document.getElementById('chatLog'), form = document.getElementById('chatForm');
-  const input = document.getElementById('chatIn'), send = document.getElementById('chatSend');
-  const session = 'sess_' + Math.random().toString(36).slice(2, 10);
-  let busy = false;
-  function add(role, text) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + (role === 'user' ? 'me' : 'ai');
-    if (role !== 'user') { const who = document.createElement('span'); who.className = 'who'; who.textContent = 'Cursiv preview'; div.appendChild(who); }
-    const body = document.createElement('span'); body.textContent = text; div.appendChild(body);
-    log.appendChild(div); log.scrollTop = log.scrollHeight;
-    return body;
-  }
-  async function ask(text) {
-    if (!text || busy) return;
-    busy = true; send.disabled = true;
-    add('user', text); input.value = '';
-    const out = add('ai', 'Thinking…');
-    try {
-      const res = await fetch('/api/demo/chat', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: text, session_id: session }),
-      });
-      if (res.status === 429) out.textContent = "That's the limit for this preview. The desktop app has no limit.";
-      else if (!res.ok) out.textContent = "I couldn't reach the preview right now. Please try again in a moment.";
-      else { const data = await res.json(); out.textContent = data.reply || '…'; }
-    } catch (e) {
-      out.textContent = 'The preview is offline right now. The desktop app works without it.';
-    }
-    log.scrollTop = log.scrollHeight;
-    busy = false; send.disabled = false; input.focus();
-  }
-  form.addEventListener('submit', e => { e.preventDefault(); ask(input.value.trim()); });
-  document.getElementById('suggest').addEventListener('click', e => {
-    if (e.target.tagName === 'BUTTON') ask(e.target.textContent);
   });
 })();
 </script>
