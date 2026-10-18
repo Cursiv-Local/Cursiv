@@ -125,11 +125,59 @@ class KnowledgeDialog(_Window):
             pass
         self.entry("Saved notes", "Answers you kept with \"save this\". Shows them in the chat.", "Show", self._send("notes"))
 
+        self.section("YOUR DOCUMENTS")
+        self.body.addWidget(self._explain(
+            "Protocols, SOPs, permits and field guides you import (PDF, TXT, MD). Cursiv quotes them by page, and each "
+            "file is fingerprinted so you can show which version was used. The original file isn't changed."))
+        self._build_documents()
+
         self.section("OFFLINE REFERENCE")
         self.body.addWidget(self._explain(
             "Short entries on survival, first aid and science that Cursiv shows word for word when a question matches. "
-            "They were written for Cursiv and have not been reviewed by a medical professional."))
+            "Sourced entries name their source; none has been reviewed by a medical professional yet."))
         self._build_reference()
+
+    def _build_documents(self):
+        from cursiv_v215.core import documents
+        self._doc_list = QListWidget(); self._doc_list.setMinimumHeight(110)
+        self.body.addWidget(self._doc_list)
+        row = QHBoxLayout()
+        add = QPushButton("Import a document…"); add.setStyleSheet(theme.ghost_button())
+        rm = QPushButton("Remove selected"); rm.setStyleSheet(theme.ghost_button())
+        self._doc_status = QLabel(""); self._doc_status.setWordWrap(True)
+        row.addWidget(add); row.addWidget(rm); row.addWidget(self._doc_status, 1)
+        holder = QWidget(); holder.setLayout(row); self.body.addWidget(holder)
+
+        def fill():
+            self._doc_list.clear()
+            for d in documents.library():
+                it = QListWidgetItem(f"{d['name']}  ·  {d['pages']} pages  ·  imported {d['imported']}  ·  "
+                                     f"fingerprint {d['fingerprint'][:16]}")
+                it.setData(Qt.ItemDataRole.UserRole, d["id"])
+                self._doc_list.addItem(it)
+            if not self._doc_list.count():
+                self._doc_list.addItem("No documents yet.")
+
+        def do_add():
+            from PyQt6.QtWidgets import QFileDialog
+            paths, _ = QFileDialog.getOpenFileNames(self, "Import documents", "", "Documents (*.pdf *.txt *.md *.csv)")
+            done, failed = 0, []
+            for p in paths:
+                try:
+                    documents.add(p); done += 1
+                except (ValueError, OSError) as exc:
+                    failed.append(f"{p.split('/')[-1]}: {exc}")
+            self._doc_status.setText(f"Imported {done}." + (" Not imported: " + "; ".join(failed) if failed else ""))
+            fill()
+
+        def do_remove():
+            it = self._doc_list.currentItem()
+            doc_id = it.data(Qt.ItemDataRole.UserRole) if it else None
+            if doc_id and documents.remove(doc_id):
+                self._doc_status.setText("Removed from Cursiv's library (the original file is untouched).")
+                fill()
+        add.clicked.connect(do_add); rm.clicked.connect(do_remove)
+        fill()
 
     def _build_reference(self):
         from cursiv_v215.core import reference

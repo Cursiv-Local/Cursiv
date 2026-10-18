@@ -1363,6 +1363,7 @@ _TOOL_NOTE = "(Checked on this computer"
 _REAL_TOOL_NOTES: set[str] = set()     # notes this code emitted for the current turn
 _RETRIEVED: list[str] = []             # text actually looked up this turn (web, plugins, tools)
 _REF_SHOWN: list[str] = []             # titles of the offline reference entries shown this turn
+_DOCS_SHOWN: list = []                 # core.documents.Passage objects supplied this turn
 _WEB_SEARCHED = False                  # a web search ran for this turn
 _WORKED = None                         # core/calc.Worked: arithmetic Cursiv computed for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
@@ -2668,6 +2669,29 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     except Exception:
         pass
 
+    # The team's own documents (core/documents.py, research roadmap R3): matching passages
+    # go into the prompt with page labels, and the person sees which pages were used.
+    # Documents-only mode: with documents imported and nothing matching, Cursiv says so
+    # itself, except in an emergency, where safety comes first.
+    try:
+        if not (_self_turn or _CODING_TURN):
+            from cursiv_v215.core import documents as _docs
+            if _docs.library():
+                _passages_found = _docs.search(user_text)
+                _emergency_now = bool(locals().get("_ph") and _ph.emergency)
+                if _passages_found:
+                    _DOCS_SHOWN[:] = _passages_found
+                    _doc_block = _docs.prompt_block(_passages_found, _docs.only_mode() and not _emergency_now)
+                    messages[0]["content"] += "\n\n" + _doc_block + "\n"
+                    _RETRIEVED.append(_doc_block)
+                    yield _docs.note_line(_passages_found) + "\n\n"
+                elif _docs.only_mode() and not _emergency_now:
+                    _CURSIV_REPLY = True
+                    yield _docs.NOT_IN_DOCS
+                    return
+    except Exception:
+        pass
+
     # Safety rule, assumption ledger, and earlier ledgers. Appended last so the
     # coding-brain prompt swap above does not drop them. The check itself runs
     # in chat() once the draft is complete (core/verify.py).
@@ -3114,6 +3138,11 @@ def chat(
         try:
             from cursiv_v215.core import answer_check as _ac
             _flag = _ac.notes(draft, list(_REF_SHOWN), _WEB_SEARCHED)
+            if _DOCS_SHOWN:
+                from cursiv_v215.core import documents as _docs
+                _bad_cites = _docs.cited_pages_problems(draft, list(_DOCS_SHOWN))
+                if _bad_cites:
+                    _flag += "\n\n*(Cursiv's check: the answer " + "; ".join(_bad_cites) + ". Check it against the pages listed above.)*"
             if _WORKED:
                 from cursiv_v215.core import calc as _calc
                 _miss = _calc.check(draft, _WORKED)
@@ -3223,6 +3252,7 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
     _REAL_TOOL_NOTES.clear()
     _RETRIEVED.clear()
     _REF_SHOWN.clear()
+    _DOCS_SHOWN.clear()
     _WEB_SEARCHED = False
     _set_answered("")
     for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):

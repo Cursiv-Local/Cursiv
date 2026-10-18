@@ -329,6 +329,11 @@ class SettingsDialog(QDialog):
                      "Off means it only remembers what you tell it with \"remember …\".",
                      semantic.learning_enabled(), semantic.set_learning)
         from cursiv_v215.chat import keys as _keys
+        self._switch(lay, "Answer only from my documents",
+                     "When you've imported documents (Memory & Knowledge → Your documents), answer only from them and "
+                     "say \"that isn't in your documents\" otherwise. Emergencies are always answered.",
+                     _keys.saved_key("documents_only") == "on",
+                     lambda on: _keys.store_key("documents_only", "on" if on else ""))
         self._switch(lay, "Suggest a break late at night or after long sessions",
                      "A one-line reminder to take a break, once per session. Turn it off for work or "
                      "field use.",

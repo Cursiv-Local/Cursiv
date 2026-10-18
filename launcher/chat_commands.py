@@ -836,6 +836,14 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         _log_reply = f"The field log couldn't be written: {_exc}" if cmd.startswith("log ") else None
     if _log_reply is not None:
         return TextResult(_log_reply)
+    # The team's documents: "documents", "add document <path>" (core/documents.py)
+    try:
+        from cursiv_v215.core import documents as _documents
+        _doc_reply = _documents.command(text)
+    except Exception:
+        _doc_reply = None
+    if _doc_reply is not None:
+        return TextResult(_doc_reply)
     if cmd in ("phases", "phase", "why that answer", "how did you decide"):
         from cursiv_v215.core.phases import last_trace_text
         return TextResult(last_trace_text())
