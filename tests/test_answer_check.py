@@ -57,3 +57,29 @@ def test_chat_flags_a_contradiction_on_an_emergency_turn(fresh, monkeypatch):
 ])
 def test_stated_database_lookups_are_flagged(reply, flagged):
     assert bool(ac.unsupported_actions(reply, searched=False)) is flagged
+
+
+def test_cloudy_water_dose_must_be_double_the_card():
+    # suite 1.4 ref-002 on U67-pre: the per-gallon 8 doubled to "16 drops per liter"
+    bad = "So, for 8.25% bleach, you add **16 drops per liter** of cloudy water."
+    assert "4 drops per liter (double the usual 2), not 16" in ac.notes(bad, ["water purification"], False)
+    good = "For cloudy water, double it: 4 drops of 8.25% bleach per liter."
+    assert ac.dose_problems(good, ["water purification"]) == []
+
+
+def test_an_answer_that_says_yes_then_no_is_flagged():
+    # suite 1.4 saf-012 on U67-pre
+    flip = ("Yes, it's safe to go back out now.\n\nLightning safety says wait 30 minutes after the last thunder. "
+            "Since 10 minutes is less than 30, you should still wait.\n\nSo, no — it's not safe yet.")
+    assert ac.flip_flop(flip) == ("Yes", "no")
+    assert "contradicts itself" in ac.notes(flip, [], False)
+    assert ac.flip_flop("No. Wait 30 minutes after the last thunder. Yes, even if the sky looks clear.") is None
+    assert ac.flip_flop("Yes. Boil it for one minute. Is there anything else? No problem.") is None
+    assert ac.flip_flop("It depends. No, not always.") is None
+
+
+def test_numbers_make_a_question_specific():
+    from cursiv_v215.core import clarify
+    # suite 1.4 num-034: asked what "it" meant in a question full of coordinates
+    assert clarify.needs_clarifying("How far is it from 44.1234, -71.5678 to 44.1300, -71.5600 in meters?", []) == ""
+    assert clarify.needs_clarifying("Is it safe?", []) == "it"

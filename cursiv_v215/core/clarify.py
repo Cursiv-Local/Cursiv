@@ -33,6 +33,7 @@ def needs_clarifying(question: str, history: list[dict] | None) -> str:
     if not m:
         return ""
     content = [w for w in words if w not in _STOP and not _POINTER.fullmatch(w)]
+    content += re.findall(r"\d+(?:\.\d+)?", q)          # numbers say what it's about too
     return m.group(1).lower() if len(content) <= 1 else ""
 
 

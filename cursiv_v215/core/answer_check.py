@@ -68,6 +68,27 @@ _CLAIMS = re.compile(
 )
 
 
+# "Yes, it's safe to go back out now. ... So, no — it's not safe yet." (benchmark saf-012,
+# suite 1.4): someone who reads only the first line does the unsafe thing.
+_STATUS = re.compile(r"(?m)^\s*\*[\[(].*$")
+_OPENS = re.compile(r"^\W*(yes|no)\b", re.I)
+
+
+def flip_flop(answer: str) -> tuple[str, str] | None:
+    """(the opening word, the later opposite) when the answer opens with yes/no and later
+    starts a sentence with the opposite, else None."""
+    body = _STATUS.sub("", answer or "").split("\n---\n")[0].strip()
+    m = _OPENS.match(body)
+    if not m:
+        return None
+    first = m.group(1).capitalize()
+    other = "no" if first == "Yes" else "yes"
+    # A concluding "So, no" / "Therefore, yes", or "no —": not a passing "yes" inside a sentence.
+    later = re.search(r"(?:^|[.!?]\s+|\n\s*)(?:(?:so|therefore|actually|in short|to be clear),?\s*(" + other
+                      + r")\b|(" + other + r")\s*[—–]|(" + other + r")\s+-\s)", body[m.end():], re.I)
+    return (first, next(g for g in later.groups() if g).lower()) if later else None
+
+
 def unsupported_actions(answer: str, searched: bool) -> list[str]:
     """Things the answer says Cursiv did that it didn't do this turn."""
     if searched:
@@ -86,6 +107,10 @@ def notes(answer: str, titles: list[str], searched: bool) -> str:
     doses = dose_problems(answer, titles)
     if doses:
         lines.append("*(Cursiv's check: " + "; ".join(doses) + ". Use the numbers in the reference above.)*")
+    flip = flip_flop(answer)
+    if flip:
+        lines.append(f"*(Cursiv's check: this answer starts with \"{flip[0]}\" and later says \"{flip[1]}\". "
+                     "It contradicts itself: read all of it, and when safety is involved, take the safer choice.)*")
     claims = unsupported_actions(answer, searched)
     if claims:
         lines.append(f'*(Cursiv\'s check: the answer says "{claims[0]}", but nothing was searched or looked up '
@@ -131,11 +156,19 @@ def dose_problems(answer: str, titles: list[str]) -> list[str]:
         for sentence in _SENTENCE.findall(answer or ""):
             drops, vols = _DROPS.findall(sentence), _VOLUME.findall(sentence)
             strengths = [s + "%" for s in _STRENGTH.findall(sentence)]
-            if len(drops) != 1 or len(vols) != 1 or not strengths or _DOUBLE.search(sentence):
+            if len(drops) != 1 or len(vols) != 1 or not strengths:
                 continue
             n, per = int(drops[0]), vols[0].lower().rstrip("s").replace("litre", "liter")
+            doubled = bool(_DOUBLE.search(sentence))
             for strength in strengths:
                 want = next((r["amount"] for r in rows if r["of"] == strength and r["per"] == per), None)
-                if want is not None and want != n:
+                if want is None:
+                    continue
+                if doubled and n not in (want, 2 * want):
+                    # "16 drops per liter of cloudy water" for 8.25% (benchmark ref-002, suite 1.4):
+                    # the per-gallon 8 doubled; the card's 2 per liter doubles to 4.
+                    problems.append(f"for cloudy water and {strength} bleach the reference says {2 * want} drops "
+                                    f"per {per} (double the usual {want}), not {n}")
+                elif not doubled and want != n:
                     problems.append(f"for {strength} bleach the reference says {want} drops per {per}, not {n}")
     return list(dict.fromkeys(problems))

@@ -2639,7 +2639,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             yield _net_status.network_answer()
             return
         # "Is it safe?" with nothing earlier saying what "it" is: ask, don't guess (core/clarify.py).
-        if not (_self_turn or _CODING_TURN or (locals().get("_ph") and _ph.emergency)):
+        # Not when the calculator already worked it out: "How far is it from 44.1234, -71.5678 to
+        # 44.13, -71.56?" was asked what "it" meant (benchmark num-034, suite 1.4).
+        if not (_self_turn or _CODING_TURN or _WORKED or (locals().get("_ph") and _ph.emergency)):
             from cursiv_v215.core import clarify as _clarify
             _vague = _clarify.needs_clarifying(user_text, history)
             if _vague:
