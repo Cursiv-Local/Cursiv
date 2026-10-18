@@ -10,6 +10,10 @@ bench/scoring.py (code checks only, no AI judge).
     py -3.13 scripts/truth_bench.py --only numerical   # one category
     py -3.13 scripts/truth_bench.py --ids num-001,ref-002
     py -3.13 scripts/truth_bench.py --label U61        # name for the results row
+    py -3.13 scripts/truth_bench.py --model qwen3:8b   # a different local model
+    py -3.13 scripts/truth_bench.py --source v3.14-U61 --label U61
+        # an earlier release's code (a git tag or commit) on the current cases,
+        # so it can be compared on a new suite version
 
 Writes bench/results/<label>-<model>.json (every reply, with failures) and adds
 a row to bench/RESULTS.md. Offline mode is on for the run, so web search and
@@ -43,6 +47,9 @@ import truth_cases
 
 ca._learn_later = lambda *a, **k: None            # no memories leak from one case into the next
 cases = [c for c in truth_cases.CASES if c["id"] in set(json.loads(sys.argv[1]))]
+if len(sys.argv) > 2 and sys.argv[2]:
+    from cursiv_v215.chat import keys
+    keys.store_key("chat_model", sys.argv[2])
 model = ca._resolve_ollama_model()
 print(json.dumps({"model": model}), flush=True)
 for c in cases:
@@ -107,6 +114,8 @@ def main() -> int:
     ap.add_argument("--only", help="one category")
     ap.add_argument("--ids", help="comma-separated case ids")
     ap.add_argument("--label", help="results label (default: version from the launcher)")
+    ap.add_argument("--model", default="", help="local model to answer with (default: Cursiv's own choice)")
+    ap.add_argument("--source", default="", help="git ref whose cursiv_v215 and launcher code to run (default: this tree)")
     args = ap.parse_args()
 
     sys.path[:0] = [str(REPO / "bench")]
@@ -123,7 +132,14 @@ def main() -> int:
     scratch = Path(tempfile.mkdtemp(prefix="cursiv_bench_"))
     rows, model = [], "?"
     try:
-        for part in ("cursiv_v215", "launcher", "bench"):
+        if args.source:
+            import io
+            import tarfile
+            tar = subprocess.run(["git", "-C", str(REPO), "archive", "--format=tar", args.source, "cursiv_v215", "launcher"],
+                                 capture_output=True, check=True).stdout
+            with tarfile.open(fileobj=io.BytesIO(tar)) as t:
+                t.extractall(scratch / "app", filter="data")
+        for part in (("bench",) if args.source else ("cursiv_v215", "launcher", "bench")):
             shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
         (scratch / "home").mkdir()
         env = {**os.environ, "USERPROFILE": str(scratch / "home"), "HOME": str(scratch / "home"),
@@ -131,7 +147,7 @@ def main() -> int:
         for k in ("BRAVE_API_KEY", "CURSIV_RELAY_URL", "CURSIV_FLEET_TOKEN"):
             env.pop(k, None)
         t0 = time.time()
-        proc = subprocess.Popen([sys.executable, "-c", CHILD, json.dumps(chosen)], cwd=scratch / "app", env=env,
+        proc = subprocess.Popen([sys.executable, "-c", CHILD, json.dumps(chosen), args.model], cwd=scratch / "app", env=env,
                                 stdout=subprocess.PIPE, text=True, encoding="utf-8")
         for line in proc.stdout:
             try:

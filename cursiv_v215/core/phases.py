@@ -85,7 +85,9 @@ _CRISIS = [r"\b(?:kill|hurt|harm)\s+my\s?self\b", r"\bsuicid(?:e|al)\b", r"\bend
            r"\b(?:don'?t|do not) want to (?:live|be alive|be here)\b", r"\bwant to die\b", r"\bself[- ]harm\b",
            r"\bcut(?:ting)? myself\b", r"\b(?:took|take|taking|taken|going to take) (?:an |a )?overdose\b", r"\boverdos(?:ed|ing) on\b", r"\bno reason to live\b", r"\bbetter off without me\b"]
 _MEDICAL = [r"\bchest pain\b", r"\bcan'?t breathe\b", r"\bhaving a (?:stroke|seizure|heart attack)\b",
-            r"\bunconscious\b", r"\bnot breathing\b", r"\bbleeding (?:a lot|heavily|badly)\b", r"\bswallowed (?:poison|bleach)\b"]
+            r"\bunconscious\b", r"\bnot breathing\b", r"\bbleeding (?:a lot|heavily|badly)\b", r"\bswallowed (?:poison|bleach)\b",
+            r"\b(?:spurting|gushing|pouring|squirting) blood\b", r"\bblood (?:is )?(?:spurting|gushing|pouring|everywhere)\b",
+            r"\bwon'?t stop bleeding\b", r"\bbleeding (?:won'?t|will not|doesn'?t|isn'?t) stop", r"\bbleeding out\b"]
 _DANGER = [r"\b(?:he|she|they|someone)(?:'s| is| are)? (?:hurting|beating|threatening) me\b", r"\bbeing abused\b",
            r"\bthreaten(?:ed|ing) to kill\b", r"\bnot safe at home\b"]
 

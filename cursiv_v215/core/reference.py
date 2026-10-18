@@ -28,7 +28,9 @@ NOT_IN_CHAT = {"improvised medications", "foraging edibility test", "medicinal p
 
 # Everyday phrases people use instead of the entry's title (whole words or phrases).
 ALIASES = {
-    "severe bleeding control": ("bleeding", "bleeding badly", "won't stop bleeding", "gushing", "gash", "deep cut"),
+    "severe bleeding control": ("bleeding", "bleeding badly", "won't stop bleeding", "gushing", "gash", "deep cut",
+                                "spurting", "pouring blood", "blood pouring", "blood is pouring",
+                                "blood spurting", "blood is spurting", "blood everywhere", "bleeding out", "lot of blood"),
     "tourniquet application": ("tourniquet",),
     "CPR adult": ("cpr", "not breathing", "no pulse", "chest compressions", "resuscitate"),
     "choking adult Heimlich": ("choking", "heimlich"),
@@ -47,13 +49,20 @@ ALIASES = {
     "drowning response": ("drowning", "drowned", "pulled from the water"),
     "diabetic emergency field": ("diabetic", "low blood sugar", "insulin"),
     "frostbite treatment": ("frostbite",),
-    "water purification": ("purify", "purifying", "safe to drink", "boil water"),
+    "water purification": ("purify", "purifying", "safe to drink", "boil water", "disinfect water", "treat water",
+                           ("bleach", "liter"), ("bleach", "litre"), ("bleach", "gallon"), ("bleach", "quart"),
+                           ("bleach", "drops"), ("bleach", "drink"), ("bleach", "drinking"), ("bleach", "cloudy"),
+                           ("bleach", "creek"), ("bleach", "river"), ("bleach", "rainwater"), ("bleach", "well water")),
 }
+# An alias given as a tuple needs all of its words ("bleach" and "gallon"), so
+# "clean the floor with bleach and water" doesn't bring up water purification.
 
 
 def _alias_hit(title: str, question: str) -> bool:
     ql = question.lower()
-    return any(re.search(r"\b" + re.escape(p) + r"\b", ql) for p in ALIASES.get(title, ()))
+    def has(phrase: str) -> bool:
+        return bool(re.search(r"\b" + re.escape(phrase) + r"\b", ql))
+    return any(all(has(w) for w in p) if isinstance(p, tuple) else has(p) for p in ALIASES.get(title, ()))
 
 
 @dataclass(frozen=True)
