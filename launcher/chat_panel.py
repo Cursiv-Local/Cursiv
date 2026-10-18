@@ -26,9 +26,14 @@ from typing import Optional
 from PyQt6.QtCore import Qt, QObject, QTimer, pyqtSignal
 from PyQt6.QtGui import QKeyEvent, QTextCursor, QGuiApplication
 from PyQt6.QtWidgets import (
+    QComboBox, QMenu,
     QWidget, QVBoxLayout, QHBoxLayout, QTextBrowser, QPlainTextEdit,
     QPushButton, QLabel, QSizePolicy, QInputDialog, QLineEdit, QMessageBox,
 )
+from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
+import theme
+import re as _re
+
 
 _HERE = Path(__file__).parent
 _ROOT = _HERE.parent
@@ -53,13 +58,6 @@ _CHAT_ROOT = _ROOT
 _RATE_SENTINEL = object()
 
 # ── Palette (matches cursiv_launcher.py exactly) ────────────────────────────
-BG     = "#0b0b12"
-BG2    = "#13131e"
-BORDER = "#2a2a3f"
-GOLD   = "#FFD700"
-LGOLD  = "#9B7B20"
-SILVER = "#C8C8D4"
-SILV2  = "#666680"
 
 
 def _load_saved_keys() -> dict:
@@ -109,6 +107,7 @@ class _ChatSignals(QObject):
     pending_write = pyqtSignal(str)     # raw WRITE_SENTINEL JSON payload, needs approval
     write_complete = pyqtSignal(str)    # result text once an approved write finishes (or fails)
     backend_ready = pyqtSignal(bool, str)  # chat_commands finished loading: ok, error message
+    models = pyqtSignal(object)         # installed Ollama chat models (list), or None if Ollama is down
 
 
 class _ChatInput(QPlainTextEdit):
@@ -119,14 +118,14 @@ class _ChatInput(QPlainTextEdit):
         self._on_send = on_send
         self._on_paste_image = on_paste_image
         self.setFixedHeight(64)
-        self.setPlaceholderText("Message Cursiv… (try: council, codex, babel, help)")
+        self.setPlaceholderText("Message Cursiv…   (Enter to send · Shift+Enter for a new line · help for commands)")
         self.setStyleSheet(f"""
             QPlainTextEdit {{
-                background: {BG2}; color: {SILVER};
-                border: 1px solid {BORDER}; border-radius: 8px;
-                padding: 8px 10px; font-size: 13px;
+                background: {theme.SURFACE}; color: {theme.TEXT};
+                border: 1px solid {theme.BORDER}; border-radius: 10px;
+                padding: 9px 12px; font-size: 14px;
             }}
-            QPlainTextEdit:focus {{ border-color: {LGOLD}; }}
+            QPlainTextEdit:focus {{ border-color: {theme.BORDER2}; }}
         """)
 
     def keyPressEvent(self, e: QKeyEvent) -> None:
@@ -305,35 +304,52 @@ class ChatPanel(QWidget):
         lay.setSpacing(10)
 
         header_row = QHBoxLayout()
-        header = QLabel("Cursiv")
-        header.setStyleSheet(
-            f'color: {GOLD}; font-size: 15px; font-weight: 700;'
-            f' font-family: "Segoe UI", "Segoe UI Historic";'
-        )
-        header_row.addWidget(header)
+        header_row.setSpacing(8)
+        # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
+        self._model_box = QComboBox()
+        self._model_box.setToolTip("Which AI model on this computer answers")
+        self._model_box.setMinimumWidth(240)
+        self._model_box.addItem("Looking for local models…", "")
+        self._model_box.setEnabled(False)
+        self._model_box.activated.connect(self._on_model_chosen)
+        header_row.addWidget(self._model_box)
         header_row.addStretch(1)
-
-        training_btn = QPushButton("🗂 Training Data")
-        training_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        training_btn.setFixedHeight(28)
-        training_btn.setStyleSheet(self._icon_btn_style() + "QPushButton { font-size: 11px; padding: 4px 10px; }")
-        training_btn.setToolTip(
-            "View, add, or delete examples in the training data store -- "
-            "upload an image or paste JSON directly."
-        )
-        training_btn.clicked.connect(lambda: self._open_training_data())
-        header_row.addWidget(training_btn)
+        # Status pill: what can go online right now (core/netgate.py + keys + Cloud).
+        self._net_pill = QPushButton("")
+        self._net_pill.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._net_pill.clicked.connect(self._open_settings_from_pill)
+        header_row.addWidget(self._net_pill)
+        # More: things that used to sit in the header (still reachable).
+        more = QPushButton("⋯")
+        more.setToolTip("More")
+        more.setFixedSize(34, 30)
+        more.setStyleSheet(theme.icon_button(30) + "QPushButton { font-size: 18px; }")
+        more.setCursor(Qt.CursorShape.PointingHandCursor)
+        menu = QMenu(more)
+        menu.addAction("Training data…", lambda: self._open_training_data())
+        menu.addAction("Settings…", self._open_settings_from_pill)
+        menu.addAction("Help (commands)", lambda: self._quick_send("help"))
+        more.setMenu(menu)
+        more.setStyleSheet(more.styleSheet() + "QPushButton::menu-indicator { image: none; width: 0; }")
+        header_row.addWidget(more)
         lay.addLayout(header_row)
+        self._signals.models.connect(self._on_models)
+        self._refresh_status_pill()
+        self._load_models()
+        self._pill_timer = QTimer(self)
+        self._pill_timer.timeout.connect(self._refresh_status_pill)
+        self._pill_timer.start(15_000)
 
         self._transcript = QTextBrowser()
         self._transcript.setOpenExternalLinks(True)
         self._transcript.setStyleSheet(f"""
             QTextBrowser {{
-                background: {BG2}; color: {SILVER};
-                border: 1px solid {BORDER}; border-radius: 8px;
-                padding: 10px; font-size: 13px;
+                background: {theme.SURFACE}; color: {theme.TEXT};
+                border: 1px solid {theme.BORDER}; border-radius: 12px;
+                padding: 14px 18px; font-size: 14px;
             }}
         """)
+        self._transcript.document().setDocumentMargin(6)
         self._transcript.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Expanding
         )
@@ -346,7 +362,7 @@ class ChatPanel(QWidget):
         row.addWidget(self._input, 1)
 
         self._voice_btn = QPushButton("🎙")
-        self._voice_btn.setFixedSize(40, 64)
+        self._voice_btn.setFixedSize(44, 64)
         self._voice_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._voice_btn.setToolTip("Record 5s of audio and transcribe it into the input box")
         self._voice_btn.setStyleSheet(self._icon_btn_style())
@@ -357,18 +373,9 @@ class ChatPanel(QWidget):
         row.addWidget(self._voice_btn)
 
         self._send_btn = QPushButton("Send")
-        self._send_btn.setFixedSize(72, 64)
+        self._send_btn.setFixedSize(76, 64)
         self._send_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._send_btn.setStyleSheet(f"""
-            QPushButton {{
-                background: #2255DD; color: #ffffff;
-                font-size: 13px; font-weight: 600;
-                border-radius: 8px; border: none;
-            }}
-            QPushButton:hover    {{ background: #3366EE; }}
-            QPushButton:pressed  {{ background: #1144CC; }}
-            QPushButton:disabled {{ background: #1a1a2e; color: {SILV2}; }}
-        """)
+        self._send_btn.setStyleSheet(theme.primary_button(10) + "QPushButton { font-size: 14px; }")
         self._send_btn.clicked.connect(self._send)
         row.addWidget(self._send_btn)
 
@@ -376,16 +383,7 @@ class ChatPanel(QWidget):
         self._stop_btn.setFixedSize(56, 64)
         self._stop_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._stop_btn.setToolTip("Stop the current response and return to standby")
-        self._stop_btn.setStyleSheet(f"""
-            QPushButton {{
-                background: transparent; color: #ff6666;
-                font-size: 12px; font-weight: 600;
-                border: 1px solid #663333; border-radius: 8px;
-            }}
-            QPushButton:hover    {{ background: rgba(255,102,102,0.10); border-color: #ff6666; }}
-            QPushButton:pressed  {{ background: rgba(255,102,102,0.18); }}
-            QPushButton:disabled {{ color: {SILV2}; border-color: {BORDER}; }}
-        """)
+        self._stop_btn.setStyleSheet(theme.ghost_button(10) + f"QPushButton:enabled {{ color: {theme.RED}; }}")
         self._stop_btn.setEnabled(False)
         self._stop_btn.clicked.connect(self._stop_generation)
         row.addWidget(self._stop_btn)
@@ -393,19 +391,137 @@ class ChatPanel(QWidget):
         lay.addLayout(row)
 
         self._status = QLabel("")
-        self._status.setStyleSheet(f"color: {SILV2}; font-size: 10px;")
+        self._status.setStyleSheet(f"color: {theme.FAINT}; font-size: 12px;")
         lay.addWidget(self._status)
 
     def _icon_btn_style(self) -> str:
-        return f"""
-            QPushButton {{
-                background: transparent; color: {GOLD}; font-size: 16px;
-                border: 1px solid {BORDER}; border-radius: 8px;
-            }}
-            QPushButton:hover    {{ background: rgba(212,175,55,0.08); border-color: {LGOLD}; }}
-            QPushButton:pressed  {{ background: rgba(212,175,55,0.15); }}
-            QPushButton:disabled {{ color: {SILV2}; }}
-        """
+        return theme.ghost_button(10) + "QPushButton { font-size: 16px; padding: 0; }"
+
+    # ── Status pill and model picker ─────────────────────────────────────
+
+    _PILL = {"offline": (theme.GREEN, "rgba(111,211,155,0.10)"), "local": (theme.GREEN, "rgba(111,211,155,0.10)"),
+             "online": (theme.AMBER, "rgba(232,180,90,0.10)")}
+
+    def _refresh_status_pill(self) -> None:
+        try:
+            from cursiv_v215.chat import status as _st
+            st = _st.network_status()
+        except Exception:
+            st = {"level": "online", "label": "Status unknown", "details": ["Couldn't read the network settings."]}
+        fg, bg = self._PILL.get(st["level"], self._PILL["online"])
+        self._net_pill.setText(f"●  {st['label']}")
+        self._net_pill.setToolTip("\n".join(st["details"]) + "\n\nClick to change in Settings.")
+        self._net_pill.setStyleSheet(
+            f"QPushButton {{ background: {bg}; color: {fg}; border: 1px solid {fg}55; border-radius: 13px;"
+            f" padding: 4px 12px; font-size: 12px; font-weight: 600; }}"
+            f"QPushButton:hover {{ border-color: {fg}; }}")
+        self._net_status = st
+
+    def _open_settings_from_pill(self) -> None:
+        win = self.window()
+        if hasattr(win, "_open_settings"):
+            win._open_settings()
+        self._refresh_status_pill()
+
+    def _load_models(self) -> None:
+        def work():
+            try:
+                from cursiv_v215.chat import status as _st
+                self._signals.models.emit(_st.local_models())
+            except Exception:
+                self._signals.models.emit(None)
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_models(self, models) -> None:
+        from cursiv_v215.chat import status as _st
+        box = self._model_box
+        box.clear()
+        if not models:
+            box.addItem("No local model yet — open Setup" if models == [] else "Ollama isn't running", "")
+            box.setEnabled(False)
+            return
+        chosen = _st.preferred_model()
+        auto = _st.automatic_model(models)
+        box.addItem(f"Automatic  ·  {auto}", "")
+        for m in models:
+            box.addItem(m, m)
+        box.setCurrentIndex(max(0, box.findData(chosen)) if chosen in models else 0)
+        box.setEnabled(True)
+
+    def _on_model_chosen(self, index: int) -> None:
+        from cursiv_v215.chat import status as _st
+        _st.set_preferred_model(self._model_box.itemData(index) or "")
+
+    def _quick_send(self, text: str) -> None:
+        if self._streaming:
+            return
+        self._input.setPlainText(text)
+        self._send()
+
+    # ── Rendering a finished answer ─────────────────────────────────────
+
+    _STATUS_LINE = _re.compile(r"^\s*\*([\[(])(.*)[\])]\*\s*$")
+
+    def _chip_html(self, inner: str) -> str:
+        """One of Cursiv's own status lines, as a small line under (or above) the answer."""
+        esc = self._escape(inner)
+        if inner.startswith("Answered by "):
+            engine = inner[len("Answered by "):]
+            local = engine.startswith(("Ollama", "Code Council", "Cursiv local"))
+            col = theme.GREEN if local else theme.AMBER
+            label = ("Local · " + self._escape(engine.split("·", 1)[-1].strip())) if local else ("Online · " + self._escape(engine))
+            return f'<p style="margin:6px 0 0 0; font-size:12px; color:{col};">● {label}</p>'
+        if inner.startswith("From Cursiv's offline reference"):
+            return (f'<table width="100%" cellpadding="10" cellspacing="0" style="margin:2px 0 10px 0;'
+                    f' background-color:{theme.SURFACE2}; border:1px solid {theme.BORDER};"><tr><td>'
+                    f'<span style="font-size:12px; color:{theme.MUTED};">{esc}</span></td></tr></table>')
+        return f'<p style="margin:4px 0; font-size:12px; color:{theme.MUTED};">{esc}</p>'
+
+    @staticmethod
+    def _keep_line_breaks(md: str) -> str:
+        """In Markdown a single newline joins lines; the model's single newlines
+        (Known: / Inferred: lines, addresses, short steps) are meant as line breaks."""
+        out, in_code = [], False
+        lines = md.split("\n")
+        for i, line in enumerate(lines):
+            if line.lstrip().startswith("```"):
+                in_code = not in_code
+            nxt = lines[i + 1] if i + 1 < len(lines) else ""
+            if (not in_code and line.strip() and nxt.strip() and not line.endswith("  ")
+                    and not _re.match(r"\s*([-*+]|\d+[.)]|#|>|\|)", nxt)):
+                line += "  "
+            out.append(line)
+        return "\n".join(out)
+
+    def _render_reply(self) -> None:
+        """Swap the plain streamed text of a finished chat answer for rendered Markdown,
+        with Cursiv's status lines as small chips. Only for chat answers: command output
+        (help, status) keeps its plain, aligned text."""
+        text = self._reply_text or ""
+        start = getattr(self, "_reply_start", None)
+        if start is None or not text.strip():
+            return
+        top, body, bottom = [], [], []
+        for line in text.splitlines():
+            m = self._STATUS_LINE.match(line)
+            if m:
+                (top if not body else bottom).append(m.group(2))
+            else:
+                body.append(line)
+        md = self._keep_line_breaks("\n".join(body).strip())
+        cursor = QTextCursor(self._transcript.document())
+        cursor.setPosition(start)
+        cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+        cursor.removeSelectedText()
+        for inner in top:
+            cursor.insertHtml(self._chip_html(inner))
+        if md:
+            if top:
+                cursor.insertBlock()
+            cursor.insertMarkdown(md)
+        for inner in bottom:
+            cursor.insertBlock()
+            cursor.insertHtml(self._chip_html(inner))
 
     # ── Transcript rendering ─────────────────────────────────────────────
 
@@ -448,7 +564,7 @@ class ChatPanel(QWidget):
         self._force_new_block()
         self._append_html_block(
             f'<p style="margin:10px 0 4px 0;">'
-            f'<span style="color:{LGOLD}; font-weight:600;">You</span><br>'
+            f'<span style="color:{theme.MUTED}; font-weight:600;">You</span><br>'
             f'<span style="color:{SILVER};">{self._escape(text)}</span></p>'
         )
 
@@ -457,7 +573,7 @@ class ChatPanel(QWidget):
         self._force_new_block()
         self._append_html_block(
             f'<p style="margin:4px 0 4px 0;">'
-            f'<span style="color:{GOLD}; font-weight:700;">✦ Cursiv</span><br>'
+            f'<span style="color:{theme.ACCENT}; font-weight:600;">Cursiv</span><br>'
             f'<span style="color:#F0E9D8; white-space:pre-wrap;">'
         )
         cursor = QTextCursor(self._transcript.document())
@@ -554,6 +670,7 @@ class ChatPanel(QWidget):
         self._stop_btn.setEnabled(True)
         self._status.setText("Cursiv is thinking…")
         self._reply_text = ""
+        self._reply_is_chat = False
         self._begin_ai_reply()
 
     def _stop_generation(self) -> None:
@@ -592,6 +709,7 @@ class ChatPanel(QWidget):
                 replace_draft=True,
             )
             self._cfg["last_user_msg"] = stripped
+            self._reply_is_chat = True          # rendered as Markdown when it finishes
             cancel_event = self._cancel_event
             full = ""
             for chunk in _iter_cancellable(gen, cancel_event):
@@ -706,7 +824,13 @@ class ChatPanel(QWidget):
         self._append_image(path)
 
     def _on_done(self) -> None:
+        if getattr(self, "_reply_is_chat", False):
+            try:
+                self._render_reply()
+            except Exception:
+                pass                     # the plain streamed text stays
         self._end_ai_reply()
+        self._refresh_status_pill()      # "offline on", a new key, ... change it
         for role, content in (getattr(self, "_pending_history_append", None) or []):
             self._history.append({"role": role, "content": content})
         self._pending_history_append = None

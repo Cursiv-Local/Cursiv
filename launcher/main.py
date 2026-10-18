@@ -132,6 +132,11 @@ def main():
     )
 
     app = QApplication.instance() or QApplication(sys.argv)
+    try:
+        import theme
+        app.setStyleSheet(theme.APP_QSS)       # one look for every window
+    except Exception:
+        pass
     app.setApplicationName("Cursiv")
     app.setApplicationDisplayName("Cursiv")
     app.setApplicationVersion("3.14")

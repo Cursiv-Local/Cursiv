@@ -29,10 +29,8 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QListWidget,
     QListWidgetItem, QMessageBox, QProgressBar, QPushButton, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2 = "#FFD700", "#C8C8D4", "#666680"
-GREEN, RED = "#3ecf6e", "#FF4455"
 
 FAT32_MAX = 4 * 1024 ** 3 - 1
 OLLAMA_API = "http://127.0.0.1:11434"
@@ -532,7 +530,7 @@ class UsbMakerDialog(QDialog):
         self.setStyleSheet(f"""
             QDialog {{ background: {BG}; color: {SILVER}; }}
             QLabel, QCheckBox {{ color: {SILVER}; background: transparent; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px;
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px;
                            padding: 6px 14px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
@@ -540,7 +538,7 @@ class UsbMakerDialog(QDialog):
                                       border-radius: 4px; padding: 4px; }}
             QProgressBar {{ background: {BG}; border: 1px solid {BORDER}; border-radius: 3px; color: {SILVER};
                             text-align: center; height: 16px; }}
-            QProgressBar::chunk {{ background: #2255DD; }}
+            QProgressBar::chunk {{ background: #d4b04c; }}
         """)
         self._sig = _Signals()
         self._sig.progress.connect(self._on_progress)

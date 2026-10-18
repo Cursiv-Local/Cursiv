@@ -23,12 +23,11 @@ from PyQt6.QtGui import QImage
 from PyQt6.QtWidgets import (
     QCheckBox, QDialog, QFileDialog, QHBoxLayout, QLabel, QLineEdit, QPushButton, QTextBrowser, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
 API = "https://cursiv.winklers-llc.com"
 SPACE_FILE = Path.home() / ".cursiv" / "space.json"
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2, RED, GREEN = "#FFD700", "#C8C8D4", "#666680", "#FF4455", "#3ecf6e"
 
 
 def load_token() -> str:
@@ -95,7 +94,7 @@ class PhoneDialog(QDialog):
             QTextBrowser {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 6px;
                             font-family: 'Segoe UI'; font-size: 13px; padding: 6px; }}
             QLineEdit {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 4px; padding: 7px; font-size: 13px; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px; padding: 7px 14px; font-weight: 600; }}
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 7px 14px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
         """)

@@ -11,9 +11,8 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget, QListWidgetItem,
     QPushButton, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2  # one palette for every window (theme.py)
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2 = "#FFD700", "#C8C8D4", "#666680"
 
 
 class MemoryDialog(QDialog):
@@ -30,7 +29,7 @@ class MemoryDialog(QDialog):
             QListWidget::item {{ padding: 7px 6px; border-bottom: 1px solid {BORDER}; }}
             QListWidget::item:selected {{ background: #1d2a4a; }}
             QLineEdit, QComboBox {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 4px; padding: 6px; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px; padding: 6px 14px; font-weight: 600; }}
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 6px 14px; font-weight: 600; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
             QCheckBox {{ color: {SILVER}; }}
         """)

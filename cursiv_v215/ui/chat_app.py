@@ -934,6 +934,9 @@ def _resolve_ollama_model() -> str | None:
     if tags is None:
         return None
     available = set(tags) | {t.split(":")[0] for t in tags}
+    _chosen = _saved_key("chat_model")            # picked in the window's model menu
+    if _chosen and _chosen in available:
+        return _chosen
     from cursiv_v215.core import speed as _speed
     # Fastest good model for this GPU first (e.g. a 3B model on a 4 GB card), if installed
     for name in (*_speed.chat_model_prefs(), OLLAMA_MODEL, *_OLLAMA_FALLBACK_MODELS):

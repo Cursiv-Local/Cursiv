@@ -28,10 +28,7 @@ from PyQt6.QtWidgets import (
 )
 
 import chat_commands as cc
-
-BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2 = (
-    "#0b0b12", "#13131e", "#2a2a3f", "#FFD700", "#9B7B20", "#C8C8D4", "#666680",
-)
+from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
 
 _LEGACY_NOTICE = (
     "This is not time-travel in the novelty sense. But it is the closest we "
@@ -104,8 +101,8 @@ class LegacyVaultDialog(QDialog):
         enter_btn.setFixedHeight(40)
         enter_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         enter_btn.setStyleSheet(
-            "QPushButton { background: #2255DD; color: #fff; font-weight: 600; border: none; border-radius: 8px; }"
-            "QPushButton:hover { background: #3366EE; }"
+            "QPushButton { background: #d4b04c; color: #17120a; font-weight: 600; border: none; border-radius: 8px; }"
+            "QPushButton:hover { background: #e2c062; }"
         )
         enter_btn.clicked.connect(self._try_login)
         lay.addWidget(enter_btn)
@@ -241,8 +238,8 @@ class LegacyVaultDialog(QDialog):
     def _btn_style(self, primary: bool = False) -> str:
         if primary:
             return (
-                "QPushButton { background: #2255DD; color: #fff; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
-                "QPushButton:hover { background: #3366EE; }"
+                "QPushButton { background: #d4b04c; color: #17120a; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
+                "QPushButton:hover { background: #e2c062; }"
             )
         return (
             f"QPushButton {{ background: transparent; color: {GOLD}; border: 1px solid {LGOLD}; "
@@ -528,7 +525,7 @@ class _ComposeLegacyLetterDialog(QDialog):
 
         self._save_btn = QPushButton("Save Letter")
         self._save_btn.setStyleSheet(
-            "QPushButton { background: #2255DD; color: #fff; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
+            "QPushButton { background: #d4b04c; color: #17120a; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
             "QPushButton:disabled { background: #1a1a2e; color: #666; }"
         )
         self._save_btn.clicked.connect(self._save)

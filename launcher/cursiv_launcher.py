@@ -32,6 +32,7 @@ from PyQt6.QtWidgets import (
 )
 
 from chat_panel import ChatPanel
+from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2, RED  # one palette for every window (theme.py)
 
 if getattr(sys, "frozen", False):
     _HERE = Path(sys.executable).parent
@@ -149,30 +150,9 @@ def _mark_getting_started_seen() -> None:
 
 
 # ── Palette ───────────────────────────────────────────────────────────────────
-BG     = "#0b0b12"
-BG2    = "#13131e"
-BORDER = "#2a2a3f"
-GOLD   = "#FFD700"
-LGOLD  = "#9B7B20"
-SILVER = "#C8C8D4"
-SILV2  = "#666680"
-RED    = "#FF4455"
 
-QSS = f"""
-QWidget {{
-    background-color: {BG};
-    color: {SILVER};
-    font-family: "Segoe UI", Arial, sans-serif;
-    font-size: 13px;
-    border: none;
-}}
-QLabel {{ background: transparent; }}
-QMenu {{
-    background: {BG2}; color: {SILVER};
-    border: 1px solid {LGOLD}; border-radius: 4px; padding: 4px;
-}}
-QMenu::item:selected {{ background: #2255DD; color: {GOLD}; }}
-"""
+import theme
+QSS = theme.APP_QSS
 
 # ── Single-instance lock ──────────────────────────────────────────────────────
 
@@ -326,7 +306,7 @@ class UpdateDialog(QDialog):
         self._progress.setVisible(False)
         self._progress.setStyleSheet(
             f"QProgressBar {{ background: {BG2}; border: 1px solid {BORDER}; color: {SILVER}; }}"
-            f"QProgressBar::chunk {{ background: #2255DD; }}"
+            f"QProgressBar::chunk {{ background: #d4b04c; }}"
         )
         vlay.addWidget(self._progress)
 
@@ -342,7 +322,7 @@ class UpdateDialog(QDialog):
         if exe_url:
             self._dl_btn = QPushButton("Update Now")
             self._dl_btn.setStyleSheet(
-                f"background: #2255DD; color: #fff; border-radius: 4px;"
+                f"background: #d4b04c; color: #17120a; border-radius: 4px;"
                 " font-weight: 600; padding: 6px 16px;"
             )
             self._dl_btn.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -487,7 +467,7 @@ class _UnlockDialog(QDialog):
         ok_btn.setFixedHeight(34)
         ok_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         ok_btn.setStyleSheet(
-            "background: #2255DD; color: #fff; border-radius: 4px;"
+            "background: #d4b04c; color: #17120a; border-radius: 4px;"
             " font-weight: 600; font-size: 13px; padding: 4px 20px;"
         )
         ok_btn.clicked.connect(self._verify)
@@ -584,7 +564,7 @@ class CommandAccessDialog(QDialog):
         add_btn.setFixedHeight(28)
         add_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         add_btn.setStyleSheet(
-            "background: #2255DD; color: #fff; border-radius: 4px;"
+            "background: #d4b04c; color: #17120a; border-radius: 4px;"
             " font-size: 11px; font-weight: 600; padding: 2px 14px;"
         )
         add_btn.clicked.connect(self._add_token)
@@ -773,7 +753,7 @@ class CommandAccessDialog(QDialog):
         bb = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok)
         bb.accepted.connect(dlg.accept)
         bb.setStyleSheet(
-            f"QPushButton {{ background: #2255DD; color: #fff; border-radius: 4px;"
+            f"QPushButton {{ background: #d4b04c; color: #17120a; border-radius: 4px;"
             " font-weight: 600; padding: 6px 20px; }}"
         )
         vl.addWidget(bb)
@@ -857,7 +837,7 @@ class FleetDialog(QDialog):
         self._refresh_btn.setFixedHeight(28)
         self._refresh_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._refresh_btn.setStyleSheet(
-            f"background: #2255DD; color: #fff; border-radius: 4px;"
+            f"background: #d4b04c; color: #17120a; border-radius: 4px;"
             " font-size: 11px; font-weight: 600; padding: 2px 16px;"
         )
         self._refresh_btn.clicked.connect(self._fetch)
@@ -1000,22 +980,22 @@ class TitleBar(QWidget):
         self._drag   = False
         self._origin = QPoint()
         self.setFixedHeight(44)
-        self.setStyleSheet(f"background: {BG2}; border-bottom: 1px solid {LGOLD};")
+        self.setObjectName("titleBar")
+        self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        self.setStyleSheet(f"#titleBar {{ background: {BG}; border-bottom: 1px solid {BORDER}; }}")
 
         row = QHBoxLayout(self)
         row.setContentsMargins(14, 0, 8, 0)
         row.setSpacing(8)
 
-        brand = QLabel("✦  CURSIV")
-        brand.setStyleSheet(
-            f"color: {GOLD}; font-size: 13px; font-weight: 700; letter-spacing: 2px;"
-        )
+        brand = QLabel("Cursiv")
+        brand.setStyleSheet(f"color: {SILVER}; font-size: 14px; font-weight: 600;")
         row.addWidget(brand)
         row.addStretch()
 
         if username:
             u = QLabel(username)
-            u.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
+            u.setStyleSheet(f"color: {SILV2}; font-size: 12px; padding-right: 6px;")
             row.addWidget(u)
 
         for symbol, tip, slot, col in [
@@ -1033,14 +1013,13 @@ class TitleBar(QWidget):
         ]:
             btn = QPushButton(symbol)
             btn.setToolTip(tip)
-            btn.setFixedSize(32, 32)
+            btn.setFixedSize(34, 30)
             btn.setCursor(Qt.CursorShape.PointingHandCursor)
+            hover = theme.RED if col == RED else theme.TEXT
             btn.setStyleSheet(f"""
-                QPushButton {{
-                    background: transparent; color: {SILV2};
-                    font-size: 14px; border-radius: 4px; border: none;
-                }}
-                QPushButton:hover {{ background: {col}22; color: {col}; }}
+                QPushButton {{ background: transparent; color: {theme.MUTED}; font-size: 14px;
+                               border-radius: 6px; border: none; }}
+                QPushButton:hover {{ background: {theme.SURFACE2}; color: {hover}; }}
             """)
             btn.clicked.connect(slot)
             row.addWidget(btn)
@@ -1225,7 +1204,7 @@ class GettingStartedDialog(QDialog):
         close_btn.setFixedHeight(36)
         close_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         close_btn.setStyleSheet(
-            "background: #2255DD; color: #fff; border: none; border-radius: 8px;"
+            "background: #d4b04c; color: #17120a; border: none; border-radius: 8px;"
             " font-size: 13px; font-weight: 600;"
         )
         close_btn.clicked.connect(self.accept)
@@ -1307,7 +1286,8 @@ class CursivLauncher(QMainWindow):
     def _build_ui(self):
         root = _ResizeRoot()
         self.setCentralWidget(root)
-        root.setStyleSheet(f"background: {BG}; border: 1px solid {LGOLD};")
+        root.setObjectName("root")
+        root.setStyleSheet(f"#root {{ background: {BG}; border: 1px solid {BORDER}; }}")
 
         vlay = QVBoxLayout(root)
         vlay.setContentsMargins(_ResizeRoot._M, 0, _ResizeRoot._M, _ResizeRoot._M)   # edge strips for resizing
@@ -1384,12 +1364,12 @@ class CursivLauncher(QMainWindow):
         self._getting_started_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._getting_started_btn.setStyleSheet(f"""
             QPushButton {{
-                background: #2255DD; color: #ffffff;
+                background: #d4b04c; color: #17120a;
                 font-size: 15px; font-weight: 600;
                 border-radius: 8px; border: none;
             }}
-            QPushButton:hover   {{ background: #3366EE; }}
-            QPushButton:pressed {{ background: #1144CC; }}
+            QPushButton:hover   {{ background: #e2c062; }}
+            QPushButton:pressed {{ background: #b8963a; }}
             QPushButton:disabled {{ background: #1a1a2e; color: {SILV2}; }}
         """)
         self._getting_started_btn.clicked.connect(self._show_getting_started)
@@ -1532,17 +1512,19 @@ class CursivLauncher(QMainWindow):
     def _build_footer(self) -> QWidget:
         footer = QWidget()
         footer.setFixedHeight(32)
-        footer.setStyleSheet(f"background: {BG2}; border-top: 1px solid {BORDER};")
+        footer.setObjectName("footer")
+        footer.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)
+        footer.setStyleSheet(f"#footer {{ background: {BG}; border-top: 1px solid {BORDER}; }}")
         row = QHBoxLayout(footer)
         row.setContentsMargins(16, 0, 16, 0)
 
         self._status_lbl = QLabel("Starting…")
-        self._status_lbl.setStyleSheet(f"color: {SILV2}; font-size: 10px;")
+        self._status_lbl.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
         row.addWidget(self._status_lbl)
         row.addStretch()
 
         ver = QLabel(f"Cursiv v{_CURRENT_VERSION}")
-        ver.setStyleSheet(f"color: {SILV2}; font-size: 10px;")
+        ver.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
         row.addWidget(ver)
         return footer
 

@@ -20,11 +20,7 @@ from PyQt6.QtWidgets import (
 )
 
 import chat_commands as cc
-
-BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2 = (
-    "#0b0b12", "#13131e", "#2a2a3f", "#FFD700", "#9B7B20", "#C8C8D4", "#666680",
-)
-
+from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
 
 class _SealSignals(QObject):
     done = pyqtSignal(object)   # TextResult
@@ -90,7 +86,7 @@ class PostalComposeDialog(QDialog):
 
         self._seal_btn = QPushButton("Seal & Send")
         self._seal_btn.setStyleSheet(
-            "QPushButton { background: #2255DD; color: #fff; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
+            "QPushButton { background: #d4b04c; color: #17120a; font-weight: 600; border: none; border-radius: 6px; padding: 8px; }"
             "QPushButton:disabled { background: #1a1a2e; color: #666; }"
         )
         self._seal_btn.clicked.connect(self._seal)

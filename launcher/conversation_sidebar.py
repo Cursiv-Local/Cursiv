@@ -14,9 +14,8 @@ from PyQt6.QtWidgets import (
 )
 
 import conversations
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2  # one palette for every window (theme.py)
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2 = "#FFD700", "#C8C8D4", "#666680"
 
 
 def confirm_leave(parent, panel) -> bool:
@@ -58,14 +57,14 @@ class ConversationSidebar(QWidget):
         self.setAttribute(Qt.WidgetAttribute.WA_StyledBackground, True)   # paint the dark background
         self.setStyleSheet(f"""
             QWidget {{ background: {BG2}; }}
-            QLabel {{ color: {SILV2}; font-size: 11px; letter-spacing: 1px; background: transparent; }}
+            QLabel {{ color: {SILV2}; font-size: 12px; font-weight: 600; background: transparent; padding-top: 6px; }}
             QPushButton {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 6px;
                            padding: 7px 10px; font-size: 12px; text-align: left; }}
             QPushButton:hover {{ border-color: {GOLD}; color: {GOLD}; }}
             QListWidget {{ background: {BG2}; color: {SILVER}; border: none; font-size: 12px; outline: none; }}
             QListWidget::item {{ padding: 8px 8px; border-radius: 6px; margin: 1px 0; }}
             QListWidget::item:hover {{ background: #1a1b28; }}
-            QListWidget::item:selected {{ background: #1d2a4a; color: #ffffff; }}
+            QListWidget::item:selected {{ background: #1b1f2a; color: #e6e2d8; }}
         """)
         lay = QVBoxLayout(self)
         lay.setContentsMargins(10, 12, 10, 10)
@@ -79,7 +78,7 @@ class ConversationSidebar(QWidget):
         self._save.clicked.connect(self._save_chat)
         row.addWidget(self._save)
         lay.addLayout(row)
-        head = QLabel("SAVED CONVERSATIONS")
+        head = QLabel("Conversations")
         lay.addWidget(head)
         self._list = QListWidget()
         self._list.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)

@@ -12,16 +12,10 @@ from PyQt6.QtWidgets import (
     QMessageBox, QPushButton, QScrollArea, QStackedWidget,
     QTextBrowser, QVBoxLayout, QWidget,
 )
+from theme import BG, BG2, GOLD, LGOLD, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
-BG    = "#0b0b12"
-BG2   = "#13131e"
-GOLD  = "#FFD700"
-LGOLD = "#9B7B20"
 SILV  = "#C8C8D4"
-SILV2 = "#666680"
-RED   = "#FF4455"
-GREEN = "#44CC88"
-BLUE  = "#2255DD"
+BLUE  = "#d4b04c"
 
 _QSS = f"""
 QDialog, QWidget {{
@@ -36,12 +30,12 @@ QLineEdit {{
 }}
 QLineEdit:focus {{ border-color: {GOLD}; }}
 QPushButton {{
-    background: {BLUE}; color: #fff;
+    background: {BLUE}; color: #17120a;
     border: none; border-radius: 6px;
     padding: 8px 20px; font-size: 13px; font-weight: 600;
 }}
-QPushButton:hover   {{ background: #3366EE; }}
-QPushButton:pressed {{ background: #1144CC; }}
+QPushButton:hover   {{ background: #e2c062; }}
+QPushButton:pressed {{ background: #b8963a; }}
 QPushButton.secondary {{
     background: {BG2}; color: {SILV2};
     border: 1px solid {LGOLD};

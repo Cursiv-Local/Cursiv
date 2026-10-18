@@ -17,9 +17,8 @@ from PyQt6.QtCore import QObject, pyqtSignal
 from PyQt6.QtWidgets import (
     QCheckBox, QDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QPushButton, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2, GREEN, RED, AMBER = "#FFD700", "#C8C8D4", "#666680", "#3ecf6e", "#FF4455", "#e8a020"
 
 # (label, config field, free?, where to get a key)
 PROVIDERS = [
@@ -75,7 +74,7 @@ class SettingsDialog(QDialog):
             QFrame#card {{ background: {BG2}; border: 1px solid {BORDER}; border-radius: 6px; }}
             QLineEdit {{ background: {BG}; color: {SILVER}; border: 1px solid {BORDER}; border-radius: 4px;
                          padding: 5px 7px; font-family: Consolas, monospace; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px; padding: 5px 12px; font-weight: 600; }}
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 5px 12px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
             QPushButton#link {{ background: transparent; color: #6f9bff; border: none; font-weight: 400; padding: 2px 4px; }}

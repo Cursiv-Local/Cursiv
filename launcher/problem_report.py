@@ -23,12 +23,11 @@ from PyQt6.QtGui import QGuiApplication
 from PyQt6.QtWidgets import (
     QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton, QTextEdit, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
 REPORT_URL = os.environ.get("CURSIV_REPORT_URL", "https://cursiv.winklers-llc.com/api/report")
 HOME_DATA = Path.home() / ".cursiv"
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2, GREEN, RED = "#FFD700", "#C8C8D4", "#666680", "#3ecf6e", "#FF4455"
 
 _SECRET_PATTERNS = [
     re.compile(r"sk-ant-[A-Za-z0-9_\-]{8,}"),
@@ -158,7 +157,7 @@ class ProblemReportDialog(QDialog):
             QLabel {{ color: {SILVER}; background: transparent; }}
             QPlainTextEdit, QTextEdit {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER};
                                          border-radius: 4px; font-family: Consolas, monospace; font-size: 11px; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-weight: 600; }}
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px; padding: 6px 16px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
         """)

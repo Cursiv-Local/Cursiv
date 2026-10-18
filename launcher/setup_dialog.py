@@ -29,10 +29,8 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QFrame, QHBoxLayout, QLabel, QLayout, QLineEdit,
     QProgressBar, QPushButton, QVBoxLayout,
 )
+from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
 
-BG, BG2, BORDER = "#0b0b12", "#13131e", "#2a2a3f"
-GOLD, SILVER, SILV2 = "#FFD700", "#C8C8D4", "#666680"
-GREEN, RED, AMBER = "#3ecf6e", "#FF4455", "#e8a020"
 
 OLLAMA_INSTALLER_URL = "https://ollama.com/download/OllamaSetup.exe"
 OLLAMA_EXE = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
@@ -159,13 +157,13 @@ class SetupDialog(QDialog):
             QDialog {{ background: {BG}; color: {SILVER}; }}
             QLabel {{ color: {SILVER}; background: transparent; }}
             QFrame#card {{ background: {BG2}; border: 1px solid {BORDER}; border-radius: 6px; }}
-            QPushButton {{ background: #2255DD; color: #fff; border: none; border-radius: 4px;
+            QPushButton {{ background: #d4b04c; color: #17120a; border: none; border-radius: 4px;
                            padding: 6px 14px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
             QProgressBar {{ background: {BG}; border: 1px solid {BORDER}; border-radius: 3px; color: {SILVER};
                             text-align: center; height: 16px; }}
-            QProgressBar::chunk {{ background: #2255DD; }}
+            QProgressBar::chunk {{ background: #d4b04c; }}
             QComboBox, QLineEdit {{ background: {BG}; color: {SILVER}; border: 1px solid {BORDER};
                                     border-radius: 4px; padding: 4px 6px; }}
             QCheckBox {{ color: {SILVER}; }}

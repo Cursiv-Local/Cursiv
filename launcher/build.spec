@@ -62,6 +62,7 @@ hiddenimports = [
     "cursiv_launcher",
     "login_dialog",
     "chat_panel",
+    "theme",
     "chat_commands",
     "legacy_vault_dialog",
     "postal_compose_dialog",
