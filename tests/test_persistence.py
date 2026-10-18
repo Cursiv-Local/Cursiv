@@ -60,3 +60,35 @@ def test_a_note_and_offline_mode_survive_a_restart(tmp_path):
     assert "the north transect marker is 40 m past the culvert" in notes
     origin, date = notes["the north transect marker is 40 m past the culvert"]
     assert origin == "user_said" and len(date) == 10   # attributed to the person, dated
+
+
+FIELD = r'''
+import json, sys
+from pathlib import Path
+sys.path[:0] = [".", "launcher"]
+import portable
+home = Path(sys.argv[1])
+portable.apply_field_defaults(home)
+from cursiv_v215.core import netgate
+from cursiv_v215.chat import keys
+from cursiv_v215.memory import semantic
+from cursiv_v215.core import phases
+print(json.dumps({"offline": netgate.is_offline(), "breaks": phases._break_notes_on(),
+                  "learning": semantic.learning_enabled()}))
+'''
+
+
+def test_a_field_copy_starts_offline_quiet_and_not_learning(tmp_path):
+    import shutil
+    app = tmp_path / "app"
+    for part in ("cursiv_v215", "launcher"):
+        shutil.copytree(ROOT / part, app / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
+    home = tmp_path / "home"
+    home.mkdir()
+    env = {**os.environ, "USERPROFILE": str(home), "HOME": str(home), "QT_QPA_PLATFORM": "offscreen",
+           "PYTHONIOENCODING": "utf-8"}
+    out = subprocess.run([sys.executable, "-c", FIELD, str(home)], cwd=app, env=env, capture_output=True,
+                         text=True, encoding="utf-8", timeout=120)
+    assert out.returncode == 0, out.stderr[-2000:]
+    assert json.loads(out.stdout.strip().splitlines()[-1]) == {"offline": True, "breaks": False, "learning": False}
+    assert (home / ".cursiv" / "field_defaults_applied").exists()      # once only

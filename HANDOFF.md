@@ -181,3 +181,14 @@ From a review of real answers (a bleeding answer said not to bandage or use a to
 ## Releases
 
 Build every installer with `py -3.13 scripts/build_release.py <tag>`: it checks that the version in `core/selfknow.py`, `launcher/cursiv_launcher.py` and `installer/cursiv_setup.iss` matches the tag, builds in a fresh git worktree of the tag, and copies the installer to `installer/Output/`. Don't build from the working tree (U59 was built from uncommitted code; U63's first build picked up edits made during the build). `tests/test_versions.py` keeps the three version strings equal; CI runs the tests on every push to main and every PR. A release needs a GitHub release with `Cursiv-Setup-<version>.exe` and `Cursiv-Setup-latest.exe`, not just a push.
+
+## U64 (2026-10-18): speed, Standard / Deep Think, Phase A fixes
+
+- Speed (`core/speed.py`): `gpu_options()` sets `num_gpu` (whole model if its file fits 90% of the card, else its share); `make_room()` unloads other models first; one retry with Ollama's own split if a load fails. Measured on a 4 GB RTX 2050 in the comments.
+- Modes: `chat/status.py` `menu_choices()` / `choose()` / `current_choice()`; `answer_mode` "deep" uses `speed.DEEP_THINK_MODEL` with `think: true`; checks and background jobs pass `standard=True`. `chat_model` counts only while `show_all_models` is on.
+- `core/calc.py` (clock and plain arithmetic into the prompt, checked after), `core/clarify.py` (vague first message), `reference_data/doses.json` + `answer_check.dose_problems()`.
+- Memory: learned facts always "inferred"; `semantic.learnable()`; `repair_learned()` runs once (settings key `learned_repair_2026_10_18`), moving non-facts to `memory_facts.removed.jsonl`.
+- verify: C-001/002/004/005/006 closed; `_ledger_span()` reads emoji headings and items on following lines; numbers with thousands separators.
+- Field copy: `portable.FIELD_MARKER`, `apply_field_defaults()`; `usb_maker` "Field copy" box.
+- Evidence: `bench/phase1/` (original + replays), `scripts/phase1_replay.py`, `scripts/compare_models.py --source`, `tests/test_persistence.py`.
+- Open: model comparison result decides Standard / Deep Think defaults; coop advice has no reference entry; CPU-only speed unmeasured; field notes export doesn't exist.

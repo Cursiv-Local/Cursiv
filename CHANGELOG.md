@@ -1,5 +1,18 @@
 # Changelog
 
+## v3.14-U64 — Faster, steadier, ready for the field (2026-10-18)
+- **About twice as fast on small graphics cards.** Ollama was leaving much of each model on the processor. Cursiv now puts as much as fits on the card, and clears other models off it first: on a 4 GB card, the everyday model went from 16 to 37 words-pieces a second.
+- **Standard or Deep Think.** The menu above the chat now offers two choices instead of model names. Standard is quick; Deep Think (qwen3 8B, when it's downloaded) reasons before it answers and takes a minute or two. Every installed model is listed only if you turn on "Advanced: show every model" in Settings.
+- **Arithmetic and clock times are worked out exactly.** "Wake at 6 AM, 8 hours of sleep, 30 minutes to fall asleep" is 9:30 PM, calculated by Cursiv, not guessed by the model; an answer that disagrees gets a note. Shown sums like "17 times 23 is 381" are checked too.
+- **Bleach doses are checked against the reference card,** and a vague first message ("Is it safe?") gets a question back instead of a guess.
+- **Memories are honest about where they came from.** Things Cursiv picked up from conversations are always marked as guesses, never "verified", and are used only when clearly relevant. A one-time clean-up relabels older ones and moves entries that weren't facts about you (copies of answers, note lines) to a backup file.
+- **Answer checking is steadier:** it no longer calls a correct answer "verified" without checking, accepts "No problems found", stops flagging correct totals, and doesn't ask for a Known/Inferred list on simple questions.
+- **Field copies.** The USB maker has a "Field copy" option: the drive starts in offline mode, with no break reminders and no learned guesses. A saved note and offline mode are tested to survive a restart.
+- **Pasted text keeps its shape** (line breaks, numbered lists, indents) in the conversation.
+- Fixed: "translate into Spanish …" was labelled as a translation to English; hypothermia and other emergencies are recognised; answers no longer offer to find a hospital or set a reminder. The memory-search model is downloaded only by Setup, never on its own.
+- The late-night break reminder can be turned off in Settings → How Cursiv answers.
+- **Measured:** truth benchmark suite 1.2; the Phase 1 conversation replayed with every answer recorded in `bench/phase1/`.
+
 ## v3.14-U63 — Safer, more accurate answers (2026-10-18)
 - **Corrected first-aid and water entries.** Severe bleeding, tourniquet, water purification and hypothermia are rewritten from published guidance (U.S. EPA, U.S. CDC, Stop the Bleed). Each card names its source and the date it was checked. An earlier answer told someone not to bandage a wound or use a tourniquet; the bleeding card now says: call 911, press firmly, pack the wound, then a tourniquet 2–3 inches above it, and note the time. The water card gives EPA bleach doses and says boiling and bleach don't remove chemicals.
 - **Heavy bleeding is treated as a medical emergency.** "Spurting blood" or "blood everywhere" used to get no first-aid card and a reply meant for a mental-health crisis. Now it gets 911 and the bleeding steps. Cursiv's instructions no longer treat a medical emergency like a crisis.

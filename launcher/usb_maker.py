@@ -435,7 +435,7 @@ class _Signals(QObject):
 
 
 def make_usb(root: Path, models: list[dict], include_private: bool,
-             sig: _Signals, cancel: threading.Event) -> None:
+             sig: _Signals, cancel: threading.Event, field: bool = False) -> None:
     try:
         have = {m["name"] for m in list_models()}
         for tag in required_names(list_models()):
@@ -496,6 +496,12 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
 
         (root / "Cursiv" / "portable.cursiv").write_text(
             "This copy of Cursiv runs from this drive. See README.txt.\n", encoding="utf-8")
+        field_marker = root / "Cursiv" / "field.cursiv"
+        if field:
+            field_marker.write_text("Field copy: on first start, offline mode on, break notes off, "
+                                    "learning off (portable.apply_field_defaults).\n", encoding="utf-8")
+        else:
+            field_marker.unlink(missing_ok=True)
         (root / "Home").mkdir(exist_ok=True)
         (root / "Start Cursiv.bat").write_bytes(START_BAT.encode("ascii"))
         (root / "README.txt").write_text(README, encoding="utf-8")
@@ -579,6 +585,10 @@ class UsbMakerDialog(QDialog):
         self._private = QCheckBox("Include my memories, keys and settings (private — only for your own USB)")
         self._private.toggled.connect(self._update_total)
         lay.addWidget(self._private)
+
+        self._field = QCheckBox("Field copy: starts in offline mode, no break reminders, no learned guesses")
+        self._field.setToolTip("For research or field use. All three can be changed in Settings on the drive.")
+        lay.addWidget(self._field)
 
         self._total = QLabel("")
         self._total.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
@@ -693,7 +703,7 @@ class UsbMakerDialog(QDialog):
         self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
         threading.Thread(target=make_usb,
                          args=(Path(d["root"]), self._chosen_models(), self._private.isChecked(),
-                               self._sig, self._cancel),
+                               self._sig, self._cancel, self._field.isChecked()),
                          daemon=True).start()
 
     def _on_progress(self, pct: int, text: str):

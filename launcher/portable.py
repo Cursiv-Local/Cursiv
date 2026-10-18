@@ -22,6 +22,7 @@ import sys
 from pathlib import Path
 
 MARKER = "portable.cursiv"
+FIELD_MARKER = "field.cursiv"          # a field copy: see apply_field_defaults()
 
 
 def usb_root() -> Path | None:
@@ -54,7 +55,30 @@ def activate() -> bool:
     ollama_dir = root / "Ollama"
     if (ollama_dir / "ollama.exe").exists():
         os.environ["PATH"] = str(ollama_dir) + os.pathsep + os.environ.get("PATH", "")
+    if (root / "Cursiv" / FIELD_MARKER).exists():
+        apply_field_defaults(home)
     return True
+
+
+def apply_field_defaults(home: Path) -> None:
+    """The first time a field copy starts: offline mode on, no break notes, no learned
+    guesses about the person (only what they save with "remember"). All three can be
+    changed in Settings afterwards; this runs once."""
+    done = home / ".cursiv" / "field_defaults_applied"
+    if done.exists():
+        return
+    try:
+        from cursiv_v215.core import netgate
+        from cursiv_v215.chat import keys
+        from cursiv_v215.memory import semantic
+        netgate.set_offline(True)
+        keys.store_key("break_notes", "off")
+        semantic.set_learning(False)
+        done.parent.mkdir(parents=True, exist_ok=True)
+        done.write_text("Field defaults set on first start: offline on, break notes off, learning off.\n",
+                        encoding="utf-8")
+    except Exception:
+        pass
 
 
 def real_home() -> Path:
