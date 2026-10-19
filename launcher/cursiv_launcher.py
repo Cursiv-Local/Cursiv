@@ -1435,11 +1435,11 @@ class CursivLauncher(QMainWindow):
             except Exception as exc:
                 self._set_status(f"Cannot open security questions: {exc}")
                 return
-        dlg = SecurityQSetupDialog(self)
+        dlg = SecurityQSetupDialog(self, username=self._username)      # the signed-in person's own
         dlg.exec()
         try:
             from cursiv_v215.guardian.security_questions import is_setup_complete
-            if is_setup_complete():
+            if is_setup_complete(self._username):
                 self._set_status("Security questions saved.")
             else:
                 self._set_status("Security questions skipped.")

@@ -175,12 +175,24 @@ def username_exists(username: str) -> bool:
         return False
 
 
-def reset_password(new_password: str) -> None:
-    """Replace the stored password hash after successful security-question verification."""
+def reset_password(new_password: str, username: str | None = None) -> None:
+    """Replace one account's password after its own security questions were answered.
+    username: the account to change (the primary when None, for older callers). Raises
+    ValueError if there's no such account. Never touches any other account."""
     _check_bcrypt()
     _ensure()
     hashed = bcrypt.hashpw(new_password.encode("utf-8"), bcrypt.gensalt(rounds=12))
-    _HASH_FILE.write_bytes(hashed)
+    if username is None or is_primary(username):
+        if username is None and not _primary_hash():
+            raise ValueError("There's no account to reset.")
+        _HASH_FILE.write_bytes(hashed)
+        return
+    accounts = _load_accounts()
+    key = _uhash(username)
+    if key not in accounts:
+        raise ValueError("There's no account with that username.")
+    accounts[key]["pw_hash"] = base64.b64encode(hashed).decode("ascii")
+    _save_accounts(accounts)
 
 
 def reset_credentials() -> None:
@@ -223,9 +235,9 @@ def remove_account(username: str) -> bool:
     Remove one login. Returns False if no such account exists. Never removes
     the last account (raises ValueError -- use start_over for that), so the
     app always has someone who can sign in. Removing the primary account
-    promotes the oldest additional account to primary and clears the
-    security questions, which were the removed person's: left in place they
-    could reset the new primary's password. App data is untouched.
+    promotes the oldest additional account to primary. The removed person's
+    security questions go with them (each account has its own); left in place
+    they could reset someone else's password. App data is untouched.
     """
     if not username_exists(username):
         return False
@@ -234,6 +246,10 @@ def remove_account(username: str) -> bool:
 
     target = _uhash(username)
     accounts = _load_accounts()
+    from cursiv_v215.guardian.security_questions import clear_security_questions
+    # The removed person's questions go with them (before any promotion: a set saved before
+    # per-account questions is read as the current primary's).
+    clear_security_questions(account_hash=target)
     if not is_primary(username):
         accounts.pop(target, None)
         _save_accounts(accounts)
@@ -251,8 +267,6 @@ def remove_account(username: str) -> bool:
     accounts.pop(heir, None)
     accounts.pop(target, None)
     _save_accounts(accounts)
-    from cursiv_v215.guardian.security_questions import clear_security_questions
-    clear_security_questions()
     return True
 
 

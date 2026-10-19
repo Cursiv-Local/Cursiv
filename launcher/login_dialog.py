@@ -133,10 +133,11 @@ class SecurityQSetupDialog(_BaseDialog):
     and provides answers that are bcrypt-hashed for later recovery.
     """
 
-    def __init__(self, parent=None, required: bool = False):
+    def __init__(self, parent=None, required: bool = False, username: str | None = None):
         super().__init__("Cursiv — Security Questions", parent)
         self.setFixedWidth(500)
         self._required = required     # first account: no skipping (it's how a forgotten password is reset)
+        self._username = username     # whose questions these are (each account has its own)
         self._build()
 
     def _build(self):
@@ -219,7 +220,7 @@ class SecurityQSetupDialog(_BaseDialog):
 
         try:
             _, setup_sq, *_ = _sq()
-            setup_sq(indices, answers)
+            setup_sq(indices, answers, self._username)
         except Exception as exc:
             self._err.setText(f"Setup error: {exc}")
             return
@@ -326,14 +327,15 @@ class ResetPasswordDialog(_BaseDialog):
 
         try:
             _, _, sq_ready, get_qs, *_ = _sq()
-            if not sq_ready():
+            if not sq_ready(username):
                 self._p0_err.setText(
-                    "No security questions are configured for this account.\n"
-                    "Use 'Reset Entire Account' below as a last resort."
+                    "This account has no security questions, so its password can't be reset here.\n"
+                    "Ask someone who can sign in to remove it and add it again (Settings → Your data "
+                    "& account). As a last resort, 'Reset Entire Account' removes every login."
                 )
                 self._nuclear_btn.setVisible(True)
                 return
-            questions = get_qs()
+            questions = get_qs(username)
         except Exception as exc:
             self._p0_err.setText(f"Security question error: {exc}")
             return
@@ -386,7 +388,7 @@ class ResetPasswordDialog(_BaseDialog):
         answers = [f.text().strip() for f in self._sq_fields]
         try:
             _, _, _, _, verify, *_ = _sq()
-            if not verify(answers):
+            if not verify(answers, self._verified_username):
                 self._p1_err.setText(
                     "Security answers do not match (need 2 of 3).\n"
                     "Check spelling — minor differences matter."
@@ -440,7 +442,7 @@ class ResetPasswordDialog(_BaseDialog):
 
         try:
             from cursiv_v215.guardian.access_gate import reset_password
-            reset_password(pw)
+            reset_password(pw, username=self._verified_username)     # only the account that answered
         except Exception as exc:
             self._p2_err.setText(f"Error saving password: {exc}")
             return
@@ -567,12 +569,14 @@ class SetupDialog(_BaseDialog):
         if not self._is_additional:
             # Security questions are required for the first account: without
             # them the only way back in was "Reset Entire Account", which let
-            # anyone at the keyboard in. Additional accounts don't have their
-            # own question-based recovery yet.
+            # anyone at the keyboard in.
             while True:
-                sq_dlg = SecurityQSetupDialog(self, required=True)
+                sq_dlg = SecurityQSetupDialog(self, required=True, username=username)
                 if sq_dlg.exec() and sq_dlg.accepted_ok():
                     break
+        else:
+            # Every account has its own questions, which reset only its own password.
+            SecurityQSetupDialog(self, required=False, username=username).exec()
 
         self._ok = True
         self.accept()

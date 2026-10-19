@@ -4,7 +4,11 @@ Cursiv Security Questions — password recovery via challenge-response.
 Answers are normalised (lowercase, strip punctuation) then bcrypt-hashed so
 they cannot be retrieved. At reset time, at least 2 of 3 must match.
 
-Storage: .cursiv/runtime/sq.json
+Storage: .cursiv/runtime/sq.json, one set per account:
+    {"accounts": {"<sha256 of username>": {"questions": [...], "answers": [...]}}}
+A file from before per-account questions ({"questions", "answers"} at the top) is the
+first (primary) account's set; it's moved under that account the next time it's written.
+Each account's questions reset only that account's password (access_gate.reset_password).
 """
 
 from __future__ import annotations
@@ -75,48 +79,95 @@ def _check(answer: str, stored: str) -> bool:
         return False
 
 
+def _uhash(username: str) -> str:
+    import hashlib
+    return hashlib.sha256((username or "").encode("utf-8")).hexdigest()
+
+
+def _primary_hash() -> str:
+    try:
+        from cursiv_v215.guardian import access_gate
+        return access_gate._primary_hash()
+    except Exception:
+        return ""
+
+
+def _load() -> dict:
+    """{"accounts": {hash: {"questions", "answers"}}}, with an old single set placed
+    under the primary account."""
+    try:
+        data = json.loads(_SQ_FILE.read_text(encoding="utf-8"))
+    except Exception:
+        return {"accounts": {}}
+    accounts = dict(data.get("accounts") or {})
+    if "questions" in data and "answers" in data:
+        primary = _primary_hash()
+        if primary and primary not in accounts:
+            accounts[primary] = {"questions": data["questions"], "answers": data["answers"]}
+    return {"accounts": accounts}
+
+
+def _save(data: dict) -> None:
+    _RUNTIME.mkdir(parents=True, exist_ok=True)
+    _SQ_FILE.write_text(json.dumps({"accounts": data["accounts"]}, indent=2), encoding="utf-8")
+
+
+def _key(username: str | None) -> str:
+    """The account a call is about: the named one, or the primary when none is named
+    (callers from before per-account questions)."""
+    return _uhash(username) if username else _primary_hash()
+
+
 # ── Public API ─────────────────────────────────────────────────────────────
 
-def setup_security_questions(q_indices: list[int], answers: list[str]) -> None:
-    """Hash and persist 3 security Q&A pairs. Overwrites any previous set."""
+def setup_security_questions(q_indices: list[int], answers: list[str], username: str | None = None) -> None:
+    """Hash and save 3 security Q&A pairs for this account (the primary if none is named).
+    Replaces that account's previous set; other accounts' sets are untouched."""
     if not _BCRYPT_OK:
         raise RuntimeError("bcrypt is not installed — run: pip install bcrypt")
     if len(q_indices) != 3 or len(answers) != 3:
         raise ValueError("Exactly 3 questions and answers are required.")
-    _RUNTIME.mkdir(parents=True, exist_ok=True)
-    hashed = [_hash_answer(a).decode("latin-1") for a in answers]
-    _SQ_FILE.write_text(
-        json.dumps({"questions": q_indices, "answers": hashed}, indent=2),
-        encoding="utf-8",
-    )
+    key = _key(username)
+    if not key:
+        raise ValueError("There's no account to set security questions for.")
+    data = _load()
+    data["accounts"][key] = {"questions": list(q_indices),
+                             "answers": [_hash_answer(a).decode("latin-1") for a in answers]}
+    _save(data)
 
 
-def is_setup_complete() -> bool:
-    return _SQ_FILE.exists()
+def is_setup_complete(username: str | None = None) -> bool:
+    """Has this account (the primary if none is named) set security questions?"""
+    key = _key(username)
+    return bool(key) and key in _load()["accounts"]
 
 
-def get_selected_questions() -> list[str]:
-    """Return the 3 question texts chosen at setup."""
-    if not _SQ_FILE.exists():
-        return []
-    data = json.loads(_SQ_FILE.read_text(encoding="utf-8"))
-    return [QUESTIONS[i] for i in data["questions"]]
+def get_selected_questions(username: str | None = None) -> list[str]:
+    """The 3 question texts this account chose."""
+    entry = _load()["accounts"].get(_key(username))
+    return [QUESTIONS[i] for i in entry["questions"]] if entry else []
 
 
-def verify_answers(answers: list[str]) -> bool:
-    """Return True when at least RESET_THRESHOLD answers match stored hashes."""
-    if not _SQ_FILE.exists():
+def verify_answers(answers: list[str], username: str | None = None) -> bool:
+    """True when at least RESET_THRESHOLD answers match this account's stored hashes."""
+    entry = _load()["accounts"].get(_key(username))
+    if not entry:
         return False
-    data = json.loads(_SQ_FILE.read_text(encoding="utf-8"))
-    stored = data["answers"]
+    stored = entry["answers"]
     if len(answers) != len(stored):
         return False
     matches = sum(_check(a, h) for a, h in zip(answers, stored))
     return matches >= RESET_THRESHOLD
 
 
-def clear_security_questions() -> None:
+def clear_security_questions(username: str | None = None, *, account_hash: str = "") -> None:
+    """Remove one account's set (by username or its hash), or every set when neither is given."""
     try:
-        _SQ_FILE.unlink(missing_ok=True)
+        if not username and not account_hash:
+            _SQ_FILE.unlink(missing_ok=True)
+            return
+        data = _load()
+        data["accounts"].pop(account_hash or _uhash(username), None)
+        _save(data)
     except Exception:
         pass

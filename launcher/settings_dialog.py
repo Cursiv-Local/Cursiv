@@ -505,8 +505,8 @@ class SettingsDialog(QDialog):
         except Exception as exc:
             return f"Nothing was removed: {exc}"
         self._refresh_accounts()
-        note = (" The security questions belonged to that account and were cleared; set new ones "
-                "in Security questions.") if was_primary else ""
+        note = (" Its security questions were removed with it; every other account keeps its own."
+                if was_primary else "")
         if username == me:
             self._quit_pending = True
             return "Your account was removed. Cursiv will close now; sign in next time with another account." + note
