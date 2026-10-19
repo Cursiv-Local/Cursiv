@@ -421,6 +421,134 @@ class SettingsDialog(QDialog):
         self._action(lay, "Security questions",
                      "Set the questions that let you reset a forgotten password.",
                      lambda: self._call_window("_setup_sq"))
+        self._accounts_card(lay)
+
+    # ── accounts ──
+    def _signed_in(self) -> str:
+        return getattr(self._win, "_username", "") or ""
+
+    def _accounts_card(self, lay):
+        v = self._card(lay)
+        t = QLabel("Accounts on this computer"); t.setStyleSheet("font-size: 14px; font-weight: 600;")
+        v.addWidget(t)
+        self._accounts_list = self._explain("")
+        v.addWidget(self._accounts_list)
+        v.addWidget(self._explain(
+            "Usernames are stored scrambled, so only yours is shown by name. Removing an account "
+            "needs its username and your password. Memories, notebook and documents are shared by "
+            "every account and stay."))
+        row = QHBoxLayout(); row.addStretch(1)
+        rm = QPushButton("Remove an account…"); rm.setObjectName("ghost")
+        rm.clicked.connect(self._remove_account_clicked); row.addWidget(rm)
+        so = QPushButton("Start over: remove all accounts"); so.setObjectName("ghost")
+        so.clicked.connect(self._start_over_clicked); row.addWidget(so)
+        v.addLayout(row)
+        self._refresh_accounts()
+
+    def _refresh_accounts(self):
+        from cursiv_v215.guardian import access_gate as ag
+        me = self._signed_in()
+        mine = 1 if me and ag.username_exists(me) else 0
+        others = max(ag.account_count() - mine, 0)
+        lines = [f"• {me} (you, signed in)"] if mine else []
+        lines += ["• another account"] * others
+        total = mine + others
+        head = f"{total} account{'s' if total != 1 else ''}:"
+        self._accounts_list.setText("\n".join([head] + lines) if lines else "No accounts.")
+
+    def _ask(self, title: str, intro: str, ask_username: bool) -> tuple[str, str] | None:
+        """Small form: (username to remove, your password), or None if cancelled."""
+        dlg = QDialog(self); dlg.setWindowTitle(title); dlg.setStyleSheet(self.styleSheet())
+        v = QVBoxLayout(dlg); v.setContentsMargins(20, 18, 20, 16); v.setSpacing(8)
+        v.addWidget(self._explain(intro))
+        user = QLineEdit(); user.setPlaceholderText("Username of the account to remove")
+        if ask_username:
+            v.addWidget(user)
+        pw = QLineEdit(); pw.setEchoMode(QLineEdit.EchoMode.Password)
+        pw.setPlaceholderText(f"Your password ({self._signed_in() or 'signed-in account'})")
+        v.addWidget(pw)
+        row = QHBoxLayout(); row.addStretch(1)
+        cancel = QPushButton("Cancel"); cancel.setObjectName("ghost"); cancel.clicked.connect(dlg.reject)
+        ok = QPushButton("Remove"); ok.clicked.connect(dlg.accept)
+        row.addWidget(cancel); row.addWidget(ok); v.addLayout(row)
+        if not dlg.exec():
+            return None
+        return user.text().strip(), pw.text()
+
+    def _tell(self, title: str, text: str):
+        from PyQt6.QtWidgets import QMessageBox
+        QMessageBox.information(self, title, text)
+
+    def _remove_account_clicked(self):
+        got = self._ask("Remove an account",
+                        "Type the username of the account to remove (it can be yours) and your own "
+                        "password. Usernames are case-sensitive.", ask_username=True)
+        if got:
+            self._tell("Remove an account", self.remove_account(*got))
+            self._quit_if_pending()
+
+    def remove_account(self, username: str, password: str) -> str:
+        """Do the removal; returns the sentence to show. Removing yourself closes Cursiv."""
+        from cursiv_v215.guardian import access_gate as ag
+        me = self._signed_in()
+        try:
+            if not (me and password and ag.verify_credentials(me, password)):
+                raise ValueError("Your password is not right.")
+            if ag.account_count() <= 1 and ag.username_exists(username):
+                return "That's the only account. Use Start over to replace it."
+            if username == me and not self._leave_ok():
+                return "Nothing was removed."
+            was_primary = ag.is_primary(username)
+            ag.remove_with_password(username, me, password)
+        except ValueError as exc:
+            return f"Nothing was removed. {exc}"
+        except Exception as exc:
+            return f"Nothing was removed: {exc}"
+        self._refresh_accounts()
+        note = (" The security questions belonged to that account and were cleared; set new ones "
+                "in Security questions.") if was_primary else ""
+        if username == me:
+            self._quit_pending = True
+            return "Your account was removed. Cursiv will close now; sign in next time with another account." + note
+        return "The account was removed." + note
+
+    def _start_over_clicked(self):
+        got = self._ask("Start over",
+                        "This removes every login on this computer and the security questions. "
+                        "Memories, notebook, documents and saved AI keys stay. Cursiv closes, and the "
+                        "next start asks you to create an account.\n\nType your password to continue.",
+                        ask_username=False)
+        if got:
+            self._tell("Start over", self.start_over(got[1]))
+            self._quit_if_pending()
+
+    def start_over(self, password: str) -> str:
+        """Remove every login; returns the sentence to show. Closes Cursiv on success."""
+        from cursiv_v215.guardian import access_gate as ag
+        me = self._signed_in()
+        try:
+            if not (me and password and ag.verify_credentials(me, password)):
+                raise ValueError("Your password is not right.")
+            if not self._leave_ok():
+                return "Nothing was removed."
+            ag.start_over(me, password)
+        except ValueError as exc:
+            return f"Nothing was removed. {exc}"
+        except Exception as exc:
+            return f"Nothing was removed: {exc}"
+        self._quit_pending = True
+        return ("Every account was removed. Cursiv will close now; the next start asks you to "
+                "create an account. Your memories, notebook and documents are kept.")
+
+    def _leave_ok(self) -> bool:
+        fn = getattr(self._win, "_confirm_leave", None)
+        return fn() if fn else True
+
+    def _quit_if_pending(self):
+        """Close Cursiv once the message is dismissed -- nobody stays signed in after their login is gone."""
+        if getattr(self, "_quit_pending", False):
+            from PyQt6.QtWidgets import QApplication
+            QApplication.quit()
 
     def _page_help(self, lay):
         self._action(lay, "Setup and engine",
