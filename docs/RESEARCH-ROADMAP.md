@@ -32,8 +32,10 @@ code signing (not yet). Personal memory stays on the computer and never syncs.
   (Vincenty, WGS84) and 24-hour clock times. Field cases in the truth benchmark (suites 1.3 and 1.4).
 - **R3 The team's documents: built and tested.** PDFs and text imported offline, answers quote the page,
   a check that cited pages were among those supplied, and a documents-only mode (never during an emergency).
-- **R4 Integrity: started.** Entries are fingerprinted and chained; sample IDs, per-sample history and
-  printable labels are built. Signed exports are next.
+- **R4 Integrity: built and tested** (U73). Entries are fingerprinted and chained; sample IDs, per-sample
+  history and printable labels; each installation has an Ed25519 key, and every export carries a signature
+  over the log's head and each exported file (`field log verify <folder>`). Not yet: QR labels, a recorded
+  clock source.
 - **R5 Hardware: started.** Battery saver, power-loss-safe saves, speed measured with and without a graphics card (`docs/HARDWARE.md`). Still to do: the SSD kit on two clean laptops, a full day on battery, full-disk behaviour.
 - **R6 Team sync: built and tested** with three simulated laptops on one USB drive (`tests/test_fieldsync.py`):
   nothing lost or duplicated, changed or cut-off copies refused, differing histories kept side by side,
@@ -41,5 +43,6 @@ code signing (not yet). Personal memory stays on the computer and never syncs.
   institution is not built.
 - **R7 Safety pack: started.** 37 entries from public U.S. government sources (`docs/REFERENCE.md`); none professionally reviewed yet.
 - R8, R9, R10: not started.
-- **R11 Field network: designed** (`docs/FIELD-NETWORK.md`), not built. Builds on R6's
-  per-laptop chains; Phase 0 overlaps R4 (signing) and R9 (photos).
+- **R11 Field network: designed** (`docs/FIELD-NETWORK.md`); Phase 0 signing built (U73): USB shares
+  are signed and checked, and a laptop's key is remembered so another machine can't add records under
+  its name. The network (Phases 1–4) isn't built.

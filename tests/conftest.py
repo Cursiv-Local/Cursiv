@@ -15,3 +15,17 @@ os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 # these tests (and reading them from OneDrive can stall an import).
 for _m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(_m, None)
+
+
+import pytest  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _signing_key_in_tmp(tmp_path_factory, monkeypatch):
+    """Never create or use the real installation key (~/.cursiv/device_key.json) in a test."""
+    from cursiv_v215.core import devicekey
+    folder = tmp_path_factory.mktemp("devicekey")
+    monkeypatch.setattr(devicekey, "key_file", lambda: folder / "device_key.json")
+    devicekey._cache.clear()
+    yield
+    devicekey._cache.clear()

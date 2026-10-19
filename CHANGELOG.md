@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- **Signed field records** (field network Phase 0, R4): each Cursiv installation has its own signing key. Every export carries `signature.json`, a signature over the log's head and every exported file; `field log verify <folder>` says whether it checks out. USB team shares are signed and checked; the first key seen for each laptop is remembered, and later shares signed by another key (or unsigned) are refused, so another machine can't add records under a laptop's name. Shares from older versions still import, reported as unsigned.
+- `docs/FIELD-NETWORK.md`: the design for a master node on local Wi-Fi (R11).
+
 ## v3.14-U72 — Mac (early) and a tidier USB (2026-10-18)
 - **Cursiv for Mac, early:** a `.dmg` for Apple Silicon Macs (M1 or newer, macOS 12+), built and tested on Apple hardware at GitHub: the full test suite and a self-test of the built app. Setup installs Ollama into your Applications folder without an admin password. Saved AI keys go into the macOS Keychain; settings and memories live in ~/Library/Application Support/Cursiv. Not signed by Apple yet (first open: System Settings → Privacy & Security → Open Anyway), and not yet used by anyone on their own Mac. The USB drive stays Windows-only.
 - **USB drive:** the top of the drive shows only `Start Cursiv.bat`, a start-here `README.txt` and the folders; the drive icon lives in the Cursiv folder. The README covers the first run, what to try, what each folder holds, and how to remove the accounts.

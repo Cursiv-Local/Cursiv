@@ -15,6 +15,13 @@ Nothing is resolved silently:
 - the same sample ID recorded on two laptops is reported.
 
 Only the field log moves. Personal memory, documents and settings never do.
+
+Signed (field network Phase 0): a share's manifest carries the laptop's signed head
+(core/devicekey.py). Import checks the signature against the copy, and remembers the
+first key seen for each laptop (team/<laptop>.key.json). After that, a share signed by
+a different key, or an unsigned share, is refused: someone copying the laptop's name
+can't add records in its place. Shares from Cursiv before U73 have no signature; they
+are imported and reported as unsigned until that laptop signs once.
 """
 from __future__ import annotations
 
@@ -24,7 +31,7 @@ import shutil
 from datetime import datetime, timezone
 from pathlib import Path
 
-from cursiv_v215.core import fieldlog
+from cursiv_v215.core import devicekey, fieldlog
 
 SHARE_DIR = "cursiv-field-share"          # the folder made on the USB drive / shared folder
 
@@ -71,15 +78,52 @@ def share(folder: Path, observer: str = "") -> Path:
     (out / f"{device}.manifest.json").write_text(json.dumps({
         "device": device, "observer": observer, "entries": len(rows), "last_hash": rows[-1]["hash"],
         "shared_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "head": devicekey.signed_head(rows, device),
     }, indent=2), encoding="utf-8")
     return out
 
 
+def _key_file(device: str) -> Path:
+    return team_dir() / f"{device}.key.json"
+
+
+def pinned_key(device: str) -> dict | None:
+    try:
+        return json.loads(_key_file(device).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def _check_signature(m: dict, device: str, rows: list[dict]) -> tuple[dict | None, list[str]]:
+    """(the verified signature envelope or None if unsigned, problems)."""
+    env = m.get("head")
+    if not env:
+        return None, []
+    if not devicekey.verify(env):
+        return None, ["its signature doesn't match: the copy or its manifest was changed after it was signed"]
+    h = env["signed"]
+    if h.get("format") != devicekey.HEAD_FORMAT or h.get("device") != device or h.get("entries") != len(rows) \
+            or (rows and h.get("hash") != rows[-1]["hash"]):
+        return None, ["its signature is for a different log or length than this copy"]
+    pin = pinned_key(device)
+    if pin and pin.get("public_key") != env["public_key"]:
+        return None, [f"it's signed by a different key ({env['key_id']}) than this laptop's earlier shares "
+                      f"({pin.get('key_id')}). Not imported. If that laptop really has a new key (a new "
+                      f"Windows account or a reinstall), delete {_key_file(device).name} in the team folder "
+                      f"to accept it."]
+    return env, []
+
+
 def _check_shared(log: Path) -> tuple[list[dict], list[str]]:
+    rows, problems, _env = _check_shared_signed(log)
+    return rows, problems
+
+
+def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]:
     try:
         rows = _read_lines(log)
     except ValueError:
-        return [], ["a line isn't a complete entry (the copy may have been cut off)"]
+        return [], ["a line isn't a complete entry (the copy may have been cut off)"], None
     problems = chain_problems(rows)
     if {e.get("device") for e in rows} - {log.stem}:
         problems.append("it contains entries from a different laptop than its name says")
@@ -91,7 +135,12 @@ def _check_shared(log: Path) -> tuple[list[dict], list[str]]:
         if m.get("entries") != len(rows) or (rows and m.get("last_hash") != rows[-1]["hash"]):
             problems.append(f"the manifest says {m.get('entries')} entries but the copy has {len(rows)}: "
                             "it was cut off or changed after it was shared")
-    return rows, problems
+        env, sig_problems = _check_signature(m, log.stem, rows)
+        problems += sig_problems
+        if env is None and not sig_problems and pinned_key(log.stem):
+            problems.append("it isn't signed, but this laptop's earlier shares were: not imported")
+        return rows, problems, env
+    return rows, problems, None
 
 
 def import_folder(folder: Path) -> dict:
@@ -102,7 +151,8 @@ def import_folder(folder: Path) -> dict:
     logs = sorted(src.glob("*.jsonl"))
     if not logs:
         raise ValueError(f"no shared field logs in {src}")
-    report = {"added": {}, "unchanged": [], "conflicts": [], "rejected": [], "own": False}
+    report = {"added": {}, "unchanged": [], "conflicts": [], "rejected": [], "own": False,
+              "signed": {}, "unsigned": []}
     me = fieldlog._device()
     team_dir().mkdir(parents=True, exist_ok=True)
     for log in logs:
@@ -110,10 +160,19 @@ def import_folder(folder: Path) -> dict:
         if device == me:
             report["own"] = True          # this laptop's own share: its log is already here
             continue
-        rows, problems = _check_shared(log)
+        rows, problems, env = _check_shared_signed(log)
         if problems:
             report["rejected"].append(f"{device}: " + "; ".join(problems))
             continue
+        if env:
+            report["signed"][device] = env["key_id"]
+            if not pinned_key(device):
+                _key_file(device).write_text(json.dumps({
+                    "device": device, "public_key": env["public_key"], "key_id": env["key_id"],
+                    "first_seen_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}, indent=2),
+                    encoding="utf-8")
+        else:
+            report["unsigned"].append(device)
         mine = team_dir() / f"{device}.jsonl"
         if not mine.exists():
             shutil.copyfile(log, mine)
@@ -186,6 +245,10 @@ def report_text(r: dict) -> str:
         lines.append(f"- CONFLICT {c}")
     for x in r["rejected"]:
         lines.append(f"- NOT IMPORTED {x}")
+    for device, kid in r.get("signed", {}).items():
+        lines.append(f"- {device}: signature checked (key {kid})")
+    for device in r.get("unsigned", []):
+        lines.append(f"- {device}: not signed (shared by Cursiv before U73); its chain was checked")
     for c in sample_clashes():
         lines.append(f"- CHECK {c}")
     if r["own"] and len(lines) == 0:

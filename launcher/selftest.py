@@ -50,18 +50,22 @@ def _checks():
         return "12.4 C = 54.32 F; 963.1 m between two GPS points"
 
     def field_notebook():
-        from cursiv_v215.core import fieldlog
-        real = fieldlog.log_dir
+        from cursiv_v215.core import devicekey, fieldlog
+        real, real_key = fieldlog.log_dir, devicekey.key_file
         with tempfile.TemporaryDirectory() as tmp:
             fieldlog.log_dir = lambda: Path(tmp)
+            devicekey.key_file = lambda: Path(tmp) / "device_key.json"   # never this computer's real key
+            devicekey._cache.clear()
             try:
                 e = fieldlog.add(observer="selftest", site="Test", measurements=[{"name": "pH", "value": "7.20"}])
                 assert fieldlog.verify() == [] and e["measurements"][0]["value"] == "7.20"
                 paths = fieldlog.export(Path(tmp) / "export")
-                assert {"csv", "json", "geojson", "report"} <= set(paths)
+                assert {"csv", "json", "geojson", "report", "signature"} <= set(paths)
+                assert fieldlog.verify_export(Path(tmp) / "export") == []
             finally:
-                fieldlog.log_dir = real
-        return "an entry saved, fingerprint chain checked, exported"
+                fieldlog.log_dir, devicekey.key_file = real, real_key
+                devicekey._cache.clear()
+        return "an entry saved, fingerprint chain checked, exported and signed, signature verified"
 
     def documents():
         from cursiv_v215.core import documents

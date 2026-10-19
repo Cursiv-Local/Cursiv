@@ -10,6 +10,8 @@ settings, is in Cursiv under **Settings → Privacy & internet**.
 - The field notebook: observations, sample IDs, corrections, exports.
 - Your imported documents (PDFs and text files) and their search index.
 - Your login (username, password hash, security answers).
+- This installation's signing key for field records (~/.cursiv/device_key.json, stored protected).
+  Only its public half goes out, inside shares and exports, so others can check your signature.
 - The offline reference (first aid, survival, science) and the calculations
   (units, coordinates, distance, dilutions, statistics, bleach doses).
 - The AI model itself, once downloaded: it runs on this computer through Ollama.

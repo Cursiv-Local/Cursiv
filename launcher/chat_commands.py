@@ -632,7 +632,8 @@ _HELP_TOPICS = {
   field log sample <id>       one sample's history
   field log check             check that no entry was changed, removed or reordered
   field report [site <name>] [today]   a printable report
-  field log export            CSV, JSON, GeoJSON, the report and sample labels
+  field log export            CSV, JSON, GeoJSON, the report and sample labels, signed
+  field log verify <folder>   check an export's signature and that no file was changed
   field log share <folder>    put this laptop's log on a USB drive or shared folder
   field log import <folder>   bring in other laptops' logs (team log, team log export)
   Corrections: Field Notebook -> Correct selected. The original always stays.

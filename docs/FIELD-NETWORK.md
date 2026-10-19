@@ -1,6 +1,7 @@
 # Cursiv Field Network: design
 
-Status: **design only, nothing here is built** beyond what "Today" says. Research roadmap R11.
+Status: **Phase 0's signing is built** (U73: device keys, signed USB shares, signed exports);
+the network itself (Phases 1–4) is design only. Research roadmap R11.
 Written 2026-10-18 so that what we build now (R4 signing, R9 photos) fits this later.
 
 ## The idea in one paragraph
@@ -76,7 +77,19 @@ Everything that syncs is a signed, append-only entry in some device's chain:
 Photos and other files are **blobs**, stored once by their SHA-256 and referenced from records
 by that hash (so a photo can't be swapped without breaking the record's fingerprint).
 
-## Device identity and signing (Phase 0, also finishes R4)
+## Device identity and signing (Phase 0, also finishes R4): built in U73
+
+As built (`core/devicekey.py`, `core/fieldsync.py`, `core/fieldlog.py`), one deliberate difference
+from the plan below: entries keep their existing `device` label (a hash of the computer name), so
+older logs and shares keep working. The key is bound to that label instead: every share carries
+a signed head, and the first key seen for a laptop is remembered (`team/<laptop>.key.json`);
+later shares signed by another key, or unsigned, are refused. Switching the label itself to the
+key id is left for Phase 1, where the master can record the link as a `device` record.
+
+Not built yet from Phase 0: incremental bundles (a share still carries the whole chain) and photos
+as hashed blobs (needs R9).
+
+The plan:
 
 - On first use each Cursiv installation makes an **Ed25519 key pair** (the `cryptography`
   package Cursiv already ships). The private key never leaves the laptop (Windows: DPAPI-protected

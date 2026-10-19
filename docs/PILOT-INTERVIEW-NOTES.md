@@ -143,8 +143,10 @@ re-run on U71 yet.
 - **Not certified** for anything, and not a medical device. No HIPAA/clinical claims.
 - **Not encryption.** The login keeps people at the keyboard out; it doesn't encrypt the disk. Use
   BitLocker for that. Saved AI keys are the exception (encrypted per Windows user).
-- **Signed exports** (proving an export came from a specific laptop) are planned, not built. The
-  fingerprint chain proves the log wasn't altered after entry.
+- **Signed exports are built** (U73): each laptop has its own signing key; an export carries a
+  signature over the log and every exported file, and `field log verify <folder>` checks it. A
+  laptop's USB shares are signed too, so another machine can't add records under its name. There
+  is no master node / network sync yet (designed: `docs/FIELD-NETWORK.md`).
 - **Speed on old laptops without a graphics card** is slower (about 13 s for 120 words before checks).
 
 ---
@@ -206,8 +208,8 @@ re-run on U71 yet.
 - **"Can it replace our protocol / field guide?"** No. Import your protocol and it answers from it,
   with pages. It doesn't replace the people who wrote it.
 - **"Is the data defensible?"** Entries are append-only and fingerprinted; corrections keep the
-  original and the reason; `field log check` proves nothing was altered; exports carry the
-  fingerprints. Signed exports aren't built yet.
+  original and the reason; `field log check` proves nothing was altered; exports are signed by the
+  laptop's own key and `field log verify` checks the signature and every file.
 - **"Can several people use it?"** Each laptop keeps its own log; logs merge by USB or a shared
   folder without internet, conflicts reported, never silently resolved.
 - **"What about medical content?"** Sourced from U.S. government pages where possible, dated on

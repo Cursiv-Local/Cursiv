@@ -284,7 +284,73 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
         labels = folder / "sample-labels.html"
         labels.write_text(labels_html(rows), encoding="utf-8")
         paths["labels"] = labels
+    paths["signature"] = sign_export(folder, paths, everything if everything is not None else entries())
     return paths
+
+
+# ── Signed exports (R4; field network Phase 0) ─────────────────────────────
+
+SIGNATURE_FILE = "signature.json"
+
+
+def _file_sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def sign_export(folder: Path, paths: dict, rows: list[dict]) -> Path:
+    """signature.json: this installation's signature over the log's head (every entry, through
+    the chain) and the SHA-256 of every exported file. verify_export() checks it."""
+    from cursiv_v215.core import devicekey
+    own = entries()
+    files = {p.name: _file_sha256(p) for p in paths.values() if p.exists() and p.name != SIGNATURE_FILE}
+    devices = sorted({e.get("device", "") for e in rows})
+    env = devicekey.sign({
+        "format": "cursiv-export-1",
+        "exported_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "exported_by_device": _device(),
+        "log_head": devicekey.head(own, _device()),
+        "entries_exported": len(rows),
+        "devices": devices,
+        "integrity": "intact" if not verify() else "problems",
+        "files": files,
+    })
+    out = folder / SIGNATURE_FILE
+    out.write_text(json.dumps(env, indent=2), encoding="utf-8")
+    return out
+
+
+def verify_export(folder: Path) -> list[str]:
+    """Problems with an export folder's signature and files, or [] when it checks out."""
+    from cursiv_v215.core import devicekey
+    folder = Path(folder)
+    sig = folder / SIGNATURE_FILE
+    if not sig.exists():
+        return [f"no {SIGNATURE_FILE} in {folder}: this export isn't signed (made before U73?)"]
+    try:
+        env = json.loads(sig.read_text(encoding="utf-8"))
+    except ValueError:
+        return [f"{SIGNATURE_FILE} can't be read"]
+    if not devicekey.verify(env):
+        return ["the signature doesn't match: signature.json was changed, or wasn't made by the key it names"]
+    problems = []
+    for name, digest in env["signed"].get("files", {}).items():
+        f = folder / name
+        if not f.exists():
+            problems.append(f"{name} is missing")
+        elif _file_sha256(f) != digest:
+            problems.append(f"{name} was changed after the export was signed")
+    return problems
+
+
+def verify_export_text(folder: Path) -> str:
+    problems = verify_export(folder)
+    if problems:
+        return "This export does NOT check out:\n" + "\n".join(f"- {p}" for p in problems)
+    env = json.loads((Path(folder) / SIGNATURE_FILE).read_text(encoding="utf-8"))
+    s = env["signed"]
+    return (f"This export checks out: signed by key {env['key_id']} (laptop {s['exported_by_device']}) on "
+            f"{s['exported_utc']}; {len(s['files'])} files unchanged; {s['entries_exported']} entries; the log's "
+            f"head was entry {s['log_head']['seq']} ({s['log_head']['hash'][:12]}).")
 
 
 # ── Field report: a printable summary of what was recorded ────────────────
@@ -492,5 +558,9 @@ def command(text: str, observer: str = "") -> str | None:
                 "The field log has problems:\n" + "\n".join(f"- {p}" for p in problems))
     if low in ("field log export", "fieldlog export", "export field log"):
         paths = export()
-        return "Exported:\n" + "\n".join(f"- {k.upper()}: {p}" for k, p in paths.items())
+        return ("Exported (signed: check it any time with  field log verify <folder>):\n"
+                + "\n".join(f"- {k.upper()}: {p}" for k, p in paths.items()))
+    m = re.match(r"(?i)^field ?log verify\s+(.+)$", t)
+    if m:
+        return verify_export_text(Path(m.group(1).strip().strip('"')))
     return None
