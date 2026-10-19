@@ -498,16 +498,19 @@ class SettingsDialog(QDialog):
                 return "That's the only account. Use Start over to replace it."
             if username == me and not self._leave_ok():
                 return "Nothing was removed."
+            was_primary = ag.is_primary(username)
             ag.remove_with_password(username, me, password)
         except ValueError as exc:
             return f"Nothing was removed. {exc}"
         except Exception as exc:
             return f"Nothing was removed: {exc}"
         self._refresh_accounts()
+        note = (" The security questions belonged to that account and were cleared; set new ones "
+                "in Security questions.") if was_primary else ""
         if username == me:
             self._quit_pending = True
-            return "Your account was removed. Cursiv will close now; sign in next time with another account."
-        return "The account was removed."
+            return "Your account was removed. Cursiv will close now; sign in next time with another account." + note
+        return "The account was removed." + note
 
     def _start_over_clicked(self):
         got = self._ask("Start over",

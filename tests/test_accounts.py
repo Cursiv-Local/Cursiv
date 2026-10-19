@@ -135,7 +135,7 @@ def test_settings_remove_yourself_closes_cursiv(ag):
     win = _Win()
     dlg = _settings(win)
     msg = dlg.remove_account("owner", "pass1234")
-    assert "Cursiv will close" in msg and dlg._quit_pending and win.asked == 1
+    assert "Cursiv will close" in msg and "security questions" in msg and dlg._quit_pending and win.asked == 1
     assert ag.verify_credentials("guest", "pass5678") and ag.account_count() == 1
 
 
