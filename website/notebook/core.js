@@ -182,6 +182,49 @@ export async function makeBundle(rows, device, keyPair, photos, observer = "", n
   return { format: BUNDLE_FORMAT, device, manifest, entries: rows, photos };
 }
 
+// ── What the phone tells the person (decided here so the tests can check it under Node) ──
+
+// persisted: navigator.storage.persist()'s answer (true/false, or null when the browser can't say).
+export function storageNote(persisted) {
+  const base = "Stored only in this browser on this phone. Send to the laptop regularly: that file is the backup.";
+  if (persisted === true) return base + " This browser agreed to keep the notebook's storage, but clearing the " +
+    "browser's data or uninstalling still deletes what hasn't been sent.";
+  if (persisted === false) return base + " This browser did NOT agree to keep its storage, so it may clear it when " +
+    "the phone runs low on space. Send often.";
+  return base + " This browser can't say whether it will keep its storage. Send often.";
+}
+
+// Why a save failed, in words; the entry is NOT kept when this is shown.
+export function saveErrorText(err) {
+  const name = (err && err.name) || "";
+  if (name === "QuotaExceededError")
+    return "Not saved: the phone's storage for this notebook is full. Send to the laptop, then free up space.";
+  if (name === "ConstraintError")
+    return "Not saved: another tab saved an entry at the same moment. Reload the page, then save again.";
+  if (name === "InvalidStateError" || name === "TransactionInactiveError" || name === "AbortError")
+    return "Not saved: the browser stopped the save (the page was closing or reloading). Save again.";
+  return `Not saved: ${(err && err.message) || "the browser refused the write"}.`;
+}
+
+// What a send contained, said honestly: unsigned files and photos that weren't on the phone are named.
+export function sendSummary({ name, entries, photos, missing = 0, signed }) {
+  let s = `Made ${name} (${entries} entr${entries === 1 ? "y" : "ies"}, ${photos} photo${photos === 1 ? "" : "s"}).`;
+  if (!signed) s += " NOT SIGNED: this browser can't make a signing key, so Cursiv can check each entry's " +
+                    "fingerprint but not that it came from this phone.";
+  if (missing) s += ` ${missing} photo${missing === 1 ? " is" : "s are"} no longer stored on this phone and ` +
+                    "couldn't be included; Cursiv will list them as missing.";
+  return s + " Import it in Cursiv on the laptop.";
+}
+
+// Opening the notebook failed: why, and what to do.
+export function openErrorText(err) {
+  const msg = (err && err.message) || String(err || "");
+  if (/indexedDB is not defined|not available|SecurityError|InvalidStateError/i.test(msg + " " + ((err && err.name) || "")))
+    return "This browser won't let the notebook store anything (private browsing, or storage turned off), so " +
+           "nothing can be saved here. Open it in a normal browser window.";
+  return `Couldn't open the notebook on this phone: ${msg}. Nothing has been saved.`;
+}
+
 // ── Send file, format 2: a standard zip (no compression: photos are already compressed) ──
 //   bundle.json                               {"format": "cursiv-phone-bundle-2", "device": ...}
 //   cursiv-field-share/<device>.jsonl         the log, one entry per line

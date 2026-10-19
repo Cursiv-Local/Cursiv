@@ -529,3 +529,52 @@ def test_the_checks_work_with_offline_mode_on(fresh, outbound, monkeypatch):
     out = "".join(ca.chat("We have 240 liters of water for 120 people for 48 hours at 2 liters per person per day. "
                           "How long will it last?", [], "", None))
     assert "lasts 1 day" in out and outbound == []
+
+
+# ══ I. Dates, spacing and small samples (benchmark rea-008, num-027, rea-016) ═══
+
+@pytest.mark.parametrize("q,expect", [
+    # by hand: 10 = 1 week + 3 days; Wednesday + 3 = Saturday
+    ("If today is Wednesday, what day of the week will it be 10 days from now?", "is a Saturday"),
+    ("If today is Monday, what day was it 15 days ago?", "is a Sunday"),               # 15 = 2 w + 1; Mon - 1
+    # 2026-10-19 is a Monday (the system clock when this was written), so the 14th was a Wednesday
+    ("What day of the week is 14 October 2026?", "14 October 2026 is a Wednesday"),
+    ("What day of the week was 2000-01-01?", "1 January 2000 is a Saturday"),           # a well-known date
+    # 17 days to 31 October, then 28: Saturday 28 November
+    ("What date is 45 days after 14 October 2026?", "is Saturday 28 November 2026"),
+    # day of year 359 (25 Dec, not a leap year) - 1
+    ("How many days between 1 January 2026 and 25 December 2026?", "is 358 days (51 weeks and 1 day)"),
+    ("How many days from 28 February 2024 to 1 March 2024?", "is 2 days"),               # 2024 is a leap year
+])
+def test_dates_and_weekdays(q, expect):
+    w = calc.work_out(q)
+    assert w and w.ok and expect in w.statement, (w and w.statement)
+
+
+@pytest.mark.parametrize("q,why", [
+    ("What day of the week is 29 February 2023?", "doesn't exist"),
+    ("What day of the week was 12/10/2026?", "day-first or month-first"),
+])
+def test_impossible_or_ambiguous_dates_are_refused(q, why):
+    w = calc.work_out(q)
+    assert w and not w.ok and why in w.statement
+
+
+def test_points_along_a_transect_count_the_ends_as_asked():
+    # by hand: 250 / 12.5 = 20 gaps; both ends 21, one end 20, neither 19
+    q = "We put a quadrat every 12.5 m along a 250 m transect, {} How many quadrats?"
+    assert "21 points" in calc.work_out(q.format("including one at each end.")).statement
+    assert "19 points" in calc.work_out(q.format("not at either end.")).statement
+    w = calc.work_out(q.format(""))
+    assert not w.ok and "both ends that's 21" in w.statement and "doesn't say which" in w.statement
+
+
+def test_a_tiny_sample_cant_show_a_difference():
+    # by hand, Wilson 95%: 3/4 -> 30% to 95%; 60/100 -> 50% to 69%: they overlap
+    w = calc.work_out("3 of 4 frogs survived at site A and 60 of 100 at site B. Does site A have better survival?")
+    assert w.tool == "proportions"
+    assert "75% (95% range 30% to 95%)" in w.statement and "60% (95% range 50% to 69%)" in w.statement
+    assert "can't show that one is really higher" in w.statement and "fewer than 10" in w.statement
+    # and a real difference is called one: 10/100 vs 60/100 -> 6% to 17% vs 50% to 69%
+    w = calc.work_out("10 of 100 survived at A, 60 of 100 at B: is B higher?")
+    assert "unlikely to be chance alone" in w.statement

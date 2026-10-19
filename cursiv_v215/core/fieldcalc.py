@@ -416,7 +416,9 @@ def lightning_wait(question: str) -> Result | None:
 
 
 def work_out(question: str) -> Result | None:
-    for fn in (lightning_wait, bleach_dose, distance, coordinates, dilution, stats, units):
+    from cursiv_v215.core import datecalc       # dates, weekdays, spaced points, two proportions
+    for fn in (lightning_wait, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
+               datecalc.weekday, datecalc.dates, datecalc.spacing, units):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):

@@ -188,3 +188,68 @@ def test_the_phones_zip_sent_over_wifi_imports(laptop):
         r.stop()
     assert f"{device}: 2 new entries" in j["message"], j          # (ok is false today: the sample is dated tomorrow)
     assert len([e for e in fieldsync.team_entries() if e["device"] == device]) == 2
+
+
+MESSAGES = r"""
+import * as core from "./core.mjs";
+const err = name => Object.assign(new Error("x"), { name });
+console.log(JSON.stringify({
+  kept: core.storageNote(true), denied: core.storageNote(false), unknown: core.storageNote(null),
+  full: core.saveErrorText(err("QuotaExceededError")), clash: core.saveErrorText(err("ConstraintError")),
+  closing: core.saveErrorText(err("AbortError")), other: core.saveErrorText(new Error("disk on fire")),
+  unsigned: core.sendSummary({ name: "f.cursivsync", entries: 1, photos: 2, missing: 1, signed: false }),
+  fine: core.sendSummary({ name: "f.cursivsync", entries: 3, photos: 0, signed: true }),
+  noidb: core.openErrorText(new Error("indexedDB is not defined")),
+  other_open: core.openErrorText(new Error("boom")),
+}));
+"""
+
+
+def _node(tmp_path, script):
+    work = tmp_path / "msg"
+    work.mkdir(exist_ok=True)
+    shutil.copyfile(REPO / "website" / "notebook" / "core.js", work / "core.mjs")
+    (work / "s.mjs").write_text(script, encoding="utf-8")
+    r = subprocess.run([NODE, "s.mjs"], cwd=work, capture_output=True, text=True, timeout=60, encoding="utf-8")
+    assert r.returncode == 0, r.stderr
+    return r.stdout
+
+
+def test_the_phone_never_calls_its_storage_permanent_and_names_every_failure(tmp_path):
+    m = json.loads(_node(tmp_path, MESSAGES))
+    for k in ("kept", "denied", "unknown"):
+        assert "Send to the laptop regularly: that file is the backup" in m[k]
+        assert "permanent" not in m[k].lower() and "guarantee" not in m[k].lower()
+    assert "still deletes what hasn't been sent" in m["kept"]
+    assert "did NOT agree to keep its storage" in m["denied"] and "can't say" in m["unknown"]
+    assert m["full"].startswith("Not saved: the phone's storage") and m["clash"].startswith("Not saved")
+    assert m["closing"].startswith("Not saved") and m["other"] == "Not saved: disk on fire."
+    assert "NOT SIGNED" in m["unsigned"] and "1 photo is no longer stored" in m["unsigned"]
+    assert "NOT SIGNED" not in m["fine"] and "missing" not in m["fine"]
+    assert "won't let the notebook store anything" in m["noidb"] and "Nothing has been saved" in m["other_open"]
+
+
+UNSIGNED = r"""
+import * as core from "./core.mjs";
+import { writeFileSync } from "node:fs";
+const device = "phone-" + core.hex(crypto.getRandomValues(new Uint8Array(6)));   // what app.js does with no key
+const rows = [];
+rows.push(await core.makeEntry(rows, device, { observer: "P", note: "no signing key on this browser" }));
+const zip = await core.makeZipBundle(rows, device, null, {}, "P");
+writeFileSync(process.argv[2], new Uint8Array(await zip.arrayBuffer()));
+console.log(device);
+"""
+
+
+def test_a_browser_without_ed25519_sends_an_unsigned_file_cursiv_says_so(laptop, tmp_path):
+    work = tmp_path / "u"
+    work.mkdir()
+    shutil.copyfile(REPO / "website" / "notebook" / "core.js", work / "core.mjs")
+    (work / "u.mjs").write_text(UNSIGNED, encoding="utf-8")
+    out = tmp_path / "u.cursivsync"
+    r = subprocess.run([NODE, "u.mjs", str(out)], cwd=work, capture_output=True, text=True, timeout=60)
+    assert r.returncode == 0, r.stderr
+    device = r.stdout.strip()
+    rep = fieldsync.import_phone_bundle(out)
+    assert rep["added"] == {device: 1} and rep["unsigned"] == [device] and not rep["signed"]
+    assert f"{device}: not signed" in fieldsync.report_text(rep)

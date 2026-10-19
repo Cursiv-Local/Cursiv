@@ -34,19 +34,27 @@ const commit = (store, fn) => new Promise((resolve, reject) => {
 });
 const done = req => new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); });
 const getMeta = k => done(tx("meta").get(k));
-const setMeta = (k, v) => done(tx("meta", "readwrite").put(v, k));
+// Settings are committed like entries: finished when the transaction is on disk, not when asked.
+const setMeta = (k, v) => commit("meta", s => s.put(v, k));
 const allEntries = async () => (await done(tx("entries").getAll())).sort((a, b) => a.seq - b.seq);
 
-let keyPair = null, device = "", entries = [], pendingPhotos = [], correcting = null;
+let keyPair = null, device = "", entries = [], pendingPhotos = [], correcting = null, persisted = null;
 
 async function init() {
+  if (typeof indexedDB === "undefined") throw new Error("indexedDB is not defined");
   db = await openDb();
-  if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+  try {
+    persisted = navigator.storage && navigator.storage.persist ? await navigator.storage.persist() : null;
+  } catch (e) { persisted = null; }
   keyPair = await getMeta("keyPair");
+  device = await getMeta("device");
   if (!keyPair) {
     try {
       keyPair = await core.newKeyPair();
-      await setMeta("keyPair", keyPair);        // the private key can't be read out of the phone
+      // The key and the name made from it are saved in one transaction: never one without the other.
+      const label = device || await core.deviceLabel(await core.publicKeyB64(keyPair.publicKey));
+      await commit("meta", s => { s.put(keyPair, "keyPair"); s.put(label, "device"); });
+      device = label;
     } catch (e) {
       keyPair = null;
       const n = $("unsupported");
@@ -55,7 +63,6 @@ async function init() {
       n.classList.remove("hidden");
     }
   }
-  device = await getMeta("device");
   if (!device) {
     device = keyPair ? await core.deviceLabel(await core.publicKeyB64(keyPair.publicKey))
                      : "phone-" + core.hex(crypto.getRandomValues(new Uint8Array(6)));
@@ -116,7 +123,12 @@ async function save() {
       if (!f.photos.length) f.photos = (correcting.photos || []).map(rel => ({ rel }));
     }
     const e = await core.makeEntry(entries, device, f);
-    await commit("entries", s => s.add(e));                 // on disk before "Saved" is shown
+    try {
+      await commit("entries", s => s.add(e));               // on disk before "Saved" is shown
+    } catch (err) {
+      say(core.saveErrorText(err), "bad");                  // and nothing claims it was
+      return;
+    }
     await setMeta("observer", f.observer.trim());
     entries.push(e);
     clearForm();
@@ -158,7 +170,12 @@ async function addPhotos(files) {
                   "image/webp": ".webp", "image/gif": ".gif" }[file.type] || ".jpg";
     const rel = `photos/${sha}${ext}`;
     const blob = new Blob([buf], { type: file.type || "image/jpeg" });
-    await commit("photos", s => s.put(blob, rel));
+    try {
+      await commit("photos", s => s.put(blob, rel));
+    } catch (err) {
+      say(core.saveErrorText(err).replace("Not saved", `Photo ${file.name} not kept`), "bad");
+      continue;
+    }
     pendingPhotos.push({ rel, name: file.name });
     const img = document.createElement("img"); img.src = URL.createObjectURL(file); $("thumbs").appendChild(img);
   }
@@ -208,8 +225,7 @@ async function render() {
   $("about").innerHTML = `Device: <code>${device}</code><br>` +
     (keyPair ? `Signing key: <code>${await core.keyId(await core.publicKeyB64(keyPair.publicKey))}</code><br>` : "Not signed (see above)<br>") +
     (problems.length ? `<span class="bad">The log has problems: ${esc(problems[0])}</span>` : `<span class="ok">Every entry intact and in order.</span>`) +
-    "<br>Stored only in this browser on this phone. Send to the laptop regularly: clearing the browser's data, " +
-    "or uninstalling, deletes what hasn't been sent.";
+    "<br>" + esc(core.storageNote(persisted));
 }
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 
@@ -218,10 +234,13 @@ async function send() {
   if (!entries.length) { say("Nothing to send yet.", "muted"); return; }
   say("Preparing the file…", "muted");
   const photos = {};
+  let missing = 0;
   for (const e of entries) for (const rel of e.photos) {
+    if (rel in photos) continue;
     const blob = await done(tx("photos").get(rel));
-    if (blob) photos[rel] = blob;
+    if (blob) photos[rel] = blob; else { photos[rel] = null; missing++; }
   }
+  for (const rel of Object.keys(photos)) if (!photos[rel]) delete photos[rel];
   const zip = await core.makeZipBundle(entries, device, keyPair, photos, $("observer").value.trim());
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
   const name = `cursiv-${device}-${stamp}.cursivsync`;
@@ -233,7 +252,8 @@ async function send() {
       const a = document.createElement("a"); a.href = URL.createObjectURL(file); a.download = name; a.click();
     }
     await setMeta("sentSeq", entries[entries.length - 1].seq);
-    say(`Made ${name} (${entries.length} entries, ${Object.keys(photos).length} photos). Import it in Cursiv on the laptop.`, "ok");
+    say(core.sendSummary({ name, entries: entries.length, photos: Object.keys(photos).length, missing,
+                           signed: !!keyPair }), keyPair && !missing ? "ok" : "warn");
     await render();
   } catch (err) {
     if (err.name !== "AbortError") say(`Couldn't share the file: ${err.message}`, "bad");
@@ -262,4 +282,4 @@ function wire() {
   $("new-id").onclick = newSampleId;
 }
 
-init().catch(err => say(`Couldn't open the notebook on this phone: ${err.message}`, "bad"));
+init().catch(err => say(core.openErrorText(err), "bad"));

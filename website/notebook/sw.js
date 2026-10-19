@@ -1,6 +1,6 @@
 // Keeps the notebook working with no signal: its own files are cached on first visit and
 // served from the cache after that. It never sends anything; it only serves these files.
-const CACHE = "cursiv-notebook-v1";
+const CACHE = "cursiv-notebook-v2";   // bump when app.js or core.js change, so phones drop the old copy
 const FILES = ["./", "./index.html", "./app.js", "./core.js", "./manifest.webmanifest", "/assets/cursiv_256.png"];
 
 self.addEventListener("install", e => {

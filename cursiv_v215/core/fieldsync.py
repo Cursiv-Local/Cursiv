@@ -513,7 +513,9 @@ def report_text(r: dict) -> str:
         lines.append(f"- CHECK {device}: its clock looks about {mins} minutes ahead of this computer's. Its times are "
                      f"kept as recorded; check that device's date and time")
     for device in r.get("unsigned", []):
-        lines.append(f"- {device}: not signed (shared by Cursiv before U73); its chain was checked")
+        why = ("its browser couldn't make a signing key" if device.startswith("phone-")
+               else "shared by Cursiv before U73")
+        lines.append(f"- {device}: not signed ({why}); its chain was checked, but not who made it")
     for c in sample_clashes():
         lines.append(f"- CHECK {c}")
     if r["own"] and len(lines) == 0:
