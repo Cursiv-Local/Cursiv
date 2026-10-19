@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v3.14-U73 — Signed field records (2026-10-18)
 - **Signed field records** (field network Phase 0, R4): each Cursiv installation has its own signing key. Every export carries `signature.json`, a signature over the log's head and every exported file; `field log verify <folder>` says whether it checks out. USB team shares are signed and checked; the first key seen for each laptop is remembered, and later shares signed by another key (or unsigned) are refused, so another machine can't add records under a laptop's name. Shares from older versions still import, reported as unsigned.
 - `docs/FIELD-NETWORK.md`: the design for a master node on local Wi-Fi (R11).
 
