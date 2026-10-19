@@ -226,12 +226,13 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
 
 def _import_photos(src: Path, rows: list[dict]) -> int:
     """Copy the photos these entries name into the photo store, each checked against its
-    SHA-256 name. Returns how many are missing or don't match (the entries still import)."""
+    SHA-256 name. Returns how many photos (each counted once) are missing or don't match
+    (the entries still import; fieldlog.photo_problems() names them)."""
     import hashlib
-    missing = 0
+    missing: set[str] = set()
     for e in rows:
         for rel in e.get("photos") or []:
-            if not fieldlog._is_stored(rel):
+            if not fieldlog._is_stored(rel) or rel in missing:
                 continue
             dest = fieldlog.photo_path(rel)
             if dest.exists():
@@ -239,11 +240,11 @@ def _import_photos(src: Path, rows: list[dict]) -> int:
             f = src / rel
             if not f.exists() or f.stat().st_size > fieldlog.PHOTO_MAX_MB * 2**20 \
                     or hashlib.sha256(f.read_bytes()).hexdigest() != Path(rel).stem:
-                missing += 1
+                missing.add(rel)
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
             _copy_atomic(f, dest)
-    return missing
+    return len(missing)
 
 
 def _clock_ahead_minutes(rows: list[dict]) -> int:

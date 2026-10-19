@@ -189,7 +189,7 @@ class _Handler(BaseHTTPRequestHandler):
         if not self._allowed():
             return
         if self.path.split("?")[0] in ("/", "/index.html"):
-            self._send(200, PAGE.encode(), "text/html; charset=utf-8")
+            self._send(200, PAGE.replace("__MAX_BYTES__", str(MAX_BYTES)).encode(), "text/html; charset=utf-8")
         else:
             self._json(404, ok=False, message="Not here.")
 
@@ -210,6 +210,7 @@ class _Handler(BaseHTTPRequestHandler):
             self._json(411, ok=False, message="The file's size wasn't given: try again.")
             return
         if length <= 0 or length > MAX_BYTES:
+            self._drain()                  # small: read it so the phone gets this answer (the page checks size first)
             self.close_connection = True
             self._json(413, ok=False, message="That file is empty or too big for one send.")
             return
@@ -256,10 +257,13 @@ PAGE = """<!doctype html>
 </main>
 <script>
 const $ = id => document.getElementById(id);
+const MAX_BYTES = __MAX_BYTES__;
 $("go").onclick = async () => {
   const f = $("file").files[0], code = $("code").value.trim(), out = $("out");
   if (!/^[0-9]{6}$/.test(code)) { out.className = "bad"; out.textContent = "Type the 6-digit code from the laptop."; return; }
   if (!f) { out.className = "bad"; out.textContent = "Pick the .cursivsync file first."; return; }
+  if (f.size > MAX_BYTES) { out.className = "bad"; out.textContent = `That file is ${(f.size / 1e9).toFixed(1)} GB, ` +
+    "more than one send can take. Send to the laptop more often, or use a USB cable."; return; }
   $("go").disabled = true; out.className = "muted";
   out.textContent = `Sending ${f.name} (${(f.size / 1e6).toFixed(1)} MB)… keep this page open.`;
   try {

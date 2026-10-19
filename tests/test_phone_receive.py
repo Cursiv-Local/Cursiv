@@ -43,6 +43,7 @@ def test_the_page_is_served_and_says_nothing_goes_online(receiver):
     resp = c.getresponse()
     page = resp.read().decode()
     assert resp.status == 200 and "Nothing goes to the internet" in page
+    assert f"const MAX_BYTES = {phone_receive.MAX_BYTES};" in page and "__MAX_BYTES__" not in page
     assert "default-src 'none'" in resp.getheader("Content-Security-Policy")
 
 
