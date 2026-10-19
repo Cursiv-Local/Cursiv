@@ -16,9 +16,11 @@ something a reviewer can check. Claims stay exactly as strong as the tests behin
 | **R8 Discipline packs** | Public-domain or open sources only: GBIF taxonomic backbone (CC0) for species names, USGS mineral and rock tables, EPA water-quality methods, NOAA references. Versioned like today's packs. | Each pack listed in REFERENCE.md with its licence. |
 | **R9 Hands-free capture** | Offline speech-to-text for voice notes, photos with their GPS and time, read-back before saving. | A voice note becomes a correct entry without typing. |
 | **R10 Field pilot** | One team on a real trip. Measure entries logged, errors found at export, answers corrected, battery uptime. Publish everything, including failures. | The written pilot report. |
+| **R11 Field network** | A master node (Raspberry Pi + SSD) on the team's local Wi-Fi: laptops sync signed, append-only records to it with no internet; nothing is merged or overwritten; the team lead sees every record, sample history, problems and combined reports; later the same protocol to an institution's server. Design: `docs/FIELD-NETWORK.md`. | Three laptops and a Pi, no internet, a week of syncing: nothing lost, duplicated or silently changed. |
 
 Order: R1, R2, R5 first (the strongest pilot), then R4 and R3, with R7 and R8 continuous,
-R6 when a team has several laptops, R9 last.
+R6 when a team has several laptops, R9 last. R11 after a pilot has used USB sync; its Phase 0
+(device keys, signed heads and exports, photos as hashed files) is built with R4 and R9.
 
 Not claimed: certification of any kind; professional review of the reference (none yet);
 code signing (not yet). Personal memory stays on the computer and never syncs.
@@ -39,3 +41,5 @@ code signing (not yet). Personal memory stays on the computer and never syncs.
   institution is not built.
 - **R7 Safety pack: started.** 37 entries from public U.S. government sources (`docs/REFERENCE.md`); none professionally reviewed yet.
 - R8, R9, R10: not started.
+- **R11 Field network: designed** (`docs/FIELD-NETWORK.md`), not built. Builds on R6's
+  per-laptop chains; Phase 0 overlaps R4 (signing) and R9 (photos).
