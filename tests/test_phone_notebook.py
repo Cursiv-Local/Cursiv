@@ -172,3 +172,19 @@ def test_a_zip_without_the_phone_header_is_not_a_phone_file(laptop):
     bad = _rezip(out, laptop / "bad.cursivsync", lambda f: f.pop("bundle.json"))
     with pytest.raises(ValueError, match="isn't a phone notebook file"):
         fieldsync.import_phone_bundle(bad)
+
+
+def test_the_phones_zip_sent_over_wifi_imports(laptop):
+    import http.client
+    from cursiv_v215.core import phone_receive
+    out, device = _phone(laptop, zip=True)
+    r = phone_receive.Receiver(port=0)
+    r.start()
+    try:
+        c = http.client.HTTPConnection("127.0.0.1", r.port, timeout=30)
+        c.request("PUT", "/upload", body=out.read_bytes(), headers={"X-Cursiv-Code": r.code, "X-File-Name": out.name})
+        j = json.loads(c.getresponse().read())
+    finally:
+        r.stop()
+    assert f"{device}: 2 new entries" in j["message"], j          # (ok is false today: the sample is dated tomorrow)
+    assert len([e for e in fieldsync.team_entries() if e["device"] == device]) == 2

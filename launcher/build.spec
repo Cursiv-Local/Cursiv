@@ -47,6 +47,7 @@ hiddenimports = [
     "pypdf",                         # core/documents.py reads PDFs page by page
     "cursiv_v215.core.documents",
     "cursiv_v215.core.fieldsync",
+    "cursiv_v215.core.phone_receive",
     "cursiv_v215.core.demo",
     "cursiv_v215.core.profile",
     "cursiv_v215.ui",
@@ -75,6 +76,7 @@ hiddenimports = [
     "theme",
     "nav_windows",
     "field_notebook",
+    "phone_receive_dialog",
     "selftest",
     "chat_commands",
     "legacy_vault_dialog",

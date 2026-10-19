@@ -135,6 +135,7 @@ class FieldNotebookDialog(QDialog):
         imp_menu = QMenu(imp)
         imp_menu.addAction("From a USB stick or shared folder…", self._import)
         imp_menu.addAction("From the phone notebook (.cursivsync file)…", self._import_phone)
+        imp_menu.addAction("Receive from a phone over Wi-Fi…", self._receive_phone)
         imp_menu.addSeparator()
         imp_menu.addAction("Revoke a lost or retired device's key…", self._revoke)
         imp.setMenu(imp_menu)
@@ -371,6 +372,14 @@ class FieldNotebookDialog(QDialog):
                                            "Phone notebook (*.cursivsync)")
         if f:
             self._show_import(lambda: fieldsync.import_phone_bundle(Path(f)))
+
+    def _receive_phone(self):
+        """The phone sends its file over the local Wi-Fi, through the phone's browser (no cable, no internet)."""
+        from phone_receive_dialog import PhoneReceiveDialog
+        dlg = PhoneReceiveDialog(self)
+        dlg.exec()
+        if dlg.imported:
+            self.refresh()
 
     def _import(self):
         from pathlib import Path
