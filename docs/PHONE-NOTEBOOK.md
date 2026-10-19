@@ -62,5 +62,8 @@ would remove this risk; that's the planned next step if teams use it.
 
 - The page can use the GPS and the camera; the rest of the website can't (separate
   `Permissions-Policy` for `/notebook/`).
-- Location is read only when you press "Use this phone's GPS", and only stored in that entry.
+- Location is optional (per team), read only when you press "Use this phone's GPS", and only stored in
+  that entry. It records where an observation was made. **The notebook is not a locating, tracking
+  or safety tool**, and nothing about it has been tested for that: teams use their own GPS and
+  tracking systems.
 - No data leaves the phone except in the file you choose to send.

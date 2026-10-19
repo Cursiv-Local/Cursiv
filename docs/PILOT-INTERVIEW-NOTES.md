@@ -253,6 +253,8 @@ so the model is warm. Share the Cursiv window, not the whole screen.
 - "Field-tested". It isn't yet.
 - "Reviewed by a doctor / medic". It isn't yet.
 - That it has live GPS (coordinates are typed, pasted or read from a photo), or a master node / network sync.
+- That Cursiv can locate or track people. It records where an observation was made; it is not a
+  locating, tracking or safety tool. Teams keep their own GPS and tracking systems.
 - Anything about a company, staff or customers that doesn't exist.
 
 ---
