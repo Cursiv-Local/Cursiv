@@ -26,13 +26,20 @@ const PAGES = [
   ["website/app.html", "app.html"],
   ["website/app.webmanifest", "app.webmanifest"],
 ];
-const FOLDERS = [["website/assets", "assets"]];
+const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"]];  // notebook: the offline phone notebook
 
+// The phone notebook (/notebook/) is the only page that may use the GPS and the camera;
+// everywhere else both stay off. Its service worker and files are re-checked on each visit.
 const HEADERS = `/*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), geolocation=()
+
+/notebook/*
+  ! Permissions-Policy
+  Permissions-Policy: camera=(self), geolocation=(self)
+  Cache-Control: no-cache
 `;
 
 const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\n";

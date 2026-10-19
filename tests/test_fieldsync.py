@@ -118,7 +118,7 @@ def test_team_export_and_commands(team, tmp_path):
     with laptop("A"):
         fieldlog.add(observer="A", note="first")
         assert "laptopB: 2 new entries" in fieldsync.command(f'field log import "{usb}"')
-        assert "3 entries from 2 laptops" in fieldsync.command("team log")
+        assert "3 entries from 2 devices" in fieldsync.command("team log")
         paths = fieldsync.team_export(tmp_path / "out")
         csv_text = paths["csv"].read_text(encoding="utf-8")
         assert csv_text.count("laptopB") == 2 and csv_text.count("laptopA") == 1

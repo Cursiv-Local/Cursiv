@@ -636,6 +636,7 @@ _HELP_TOPICS = {
   field log verify <folder>   check an export's signature and that no file was changed
   field log share <folder>    put this laptop's log on a USB drive or shared folder
   field log import <folder>   bring in other laptops' logs (team log, team log export)
+  field log import <file>     a .cursivsync file from the phone notebook (cursiv.winklers-llc.com/notebook)
   Corrections: Field Notebook -> Correct selected. The original always stays.
   demo / demo off             sample data to try it with, kept apart from yours"""),
     "documents": ("Your documents and calculations", """\

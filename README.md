@@ -64,6 +64,8 @@ Saved AI keys go into the macOS Keychain.
 - **Every answer says where it came from:** Cursiv's offline reference, your documents, Cursiv's
   calculations, or *model knowledge (not checked against a source)*, written by Cursiv, not by the AI.
 - **Checks after every answer** for unsupported claims, wrong doses, and answers that contradict themselves.
+- **Phone notebook.** Record on a phone with no signal ([cursiv.winklers-llc.com/notebook](https://cursiv.winklers-llc.com/notebook/));
+  send one file to the laptop by USB, AirDrop or Quick Share, imported with the same checks. See [docs/PHONE-NOTEBOOK.md](docs/PHONE-NOTEBOOK.md).
 - **Team sync without internet.** Laptops share their signed logs by USB stick or shared folder; nothing is
   merged or overwritten, and disagreements are shown, not resolved by software.
 - **Measured.** A fixed truth benchmark with every failure published ([bench/](bench/)), and an offline

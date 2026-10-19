@@ -229,6 +229,43 @@ def import_folder(folder: Path) -> dict:
     return report
 
 
+# ── The phone notebook (website/notebook): one .cursivsync file per send ────────
+# The phone keeps a log in exactly the laptop's format and signs its head with its own
+# Ed25519 key. Its file is unpacked into a share folder and imported like a laptop's
+# USB share, through every check above.
+
+PHONE_FORMAT = "cursiv-phone-bundle-1"
+_PHONE_DEVICE = re.compile(r"^phone-[0-9a-f]{12}$")
+
+
+def import_phone_bundle(path: Path) -> dict:
+    """Import a .cursivsync file from the phone notebook. Same report as import_folder()."""
+    import base64
+    import tempfile
+    path = Path(path)
+    try:
+        bundle = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError(f"{path.name} isn't a phone notebook file ({exc})") from exc
+    if not isinstance(bundle, dict) or bundle.get("format") != PHONE_FORMAT:
+        raise ValueError(f"{path.name} isn't a phone notebook file")
+    device = str(bundle.get("device", ""))
+    if not _PHONE_DEVICE.match(device):
+        raise ValueError("the file doesn't name a phone (its device label is wrong)")
+    with tempfile.TemporaryDirectory() as tmp:
+        out = Path(tmp) / SHARE_DIR
+        out.mkdir()
+        with (out / f"{device}.jsonl").open("w", encoding="utf-8") as f:
+            for e in bundle.get("entries") or []:
+                f.write(json.dumps(e, ensure_ascii=False, separators=(",", ":")) + "\n")
+        (out / f"{device}.manifest.json").write_text(json.dumps(bundle.get("manifest") or {}), encoding="utf-8")
+        for rel, data in (bundle.get("photos") or {}).items():
+            if fieldlog._is_stored(rel):
+                (out / rel).parent.mkdir(parents=True, exist_ok=True)
+                (out / rel).write_bytes(base64.b64decode(data))
+        return import_folder(Path(tmp))
+
+
 def team_entries() -> list[dict]:
     """Every entry from this laptop and every imported laptop (not conflict copies)."""
     rows = list(fieldlog.entries())
@@ -295,6 +332,8 @@ def command(text: str, observer: str = "") -> str | None:
     if m:
         folder = Path(m.group(2).strip().strip('"'))
         try:
+            if m.group(1).lower() == "import" and folder.suffix.lower() == ".cursivsync":
+                return report_text(import_phone_bundle(folder))
             if m.group(1).lower() == "share":
                 out = share(folder, observer)
                 return (f"Shared this laptop's field log to {out}. On the other laptops: "
@@ -308,9 +347,10 @@ def command(text: str, observer: str = "") -> str | None:
         if not rows:
             return "No field entries yet, from this laptop or any imported one."
         devices = sorted({e["device"] for e in rows})
-        head = f"Team field log: {len(rows)} entries from {len(devices)} laptop{'s' if len(devices) != 1 else ''}"
+        head = f"Team field log: {len(rows)} entries from {len(devices)} device{'s' if len(devices) != 1 else ''}"
         clash = sample_clashes(rows)
-        body = "\n".join(f"[{e['device'][:6]}] {fieldlog.summary(e)}" for e in rows[-15:])
+        body = "\n".join(f"[{e['device'] if e['device'].startswith('phone-') else e['device'][:6]}] "
+                         f"{fieldlog.summary(e)}" for e in rows[-15:])
         return head + " (latest 15):\n" + body + ("\nCheck:\n" + "\n".join(f"- {c}" for c in clash) if clash else "")
     if low in ("team log export", "export team log", "field log team export"):
         paths = team_export()

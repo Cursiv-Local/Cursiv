@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cursiv Field Notebook</title>
+<meta name="description" content="Record field observations on your phone, offline. Everything stays on the phone until you send it to Cursiv on your laptop.">
+<meta name="theme-color" content="#0e1016">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="/assets/cursiv_256.png">
+<link rel="apple-touch-icon" href="/assets/cursiv_256.png">
+<style>
+  :root { --bg:#0e1016; --surface:#151821; --border:#262b38; --text:#e6e2d8; --muted:#9a9586; --gold:#d4b04c;
+          --green:#6fd39b; --amber:#e8b45a; --red:#ff6b6b; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:16px/1.45 -apple-system, "Segoe UI", Roboto, sans-serif;
+         padding: env(safe-area-inset-top) 16px calc(24px + env(safe-area-inset-bottom)); }
+  header { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:14px 0 8px; }
+  h1 { font-size:20px; margin:0; } h2 { font-size:16px; margin:22px 0 8px; }
+  .badge { font-size:12px; font-weight:700; border:1px solid var(--green); color:var(--green); border-radius:12px; padding:3px 9px; white-space:nowrap; }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; margin:10px 0; }
+  label { display:block; font-size:13px; color:var(--muted); margin:10px 0 4px; }
+  input, textarea, select { width:100%; background:var(--bg); color:var(--text); border:1px solid var(--border); border-radius:8px;
+         padding:10px; font:inherit; }
+  textarea { min-height:70px; resize:vertical; }
+  .row { display:flex; gap:8px; } .row > * { flex:1; min-width:0; }
+  .meas { display:grid; grid-template-columns: 1.4fr 1fr 0.8fr; gap:6px; margin-bottom:6px; }
+  button { font:inherit; border-radius:10px; padding:11px 14px; border:1px solid var(--border); background:transparent; color:var(--text); }
+  button.primary { background:var(--gold); color:#17120a; border-color:var(--gold); font-weight:700; width:100%; padding:14px; }
+  button.small { padding:7px 10px; font-size:14px; }
+  .muted { color:var(--muted); font-size:13px; }
+  .ok { color:var(--green); } .warn { color:var(--amber); } .bad { color:var(--red); }
+  .entry { border-top:1px solid var(--border); padding:10px 0; }
+  .entry b { color:var(--gold); }
+  .thumbs { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .thumbs img { width:64px; height:64px; object-fit:cover; border-radius:6px; border:1px solid var(--border); }
+  #status { min-height:1.4em; margin-top:8px; }
+  .hidden { display:none; }
+  .notice { border:1px dashed var(--amber); color:var(--amber); border-radius:10px; padding:10px; font-size:14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Field Notebook</h1>
+  <span class="badge" id="offline-badge">ON THIS PHONE</span>
+</header>
+<p class="muted">Everything you record stays on this phone, even with no signal. Send it to Cursiv on your laptop
+  when you're back: nothing goes to the internet.</p>
+
+<div id="unsupported" class="notice hidden"></div>
+
+<div class="card">
+  <div id="form-title"><b>New entry</b></div>
+  <label for="observer">Observer</label>
+  <input id="observer" autocomplete="name" placeholder="Your name">
+  <label for="site">Site</label>
+  <input id="site" placeholder="Site or station">
+  <label for="sample">Sample ID (optional)</label>
+  <div class="row"><input id="sample" placeholder="e.g. a vial label"><button class="small" id="new-id" type="button" style="flex:0 0 auto">New ID</button></div>
+  <label>Location</label>
+  <div class="row"><input id="lat" inputmode="decimal" placeholder="Latitude"><input id="lon" inputmode="decimal" placeholder="Longitude"></div>
+  <div class="row" style="margin-top:6px"><button class="small" id="gps" type="button">Use this phone's GPS</button></div>
+  <div class="muted" id="gps-status"></div>
+  <label>Measurements (values kept exactly as typed)</label>
+  <div id="meas"></div>
+  <button class="small" id="add-meas" type="button">+ Another measurement</button>
+  <label for="note">Notes</label>
+  <textarea id="note" placeholder="Conditions, what you saw, anything else"></textarea>
+  <label>Photos</label>
+  <input id="photo-input" type="file" accept="image/*" multiple class="hidden">
+  <button class="small" id="add-photo" type="button">📎 Add photos</button>
+  <div class="thumbs" id="thumbs"></div>
+  <div style="margin-top:14px"><button class="primary" id="save" type="button">Save entry</button></div>
+  <button class="small hidden" id="cancel-correction" type="button" style="margin-top:8px">Cancel correction</button>
+  <div id="status"></div>
+</div>
+
+<div class="card">
+  <div class="row" style="align-items:center">
+    <div><b id="count">0 entries</b><div class="muted" id="unsent"></div></div>
+    <button id="send" type="button" style="flex:0 0 auto">Send to laptop</button>
+  </div>
+  <div class="muted" style="margin-top:8px">Makes one file. Move it to the laptop with a USB cable, AirDrop or Quick Share
+    (they work without internet), then in Cursiv: Field Notebook → Import from team…, or type
+    <code>field log import &lt;file&gt;</code>.</div>
+</div>
+
+<h2>Entries</h2>
+<div id="list"></div>
+
+<h2>This phone</h2>
+<div class="card muted" id="about"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

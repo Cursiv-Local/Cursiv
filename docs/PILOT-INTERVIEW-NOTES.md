@@ -43,6 +43,7 @@ field season with a research team. That is what the pilot is for.
 | **Source on every answer** | A line written by Cursiv (not the AI) from what it actually gave the model: offline reference, your documents (pages), Cursiv's calculations, web results, saved memories, or *model knowledge (not checked against a source)*. | any answer |
 | **Checks after the answer** | A second pass looks for unsupported claims, changed numbers, and doses that don't match the card; an answer that says "yes, safe" and then "don't go" gets a warning on top. Claims to have searched databases that weren't searched get a note. | `core/verify.py`, `core/answer_check.py` |
 | **Works when the AI engine fails** | It says so, then gives what it has without the model: the calculation, the reference card, the matching document pages. | `chat_app._without_model` |
+| **Phone notebook (new, not yet field-tested on phones)** | Record on a phone with no signal; everything stays on the phone; one file goes to the laptop by USB, AirDrop or Quick Share and is imported with the same checks (same format, fingerprints, the phone's own signature). Storage on phones isn't proven yet: send daily. | `docs/PHONE-NOTEBOOK.md` |
 | **Demo with sample data** | `demo` loads a sample stream survey and protocol, kept apart from real records. | `docs/FIELD-DEMO.md` |
 
 ---

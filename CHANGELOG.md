@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- **Phone notebook (new):** record observations on a phone with no signal at cursiv.winklers-llc.com/notebook (add it to the home screen; it works offline after the first visit). Everything stays on the phone. *Send to laptop* makes one file (USB, AirDrop or Quick Share); Cursiv imports it through the same checks as a laptop's team share: the same entry format, fingerprints, the phone's own signature, photos by fingerprint. Field Notebook → Import from team → From the phone notebook, or `field log import <file>`. Tested in a desktop browser and by cross-checking the phone's code against Cursiv's; not yet on real phones in the field. See docs/PHONE-NOTEBOOK.md.
+
 ## v3.14-U74 — Photos, safer lightning answers, accounts (2026-10-19)
 - **Photos.** A paperclip on the main screen: *Add photos to a field entry* (the camera's time and GPS are kept, a blank location is filled from the photo; photos are stored by fingerprint, included and signed in exports, and carried by team sharing), or *Ask Cursiv about a photo*, read by the local image model. Reading photos is now local first; online keys only when no image model is installed and the internet isn't blocked, and the answer says where the photo went. Making images still needs an online service.
 - **Lightning:** "is it safe to go back out? last thunder 10 minutes ago" gets Cursiv's own "Not yet: wait about 20 more minutes" (the 30-minute rule, counted in code) above the model's answer. Never for questions about getting to safety.

@@ -9,7 +9,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QDialog, QFileDialog, QFormLayout, QFrame, QGridLayout, QHBoxLayout, QInputDialog, QLabel, QLineEdit,
     QMessageBox, QPlainTextEdit, QPushButton, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
-    QAbstractItemView, QHeaderView,
+    QAbstractItemView, QHeaderView, QMenu,
 )
 
 import theme
@@ -130,7 +130,12 @@ class FieldNotebookDialog(QDialog):
         exp = QPushButton("Export…"); exp.setStyleSheet(theme.ghost_button()); exp.clicked.connect(self._export)
         rep = QPushButton("Report…"); rep.setStyleSheet(theme.ghost_button()); rep.clicked.connect(self._report)
         share = QPushButton("Share with team…"); share.setStyleSheet(theme.ghost_button()); share.clicked.connect(self._share)
-        imp = QPushButton("Import from team…"); imp.setStyleSheet(theme.ghost_button()); imp.clicked.connect(self._import)
+        imp = QPushButton("Import from team…"); imp.setStyleSheet(theme.ghost_button() +
+                                                                  "QPushButton::menu-indicator { image: none; width: 0; }")
+        imp_menu = QMenu(imp)
+        imp_menu.addAction("From a USB stick or shared folder…", self._import)
+        imp_menu.addAction("From the phone notebook (.cursivsync file)…", self._import_phone)
+        imp.setMenu(imp_menu)
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
         for b in (fix, check, exp, rep, share, imp):
             foot.addWidget(b)
@@ -321,14 +326,26 @@ class FieldNotebookDialog(QDialog):
                                 "On each other laptop: Import from team… and pick the same drive. "
                                 "Only the field log is shared; memories and documents stay on this computer.")
 
+    def _import_phone(self):
+        """A file from the phone notebook (website/notebook), sent by USB, AirDrop or Quick Share."""
+        from pathlib import Path
+        from cursiv_v215.core import fieldsync
+        f, _ = QFileDialog.getOpenFileName(self, "Import from the phone notebook", "",
+                                           "Phone notebook (*.cursivsync)")
+        if f:
+            self._show_import(lambda: fieldsync.import_phone_bundle(Path(f)))
+
     def _import(self):
         from pathlib import Path
         from cursiv_v215.core import fieldsync
         folder = QFileDialog.getExistingDirectory(self, "Import field logs from…")
-        if not folder:
-            return
+        if folder:
+            self._show_import(lambda: fieldsync.import_folder(Path(folder)))
+
+    def _show_import(self, run):
+        from cursiv_v215.core import fieldsync
         try:
-            text = fieldsync.report_text(fieldsync.import_folder(Path(folder)))
+            text = fieldsync.report_text(run())
         except (OSError, ValueError) as exc:
             QMessageBox.warning(self, "Not imported", str(exc))
             return

@@ -1,0 +1,11 @@
+{
+  "name": "Cursiv Field Notebook",
+  "short_name": "Field Notebook",
+  "description": "Record field observations offline on your phone and send them to Cursiv on your laptop.",
+  "start_url": "/notebook/",
+  "scope": "/notebook/",
+  "display": "standalone",
+  "background_color": "#0e1016",
+  "theme_color": "#0e1016",
+  "icons": [{ "src": "/assets/cursiv_256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" }]
+}
