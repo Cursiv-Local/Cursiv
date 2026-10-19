@@ -76,7 +76,7 @@ def weekday(question: str) -> Result | None:
     start = _DAYS.index(day.capitalize())
     end = _DAYS[(start + (-days if back else days)) % 7]
     return Result(f"{days} day{'s' if days != 1 else ''} {'before' if back else 'after'} a {day.capitalize()} is a "
-                  f"{end} ({days} = {days // 7} week{'s' if days // 7 != 1 else ''} and {days % 7} day"
+                  f"{end} ({days} = {days // 7} week{'s' if days // 7 != 1 else ''} ({days // 7 * 7} days) and {days % 7} day"
                   f"{'s' if days % 7 != 1 else ''}).", 0.0, answer=end)    # benchmark rea-008, U75: checked by name
 
 

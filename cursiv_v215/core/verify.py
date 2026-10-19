@@ -76,7 +76,9 @@ def exact_format(user_text: str) -> bool:
 
 
 _DECISION = re.compile(r"(?i)\b(should i|should we|which is better|pros and cons|help me decide)\b")
-_NUM_NOUN = re.compile(r"(?i)\b(\d+(?:\.\d+)?)\s+([a-z][a-z0-9-]{2,})\b")
+_NUM_NOUN = re.compile(r"(?i)(?<![\d,.])(\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)\s+([a-z][a-z0-9-]{2,})\b")
+# "4 to 6 weeks", "4-6 weeks", "4 or 5 days": the first number belongs to the noun too
+_RANGE_NOUN = re.compile(r"(?i)(?<![\d,.])(\d+(?:\.\d+)?)\s*(?:to|-|–|or|and)\s*\d+(?:\.\d+)?\s+([a-z][a-z0-9-]{2,})\b")
 _DEF = re.compile(
     r"(?i)\b(?:define|let)\s+([a-z][a-z0-9_-]*)\s+(?:as|be|=)\s+([^.\n]+)"
     r"|\b([a-z][a-z0-9_-]*)\s+means\s+([^.\n]+)"
@@ -158,6 +160,8 @@ def number_bindings(text: str) -> dict[str, set[str]]:
     """Map a noun to the numbers written immediately in front of it."""
     found: dict[str, set[str]] = {}
     for match in _NUM_NOUN.finditer(text or ""):
+        found.setdefault(match.group(2).lower(), set()).add(match.group(1).replace(",", ""))
+    for match in _RANGE_NOUN.finditer(text or ""):
         found.setdefault(match.group(2).lower(), set()).add(match.group(1))
     return found
 
@@ -179,18 +183,35 @@ def _norm(text: str) -> str:
 
 # A number that is the result of a calculation ("= 36 liters", "36 liters in total")
 # is an answer, not a restated input (AUDIT C-004).
-_RESULT_BEFORE = re.compile(r"(?i)(=|\b(is|are|makes|comes to|equals|need|needs|total(?: of)?|get|gives|that's|so)\s*(about |around |roughly )?)\s*$")
+_RESULT_BEFORE = re.compile(r"(?i)(=|→|\b(is|are|makes|comes to|equals|need|needs|total(?: of)?|get|gives|that's|so|"
+                            r"answer|you (?:go|need|get|travel|drive|use)|it (?:takes|will take)|about|around|"
+                            r"roughly|approximately|just over|just under|nearly|almost)\s*[:,]?\s*"
+                            r"(about |around |roughly )?)\s*$")
 _RESULT_AFTER = re.compile(r"(?i)^\s*(in total|total|altogether|overall|combined|in all|for the (whole|entire))\b")
 
 
-def _input_bindings(draft: str) -> dict[str, set[str]]:
+def _numbers(text: str) -> set[str]:
+    return {x.replace(",", "") for x in re.findall(r"(?<![\d,.])\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?",
+                                                   text or "")}
+
+
+def _input_bindings(draft: str, grounded: set[str] | None = None) -> dict[str, set[str]]:
+    """Numbers in front of a noun that read as restating the question. Not counted: a result the answer
+    works out ("= 36 liters", "So, 9 eggs", "Answer: 20 degrees") and a number from Cursiv's sources
+    (its calculation, the reference card) or from the question that isn't tied to another noun there.
+    Noting those under correct answers was most of this check's noise (bench/FAILURES-U75.md)."""
     found: dict[str, set[str]] = {}
+    results: set[str] = set()                  # worked out earlier in this answer ("= 12 liters", then "12 liters")
     for m in _NUM_NOUN.finditer(draft or ""):
         before = draft[max(0, m.start() - 24): m.start()]
         after = draft[m.end(): m.end() + 24]
+        value = m.group(1).replace(",", "")
         if _RESULT_BEFORE.search(before) or _RESULT_AFTER.search(after):
+            results.add(value)
             continue
-        found.setdefault(m.group(2).lower(), set()).add(m.group(1))
+        if value in (grounded or set()) or value in results or before.rstrip().endswith("("):  # "1 week (7 days)"
+            continue
+        found.setdefault(m.group(2).lower(), set()).add(value)
     return found
 
 
@@ -205,6 +226,9 @@ def arithmetic_problems(draft: str) -> list[str]:
     """Shown arithmetic that is wrong: "17 times 23 is 381", "4 x 3 x 3 = 30"."""
     problems = []
     for m in _EXPR.finditer(draft or ""):
+        # "(68 − 32) × 5/9 = 36": only the tail "5/9 = 36" matched (benchmark num-010, U68 and U75)
+        if re.search(r"[)×x*+\-−/÷]\s*$", draft[max(0, m.start() - 3): m.start()]):
+            continue
         expr = m.group(1)
         tokens = re.findall(_N + "|" + _OP, expr, re.I)
         py = "".join(_OPS.get(t.lower(), t) if not re.fullmatch(_N, t) else t.replace(",", "") for t in tokens)
@@ -213,17 +237,24 @@ def arithmetic_problems(draft: str) -> list[str]:
         except Exception:
             continue
         stated = float(m.group(2).replace(",", ""))
+        frac = re.match(r"\s*/\s*(\d+)", draft[m.end():])       # "3/4 plus 1/8 is 7/8" (num-003)
+        if frac and int(frac.group(1)):
+            stated = stated / int(frac.group(1))
         if abs(value - stated) > max(0.01, abs(value) * 0.005):
             shown = int(value) if float(value).is_integer() else round(value, 2)
             problems.append(f"arithmetic: {expr.strip()} is {shown}, not {m.group(2)}")
     return problems
 
 
-def constraint_problems(user_text: str, draft: str) -> list[str]:
-    """Numbers and definitions from the question must not drift in the draft."""
+def constraint_problems(user_text: str, draft: str, sources: str = "") -> list[str]:
+    """Numbers and definitions from the question must not drift in the draft: "4 people need 3 liters"
+    answered with "each person drinks 4 liters" is caught; worked results and numbers from Cursiv's
+    sources are not."""
     problems: list[str] = arithmetic_problems(draft)
     user_nums = number_bindings(user_text)
-    for noun, values in _input_bindings(draft).items():
+    tied = {v for vals in user_nums.values() for v in vals}       # "4 people": 4 can't become "4 liters"
+    grounded = (_numbers(user_text) - tied) | _numbers(sources)
+    for noun, values in _input_bindings(draft, grounded).items():
         if noun not in user_nums:
             continue
         changed = values - user_nums[noun]
@@ -460,7 +491,7 @@ def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
 
 def _problems(user_text: str, text: str, context: str = "", sources: str = "") -> list[str]:
     grounding = "\n".join(part for part in (user_text, context, sources) if part)
-    found = constraint_problems(user_text, text)
+    found = constraint_problems(user_text, text, sources)
     found += assumptions_stated_as_facts(text)
     found += known_problems(grounding, text)
     found += citation_problems(f"{user_text}\n{context}", sources, text)

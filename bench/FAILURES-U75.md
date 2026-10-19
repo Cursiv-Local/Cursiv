@@ -54,7 +54,12 @@ It added a "Checked, with notes" block under 29 of 153 U75 answers; **28 of thos
 (U68: 31 of 33). Its "changed X from A to B" lines appeared under 12 answers, 11 correct; every one read
 (rea-008, num-003, rea-018, num-036, num-037) was noise ("changed days from 100 to 2, 98" under a correct
 weekday answer). It also printed one useful note (rea-016: the model's "both go from 30% to 95%" was wrong).
-This is the older check, not part of this work; a fix is proposed separately.
+**Fixed since** (measured with `scripts/verify_replay.py`, which replays the deterministic parts over saved
+answers without a model): on the 149 correct U75 answers its deterministic notes went from 17 to 4 (changed
+numbers 11 to 1, arithmetic 2 to 0, citation 1 to 0; the 3 left are general knowledge listed as Known, which
+that rule is for). A worked result, a number from Cursiv's sources, a range in the question, a bracketed
+equivalent and "4,620" are no longer read as changed inputs; a restated number that really changed still is
+("each person drinks 4 liters" for 3). The model's own verdict, the other half of the check, can't be replayed.
 
 ## Not measured
 

@@ -589,3 +589,55 @@ def test_one_time_repair_of_learned_memories(memory):
     assert facts["c"]["origin"] == "user_said"            # what the person said is untouched
     moved = (memory.CURSIV_DIR / memory.REMOVED_FILE_NAME).read_text(encoding="utf-8")
     assert "Detailed plan" in moved                       # kept, not deleted
+
+
+# ── From the live U75 benchmark (bench/FAILURES-U75.md, scripts/verify_replay.py) ──
+# Notes under correct answers: the deterministic checks went from 17 to 4 on the 149 correct U75 answers.
+
+@pytest.mark.parametrize("q,draft,sources", [
+    # rea-008: a week's 7 days, and Cursiv's own calculation
+    ("If today is Wednesday, what day of the week will it be 10 days from now?",
+     "10 days after Wednesday is Saturday.\n- 7 days after Wednesday is Wednesday again.\n- 10 days is 1 week "
+     "(7 days) plus 3 more days.", "Worked out by Cursiv's code (exact): 10 days after a Wednesday is a Saturday "
+     "(10 = 1 week (7 days) and 3 days)."),
+    # rea-011: "So, 9 eggs"
+    ("A recipe for 4 people uses 3 eggs. I'm cooking for 12. How many eggs do I need?",
+     "3 eggs for 4 people means 3 ÷ 4 = 0.75 eggs per person. For 12 people: 0.75 × 12 = 9 eggs. So, 9 eggs.", ""),
+    # rea-010: a range in the question
+    ("Garlic should be planted about 4 to 6 weeks before the ground freezes. If it freezes November 15, when?",
+     "4 to 6 weeks before November 15. 4 weeks before November 15 is October 18.", ""),
+    # num-015: a result mentioned again
+    ("We have 4 people and each needs 3 liters of water a day. How much water for 3 days?",
+     "4 people × 3 liters each = 12 liters per day. 12 liters per day × 3 days = 36 liters.", ""),
+    # num-016 and num-010: "You go", "Answer:"
+    ("If I drive 60 miles an hour for 2 and a half hours, how far do I go?", "You go 150 miles.", ""),
+    ("What is 68 degrees Fahrenheit in Celsius?", "So: (68 − 32) × 5/9 = 36 × 5/9 = 20\n\nAnswer: 20 degrees Celsius.",
+     ""),
+    # ref-014: "4,620 feet" is one number
+    ("Fence inventory: 14 rolls of woven wire, 330 feet per roll. How many feet in total?",
+     "Total feet = 14 × 330 = 4,620 feet. Answer: 4,620 feet of woven wire in total.", ""),
+    # adv-011: a number from the reference card Cursiv gave
+    ("Sheet A: add 4 drops of bleach per liter. Sheet B: add 8 drops per liter. How many drops?",
+     "The EPA card says 2 drops per liter for clear water, doubled to 4 drops per liter for cloudy water.",
+     "[survival/water-purification] Per 1 liter or quart: 2 drops (6% or 8.25%)."),
+    # num-003: a fraction as the stated result
+    ("What is 3/4 plus 1/8, as a fraction?", "3/4 plus 1/8 is 7/8. 3/4 is the same as 6/8. 6/8 plus 1/8 is 7/8.", ""),
+])
+def test_worked_steps_and_sourced_numbers_are_not_drift(q, draft, sources):
+    assert verify.constraint_problems(q, draft, sources) == []
+
+
+@pytest.mark.parametrize("q,draft,word", [
+    ("4 people need 3 liters of water per day for 3 days. How much total?", "Each person drinks 4 liters a day.",
+     "liters"),                                                       # 4 belongs to people, not liters
+    ("The retry limit is exactly 3 retries.", "Set the retry limit to 5 retries.", "retries"),
+    ("We have 40 samples to process.", "You have 50 samples to process.", "samples"),
+    ("Plant 4 to 6 weeks before the frost.", "Plant 8 weeks before the frost.", "weeks"),
+])
+def test_a_restated_number_that_changed_is_still_caught(q, draft, word):
+    assert any(word in p for p in verify.constraint_problems(q, draft))
+
+
+def test_wrong_arithmetic_is_still_caught_after_the_chain_and_fraction_fixes():
+    assert verify.arithmetic_problems("3/4 plus 1/8 is 5/8") == ["arithmetic: 3/4 plus 1/8 is 0.88, not 5"]
+    assert verify.arithmetic_problems("4 x 3 x 3 = 30 liters") == ["arithmetic: 4 x 3 x 3 is 36, not 30"]
