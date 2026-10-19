@@ -1,6 +1,8 @@
-# Cursiv — Offline. Yours. Everywhere.
+# Cursiv: an offline AI assistant for field research
 
-> Not a subscription. Not someone else's server. A private AI companion that lives on your own computer, works without the internet, and belongs to you.
+> Runs on your own laptop with the internet blocked if you want. Records field data you can defend,
+> works out the numbers in code, answers from your own protocols with page numbers, and says where
+> every answer came from.
 
 <p align="center">
   <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">
@@ -9,7 +11,8 @@
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> — one click, about 100 MB ·
+  <b><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 80 MB) ·
+  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
   <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">release notes</a> ·
   <a href="CHANGELOG.md">what's new</a>
 </p>
@@ -45,18 +48,32 @@ Saved AI keys go into the macOS Keychain.
 
 ## What it does
 
-- **Chats offline** through Ollama on your own computer. Cursiv picks the right model for your graphics card.
-- **Local first.** When your computer has a model, it answers — your messages stay on your PC. A free [Gemini](https://aistudio.google.com/apikey) or [Groq](https://console.groq.com/keys) key is a backup for when there's no local model or it can't answer, and the way to read images. Paid keys (OpenAI, Anthropic, xAI) are optional, never required. Every reply ends with **"Answered by …"** so you always know which one answered.
-- **Remembers you** — lasting facts about each person, learned from conversations or added with *"remember …"*. Memories are stored on your computer. If you use an online AI, the memories relevant to a message are sent with it. *"What I remember"* lets you see, edit and delete them.
-- **Reads images** you paste in — offline with the free Gemma 3 model, or with a key.
-- **Makes images** with a free Cloudflare account or a paid OpenAI key (type `image a lighthouse at dawn`). Offline models can't make images, and Cursiv tells you how to turn it on.
-- **Helps you code** — step-by-step help with local coding models, error diagnosis, and a sandbox that runs and fixes the Python it writes.
-- **The council** — ask `council <question>` and Cursiv's advisors each answer from their own angle, then one combined answer comes back.
-- **Your own agents** — `agent new <name>: <job>` creates a specialist you talk to with `@name`.
-- **Adds new abilities** — `evolve <idea>` writes a plugin, safety-checks it, tests it in a sandbox, and installs it only when you approve.
-- **Learns your voice** — save examples in Training Data, then train a small personal model with LoRA and add it to Ollama.
-- **Phone app** — link your phone to share one conversation with your computer.
-- **Sealed letters** — write letters that only open for the right person.
+- **Local only, and you can see it.** The AI model runs on your computer. Offline mode blocks every
+  connection off the computer; the top of the window says *LOCAL ONLY · internet blocked*. See
+  [PRIVACY.md](PRIVACY.md) for everything that could ever leave the computer, and when.
+- **A field notebook you can defend.** Observations are kept exactly as typed (12.40 stays 12.40), with
+  site, coordinates, sample IDs, observer and photos. Nothing is overwritten: a correction is a new entry
+  with a reason. Every entry is fingerprinted and chained, and exports are signed by the laptop's own key
+  (`field log verify <folder>` checks them). CSV, JSON, GeoJSON and a printable field report.
+- **Photos.** The paperclip adds photos to a field entry (the camera's time and GPS are kept) or asks the
+  local image model what a photo shows. Making new images needs an online service; Cursiv only reads them offline.
+- **Numbers worked out in code, not guessed:** unit conversions, degrees-minutes-seconds, UTM, distance and
+  bearing between GPS points, dilutions, statistics, clock times, bleach doses, the lightning 30-minute rule.
+- **Your documents.** Import protocols and SOPs; answers quote them by page, and say when they don't cover
+  a question. "Answer only from my documents" refuses anything else (except emergencies).
+- **Every answer says where it came from:** Cursiv's offline reference, your documents, Cursiv's
+  calculations, or *model knowledge (not checked against a source)*, written by Cursiv, not by the AI.
+- **Checks after every answer** for unsupported claims, wrong doses, and answers that contradict themselves.
+- **Team sync without internet.** Laptops share their signed logs by USB stick or shared folder; nothing is
+  merged or overwritten, and disagreements are shown, not resolved by software.
+- **Measured.** A fixed truth benchmark with every failure published ([bench/](bench/)), and an offline
+  demonstration with zero outside connections ([OFFLINE-DEMO.md](OFFLINE-DEMO.md)).
+- **Try it with sample data:** type `demo`. A walkthrough for showing it to a team: [docs/FIELD-DEMO.md](docs/FIELD-DEMO.md).
+
+Personal features from earlier versions (family letters, a legacy vault, the phone app, coding help, the
+council, custom agents, LoRA training) are still there but hidden: Settings → Appearance → *Show personal features*.
+
+**Not yet:** field use by a research team, professional review of the first-aid content, code signing, live GPS.
 
 ---
 

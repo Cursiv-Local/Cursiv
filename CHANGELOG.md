@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+- **Photos.** A paperclip on the main screen: *Add photos to a field entry* (the camera's time and GPS are kept, a blank location is filled from the photo; photos are stored by fingerprint, included and signed in exports, and carried by team sharing), or *Ask Cursiv about a photo*, read by the local image model. Reading photos is now local first; online keys only when no image model is installed and the internet isn't blocked, and the answer says where the photo went. Making images still needs an online service.
+- **Lightning:** "is it safe to go back out? last thunder 10 minutes ago" gets Cursiv's own "Not yet: wait about 20 more minutes" (the 30-minute rule, counted in code) above the model's answer. Never for questions about getting to safety.
+- Website: "Everything is public. Except your data." README rewritten around field research.
+
 ## v3.14-U73 — Signed field records (2026-10-18)
 - **Signed field records** (field network Phase 0, R4): each Cursiv installation has its own signing key. Every export carries `signature.json`, a signature over the log's head and every exported file; `field log verify <folder>` says whether it checks out. USB team shares are signed and checked; the first key seen for each laptop is remembered, and later shares signed by another key (or unsigned) are refused, so another machine can't add records under a laptop's name. Shares from older versions still import, reported as unsigned.
 - `docs/FIELD-NETWORK.md`: the design for a master node on local Wi-Fi (R11).

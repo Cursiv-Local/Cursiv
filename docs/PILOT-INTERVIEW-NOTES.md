@@ -117,9 +117,10 @@ re-run on U71 yet.
 - Said 3 of 4 frogs surviving beats 60 of 100: it doesn't flag tiny samples on its own.
 - Worked "250 ÷ 12.5 = 20" and trailed off before the right answer (21 quadrats).
 - Invented a population ("a few dozen") for a tiny unincorporated town.
-- And one passes only because of a guard: on "safe to go back on the lake 10 minutes after
-  thunder?" the model opens "Yes, it's safe" every time; Cursiv puts a warning above it. The
-  guard works; the model's habit is still there.
+- And one passed only because of a guard: on "safe to go back on the lake 10 minutes after
+  thunder?" the model opens "Yes, it's safe" every time. Since then (unreleased at the time of
+  writing) Cursiv counts the 30-minute rule itself and shows "Not yet: wait about 20 more minutes"
+  above the model's answer, only for questions about going back out (never for getting to safety).
 
 ---
 
@@ -132,7 +133,9 @@ re-run on U71 yet.
   reference; it is not a substitute for a domain expert, and it still makes mistakes (see above).
   The design assumes it will, which is why calculations are done in code and sources are labelled.
 - **No live GPS.** Coordinates are typed or pasted. Distance, bearing and UTM are computed.
-- **No photos in the notebook window yet** (the data format has a place for them).
+- **Photos are new and untested in the field.** The paperclip attaches photos to an entry (camera
+  time and GPS kept, stored by fingerprint, exported and signed) and asks the local image model about
+  a photo. The image model's reading can be wrong. Cursiv can't make images offline.
 - **Voice input** exists (local speech-to-text) but hasn't been tested for field use.
 - **Windows first; Mac is early.** The Mac version (Apple Silicon, macOS 12+) is built and tested automatically
   on Apple hardware at GitHub (the full test suite plus a self-test of the built app), but nobody has used it on
@@ -179,6 +182,11 @@ re-run on U71 yet.
 ## 9. The pilot: what we'd propose
 
 - **One team, one real trip or field season.** A few laptops or a few Cursiv drives.
+- **One researcher per drive (or laptop), one account in that person's name**, plus one for the
+  team lead, who imports everyone's logs. A drive can hold several accounts, but the notebook,
+  documents and the signing key belong to the drive, not the person: one person per drive keeps
+  "this export came from this drive" meaning "from this person". Sharing a drive works if they're
+  short of hardware; each person then signs in as themselves and checks the Observer field.
 - **We provide:** the drives or installers, setup help over video, the sample-data demo for training,
   fixes during the pilot, and a written report.
 - **We'd measure** (research roadmap R10, `docs/RESEARCH-ROADMAP.md`): entries logged; errors found at
@@ -243,7 +251,7 @@ so the model is warm. Share the Cursiv window, not the whole screen.
 - "It never makes mistakes" or "100% accurate". Quote the measured number and the misses.
 - "Field-tested". It isn't yet.
 - "Reviewed by a doctor / medic". It isn't yet.
-- That it has GPS, photos or signed exports. Not yet.
+- That it has live GPS (coordinates are typed, pasted or read from a photo), or a master node / network sync.
 - Anything about a company, staff or customers that doesn't exist.
 
 ---
