@@ -1,6 +1,6 @@
 ﻿; ============================================================
-; Cursiv v3.14-U74 — Photos, safer lightning answers, accounts
-; Produces: installer\Output\Cursiv-Setup-3.14-U74.exe
+; Cursiv v3.14-U75 — Records that hold up, honest answers, phone over Wi-Fi
+; Produces: installer\Output\Cursiv-Setup-3.14-U75.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat
 ; panel, tray, guardian, feedback loops, and terminal/chat mode via -t).
@@ -11,7 +11,7 @@
 ; ============================================================
 
 #define AppName      "Cursiv"
-#define AppVer       "3.14-U74"
+#define AppVer       "3.14-U75"
 #define AppPublisher "Joshua Winkler"
 #define AppURL       "https://cursiv.winklers-llc.com"
 #define SourceURL    "https://github.com/winklersllc2026-bit/Cursiv"
@@ -44,7 +44,7 @@ InfoBeforeFile=BEFORE-INSTALL.txt
 InfoAfterFile=..\CHANGELOG.md
 AppComments=A personal AI assistant that runs on your own computer. The local model answers first; online features are optional, and offline mode blocks every connection off this computer.
 OutputDir=Output
-OutputBaseFilename=Cursiv-Setup-3.14-U74
+OutputBaseFilename=Cursiv-Setup-3.14-U75
 SetupIconFile=..\launcher\resources\icons\cursiv.ico
 WizardSmallImageFile=..\launcher\resources\icons\cursiv_256.png
 Compression=lzma2/ultra64
