@@ -18,7 +18,7 @@ pytestmark = pytest.mark.skipif(NODE is None, reason="needs Node.js to run the p
 SCRIPT = r"""
 import * as core from "./core.mjs";
 import { writeFileSync } from "node:fs";
-const out = process.argv[2], extra = process.argv[3] === "extra";
+const out = process.argv[2], extra = process.argv[3] === "extra", asZip = process.argv[4] === "zip";
 const keyPair = await core.newKeyPair();
 const pub = await core.publicKeyB64(keyPair.publicKey);
 const device = await core.deviceLabel(pub);
@@ -35,9 +35,13 @@ await add({ observer: "Ana Ruíz", site: "Upper Brook (site A)", lat: "44.123456
 await add({ observer: "Ana Ruíz", site: "Upper Brook (site A)", measurements: [{ name: "pH", value: "7.30" }],
             corrects: rows[0].id, reason: "meter recalibrated", photos: [{ rel }] });
 if (extra) await add({ observer: "Ana Ruíz", note: "third entry" });
-const photos = { [rel]: core.b64(photoBytes) };
-const bundle = await core.makeBundle(rows, device, keyPair, photos, "Ana Ruíz");
-writeFileSync(out, JSON.stringify(bundle));
+if (asZip) {
+  const zip = await core.makeZipBundle(rows, device, keyPair, { [rel]: new Blob([photoBytes]) }, "Ana Ruíz");
+  writeFileSync(out, new Uint8Array(await zip.arrayBuffer()));
+} else {
+  const bundle = await core.makeBundle(rows, device, keyPair, { [rel]: core.b64(photoBytes) }, "Ana Ruíz");
+  writeFileSync(out, JSON.stringify(bundle));
+}
 console.log(device);
 """
 
@@ -51,13 +55,13 @@ def laptop(tmp_path, monkeypatch):
     return tmp_path
 
 
-def _phone(tmp_path, name="send.cursivsync", extra=False, workdir=None):
+def _phone(tmp_path, name="send.cursivsync", extra=False, workdir=None, zip=False):
     work = workdir or (tmp_path / "phone")
     work.mkdir(exist_ok=True)
     shutil.copyfile(REPO / "website" / "notebook" / "core.js", work / "core.mjs")
     (work / "make.mjs").write_text(SCRIPT, encoding="utf-8")
     out = tmp_path / name
-    r = subprocess.run([NODE, "make.mjs", str(out), "extra" if extra else ""], cwd=work,
+    r = subprocess.run([NODE, "make.mjs", str(out), "extra" if extra else "", "zip" if zip else ""], cwd=work,
                        capture_output=True, text=True, timeout=60)
     assert r.returncode == 0, r.stderr
     return out, r.stdout.strip()
@@ -113,3 +117,58 @@ def test_the_chat_command_imports_a_phone_file(laptop):
     out, device = _phone(laptop)
     text = fieldsync.command(f'field log import "{out}"')
     assert f"{device}: 2 new entries" in text and "signature checked" in text
+
+
+# ── format 2: the zip the phone sends now ──
+
+def test_the_phones_zip_opens_as_an_ordinary_zip_and_imports(laptop):
+    import zipfile
+    out, device = _phone(laptop, zip=True)
+    with zipfile.ZipFile(out) as z:
+        assert z.testzip() is None                                  # every CRC the phone wrote is right
+        names = set(z.namelist())
+        assert {"bundle.json", f"cursiv-field-share/{device}.jsonl", f"cursiv-field-share/{device}.manifest.json"} <= names
+        assert json.loads(z.read("bundle.json"))["format"] == "cursiv-phone-bundle-2"
+    r = fieldsync.import_phone_bundle(out)
+    assert r["added"] == {device: 2} and device in r["signed"] and not r["rejected"] and not r["photos_missing"]
+    rows = [e for e in fieldsync.team_entries() if e["device"] == device]
+    assert fieldsync.chain_problems(rows) == [] and fieldlog.photo_path(rows[0]["photos"][0]).exists()
+    assert rows[0]["note"].startswith("café ☂")
+    assert fieldsync.import_phone_bundle(out)["unchanged"] == [device]
+
+
+def _rezip(src, dest, change):
+    import zipfile
+    with zipfile.ZipFile(src) as z:
+        files = {n: z.read(n) for n in z.namelist()}
+    change(files)
+    with zipfile.ZipFile(dest, "w") as z:
+        for n, data in files.items():
+            z.writestr(n, data)
+    return dest
+
+
+@pytest.mark.parametrize("bad_name", ["../evil.txt", "/abs.txt", "cursiv-field-share/laptopB.jsonl",
+                                      "cursiv-field-share/photos/../../x.jpg", "other/readme.txt"])
+def test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole(laptop, bad_name):
+    out, device = _phone(laptop, zip=True)
+    bad = _rezip(out, laptop / "bad.cursivsync", lambda f: f.__setitem__(bad_name, b"x"))
+    with pytest.raises(ValueError, match="doesn't send"):
+        fieldsync.import_phone_bundle(bad)
+    assert not [e for e in fieldsync.team_entries() if e["device"] == device]
+
+
+def test_a_changed_entry_inside_the_zip_is_refused(laptop):
+    out, device = _phone(laptop, zip=True)
+    log = f"cursiv-field-share/{device}.jsonl"
+    bad = _rezip(out, laptop / "bad.cursivsync",
+                 lambda f: f.__setitem__(log, f[log].replace(b'"12.40"', b'"19.90"')))
+    r = fieldsync.import_phone_bundle(bad)
+    assert not r["added"] and "changed after it was recorded" in r["rejected"][0]
+
+
+def test_a_zip_without_the_phone_header_is_not_a_phone_file(laptop):
+    out, _ = _phone(laptop, zip=True)
+    bad = _rezip(out, laptop / "bad.cursivsync", lambda f: f.pop("bundle.json"))
+    with pytest.raises(ValueError, match="isn't a phone notebook file"):
+        fieldsync.import_phone_bundle(bad)

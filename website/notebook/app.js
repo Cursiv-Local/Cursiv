@@ -220,12 +220,12 @@ async function send() {
   const photos = {};
   for (const e of entries) for (const rel of e.photos) {
     const blob = await done(tx("photos").get(rel));
-    if (blob) photos[rel] = core.b64(await blob.arrayBuffer());
+    if (blob) photos[rel] = blob;
   }
-  const bundle = await core.makeBundle(entries, device, keyPair, photos, $("observer").value.trim());
+  const zip = await core.makeZipBundle(entries, device, keyPair, photos, $("observer").value.trim());
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
   const name = `cursiv-${device}-${stamp}.cursivsync`;
-  const file = new File([JSON.stringify(bundle)], name, { type: "application/json" });
+  const file = new File([zip], name, { type: "application/zip" });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
       await navigator.share({ files: [file], title: name });

@@ -296,11 +296,73 @@ PHONE_FORMAT = "cursiv-phone-bundle-1"
 _PHONE_DEVICE = re.compile(r"^phone-[0-9a-f]{12}$")
 
 
+PHONE_ZIP_FORMAT = "cursiv-phone-bundle-2"
+_ZIP_LIMIT = 4 << 30                       # the whole file, unpacked (a zip's sizes can lie: counted as read)
+_LOG_LIMIT = 200 << 20                     # bundle.json, the log and its manifest, each
+
+
+def _unzip_phone_bundle(path: Path, into: Path) -> None:
+    """Unpack a format-2 send file into `into`, letting through only the names a phone writes:
+    bundle.json, cursiv-field-share/<phone>.jsonl, <phone>.manifest.json and photos/<sha256>.<ext>.
+    Anything else (another folder, an absolute path, "..", a second log) refuses the whole file."""
+    import zipfile
+    try:
+        z = zipfile.ZipFile(path)
+    except (OSError, zipfile.BadZipFile) as exc:
+        raise ValueError(f"{path.name} isn't a phone notebook file ({exc})") from exc
+    with z:
+        names = z.namelist()
+        if len(names) != len(set(names)):
+            raise ValueError(f"{path.name} names a file twice")
+        try:
+            head = json.loads(z.read("bundle.json")) if "bundle.json" in names else {}
+        except ValueError:
+            head = {}
+        if not isinstance(head, dict) or head.get("format") != PHONE_ZIP_FORMAT:
+            raise ValueError(f"{path.name} isn't a phone notebook file")
+        device = str(head.get("device", ""))
+        if not _PHONE_DEVICE.match(device):
+            raise ValueError("the file doesn't name a phone (its device label is wrong)")
+        allowed = {"bundle.json", f"{SHARE_DIR}/{device}.jsonl", f"{SHARE_DIR}/{device}.manifest.json"}
+        photo_max = fieldlog.PHOTO_MAX_MB << 20
+        total = 0
+        for info in z.infolist():
+            name = info.filename
+            rel = name[len(SHARE_DIR) + 1:] if name.startswith(SHARE_DIR + "/") else ""
+            if info.is_dir() or not (name in allowed or fieldlog._is_stored(rel)):
+                raise ValueError(f"{path.name} holds something a phone doesn't send ({name[:80]}): not imported")
+            limit = photo_max if fieldlog._is_stored(rel) else _LOG_LIMIT
+            if name == "bundle.json":
+                continue
+            dest = into / name
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            got = 0
+            with z.open(info) as src, dest.open("wb") as out:
+                while chunk := src.read(1 << 20):
+                    got += len(chunk)
+                    total += len(chunk)
+                    if got > limit + (1 << 20) or total > _ZIP_LIMIT:
+                        raise ValueError(f"{path.name} is too big to be a phone's send file ({name[:80]})")
+                    out.write(chunk)
+        if f"{SHARE_DIR}/{device}.jsonl" not in names:
+            raise ValueError(f"{path.name} has no log in it")
+
+
 def import_phone_bundle(path: Path) -> dict:
-    """Import a .cursivsync file from the phone notebook. Same report as import_folder()."""
+    """Import a .cursivsync file from the phone notebook: format 2 (a zip, what the phone makes now)
+    or format 1 (one JSON file with photos inside, from earlier versions). Same report as import_folder()."""
     import base64
     import tempfile
     path = Path(path)
+    try:
+        with path.open("rb") as f:
+            is_zip = f.read(2) == b"PK"
+    except OSError as exc:
+        raise ValueError(f"can't read {path.name} ({exc})") from exc
+    if is_zip:
+        with tempfile.TemporaryDirectory() as tmp:
+            _unzip_phone_bundle(path, Path(tmp))
+            return import_folder(Path(tmp))
     try:
         bundle = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, ValueError) as exc:
