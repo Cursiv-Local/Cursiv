@@ -235,6 +235,11 @@ class FieldNotebookDialog(QDialog):
             self._status.setText(f"Not saved: {exc}.")
             self._status.setStyleSheet(f"color: {theme.RED};")
             return
+        except OSError as exc:                 # disk full, read-only or pulled drive: nothing was written
+            self._status.setText(f"Not saved: couldn't write the field log ({exc}). Nothing was recorded; "
+                                 "free some space or check the drive, then save again.")
+            self._status.setStyleSheet(f"color: {theme.RED};")
+            return
         self._status.setText(f"Saved #{e['seq']} · fingerprint {e['hash'][:12]}")
         self._status.setStyleSheet(f"color: {theme.GREEN};")
         self._clear_form()
@@ -305,8 +310,13 @@ class FieldNotebookDialog(QDialog):
         folder = QFileDialog.getExistingDirectory(self, "Export the field log to…")
         if not folder:
             return
-        paths = fieldlog.export(Path(folder) / "Cursiv field log")
-        QMessageBox.information(self, "Exported", "Saved:\n" + "\n".join(str(p) for p in paths.values()))
+        try:
+            paths = fieldlog.export(Path(folder) / "Cursiv field log")
+        except (OSError, ValueError) as exc:
+            QMessageBox.warning(self, "Not exported", f"{exc}\n\nAny earlier export there is unchanged.")
+            return
+        QMessageBox.information(self, "Exported", "Saved and checked against its signature:\n"
+                                + "\n".join(str(p) for p in paths.values()))
 
     def _report(self):
         """A printable report of the current entries, opened in the browser."""
@@ -318,10 +328,14 @@ class FieldNotebookDialog(QDialog):
             QMessageBox.information(self, "Field report", "The field log is empty.")
             return
         folder = fieldlog.log_dir() / "reports"
-        folder.mkdir(parents=True, exist_ok=True)
         from datetime import datetime
+        from cursiv_v215.core import atomic
         path = Path(folder) / f"field-report-{datetime.now():%Y-%m-%d_%H%M%S}.html"
-        path.write_text(fieldlog.report_html(rows), encoding="utf-8")
+        try:
+            atomic.write_text(path, fieldlog.report_html(rows))
+        except OSError as exc:
+            QMessageBox.warning(self, "Field report", f"Couldn't save the report ({exc}).")
+            return
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(path)))
 
     # ── team sync (core/fieldsync.py): a USB drive or a shared folder, no internet ──

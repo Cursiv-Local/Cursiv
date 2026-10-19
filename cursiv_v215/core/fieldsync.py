@@ -89,18 +89,21 @@ def share(folder: Path, observer: str = "") -> Path:
     out = Path(folder) / SHARE_DIR
     out.mkdir(parents=True, exist_ok=True)
     device = fieldlog._device()
-    shutil.copyfile(fieldlog.log_file(), out / f"{device}.jsonl")
+    # Each file is written whole or not at all (a pulled drive leaves the old or the new one); a log
+    # and manifest that don't match after an interruption are refused on import, never half-read.
+    from cursiv_v215.core import atomic
+    _copy_atomic(fieldlog.log_file(), out / f"{device}.jsonl")
     for e in rows:                                   # photos travel with the log, named by their SHA-256
         for rel in e.get("photos") or []:
             src = fieldlog.photo_path(rel)
             if fieldlog._is_stored(rel) and src.exists() and not (out / rel).exists():
                 (out / rel).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(src, out / rel)
-    (out / f"{device}.manifest.json").write_text(json.dumps({
+                _copy_atomic(src, out / rel)
+    atomic.write_text(out / f"{device}.manifest.json", json.dumps({
         "device": device, "observer": observer, "entries": len(rows), "last_hash": rows[-1]["hash"],
         "shared_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "head": devicekey.signed_head(rows, device),
-    }, indent=2), encoding="utf-8")
+    }, indent=2))
     return out
 
 

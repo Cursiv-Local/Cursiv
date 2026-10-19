@@ -246,10 +246,10 @@ def test_an_entry_with_no_source_says_so_everywhere():
 
 def test_a_reviewed_entry_and_a_malformed_record(monkeypatch):
     e = _entry("survival/water-purification")
-    monkeypatch.setattr(reference, "source", lambda t: {"source": "X", "url": "https://x.org", "checked": "2026-01-01",
-                                                        "reviewed": True})
-    assert reference.evidence(e)["reviewed"] and "reviewed by a professional" in reference.evidence(e)["state"]
-    monkeypatch.undo()
+    with monkeypatch.context() as m:
+        m.setattr(reference, "source", lambda t: {"source": "X", "url": "https://x.org", "checked": "2026-01-01",
+                                                  "reviewed": True})
+        assert reference.evidence(e)["reviewed"] and "reviewed by a professional" in reference.evidence(e)["state"]
     monkeypatch.setattr(reference, "_sources", {"water purification": {"source": "EPA", "url": "http://epa.gov"}})
     monkeypatch.setattr(reference, "_pack_sources", {})
     assert reference.source("water purification") is None              # not https: not a source
@@ -401,12 +401,12 @@ def test_conversation_values_claimed_as_stored_in_a_real_turn(fresh, outbound, m
 def test_a_failed_write_is_never_reported_as_saved(memory, monkeypatch):
     def full(path, text, encoding="utf-8"):
         raise OSError(28, "No space left on device")
-    monkeypatch.setattr(memory._atomic, "write_text", full)
-    out = memory.memory_command(RECORD)
-    assert out.startswith("Not saved") and "No space left" in out and "Nothing was stored" in out
-    out = memory.memory_command("remember the generator key is in the blue box")
-    assert out.startswith("Not saved")
-    monkeypatch.undo()
+    with monkeypatch.context() as m:
+        m.setattr(memory._atomic, "write_text", full)
+        out = memory.memory_command(RECORD)
+        assert out.startswith("Not saved") and "No space left" in out and "Nothing was stored" in out
+        out = memory.memory_command("remember the generator key is in the blue box")
+        assert out.startswith("Not saved")
     assert memory.find("FIELD-731") == []
 
 

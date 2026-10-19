@@ -454,11 +454,48 @@ CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "
               "fingerprint", "device", "location_accuracy_m")
 
 
+def _is_export(folder: Path) -> bool:
+    return (folder / SIGNATURE_FILE).exists() or (folder / "observations.json").exists()
+
+
 def export(folder: Path | None = None, include_corrected: bool = False, *,
            rows: list[dict] | None = None, everything: list[dict] | None = None) -> dict[str, Path]:
-    """Write CSV, JSON and GeoJSON; returns their paths. JSON always has every entry.
-    rows / everything: other entries to export (the team log, fieldsync.team_export)."""
-    folder = folder or (log_dir() / "exports" / datetime.now().strftime("%Y-%m-%d_%H%M%S"))
+    """Write CSV, JSON and GeoJSON (and the report, photos, signature); returns their paths.
+    JSON always has every entry. rows / everything: other entries to export (fieldsync.team_export).
+
+    Made in a temporary folder beside the target, checked against its own signature, and only
+    then put in place: a power cut, a pulled drive or a full disk leaves the previous export as
+    it was. An existing folder is replaced only if it's an earlier Cursiv export (or empty)."""
+    final = Path(folder or (log_dir() / "exports" / datetime.now().strftime("%Y-%m-%d_%H%M%S")))
+    if final.exists() and any(final.iterdir()) and not _is_export(final):
+        raise ValueError(f"{final} already has other files in it; pick an empty folder or an earlier export")
+    final.parent.mkdir(parents=True, exist_ok=True)
+    work = final.with_name(f".{final.name}.partial-{uuid.uuid4().hex[:8]}")
+    try:
+        paths = _export_into(work, include_corrected, rows=rows, everything=everything)
+        problems = verify_export(work)
+        if problems:
+            raise OSError("the new export didn't check out after writing (" + problems[0] + "); the previous "
+                          "export, if any, is unchanged")
+        if final.exists():
+            old = final.with_name(f".{final.name}.previous-{uuid.uuid4().hex[:8]}")
+            os.replace(final, old)
+            try:
+                os.replace(work, final)
+            except OSError:
+                os.replace(old, final)                   # put the previous export back
+                raise
+            shutil.rmtree(old, ignore_errors=True)
+        else:
+            os.replace(work, final)
+    except BaseException:
+        shutil.rmtree(work, ignore_errors=True)
+        raise
+    return {k: final / p.relative_to(work) for k, p in paths.items()}
+
+
+def _export_into(folder: Path, include_corrected: bool = False, *,
+                 rows: list[dict] | None = None, everything: list[dict] | None = None) -> dict[str, Path]:
     folder.mkdir(parents=True, exist_ok=True)
     if rows is None:
         rows = entries() if include_corrected else current()
@@ -796,6 +833,9 @@ def command(text: str, observer: str = "") -> str | None:
             e = add(**fields)
         except ValueError as exc:
             return f"Not saved: {exc}."
+        except OSError as exc:
+            return (f"Not saved: Cursiv couldn't write the field log ({type(exc).__name__}: {exc}). Nothing was "
+                    f"recorded. Check that {log_dir()} is on a drive with space that isn't read-only, then try again.")
         return (f"Saved to the field log: {summary(e)}\nFingerprint {e['hash'][:12]}. "
                 "Corrections are added as new entries; nothing is overwritten.")
     if low in ("field log", "fieldlog", "field notes", "show field log"):
@@ -829,7 +869,10 @@ def command(text: str, observer: str = "") -> str | None:
         return (f"All {n} entries are intact and in order." if not problems else
                 "The field log has problems:\n" + "\n".join(f"- {p}" for p in problems))
     if low in ("field log export", "fieldlog export", "export field log"):
-        paths = export()
+        try:
+            paths = export()
+        except (OSError, ValueError) as exc:
+            return f"Not exported: {exc}. Nothing was changed."
         return ("Exported (signed: check it any time with  field log verify <folder>):\n"
                 + "\n".join(f"- {k.upper()}: {p}" for k, p in paths.items()))
     m = re.match(r"(?i)^field ?log verify\s+(.+)$", t)

@@ -22,6 +22,32 @@ for _m in ("codex_tool_bridge", "knowledge_brain"):
 import pytest  # noqa: E402
 
 
+def _real_data_state():
+    """The person's real records a test must never create or change."""
+    from cursiv_v215.core import paths
+    home = Path.home() / ".cursiv"
+    out = {}
+    for p in (home / "fieldlog", home / "fieldlog" / "observations.jsonl", home / "device_key.json",
+              paths.APP_DATA / "memory_facts.jsonl", paths.APP_DATA / "config.json"):
+        try:
+            st = p.stat()
+            out[str(p)] = (st.st_size, st.st_mtime_ns)
+        except OSError:
+            out[str(p)] = None
+    return out
+
+
+@pytest.fixture(autouse=True)
+def _real_data_untouched():
+    """Fails any test that writes to the real field log, signing key or memory (a test that undid
+    its own redirection once pointed at them)."""
+    before = _real_data_state()
+    yield
+    after = _real_data_state()
+    changed = [p for p in before if before[p] != after[p]]
+    assert not changed, f"this test touched real data: {changed}"
+
+
 @pytest.fixture(autouse=True)
 def _signing_key_in_tmp(tmp_path_factory, monkeypatch):
     """Never create or use the real installation key (~/.cursiv/device_key.json) in a test."""
