@@ -135,7 +135,7 @@ passing check means "not contradicted by the record", not "true". The model-base
 | Phone storage, durability, quota, persistence, Safari/Chrome crypto | **Not tested.** Message logic is tested under Node; the browser paths are not |
 | Clean install, first launch, upgrade, uninstall | Inspection of `installer/cursiv_setup.iss`, `launcher/data_home.py` and the installed copy on this laptop. **No clean machine was used** |
 | Reference content is accurate | **Not established.** 37 of 112 entries name a public source; 0 are professionally reviewed |
-| The new answer checks reduce bad answers in practice | **Not measured.** No live-model benchmark run since the changes |
+| The new answer checks on live answers | **Partly measured** (`bench/FAILURES-U75.md`): one 153-case run on U75 plus 5 new cases. New checks: 3 notes, 1 true, 2 false (fixed); 2 misses found and fixed. U75 98.7% vs U68 97.4% on suite 1.5, within run-to-run noise; rea-008, rea-016 and num-027 traceably fixed by the calculators. The older model-based check put notes under 28 correct answers. A full miss rate is not measured |
 
 ---
 
@@ -147,8 +147,9 @@ passing check means "not contradicted by the record", not "true". The model-base
    published source (43 of the 80 medical/survival entries).
 3. **No clean-machine install test.** First launch needs internet once (Ollama and the model); the
    installer is unsigned, so SmartScreen warns; nobody non-technical has done it unaided.
-4. **The answer checks are pattern checks and haven't been measured on live answers.** They catch the
-   phrasings seen in the tests; a benchmark run on the current code is needed to see what they catch and miss.
+4. **The answer checks are pattern checks, measured once on live answers.** On one run they were mostly silent,
+   with about as many false notes as true ones (fixed since); the older model-based check adds noise under correct
+   answers (`bench/FAILURES-U75.md`). A miss rate across all answers isn't measured.
 5. **Data at rest isn't encrypted** (login isn't encryption; on a USB the signing key is readable), and a
    laptop's first share is trusted on first sight.
 
@@ -173,7 +174,6 @@ passing check means "not contradicted by the record", not "true". The model-base
 - **Independent reviewer** (a medic or physician): the 80 medical/survival entries, starting with the five
   held back, using `docs/PROFESSIONAL-REVIEW.md`.
 - **Field team:** a week of real use with daily sends; count lost, duplicated or refused records.
-- **Benchmark run** on the current code (`scripts/truth_bench.py`) to measure the new checks on live answers.
 
 ### Clean-install procedure (manual; not yet done)
 

@@ -24,8 +24,10 @@ _N = r"(\d+)"
 
 
 class Result:
-    def __init__(self, statement: str, value: float, tol: float = 0.0):
+    """answer: words the reply must contain instead of a number ("Saturday"); facts: for contradiction checks."""
+    def __init__(self, statement: str, value: float, tol: float = 0.0, answer: str = "", facts: dict | None = None):
         self.statement, self.value, self.tol, self.lead, self.tool = statement, value, tol, "", ""
+        self.answer, self.facts = answer, facts or {}
 
 
 def _month(name: str) -> int:
@@ -75,7 +77,7 @@ def weekday(question: str) -> Result | None:
     end = _DAYS[(start + (-days if back else days)) % 7]
     return Result(f"{days} day{'s' if days != 1 else ''} {'before' if back else 'after'} a {day.capitalize()} is a "
                   f"{end} ({days} = {days // 7} week{'s' if days // 7 != 1 else ''} and {days % 7} day"
-                  f"{'s' if days % 7 != 1 else ''}).", float(_DAYS.index(end)), 0.0)
+                  f"{'s' if days % 7 != 1 else ''}).", 0.0, answer=end)    # benchmark rea-008, U75: checked by name
 
 
 _BETWEEN = re.compile(r"(?i)\bhow many (?:days|weeks)\b.*?\b(?:between|from|since|until|till|to)\b")
@@ -110,7 +112,7 @@ def dates(question: str) -> Result | None:
                       float(end.day))
     if len(ds) == 1 and _WHICH_DAY.search(q):
         return Result(f"{ds[0].day} {ds[0].strftime('%B')} {ds[0].year} is a {_DAYS[ds[0].weekday()]}.",
-                      float(ds[0].day))
+                      0.0, answer=_DAYS[ds[0].weekday()])
     return None
 
 
@@ -182,4 +184,4 @@ def proportions(question: str) -> Result | None:
     small = " A sample of fewer than 10 is very weak evidence on its own." if min(n1, n2) < 10 else ""
     return Result(f"{k1} of {n1} = {pct(k1 / n1)} (95% range {pct(lo1)} to {pct(hi1)}); {k2} of {n2} = "
                   f"{pct(k2 / n2)} (95% range {pct(lo2)} to {pct(hi2)}), Wilson intervals. {verdict}{small}",
-                  float(round(100 * k1 / n1)), 0.5)
+                  float(round(100 * k1 / n1)), 0.5, facts={"overlap": overlap})

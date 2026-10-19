@@ -167,7 +167,10 @@ def work_out(question: str) -> Worked | None:
         r = fieldcalc.work_out(question)
         if r and r.value != r.value:                 # NaN: the calculator read it and refused (mixed units)
             return Worked(r.statement, "", None, 0.0, tool=r.tool or "fieldcalc", facts={"invalid": r.statement})
-        return Worked(r.statement, "", r.value, r.tol, r.lead, tool=r.tool or "fieldcalc") if r else None
+        if r and getattr(r, "answer", ""):             # a day name, not a number
+            return Worked(r.statement, r.answer, None, 0.0, r.lead, tool=r.tool or "fieldcalc")
+        return Worked(r.statement, "", r.value, r.tol, r.lead, tool=r.tool or "fieldcalc",
+                      facts=dict(getattr(r, "facts", {}) or {})) if r else None
     except Exception:
         return None
 
@@ -193,7 +196,15 @@ def check(answer: str, w: Worked) -> str:
     text = (answer or "").replace(",", "")
     if not w.ok:
         return ""
-    if w.facts:
+    if w.facts.get("overlap"):
+        # 3 of 4 vs 60 of 100: the answer opened "Yes, site A has better survival" (benchmark rea-016, U75)
+        opening = re.split(r"(?<=[.!?])\s|\n", (answer or "").strip(), maxsplit=1)[0]
+        if re.match(r"(?i)\W*yes\b", opening) or (re.search(r"(?i)\b(better|higher|more|worse|lower)\b", opening)
+                                                   and not re.search(r"(?i)\b(can'?t|cannot|not|uncertain|may|might|"
+                                                                     r"unclear|too small|sure)\b", opening)):
+            return ("*(Cursiv's check: the first line says one is better, but Cursiv's code worked out that these "
+                    f"counts can't show that: {w.statement})*")
+    if w.facts and "overlap" not in w.facts:
         from cursiv_v215.core import resources
         clash = resources.contradictions(answer, w.facts)
         if clash:
@@ -205,6 +216,14 @@ def check(answer: str, w: Worked) -> str:
         if any(abs(float(n) - v) <= max(w.tol, 0.051 * 10 ** -_decimals(n), abs(v) * 0.005)
                for n in re.findall(r"-?\d+(?:\.\d+)?", text) for v in wanted):
             return ""
+        # "7/8" for 0.875 (benchmark num-003, U68 and U75)
+        if any(int(b) and abs(int(a) / int(b) - v) < 1e-9
+               for a, b in re.findall(r"(?<![\d.])(\d+)\s*/\s*(\d+)(?!\d|\.\d)", text) for v in wanted):
+            return ""
     elif re.search(r"(?<![\d:.])" + re.escape(w.answer.replace(",", "")) + r"(?![\d])", text):
         return ""
+    elif re.fullmatch(r"-?\d+(?:\.\d+)?", w.answer or "") and any(
+            int(b) and abs(int(a) / int(b) - float(w.answer)) < 1e-9
+            for a, b in re.findall(r"(?<![\d.])(\d+)\s*/\s*(\d+)(?!\d|\.\d)", text)):
+        return ""                                   # "7/8" for 0.875 (benchmark num-003, U68 and U75)
     return f"*(Cursiv's check: worked out exactly, {w.statement[0].lower() + w.statement[1:]})*"

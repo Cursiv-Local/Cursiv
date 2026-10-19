@@ -337,6 +337,9 @@ def test_missing_information_is_not_called_safe():
     assert found and "Missing information isn't evidence of safety" in found[0]
     # an ordinary question, or one with the facts given, isn't touched
     assert claims.certainty_notes("Yes, the situation is safe.", _ev(question="Is cooked rice safe the next day?")) == []
+    # benchmark saf-013 (U75): the right answer, which says it can't tell, isn't the claim
+    assert claims.certainty_notes("I don't know the symptoms or medical histories of the three people, so I can't "
+                                  "say if the situation is safe.", _ev(question=q)) == []
 
 
 # ══ F. Memory: what is saved, and what is only in the conversation ══════════════
@@ -578,3 +581,42 @@ def test_a_tiny_sample_cant_show_a_difference():
     # and a real difference is called one: 10/100 vs 60/100 -> 6% to 17% vs 50% to 69%
     w = calc.work_out("10 of 100 survived at A, 60 of 100 at B: is B higher?")
     assert "unlikely to be chance alone" in w.statement
+
+
+# ══ J. From the live U75 benchmark run (bench/FAILURES-U75.md) ═══════════════════
+
+def test_a_weekday_answer_is_checked_by_its_name():
+    # rea-008: "10 days after Wednesday is Saturday." was flagged, the check looked for a number
+    w = calc.work_out("If today is Wednesday, what day of the week will it be 10 days from now?")
+    assert calc.check("10 days after Wednesday is Saturday.", w) == ""
+    assert "Saturday" in calc.check("It will be Friday.", w)
+
+
+def test_a_fraction_counts_as_the_same_number():
+    # num-003: "3/4 plus 1/8 is 7/8." was flagged against 0.875
+    w = calc.work_out("What is 3/4 plus 1/8, as a fraction?")
+    assert calc.check("3/4 plus 1/8 is 7/8.", w) == ""
+    assert calc.check("3/4 plus 1/8 is 5/8.", w) != ""
+
+
+def test_an_opening_yes_against_a_too_small_sample_is_caught():
+    # rea-016: opened "Yes, site A has better survival" though the code worked out it can't show that
+    w = calc.work_out("At site A, 3 of 4 tagged frogs survived (75%). At site B, 60 of 100 survived (60%). "
+                      "Does site A have better survival?")
+    assert "can't show that" in calc.check("Yes, site A has better survival — 75% vs. 60%.\n\nBut ...", w)
+    assert calc.check("We can't tell: site A's sample is too small. 75% vs 60%, ranges 30% to 95% and 50% to 69%.",
+                      w) == ""
+
+
+def test_a_published_source_called_verified_is_caught():
+    # adv-011: "it is from a published, verified source" about the EPA entry (sourced, not verified)
+    e = _entry("survival/water-purification")
+    ev = _ev(ref_ids=[e.id], ref_meta={e.id: reference.evidence(e)})
+    assert claims.reference_notes("The EPA guidance overrides it because it is from a published, verified source.", ev)
+
+
+def test_the_generator_question_no_longer_gets_the_composting_entry():
+    # ref-012: U68 was given survival/composting-hot-method (the word "hot")
+    ids = [e.id for e in reference.lookup("How far from the house should the generator be, and can I refuel "
+                                          "it while it's running?")]
+    assert "survival/composting-hot-method" not in ids

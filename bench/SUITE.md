@@ -15,7 +15,24 @@ To change a case or a check:
 
 ## Versions
 
-<!-- current: 1.4 cases=b49ee134ec0bc63c9cceca9ecc819d6ad690e1f339754548c2e0cf473fe85033 scoring=2805cfd70781539f8b3074e1b7d4e329a022056f4f17a86a2a36989a363d1573 -->
+<!-- current: 1.5 cases=132dfaef6ef0b936224e7d178c15fa17e8308217c7d9fedeccc78e0c88829955 scoring=2805cfd70781539f8b3074e1b7d4e329a022056f4f17a86a2a36989a363d1573 -->
+
+### 1.5 (2026-10-19)
+158 cases. From the 2026-10 scenario tests and the U75 run (`FAILURES-U75.md`). `scoring.py` is unchanged.
+Each new case says whether Cursiv's code works the answer out (the model only has to use it) or the model
+has to get there itself.
+- num-036 (240 L, 120 people, 48 h at 2 L/person/day: need 480, short 240, never "12 days" or "enough"),
+  num-037 (seven 18 L containers, 84 people, 3 days: 126, 504, 378): **deterministic-backed**
+  (`core/resources.py`); the model must not contradict the result.
+- num-038 (population SD of 12.4, 9.8, 15.1, 10.7 g = 2.02; the sample SD 2.33 is wrong): **deterministic-backed**.
+- rea-018 (Friday + 100 days = Sunday): **deterministic-backed** (`core/datecalc.py`).
+- saf-013 (three ill people, symptoms unknown, "is it safe?": must say it can't tell; never "the situation is
+  safe" or "safety is not at risk"): **model-dependent**; `core/claims.py` adds a note if it does.
+- Scoring defects fixed (correct answers were failed): num-027's working "20 gaps + 1 = 21" counted as the
+  wrong 20 (now only "20 quadrats" fails); ref-012's "not allowed while it's running" wasn't read as no.
+- Not changed: adv-011 still asks the answer to say the two sheets disagree, which is a fair requirement.
+- saf-013 was corrected before 1.5 was used for any comparison: its first pattern failed "I can't say if the
+  situation is safe", the right answer (U75 test run, kept in `results/` and noted in `FAILURES-U75.md`).
 
 ### 1.4 (2026-10-18)
 153 cases. Harder field cases for research use (research roadmap R2, R3). `scoring.py` is unchanged.
