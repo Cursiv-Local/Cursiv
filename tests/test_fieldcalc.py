@@ -109,3 +109,25 @@ def test_bleach_dose_comes_from_the_card():
     assert fc.bleach_dose("How much bleach for 5 gallons of water?") is None      # 6% and 8.25% differ per gallon
     assert fc.bleach_dose("How many drops of 5% bleach per gallon?") is None       # not on the card
     assert fc.bleach_dose("Bleach and ammonia make a stronger cleaner, right? What ratio?") is None
+
+
+@pytest.mark.parametrize("question, lead", [
+    ("We're on the lake. The last thunder was 10 minutes ago. Is it safe to go back out?", "wait about 20 more minutes"),
+    ("last thunder was 45 minutes ago, can we resume sampling?", "30-minute wait has passed"),
+    ("lightning an hour ago, is it safe now?", "30-minute wait has passed"),
+])
+def test_lightning_return_is_counted_by_cursiv(question, lead):
+    r = fc.lightning_wait(question)
+    assert r and lead in r.lead and "National Weather Service" in r.statement
+
+
+@pytest.mark.parametrize("question", [
+    "We heard thunder 5 min ago, should we get off the ridge?",
+    "thunder 2 minutes ago, should we leave the water?",
+    "thunder 10 minutes ago, is it safe to keep working on the ridge?",
+    "thunder 10 minutes ago, can we take shelter under a tree?",
+    "What causes thunder?",
+])
+def test_lightning_never_says_wait_about_getting_to_safety(question):
+    # getting off a ridge or out of the water is never a wait: no Cursiv line, the reference card answers
+    assert fc.lightning_wait(question) is None

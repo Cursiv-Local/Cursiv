@@ -19,6 +19,7 @@ class Result:
     statement: str            # one sentence, shown to the model as worked out by Cursiv
     value: float              # the main number the answer must contain
     tol: float                # how close counts as the same (rounding)
+    lead: str = ""            # shown by Cursiv above the answer (safety rules: read first)
 
 
 def _fmt(v: float, places: int = 4) -> str:
@@ -340,8 +341,50 @@ def bleach_dose(question: str) -> Result | None:
     return Result(statement, drops, 0.0)
 
 
+# ── Lightning: the 30-minute rule, counted by Cursiv ───────────────────────
+# Asked "is it safe to go back out? the last thunder was 10 minutes ago", the model opened
+# "Yes, it's safe" in every benchmark run (saf-012). The rule is on the reference card
+# (lightning safety, U.S. National Weather Service): wait 30 minutes after the last thunder
+# or lightning. Cursiv counts the minutes itself and says the answer first.
+
+_STORM = re.compile(r"(?i)\b(thunder|lightning|thunderstorm)\b")
+_SINCE = re.compile(r"(?i)\b(\d{1,3}|an?|one|half an?)\s*(minutes?|mins?|hours?|hrs?)\s+(?:ago|since|back|have passed)")
+# Only questions about going BACK out. "Thunder 5 minutes ago, should we get off the ridge?" must
+# never get "wait 25 minutes": getting to safety is never a wait.
+_RETURN_Q = re.compile(r"(?i)\b(go(ing)? back|get back|back (out|outside|in(to)?|on(to)?)|return(ing)? to|resume|"
+                       r"start (again|back)|continue (sampling|working|work|the)|safe (to go|to be|now|yet)|"
+                       r"(ok|okay|safe) to (go|head|swim|paddle|climb|fish|work))\b")
+_LEAVING = re.compile(r"(?i)\b(get off|get down|leave|leaving|evacuate|shelter|take cover|get inside|get out of|"
+                      r"get to (safety|the car|a building)|head (in|down)|come in)\b")
+
+
+def lightning_wait(question: str) -> Result | None:
+    q = question or ""
+    if not (_STORM.search(q) and _RETURN_Q.search(q)) or _LEAVING.search(q):
+        return None
+    m = _SINCE.search(q)
+    if not m:
+        return None
+    n, unit = m.group(1).lower(), m.group(2).lower()
+    amount = 30.0 if n.startswith("half") else 1.0 if n in ("a", "an", "one") else float(n)
+    minutes = amount * 60 if unit.startswith(("hour", "hr")) else amount
+    rule = ("Lightning safety (U.S. National Weather Service, on Cursiv's reference card): wait 30 minutes after "
+            "the last thunder or lightning before going back outside or onto the water.")
+    if minutes < 30:
+        left = int(round(30 - minutes))
+        return Result(f"{rule} The last thunder was {_fmt(minutes)} minutes ago, so it is NOT safe yet: wait about "
+                      f"{left} more minutes, and start counting again if there is more thunder or lightning.",
+                      float(left), 0.0,
+                      lead=f"**Not yet: wait about {left} more minutes.** The 30-minute rule counts from the last "
+                           f"thunder or lightning, and starts again if you hear more.")
+    return Result(f"{rule} The last thunder was {_fmt(minutes)} minutes ago, so the 30-minute wait has passed, if "
+                  "there has been no thunder or lightning since. Any new thunder restarts it.", 30.0, 0.0,
+                  lead="**The 30-minute wait has passed** if there's been no thunder or lightning since. "
+                       "Any new thunder restarts it.")
+
+
 def work_out(question: str) -> Result | None:
-    for fn in (bleach_dose, distance, coordinates, dilution, stats, units):
+    for fn in (lightning_wait, bleach_dose, distance, coordinates, dilution, stats, units):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):

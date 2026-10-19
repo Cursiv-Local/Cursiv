@@ -107,7 +107,8 @@ def test_yes_its_safe_then_dont_go_gets_a_warning_on_top(fresh, monkeypatch):
                      [], "", None, replace_draft=True):
         parts = [c[len(ca.REPLACE_SENTINEL):]] if c.startswith(ca.REPLACE_SENTINEL) else parts + [c]
     out = "".join(parts)
-    assert out.index("contradicts itself") < out.index("Yes, it's safe")
+    # Cursiv's own answer first (the 30-minute rule, counted in code), then the warning, then the model
+    assert out.index("Not yet: wait about 20 more minutes") < out.index("contradicts itself") < out.index("Yes, it's safe")
     assert out.count("contradicts itself") == 1
     assert ac.flip_flop("Yes, it's safe. Boil it for one minute first.") is None
 

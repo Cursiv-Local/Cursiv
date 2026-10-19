@@ -39,6 +39,7 @@ class Worked:
     answer: str         # what the reply must contain: "9:30"
     value: float | None = None   # for field calculations: a number the reply must contain, within tol
     tol: float = 0.0
+    lead: str = ""               # Cursiv's own line above the answer (safety rules)
 
 
 def _num(text: str) -> float:
@@ -140,7 +141,7 @@ def work_out(question: str) -> Worked | None:
     # Units, coordinates, dilutions, statistics (core/fieldcalc.py, research roadmap R2)
     from cursiv_v215.core import fieldcalc
     r = fieldcalc.work_out(question)
-    return Worked(r.statement, "", r.value, r.tol) if r else None
+    return Worked(r.statement, "", r.value, r.tol, r.lead) if r else None
 
 
 def prompt_note(w: Worked) -> str:

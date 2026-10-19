@@ -2668,6 +2668,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             _WORKED = _calc.work_out(user_text)
             if _WORKED:
                 messages[0]["content"] += "\n\n" + _calc.prompt_note(_WORKED) + "\n"
+                if _WORKED.lead:                 # a safety rule's answer, first, from Cursiv
+                    yield _WORKED.lead + "\n\n"
         # "Are you offline?" is answered from the real switches and gate, not by the model,
         # which said "I am completely offline" as fact (benchmark gen-020, U65).
         from cursiv_v215.chat import status as _net_status
@@ -3180,6 +3182,8 @@ def chat(
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply)
         draft = _strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        if _WORKED and _WORKED.lead and draft.startswith(_WORKED.lead.strip()):
+            draft = draft[len(_WORKED.lead.strip()):].strip()    # nor Cursiv's own safety line
         if _PHASE_AFTER:             # Route / Recovery notes from the phases
             reply.append(_PHASE_AFTER)
             yield _PHASE_AFTER
