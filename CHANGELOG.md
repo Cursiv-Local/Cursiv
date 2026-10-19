@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.14-U77 — Fixes from the first Cross-check tests (2026-10-19)
+Found by testing U76's Cross-check on real answers:
+- An answer that opened "No, site A does not have better survival" and ended "Therefore, site A has better survival" (3 of 4 frogs vs 60 of 100) passed Cursiv's own check; only the Cross-check reviewer caught it. Every sentence is now read: saying 75% is higher than 60% is fine, concluding one site is better is flagged, and a first line that says the opposite of the conclusion is called a contradiction.
+- "This assumes 2 liters per person per day is sufficient" no longer gets an amber "contradicts" note: it's about the allocation, not the supply.
+- "your saved memories" no longer appears under answers that didn't use one: words from your own question don't count, and it takes three of a memory's words (or a code or number).
+
 ## v3.14-U76 — Cross-check and quieter answer checks (2026-10-19)
 - **Cross-check (new, optional):** a *Cross-check* button under the chat asks another AI to review the last answer, as a second opinion: errors, unsupported claims, missing assumptions, honest differences. It needs your own key for that company (Claude, OpenAI, xAI, or a free Gemini or Groq key), shows exactly what will be sent and to whom, and sends nothing until you press Send. Only that question and answer go; the review appears below the answer without changing it. Offline mode refuses it.
 - The answer check puts far fewer notes under correct answers (17 to 4 on the U75 benchmark answers); a number the question gave that really changed is still caught.
