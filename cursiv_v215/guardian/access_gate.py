@@ -192,6 +192,97 @@ def reset_credentials() -> None:
             pass
 
 
+def _uhash(username: str) -> str:
+    return hashlib.sha256(username.encode("utf-8")).hexdigest()
+
+
+def _primary_hash() -> str:
+    """SHA-256 of the primary username, or "" when there is no primary account."""
+    if not (_META_FILE.exists() and _HASH_FILE.exists()):
+        return ""
+    try:
+        return _META_FILE.read_text(encoding="utf-8").strip()
+    except Exception:
+        return ""
+
+
+def account_count() -> int:
+    """How many logins exist on this install (primary plus additional)."""
+    primary = _primary_hash()
+    others = [h for h in _load_accounts() if h != primary]
+    return (1 if primary else 0) + len(others)
+
+
+def is_primary(username: str) -> bool:
+    primary = _primary_hash()
+    return bool(primary) and hmac.compare_digest(_uhash(username), primary)
+
+
+def remove_account(username: str) -> bool:
+    """
+    Remove one login. Returns False if no such account exists. Never removes
+    the last account (raises ValueError -- use start_over for that), so the
+    app always has someone who can sign in. Removing the primary account
+    promotes the oldest additional account to primary and clears the
+    security questions, which were the removed person's: left in place they
+    could reset the new primary's password. App data is untouched.
+    """
+    if not username_exists(username):
+        return False
+    if account_count() <= 1:
+        raise ValueError("This is the only account. Use Start over to replace it.")
+
+    target = _uhash(username)
+    accounts = _load_accounts()
+    if not is_primary(username):
+        accounts.pop(target, None)
+        _save_accounts(accounts)
+        return True
+
+    # Promote the oldest additional account. Write the new primary before
+    # removing it from accounts.json, so an interruption leaves a duplicate
+    # login, never none.
+    heir = min((h for h in accounts if h != target),
+               key=lambda h: accounts[h].get("created", ""))
+    _ensure()
+    _HASH_FILE.write_bytes(base64.b64decode(accounts[heir]["pw_hash"]))
+    _META_FILE.write_text(heir, encoding="utf-8")
+    _FLAG_FILE.write_text(heir, encoding="utf-8")
+    accounts.pop(heir, None)
+    accounts.pop(target, None)
+    _save_accounts(accounts)
+    from cursiv_v215.guardian.security_questions import clear_security_questions
+    clear_security_questions()
+    return True
+
+
+def remove_with_password(username: str, signed_in: str, password: str) -> None:
+    """
+    Settings' Remove: the signed-in person proves it's them with their
+    password, then names the account to remove (which may be their own).
+    Raises ValueError with a sentence to show when anything is wrong.
+    """
+    if not (signed_in and password and verify_credentials(signed_in, password)):
+        raise ValueError("Your password is not right.")
+    if not username or not username_exists(username):
+        raise ValueError("There's no account with that username (usernames are case-sensitive).")
+    remove_account(username)
+
+
+def start_over(signed_in: str, password: str) -> None:
+    """
+    Remove every login and the security questions after the signed-in
+    person confirms their password. Memories, notebook, documents and saved
+    keys stay. The caller must close the app right after: the next start
+    shows Create Account.
+    """
+    if not (signed_in and password and verify_credentials(signed_in, password)):
+        raise ValueError("Your password is not right.")
+    reset_credentials()
+    from cursiv_v215.guardian.security_questions import clear_security_questions
+    clear_security_questions()
+
+
 def fragment_status() -> dict[str, bool]:
     """Diagnostic: which credential files are present. No password data exposed."""
     return {

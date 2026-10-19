@@ -79,8 +79,12 @@ WHAT'S ON THIS DRIVE
                            with the drive if you give or sell a copy
 
 START OVER (REMOVE THE ACCOUNTS)
-  Close Cursiv, then delete the folder Home\\.cursiv\\runtime. The next start asks
-  you to create an account. Your notebook, memories and documents stay.
+  In Cursiv: Settings > Your data & account > Accounts on this computer.
+  "Remove an account..." removes one login (its username and your password).
+  "Start over: remove all accounts" removes every login (your password); Cursiv
+  closes and the next start asks you to create an account. Your notebook,
+  memories and documents stay.
+  Can't sign in at all: close Cursiv and delete the folder Home\\.cursiv\\runtime.
   To remove everything, delete Home\\.cursiv entirely.
 
 IF SOMETHING ISN'T RIGHT
