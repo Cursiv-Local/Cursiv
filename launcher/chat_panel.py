@@ -28,7 +28,7 @@ from PyQt6.QtGui import QKeyEvent, QTextBlockFormat, QTextCharFormat, QTextCurso
 from PyQt6.QtWidgets import (
     QComboBox, QMenu,
     QWidget, QVBoxLayout, QHBoxLayout, QTextBrowser, QPlainTextEdit,
-    QPushButton, QLabel, QSizePolicy, QInputDialog, QLineEdit, QMessageBox,
+    QPushButton, QLabel, QSizePolicy, QInputDialog, QLineEdit, QMessageBox, QDialog,
 )
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
 import theme
@@ -117,6 +117,7 @@ class _ChatSignals(QObject):
     write_complete = pyqtSignal(str)    # result text once an approved write finishes (or fails)
     backend_ready = pyqtSignal(bool, str)  # chat_commands finished loading: ok, error message
     models = pyqtSignal(object)         # installed Ollama chat models (list), or None if Ollama is down
+    crosscheck = pyqtSignal(object)     # core.crosscheck.Review, from the background thread
 
 
 class _ChatInput(QPlainTextEdit):
@@ -422,6 +423,7 @@ class ChatPanel(QWidget):
         header_row.addWidget(more)
         lay.addLayout(header_row)
         self._signals.models.connect(self._on_models)
+        self._signals.crosscheck.connect(self._on_cross_check)
         self._refresh_status_pill()
         self._load_models()
         self._pill_timer = QTimer(self)
@@ -493,6 +495,17 @@ class ChatPanel(QWidget):
         self._stop_btn.setEnabled(False)
         self._stop_btn.clicked.connect(self._stop_generation)
         row.addWidget(self._stop_btn)
+
+        # Cross-check (core/crosscheck.py): only on request, only after confirming what goes where
+        self._cc_btn = QPushButton("Cross-\ncheck")
+        self._cc_btn.setFixedSize(64, 64)
+        self._cc_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._cc_btn.setToolTip("Ask another AI (with your own key) to review the last answer. You see exactly "
+                                "what would be sent, and to whom, before anything leaves this computer.")
+        self._cc_btn.setStyleSheet(self._icon_btn_style() + "QPushButton { font-size: 12px; }")
+        self._cc_btn.setEnabled(False)
+        self._cc_btn.clicked.connect(self._cross_check)
+        row.addWidget(self._cc_btn)
 
         lay.addLayout(row)
 
@@ -903,6 +916,8 @@ class ChatPanel(QWidget):
         self._send_btn.setEnabled(False)
         self._voice_btn.setEnabled(False)
         self._stop_btn.setEnabled(True)
+        self._cc_btn.setEnabled(False)
+        self._last_exchange = None           # a new turn: nothing finished to cross-check yet
         self._status.setText("Cursiv is thinking…")
         self._reply_text = ""
         self._reply_is_chat = False
@@ -976,10 +991,47 @@ class ChatPanel(QWidget):
                 )
                 self._signals.cancelled.emit()
                 return
-            self._signals.done.emit()
             self._pending_history_append = [("user", stripped), ("assistant", full)]
+            self._last_exchange = (stripped, full) if full.strip() else None
+            self._signals.done.emit()
         except Exception as e:
             self._signals.error.emit(str(e))
+
+    # ── Cross-check: a second AI reviews the last answer, only on request (core/crosscheck.py) ──
+    def _cross_check(self) -> None:
+        from cursiv_v215.core import crosscheck
+        exchange = getattr(self, "_last_exchange", None)
+        if not exchange or self._streaming:
+            return
+        providers = crosscheck.available(self._cfg)
+        if not providers:
+            QMessageBox.information(self, "Cross-check",
+                                    "Cross-check sends an answer to another AI service for a second opinion, so it "
+                                    "needs your own key for one: Claude, OpenAI, xAI, or a free Gemini or Groq key "
+                                    "(Settings → AI keys). Nothing was sent. Cursiv works the same without one.")
+            return
+        from crosscheck_dialog import CrossCheckDialog
+        dlg = CrossCheckDialog(exchange[0], exchange[1], providers, self)
+        if dlg.exec() != QDialog.DialogCode.Accepted or dlg.payload is None:
+            return                                    # cancelled: nothing leaves this computer
+        payload = dlg.payload
+        self._cc_btn.setEnabled(False)
+        self._status.setText(f"Asking {payload.to} for a second opinion…")
+        cfg = dict(self._cfg)
+        threading.Thread(target=lambda: self._signals.crosscheck.emit(crosscheck.review(payload, cfg)),
+                         daemon=True).start()
+
+    def _on_cross_check(self, r) -> None:
+        """The review goes below the answer, in its own block; the answer and the history are untouched."""
+        from cursiv_v215.core import crosscheck
+        colour = theme.AMBER if r.ok else theme.RED
+        self._force_new_block()
+        self._append_html_block(
+            f'<div style="margin:8px 0 14px 0; padding:8px 10px; border-left:3px solid {colour};">'
+            f'<span style="color:{colour}; font-weight:600;">{self._escape(crosscheck.heading(r))}</span><br>'
+            f'<span style="color:{SILVER};">{self._keep_shape(r.text)}</span></div>')
+        self._status.setText("")
+        self._cc_btn.setEnabled(bool(getattr(self, "_last_exchange", None)) and not self._streaming)
 
     def _deliver_result(self, result, history: list[dict], text: str = "") -> None:
         """Runs on the background thread -- streams a command's TextResult/StreamResult."""
@@ -1074,6 +1126,7 @@ class ChatPanel(QWidget):
         self._send_btn.setEnabled(True)
         self._voice_btn.setEnabled(True)
         self._stop_btn.setEnabled(False)
+        self._cc_btn.setEnabled(bool(getattr(self, "_last_exchange", None)))
         self._status.setText("")
         self._input.setFocus()
 

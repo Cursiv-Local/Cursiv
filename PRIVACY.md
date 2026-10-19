@@ -29,6 +29,7 @@ Each of these is off, or never used, unless you act:
 | **Web search** | When you type `search: …`, or turn on automatic web search (off by default) | Your search words, to the search provider |
 | **Reading a web page** | When you type `pull <address>` | A request for that page |
 | **Cloud AI keys** (OpenAI, Anthropic, xAI, Groq, Gemini) | Only if you saved a key, **and** you choose that AI by name, paste an image, give the AI file-writing access, or no local model is ready | That conversation, to that company |
+| **Cross-check** | Only when you click Cross-check, pick a company you saved a key for, read exactly what will be sent, and press Send. Never automatically; refused in offline mode | That one question and that one answer, with the reviewer's instructions, to the company you picked. No memories, documents, field notes, other turns or files. The review is shown under the answer and isn't kept in the conversation |
 | **Cursiv Cloud** | Only if you turn it on in Settings, and then only when no local model is ready | That message, to Cursiv's server (cursiv.winklers-llc.com) |
 | **Update check** | When you click Check for updates, or turn on automatic checks (off by default) | A request to GitHub for the latest release |
 | **Problem report** | Only when you click Report a problem | Cursiv's error logs (never chats, letters or keys) |

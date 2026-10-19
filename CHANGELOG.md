@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+- **Cross-check (new, optional):** a *Cross-check* button under the chat asks another AI to review the last answer, as a second opinion: errors, unsupported claims, missing assumptions, honest differences. It needs your own key for that company (Claude, OpenAI, xAI, or a free Gemini or Groq key), shows exactly what will be sent and to whom, and sends nothing until you press Send. Only that question and answer go; the review appears below the answer without changing it. Offline mode refuses it.
+- The answer check puts far fewer notes under correct answers (17 to 4 on the U75 benchmark answers); a number the question gave that really changed is still caught.
+
 ## v3.14-U75 — Records that hold up, honest answers, phone over Wi-Fi (2026-10-19)
 - **Cursiv USB: the drive's own AI engine gets time to start.** From a USB stick it took 46 seconds on a fast laptop; Cursiv gave up after 15 and said "Ollama isn't running". It now waits up to 2 minutes, the model menu says it's starting the engine, and `status` says which engine is answering: the drive's own, or this computer's (which only sees this computer's models; that's why a drive could answer with llama3.1 instead of qwen3).
 - **Phone notebook (new):** record observations on a phone with no signal at cursiv.winklers-llc.com/notebook (add it to the home screen; it works offline after the first visit). Everything stays on the phone. *Send to laptop* makes one file (USB, AirDrop or Quick Share); Cursiv imports it through the same checks as a laptop's team share: the same entry format, fingerprints, the phone's own signature, photos by fingerprint. Field Notebook → Import from team → From the phone notebook, or `field log import <file>`. Tested in a desktop browser and by cross-checking the phone's code against Cursiv's; not yet on real phones in the field. See docs/PHONE-NOTEBOOK.md.
