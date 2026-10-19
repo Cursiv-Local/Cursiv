@@ -84,7 +84,7 @@ def _serve_log() -> Path:
 
 def start(env: dict | None = None, wait: int = 30) -> bool:
     """Start the engine in the background if it isn't running. On a Cursiv USB it waits up to
-    60 s (a big program starting from a USB stick, with antivirus scanning it, can be slow) and
+    2 minutes (measured 46 s on a fast laptop, mostly detecting the graphics card from the stick) and
     keeps the engine's own messages in ~/.cursiv/logs/ollama-serve.log (on the drive)."""
     if running():
         return True
@@ -95,7 +95,7 @@ def start(env: dict | None = None, wait: int = 30) -> bool:
     out = subprocess.DEVNULL
     try:
         if usb:
-            wait = max(wait, 60)
+            wait = max(wait, 120)              # measured: 46 s on a fast laptop, mostly finding the GPU
             _serve_log().parent.mkdir(parents=True, exist_ok=True)
             out = open(_serve_log(), "ab")
         subprocess.Popen([cmd, "serve"], stdout=out, stderr=out, creationflags=_NO_WINDOW, env=env)
@@ -127,7 +127,7 @@ def diagnose() -> str:
         return f"running ({where or 'Ollama'})" + (", the drive's own" if usb else "")
     if usb:
         drive_exe = usb / "Ollama" / "ollama.exe"
-        if not drive_exe.exists() and not exe():
+        if not drive_exe.exists():                 # the drive's own, not one this computer has
             return f"not running: there's no {drive_exe} on this drive. Make the USB again"
         models = usb / "Models" / "manifests" / "registry.ollama.ai" / "library" / "qwen3" / "4b-instruct"
         note = "" if models.exists() else " Also, qwen3:4b-instruct isn't in the drive's Models folder: make the USB again."

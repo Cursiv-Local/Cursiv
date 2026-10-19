@@ -552,10 +552,25 @@ class ChatPanel(QWidget):
         self._refresh_status_pill()
 
     def _load_models(self) -> None:
+        # The AI engine is started here, in the background, if it's installed but not running:
+        # from a Cursiv USB it can take a minute or two (measured 46 s on a fast laptop), and
+        # until then the menu says so instead of "Ollama isn't running".
+        import os as _os
+        portable = _os.environ.get("CURSIV_PORTABLE") == "1"
+        self._model_box.clear()
+        self._model_box.addItem("Starting the AI engine… (from a USB drive this can take a minute or two)"
+                                if portable else "Looking for local models…", "")
+        self._model_box.setEnabled(False)
+
         def work():
             try:
                 from cursiv_v215.chat import status as _st
-                self._signals.models.emit(_st.local_models())
+                models = _st.local_models()
+                if models is None:
+                    from cursiv_v215.core import ollama_host, speed
+                    if ollama_host.installed() and ollama_host.start(speed.ollama_env()):
+                        models = _st.local_models()
+                self._signals.models.emit(models)
             except Exception:
                 self._signals.models.emit(None)
         threading.Thread(target=work, daemon=True).start()
@@ -565,7 +580,8 @@ class ChatPanel(QWidget):
         box = self._model_box
         box.clear()
         if not models:
-            box.addItem("No local model yet — open Setup" if models == [] else "Ollama isn't running", "")
+            box.addItem("No local model yet — open Setup" if models == [] else
+                        "The AI engine didn't start: type status for the reason", "")
             box.setEnabled(False)
             return
         for label, choice, enabled in _st.menu_choices(models):
