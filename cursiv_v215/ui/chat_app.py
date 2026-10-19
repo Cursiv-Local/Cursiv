@@ -885,7 +885,7 @@ def _ensure_ollama() -> bool:
         return False  # not installed — nothing to start
     try:
         from cursiv_v215.core import speed as _speed
-        return _host.start(_speed.ollama_env(), wait=15)   # flash attention + compact cache, this server only
+        return _host.start(_speed.ollama_env(), wait=15)   # (60 s on a USB); flash attention + compact cache
     except Exception:
         return False
 

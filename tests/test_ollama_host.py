@@ -39,3 +39,22 @@ def test_on_the_path_wins(monkeypatch):
 
 def test_the_installer_matches_the_system():
     assert oh.INSTALLER_URL.endswith("Ollama-darwin.zip" if oh.MAC else "OllamaSetup.exe")
+
+
+def test_usb_diagnosis_says_which_engine_or_why_none(tmp_path, monkeypatch):
+    drive = tmp_path / "E"
+    (drive / "Ollama").mkdir(parents=True)
+    monkeypatch.setenv("CURSIV_PORTABLE", "1")
+    monkeypatch.setenv("CURSIV_USB_ROOT", str(drive))
+    monkeypatch.setattr(oh.shutil, "which", lambda name: None)
+    monkeypatch.setattr(oh, "running", lambda timeout=2: False)
+    assert "no " in oh.diagnose() and "ollama.exe on this drive" in oh.diagnose()
+    (drive / "Ollama" / "ollama.exe").write_text("x")
+    monkeypatch.setattr(oh, "exe", lambda: str(drive / "Ollama" / "ollama.exe"))
+    d = oh.diagnose()
+    assert "didn't start" in d and "qwen3:4b-instruct isn't in the drive's Models folder" in d
+    monkeypatch.setattr(oh, "running", lambda timeout=2: True)
+    monkeypatch.setattr(oh, "running_exe", lambda: str(tmp_path / "C" / "Programs" / "Ollama" / "ollama.exe"))
+    assert "this computer's own engine" in oh.diagnose() and "NOT the drive's" in oh.diagnose()
+    monkeypatch.setattr(oh, "running_exe", lambda: str(drive / "Ollama" / "ollama.exe"))
+    assert "the drive's own" in oh.diagnose()

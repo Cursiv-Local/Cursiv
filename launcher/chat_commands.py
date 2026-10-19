@@ -793,6 +793,13 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         return TextResult(f"{msg}")
 
     # ── Simple state toggles ────────────────────────────────────────────
+    def _engine_line() -> str:
+        try:
+            from cursiv_v215.core import ollama_host
+            return ollama_host.diagnose()
+        except Exception as exc:
+            return f"unknown ({exc})"
+
     if cmd == "status":
         # What a reviewer asks first: is it local only, and which model answers (MRS feedback, 2026-10-18).
         try:
@@ -808,6 +815,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         lines = [
             f"Mode:          {mode}",
             f"AI model:      {(model + ', on this computer (Ollama)') if model else 'no local model running'}",
+            f"AI engine:     {_engine_line()}",
             f"Offline mode:  {'ON' if _gate().is_offline() else 'OFF'}",
             f"Web search:    {'automatic' if _gate().setting('web_search_auto') else 'only search:'}",
             f"Update check:  {'automatic' if _gate().setting('update_check_auto') else 'manual'}",

@@ -73,19 +73,72 @@ def _wait(seconds: int) -> bool:
     return False
 
 
+def _usb_root() -> Path | None:
+    root = os.environ.get("CURSIV_USB_ROOT")
+    return Path(root) if os.environ.get("CURSIV_PORTABLE") == "1" and root else None
+
+
+def _serve_log() -> Path:
+    return Path.home() / ".cursiv" / "logs" / "ollama-serve.log"
+
+
 def start(env: dict | None = None, wait: int = 30) -> bool:
-    """Start the engine in the background if it isn't running."""
+    """Start the engine in the background if it isn't running. On a Cursiv USB it waits up to
+    60 s (a big program starting from a USB stick, with antivirus scanning it, can be slow) and
+    keeps the engine's own messages in ~/.cursiv/logs/ollama-serve.log (on the drive)."""
     if running():
         return True
     cmd = exe()
     if not cmd:
         return False
+    usb = _usb_root()
+    out = subprocess.DEVNULL
     try:
-        subprocess.Popen([cmd, "serve"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-                         creationflags=_NO_WINDOW, env=env)
+        if usb:
+            wait = max(wait, 60)
+            _serve_log().parent.mkdir(parents=True, exist_ok=True)
+            out = open(_serve_log(), "ab")
+        subprocess.Popen([cmd, "serve"], stdout=out, stderr=out, creationflags=_NO_WINDOW, env=env)
     except Exception:
         return False
     return _wait(wait)
+
+
+def running_exe() -> str:
+    """The program file of whatever is answering on Ollama's port, or "" (needs psutil)."""
+    try:
+        import psutil
+        for c in psutil.net_connections(kind="tcp"):
+            if c.laddr and c.laddr.port == 11434 and c.status == psutil.CONN_LISTEN and c.pid:
+                return psutil.Process(c.pid).exe()
+    except Exception:
+        pass
+    return ""
+
+
+def diagnose() -> str:
+    """One line for `status`: which engine is answering, or why none is."""
+    usb = _usb_root()
+    if running():
+        where = running_exe()
+        if usb and where and not Path(where).resolve().is_relative_to(usb.resolve()):
+            return (f"this computer's own engine ({where}), NOT the drive's: it only sees this computer's models. "
+                    f"Quit Ollama in the tray and restart Cursiv to use the drive's")
+        return f"running ({where or 'Ollama'})" + (", the drive's own" if usb else "")
+    if usb:
+        drive_exe = usb / "Ollama" / "ollama.exe"
+        if not drive_exe.exists() and not exe():
+            return f"not running: there's no {drive_exe} on this drive. Make the USB again"
+        models = usb / "Models" / "manifests" / "registry.ollama.ai" / "library" / "qwen3" / "4b-instruct"
+        note = "" if models.exists() else " Also, qwen3:4b-instruct isn't in the drive's Models folder: make the USB again."
+        tail = ""
+        try:
+            tail = _serve_log().read_text(encoding="utf-8", errors="replace").strip().splitlines()[-1][:200]
+        except Exception:
+            pass
+        return ("not running: the drive's engine didn't start" + (f" (its last message: {tail})" if tail else "")
+                + "." + note)
+    return "not running" + ("" if installed() else ": Ollama isn't installed (Setup installs it)")
 
 
 def restart(env: dict | None = None) -> bool:
