@@ -1364,15 +1364,17 @@ _MEMORY_CTX = ""                       # the memory block as put into the prompt
 _MEMORY_WORDS = _re.compile(r"[A-Za-z0-9][\w.-]{3,}")
 
 
-def _memory_used(answer: str) -> bool:
-    """Did the answer use a saved memory it was given? Two of a memory's distinctive words (or one
-    code or number) in the answer. Being offered a memory isn't using it: "your saved memories" was
-    named under answers that never touched them (2026-10 scenario test)."""
-    words = {w.lower() for w in _MEMORY_WORDS.findall(answer or "")}
+def _memory_used(answer: str, question: str = "") -> bool:
+    """Did the answer use a saved memory it was given? Three of a memory's distinctive words (or one
+    code or number) in the answer's own words that the question didn't already have. Being offered a
+    memory isn't using it, and a word the person just typed isn't evidence of memory: "your saved
+    memories" was named under a water-supply answer that used none (2026-10 tests, first U76 Cross-check)."""
+    words = {w.lower() for w in _MEMORY_WORDS.findall(_strip_status_lines(answer or ""))}
+    asked = {w.lower() for w in _MEMORY_WORDS.findall(question or "")}
     for text in _MEMORY_TEXTS:
-        mine = {w.lower() for w in _MEMORY_WORDS.findall(text)} - _COMMON_WORDS
+        mine = {w.lower() for w in _MEMORY_WORDS.findall(text)} - _COMMON_WORDS - asked
         shared = mine & words
-        if len(shared) >= 2 or any(any(c.isdigit() for c in w) for w in shared):
+        if len(shared) >= 3 or any(any(c.isdigit() for c in w) for w in shared):
             return True
     return False
 
@@ -1393,7 +1395,7 @@ def _ref_evidence() -> dict:
         return {}
 
 
-def sources_line(answer: str = "") -> str:
+def sources_line(answer: str = "", question: str = "") -> str:
     """What this turn's answer was actually given, from Cursiv's own records, never the
     model's say-so: the offline reference (with what backs each entry), the person's documents,
     Cursiv's calculations, web results, and saved memories only when the answer used them.
@@ -1416,7 +1418,7 @@ def sources_line(answer: str = "") -> str:
         parts.append("worked out by Cursiv's code" if _WORKED.ok else "Cursiv's calculator (it refused this question)")
     if _WEB_SEARCHED:
         parts.append("web search results")
-    if _MEMORY_RECALLED and _memory_used(answer):
+    if _MEMORY_RECALLED and _memory_used(answer, question):
         parts.append("your saved memories")
     if _CURSIV_REPLY:
         return ("Sources: " + "; ".join(parts) + ". Written by Cursiv, no AI model") if parts \
@@ -3411,7 +3413,8 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
             reply.append(chunk)
         yield chunk
     if _ANSWERED_BY or _CURSIV_REPLY:   # what the answer was given (Cursiv's records, not the model's)
-        note = f"\n\n*[{sources_line(''.join(reply))}]*"
+        _asked = message.get("text", "") if isinstance(message, dict) else str(message or "")
+        note = f"\n\n*[{sources_line(''.join(reply), _asked)}]*"
         reply.append(note)
         yield note
     if _ANSWERED_BY:     # say which engine answered (written by Cursiv, not the model)

@@ -242,6 +242,10 @@ _LASTS = re.compile(r"(?i)\b(?:last(?:s|ing)?|enough for|sufficient for|cover(?:
                     r"[^.!?\n]{0,40}?(?<![\d.])(\d+(?:\.\d+)?)\s*(hours?|hrs?|days?|weeks?)\b")
 _ENOUGH = re.compile(r"(?i)\b(enough|sufficient|adequate|plenty|will cover|covers? (?:everyone|the (?:whole|full|entire)))\b")
 _NOT = re.compile(r"(?i)\b(not|n't|isn't|insufficient|short|shortfall|only|less than|falls?|under|lacks?|won't|without)\b")
+# "This assumes 2 liters per person per day is sufficient" is about the allocation, not the supply
+# (first live Cross-check, U76): only a sentence calling the supply enough contradicts a shortfall.
+_ABOUT_ALLOCATION = re.compile(r"(?i)\b(assum\w*|allocation|ration\w*|per person(?: per day)?\s+(?:is|are|was|be)|"
+                               r"whether|if\b[^.]{0,40}\b(?:enough|sufficient|adequate))")
 
 
 _PER_DAY = re.compile(r"(?i)(?<![\d.])(\d+(?:\.\d+)?)\s*(?:liters?|litres?|l|meals?|rations?)\s*(?:of water\s*)?"
@@ -292,7 +296,7 @@ def contradictions(answer: str, facts: dict) -> list[str]:
                 break
     if (facts.get("short") or 0) > 1e-9:
         for sentence in re.split(r"(?<=[.!?])\s+|\n", answer or ""):
-            if _ENOUGH.search(sentence) and not _NOT.search(sentence):
+            if _ENOUGH.search(sentence) and not _NOT.search(sentence) and not _ABOUT_ALLOCATION.search(sentence):
                 found.append(f"it calls the supply enough (\"{sentence.strip()[:80]}\"), but there's a shortfall of "
                              f"{_fmt(facts['short'])} {facts['unit']} for the period")
                 break

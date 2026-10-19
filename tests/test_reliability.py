@@ -620,3 +620,30 @@ def test_the_generator_question_no_longer_gets_the_composting_entry():
     ids = [e.id for e in reference.lookup("How far from the house should the generator be, and can I refuel "
                                           "it while it's running?")]
     assert "survival/composting-hot-method" not in ids
+
+
+# ══ K. From the first live Cross-check (U76, OpenAI), 2026-10-19 ═══════════════════
+
+U76_Q = ("We have 240 liters of water for 120 people for 48 hours. At 2 liters per person per day, how much water do "
+         "we need, what's the shortfall, and how long will our supply last?")
+U76_ANSWER = ("We need 480 liters of water for 120 people for 48 hours (2 days) at 2 liters per person per day.\n"
+              "Our supply is only 240 liters.\nThe shortfall is 240 liters (480 - 240).\n"
+              "At 2 liters per person per day, the 240-liter supply will last only 1 day for all 120 people.\n"
+              "Note: This assumes 2 liters per person per day is sufficient. Real needs may vary based on climate, "
+              "activity, age, and health.")
+
+
+def test_a_note_about_the_allocation_isnt_calling_the_supply_enough():
+    w = calc.work_out(U76_Q)
+    assert calc.check(U76_ANSWER, w) == ""
+    # ...while calling the supply enough still is
+    assert "shortfall of 240 L" in calc.check("Good news: the 240 liters is sufficient for the 48 hours.", w)
+
+
+def test_words_from_the_question_dont_make_a_memory_used(monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    monkeypatch.setattr(ca, "_MEMORY_RECALLED", True)
+    monkeypatch.setattr(ca, "_MEMORY_TEXTS", ["Jw stores drinking water for the family in 20-liter jugs in the barn."])
+    assert "your saved memories" not in ca.sources_line(U76_ANSWER, U76_Q)
+    used = "Your 20-liter jugs in the barn hold the water."
+    assert "your saved memories" in ca.sources_line(used, U76_Q)
