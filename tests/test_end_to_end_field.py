@@ -284,3 +284,53 @@ def test_a_damaged_photo_on_a_first_import_is_left_out_and_named(phone, laptop):
     # the good file later supplies the photo, checked against its fingerprint
     fieldsync.import_phone_bundle(phone["send2"])
     assert fieldlog.photo_problems(_mine(device)) == []
+
+
+# ── the same workflow with offline mode on, every connection attempt recorded ──
+
+_attempts: list | None = None
+
+
+def _watch(event, args):
+    if _attempts is None:
+        return
+    from cursiv_v215.core import netgate
+    if event in ("socket.connect", "socket.sendto"):
+        host = args[1][0] if len(args) > 1 and isinstance(args[1], tuple) else None
+    elif event in ("socket.getaddrinfo", "socket.gethostbyname"):
+        host = args[0]
+    else:
+        return
+    if not netgate.is_local(host):
+        _attempts.append((event, host))
+
+
+import sys as _sys                                      # noqa: E402
+_sys.addaudithook(_watch)
+
+
+def test_receive_import_and_export_work_offline_without_reaching_anything(phone, laptop, monkeypatch):
+    global _attempts
+    import http.client
+    from cursiv_v215.core import netgate, phone_receive
+    monkeypatch.setattr(netgate, "CONFIG_FILE", laptop / "app" / "config.json")
+    netgate.set_offline(True)
+    assert not netgate.allowed()
+    _attempts = []
+    try:
+        r = phone_receive.Receiver(port=0)
+        r.start()
+        try:
+            c = http.client.HTTPConnection("127.0.0.1", r.port, timeout=30)
+            c.request("PUT", "/upload", body=phone["send2"].read_bytes(),
+                      headers={"X-Cursiv-Code": r.code, "X-File-Name": "send-2.cursivsync"})
+            j = json.loads(c.getresponse().read())
+        finally:
+            r.stop()
+        assert f"{phone['device']}: 6 new entries" in j["message"], j
+        paths = fieldsync.team_export(laptop / "export")
+        assert fieldlog.verify_export(laptop / "export") == [] and "photos" in paths
+        assert fieldlog.photo_problems(_mine(phone["device"])) == []
+    finally:
+        seen, _attempts = _attempts, None
+    assert seen == [], seen

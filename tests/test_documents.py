@@ -134,3 +134,19 @@ def test_with_the_ai_engine_down_cursiv_gives_what_it_has(library, tmp_path, fre
     assert "53.6 F" in out and "worked out by Cursiv's code" in out
     out = "".join(ca.chat("What is a riffle in a stream?", [], "", None))
     assert "no answer without the model" in out and "Sources: Cursiv itself (no AI model)" in out
+
+
+def test_documents_import_and_answer_with_offline_mode_on_and_no_connection(library, tmp_path, fresh, outbound,
+                                                                            monkeypatch):
+    """Offline on, the AI engine down: a team document is imported, found and quoted by page,
+    and nothing tries to leave this computer (outbound records any attempt)."""
+    from cursiv_v215.core import netgate
+    from cursiv_v215.ui import chat_app as ca
+    netgate.set_offline(True)
+    monkeypatch.setattr(ca, "_local_model_ready", lambda: False)
+    library.add(_pdf(tmp_path / "WS-3 protocol.pdf"))
+    hits = library.search("samples on ice lab hours")
+    assert hits and "24 hours" in str(hits[0])
+    out = "".join(ca.chat("How long can water samples stay on ice before they go to the lab?", [], "", None))
+    assert "WS-3 protocol.pdf p. 2" in out and "24 hours" in out
+    assert outbound == []

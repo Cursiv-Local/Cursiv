@@ -3062,14 +3062,16 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str],
         if tried:
             yield (
                 f"*[{', '.join(tried)} unavailable and Ollama is not running.]*\n\n"
-                "Start Ollama with `ollama run llama3.1` for offline use."
+                "For offline answers, the local AI engine needs to be running: type `status` to see why it "
+                "isn't, or open Setup to install the local model."
             )
         else:
             yield (
                 "[No AI is available yet: no API key, Ollama isn't running, and Cursiv Cloud "
                 + ("couldn't be reached" if cloud_enabled() else "is turned off ('cloud on' to use it)")
                 + ".]\n\n"
-                "**To run locally:** start Ollama with `ollama run llama3.1`.\n\n"
+                "**To run locally:** open Setup to install the local AI engine and model, or type `status` "
+                "to see why the engine isn't running.\n\n"
                 + FREE_KEY_HELP
             )
 

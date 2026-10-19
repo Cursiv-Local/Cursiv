@@ -99,6 +99,7 @@ def run(report: str | None = None) -> int:
     # The chat window starts a background model lookup; it may still be finishing when the
     # self-test exits. Its errors aren't part of the result.
     threading.excepthook = lambda args: None
+    os.environ["CURSIV_NO_ENGINE_START"] = "1"         # check the window, but never start the AI engine
     lines, failed = [], 0
     try:
         from cursiv_v215.core import selfknow

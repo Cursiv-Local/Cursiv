@@ -10,6 +10,8 @@ for p in (str(ROOT), str(ROOT / "launcher")):
 
 # Qt windows are built off-screen; tests never show anything.
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+# Building the chat window never starts the real AI engine in a test.
+os.environ["CURSIV_NO_ENGINE_START"] = "1"
 
 # Optional add-ons from a sibling Winkler_Codex_AI checkout are not part of
 # these tests (and reading them from OneDrive can stall an import).

@@ -566,7 +566,7 @@ class ChatPanel(QWidget):
             try:
                 from cursiv_v215.chat import status as _st
                 models = _st.local_models()
-                if models is None:
+                if models is None and _os.environ.get("CURSIV_NO_ENGINE_START") != "1":   # self-test, tests
                     from cursiv_v215.core import ollama_host, speed
                     if ollama_host.installed() and ollama_host.start(speed.ollama_env()):
                         models = _st.local_models()
