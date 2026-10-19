@@ -3,7 +3,7 @@ reference provenance, safety certainty, untrusted documents, and earlier answers
 
 Every expected number here was worked out by hand (shown in the comments), not taken from the
 code under test. Model behaviour is simulated with fixed replies, so these test Cursiv's checks,
-not a model; docs/RELIABILITY.md says which failures need a live-model run to confirm.
+not a model; docs/EVIDENCE.md says which failures need a live-model run to confirm.
 """
 import json
 import os

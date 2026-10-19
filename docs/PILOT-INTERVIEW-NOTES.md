@@ -129,7 +129,8 @@ re-run on U71 yet.
 
 - **Not field-tested by a research team.** Everything is tested on the developer's laptop. That is the pilot.
 - **No professional review** of the first-aid and survival content. 43 of 80 of those entries have
-  no published source yet. Entries say so on the card. Three entries are held back until reviewed.
+  no published source yet. Entries say so on the card, and the AI is told they're unverified. Five entries are
+  held back from chat until reviewed (including an unsourced antibiotic dose and "all insects are safe if cooked").
 - **The AI is small** (4 billion parameters). It's good at plain answers and following the
   reference; it is not a substitute for a domain expert, and it still makes mistakes (see above).
   The design assumes it will, which is why calculations are done in code and sources are labelled.
