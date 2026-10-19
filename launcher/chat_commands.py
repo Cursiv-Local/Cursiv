@@ -896,6 +896,11 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         _mem_reply = None
     if _mem_reply is not None:
         return TextResult(_mem_reply)
+    # The paperclip: photo "<path>" <question> -- the image model reads a photo
+    _pm = _PHOTO_CMD.match(text.strip())
+    if _pm and (Path(_pm.group(1) or _pm.group(2)).suffix.lower() in
+                {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp", ".tif", ".tiff", ".heic"}):
+        return describe_photo(_pm.group(1) or _pm.group(2), _pm.group(3), cfg)
     # The field demo: demo, demo off, demo questions (core/demo.py)
     try:
         from cursiv_v215.core import demo as _demo
@@ -2036,6 +2041,27 @@ def _ollama_vision_model() -> str:
 def _vision_describe(img_b64: str, mime: str, prompt_text: str, cfg: dict) -> tuple[str, str]:
     import urllib.request
     from cursiv_v215.ui.chat_app import _saved_key, GEMINI_URL, GEMINI_MODELS
+    # Local first (a photo stays on this computer when the image model is installed);
+    # online keys only when nothing local can read it and the internet isn't blocked.
+    model = _ollama_vision_model()
+    if model:
+        try:
+            body = json.dumps({"model": model, "prompt": prompt_text,
+                               "images": [img_b64], "stream": False}).encode()
+            req = urllib.request.Request("http://127.0.0.1:11434/api/generate", data=body,
+                                         headers={"Content-Type": "application/json"})
+            with urllib.request.urlopen(req, timeout=600) as r:
+                text = json.loads(r.read()).get("response", "")
+            if text.strip():
+                return text, f"{model} (local)"
+        except Exception:
+            pass
+    try:
+        from cursiv_v215.core import netgate as _ng
+        if not _ng.allowed():
+            return "", ""
+    except Exception:
+        return "", ""
     ant_key, oai_key = cfg.get("anthropic_key", ""), cfg.get("openai_key", "")
     gem_key = cfg.get("gemini_key", "") or _saved_key("gemini_key")
 
@@ -2086,19 +2112,6 @@ def _vision_describe(img_b64: str, mime: str, prompt_text: str, cfg: dict) -> tu
             except Exception:
                 continue
 
-    model = _ollama_vision_model()
-    if model:
-        try:
-            body = json.dumps({"model": model, "prompt": prompt_text,
-                               "images": [img_b64], "stream": False}).encode()
-            req = urllib.request.Request("http://127.0.0.1:11434/api/generate", data=body,
-                                         headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=600) as r:
-                text = json.loads(r.read()).get("response", "")
-            if text.strip():
-                return text, f"{model} (local)"
-        except Exception:
-            pass
     return "", ""
 
 
@@ -2142,6 +2155,48 @@ def image_to_training_entry(image_bytes: bytes, cfg: dict, ext: str = "png") -> 
     with _TRAINING_JSONL.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
     return True, f"Image analyzed via {vision_provider} and added to training data.", entry
+
+
+# ── "photo <path> <question>": the chat's paperclip ─────────────────────────
+_PHOTO_CMD = re.compile(r'(?is)^photo\s+(?:"([^"]+)"|(\S+))\s*(.*)$')
+_NO_LOCAL_VISION = (
+    "Reading photos offline needs Cursiv's image model on this computer, and none is installed. "
+    "Install it in Setup (step 5: gemma3 4B, 3.3 GB; needs the internet once). "
+    "With the internet blocked, Cursiv won't send the photo anywhere.")
+
+
+def describe_photo(path: str, question: str, cfg: dict) -> TextResult:
+    """Ask the image model about a photo. Local model first; the answer says where it was read."""
+    import base64 as _b64p
+    import io
+    p = Path(path)
+    if not p.is_file():
+        return TextResult(f"No photo at {p}.")
+    try:
+        from PIL import Image
+        with Image.open(p) as img:                      # smaller is much faster, and enough to read
+            img = img.convert("RGB")
+            img.thumbnail((1280, 1280))
+            buf = io.BytesIO(); img.save(buf, "JPEG", quality=88)
+        data, mime = buf.getvalue(), "image/jpeg"
+    except Exception:
+        data, mime = p.read_bytes(), "image/jpeg"
+    q = question.strip() or "Describe what this photo shows, as an observer in the field would: what, where, condition."
+    prompt = (q + "\n\nSay only what is visible in the photo. If something can't be told from the photo "
+              "(species, exact size, chemistry), say so instead of guessing.")
+    text, provider = _vision_describe(_b64p.b64encode(data).decode(), mime, prompt, cfg)
+    if not text:
+        try:
+            from cursiv_v215.core import netgate as _ng
+            offline = not _ng.allowed()
+        except Exception:
+            offline = True
+        return TextResult(_NO_LOCAL_VISION if offline or not _ollama_vision_model() else _NO_VISION_HELP)
+    local = provider.endswith("(local)")
+    where = (f"read by {provider[:-8]} on this computer" if local
+             else f"sent to {provider} online: this photo left this computer")
+    return TextResult(f"{text.strip()}\n\n*[Sources: your photo ({p.name}), {where}. The AI's reading of a photo can "
+                      f"be wrong; check anything that matters.]*", image_path=str(p))
 
 
 # ── Paste image from clipboard → vision analysis → strand. Caller passes

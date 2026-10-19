@@ -447,6 +447,23 @@ class ChatPanel(QWidget):
         row = QHBoxLayout()
         row.setSpacing(8)
 
+        # Paperclip: add photos to a field entry, or ask the image model about a photo.
+        self._clip_btn = QPushButton("📎")
+        self._clip_btn.setFixedSize(44, 64)
+        self._clip_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._clip_btn.setToolTip("Add photos to a field entry, or ask Cursiv about a photo")
+        self._clip_btn.setStyleSheet(self._icon_btn_style() + "QPushButton { font-size: 20px; }"
+                                     "QPushButton::menu-indicator { image: none; width: 0; }")
+        clip_menu = QMenu(self._clip_btn)
+        clip_menu.addAction("Add photos to a field entry…", self._clip_to_notebook)
+        clip_menu.addAction("Ask Cursiv about a photo…", self._clip_ask)
+        clip_menu.addSeparator()
+        note = clip_menu.addAction("Making new images needs an online service (a paid OpenAI key or a free "
+                                   "Cloudflare account); offline, Cursiv can only read photos.")
+        note.setEnabled(False)
+        self._clip_btn.setMenu(clip_menu)
+        row.addWidget(self._clip_btn)
+
         self._input = _ChatInput(self._send, self._handle_pasted_image)
         row.addWidget(self._input, 1)
 
@@ -510,6 +527,23 @@ class ChatPanel(QWidget):
             self._demo_pill.setVisible(_demo.active())
         except Exception:
             self._demo_pill.setVisible(False)
+
+    _PHOTO_FILTER = "Photos (*.jpg *.jpeg *.png *.heic *.heif *.webp *.tif *.tiff *.gif *.bmp)"
+
+    def _clip_to_notebook(self) -> None:
+        from PyQt6.QtWidgets import QFileDialog
+        files, _ = QFileDialog.getOpenFileNames(self, "Photos for a field entry", "", self._PHOTO_FILTER)
+        if not files:
+            return
+        win = self.window()
+        if hasattr(win, "_open_field_notebook"):
+            win._open_field_notebook(photos=files)
+
+    def _clip_ask(self) -> None:
+        from PyQt6.QtWidgets import QFileDialog
+        f, _ = QFileDialog.getOpenFileName(self, "A photo to ask about", "", self._PHOTO_FILTER)
+        if f:
+            self.prefill(f'photo "{f}" What does this photo show?')
 
     def _open_settings_from_pill(self) -> None:
         win = self.window()

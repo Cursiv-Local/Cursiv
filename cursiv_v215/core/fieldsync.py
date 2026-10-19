@@ -75,6 +75,12 @@ def share(folder: Path, observer: str = "") -> Path:
     out.mkdir(parents=True, exist_ok=True)
     device = fieldlog._device()
     shutil.copyfile(fieldlog.log_file(), out / f"{device}.jsonl")
+    for e in rows:                                   # photos travel with the log, named by their SHA-256
+        for rel in e.get("photos") or []:
+            src = fieldlog.photo_path(rel)
+            if fieldlog._is_stored(rel) and src.exists() and not (out / rel).exists():
+                (out / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(src, out / rel)
     (out / f"{device}.manifest.json").write_text(json.dumps({
         "device": device, "observer": observer, "entries": len(rows), "last_hash": rows[-1]["hash"],
         "shared_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -143,6 +149,27 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
     return rows, problems, None
 
 
+def _import_photos(src: Path, rows: list[dict]) -> int:
+    """Copy the photos these entries name into the photo store, each checked against its
+    SHA-256 name. Returns how many are missing or don't match (the entries still import)."""
+    import hashlib
+    missing = 0
+    for e in rows:
+        for rel in e.get("photos") or []:
+            if not fieldlog._is_stored(rel):
+                continue
+            dest = fieldlog.photo_path(rel)
+            if dest.exists():
+                continue
+            f = src / rel
+            if not f.exists() or hashlib.sha256(f.read_bytes()).hexdigest() != Path(rel).stem:
+                missing += 1
+                continue
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copyfile(f, dest)
+    return missing
+
+
 def import_folder(folder: Path) -> dict:
     """Import every shared log in folder (or folder/cursiv-field-share). Returns a report:
     {"added": {device: new entries}, "unchanged": [...], "conflicts": [...], "rejected": [...], "own": bool}."""
@@ -152,7 +179,7 @@ def import_folder(folder: Path) -> dict:
     if not logs:
         raise ValueError(f"no shared field logs in {src}")
     report = {"added": {}, "unchanged": [], "conflicts": [], "rejected": [], "own": False,
-              "signed": {}, "unsigned": []}
+              "signed": {}, "unsigned": [], "photos_missing": {}}
     me = fieldlog._device()
     team_dir().mkdir(parents=True, exist_ok=True)
     for log in logs:
@@ -164,6 +191,9 @@ def import_folder(folder: Path) -> dict:
         if problems:
             report["rejected"].append(f"{device}: " + "; ".join(problems))
             continue
+        missing = _import_photos(src, rows)
+        if missing:
+            report["photos_missing"][device] = missing
         if env:
             report["signed"][device] = env["key_id"]
             if not pinned_key(device):
@@ -247,6 +277,8 @@ def report_text(r: dict) -> str:
         lines.append(f"- NOT IMPORTED {x}")
     for device, kid in r.get("signed", {}).items():
         lines.append(f"- {device}: signature checked (key {kid})")
+    for device, n in r.get("photos_missing", {}).items():
+        lines.append(f"- {device}: {n} photo(s) missing or not matching their fingerprint (the entries are in)")
     for device in r.get("unsigned", []):
         lines.append(f"- {device}: not signed (shared by Cursiv before U73); its chain was checked")
     for c in sample_clashes():

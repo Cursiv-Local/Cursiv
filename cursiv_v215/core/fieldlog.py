@@ -20,6 +20,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import socket
 import threading
 import time
@@ -45,6 +46,77 @@ def log_file() -> Path:
 def _device() -> str:
     """A short, stable label for this computer (a hash, not its name)."""
     return hashlib.sha256(socket.gethostname().encode("utf-8", "replace")).hexdigest()[:12]
+
+
+# ── Photos: stored once, named by their SHA-256 ───────────────────────────
+# An entry lists "photos/<sha256>.<ext>"; the name is part of the entry's
+# fingerprint, so a photo can't be swapped without breaking the record. The time
+# and GPS position a camera wrote into the photo (EXIF) are kept in photo_info.
+
+PHOTO_EXTS = {".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp", ".tif", ".tiff", ".gif", ".bmp"}
+
+
+def photo_dir() -> Path:
+    return log_dir() / "photos"
+
+
+def photo_path(stored: str) -> Path:
+    """Where a stored photo ("photos/<sha256>.jpg") is on this computer."""
+    return log_dir() / stored
+
+
+def _exif_rational(v) -> float:
+    try:
+        return float(v)
+    except TypeError:
+        return v[0] / v[1]
+
+
+def photo_info(path: Path) -> dict:
+    """{"taken": "2026:10:18 14:31:05" or "", "lat": float|None, "lon": float|None} from EXIF."""
+    info = {"taken": "", "lat": None, "lon": None}
+    try:
+        from PIL import Image
+        with Image.open(path) as img:
+            exif = img.getexif()
+            sub = exif.get_ifd(0x8769)                       # Exif sub-IFD
+            info["taken"] = str(sub.get(36867) or exif.get(306) or "")
+            gps = exif.get_ifd(0x8825)
+            if gps and 2 in gps and 4 in gps:
+                def deg(dms):
+                    d, m, s = (_exif_rational(x) for x in dms)
+                    return d + m / 60 + s / 3600
+                lat, lon = deg(gps[2]), deg(gps[4])
+                if str(gps.get(1, "N")).upper().startswith("S"):
+                    lat = -lat
+                if str(gps.get(3, "E")).upper().startswith("W"):
+                    lon = -lon
+                if -90 <= lat <= 90 and -180 <= lon <= 180:
+                    info["lat"], info["lon"] = round(lat, 7), round(lon, 7)
+    except Exception:
+        pass
+    return info
+
+
+def store_photo(path) -> str:
+    """Copy a photo into the notebook's photo store; returns "photos/<sha256><ext>"."""
+    src = Path(path)
+    if not src.is_file():
+        raise ValueError(f"no photo at {src}")
+    ext = src.suffix.lower()
+    if ext not in PHOTO_EXTS:
+        raise ValueError(f"{src.name} isn't a photo Cursiv recognises ({', '.join(sorted(PHOTO_EXTS))})")
+    digest = hashlib.sha256(src.read_bytes()).hexdigest()
+    rel = f"photos/{digest}{'.jpg' if ext == '.jpeg' else ext}"
+    dest = log_dir() / rel
+    if not dest.exists():
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(src, dest)
+    return rel
+
+
+def _is_stored(p: str) -> bool:
+    return isinstance(p, str) and re.fullmatch(r"photos/[0-9a-f]{64}\.[a-z]+", p) is not None
 
 
 def _fingerprint(entry: dict) -> str:
@@ -113,6 +185,14 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         raise ValueError("a sample ID can use letters, numbers, '-', '_' and '.' (up to 40)")
     if not (meas or note.strip() or photos or sample_id):
         raise ValueError("an entry needs at least a measurement, a note or a photo")
+    stored, infos = [], []
+    for p in photos or []:
+        if _is_stored(str(p)):
+            stored.append(str(p))
+            continue
+        rel = store_photo(p)
+        stored.append(rel)
+        infos.append({"file": rel, "name": Path(p).name, **photo_info(Path(p))})
     with _lock:
         existing, _bad = _read()
         if corrects and corrects not in {e["id"] for e in existing}:
@@ -130,13 +210,15 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
             "location_source": location_source if lat_v is not None else "",
             "measurements": meas,
             "note": note.strip(),
-            "photos": [str(p) for p in (photos or [])],
+            "photos": stored,
             "corrects": corrects or None,
             "reason": reason.strip(),
             "device": _device(),
             "app_version": app_version,
             "prev": existing[-1]["hash"] if existing else GENESIS,
         }
+        if infos:
+            entry["photo_info"] = infos
         entry["hash"] = _fingerprint(entry)
         log_dir().mkdir(parents=True, exist_ok=True)
         # One line per entry, flushed to disk before returning, so a power cut can
@@ -155,6 +237,7 @@ def correct(entry_id: str, reason: str, **fields) -> dict:
         raise ValueError(f"no entry {entry_id} to correct")
     base = {k: old.get(k) for k in ("observer", "site", "lat", "lon", "location_source", "measurements",
                                     "note", "photos", "sample_id")}
+    base["photos"] = base.get("photos") or []
     base["sample_id"] = base.get("sample_id") or ""
     base.update(fields)
     return add(**base, corrects=entry_id, reason=reason)
@@ -284,6 +367,14 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
         labels = folder / "sample-labels.html"
         labels.write_text(labels_html(rows), encoding="utf-8")
         paths["labels"] = labels
+    for e in (everything if everything is not None else entries()):
+        for rel in e.get("photos") or []:
+            src = photo_path(rel)
+            if _is_stored(rel) and src.exists() and not (folder / rel).exists():
+                (folder / rel).parent.mkdir(parents=True, exist_ok=True)
+                shutil.copyfile(src, folder / rel)
+    if (folder / "photos").is_dir():
+        paths["photos"] = folder / "photos"
     paths["signature"] = sign_export(folder, paths, everything if everything is not None else entries())
     return paths
 
@@ -302,7 +393,8 @@ def sign_export(folder: Path, paths: dict, rows: list[dict]) -> Path:
     the chain) and the SHA-256 of every exported file. verify_export() checks it."""
     from cursiv_v215.core import devicekey
     own = entries()
-    files = {p.name: _file_sha256(p) for p in paths.values() if p.exists() and p.name != SIGNATURE_FILE}
+    files = {f.relative_to(folder).as_posix(): _file_sha256(f) for f in sorted(Path(folder).rglob("*"))
+             if f.is_file() and f.name != SIGNATURE_FILE}
     devices = sorted({e.get("device", "") for e in rows})
     env = devicekey.sign({
         "format": "cursiv-export-1",

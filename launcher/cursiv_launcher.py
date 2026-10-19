@@ -1582,11 +1582,14 @@ class CursivLauncher(QMainWindow):
         except Exception as e:
             self._set_status(f"Memory & Knowledge failed to open: {e}")
 
-    def _open_field_notebook(self):
+    def _open_field_notebook(self, photos=None):
         try:
             from field_notebook import FieldNotebookDialog
             from cursiv_v215.memory.semantic import current_person
-            FieldNotebookDialog(self, observer=current_person().title()).exec()
+            dlg = FieldNotebookDialog(self, observer=current_person().title())
+            if photos:
+                dlg.add_photos(photos)
+            dlg.exec()
         except Exception as e:
             self._set_status(f"Field Notebook failed to open: {e}")
 

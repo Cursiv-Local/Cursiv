@@ -19,11 +19,13 @@ ROWS = 2      # measurement rows shown at first; "+ Another measurement" adds mo
 
 
 class FieldNotebookDialog(QDialog):
-    def __init__(self, parent=None, observer: str = ""):
+    def __init__(self, parent=None, observer: str = "", photos=None):
         super().__init__(parent)
         self.setWindowTitle("Cursiv — Field Notebook")
         self.resize(1000, 860)
         self._correcting: str = ""
+        self._photos: list = []                 # files picked for this entry (or stored names when correcting)
+        self._loc_from_photo = False
         outer = QVBoxLayout(self)
         outer.setContentsMargins(24, 20, 24, 16)
         outer.setSpacing(10)
@@ -85,6 +87,14 @@ class FieldNotebookDialog(QDialog):
         self._note = QPlainTextEdit(); self._note.setPlaceholderText("Notes (conditions, what you saw, anything else)")
         self._note.setFixedHeight(52)
         form_box.addWidget(self._note)
+        photo_row = QHBoxLayout()
+        add_photo = QPushButton("📎  Add photos…"); add_photo.setStyleSheet(theme.ghost_button())
+        add_photo.setToolTip("Attach photos to this entry. The time and GPS position the camera recorded are kept, "
+                             "and a missing location is filled in from the photo.")
+        add_photo.clicked.connect(self._pick_photos)
+        self._photo_lbl = QLabel(""); self._photo_lbl.setStyleSheet(f"color: {theme.MUTED};")
+        photo_row.addWidget(add_photo); photo_row.addWidget(self._photo_lbl, 1)
+        form_box.addLayout(photo_row)
         buttons = QHBoxLayout()
         self._save = QPushButton("Save entry"); self._save.setStyleSheet(theme.primary_button())
         self._save.clicked.connect(self._save_entry)
@@ -138,8 +148,37 @@ class FieldNotebookDialog(QDialog):
             self._grid.addWidget(w, r, col)
         self._rows.append((name, value, unit))
 
+    # ── photos ────────────────────────────────────────────────────────
+    def _pick_photos(self):
+        files, _ = QFileDialog.getOpenFileNames(
+            self, "Add photos to this entry", "",
+            "Photos (" + " ".join("*" + e for e in sorted(fieldlog.PHOTO_EXTS)) + ")")
+        if files:
+            self.add_photos(files)
+
+    def add_photos(self, files) -> None:
+        """Attach photos to the entry being written; fill a blank location from the first photo's GPS."""
+        from pathlib import Path
+        for f in files:
+            if f not in self._photos:
+                self._photos.append(f)
+        note = ""
+        if not self._lat.text().strip() and not self._lon.text().strip():
+            for f in files:
+                info = fieldlog.photo_info(Path(f)) if Path(str(f)).exists() else {}
+                if info.get("lat") is not None:
+                    self._lat.setText(str(info["lat"])); self._lon.setText(str(info["lon"]))
+                    self._loc_from_photo = True
+                    note = " · location filled in from the photo's GPS"
+                    break
+        n = len(self._photos)
+        self._photo_lbl.setText(f"{n} photo{'s' if n != 1 else ''} attached{note}" if n else "")
+
     def _clear_form(self):
         self._correcting = ""
+        self._photos = []
+        self._loc_from_photo = False
+        self._photo_lbl.setText("")
         self._form_title.setText("New entry")
         self._cancel.setVisible(False)
         self._save.setText("Save entry")
@@ -154,7 +193,9 @@ class FieldNotebookDialog(QDialog):
         lat, lon = self._lat.text().strip(), self._lon.text().strip()
         return {
             "observer": self._observer.text(), "site": self._site.text(),
-            "lat": lat or None, "lon": lon or None, "location_source": "typed" if lat else "",
+            "lat": lat or None, "lon": lon or None,
+            "location_source": ("photo GPS" if self._loc_from_photo else "typed") if lat else "",
+            "photos": list(self._photos),
             "measurements": [{"name": n.text(), "value": v.text(), "unit": u.text()}
                              for n, v, u in self._rows if n.text().strip()],
             "note": self._note.toPlainText(),
@@ -201,6 +242,8 @@ class FieldNotebookDialog(QDialog):
         for (n, v, u), m in zip(self._rows, e["measurements"]):
             n.setText(m["name"]); v.setText(m["value"]); u.setText(m["unit"])
         self._note.setPlainText(e["note"])
+        self._photos = list(e.get("photos") or [])
+        self._photo_lbl.setText(f"{len(self._photos)} photo(s) kept from the original" if self._photos else "")
 
     # ── list, checks, export ───────────────────────────────────────────
     def refresh(self):
@@ -209,8 +252,10 @@ class FieldNotebookDialog(QDialog):
         for r, e in enumerate(reversed(rows)):
             meas = ", ".join(f"{m['name']} {m['value']}{(' ' + m['unit']) if m['unit'] else ''}" for m in e["measurements"])
             site = e["site"] + (f"  [{e['sample_id']}]" if e.get("sample_id") else "")
+            photos = len(e.get("photos") or [])
             cells = [str(e["seq"]), e["recorded_local"].replace("T", " ")[:19], site, meas,
-                     e["note"] + (f"  (corrects an earlier entry: {e['reason']})" if e.get("corrects") else "")]
+                     (f"📷 {photos}  " if photos else "") + e["note"]
+                     + (f"  (corrects an earlier entry: {e['reason']})" if e.get("corrects") else "")]
             for c, text in enumerate(cells):
                 item = QTableWidgetItem(text)
                 if c == 0:
