@@ -177,7 +177,7 @@ From a review of real answers (a bleeding answer said not to bandage or use a to
 - Benchmark: suites 1.1 (new cases, 4 defective checks fixed) and 1.2 (checks only: curly apostrophes, ledger "Unknown:" lines no longer count as admitting it can't know, negations before unsafe phrases). `truth_bench.py --model / --source <ref>`, `truth_rescore.py`, `compare_models.py`. Open failures: `bench/FAILURES-U63-pre.md` (rea-009 arithmetic, ref-015 dose merge, amb-002 assumed "it").
 - Not done: the six Phase 1 prompts need to be re-run once the owner supplies them; a dose-number comparison against the card; the model comparison run.
 
-- U76 (unreleased): `verify.constraint_problems(user_text, draft, sources)` takes the turn's sources; a number is
+- U76: `verify.constraint_problems(user_text, draft, sources)` takes the turn's sources; a number is
   drift only if it restates the question differently. Worked results ("So, 9 eggs"), numbers in Cursiv's
   sources, ranges, bracketed equivalents and repeated results are not. `arithmetic_problems` skips the tail of a
   longer chain and reads "7/8". Measure with `scripts/verify_replay.py <results.json>` (bench/FAILURES-U75.md).

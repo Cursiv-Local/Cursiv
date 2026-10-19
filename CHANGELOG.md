@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## v3.14-U76 — Cross-check and quieter answer checks (2026-10-19)
 - **Cross-check (new, optional):** a *Cross-check* button under the chat asks another AI to review the last answer, as a second opinion: errors, unsupported claims, missing assumptions, honest differences. It needs your own key for that company (Claude, OpenAI, xAI, or a free Gemini or Groq key), shows exactly what will be sent and to whom, and sends nothing until you press Send. Only that question and answer go; the review appears below the answer without changing it. Offline mode refuses it.
 - The answer check puts far fewer notes under correct answers (17 to 4 on the U75 benchmark answers); a number the question gave that really changed is still caught.
+- From a live benchmark run of U75 (bench/FAILURES-U75.md): a weekday answer is checked by the day's name, "7/8" counts as 0.875, an answer that opens "Yes, A is better" when the counts are too small to show it gets a note, and so does calling a published source "verified". Benchmark suite 1.5 adds the water-supply, small-sample, weekday and "is it safe with nothing known" cases.
 
 ## v3.14-U75 — Records that hold up, honest answers, phone over Wi-Fi (2026-10-19)
 - **Cursiv USB: the drive's own AI engine gets time to start.** From a USB stick it took 46 seconds on a fast laptop; Cursiv gave up after 15 and said "Ollama isn't running". It now waits up to 2 minutes, the model menu says it's starting the engine, and `status` says which engine is answering: the drive's own, or this computer's (which only sees this computer's models; that's why a drive could answer with llama3.1 instead of qwen3).
