@@ -41,11 +41,25 @@ def team_dir() -> Path:
 
 
 def _read_lines(path: Path) -> list[dict]:
+    """Every entry in a log file; ValueError if any line isn't one (cut off, or not an entry)."""
     out = []
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.strip():
-            out.append(json.loads(line))
+            e = json.loads(line)
+            if not isinstance(e, dict):
+                raise ValueError("a line isn't an entry")
+            out.append(e)
     return out
+
+
+def _copy_atomic(src: Path, dest: Path) -> None:
+    """Copy so a power cut or a pulled drive leaves either the old file or the new one, never half."""
+    import os
+    tmp = dest.with_name(dest.name + ".tmp")
+    shutil.copyfile(src, tmp)
+    with tmp.open("rb+") as f:
+        os.fsync(f.fileno())
+    os.replace(tmp, dest)
 
 
 def chain_problems(rows: list[dict]) -> list[str]:
@@ -58,7 +72,8 @@ def chain_problems(rows: list[dict]) -> list[str]:
             problems.append(f"entry {e.get('seq')} was changed after it was recorded")
         if e.get("seq") != seq + 1:
             problems.append(f"entry numbers jump from {seq} to {e.get('seq')}")
-        prev, seq = e.get("hash"), e.get("seq", seq)
+        n = e.get("seq")
+        prev, seq = e.get("hash"), n if isinstance(n, int) and not isinstance(n, bool) else seq + 1
     return problems
 
 
@@ -144,6 +159,12 @@ def _check_signature(m: dict, device: str, rows: list[dict]) -> tuple[dict | Non
     if not devicekey.verify(env):
         return None, ["its signature doesn't match: the copy or its manifest was changed after it was signed"]
     h = env["signed"]
+    if not isinstance(h, dict):
+        return None, ["its signature isn't over a log head"]
+    if device.startswith("phone-") and env["key_id"][:12] != device[6:]:
+        # a phone's name is "phone-" + the first 12 of its key id (website/notebook/core.js deviceLabel)
+        return None, [f"it's signed by key {env['key_id']}, which isn't the key that phone's name comes from: "
+                      "another device is using that phone's name. Not imported"]
     if h.get("format") != devicekey.HEAD_FORMAT or h.get("device") != device or h.get("entries") != len(rows) \
             or (rows and h.get("hash") != rows[-1]["hash"]):
         return None, ["its signature is for a different log or length than this copy"]
@@ -164,20 +185,34 @@ def _check_shared(log: Path) -> tuple[list[dict], list[str]]:
 def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]:
     try:
         rows = _read_lines(log)
-    except ValueError:
+    except (OSError, ValueError):
         return [], ["a line isn't a complete entry (the copy may have been cut off)"], None
     problems = chain_problems(rows)
+    bad = [(i, p) for i, e in enumerate(rows, 1) for p in fieldlog.record_problems(e)]   # i: its place in the file
+    if bad:
+        seq, first = bad[0]
+        problems.append(f"entry {seq} has a value Cursiv can't accept ({first})"
+                        + (f", and {len(bad) - 1} more problem(s)" if len(bad) > 1 else "")
+                        + ". The whole log was refused, so nothing from it is half-imported")
     newer = max((e.get("schema", 0) for e in rows if isinstance(e.get("schema", 0), int)), default=0)
     if newer > fieldlog.SCHEMA:
         problems.append(f"it was made by a newer Cursiv (record schema {newer}; this one reads up to "
                         f"{fieldlog.SCHEMA}). Update Cursiv, then import it again")
-    if {e.get("device") for e in rows} - {log.stem}:
-        problems.append("it contains entries from a different laptop than its name says")
+    other = next((e for e in rows if e.get("device") != log.stem), None)
+    if other is not None:
+        problems.append(f"entry {other.get('seq')} says it's from {str(other.get('device'))[:30]}, not {log.stem}: "
+                        "it contains entries from a different laptop than its name says")
     man = log.with_name(log.stem + ".manifest.json")
     if not man.exists():
         problems.append("its manifest is missing")
     else:
-        m = json.loads(man.read_text(encoding="utf-8"))
+        try:
+            m = json.loads(man.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            m = None
+        if not isinstance(m, dict):
+            problems.append("its manifest can't be read (cut off or damaged)")
+            return rows, problems, None
         if m.get("entries") != len(rows) or (rows and m.get("last_hash") != rows[-1]["hash"]):
             problems.append(f"the manifest says {m.get('entries')} entries but the copy has {len(rows)}: "
                             "it was cut off or changed after it was shared")
@@ -207,7 +242,7 @@ def _import_photos(src: Path, rows: list[dict]) -> int:
                 missing += 1
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copyfile(f, dest)
+            _copy_atomic(f, dest)
     return missing
 
 
@@ -242,7 +277,10 @@ def import_folder(folder: Path) -> dict:
         if device == me:
             report["own"] = True          # this laptop's own share: its log is already here
             continue
-        rows, problems, env = _check_shared_signed(log)
+        try:
+            rows, problems, env = _check_shared_signed(log)
+        except Exception as exc:                       # one damaged log never stops the others
+            rows, problems, env = [], [f"it couldn't be read ({type(exc).__name__})"], None
         if problems:
             report["rejected"].append(f"{device}: " + "; ".join(problems))
             continue
@@ -255,22 +293,27 @@ def import_folder(folder: Path) -> dict:
         if env:
             report["signed"][device] = env["key_id"]
             if not pinned_key(device):
-                _key_file(device).write_text(json.dumps({
+                from cursiv_v215.core import atomic
+                atomic.write_text(_key_file(device), json.dumps({
                     "device": device, "public_key": env["public_key"], "key_id": env["key_id"],
-                    "first_seen_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}, indent=2),
-                    encoding="utf-8")
+                    "first_seen_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}, indent=2))
         else:
             report["unsigned"].append(device)
         mine = team_dir() / f"{device}.jsonl"
         if not mine.exists():
-            shutil.copyfile(log, mine)
+            _copy_atomic(log, mine)
             report["added"][device] = len(rows)
             continue
-        have = _read_lines(mine)
+        try:
+            have = _read_lines(mine)
+        except (OSError, ValueError):
+            report["rejected"].append(f"{device}: the copy imported earlier ({mine.name}) can't be read; "
+                                      "nothing was changed. Run 'team log' for details")
+            continue
         hashes_have, hashes_new = [e["hash"] for e in have], [e["hash"] for e in rows]
         if hashes_new[:len(hashes_have)] == hashes_have:
             if len(rows) > len(have):
-                shutil.copyfile(log, mine)                     # it only grew
+                _copy_atomic(log, mine)                        # it only grew
                 report["added"][device] = len(rows) - len(have)
             else:
                 report["unchanged"].append(device)
@@ -279,7 +322,7 @@ def import_folder(folder: Path) -> dict:
         else:
             stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
             keep = team_dir() / f"{device}.conflict-{stamp}.jsonl"
-            shutil.copyfile(log, keep)
+            _copy_atomic(log, keep)
             first = next(i for i, (a, b) in enumerate(zip(hashes_have, hashes_new)) if a != b)
             report["conflicts"].append(
                 f"{device}: its history differs from the copy imported earlier, from entry {first + 1} on. "
@@ -386,14 +429,39 @@ def import_phone_bundle(path: Path) -> dict:
         return import_folder(Path(tmp))
 
 
-def team_entries() -> list[dict]:
-    """Every entry from this laptop and every imported laptop (not conflict copies)."""
-    rows = list(fieldlog.entries())
-    seen = {e["hash"] for e in rows}
-    for f in sorted(team_dir().glob("*.jsonl")) if team_dir().is_dir() else []:
-        if ".conflict-" in f.name:
+def _team_files() -> list[Path]:
+    return [f for f in (sorted(team_dir().glob("*.jsonl")) if team_dir().is_dir() else [])
+            if ".conflict-" not in f.name]
+
+
+def team_problems() -> list[str]:
+    """Imported copies here that no longer check out (damaged on this disk after import)."""
+    out = []
+    for f in _team_files():
+        try:
+            rows = _read_lines(f)
+        except (OSError, ValueError):
+            out.append(f"{f.name} can't be read: import that device's share again")
             continue
-        for e in _read_lines(f):
+        p = chain_problems(rows) + [f"entry {e.get('seq')}: {x}" for e in rows for x in fieldlog.record_problems(e)]
+        if p:
+            out.append(f"{f.name}: {p[0]}")
+    return out
+
+
+def team_entries() -> list[dict]:
+    """Every entry from this laptop and every imported laptop (not conflict copies).
+    A copy damaged after import is left out (team_problems() names it), not half-read."""
+    rows = list(fieldlog.entries())
+    seen = {e.get("hash") for e in rows}
+    for f in _team_files():
+        try:
+            theirs = _read_lines(f)
+        except (OSError, ValueError):
+            continue
+        if chain_problems(theirs) or any(fieldlog.record_problems(e) for e in theirs):
+            continue
+        for e in theirs:
             if e["hash"] not in seen:
                 seen.add(e["hash"])
                 rows.append(e)
@@ -481,6 +549,10 @@ def command(text: str, observer: str = "") -> str | None:
             return "No field entries yet, from this laptop or any imported one."
         devices = sorted({e["device"] for e in rows})
         head = f"Team field log: {len(rows)} entries from {len(devices)} device{'s' if len(devices) != 1 else ''}"
+        damaged = team_problems()
+        if damaged:
+            head = ("WARNING, left out because they no longer check out:\n" + "\n".join(f"- {d}" for d in damaged)
+                    + "\n" + head)
         clash = sample_clashes(rows)
         gone = {v["device"]: v for v in revoked().values()}
         body = "\n".join(f"[{e['device'] if e['device'].startswith('phone-') else e['device'][:6]}] "

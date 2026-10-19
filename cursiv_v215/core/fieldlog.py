@@ -18,6 +18,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 import os
 import re
 import shutil
@@ -144,8 +145,12 @@ def _read() -> tuple[list[dict], list[str]]:
         if not line.strip():
             continue
         try:
-            entries.append(json.loads(line))
+            e = json.loads(line)
         except ValueError:
+            e = None
+        if isinstance(e, dict):
+            entries.append(e)
+        else:
             bad.append(f"line {n} isn't a complete entry")
     return entries, bad
 
@@ -210,8 +215,8 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         accuracy = None
         if lat_v is not None and location_accuracy_m not in (None, ""):
             accuracy = round(float(location_accuracy_m), 1)
-            if accuracy < 0:
-                raise ValueError("location accuracy can't be negative")
+            if not math.isfinite(accuracy) or accuracy < 0:
+                raise ValueError("location accuracy must be a number of metres, 0 or more")
         entry = {
             "schema": SCHEMA,
             "id": uuid.uuid4().hex[:12],
@@ -239,12 +244,29 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         entry["hash"] = _fingerprint(entry)
         log_dir().mkdir(parents=True, exist_ok=True)
         # One line per entry, flushed to disk before returning, so a power cut can
-        # at worst leave one incomplete last line (verify() reports it).
+        # at worst leave one incomplete last line (verify() reports it). If the last
+        # write was cut off, this entry starts on a new line instead of being glued
+        # onto the broken one (which would make both unreadable).
+        line = json.dumps(entry, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n"
+        if not _ends_with_newline(log_file()):
+            line = "\n" + line
         with log_file().open("a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False, separators=(",", ":")) + "\n")
+            f.write(line)
             f.flush()
             os.fsync(f.fileno())
         return entry
+
+
+def _ends_with_newline(path: Path) -> bool:
+    try:
+        with path.open("rb") as f:
+            f.seek(0, os.SEEK_END)
+            if f.tell() == 0:
+                return True
+            f.seek(-1, os.SEEK_END)
+            return f.read(1) == b"\n"
+    except FileNotFoundError:
+        return True
 
 
 def correct(entry_id: str, reason: str, **fields) -> dict:
@@ -280,8 +302,103 @@ def verify() -> list[str]:
             problems.append(f"entry {e.get('seq')} ({e.get('id')}) was changed after it was recorded")
         if e.get("seq") != seq + 1:
             problems.append(f"entry numbers jump from {seq} to {e.get('seq')}")
-        prev, seq = e.get("hash"), e.get("seq", seq)
+        n = e.get("seq")
+        prev, seq = e.get("hash"), n if isinstance(n, int) and not isinstance(n, bool) else seq + 1
     return problems
+
+
+def _num(v) -> bool:
+    return isinstance(v, (int, float)) and not isinstance(v, bool) and math.isfinite(v)
+
+
+def _utc_ok(v) -> bool:
+    try:
+        datetime.strptime(v, "%Y-%m-%dT%H:%M:%SZ")
+        return True
+    except (TypeError, ValueError):
+        return False
+
+
+def _local_ok(v) -> bool:
+    try:
+        datetime.fromisoformat(v)
+        return isinstance(v, str)
+    except (TypeError, ValueError):
+        return False
+
+
+def record_problems(e) -> list[str]:
+    """What's wrong with one entry's values, or []. A fingerprint only proves an entry
+    wasn't changed after it was made; this catches entries made wrong (by a bug, an old
+    or foreign program, or on purpose) before they're trusted. Entries from before the
+    schema field, sample IDs or photos (older Cursiv) still pass."""
+    if not isinstance(e, dict):
+        return ["isn't an entry"]
+    p = []
+    for k in ("id", "recorded_utc", "recorded_local", "observer", "site", "note", "reason", "device", "prev", "hash"):
+        if not isinstance(e.get(k), str):
+            p.append(f"{k} is missing or not text")
+    for k in ("location_source", "app_version", "sample_id", "location_fix_utc"):
+        if k in e and not isinstance(e[k], str):
+            p.append(f"{k} is not text")
+    if not (isinstance(e.get("seq"), int) and not isinstance(e.get("seq"), bool) and e["seq"] >= 1):
+        p.append("its number (seq) isn't a whole number from 1")
+    if "schema" in e and not (isinstance(e["schema"], int) and not isinstance(e["schema"], bool)):
+        p.append("schema isn't a whole number")
+    if isinstance(e.get("recorded_utc"), str) and not _utc_ok(e["recorded_utc"]):
+        p.append(f"recorded_utc {e['recorded_utc'][:30]!r} isn't a time (YYYY-MM-DDTHH:MM:SSZ)")
+    if not _local_ok(e.get("recorded_local")):
+        p.append("recorded_local isn't a time")
+    lat, lon = e.get("lat"), e.get("lon")
+    if (lat is None) != (lon is None):
+        p.append("it has a latitude or a longitude but not both")
+    elif lat is not None:
+        if not (_num(lat) and -90 <= lat <= 90):
+            p.append(f"latitude {lat!r} isn't a number from -90 to 90")
+        if not (_num(lon) and -180 <= lon <= 180):
+            p.append(f"longitude {lon!r} isn't a number from -180 to 180")
+    acc = e.get("location_accuracy_m")
+    if acc is not None and not (_num(acc) and acc >= 0):
+        p.append(f"location accuracy {acc!r} isn't a number of metres")
+    meas = e.get("measurements")
+    if not isinstance(meas, list):
+        p.append("measurements isn't a list")
+    else:
+        for m in meas:
+            if not (isinstance(m, dict) and isinstance(m.get("name"), str) and m["name"].strip()
+                    and isinstance(m.get("value"), str) and isinstance(m.get("unit", ""), str)
+                    and (m.get("number") is None or _num(m.get("number")))):
+                p.append(f"a measurement isn't a name, a value as text, a unit and a number or nothing ({str(m)[:60]})")
+                break
+    photos = e.get("photos", [])
+    if not isinstance(photos, list) or not all(_is_stored(x) for x in photos):
+        p.append("photos isn't a list of stored photo names (photos/<sha256>.<ext>)")
+    if e.get("corrects") is not None and not isinstance(e.get("corrects"), str):
+        p.append("corrects isn't an entry id")
+    if e.get("corrects") and not str(e.get("reason", "")).strip():
+        p.append("it corrects an entry but gives no reason")
+    sid = e.get("sample_id", "")
+    if isinstance(sid, str) and sid and not _SAMPLE_OK.fullmatch(sid):
+        p.append(f"sample ID {sid[:40]!r} isn't valid")
+    return p
+
+
+def photo_problems(rows: list[dict] | None = None) -> list[str]:
+    """Photos these entries name that are missing from this computer or whose bytes no longer
+    match the SHA-256 in their name (changed or damaged after they were stored)."""
+    out = []
+    for e in rows if rows is not None else entries():
+        for rel in e.get("photos") or []:
+            where = f"entry {e.get('seq')} ({e.get('device', '')})"
+            if not _is_stored(rel):
+                out.append(f"{where}: {str(rel)[:60]!r} isn't a stored photo name")
+                continue
+            f = photo_path(rel)
+            if not f.is_file():
+                out.append(f"{where}: photo {rel} is missing")
+            elif _file_sha256(f) != Path(rel).stem:
+                out.append(f"{where}: photo {rel} doesn't match its fingerprint (changed or damaged after it was stored)")
+    return out
 
 
 # ── Sample IDs (research roadmap R4) ───────────────────────────────────────
@@ -345,7 +462,8 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
     folder.mkdir(parents=True, exist_ok=True)
     if rows is None:
         rows = entries() if include_corrected else current()
-    problems = verify()
+    every = entries() if everything is None else everything
+    problems = verify() + photo_problems(every)
 
     csv_path = folder / "observations.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as f:
@@ -387,15 +505,18 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
         labels = folder / "sample-labels.html"
         labels.write_text(labels_html(rows), encoding="utf-8")
         paths["labels"] = labels
-    for e in (everything if everything is not None else entries()):
+    for e in every:
         for rel in e.get("photos") or []:
             src = photo_path(rel)
-            if _is_stored(rel) and src.exists() and not (folder / rel).exists():
+            # only a photo that still matches its fingerprint is copied, so the signature never
+            # vouches for a changed one (photo_problems() lists it in the export's integrity)
+            if _is_stored(rel) and src.is_file() and not (folder / rel).exists() \
+                    and _file_sha256(src) == Path(rel).stem:
                 (folder / rel).parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(src, folder / rel)
     if (folder / "photos").is_dir():
         paths["photos"] = folder / "photos"
-    paths["signature"] = sign_export(folder, paths, everything if everything is not None else entries())
+    paths["signature"] = sign_export(folder, paths, every, problems)
     return paths
 
 
@@ -408,7 +529,7 @@ def _file_sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def sign_export(folder: Path, paths: dict, rows: list[dict]) -> Path:
+def sign_export(folder: Path, paths: dict, rows: list[dict], problems: list[str] | None = None) -> Path:
     """signature.json: this installation's signature over the log's head (every entry, through
     the chain) and the SHA-256 of every exported file. verify_export() checks it."""
     from cursiv_v215.core import devicekey
@@ -423,7 +544,7 @@ def sign_export(folder: Path, paths: dict, rows: list[dict]) -> Path:
         "log_head": devicekey.head(own, _device()),
         "entries_exported": len(rows),
         "devices": devices,
-        "integrity": "intact" if not verify() else "problems",
+        "integrity": "intact" if not (verify() if problems is None else problems) else "problems",
         "files": files,
     })
     out = folder / SIGNATURE_FILE
@@ -440,18 +561,51 @@ def verify_export(folder: Path) -> list[str]:
         return [f"no {SIGNATURE_FILE} in {folder}: this export isn't signed (made before U73?)"]
     try:
         env = json.loads(sig.read_text(encoding="utf-8"))
-    except ValueError:
-        return [f"{SIGNATURE_FILE} can't be read"]
-    if not devicekey.verify(env):
+    except (OSError, ValueError):
+        return [f"{SIGNATURE_FILE} can't be read (cut off or damaged)"]
+    if not isinstance(env, dict) or not devicekey.verify(env):
         return ["the signature doesn't match: signature.json was changed, or wasn't made by the key it names"]
+    s = env.get("signed")
+    files = s.get("files") if isinstance(s, dict) else None
+    if not isinstance(files, dict) or s.get("format") != "cursiv-export-1":
+        return [f"{SIGNATURE_FILE} isn't a Cursiv export signature"]
     problems = []
-    for name, digest in env["signed"].get("files", {}).items():
+    root = folder.resolve()
+    for name, digest in files.items():
         f = folder / name
-        if not f.exists():
+        if not f.resolve().is_relative_to(root):
+            problems.append(f"the signature names a file outside the export ({name[:60]})")
+        elif not f.is_file():
             problems.append(f"{name} is missing")
         elif _file_sha256(f) != digest:
             problems.append(f"{name} was changed after the export was signed")
+    for f in sorted(folder.rglob("*")):
+        rel = f.relative_to(folder).as_posix()
+        if f.is_file() and rel != SIGNATURE_FILE and rel not in files:
+            problems.append(f"{rel} isn't covered by the signature (added after the export was made)")
     return problems
+
+
+def _signer(key_id: str) -> str:
+    """Whose key signed: this installation's, a team device Cursiv has imported signed, or unknown.
+    Reads the saved keys only; never makes a key."""
+    try:
+        from cursiv_v215.core import devicekey
+        mine = json.loads(devicekey.key_file().read_text(encoding="utf-8"))
+        if mine.get("key_id") == key_id:
+            return "this installation's key"
+    except (OSError, ValueError):
+        pass
+    team = log_dir() / "team"
+    for f in sorted(team.glob("*.key.json")) if team.is_dir() else []:
+        try:
+            k = json.loads(f.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if k.get("key_id") == key_id:
+            return f"not this installation's key; it's the key of {k.get('device')}, imported before"
+    return ("not this installation's key, and not a key Cursiv has seen from a team device: "
+            "check the key id with whoever sent it")
 
 
 def verify_export_text(folder: Path) -> str:
@@ -460,9 +614,15 @@ def verify_export_text(folder: Path) -> str:
         return "This export does NOT check out:\n" + "\n".join(f"- {p}" for p in problems)
     env = json.loads((Path(folder) / SIGNATURE_FILE).read_text(encoding="utf-8"))
     s = env["signed"]
-    return (f"This export checks out: signed by key {env['key_id']} (laptop {s['exported_by_device']}) on "
-            f"{s['exported_utc']}; {len(s['files'])} files unchanged; {s['entries_exported']} entries; the log's "
-            f"head was entry {s['log_head']['seq']} ({s['log_head']['hash'][:12]}).")
+    head = s.get("log_head") if isinstance(s.get("log_head"), dict) else {}
+    text = (f"This export checks out: signed by key {env['key_id']} ({_signer(env['key_id'])}; "
+            f"made on laptop {s.get('exported_by_device')}) on "
+            f"{s.get('exported_utc')}; {len(s['files'])} files unchanged; {s.get('entries_exported')} entries; the log's "
+            f"head was entry {head.get('seq')} ({str(head.get('hash', ''))[:12]}).")
+    if s.get("integrity") != "intact":
+        text += ("\nBUT when it was made, the log had problems (a changed entry or a damaged photo): "
+                 "observations.json lists them under \"integrity\".")
+    return text
 
 
 # ── Field report: a printable summary of what was recorded ────────────────
@@ -664,7 +824,7 @@ def command(text: str, observer: str = "") -> str | None:
         path.write_text(report_html(rows, title), encoding="utf-8")
         return f"Field report saved ({len(rows)} entr{'y' if len(rows) == 1 else 'ies'}): {path}\nOpen it in a browser to read or print it."
     if low in ("field log check", "fieldlog check", "check field log"):
-        problems = verify()
+        problems = verify() + photo_problems()
         n = len(entries())
         return (f"All {n} entries are intact and in order." if not problems else
                 "The field log has problems:\n" + "\n".join(f"- {p}" for p in problems))

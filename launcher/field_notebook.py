@@ -292,9 +292,10 @@ class FieldNotebookDialog(QDialog):
             self._integrity.setStyleSheet(f"color: {theme.GREEN};")
 
     def _check(self):
-        problems = fieldlog.verify()
+        problems = fieldlog.verify() + fieldlog.photo_problems()     # photos too (slower, so only on request)
         if not problems:
-            QMessageBox.information(self, "Field log", f"All {len(fieldlog.entries())} entries are intact and in order.")
+            QMessageBox.information(self, "Field log", f"All {len(fieldlog.entries())} entries are intact and in order, "
+                                                       "and every photo matches its fingerprint.")
         else:
             QMessageBox.warning(self, "Field log", "\n".join(problems))
         self._show_integrity()
