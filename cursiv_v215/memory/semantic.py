@@ -187,10 +187,46 @@ def _overlap(a: str, b: str) -> float:
 
 # ── Facts ───────────────────────────────────────────────────────────────────
 
+UNREADABLE_FILE_NAME = "memory_facts.unreadable.jsonl"
+
+
+def _read_facts() -> tuple[list[dict], list[str]]:
+    """(saved memories, lines that aren't one). One damaged line used to make every memory
+    disappear, and the next save then rewrote the file with only the new one."""
+    try:
+        lines = FACTS_FILE.read_text(encoding="utf-8").splitlines()
+    except FileNotFoundError:
+        return [], []
+    facts, bad = [], []
+    for line in lines:
+        if not line.strip():
+            continue
+        try:
+            f = json.loads(line)
+        except ValueError:
+            f = None
+        if isinstance(f, dict) and isinstance(f.get("text"), str) and f["text"].strip():
+            facts.append(f)
+        else:
+            bad.append(line)
+    return facts, bad
+
+
+def memory_status() -> dict:
+    """What the memory file is actually like: {"file", "exists", "saved", "unreadable", "error"}."""
+    out = {"file": str(FACTS_FILE), "exists": FACTS_FILE.exists(), "saved": 0, "unreadable": 0, "error": ""}
+    try:
+        facts, bad = _read_facts()
+        out["saved"], out["unreadable"] = len(facts), len(bad)
+    except OSError as exc:
+        out["error"] = f"{type(exc).__name__}: {exc}"
+    return out
+
+
 def list_facts(person: str | None = None) -> list[dict[str, Any]]:
     try:
-        facts = [json.loads(l) for l in FACTS_FILE.read_text(encoding="utf-8").splitlines() if l.strip()]
-    except Exception:
+        facts, _bad = _read_facts()
+    except OSError:
         facts = []
     if facts and not _settings().get(REPAIR_KEY):
         facts = repair_learned(facts)
@@ -201,6 +237,17 @@ def list_facts(person: str | None = None) -> list[dict[str, Any]]:
 
 def _write_facts(facts: list[dict]) -> None:
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        _facts, bad = _read_facts()
+    except OSError:
+        bad = []
+    if bad:      # damaged lines are kept beside the file, never dropped by a rewrite
+        keep = FACTS_FILE.with_name(UNREADABLE_FILE_NAME)
+        have = set(keep.read_text(encoding="utf-8").splitlines()) if keep.exists() else set()
+        new = [b for b in bad if b not in have]
+        if new:
+            with keep.open("a", encoding="utf-8") as f:
+                f.write("".join(b + "\n" for b in new))
     _atomic.write_text(FACTS_FILE, "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts))
 
 
@@ -348,7 +395,9 @@ def add_fact(text: str, person: str | None = None, source: str = "manual",
     A duplicate is not rewritten, so saying the same thing again cannot upgrade
     user_said into verified.
     """
-    text = re.sub(r"\s+", " ", (text or "").strip())[:400]
+    text = re.sub(r"\s+", " ", (text or "").strip())
+    if len(text) > MAX_FACT:
+        raise ValueError(f"it's {len(text)} characters; one saved memory holds up to {MAX_FACT}")
     if len(text) < 4:
         return None
     person = (person or _person).lower()
@@ -369,6 +418,83 @@ def add_fact(text: str, person: str | None = None, source: str = "manual",
         facts.append(fact)
         _write_facts(facts)
         return fact
+
+
+MAX_FACT = 400
+
+
+def find(query: str, person: str | None = None) -> list[dict]:
+    """Saved memories that contain the query's identifiers (FIELD-731, 18.6) and most of its words,
+    exactly as stored. Plain text matching, no model and no embeddings, so it works offline."""
+    q = (query or "").lower()
+    ids = set(re.findall(r"[a-z0-9]+(?:[-_./][a-z0-9]+)+|\d+(?:\.\d+)?", q))
+    words = {w for w in re.findall(r"[a-z]{3,}", q)} - {"the", "and", "for", "from", "with", "that", "this",
+                                                         "record", "records", "memory", "saved", "stored", "data",
+                                                         "details", "entry", "about", "what", "your", "my"}
+    out = []
+    for f in list_facts(person or _person):
+        t = f["text"].lower()
+        if ids and not all(i in t for i in ids):
+            continue
+        if not ids and (not words or sum(w in t for w in words) < max(1, (len(words) + 1) // 2)):
+            continue
+        out.append(f)
+    return out
+
+
+_SAVE = re.compile(r"(?is)^\s*(?:please\s+)?(?:save|store|remember|keep|record)\s+(?:this|the following|these|that)"
+                   r"(?:\s+(?:record|details|data|information|note|measurement|entry|reading))?"
+                   r"(?:\s+(?:to|in|into)\s+(?:your\s+|the\s+)?(?:persistent\s+|long[- ]term\s+|saved\s+)?memory)?"
+                   r"\s*[:\-\u2013]\s*(.+)$")
+_RECALL = re.compile(r"(?is)^\s*(?:please\s+)?(?:recall|retrieve|look up|fetch|pull up|find)\s+(.+)$")
+_RECALL_NEEDS = re.compile(r"(?i)\b(memory|memories|saved|stored|record)\b")
+
+
+def _record_text(body: str) -> str:
+    """A record as one line, its fields kept exactly: "Site: North Ridge; Temperature: 18.6°C"."""
+    lines = [re.sub(r"^\s*(?:[-*\u2022]|\d+[.)])\s+", "", ln).strip() for ln in body.splitlines()]
+    return "; ".join(ln for ln in lines if ln)
+
+
+def _save_reply(text: str) -> str:
+    try:
+        saved = add_fact(text, source="manual")
+    except ValueError as exc:
+        return (f"Not saved: {exc}. Save it in shorter parts, or record it in the field notebook (log ...), "
+                "which keeps any length.")
+    except OSError as exc:
+        return (f"Not saved: Cursiv couldn't write its memory file ({type(exc).__name__}: {exc}). Nothing was "
+                f"stored. Check that {FACTS_FILE.parent} is on a drive with space that isn't read-only.")
+    if not saved:
+        return "Already saved: an identical memory is there (nothing new was written)."
+    back = next((f for f in list_facts() if f.get("id") == saved["id"]), None)
+    if not back or back["text"] != saved["text"]:
+        return "Not saved: the write seemed to work but reading it back didn't find it. Try again."
+    return (f"Saved to Cursiv's memory on this computer ({saved['created']}), exactly as:\n{saved['text']}\n"
+            "Get it back any time with: recall <words or code>")
+
+
+def _recall_reply(query: str) -> str:
+    status = memory_status()
+    if status["error"]:
+        return (f"Couldn't read Cursiv's saved memory ({status['error']}). This is a storage problem, not "
+                "'not found': the memory may still be there.")
+    hits = find(query)
+    damaged = (f"\n(Note: {status['unreadable']} saved line(s) in the memory file are damaged and can't be read; "
+               f"they're kept in {UNREADABLE_FILE_NAME}, not used.)" if status["unreadable"] else "")
+    if not hits:
+        return (f"Nothing in Cursiv's saved memory matches \"{query.strip()}\" ({status['saved']} memories saved). "
+                "If it was mentioned earlier in this conversation, it was only in the conversation; it was never "
+                "saved. To save something: remember <it>" + damaged)
+    rows = "\n".join(f"- {f['text']}  (saved {f.get('created', 'date unknown')}, {origin_label(f)})" for f in hits)
+    clash = ""
+    for i, a in enumerate(hits):
+        for b in hits[i + 1:]:
+            why = conflict_reason(a["text"], b["text"])
+            if why:
+                clash = f"\nThese saved memories conflict ({why}); Cursiv doesn't pick one."
+                break
+    return f"From Cursiv's saved memory, exactly as stored ({len(hits)} found):\n{rows}{clash}{damaged}"
 
 
 def forget(words: str, person: str | None = None) -> list[str]:
@@ -568,13 +694,24 @@ def memory_command(text: str) -> str | None:
     Returns the reply, or None if the text isn't a memory command."""
     t = (text or "").strip()
     low = t.lower()
+    m = _SAVE.match(t)
+    if m:                                        # "save this record: ..." -- saved exactly, or said why not
+        return _save_reply(_record_text(m.group(1)))
+    m = _RECALL.match(t)
+    if m and _RECALL_NEEDS.search(t):            # "retrieve the FIELD-731 record from memory"
+        return _recall_reply(m.group(1))
     if low.startswith("remember ") and len(t) > 9:
         fact = t[9:].strip()
         if fact.lower().startswith("that "):
             fact = fact[5:]
         if _person != SHARED and re.match(r"(?i)^(i|my|i'm|i've|me)\b", fact):
             fact = f"{_person.title()}: {fact}"     # first person -> unambiguous when recalled later
-        saved = add_fact(fact, source="manual")
+        try:
+            saved = add_fact(fact, source="manual")
+        except ValueError as exc:
+            return f"Not saved: {exc}. Save it in shorter parts."
+        except OSError as exc:
+            return f"Not saved: Cursiv couldn't write its memory file ({type(exc).__name__}: {exc}). Nothing was stored."
         return f"Got it — I'll remember: {saved['text']}" if saved else "I already remember that."
     if low.startswith("forget ") and len(t) > 7:
         gone = forget(t[7:])

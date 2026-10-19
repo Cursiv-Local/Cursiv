@@ -589,8 +589,12 @@ def _build_strand_context(query: str, top_k: int = 2) -> str:
         from cursiv_v215.memory import semantic as _sem
         ctx = _sem.build_context(query)
         if ctx:
-            global _MEMORY_RECALLED
+            global _MEMORY_RECALLED, _MEMORY_CTX
             _MEMORY_RECALLED = True
+            _MEMORY_CTX = ctx
+            # the memories themselves, so the source line names them only if the answer used them
+            _MEMORY_TEXTS[:] = [_re.sub(r"^- (?:\[[^\]]*\] )?", "", ln).strip()
+                                for ln in ctx.splitlines() if ln.startswith("- ")]
             return ctx
     except Exception:
         pass
@@ -1355,26 +1359,64 @@ _WEB_SEARCHED = False                  # a web search ran for this turn
 _WORKED = None                         # core/calc.Worked: arithmetic Cursiv computed for this turn
 _ANSWERED_BY = ""                      # engine that answered the current turn
 _MEMORY_RECALLED = False               # saved memories were put in front of the model this turn
+_MEMORY_TEXTS: list[str] = []          # ...and which ones
+_MEMORY_CTX = ""                       # the memory block as put into the prompt
+_MEMORY_WORDS = _re.compile(r"[A-Za-z0-9][\w.-]{3,}")
+
+
+def _memory_used(answer: str) -> bool:
+    """Did the answer use a saved memory it was given? Two of a memory's distinctive words (or one
+    code or number) in the answer. Being offered a memory isn't using it: "your saved memories" was
+    named under answers that never touched them (2026-10 scenario test)."""
+    words = {w.lower() for w in _MEMORY_WORDS.findall(answer or "")}
+    for text in _MEMORY_TEXTS:
+        mine = {w.lower() for w in _MEMORY_WORDS.findall(text)} - _COMMON_WORDS
+        shared = mine & words
+        if len(shared) >= 2 or any(any(c.isdigit() for c in w) for w in shared):
+            return True
+    return False
+
+
+_COMMON_WORDS = {"about", "after", "also", "been", "from", "have", "into", "just", "like", "more", "much", "only",
+                 "over", "some", "that", "their", "them", "then", "there", "they", "this", "time", "very", "what",
+                 "when", "with", "would", "your", "user", "likes", "prefers", "wants", "family", "people"}
 _DOCS_SEARCHED_EMPTY: list = []        # document names searched this turn with nothing matching
 
 
-def sources_line() -> str:
+def _ref_evidence() -> dict:
+    """id -> reference.evidence() for the entries given this turn."""
+    try:
+        from cursiv_v215.core import reference as _r
+        by_title = {e.title: e for e in _r.entries()}
+        return {by_title[t].id: _r.evidence(by_title[t]) for t in dict.fromkeys(_REF_SHOWN) if t in by_title}
+    except Exception:
+        return {}
+
+
+def sources_line(answer: str = "") -> str:
     """What this turn's answer was actually given, from Cursiv's own records, never the
-    model's say-so: the offline reference, the person's documents, Cursiv's calculations,
-    web results, saved memories. Nothing given: model knowledge, not checked."""
+    model's say-so: the offline reference (with what backs each entry), the person's documents,
+    Cursiv's calculations, web results, and saved memories only when the answer used them.
+    Nothing given: model knowledge, not checked."""
     parts = []
     if _REF_SHOWN:
-        parts.append("Cursiv Offline Reference (" + ", ".join(dict.fromkeys(_REF_SHOWN)) + ")")
+        ev = _ref_evidence()
+        sourced = {m["title"] for m in ev.values() if m["sourced"]}
+        bare = [t for t in dict.fromkeys(_REF_SHOWN) if t not in sourced]
+        parts.append("Cursiv Offline Reference (" + ", ".join(dict.fromkeys(_REF_SHOWN))
+                     + (f"; no published source for: {', '.join(bare)}" if bare else "")
+                     + ("; none professionally reviewed" if not any(m["reviewed"] for m in ev.values()) else "")
+                     + ")")
     if _DOCS_SHOWN:
         pages = dict.fromkeys(f"{p.name} p. {p.page}" for p in _DOCS_SHOWN)
         parts.append("Your documents (" + ", ".join(pages) + ")")
     elif _DOCS_SEARCHED_EMPTY:
         parts.append("your documents searched, nothing on this; the rest is model knowledge (not checked)")
     if _WORKED:
-        parts.append("worked out by Cursiv's code")
+        parts.append("worked out by Cursiv's code" if _WORKED.ok else "Cursiv's calculator (it refused this question)")
     if _WEB_SEARCHED:
         parts.append("web search results")
-    if _MEMORY_RECALLED:
+    if _MEMORY_RECALLED and _memory_used(answer):
         parts.append("your saved memories")
     if _CURSIV_REPLY:
         return ("Sources: " + "; ".join(parts) + ". Written by Cursiv, no AI model") if parts \
@@ -2723,6 +2765,18 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 _emergency_now = bool(locals().get("_ph") and _ph.emergency)
                 if _passages_found:
                     _DOCS_SHOWN[:] = _passages_found
+                    # A passage that talks to the AI: flagged to the person, and saved memories are
+                    # taken out of the prompt, so a document can never get them out (core/documents.py).
+                    _inj = _docs.instruction_flags(_passages_found)
+                    if _inj:
+                        global _MEMORY_RECALLED
+                        if _MEMORY_CTX:
+                            messages[0]["content"] = messages[0]["content"].replace(
+                                _MEMORY_CTX, "(Saved memories withheld for this answer: a document in it contains "
+                                             "instructions.)")
+                        _MEMORY_TEXTS.clear()
+                        _MEMORY_RECALLED = False
+                        yield _docs.instruction_note(_inj) + "\n\n"
                     _doc_block = _docs.prompt_block(_passages_found, _docs.only_mode() and not _emergency_now)
                     messages[0]["content"] += "\n\n" + _doc_block + "\n"
                     _RETRIEVED.append(_doc_block)
@@ -3211,6 +3265,9 @@ def chat(
                 from cursiv_v215.core import calc as _calc
                 _miss = _calc.check(draft, _WORKED)
                 _flag += ("\n\n" + _miss) if _miss else ""
+            # What the answer says Cursiv did, against what Cursiv's code recorded (core/claims.py)
+            from cursiv_v215.core import claims as _claims
+            _flag += _claims.notes(draft, _evidence(message, history))
             if _flag:
                 reply.append(_flag)
                 yield _flag
@@ -3252,6 +3309,30 @@ def chat(
 
 class _SkipCheck(Exception):
     pass
+
+
+def _evidence(message, history) -> "object":
+    """This turn's record for core/claims.py: what actually ran, was given, was saved."""
+    from cursiv_v215.core import claims as _claims
+    earlier = []
+    for m in (history or [])[-8:]:
+        if m.get("role") == "assistant":
+            content = m.get("content", "")
+            if not isinstance(content, str):
+                content = next((p.get("text", "") for p in content if p.get("type") == "text"), "")
+            earlier.append(_strip_status_lines(content))
+    return _claims.Evidence(
+        question=message.get("text", "") if isinstance(message, dict) else str(message or ""),
+        worked=_WORKED.record() if _WORKED else None,
+        worked_facts=dict(_WORKED.facts) if _WORKED else {},
+        ref_ids=list(_ref_evidence()),
+        ref_meta=_ref_evidence(),
+        memory_texts=list(_MEMORY_TEXTS),
+        memory_saved=False,                 # a model turn never saves; only `remember` / "save this" do
+        searched=_WEB_SEARCHED,
+        docs=list(dict.fromkeys(p.name for p in _DOCS_SHOWN)),
+        earlier=earlier,
+    )
 
 
 def _compact_notes(outcome) -> str:
@@ -3315,6 +3396,9 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
     global _WEB_SEARCHED, _WORKED, _MEMORY_RECALLED
     _WORKED = None
     _MEMORY_RECALLED = False
+    _MEMORY_TEXTS.clear()
+    global _MEMORY_CTX
+    _MEMORY_CTX = ""
     _REAL_TOOL_NOTES.clear()
     _RETRIEVED.clear()
     _REF_SHOWN.clear()
@@ -3327,7 +3411,7 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
             reply.append(chunk)
         yield chunk
     if _ANSWERED_BY or _CURSIV_REPLY:   # what the answer was given (Cursiv's records, not the model's)
-        note = f"\n\n*[{sources_line()}]*"
+        note = f"\n\n*[{sources_line(''.join(reply))}]*"
         reply.append(note)
         yield note
     if _ANSWERED_BY:     # say which engine answered (written by Cursiv, not the model)

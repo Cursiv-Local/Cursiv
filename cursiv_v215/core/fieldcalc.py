@@ -20,6 +20,7 @@ class Result:
     value: float              # the main number the answer must contain
     tol: float                # how close counts as the same (rounding)
     lead: str = ""            # shown by Cursiv above the answer (safety rules: read first)
+    tool: str = ""            # which calculation made it (set by work_out)
 
 
 def _fmt(v: float, places: int = 4) -> str:
@@ -266,8 +267,13 @@ _T975 = {1: 12.706, 2: 4.303, 3: 3.182, 4: 2.776, 5: 2.571, 6: 2.447, 7: 2.365, 
          11: 2.201, 12: 2.179, 13: 2.160, 14: 2.145, 15: 2.131, 16: 2.120, 17: 2.110, 18: 2.101, 19: 2.093,
          20: 2.086, 21: 2.080, 22: 2.074, 23: 2.069, 24: 2.064, 25: 2.060, 26: 2.056, 27: 2.052, 28: 2.048,
          29: 2.045, 30: 2.042, 40: 2.021, 60: 2.000, 120: 1.980}
-_STATS = re.compile(r"(?i)\b(mean|average|standard deviation|std dev|sd|confidence interval|summary statistics|stats)\b"
-                    r"[^0-9-]*((?:-?\d+(?:\.\d+)?\s*[,;\s]\s*){2,}-?\d+(?:\.\d+)?)")
+_STATS = re.compile(r"(?i)\b(mean|average|median|range|total|sum|standard deviation|std dev|sd|"
+                    r"confidence interval|summary statistics|stats|statistics)\b")
+# "12.4 g, 9.8 g, 15.1 g and 10.7 g": numbers, each with an optional unit, in one list
+_VALUE = r"-?\d+(?:\.\d+)?(?:\s*(?:°\s*[CF]|%|[A-Za-zµ]+(?:/[A-Za-zµ]+)?))?"
+_LIST = re.compile(r"(" + _VALUE + r"(?:\s*(?:,|;|,?\s+and\s+|\s)\s*" + _VALUE + r"){1,})")
+_ONE = re.compile(r"(-?\d+(?:\.\d+)?)\s*(°\s*[CF]|%|[A-Za-zµ]+(?:/[A-Za-zµ]+)?)?")
+_NOT_UNITS = {"and", "or", "to", "is", "are", "the", "of", "in", "for", "what", "with"}
 
 
 def t975(df: int) -> float:
@@ -280,17 +286,43 @@ def t975(df: int) -> float:
 
 
 def stats(question: str) -> Result | None:
-    m = _STATS.search(question or "")
+    """Summary statistics of a list of measurements. The sample standard deviation (n - 1) unless
+    the population one is asked for; both if both are. Units are kept and must all be the same."""
+    q = question or ""
+    m = _STATS.search(q)
     if not m:
         return None
-    xs = [float(x) for x in re.findall(r"-?\d+(?:\.\d+)?", m.group(2))]
+    lists = [x for x in _LIST.finditer(q[m.end():]) if len(_ONE.findall(x.group(1))) >= 2]
+    if not lists:
+        lists = [x for x in _LIST.finditer(q) if len(_ONE.findall(x.group(1))) >= 2]
+    if not lists:
+        return None
+    pairs = [(float(v), (u or "").replace(" ", "")) for v, u in _ONE.findall(lists[0].group(1))]
+    pairs = [(v, "" if u.lower() in _NOT_UNITS else u) for v, u in pairs]
+    xs = [v for v, _ in pairs]
     if len(xs) < 2:
         return None
-    n, mean, sd = len(xs), statistics.fmean(xs), statistics.stdev(xs)
-    half = t975(n - 1) * sd / math.sqrt(n)
-    return Result(f"n = {n}, mean = {_fmt(mean)}, sample standard deviation = {_fmt(sd)}, "
-                  f"95% confidence interval for the mean = {_fmt(mean - half)} to {_fmt(mean + half)} "
-                  f"(t distribution, {n - 1} degrees of freedom).", mean, max(abs(mean) * 0.0005, 0.001))
+    units = {u for _, u in pairs if u}
+    if len(units) > 1:
+        return Result(f"Cursiv didn't calculate this: the values are in different units ({', '.join(sorted(units))}); "
+                      "convert them to one unit first.", float("nan"), 0.0)
+    u = (" " + next(iter(units))) if units else ""
+    n, mean = len(xs), statistics.fmean(xs)
+    want_pop = re.search(r"(?i)\bpopulation\b", q) is not None
+    want_sample = re.search(r"(?i)\bsample (?:standard deviation|sd|std)", q) is not None or not want_pop
+    parts = [f"n = {n}", f"total = {_fmt(sum(xs))}{u}", f"mean = {_fmt(mean)}{u}",
+             f"median = {_fmt(statistics.median(xs))}{u}",
+             f"range = {_fmt(max(xs) - min(xs))}{u} ({_fmt(min(xs))} to {_fmt(max(xs))})"]
+    if want_sample:
+        sd = statistics.stdev(xs)
+        half = t975(n - 1) * sd / math.sqrt(n)
+        parts.append(f"sample standard deviation (n - 1) = {_fmt(sd)}{u}")
+        parts.append(f"95% confidence interval for the mean = {_fmt(mean - half)} to {_fmt(mean + half)}{u} "
+                     f"(t distribution, {n - 1} degrees of freedom)")
+    if want_pop:
+        parts.append(f"population standard deviation (n) = {_fmt(statistics.pstdev(xs))}{u}")
+    note = " With fewer than 5 values these are rough: one unusual value moves them a lot." if n < 5 else ""
+    return Result(", ".join(parts) + "." + note, mean, max(abs(mean) * 0.0005, 0.001))
 
 
 # ── Bleach for drinking water, from the reference card's own table ─────────
@@ -390,5 +422,6 @@ def work_out(question: str) -> Result | None:
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):
             r = None
         if r:
+            r.tool = fn.__name__
             return r
     return None

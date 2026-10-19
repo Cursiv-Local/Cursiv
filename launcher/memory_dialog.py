@@ -105,7 +105,11 @@ class MemoryDialog(QDialog):
         if not text:
             return
         person = self._sem.SHARED if self._scope.currentData() == "family" else None
-        saved = self._sem.add_fact(text, person, source="manual")
+        try:
+            saved = self._sem.add_fact(text, person, source="manual")
+        except (OSError, ValueError) as exc:          # too long, disk full, read-only drive: say so
+            self._status.setText(f"Not saved: {exc}")
+            return
         self._new.clear()
         self._status.setText("Saved." if saved else "Already remembered.")
         self._refresh()

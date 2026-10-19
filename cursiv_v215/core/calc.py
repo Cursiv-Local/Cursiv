@@ -12,7 +12,7 @@ answers as before.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 _WORDNUM = {"a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7,
             "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "fifteen": 15, "twenty": 20,
@@ -40,6 +40,18 @@ class Worked:
     value: float | None = None   # for field calculations: a number the reply must contain, within tol
     tol: float = 0.0
     lead: str = ""               # Cursiv's own line above the answer (safety rules)
+    facts: dict = field(default_factory=dict)   # resources: supply, need, shortfall, how long it lasts
+    tool: str = ""               # the function that worked it out ("resources", "clock", "units", ...)
+    inputs: dict = field(default_factory=dict)  # what it was given, as read from the question
+
+    @property
+    def ok(self) -> bool:
+        """False when the calculator read the question but refused it (0 people, a negative supply...)."""
+        return not self.facts.get("invalid")
+
+    def record(self) -> dict:
+        """What actually ran, for the trace and for checking claims of tool use."""
+        return {"tool": self.tool, "inputs": dict(self.inputs), "result": self.statement, "ok": self.ok}
 
 
 def _num(text: str) -> float:
@@ -100,7 +112,9 @@ def clock_arithmetic(question: str) -> Worked | None:
     if back and day < 0 and end % (24 * 60) >= 12 * 60:
         when = " (the night before)"
     verb = "minus" if back else "plus"
-    return Worked(f"{times[0].group(0).strip()} {verb} {_say(total)} is {shown}{when}.", shown.split()[0])
+    return Worked(f"{times[0].group(0).strip()} {verb} {_say(total)} is {shown}{when}.", shown.split()[0],
+                  tool="clock", inputs={"time": times[0].group(0).strip(), "duration": _say(total),
+                                        "direction": verb})
 
 
 _OPS = {"x": "*", "×": "*", "*": "*", "times": "*", "multiplied by": "*", "+": "+", "plus": "+",
@@ -121,7 +135,8 @@ def plain_arithmetic(question: str) -> Worked | None:
     if m:
         a, b = float(m.group(1).replace(",", "")), float(m.group(2).replace(",", ""))
         v = a * b / 100
-        return Worked(f"{m.group(1)}% of {m.group(2)} is {_show(v)}.", _show(v))
+        return Worked(f"{m.group(1)}% of {m.group(2)} is {_show(v)}.", _show(v), tool="percent",
+                      inputs={"percent": m.group(1), "of": m.group(2)})
     m = _SUM.search(q)
     if not m:
         return None
@@ -131,22 +146,40 @@ def plain_arithmetic(question: str) -> Worked | None:
         v = eval(expr, {"__builtins__": {}}, {})          # digits and + - * / only
     except Exception:
         return None
-    return Worked(f"{m.group(1).strip()} is {_show(v)}.", _show(v))
+    return Worked(f"{m.group(1).strip()} is {_show(v)}.", _show(v), tool="arithmetic",
+                  inputs={"expression": m.group(1).strip()})
 
 
 def work_out(question: str) -> Worked | None:
-    w = clock_arithmetic(question) or plain_arithmetic(question)
-    if w:
-        return w
-    # Units, coordinates, dilutions, statistics (core/fieldcalc.py, research roadmap R2)
-    from cursiv_v215.core import fieldcalc
-    r = fieldcalc.work_out(question)
-    return Worked(r.statement, "", r.value, r.tol, r.lead) if r else None
+    """What Cursiv's code works out for this question, or None (then nothing was calculated,
+    and nothing may say it was). A calculator that fails counts as None, never as a result."""
+    try:
+        w = clock_arithmetic(question) or plain_arithmetic(question)
+        if w:
+            return w
+        # Supplies, people and time (core/resources.py): before units, which would read "18 liters"
+        from cursiv_v215.core import resources
+        p = resources.work_out(question)
+        if p:
+            return Worked(p.statement, "", p.value, p.tol, facts=p.facts, tool="resources", inputs=p.inputs)
+        # Units, coordinates, dilutions, statistics (core/fieldcalc.py, research roadmap R2)
+        from cursiv_v215.core import fieldcalc
+        r = fieldcalc.work_out(question)
+        if r and r.value != r.value:                 # NaN: the calculator read it and refused (mixed units)
+            return Worked(r.statement, "", None, 0.0, tool=r.tool or "fieldcalc", facts={"invalid": r.statement})
+        return Worked(r.statement, "", r.value, r.tol, r.lead, tool=r.tool or "fieldcalc") if r else None
+    except Exception:
+        return None
 
 
 def prompt_note(w: Worked) -> str:
+    if not w.ok:
+        return ("## Cursiv's calculator\n" + w.statement +
+                " Don't give a calculated result for this; say which figure is missing or wrong and ask for it.")
     return ("## Worked out by Cursiv (exact)\n" + w.statement +
-            " Use this result as given; don't redo the calculation differently.")
+            " Use these results as given, with their units and time period; don't redo the calculation "
+            "differently, and don't describe the supply as lasting longer or being enough when it isn't. "
+            "Don't say a tool or calculator was used: Cursiv adds that line itself.")
 
 
 def _decimals(number: str) -> int:
@@ -155,12 +188,22 @@ def _decimals(number: str) -> int:
 
 
 def check(answer: str, w: Worked) -> str:
-    """A line for under the answer when it doesn't contain the worked-out result, else ""."""
+    """A line for under the answer when it doesn't contain the worked-out result or contradicts
+    it ("lasts 12 days" when it lasts 1; "enough" with a shortfall), else ""."""
     text = (answer or "").replace(",", "")
+    if not w.ok:
+        return ""
+    if w.facts:
+        from cursiv_v215.core import resources
+        clash = resources.contradictions(answer, w.facts)
+        if clash:
+            return ("*(Cursiv's check: the answer contradicts what Cursiv's code worked out: " + "; ".join(clash)
+                    + f". Worked out exactly: {w.statement})*")
     if w.value is not None:
         # rounding is fine ("about 54.3" for 54.32); a different number isn't
-        if any(abs(float(n) - w.value) <= max(w.tol, 0.051 * 10 ** -_decimals(n))
-               for n in re.findall(r"-?\d+(?:\.\d+)?", text)):
+        wanted = [w.value] + list(w.facts.get("also", []))
+        if any(abs(float(n) - v) <= max(w.tol, 0.051 * 10 ** -_decimals(n), abs(v) * 0.005)
+               for n in re.findall(r"-?\d+(?:\.\d+)?", text) for v in wanted):
             return ""
     elif re.search(r"(?<![\d:.])" + re.escape(w.answer.replace(",", "")) + r"(?![\d])", text):
         return ""

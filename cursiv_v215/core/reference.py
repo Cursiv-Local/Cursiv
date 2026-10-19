@@ -30,7 +30,12 @@ PACK_LICENSES = ("public domain (U.S. government work)",)
 # Not cited in chat until someone qualified reviews them: home remedies without
 # warnings for children, the universal edibility test, and plant medicine.
 # The `ref` command still shows them.
-NOT_IN_CHAT = {"improvised medications", "foraging edibility test", "medicinal plants field reference"}
+NOT_IN_CHAT = {"improvised medications", "foraging edibility test", "medicinal plants field reference",
+               # No published source, and advice that could hurt someone if read as authoritative
+               # (2026-10 scenario test): "All insects safe if cooked", pine bark "edible raw" ...
+               "emergency calorie sources",
+               # ... and an antibiotic dose ("amoxicillin 500mg every 8h") with no allergy warning
+               "dental emergency field"}
 
 # Everyday phrases people use instead of the entry's title (whole words or phrases).
 ALIASES = {
@@ -96,6 +101,8 @@ _SAFETY = re.compile(
 
 
 def _stem(word: str) -> str:
+    if len(word) > 4 and word.endswith("ies"):
+        return word[:-1]                 # "calories" -> "calorie", the same as the title's word
     for suffix in ("ing", "ion", "ed", "es", "s"):
         if len(word) > 4 and word.endswith(suffix):
             return word[: -len(suffix)]
@@ -205,6 +212,19 @@ def _need(title: set[str]) -> int:
     return len(title) if len(title) <= 2 else (len(title) + 1) // 2
 
 
+_generic_words: set[str] | None = None
+
+
+def _generic() -> set[str]:
+    """Title words shared by 3 or more entries ("water", "food", "emergency", "field", "safety")."""
+    global _generic_words
+    if _generic_words is None:
+        from collections import Counter
+        df = Counter(w for e in entries() for w in _words(e.title))
+        _generic_words = {w for w, n in df.items() if n >= 3}
+    return _generic_words
+
+
 def lookup(question: str, limit: int = 2) -> list[Entry]:
     """Entries whose topic the question names. Usually none."""
     q = _words(question)
@@ -218,10 +238,17 @@ def lookup(question: str, limit: int = 2) -> list[Entry]:
         if e.title in NOT_IN_CHAT:
             continue
         hit = len(title & q)
-        if _alias_hit(e.title, question):
+        alias = _alias_hit(e.title, question)
+        if alias:
             hit = max(hit, _need(title))   # an everyday phrase for the topic names it
         # the question names most of the topic, or one topic word plus two of the entry's words
         if hit < _need(title) and not (len(title) > 2 and hit >= 1 and len((q - title) & _words(e.text)) >= 2):
+            continue
+        # ...and names what makes this topic this topic, not only words many topics share: a plan
+        # for "water, food, power" brought up "water wheel power" and, from "emergency" + "water",
+        # emergency insect eating (2026-10 scenario test). Titles made only of shared words still match.
+        distinct = title - _generic()
+        if not alias and distinct and len(distinct & q) < _need(distinct):
             continue
         scored.append((hit / len(title), hit, e))
     scored.sort(key=lambda t: (t[0], t[1]), reverse=True)
@@ -234,12 +261,16 @@ def is_safety_question(question: str) -> bool:
 
 def prompt_block(found: list[Entry]) -> str:
     lines = ["## Cursiv's offline reference",
-             "These entries come from the reference data built into Cursiv. Use them for the facts "
-             "they cover and cite the entry ID, e.g. (offline reference: survival/water-purification). "
-             "Don't add numbers or steps the entry doesn't give; if it doesn't cover part of the "
-             "question, say that part isn't in the reference.", ""]
+             "These entries come from the reference data built into Cursiv. Each says what backs it. Being in "
+             "this library doesn't make an entry accurate: an entry with a published source can be used for what "
+             "it covers; an entry with NO published source is unverified notes, so don't present its claims as "
+             "established and don't say the answer is grounded in, verified by or tested against it. None has "
+             "been reviewed by a professional; never say one was, and never describe an entry's origin beyond "
+             "what is written here. Cite the entry ID, e.g. (offline reference: survival/water-purification). "
+             "Don't add numbers or steps the entry doesn't give; if it doesn't cover part of the question, say "
+             "that part isn't in the reference.", ""]
     for e in found:
-        lines.append(f"[{e.id}] {e.title.upper()}: {e.text}")
+        lines.append(f"[{e.id}] ({evidence(e)['state']}) {e.title.upper()}: {e.text}")
     return "\n".join(lines)
 
 
@@ -262,7 +293,59 @@ def source(title: str) -> dict | None:
             _sources = {}
     packs()
     got = _pack_sources.get(title) or _sources.get(title)
-    return got if isinstance(got, dict) else None
+    # a record without a name and an https address isn't a source, whatever else it says
+    if not isinstance(got, dict) or not str(got.get("source") or "").strip() \
+            or not str(got.get("url") or "").startswith("https://"):
+        return None
+    return got
+
+
+SAFETY_CATEGORIES = ("medical", "survival")
+
+
+def evidence(e: Entry) -> dict:
+    """What backs an entry, from its records only; anything not on file is "unknown", never filled in.
+    state: one of three phrases shown to the person and the model."""
+    src = source(e.title)
+    reviewed = bool(src and src.get("reviewed") is True)
+    if src and reviewed:
+        state = f"published source: {src['source']}; reviewed by a professional"
+    elif src:
+        state = (f"published source: {src['source']}, checked {src.get('checked') or 'date unknown'}; "
+                 "not reviewed by a professional")
+    else:
+        state = "no published source; not reviewed by a professional; treat as unverified"
+    return {"id": e.id, "title": e.title, "category": e.category, "state": state, "sourced": bool(src), "reviewed": reviewed,
+            "source": (src or {}).get("source") or "unknown", "url": (src or {}).get("url") or "unknown",
+            "checked": (src or {}).get("checked") or "unknown",
+            "safety_sensitive": e.category in SAFETY_CATEGORIES, "in_chat": e.title not in NOT_IN_CHAT}
+
+
+def provenance_problems() -> list[str]:
+    """Source records (reference_data/sources.json) that are malformed or point at no entry."""
+    try:
+        data = json.loads((DATA_DIR / "sources.json").read_text(encoding="utf-8"))
+    except Exception as exc:
+        return [f"sources.json can't be read ({exc})"]
+    titles = {e.title for e in entries()}
+    out = []
+    for title, rec in data.items():
+        if title.startswith("_"):
+            continue
+        if not isinstance(rec, dict):
+            out.append(f"{title}: the record isn't a set of fields")
+            continue
+        if title not in titles:
+            out.append(f"{title}: no reference entry has this title")
+        if not str(rec.get("source") or "").strip():
+            out.append(f"{title}: no source name")
+        if not str(rec.get("url") or "").startswith("https://"):
+            out.append(f"{title}: source url isn't https")
+        if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", str(rec.get("checked") or "")):
+            out.append(f"{title}: no check date (YYYY-MM-DD)")
+        if not isinstance(rec.get("reviewed"), bool):
+            out.append(f"{title}: reviewed isn't true or false")
+    return out
 
 
 def note_line(found: list[Entry]) -> str:
@@ -273,11 +356,14 @@ def note_line(found: list[Entry]) -> str:
     lines = []
     for e in found:
         if e.category in ("medical", "survival"):
+            ev = evidence(e)
             src = source(e.title)
-            based = (f" Based on {src['source']} (checked {src['checked']})." if src
-                     else " Written for Cursiv; no published source attached yet.")
-            caveat = (" Not reviewed by a medical professional; in an emergency call 911."
-                      if e.category == "medical" else "")
+            based = (f" Based on {src['source']} (checked {src.get('checked') or 'date unknown'})." if src
+                     else " Written for Cursiv; no published source attached yet, so treat it as unverified.")
+            caveat = ("" if ev["reviewed"] else
+                      " Not reviewed by a medical professional." if e.category == "medical" else
+                      " Not reviewed by a professional.") + \
+                     (" In an emergency call 911." if e.category == "medical" else "")
             lines.append(f"*(From Cursiv's offline reference, {e.title} [{e.id}]: {e.text}{based}{caveat})*")
         else:
             lines.append(f"*(From Cursiv's offline reference: {e.title} [{e.id}])*")
