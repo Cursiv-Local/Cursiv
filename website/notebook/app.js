@@ -84,6 +84,8 @@ function readForm() {
     observer: $("observer").value, site: $("site").value, sample_id: $("sample").value,
     lat: $("lat").value.trim(), lon: $("lon").value.trim(),
     location_source: $("lat").dataset.source || "typed",
+    location_accuracy_m: $("lat").dataset.accuracy || null,
+    location_fix_utc: $("lat").dataset.fix || "",
     measurements: [...$("meas").children].map(r => {
       const [n, v, u] = r.querySelectorAll("input");
       return { name: n.value, value: v.value, unit: u.value };
@@ -95,7 +97,7 @@ function readForm() {
 
 function clearForm() {
   for (const id of ["site", "sample", "lat", "lon", "note"]) $(id).value = "";
-  delete $("lat").dataset.source;
+  delete $("lat").dataset.source; delete $("lat").dataset.accuracy; delete $("lat").dataset.fix;
   $("meas").innerHTML = ""; addMeasRow(); addMeasRow();
   pendingPhotos = []; $("thumbs").innerHTML = ""; $("gps-status").textContent = "";
   correcting = null; $("form-title").innerHTML = "<b>New entry</b>";
@@ -132,7 +134,9 @@ function gps() {
   navigator.geolocation.getCurrentPosition(p => {
     const acc = Math.round(p.coords.accuracy);
     $("lat").value = p.coords.latitude.toFixed(7); $("lon").value = p.coords.longitude.toFixed(7);
-    $("lat").dataset.source = `phone GPS ±${acc} m`;
+    $("lat").dataset.source = "phone GPS";
+    $("lat").dataset.accuracy = String(p.coords.accuracy);
+    $("lat").dataset.fix = new Date(p.timestamp).toISOString().replace(/\.\d{3}Z$/, "Z");
     st.textContent = `GPS fix: ±${acc} m at ${new Date(p.timestamp).toLocaleTimeString()}`;
     st.className = acc <= 30 ? "ok" : "warn";
   }, err => {
@@ -145,6 +149,9 @@ function gps() {
 
 async function addPhotos(files) {
   for (const file of files) {
+    const mb = file.size / 1048576;
+    if (mb > 50) { say(`${file.name} is ${mb.toFixed(0)} MB: photos over 50 MB aren't kept.`, "bad"); continue; }
+    if (mb > 15) say(`${file.name} is ${mb.toFixed(0)} MB, larger than usual; it's kept, but sending takes longer.`, "warn");
     const buf = await file.arrayBuffer();
     const sha = await core.sha256Hex(buf);
     const ext = { "image/jpeg": ".jpg", "image/png": ".png", "image/heic": ".heic", "image/heif": ".heif",
@@ -163,7 +170,11 @@ function startCorrection(e) {
   correcting = e;
   $("form-title").innerHTML = `<b>Correcting #${e.seq}</b> <span class="muted">(the original stays)</span>`;
   $("observer").value = e.observer; $("site").value = e.site; $("sample").value = e.sample_id || "";
-  if (e.lat !== null) { $("lat").value = e.lat; $("lon").value = e.lon; $("lat").dataset.source = e.location_source; }
+  if (e.lat !== null) {
+    $("lat").value = e.lat; $("lon").value = e.lon; $("lat").dataset.source = e.location_source;
+    if (e.location_accuracy_m != null) $("lat").dataset.accuracy = String(e.location_accuracy_m);
+    if (e.location_fix_utc) $("lat").dataset.fix = e.location_fix_utc;
+  }
   $("meas").innerHTML = "";
   (e.measurements.length ? e.measurements : [{}, {}]).forEach(addMeasRow);
   $("note").value = e.note;

@@ -11,6 +11,7 @@ export const GENESIS = "genesis";
 export const HEAD_FORMAT = "cursiv-head-1";
 export const BUNDLE_FORMAT = "cursiv-phone-bundle-1";
 export const APP_VERSION = "phone-notebook-1";
+export const SCHEMA = 1;          // the same record schema as cursiv_v215/core/fieldlog.py
 
 // ── canonical JSON: the same bytes as Python's
 //    json.dumps(obj, sort_keys=True, ensure_ascii=False, separators=(",", ":"))
@@ -90,7 +91,13 @@ export async function makeEntry(existing, device, f, now = new Date()) {
   if (f.corrects && !existing.some(e => e.id === f.corrects)) throw new Error(`no entry ${f.corrects} to correct`);
   const last = existing[existing.length - 1];
   const id = hex(globalThis.crypto.getRandomValues(new Uint8Array(6)));
+  let accuracy = null;
+  if (lat !== null && f.location_accuracy_m !== undefined && f.location_accuracy_m !== null && f.location_accuracy_m !== "") {
+    accuracy = Math.round(Number(f.location_accuracy_m) * 10) / 10;
+    if (!Number.isFinite(accuracy) || accuracy < 0) throw new Error("location accuracy isn't a number of metres");
+  }
   const entry = {
+    schema: SCHEMA,
     id,
     seq: last ? last.seq + 1 : 1,
     recorded_utc: utcIso(now),
@@ -100,6 +107,8 @@ export async function makeEntry(existing, device, f, now = new Date()) {
     site: String(f.site || "").trim(),
     lat, lon,
     location_source: lat !== null ? String(f.location_source || "typed") : "",
+    location_accuracy_m: accuracy,
+    location_fix_utc: lat !== null ? String(f.location_fix_utc || "") : "",
     measurements: meas,
     note: String(f.note || "").trim(),
     photos,

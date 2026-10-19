@@ -93,6 +93,38 @@ def _key_file(device: str) -> Path:
     return team_dir() / f"{device}.key.json"
 
 
+# ── Revoked keys: the team lead marks a lost, stolen or retired device ─────────
+# New files signed by a revoked key are refused. What was imported before stays, and the
+# team view says which entries came from a key revoked later. Nothing is deleted.
+
+def _revoked_file() -> Path:
+    return team_dir() / "revoked.json"
+
+
+def revoked() -> dict:
+    """{key_id: {"device", "reason", "revoked_utc", "by"}}"""
+    try:
+        return json.loads(_revoked_file().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+
+
+def revoke(device: str, reason: str, by: str = "") -> dict:
+    """Revoke the key remembered for a device. Raises ValueError if there's none or no reason."""
+    if not reason.strip():
+        raise ValueError("give a reason (lost, stolen, retired...): it's kept with the revocation")
+    pin = pinned_key(device)
+    if not pin:
+        raise ValueError(f"no signing key is remembered for {device} (it was never imported signed)")
+    data = revoked()
+    data[pin["key_id"]] = {"device": device, "reason": reason.strip(), "by": by.strip(),
+                           "revoked_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    team_dir().mkdir(parents=True, exist_ok=True)
+    from cursiv_v215.core import atomic
+    atomic.write_text(_revoked_file(), json.dumps(data, indent=2))
+    return data[pin["key_id"]]
+
+
 def pinned_key(device: str) -> dict | None:
     try:
         return json.loads(_key_file(device).read_text(encoding="utf-8"))
@@ -105,6 +137,10 @@ def _check_signature(m: dict, device: str, rows: list[dict]) -> tuple[dict | Non
     env = m.get("head")
     if not env:
         return None, []
+    gone = revoked().get(env.get("key_id", ""))
+    if gone:
+        return None, [f"it's signed by a key the team lead revoked on {gone['revoked_utc'][:10]} "
+                      f"({gone['reason']}). Not imported; what came from it earlier stays, marked."]
     if not devicekey.verify(env):
         return None, ["its signature doesn't match: the copy or its manifest was changed after it was signed"]
     h = env["signed"]
@@ -131,6 +167,10 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
     except ValueError:
         return [], ["a line isn't a complete entry (the copy may have been cut off)"], None
     problems = chain_problems(rows)
+    newer = max((e.get("schema", 0) for e in rows if isinstance(e.get("schema", 0), int)), default=0)
+    if newer > fieldlog.SCHEMA:
+        problems.append(f"it was made by a newer Cursiv (record schema {newer}; this one reads up to "
+                        f"{fieldlog.SCHEMA}). Update Cursiv, then import it again")
     if {e.get("device") for e in rows} - {log.stem}:
         problems.append("it contains entries from a different laptop than its name says")
     man = log.with_name(log.stem + ".manifest.json")
@@ -162,12 +202,27 @@ def _import_photos(src: Path, rows: list[dict]) -> int:
             if dest.exists():
                 continue
             f = src / rel
-            if not f.exists() or hashlib.sha256(f.read_bytes()).hexdigest() != Path(rel).stem:
+            if not f.exists() or f.stat().st_size > fieldlog.PHOTO_MAX_MB * 2**20 \
+                    or hashlib.sha256(f.read_bytes()).hexdigest() != Path(rel).stem:
                 missing += 1
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(f, dest)
     return missing
+
+
+def _clock_ahead_minutes(rows: list[dict]) -> int:
+    """Minutes the device's clock looks ahead of this computer's (entries recorded "in the
+    future"), or 0. Times are kept as recorded; this only flags them."""
+    now = datetime.now(timezone.utc)
+    worst = 0.0
+    for e in rows:
+        try:
+            t = datetime.strptime(e.get("recorded_utc", ""), "%Y-%m-%dT%H:%M:%SZ").replace(tzinfo=timezone.utc)
+        except ValueError:
+            continue
+        worst = max(worst, (t - now).total_seconds() / 60)
+    return int(round(worst)) if worst > 5 else 0
 
 
 def import_folder(folder: Path) -> dict:
@@ -194,6 +249,9 @@ def import_folder(folder: Path) -> dict:
         missing = _import_photos(src, rows)
         if missing:
             report["photos_missing"][device] = missing
+        ahead = _clock_ahead_minutes(rows)
+        if ahead:
+            report.setdefault("clock", {})[device] = ahead
         if env:
             report["signed"][device] = env["key_id"]
             if not pinned_key(device):
@@ -315,7 +373,11 @@ def report_text(r: dict) -> str:
     for device, kid in r.get("signed", {}).items():
         lines.append(f"- {device}: signature checked (key {kid})")
     for device, n in r.get("photos_missing", {}).items():
-        lines.append(f"- {device}: {n} photo(s) missing or not matching their fingerprint (the entries are in)")
+        lines.append(f"- {device}: {n} photo(s) missing, over {fieldlog.PHOTO_MAX_MB} MB, or not matching their "
+                     f"fingerprint (the entries are in)")
+    for device, mins in r.get("clock", {}).items():
+        lines.append(f"- CHECK {device}: its clock looks about {mins} minutes ahead of this computer's. Its times are "
+                     f"kept as recorded; check that device's date and time")
     for device in r.get("unsigned", []):
         lines.append(f"- {device}: not signed (shared by Cursiv before U73); its chain was checked")
     for c in sample_clashes():
@@ -326,8 +388,17 @@ def report_text(r: dict) -> str:
 
 
 def command(text: str, observer: str = "") -> str | None:
-    """field log share <folder>, field log import <folder>, team log, team log export."""
+    """field log share <folder>, field log import <folder>, team log, team log export,
+    field log revoke <device> <reason>."""
     t = (text or "").strip()
+    m = re.match(r"(?i)^field ?log revoke\s+(\S+)\s*(.*)$", t)
+    if m:
+        try:
+            r = revoke(m.group(1), m.group(2), by=observer)
+        except ValueError as exc:
+            return f"Not revoked: {exc}."
+        return (f"Revoked {m.group(1)}'s key ({r['reason']}). New files signed by it will be refused; "
+                f"entries imported before stay in the team log, marked as from a revoked key.")
     m = re.match(r"(?i)^field ?log (share|import)\s+(.+)$", t)
     if m:
         folder = Path(m.group(2).strip().strip('"'))
@@ -349,8 +420,11 @@ def command(text: str, observer: str = "") -> str | None:
         devices = sorted({e["device"] for e in rows})
         head = f"Team field log: {len(rows)} entries from {len(devices)} device{'s' if len(devices) != 1 else ''}"
         clash = sample_clashes(rows)
+        gone = {v["device"]: v for v in revoked().values()}
         body = "\n".join(f"[{e['device'] if e['device'].startswith('phone-') else e['device'][:6]}] "
-                         f"{fieldlog.summary(e)}" for e in rows[-15:])
+                         f"{fieldlog.summary(e)}"
+                         + (f"  (key revoked {gone[e['device']]['revoked_utc'][:10]})" if e["device"] in gone else "")
+                         for e in rows[-15:])
         return head + " (latest 15):\n" + body + ("\nCheck:\n" + "\n".join(f"- {c}" for c in clash) if clash else "")
     if low in ("team log export", "export team log", "field log team export"):
         paths = team_export()

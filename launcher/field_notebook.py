@@ -135,6 +135,8 @@ class FieldNotebookDialog(QDialog):
         imp_menu = QMenu(imp)
         imp_menu.addAction("From a USB stick or shared folder…", self._import)
         imp_menu.addAction("From the phone notebook (.cursivsync file)…", self._import_phone)
+        imp_menu.addSeparator()
+        imp_menu.addAction("Revoke a lost or retired device's key…", self._revoke)
         imp.setMenu(imp_menu)
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
         for b in (fix, check, exp, rep, share, imp):
@@ -164,7 +166,15 @@ class FieldNotebookDialog(QDialog):
     def add_photos(self, files) -> None:
         """Attach photos to the entry being written; fill a blank location from the first photo's GPS."""
         from pathlib import Path
+        big = []
         for f in files:
+            mb = Path(str(f)).stat().st_size / 2**20 if Path(str(f)).exists() else 0
+            if mb > fieldlog.PHOTO_MAX_MB:
+                QMessageBox.warning(self, "Photo too large",
+                                    f"{Path(str(f)).name} is {mb:.0f} MB; photos over {fieldlog.PHOTO_MAX_MB} MB aren't kept.")
+                continue
+            if mb > fieldlog.PHOTO_WARN_MB:
+                big.append(Path(str(f)).name)
             if f not in self._photos:
                 self._photos.append(f)
         note = ""
@@ -177,6 +187,8 @@ class FieldNotebookDialog(QDialog):
                     note = " · location filled in from the photo's GPS"
                     break
         n = len(self._photos)
+        if big:
+            note += f" · {', '.join(big)} over {fieldlog.PHOTO_WARN_MB} MB"
         self._photo_lbl.setText(f"{n} photo{'s' if n != 1 else ''} attached{note}" if n else "")
 
     def _clear_form(self):
@@ -325,6 +337,31 @@ class FieldNotebookDialog(QDialog):
         QMessageBox.information(self, "Shared", f"This laptop's field log is in:\n{out}\n\n"
                                 "On each other laptop: Import from team… and pick the same drive. "
                                 "Only the field log is shared; memories and documents stay on this computer.")
+
+    def _revoke(self):
+        """The team lead marks a lost, stolen or retired phone or laptop: its new files are refused."""
+        from cursiv_v215.core import fieldsync
+        devices = sorted(p.name[:-len(".key.json")] for p in fieldsync.team_dir().glob("*.key.json")) \
+            if fieldsync.team_dir().is_dir() else []
+        gone = {v["device"] for v in fieldsync.revoked().values()}
+        devices = [d for d in devices if d not in gone]
+        if not devices:
+            QMessageBox.information(self, "Revoke a key", "No imported device has a signing key to revoke yet.")
+            return
+        device, ok = QInputDialog.getItem(self, "Revoke a device's key",
+                                          "Device (its new files will be refused; what's already imported stays):",
+                                          devices, 0, False)
+        if not ok:
+            return
+        reason, ok = QInputDialog.getText(self, "Reason", "Why? (lost, stolen, retired…) Kept with the revocation:")
+        if not ok:
+            return
+        try:
+            fieldsync.revoke(device, reason, by=self._observer.text().strip())
+        except ValueError as exc:
+            QMessageBox.warning(self, "Not revoked", str(exc))
+            return
+        QMessageBox.information(self, "Revoked", f"{device}'s key is revoked. New files signed by it will be refused.")
 
     def _import_phone(self):
         """A file from the phone notebook (website/notebook), sent by USB, AirDrop or Quick Share."""

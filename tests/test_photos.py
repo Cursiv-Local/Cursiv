@@ -95,7 +95,7 @@ def test_team_sharing_carries_photos_and_checks_them(team, tmp_path):
         r = fieldsync.import_folder(usb)
         assert r["added"] == {"laptopC": 1} and r["photos_missing"] == {"laptopC": 1}
         assert not fieldlog.photo_path(e2["photos"][0]).exists()
-        assert "photo(s) missing or not matching" in fieldsync.report_text(r)
+        assert "photo(s) missing, over 50 MB, or not matching" in fieldsync.report_text(r)
 
 
 # ── the paperclip: asking the image model about a photo ─────────────────────

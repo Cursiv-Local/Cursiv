@@ -27,7 +27,8 @@ const rel = `photos/${await core.sha256Hex(photoBytes)}.jpg`;
 const rows = [];
 const add = async f => rows.push(await core.makeEntry(rows, device, f, new Date("2026-10-19T14:31:05Z")));
 await add({ observer: "Ana Ruíz", site: "Upper Brook (site A)", lat: "44.1234567", lon: "-71.5678",
-            location_source: "phone GPS ±6 m", sample_id: "UBA-20261019-001",
+            location_source: "phone GPS ±6 m", location_accuracy_m: "6.43", location_fix_utc: "2026-10-19T14:30:58Z",
+            sample_id: "UBA-20261019-001",
             measurements: [{ name: "water temp", value: "12.40", unit: "°C" }, { name: "count", value: "12" },
                            { name: "pH", value: "7.2" }, { name: "tiny", value: "0.0000001" }],
             note: "café ☂ — riffle, \"clear\" water\nsecond line", photos: [{ rel, name: "IMG_1.jpg" }] });
@@ -71,6 +72,7 @@ def test_a_phone_log_imports_with_every_fingerprint_and_the_signature_checked(la
     assert fieldsync.chain_problems(rows) == []                     # Python re-derives every JS fingerprint
     first = rows[0]
     assert first["measurements"][0]["value"] == "12.40" and first["location_source"] == "phone GPS ±6 m"
+    assert first["schema"] == 1 and first["location_accuracy_m"] == 6.4 and first["location_fix_utc"] == "2026-10-19T14:30:58Z"
     assert first["note"].startswith("café ☂") and fieldlog.photo_path(first["photos"][0]).exists()
     current = [e for e in fieldsync.team_current() if e["device"] == device]
     assert len(current) == 1 and current[0]["reason"] == "meter recalibrated"

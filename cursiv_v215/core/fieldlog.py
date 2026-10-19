@@ -29,6 +29,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 GENESIS = "genesis"
+# Record schema. 1 (U75): "schema", and optional "location_accuracy_m" / "location_fix_utc".
+# Entries without "schema" are 0 and still valid. A newer schema is refused on import (fieldsync).
+SCHEMA = 1
 _lock = threading.Lock()
 
 
@@ -54,6 +57,8 @@ def _device() -> str:
 # and GPS position a camera wrote into the photo (EXIF) are kept in photo_info.
 
 PHOTO_EXTS = {".jpg", ".jpeg", ".png", ".heic", ".heif", ".webp", ".tif", ".tiff", ".gif", ".bmp"}
+PHOTO_WARN_MB = 15        # a warning when attaching (phone photos are usually 2-6 MB)
+PHOTO_MAX_MB = 50         # refused above this, here, on the phone and on import (docs/MOBILE-PLAN.md)
 
 
 def photo_dir() -> Path:
@@ -106,6 +111,9 @@ def store_photo(path) -> str:
     ext = src.suffix.lower()
     if ext not in PHOTO_EXTS:
         raise ValueError(f"{src.name} isn't a photo Cursiv recognises ({', '.join(sorted(PHOTO_EXTS))})")
+    size_mb = src.stat().st_size / 2**20
+    if size_mb > PHOTO_MAX_MB:
+        raise ValueError(f"{src.name} is {size_mb:.0f} MB; photos over {PHOTO_MAX_MB} MB aren't stored")
     digest = hashlib.sha256(src.read_bytes()).hexdigest()
     rel = f"photos/{digest}{'.jpg' if ext == '.jpeg' else ext}"
     dest = log_dir() / rel
@@ -171,6 +179,7 @@ def _coord(value, low: float, high: float):
 
 
 def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
+        location_accuracy_m=None, location_fix_utc: str = "",
         measurements=None, note: str = "", photos=None, corrects: str = "", reason: str = "",
         app_version: str = "", sample_id: str = "") -> dict:
     """Append one entry and return it. Coordinates are decimal degrees (WGS84)."""
@@ -198,7 +207,13 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         if corrects and corrects not in {e["id"] for e in existing}:
             raise ValueError(f"no entry {corrects} to correct")
         now = time.time()
+        accuracy = None
+        if lat_v is not None and location_accuracy_m not in (None, ""):
+            accuracy = round(float(location_accuracy_m), 1)
+            if accuracy < 0:
+                raise ValueError("location accuracy can't be negative")
         entry = {
+            "schema": SCHEMA,
             "id": uuid.uuid4().hex[:12],
             "seq": (existing[-1]["seq"] + 1) if existing else 1,
             "recorded_utc": datetime.fromtimestamp(now, timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
@@ -208,6 +223,8 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
             "site": site.strip(),
             "lat": lat_v, "lon": lon_v,
             "location_source": location_source if lat_v is not None else "",
+            "location_accuracy_m": accuracy,
+            "location_fix_utc": (location_fix_utc or "") if lat_v is not None else "",
             "measurements": meas,
             "note": note.strip(),
             "photos": stored,
@@ -236,7 +253,8 @@ def correct(entry_id: str, reason: str, **fields) -> dict:
     if old is None:
         raise ValueError(f"no entry {entry_id} to correct")
     base = {k: old.get(k) for k in ("observer", "site", "lat", "lon", "location_source", "measurements",
-                                    "note", "photos", "sample_id")}
+                                    "note", "photos", "sample_id", "location_accuracy_m", "location_fix_utc")}
+    base["location_fix_utc"] = base.get("location_fix_utc") or ""
     base["photos"] = base.get("photos") or []
     base["sample_id"] = base.get("sample_id") or ""
     base.update(fields)
@@ -316,7 +334,7 @@ def labels_html(rows: list[dict]) -> str:
 
 CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "sample_id", "site", "lat", "lon",
               "location_source", "measurement", "value", "unit", "note", "photos", "corrects", "reason",
-              "fingerprint", "device")
+              "fingerprint", "device", "location_accuracy_m")
 
 
 def export(folder: Path | None = None, include_corrected: bool = False, *,
@@ -338,8 +356,9 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
                       e.get("sample_id", ""), e["site"],
                       "" if e["lat"] is None else e["lat"], "" if e["lon"] is None else e["lon"],
                       e["location_source"]]
+            acc = e.get("location_accuracy_m")
             tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"],
-                    e.get("device", "")]
+                    e.get("device", ""), "" if acc is None else acc]
             for m in e["measurements"] or [{"name": "", "value": "", "unit": ""}]:
                 w.writerow(common + [m["name"], m["value"], m["unit"]] + tail)
 
@@ -354,7 +373,8 @@ def export(folder: Path | None = None, include_corrected: bool = False, *,
     features = [{"type": "Feature", "geometry": {"type": "Point", "coordinates": [e["lon"], e["lat"]]},
                  "properties": {**{k: e[k] for k in ("id", "seq", "recorded_utc", "observer", "site",
                                                      "measurements", "note", "hash")},
-                                "sample_id": e.get("sample_id", "")}}
+                                "sample_id": e.get("sample_id", ""),
+                                "location_accuracy_m": e.get("location_accuracy_m")}}
                 for e in rows if e["lat"] is not None]
     geo_path.write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=2,
                                    ensure_ascii=False), encoding="utf-8")
