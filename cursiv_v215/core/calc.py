@@ -190,6 +190,33 @@ def _decimals(number: str) -> int:
     return len(number.split(".")[1]) - 1 if "." in number else -1
 
 
+_HEDGE = re.compile(r"(?i)\b(can'?t|cannot|not|n't|no|uncertain|may|might|unclear|too small|sure|unreliable|"
+                    r"not enough|if|whether)\b")
+_VERDICT = re.compile(r"(?i)\b(better|worse)\b|\b(survives?|survived|does|did|performs?|performed)\s+better\b")
+
+
+def _too_small_to_tell(answer: str) -> str:
+    """When two proportions can't be told apart: what in the answer says one is better anyway, or "".
+    "75% is higher than 60%" is true and fine; "site A has better survival" is the conclusion the counts
+    don't support. Benchmark rea-016 (U75) opened "Yes, ..."; the first live U76 test opened "No, site A
+    does not have better survival" and ended "Therefore, site A has better survival"."""
+    text = re.sub(r"(?m)^[ \t]*\*[\[(].*$", "", answer or "").strip()
+    sentences = [x.strip() for x in re.split(r"(?<=[.!?])\s+|\n+", text) if x.strip()]
+    if not sentences:
+        return ""
+    opening = sentences[0]
+    claims = [x for x in sentences if _VERDICT.search(x) and not _HEDGE.search(x)]
+    opens_yes = re.match(r"(?i)\W*yes\b", opening) is not None
+    opens_no = re.match(r"(?i)\W*no\b", opening) is not None or (_VERDICT.search(opening) and
+                                                                re.search(r"(?i)\b(not|n't)\b", opening))
+    if opens_no and claims:
+        return (f'the answer contradicts itself: its first line says "{opening[:70]}" and later "{claims[0][:70]}"; '
+                "and it can't be either way")
+    if opens_yes or claims:
+        return f'the answer says one is better ("{(claims[0] if claims else opening)[:80]}")'
+    return ""
+
+
 def check(answer: str, w: Worked) -> str:
     """A line for under the answer when it doesn't contain the worked-out result or contradicts
     it ("lasts 12 days" when it lasts 1; "enough" with a shortfall), else ""."""
@@ -197,13 +224,10 @@ def check(answer: str, w: Worked) -> str:
     if not w.ok:
         return ""
     if w.facts.get("overlap"):
-        # 3 of 4 vs 60 of 100: the answer opened "Yes, site A has better survival" (benchmark rea-016, U75)
-        opening = re.split(r"(?<=[.!?])\s|\n", (answer or "").strip(), maxsplit=1)[0]
-        if re.match(r"(?i)\W*yes\b", opening) or (re.search(r"(?i)\b(better|higher|more|worse|lower)\b", opening)
-                                                   and not re.search(r"(?i)\b(can'?t|cannot|not|uncertain|may|might|"
-                                                                     r"unclear|too small|sure)\b", opening)):
-            return ("*(Cursiv's check: the first line says one is better, but Cursiv's code worked out that these "
-                    f"counts can't show that: {w.statement})*")
+        note = _too_small_to_tell(answer)
+        if note:
+            return f"*(Cursiv's check: {note}, but Cursiv's code worked out that these counts can't show that: {w.statement})*"
+        return ""            # it didn't claim a difference: that's what matters here, not quoting 75%
     if w.facts and "overlap" not in w.facts:
         from cursiv_v215.core import resources
         clash = resources.contradictions(answer, w.facts)

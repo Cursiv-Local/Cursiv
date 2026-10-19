@@ -647,3 +647,27 @@ def test_words_from_the_question_dont_make_a_memory_used(monkeypatch):
     assert "your saved memories" not in ca.sources_line(U76_ANSWER, U76_Q)
     used = "Your 20-liter jugs in the barn hold the water."
     assert "your saved memories" in ca.sources_line(used, U76_Q)
+
+
+
+FROG_Q = "At site A, 3 of 4 tagged frogs survived. At site B, 60 of 100 survived. Does site A have better survival?"
+
+
+def test_a_better_conclusion_after_a_no_opening_is_caught_as_a_contradiction():
+    # the first live U76 test: "No, ... does not have better survival." then "Therefore, site A has better survival."
+    w = calc.work_out(FROG_Q)
+    answer = ("No, site A does not have better survival.\nAt site A: 3 out of 4 frogs survived → 75% survival rate.\n"
+              "At site B: 60 out of 100 frogs survived → 60% survival rate.\nSo site A has a higher survival rate "
+              "(75%) than site B (60%).\nTherefore, site A has better survival.\nNote: The sample sizes are small, "
+              "so results may not be fully reliable.")
+    note = calc.check(answer, w)
+    assert "contradicts itself" in note and "Therefore, site A has better survival" in note and "can't show that" in note
+
+
+@pytest.mark.parametrize("answer", [
+    "Site A's rate is higher (75% vs 60%), but with only 4 frogs we can't tell whether its survival is really better.",
+    "75% is higher than 60%, but the sample of 4 is too small to say site A is better.",
+    "We can't conclude that: the ranges overlap (30% to 95% and 50% to 69%).",
+])
+def test_saying_the_rate_is_higher_but_it_cant_be_told_is_fine(answer):
+    assert calc.check(answer, calc.work_out(FROG_Q)) == ""
