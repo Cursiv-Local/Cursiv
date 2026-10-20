@@ -2564,17 +2564,33 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             _search_q = _search_q[len(_pfx):].strip()
             break
     _web_ctx = ""
+    _search_failed = ""
     if netgate.is_offline() and user_text.lower().startswith(("search:", "search ")):
         yield f"*[Web search skipped. {netgate.OFFLINE_MESSAGE}]*\n\n"
-    elif _needs_search(user_text) and _is_online():
-        _web_ctx = _web_search(_search_q[:300])
+    elif _needs_search(user_text):
+        if _is_online():
+            _web_ctx = _web_search(_search_q[:300])
+            if not _web_ctx:
+                from cursiv_v215.chat import web_search as _ws
+                _search_failed = _ws.last_problem or "nothing came back"
+        else:
+            _search_failed = "this computer isn't connected to the internet right now"
+    if _search_failed:
+        # Said by Cursiv, and told to the model: with nothing to go on it said searching "would violate
+        # privacy and safety rules" (U77, a DuckDuckGo bot check)
+        yield f"*[Web search tried, no results: {_search_failed}. Nothing below comes from the web.]*\n\n"
+        messages[0]["content"] += (
+            "\n\n## Web search\nThe person asked for a web search. It was tried and returned nothing ("
+            + _search_failed + "). Say that in one plain sentence. Don't claim you searched or found anything, "
+            "and don't say searching is against any rule or that you can't search: it was tried and failed.\n")
     if _web_ctx:
         global _WEB_SEARCHED
         _WEB_SEARCHED = True
         _RETRIEVED.append(_web_ctx)
         messages[0]["content"] += (
             "\n\n## Live Web Search Results\n"
-            "*(Retrieved in real-time for this query — treat these as current facts)*\n\n"
+            "*(Snippets from a web search for this question, just now. They can be wrong or out of date: "
+            "say which parts of the answer come from them)*\n\n"
             + _web_ctx + "\n"
         )
 

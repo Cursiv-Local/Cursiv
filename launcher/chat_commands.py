@@ -1363,7 +1363,12 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult(f"Web search skipped. {_gate().OFFLINE_MESSAGE}")
         results = _web_search(query)
         if not results:
-            return TextResult("No web results found. Check internet connection or try a different query.")
+            try:
+                from cursiv_v215.chat import web_search as _ws
+                why = _ws.last_problem
+            except Exception:
+                why = ""
+            return TextResult(f"No web results: {why or 'nothing came back'}. Nothing was answered from the web.")
         gen = _chat(
             f"search: {query}", history,
             cfg.get("api_key", ""), None, cfg.get("file_access", False),

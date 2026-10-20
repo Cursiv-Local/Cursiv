@@ -31,6 +31,15 @@ except Exception:
 
 BRAVE_KEY = os.environ.get("BRAVE_API_KEY", "")
 
+# DuckDuckGo sometimes answers with a "are you a bot?" challenge instead of results. Its sentences
+# ("Please complete the following challenge ...") used to be kept as search results, cached for a day,
+# given to the model as current facts and labelled "web search results" (U77, 2026-10-19).
+_BOT_CHECK = _re.compile(r"(?i)bots use duckduckgo|complete the following challenge|select all squares|"
+                         r"anomaly-modal|error-lite[+@]|confirm this search was made by a human|unusual traffic|captcha")
+BOT_CHECK_MESSAGE = ("DuckDuckGo asked to confirm a human (a bot check) instead of giving results, so nothing came back. "
+                     "This happens after many searches from one connection; try again later")
+last_problem = ""          # why the last _web_search() came back empty: "" when it found something
+
 _SEARCH_TRIGGERS = (
     "latest ", "current ", "today ", "right now", "this week", "this month",
     "who won", "what happened", "news ", "price of ", "weather ",
@@ -83,6 +92,10 @@ def _ddg_search(query: str, max_results: int = 4) -> str:
         })
         with urllib.request.urlopen(req, timeout=7) as r:
             html = r.read().decode("utf-8", errors="replace")
+        if _BOT_CHECK.search(html):
+            global last_problem
+            last_problem = BOT_CHECK_MESSAGE
+            return ""
         text  = _re.sub(r"<[^>]+>", " ", html)
         text  = _re.sub(r"\s+", " ", text)
         snips = _re.findall(r"[A-Z][^.!?]{30,250}[.!?]", text)
@@ -133,6 +146,8 @@ def _web_search(query: str, max_results: int = 4) -> str:
     Falls back to cache (marked [cached]) when offline.
     Uses Brave Search API if BRAVE_API_KEY is set, else DuckDuckGo.
     """
+    global last_problem
+    last_problem = ""
     q = query.strip()
     if not q:
         return ""
@@ -146,7 +161,7 @@ def _web_search(query: str, max_results: int = 4) -> str:
         hit = _wcache_get(q)
         if hit:
             result, fresh = hit
-            if fresh:
+            if fresh and not _BOT_CHECK.search(result or ""):   # a bot check cached before U78 isn't a result
                 return result
 
     # Live search (never while offline mode is on)
@@ -158,6 +173,8 @@ def _web_search(query: str, max_results: int = 4) -> str:
     if not live_result and netgate.allowed():
         live_result = _ddg_search(q, max_results)
 
+    if live_result and _BOT_CHECK.search(live_result):
+        live_result, last_problem = "", BOT_CHECK_MESSAGE
     if live_result and _WCACHE_OK:
         _wcache_store(q, live_result)
         return live_result
@@ -165,8 +182,11 @@ def _web_search(query: str, max_results: int = 4) -> str:
     # Offline fallback — serve stale cache with label
     if _WCACHE_OK and not live_result:
         stale = _wcache_get(q, allow_stale=True)
-        if stale:
+        if stale and not _BOT_CHECK.search(stale[0] or ""):
             result, _ = stale
             return f"[cached — offline fallback]\n{result}"
 
+    if not live_result and not last_problem:
+        last_problem = ("offline mode is on" if not netgate.allowed() else
+                        "the search engine sent back no results (or couldn't be reached)")
     return live_result
