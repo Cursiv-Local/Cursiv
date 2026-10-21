@@ -1,8 +1,6 @@
-# Cursiv: an offline AI assistant for field research
+# Cursiv
 
-> Runs on your own laptop with the internet blocked if you want. Records field data you can defend,
-> works out the numbers in code, answers from your own protocols with page numbers, and says where
-> every answer came from.
+Cursiv is a local-first AI assistant for Windows. It runs compatible language models on your computer and includes tools for field notes, documents, calculations, and offline use.
 
 <p align="center">
   <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">
@@ -13,139 +11,159 @@
 <p align="center">
   <b><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 80 MB) ·
   <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
-  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">release notes</a> ·
-  <a href="CHANGELOG.md">what's new</a>
+  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">Release notes</a> ·
+  <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-**The speed of the answers reflects your hardware. The accuracy of the information must always be verified by you. Cursiv was not designed to replace human judgment — it was designed to support it.**
+## 1. Intro
 
----
+### What It Is
 
-## Install in three steps
+Cursiv is open-source software released under the MIT License. Its default setup uses Ollama to run a compatible AI model locally. With a model and its required files installed, supported features can work without internet access.
 
-1. **Download** the installer with the button above and run it.
-   Windows may say *"Windows protected your PC"* because Cursiv isn't from a big company — click **More info → Run anyway**.
-2. **Create a username and password.** They're stored only on your computer.
-3. **The Setup window** opens and installs Ollama (the free local AI engine) and an AI model, with progress bars. Pick a model, click Download, and start chatting while it finishes.
+Its tools include:
 
-That's it — one window, nothing else to open. Updates arrive inside the app.
+- **Field notebook:** Records observations, sites, coordinates, sample IDs, notes, and photos. Photo entries retain camera time and GPS when available. Measurements are kept as entered. Corrections become new entries with a reason; chained fingerprints make later changes detectable. Exports are signed with the device's key. Export to CSV, JSON, GeoJSON, or a printable field report. `field log verify <folder>` checks exported logs.
+- **Calculations:** Computes unit conversions, coordinates, UTM, distance and bearing, dilutions, statistics, clock times, bleach doses, and the lightning 30-minute rule in code.
+- **Documents:** Import protocols and SOPs. Answers can quote a document by page, identify when it does not cover a question, or follow “Answer only from my documents” (except emergencies).
+- **Offline reference and answer checks:** Cursiv can answer from its bundled reference and label whether an answer came from that reference, your documents, a calculation, or unchecked model knowledge. Cursiv's code adds these source labels. Code checks selected claims, numbers, doses, and contradictions; these checks do not catch every error.
+- **Photos:** Attach photos to field entries or ask a compatible vision model to describe them. Reading photos depends on an available local vision model or an online provider; making images requires an online service.
+- **Phone notebook:** Capture field records on a phone without signal after opening the [phone notebook](https://cursiv.winklers-llc.com/notebook/) once. Transfer its export file to the laptop for import. This is a capture tool, not the desktop AI running on a phone. See [phone notebook details](docs/PHONE-NOTEBOOK.md).
+- **Team log sharing:** Move signed field logs between computers using a USB drive or shared folder. Cursiv does not merge or overwrite entries; it reports conflicts.
 
-**Needs:** Windows 10 or 11 (64-bit) · 8 GB RAM · about 6 GB free disk for one model (more for extras).
-**No download wanted?** Paste a free Gemini or Groq key in Setup and Cursiv answers right away.
+Older personal features—including family letters, a legacy vault, the phone app, coding help, the council, custom agents, and LoRA training—remain available under **Settings → Appearance → Show personal features**.
 
-### On a Mac (early)
+### What It Isn't
 
-For Apple Silicon Macs (M1 or newer), macOS 12+. Download `Cursiv-<version>-mac-arm64.dmg` from the
-[latest release](https://github.com/winklersllc2026-bit/Cursiv/releases/latest) and drag Cursiv into Applications.
-This build isn't signed by Apple yet, so the first time: try to open it, then **System Settings → Privacy & Security →
-Open Anyway**. Setup installs Ollama into your Applications folder (no admin password) and downloads the model.
+Cursiv is not a frontier model, and its answers are not guaranteed to be correct. Small local models can be confidently wrong; Cursiv's checks catch some errors but do not eliminate hallucinations. Verify anything important.
 
-Honest status: the Mac version is built and tested automatically on Apple hardware at GitHub (the full test suite and
-a self-test of the built app), but nobody has used it on their own Mac yet. The Cursiv USB drive is Windows-only.
-Saved AI keys go into the macOS Keychain.
+Cursiv is not certified for medical or safety-critical use. Its first-aid reference has not been reviewed by a medical professional, and a research team has not yet used Cursiv in the field. The app does not provide live GPS. The Mac build is early and unsigned; there is no Linux version.
 
----
+### Why It Exists
 
-## What it does
+Cursiv is designed to remain useful when internet access is unavailable or an online service cannot be reached. Its guiding idea is to keep useful tools and knowledge on people's own computers, rather than make every task depend on one service or connection.
 
-- **Local only, and you can see it.** The AI model runs on your computer. Offline mode blocks every
-  connection off the computer; the top of the window says *LOCAL ONLY · internet blocked*. See
-  [PRIVACY.md](PRIVACY.md) for everything that could ever leave the computer, and when.
-- **A field notebook you can defend.** Observations are kept exactly as typed (12.40 stays 12.40), with
-  site, coordinates, sample IDs, observer and photos. Nothing is overwritten: a correction is a new entry
-  with a reason. Every entry is fingerprinted and chained, and exports are signed by the laptop's own key
-  (`field log verify <folder>` checks them). CSV, JSON, GeoJSON and a printable field report.
-- **Photos.** The paperclip adds photos to a field entry (the camera's time and GPS are kept) or asks the
-  local image model what a photo shows. Making new images needs an online service; Cursiv only reads them offline.
-- **Numbers worked out in code, not guessed:** unit conversions, degrees-minutes-seconds, UTM, distance and
-  bearing between GPS points, dilutions, statistics, clock times, bleach doses, the lightning 30-minute rule.
-- **Your documents.** Import protocols and SOPs; answers quote them by page, and say when they don't cover
-  a question. "Answer only from my documents" refuses anything else (except emergencies).
-- **Every answer says where it came from:** Cursiv's offline reference, your documents, Cursiv's
-  calculations, or *model knowledge (not checked against a source)*, written by Cursiv, not by the AI.
-- **Checks after every answer** for unsupported claims, wrong doses, and answers that contradict themselves.
-- **Phone notebook.** Record on a phone with no signal ([cursiv.winklers-llc.com/notebook](https://cursiv.winklers-llc.com/notebook/));
-  send one file to the laptop by USB, AirDrop or Quick Share, imported with the same checks. See [docs/PHONE-NOTEBOOK.md](docs/PHONE-NOTEBOOK.md).
-- **Team sync without internet.** Laptops share their signed logs by USB stick or shared folder; nothing is
-  merged or overwritten, and disagreements are shown, not resolved by software.
-- **Measured.** A fixed truth benchmark with every failure published ([bench/](bench/)), and an offline
-  demonstration with zero outside connections ([OFFLINE-DEMO.md](OFFLINE-DEMO.md)).
-- **Try it with sample data:** type `demo`. A walkthrough for showing it to a team: [docs/FIELD-DEMO.md](docs/FIELD-DEMO.md).
+## 2. Installation & Deployment
 
-Personal features from earlier versions (family letters, a legacy vault, the phone app, coding help, the
-council, custom agents, LoRA training) are still there but hidden: Settings → Appearance → *Show personal features*.
+### Windows Installer
 
-**Not yet:** field use by a research team, professional review of the first-aid content, code signing, live GPS.
+**Requirements:** Windows 10 or 11 (64-bit), 8 GB RAM, and about 6 GB of free disk space for one model. Additional models need more space.
 
----
+1. [Download the latest Windows installer](https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe) and run it.
+2. If Windows displays “Windows protected your PC,” select **More info → Run anyway**. The installer is not code-signed yet.
+3. Create a local username and password, then set security questions for password recovery.
+4. In Setup, install Ollama and download a model. You can start chatting while the model finishes downloading.
 
-## Cursiv on a USB
+The initial Ollama and model downloads need internet access. After a compatible model is installed, local chat and other supported local features can work offline. Updates are offered through the in-app updater, which needs internet access to check GitHub. Alternatively, Setup accepts a Gemini or Groq key; those providers require internet access and receive the content sent in their requests.
 
-Tray menu → **Make a Cursiv USB…** copies Cursiv, its AI engine and your models onto a USB drive. Plug it into any Windows PC and double-click **Start Cursiv** — nothing gets installed, it works offline, and everything it saves stays on the drive.
+### Mac Build (Early)
 
-- Everything together is about **30 GB** — use a **64 GB or bigger** USB 3 drive or USB SSD, formatted **exFAT**.
-- By default the USB starts fresh, so you can **give someone their own Cursiv**. Tick *"Include my memories, keys and settings"* to make a private copy of yours.
+An early build is available for Apple Silicon Macs (M1 or newer) running macOS 12 or later. Download the [latest Mac release](https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg), then drag Cursiv into Applications. The build is not signed by Apple. On first open, use **System Settings → Privacy & Security → Open Anyway** if macOS blocks it.
 
----
+Setup installs Ollama into Applications without an administrator password and downloads a model. The Mac build is tested automatically on Apple hardware at GitHub, including the test suite and an app self-test, but no one has yet tested it on their own Mac. Saved AI keys go into the macOS Keychain. The USB edition is Windows-only.
 
-## A note on the guardrails
+### Portable USB Deployment
 
-Cursiv has a local-only login, encrypts your saved AI keys for your Windows account, asks before every file it writes (and never touches its own keys or login files), and has an offline mode (`offline on`) that blocks every connection off your computer.
+From the tray menu, choose **Make a Cursiv USB…**. Cursiv copies the app, Ollama, and your installed models to a USB drive or USB SSD. The portable launcher directs Cursiv's home folder, model files, and Ollama to the drive. On a Windows PC, run **Start Cursiv** from the drive; it does not install Cursiv on that PC.
 
-These were not built to restrict you. Every guardrail exists to protect you — to keep your data from leaving without your knowledge, your identity from being impersonated, and your machine from being used against you. If the system feels locked down, that lock faces outward, toward the things that would compromise you. Not inward toward you.
+The complete copy is about 30 GB. Use a USB 3 drive or SSD with at least 64 GB, formatted as exFAT. By default, the USB starts fresh without your memories, keys, or settings. Select **Include my memories, keys and settings** to copy them; a private USB copy keeps saved AI keys readable so they can be used on other PCs. Keep that drive secure.
 
-Whoever installs Cursiv owns that copy. You have the final say over it.
+The USB edition is Windows-only. The project has tested its copy, verification, and update steps, but has not yet completed an end-to-end test on a second clean PC. See the [field kit test checklist](docs/FIELD-KIT-TEST.md) for remaining checks.
 
-**What the login is — and isn't.** It keeps people at your keyboard out of your Cursiv: it never opens without it, and a new login can only be added by someone who can already log in. It is a lock on the front door, not encryption — anyone who can open this computer's files can read Cursiv's memories and conversations, the same as your other documents. Your saved AI keys are the exception: they're encrypted for your Windows account, so a copied file or another Windows user gets nothing usable (a private USB copy holds them readable, so it can run on other PCs — keep that drive safe). Set the security questions when you create your account; they're how you reset a forgotten password.
+## 3. Technical Details
 
----
+### Privacy
 
-## Why this exists
+When a local model answers, inference happens on your computer. Conversations, memories, imported documents, and field records are stored locally. Local storage does not mean all files are encrypted: conversations and memories are not encrypted on disk. Saved AI keys have separate protection—Windows DPAPI on Windows and the Keychain on macOS.
 
-Every major AI system runs in the cloud — on someone else's terms, on someone else's servers, subject to someone else's decisions about what stays online.
+Online features work when used or enabled:
 
-Cursiv was built on a different premise. What happens to all the knowledge we've built when the internet goes down? When a service shuts off? When access is restricted?
+- Setup downloads Ollama and models.
+- Web search sends search terms when you use `search:` or enable automatic search. `pull <address>` requests the page you specify.
+- The local model is used first when available. Saved cloud-provider keys can send a prompt or content to the selected provider when no local model is ready, when you choose that provider, or when a feature needs an online provider, such as image handling.
+- Cursiv Cloud is off unless enabled; when enabled, it is used only when no local model is ready.
+- Update checks are manual unless you enable automatic checks, which are off by default. A manual check reads GitHub's public release list.
+- The phone app uses the website for its conversations and photos. Phone linking requires setup; problem reports send logs only when you submit a report.
 
-**Cursiv is a knowledge seed.** Each install is a piece of AI that lives in a home, a workshop, a school, a studio. It grows with every conversation and can be trained on your own voice.
+Offline mode (`offline on`, or the switch in **Settings → Privacy & internet**) blocks every connection off the computer at the socket level and stays on after restart. Web search, page requests, cloud services, update checks, and model downloads are then unavailable. See [PRIVACY.md](PRIVACY.md) for the full data and network details and [OFFLINE-DEMO.md](OFFLINE-DEMO.md) for the published offline demonstration.
 
-The goal is simple: **reduce the chance that future generations lose the systems of knowledge we are building for them.**
+### Guardrails and Limitations
 
----
+Cursiv includes a local login, prompts before file writes, and an offline mode that blocks network connections. The login limits access at the keyboard; it is not disk encryption. A new login can only be added by someone already logged in. The file-writing tool asks before writing and is designed not to touch its own login or key files. Saved AI keys are encrypted for the Windows account (or stored in the macOS Keychain); memories and conversations are not encrypted on disk.
 
-## Honest about what it is
+These controls are intended to help the person using Cursiv manage access, files, and network connections. They do not guarantee answer accuracy, privacy in every data path, or safety for high-risk use. Review the [benchmark cases and results](bench/) alongside the limitations above.
 
-**Speed** — local models run on your CPU and graphics card. A gaming PC is fast; an older laptop is slower. On a computer too slow for local models, skip the model download and use a free key instead.
+Other practical limits:
 
-**Accuracy** — the model does its best, and it will sometimes be wrong, confidently. Treat answers as a starting point. Verify what matters.
+- Speed depends on the model, CPU, graphics hardware, memory, and context length. Smaller or older computers may run local models more slowly; an optional online provider key is another choice, if available.
+- Accuracy varies by model and task. Check important answers against reliable sources.
+- First-aid reference entries are not professionally reviewed.
+- The phone notebook stores records in the phone browser. It has been tested in desktop Chromium, not on real iPhones or Android phones. Browsers may clear stored data; send records to the laptop regularly and treat the phone as a capture tool, not the archive. Details and limitations are in [docs/PHONE-NOTEBOOK.md](docs/PHONE-NOTEBOOK.md).
 
-**Coding** — built to get you most of the way there and help you understand the rest.
+### For Developers
 
-**Privacy** — when the local model answers, nothing you type leaves your computer. A key you added is used only when there's no local model, it can't answer, or you paste an image — and then that message goes to that provider. Cursiv Cloud, a free backup that answers only when no local model is ready, is off unless you turn it on (Setup, Settings or `cloud on`). Web search happens only when you start a message with `search:`. The automatic update check is off unless you turn it on (`autoupdate on`); the Check for Updates button reads GitHub's public release list and sends nothing about you. The phone link and problem reports send only when you set them up or click them. **Offline mode** (`offline on`, or Settings) blocks every connection off your computer and stays on after a restart.
+#### Run from Source
 
-**Ownership** — your data, your models, your copy. Nobody can change it or shut it off remotely.
+On Windows with Python 3.11 or newer:
 
----
+```bash
+pip install -r requirements.txt
+python launcher/main.py
+```
 
-## Privacy, and a demo with sample data
+Install [Ollama](https://ollama.com) and pull the default model:
 
-**[PRIVACY.md](PRIVACY.md)** lists what stays on your computer, everything that could leave it and when, and what offline mode blocks. **[docs/FIELD-DEMO.md](docs/FIELD-DEMO.md)** is a 10-minute walkthrough for showing Cursiv to a research group: type `demo` to load a sample stream survey and protocol, kept apart from your own records.
+```bash
+ollama pull qwen3:4b-instruct
+```
 
-## For developers
+You can also install Ollama and a model through Cursiv's Setup window, or add a Gemini or Groq key. See [TECH.md](TECH.md) for the repository layout and architecture.
 
-**[TECH.md](TECH.md)** explains how Cursiv is built — the desktop app, the chat engine, memory, the council, the login and protections, training, the USB edition — and how to run it from source and build the installer.
+#### Build the Windows Installer
 
----
+The installer build uses PyInstaller (listed in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
-## About
+1. Update the version in `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Versions keep the major number and add an update suffix, such as `3.14-U55`.
+2. Build the app with `scripts\build.bat`. It runs `python -m PyInstaller launcher/build.spec`.
+3. Build the installer with `scripts\package.bat`. The installer is written to `installer\Output\Cursiv-Setup-<version>.exe`.
 
-Cursiv was designed and built by **Joshua Winkler**. It is shared freely: anyone with a computer should be able to have a real AI that runs on their own machine, without subscriptions, without cloud dependency, and without handing their data to anyone.
+#### Release an Update
 
-The world's knowledge should not live in one place. It should be spread across people, machines, homes and schools, so no single failure can take it all down.
+A Git push does not update installed copies. Publish a GitHub release and attach the installer using both the versioned filename and the stable `Cursiv-Setup-latest.exe` filename. The README download button and website depend on that exact stable asset name.
 
-Take it. Use it. Build on it. Make it yours.
+```bash
+gh release create v3.14-U55 installer/Output/Cursiv-Setup-3.14-U55.exe Cursiv-Setup-latest.exe --title "Cursiv v3.14-U55" --notes-file notes.md --latest
+```
 
----
+The updater reads `https://api.github.com/repos/winklersllc2026-bit/Cursiv/releases/latest` and downloads the attached installer.
 
-## License
+#### Publish the Website
 
-Released under the [MIT License](LICENSE) — you are free to use, modify and share it. Copyright © 2026 Joshua Winkler.
+```bash
+node cloudflare/publish.mjs
+```
+
+This builds `cloudflare/dist/` from the website's allowlisted files, then deploys with Wrangler. To build without deploying:
+
+```bash
+node cloudflare/publish.mjs --build-only
+```
+
+#### Optional Features
+
+- **LoRA training** needs `torch`, `transformers`, `peft`, `accelerate`, and `datasets` in a normal (non-bundled) Python environment. The Training Data window checks for and installs them in a visible terminal. CPU training works but is slow—roughly six minutes per example per epoch on a typical CPU.
+- **Voice** uses `faster-whisper` and `sounddevice` when installed.
+
+### Demo with Sample Data
+
+In Cursiv, type `demo` to load a sample stream survey and sample protocol. The demo is labeled as sample data and kept apart from your own notebook and documents. Type `demo off` to remove the sample data and return to your own records.
+
+For the full walkthrough, including how to enable offline mode and what each example demonstrates, see [docs/FIELD-DEMO.md](docs/FIELD-DEMO.md). The demo shows documented workflows with sample data; it does not establish that Cursiv has been used by a research team in the field.
+
+## 4. Authorship
+
+Cursiv was designed and built by **Joshua Winkler**. The project is shared under the MIT License. The repository does not separately describe AI-assisted contributions.
+
+## 5. License
+
+Cursiv is released under the [MIT License](LICENSE). Copyright © 2026 Joshua Winkler.
