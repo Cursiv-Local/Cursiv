@@ -112,7 +112,8 @@ def test_portable_mode_points_home_models_and_ollama_at_the_drive(tmp, monkeypat
     monkeypatch.setattr(sys, "frozen", True, raising=False)
     monkeypatch.setattr(sys, "executable", str(drive / "Cursiv" / "Cursiv.exe"))
     for var in ("USERPROFILE", "HOME", "OLLAMA_MODELS", "PATH", "CURSIV_PORTABLE",
-                "CURSIV_REAL_HOME", "CURSIV_USB_ROOT"):
+                "CURSIV_REAL_HOME", "CURSIV_USB_ROOT", 'CURSIV_APP_DATA', 'CURSIV_DATA_DIR',
+                'CURSIV_HOST_LOCALAPPDATA', 'APPDATA', 'LOCALAPPDATA', 'TEMP', 'TMP'):
         monkeypatch.setenv(var, os.environ.get(var, ""))
     real_home = os.environ["USERPROFILE"]
 

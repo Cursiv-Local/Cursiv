@@ -7,9 +7,9 @@ Cursiv semantic memory -- memory that finds by meaning and learns.
   * Recall: facts and saved strands are matched to the question by meaning, using
     a small local embedding model through Ollama (nomic-embed-text). Without it,
     recall falls back to word overlap -- nothing breaks.
-  * Learning: after a conversation turn, the cheapest available AI (free Groq or
-    Gemini key, else the local model -- never paid keys, never Cursiv Cloud)
-    picks out lasting facts. Turn off with "memory learn off".
+  * Learning: direct common statements are selected in code after a conversation
+    turn. Optional suggestions use only the configured local model, never cloud
+    extraction. Turn off with "memory learn off".
 
 Everything stays in the user's .cursiv folder. Each fact is tagged with an
 origin (user_said, inferred, verified) and a date. A preference never
@@ -22,6 +22,7 @@ import hashlib
 import json
 import math
 import re
+import shutil
 import threading
 import time
 import urllib.request
@@ -40,8 +41,9 @@ OLLAMA = "http://127.0.0.1:11434"
 EMBED_MODEL = "nomic-embed-text"
 SHARED = "family"
 
-_lock = threading.Lock()
+_lock = threading.RLock()
 _person = SHARED
+_generation = 0                       # invalidate pending learning after forget/disable
 _emb_cache: dict[str, list[float]] | None = None
 _embed_ok: bool | None = None          # None = not checked yet
 _pulling = False
@@ -59,24 +61,43 @@ def current_person() -> str:
     return _person
 
 
+def generation() -> int:
+    with _lock:
+        return _generation
+
+
 # ── Settings ────────────────────────────────────────────────────────────────
 
 def _settings() -> dict:
     try:
-        return json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return {}
+    if not isinstance(settings, dict):
+        raise ValueError('Memory settings must be an object')
+    return settings
 
 
 def learning_enabled() -> bool:
-    return _settings().get("learn", True)
+    try:
+        if SETTINGS_FILE.exists():
+            s = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+            return isinstance(s, dict) and s.get("learn", True) is True
+        return True
+    except (OSError, ValueError):
+        return False                         # unreadable settings never enable retention
 
 
 def set_learning(on: bool) -> None:
-    s = _settings()
-    s["learn"] = bool(on)
-    CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-    _atomic.write_text(SETTINGS_FILE, json.dumps(s, indent=2))
+    global _generation
+    with _lock:
+        s = _settings()
+        s["learn"] = bool(on)
+        _atomic.write_text(SETTINGS_FILE, json.dumps(s, indent=2))
+        if _settings().get('learn') is not bool(on):
+            raise OSError('Memory setting write could not be verified')
+        if not on:
+            _generation += 1
 
 
 # ── Embeddings (local, through Ollama) ──────────────────────────────────────
@@ -223,24 +244,48 @@ def memory_status() -> dict:
     return out
 
 
-def list_facts(person: str | None = None) -> list[dict[str, Any]]:
-    try:
+def list_facts(person: str | None = None, *, include_superseded: bool = False) -> list[dict[str, Any]]:
+    with _lock:
         facts, _bad = _read_facts()
-    except OSError:
-        facts = []
-    if facts and not _settings().get(REPAIR_KEY):
-        facts = repair_learned(facts)
+        try:
+            repair_needed = not _settings().get(REPAIR_KEY)
+        except (OSError, ValueError):
+            repair_needed = False          # retrieval cannot repair/reset damaged privacy settings
+        if facts and repair_needed:
+            facts = repair_learned(facts)
+    if not include_superseded:
+        facts = [f for f in facts if f.get('status', 'active') == 'active']
     if person:
         facts = [f for f in facts if f.get("person") in (person, SHARED)]
     return facts
 
 
+def _backup_existing() -> None:
+    """One byte-for-byte pre-upgrade snapshot, before any existing memory is rewritten."""
+    folder = FACTS_FILE.parent / 'backups' / 'autonomous-memory-v1'
+    for source in (FACTS_FILE, SETTINGS_FILE):
+        if source.parent != FACTS_FILE.parent or not source.exists():
+            continue
+        target = folder / source.name
+        checksum = folder / (source.name + '.sha256')
+        if target.exists():
+            if not checksum.exists() and target.read_bytes() == source.read_bytes():
+                _atomic.write_text(checksum, hashlib.sha256(target.read_bytes()).hexdigest())
+            if not checksum.exists() or checksum.read_text(encoding='utf-8').strip() != hashlib.sha256(target.read_bytes()).hexdigest():
+                raise OSError('Existing memory backup cannot be verified')
+            continue
+        folder.mkdir(parents=True, exist_ok=True)
+        before = source.read_bytes()
+        shutil.copy2(source, target)
+        if target.read_bytes() != before:
+            raise OSError('Memory backup verification failed')
+        _atomic.write_text(checksum, hashlib.sha256(before).hexdigest())
+
+
 def _write_facts(facts: list[dict]) -> None:
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-    try:
-        _facts, bad = _read_facts()
-    except OSError:
-        bad = []
+    _facts, bad = _read_facts()             # abort on unreadable storage; never replace with an empty view
+    _backup_existing()
     if bad:      # damaged lines are kept beside the file, never dropped by a rewrite
         keep = FACTS_FILE.with_name(UNREADABLE_FILE_NAME)
         have = set(keep.read_text(encoding="utf-8").splitlines()) if keep.exists() else set()
@@ -248,7 +293,10 @@ def _write_facts(facts: list[dict]) -> None:
         if new:
             with keep.open("a", encoding="utf-8") as f:
                 f.write("".join(b + "\n" for b in new))
-    _atomic.write_text(FACTS_FILE, "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts))
+    payload = "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts)
+    _atomic.write_text(FACTS_FILE, payload)
+    if FACTS_FILE.read_text(encoding='utf-8') != payload:
+        raise OSError('Memory write could not be verified')
 
 
 REMOVED_FILE_NAME = "memory_facts.removed.jsonl"
@@ -263,6 +311,9 @@ def repair_learned(facts: list[dict]) -> list[dict]:
     "remember" is untouched."""
     kept, removed = [], []
     for f in facts:
+        if f.get('event_id') and f.get('evidence') in ('direct_statement', 'inferred'):
+            kept.append(f)                    # current validated records are not legacy repair inputs
+            continue
         if (f.get("source") or "") not in ("learned", "verified"):
             kept.append(f)
             continue
@@ -272,6 +323,7 @@ def repair_learned(facts: list[dict]) -> list[dict]:
         else:
             removed.append(f)
     try:
+        _backup_existing()
         if removed:
             with (CURSIV_DIR / REMOVED_FILE_NAME).open("a", encoding="utf-8") as out:
                 out.write("".join(json.dumps(f, ensure_ascii=False) + "\n" for f in removed))
@@ -330,6 +382,16 @@ def fact_subtitle(fact: dict) -> str:
     """Date, origin, and family — the line under a memory in the window and the chat command."""
     when = fact.get("date") or (fact.get("created") or "")[:10]
     bits = [bit for bit in (when, origin_label(fact)) if bit]
+    if fact.get('source') == 'learned':
+        bits.append('automatic')
+    elif fact.get('source') == 'manual':
+        bits.append('explicit')
+    if fact.get('evidence'):
+        bits.append(fact['evidence'].replace('_', ' '))
+    if fact.get('updated'):
+        bits.append('updated ' + fact['updated'])
+    if fact.get('status') == 'superseded':
+        bits.append('superseded')
     if fact.get("person") == SHARED:
         bits.append("family")
     return " · ".join(bits)
@@ -389,7 +451,7 @@ def _content_words(text: str) -> set[str]:
 
 
 def add_fact(text: str, person: str | None = None, source: str = "manual",
-             origin: str | None = None) -> dict | None:
+             origin: str | None = None, *, metadata: dict | None = None, correction: bool = False) -> dict | None:
     """Save a fact unless it's (nearly) already known. Returns it, or None if duplicate.
 
     A duplicate is not rewritten, so saying the same thing again cannot upgrade
@@ -402,19 +464,38 @@ def add_fact(text: str, person: str | None = None, source: str = "manual",
         return None
     person = (person or _person).lower()
     with _lock:
-        facts = list_facts()
-        same = [f for f in facts if f.get("person") == person]
+        if metadata and source == 'learned':
+            if not learning_enabled() or metadata.get('_generation', _generation) != _generation:
+                return None
+        facts = list_facts(include_superseded=True)
+        same = [f for f in facts if f.get("person") == person and f.get('status', 'active') == 'active']
+        if metadata and metadata.get('event_id') and any(
+                f.get('event_id') == metadata['event_id'] and f['text'].lower() == text.lower() for f in facts):
+            return None
         if any(f["text"].lower() == text.lower() for f in same):
             return None
-        vecs = embed([text] + [f["text"] for f in same]) if same else None
+        comparable = [f for f in same if not conflict_reason(text, f['text'])]
+        vecs = embed([text] + [f["text"] for f in comparable]) if comparable else None
         if vecs and any(_cos(vecs[0], v) > 0.92 for v in vecs[1:]):
             return None
-        if not vecs and any(_overlap(text, f["text"]) > 0.8 for f in same):
+        if not vecs and any(_overlap(text, f["text"]) > 0.8 for f in comparable):
             return None
         fact = {"id": uuid.uuid4().hex[:10], "person": person, "text": text,
                 "created": time.strftime("%Y-%m-%d %H:%M"),
                 "date": time.strftime("%Y-%m-%d"),
                 "source": source, "origin": origin_for(source, origin)}
+        if metadata:
+            for key in ('category', 'provenance', 'evidence', 'event_id', 'slot'):
+                if metadata.get(key) is not None:
+                    fact[key] = metadata[key]
+            fact['status'] = 'active'
+            fact['updated'] = fact['created']
+            if correction and fact.get('slot'):
+                for prior in same:
+                    if prior.get('source') == 'learned' and prior.get('slot') == fact['slot']:
+                        prior['status'] = 'superseded'
+                        prior['superseded_by'] = fact['id']
+                        prior['updated'] = fact['updated']
         facts.append(fact)
         _write_facts(facts)
         return fact
@@ -463,8 +544,7 @@ def _save_reply(text: str) -> str:
         return (f"Not saved: {exc}. Save it in shorter parts, or record it in the field notebook (log ...), "
                 "which keeps any length.")
     except OSError as exc:
-        return (f"Not saved: Cursiv couldn't write its memory file ({type(exc).__name__}: {exc}). Nothing was "
-                f"stored. Check that {FACTS_FILE.parent} is on a drive with space that isn't read-only.")
+        return _save_error(exc)
     if not saved:
         return "Already saved: an identical memory is there (nothing new was written)."
     back = next((f for f in list_facts() if f.get("id") == saved["id"]), None)
@@ -472,6 +552,18 @@ def _save_reply(text: str) -> str:
         return "Not saved: the write seemed to work but reading it back didn't find it. Try again."
     return (f"Saved to Cursiv's memory on this computer ({saved['created']}), exactly as:\n{saved['text']}\n"
             "Get it back any time with: recall <words or code>")
+
+
+def _save_error(exc: OSError) -> str:
+    try:
+        FACTS_FILE.stat()
+        absent = False
+    except FileNotFoundError:
+        absent = True
+    except OSError:
+        absent = False
+    detail = 'Nothing was stored.' if absent else 'Inspect saved memories before retrying; the write is unconfirmed.'
+    return f"Not saved: Cursiv couldn't confirm its memory write ({type(exc).__name__}: {exc}). {detail}"
 
 
 def _recall_reply(query: str) -> str:
@@ -484,8 +576,8 @@ def _recall_reply(query: str) -> str:
                f"they're kept in {UNREADABLE_FILE_NAME}, not used.)" if status["unreadable"] else "")
     if not hits:
         return (f"Nothing in Cursiv's saved memory matches \"{query.strip()}\" ({status['saved']} memories saved). "
-                "If it was mentioned earlier in this conversation, it was only in the conversation; it was never "
-                "saved. To save something: remember <it>" + damaged)
+                "It may have been only in the conversation; this search cannot establish whether it was never saved. "
+                "To save something: remember <it>" + damaged)
     rows = "\n".join(f"- {f['text']}  (saved {f.get('created', 'date unknown')}, {origin_label(f)})" for f in hits)
     clash = ""
     for i, a in enumerate(hits):
@@ -499,26 +591,30 @@ def _recall_reply(query: str) -> str:
 
 def forget(words: str, person: str | None = None) -> list[str]:
     """Delete facts matching an id or containing the words. Returns removed texts."""
+    global _generation
     words = (words or "").strip().lower()
     if not words:
         return []
     person = (person or _person).lower()
     with _lock:
-        facts = list_facts()
+        facts = list_facts(include_superseded=True)
         gone = [f for f in facts if f.get("person") in (person, SHARED) and (f["id"] == words or words in f["text"].lower())]
         if gone:
             ids = {f["id"] for f in gone}
             _write_facts([f for f in facts if f["id"] not in ids])
+        _generation += 1
         return [f["text"] for f in gone]
 
 
 def delete_fact(fact_id: str) -> bool:
+    global _generation
     with _lock:
-        facts = list_facts()
+        facts = list_facts(include_superseded=True)
         keep = [f for f in facts if f["id"] != fact_id]
         if len(keep) == len(facts):
             return False
         _write_facts(keep)
+        _generation += 1
         return True
 
 
@@ -540,7 +636,8 @@ def recall(query: str, person: str | None = None, top_k: int = 6) -> list[tuple[
     """Most relevant (score, kind, text) for the query: this person's facts,
     family facts, and saved conversation notes."""
     person = (person or _person).lower()
-    items = [("fact", f["text"]) for f in list_facts(person)] + _strand_items()
+    stored = list_facts(person)
+    items = [("fact", f["text"]) for f in stored] + _strand_items()
     if not items or not query.strip():
         return []
     vecs = embed([query] + [t for _, t in items])
@@ -555,8 +652,15 @@ def recall(query: str, person: str | None = None, top_k: int = 6) -> list[tuple[
             if score >= (0.68 if text in inferred else 0.55):
                 scored.append((score, kind, text))
     else:
+        personal = bool(re.search(r'(?i)\b(my|me|I|our|we)\b', query))
+        category = ('project' if re.search(r'(?i)\b(project|building|working)\b', query) else
+                    'preference' if re.search(r'(?i)\b(prefer|preference|language|drink)\b', query) else '')
+        category_hits = {f['text'] for f in stored if personal and category
+                         and f.get('category') == category and f.get('evidence') == 'direct_statement'}
         for kind, text in items:
             score = _overlap(query, text)
+            if text in category_hits:
+                score = max(score, 0.3)
             if score >= (0.25 if text in inferred else 0.12):
                 scored.append((score, kind, text))
     scored.sort(key=lambda x: x[0], reverse=True)
@@ -564,7 +668,10 @@ def recall(query: str, person: str | None = None, top_k: int = 6) -> list[tuple[
 
 
 def _fact_line(text: str, by_text: dict[str, dict]) -> str:
-    return f"- [{origin_label(by_text.get(text))}] {text}"
+    fact = by_text.get(text) or {}
+    quote = (fact.get('provenance') or {}).get('user_quote', '')
+    evidence = f' (user stated: {quote})' if fact.get('evidence') == 'direct_statement' and quote else ''
+    return f"- [{origin_label(fact)}] {text}{evidence}"
 
 
 def build_context(query: str, person: str | None = None) -> str:
@@ -609,8 +716,9 @@ def build_context(query: str, person: str | None = None) -> str:
     if fact_hits:
         lines = "\n".join(_fact_line(text, by_text) for text in fact_hits)
         out.append(f"What you remember about {who}. Use it only if it changes the answer, and don't recite it. "
-                   "Lines marked [inferred] are guesses from earlier conversations, not facts: never list them as "
-                   "Known and never state them as true.\n" + lines)
+                   "Lines marked [inferred] are extracted interpretations, not independently verified facts. "
+                   "When a user-stated quote is attached, attribute the statement to the user. Otherwise never "
+                   "list an inference as Known or state it as true.\n" + lines)
     if conflicts:
         rows = ["These memories conflict — do not silently prefer one. Tell the person:"]
         for left, right, reason in conflicts:
@@ -643,30 +751,57 @@ _LEARN_PROMPT = (
 
 
 def learn_from_exchange(user_text: str, reply: str, ask: Callable[[list[dict]], str], person: str | None = None,
-                        origin: str = "inferred") -> list[str]:
+                        origin: str = "inferred", *, event_id: str = "", expected_generation: int | None = None) -> list[str]:
     """Extract lasting facts with `ask` (messages -> text) and save new ones.
 
-    origin is inferred, or verified when a verification pass already cleared the
-    turn. Learning never writes user_said — only the person does, via remember.
+    The origin argument is retained for caller compatibility; automatic facts
+    always stay inferred, with direct-user evidence recorded separately.
     """
-    if not learning_enabled() or len((user_text or "").strip()) < 20:
+    from . import formation
+    expected_generation = generation() if expected_generation is None else expected_generation
+    if not formation.enabled_for(user_text):
+        formation.record('disabled_or_excluded')
         return []
     person = (person or _person).lower()
     name = person.title() if person != SHARED else "the user"
-    messages = [{"role": "system", "content": _LEARN_PROMPT.format(name=name)},
-                {"role": "user", "content": f"User said:\n{user_text[:3000]}\n\nAssistant replied:\n{(reply or '')[:3000]}"}]
-    try:
-        raw = ask(messages) or ""
-        m = re.search(r"\[.*\]", raw, re.S)
-        items = json.loads(m.group(0)) if m else []
-    except Exception:
-        return []
-    # A check passing on the answer doesn't make a guess about the person true:
-    # learned facts are always "inferred". Only "remember ..." is "you said".
+    proposed = formation.candidates(user_text, person)
+    if not proposed and len(user_text.strip()) >= 20:
+        messages = [{"role": "system", "content": _LEARN_PROMPT.format(name=name)},
+                    {"role": "user", "content": f"User said:\n{user_text[:3000]}"}]
+        try:
+            raw = ask(messages) or ""
+            m = re.search(r"\[.*\]", raw, re.S)
+            items = json.loads(m.group(0)) if m else []
+            if not isinstance(items, list):
+                formation.record('invalid_output')
+                return []
+        except Exception as exc:
+            formation.record('extraction_failed', exc)
+            return []
+        proposed = [dict(text=it, category='inferred_fact', evidence='inferred', quote=user_text[:3000])
+                    for it in items[:5] if isinstance(it, str) and formation.supported(it, user_text, person)]
+    event_id = event_id or uuid.uuid4().hex
     saved = []
-    for it in items[:5]:
-        if isinstance(it, str) and learnable(it, name) and add_fact(it, person, source="learned", origin="inferred"):
-            saved.append(it)
+    for candidate in proposed:
+        formation.record('candidate')
+        if not formation.enabled_for(user_text) or not formation.permitted(candidate['text']):
+            formation.record('rejected')
+            continue
+        metadata = {k: candidate.get(k) for k in ('category', 'evidence', 'slot')}
+        metadata.update(event_id=event_id, provenance={'message_id': event_id, 'user_quote': candidate['quote']},
+                        _generation=expected_generation)
+        formation.record('save_attempted')
+        try:
+            fact = add_fact(candidate['text'], person, source='learned', origin='inferred', metadata=metadata,
+                            correction=candidate.get('correction', False))
+        except (OSError, ValueError) as exc:
+            formation.record('save_failed', exc)
+            raise                        # callers keep chat alive; phone sync retries instead of advancing
+        if fact:
+            saved.append(fact['text'])
+            formation.record('save_confirmed')
+        else:
+            formation.record('duplicate_or_disabled')
     return saved
 
 
@@ -694,6 +829,9 @@ def memory_command(text: str) -> str | None:
     Returns the reply, or None if the text isn't a memory command."""
     t = (text or "").strip()
     low = t.lower()
+    if low == 'memory diagnostics':
+        from . import formation
+        return 'Memory formation diagnostics (counts only):\n' + json.dumps(formation.diagnostics(), sort_keys=True)
     m = _SAVE.match(t)
     if m:                                        # "save this record: ..." -- saved exactly, or said why not
         return _save_reply(_record_text(m.group(1)))
@@ -711,7 +849,7 @@ def memory_command(text: str) -> str | None:
         except ValueError as exc:
             return f"Not saved: {exc}. Save it in shorter parts."
         except OSError as exc:
-            return f"Not saved: Cursiv couldn't write its memory file ({type(exc).__name__}: {exc}). Nothing was stored."
+            return _save_error(exc)
         return f"Got it — I'll remember: {saved['text']}" if saved else "I already remember that."
     if low.startswith("forget ") and len(t) > 7:
         gone = forget(t[7:])

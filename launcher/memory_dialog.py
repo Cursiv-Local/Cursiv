@@ -50,6 +50,9 @@ class MemoryDialog(QDialog):
         self._search.setPlaceholderText("Search memories…")
         self._search.textChanged.connect(self._refresh)
         lay.addWidget(self._search)
+        self._historical = QCheckBox('Include superseded memories')
+        self._historical.toggled.connect(self._refresh)
+        lay.addWidget(self._historical)
         self._list = QListWidget()
         self._list.setWordWrap(True)
         lay.addWidget(self._list, 1)
@@ -71,7 +74,7 @@ class MemoryDialog(QDialog):
         bottom = QHBoxLayout()
         self._learn = QCheckBox("Learn lasting facts from our conversations")
         self._learn.setChecked(sem.learning_enabled())
-        self._learn.toggled.connect(sem.set_learning)
+        self._learn.toggled.connect(self._set_learning)
         bottom.addWidget(self._learn, 1)
         delete = QPushButton("Forget selected")
         delete.setObjectName("ghost")
@@ -88,7 +91,11 @@ class MemoryDialog(QDialog):
 
     def _refresh(self):
         q = self._search.text().strip().lower()
-        facts = self._sem.list_facts(self._sem.current_person())
+        try:
+            facts = self._sem.list_facts(self._sem.current_person(), include_superseded=self._historical.isChecked())
+        except OSError as exc:
+            self._status.setText(f'Could not read memories: {type(exc).__name__}')
+            return
         if q:
             facts = [f for f in facts if q in f["text"].lower()]
         self._list.clear()
@@ -98,7 +105,16 @@ class MemoryDialog(QDialog):
             self._list.addItem(item)
         self._status.setText(f"{len(facts)} memor{'y' if len(facts) == 1 else 'ies'}"
                              + ("" if self._sem.embeddings_available() else
-                                "  ·  matching by keywords (the meaning-search model downloads in the background when Ollama is running)"))
+                                "  ·  matching by keywords (Setup can install the local meaning-search model)"))
+
+    def _set_learning(self, on):
+        try:
+            self._sem.set_learning(on)
+        except (OSError, ValueError) as exc:
+            self._learn.blockSignals(True)
+            self._learn.setChecked(self._sem.learning_enabled())
+            self._learn.blockSignals(False)
+            self._status.setText(f'Learning setting not saved: {type(exc).__name__}')
 
     def _add(self):
         text = self._new.text().strip()
@@ -111,10 +127,13 @@ class MemoryDialog(QDialog):
             self._status.setText(f"Not saved: {exc}")
             return
         self._new.clear()
-        self._status.setText("Saved." if saved else "Already remembered.")
         self._refresh()
+        self._status.setText("Saved and verified." if saved else "Already remembered.")
 
     def _delete(self):
         item = self._list.currentItem()
-        if item and self._sem.delete_fact(item.data(Qt.ItemDataRole.UserRole)):
-            self._refresh()
+        try:
+            if item and self._sem.delete_fact(item.data(Qt.ItemDataRole.UserRole)):
+                self._refresh()
+        except OSError as exc:
+            self._status.setText(f'Could not confirm deletion: {type(exc).__name__}')

@@ -48,7 +48,8 @@ README = """CURSIV ON A USB DRIVE: START HERE
 TO START
   Double-click "Start Cursiv" (Start Cursiv.bat). That's all.
   Nothing is installed on the computer. Cursiv, its AI engine (Ollama) and the AI
-  model all run from this drive, and everything Cursiv saves stays on this drive.
+  model can run from this drive. Cursiv's portable data and workspace stay on it.
+  Windows and an existing host Ollama service may retain their own system traces.
   Works on Windows 10 and 11 (64-bit).
 
 THE FIRST TIME
@@ -73,6 +74,13 @@ WHAT'S ON THIS DRIVE
   Cursiv\\                  the program
   Home\\                    everything Cursiv saves: accounts, memories, field
                            notebook, documents, settings (Home\\.cursiv)
+  Workspace\\               authorized research and project files
+
+  Updates preserve existing personal data. Legacy data conflicts stop startup
+  after verified backups; they are never silently merged. Keep a separate backup.
+  Cursiv does not encrypt this drive. Anyone with access may read its files and
+  copied credentials. Use drive encryption when appropriate. A lost or damaged
+  drive is not recoverable without a separate backup. Close Cursiv before ejecting.
   Models\\                  the AI models
   Ollama\\                  the AI engine
   Licenses\\                licences for Cursiv, Ollama and each model; keep them
@@ -366,9 +374,15 @@ def stale_files(root: Path, plan: list[tuple[Path, Path]]) -> list[Path]:
         base = root / top
         if not base.is_dir():
             continue
-        for f in base.rglob("*"):
-            if f.is_file() and f.resolve() not in wanted and not _is_personal(f.relative_to(root)):
-                out.append(f)
+        if base.is_symlink() or base.is_junction():
+            raise OSError(f'Linked USB program folder refused: {base}')
+        for folder, dirs, names in os.walk(base, followlinks=False):
+            dirs[:] = [name for name in dirs if not _is_personal((Path(folder) / name).relative_to(root))
+                       and not (Path(folder) / name).is_symlink() and not (Path(folder) / name).is_junction()]
+            for name in names:
+                f = Path(folder) / name
+                if not f.is_symlink() and f.resolve() not in wanted and not _is_personal(f.relative_to(root)):
+                    out.append(f)
     return out
 
 
@@ -406,22 +420,27 @@ def copy_files(todo: list[tuple[Path, Path]], progress, cancel: threading.Event)
     total = sum(s.stat().st_size for s, _ in todo) or 1
     copied = 0
     for i, (src, dest) in enumerate(todo, 1):
+        from cursiv_v215.core.state_store import checked
+        checked(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
-        part = dest.with_name(dest.name + ".part")
-        with open(src, "rb") as fi, open(part, "wb") as fo:
-            while chunk := fi.read(8 << 20):
-                if cancel.is_set():
-                    fo.close()
-                    part.unlink(missing_ok=True)
-                    raise InterruptedError
-                fo.write(chunk)
-                copied += len(chunk)
-                progress(int(copied * 100 / total),
-                         f"Copying {i} of {len(todo)} files — {copied / GB:.1f} of {total / GB:.1f} GB")
-            fo.flush()
-            os.fsync(fo.fileno())
-        os.replace(part, dest)
-        shutil.copystat(src, dest, follow_symlinks=True)
+        fd, temporary = tempfile.mkstemp(prefix='.' + dest.name, suffix='.part', dir=dest.parent)
+        part = Path(temporary)
+        try:
+            with os.fdopen(fd, 'wb') as fo, open(src, 'rb') as fi:
+                while chunk := fi.read(8 << 20):
+                    if cancel.is_set():
+                        raise InterruptedError
+                    fo.write(chunk)
+                    copied += len(chunk)
+                    progress(int(copied * 100 / total),
+                             f"Copying {i} of {len(todo)} files — {copied / GB:.1f} of {total / GB:.1f} GB")
+                fo.flush()
+                os.fsync(fo.fileno())
+            checked(dest)
+            os.replace(part, dest)
+            shutil.copystat(src, dest, follow_symlinks=False)
+        finally:
+            part.unlink(missing_ok=True)
 
 
 def _download_ollama(dest_dir: Path, progress, cancel: threading.Event) -> Path:
@@ -484,10 +503,10 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             tmp_zip_dir = Path(tempfile.mkdtemp(prefix="cursiv_ollama_"))
             osrc = _download_ollama(tmp_zip_dir, sig.progress.emit, cancel)
 
-        # Fresh copy on a drive that once held a private one: remove that first.
-        wiped = False if include_private else wipe_private_copy(root)
-
-        plan = [(s, root / d) for s, d in build_plan(models, include_private, osrc)]
+        # Updating binaries never resets existing personal data, even if private
+        # copying is unchecked. A fresh private copy only fills missing files.
+        wiped = False
+        plan = update_plan(root, build_plan(models, include_private, osrc))
         todo = [(s, d) for s, d in plan if _needs_copy(s, d)]
         total = sum(s.stat().st_size for s, _ in todo) or 1
 
@@ -503,13 +522,10 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         copy_files(todo, sig.progress.emit, cancel)
         for f in stale_files(root, plan):
             f.unlink(missing_ok=True)
-        for leftover in root.rglob("*.part"):
-            leftover.unlink(missing_ok=True)
         if include_private:
             (root / PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
             (root / PRIVATE_MARKER).write_text(
-                "This drive holds a private copy of someone's Cursiv data. Making a fresh "
-                "copy on it removes that data.\n", encoding="utf-8")
+                "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
 
         sig.progress.emit(-1, "Checking the drive matches…")
         problems = verify_usb(plan)
@@ -521,8 +537,8 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
             # Saved keys are encrypted for this Windows account; the USB runs on
             # other PCs, so its copy holds them readable (the note below says so).
             from cursiv_v215.core import keystore
-            for cfg_file in (root / "Cursiv").rglob("config.json"):
-                if cfg_file.parent.name == ".cursiv":
+            for _src, cfg_file in plan:
+                if cfg_file.name == 'config.json' and cfg_file.parent.name == '.cursiv':
                     keystore.export_readable(cfg_file)
 
         write_licenses(root, models)
@@ -541,8 +557,7 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         tidy_root(root)
         if tmp_zip_dir:
             shutil.rmtree(tmp_zip_dir, ignore_errors=True)
-        note = (" Your memories, keys and settings are on it — keep it safe."
-                if include_private else " It starts fresh, so it can be given to someone else.")
+        note = ' Existing drive data was preserved. Private data on this drive is not encrypted by Cursiv.'
         if wiped:
             note += " The private data from the earlier copy was removed from the drive."
         sig.done.emit(True, f"Done. Plug the drive into any Windows PC and double-click "
@@ -551,6 +566,27 @@ def make_usb(root: Path, models: list[dict], include_private: bool,
         sig.done.emit(False, "Stopped. Click Make USB again to pick up where it left off.")
     except Exception as exc:
         sig.done.emit(False, f"Couldn't finish: {exc}")
+
+
+def update_plan(root: Path, pairs: list[tuple[Path, Path]]) -> list[tuple[Path, Path]]:
+    """Never overwrite a private file during a program refresh."""
+    root = root.resolve()
+    result = []
+    for source, relative in pairs:
+        if relative.is_absolute() or '..' in relative.parts:
+            raise ValueError('USB copy path must be relative and inside the drive')
+        target = root / relative
+        cursor = target
+        while cursor != root:
+            if cursor.is_symlink() or cursor.is_junction():
+                raise OSError(f'USB update refuses linked destination: {cursor}')
+            cursor = cursor.parent
+        if not target.resolve().is_relative_to(root):
+            raise OSError('USB destination escapes selected drive')
+        if '.cursiv' in relative.parts and target.exists():
+            continue
+        result.append((source, target))
+    return result
 
 
 def tidy_root(root: Path) -> None:
@@ -727,8 +763,8 @@ class UsbMakerDialog(QDialog):
             ok = QMessageBox.question(
                 self, "Private data on this drive",
                 "This drive has a private copy of your memories, keys and settings from an "
-                "earlier time. Making a fresh copy removes them from the drive (they stay on "
-                "this computer).\n\nContinue?",
+                "earlier time. Updating preserves that data; this is not a way to reset a drive "
+                "for another person.\n\nContinue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
                 return
@@ -737,6 +773,14 @@ class UsbMakerDialog(QDialog):
                 self, "Private data",
                 "Your memories, keys and conversations will be copied onto the drive. Anyone who "
                 "has the drive can read them.\n\nContinue?",
+                QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+            if ok != QMessageBox.StandardButton.Yes:
+                return
+        missing = [tag for tag in required_names(list_models()) if tag not in {m['name'] for m in list_models()}]
+        if missing or ollama_dir() is None:
+            ok = QMessageBox.question(self, 'Downloads required',
+                'Making this USB requires downloading missing models or the Ollama runtime. '
+                'This may use several GB of internet data. Download and continue?',
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
                 return

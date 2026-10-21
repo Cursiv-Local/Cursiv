@@ -22,13 +22,51 @@ for _m in ("codex_tool_bridge", "knowledge_brain"):
 import pytest  # noqa: E402
 
 
-def _real_data_state():
+@pytest.fixture(autouse=True)
+def _memory_isolated(tmp_path, monkeypatch):
+    """Background learning must not outlive a test's storage redirections.
+
+The baseline suite changed the copied app's memory during an unrelated test.
+Tests exercise learner work explicitly; ordinary chat tests never start jobs.
+"""
+    from cursiv_v215.memory import semantic, formation
+    folder = tmp_path / 'memory'
+    for key, value in (('CURSIV_DIR', folder), ('FACTS_FILE', folder / 'memory_facts.jsonl'),
+                       ('SETTINGS_FILE', folder / 'memory_settings.json'),
+                       ('EMB_CACHE_FILE', folder / 'embeddings_cache.json')):
+        monkeypatch.setattr(semantic, key, value)
+    monkeypatch.setattr(semantic, '_person', semantic.SHARED)
+    monkeypatch.setattr(semantic, '_generation', 0)
+    monkeypatch.setattr(semantic, '_embed_ok', False)
+    monkeypatch.setattr(semantic, '_emb_cache', {})
+    from cursiv_v215.memory import projects
+    from cursiv_v215.core import style
+    from cursiv_v215.coding import brain
+    monkeypatch.setattr(projects, 'DIR', folder / 'projects')
+    monkeypatch.setattr(style, 'DIR', folder / 'style')
+    monkeypatch.setattr(brain, 'CURSIV_DIR', folder)
+    monkeypatch.setattr(brain, 'PROFILE_FILE', folder / 'coding_profile.json')
+    monkeypatch.setattr(brain, 'LESSONS_FILE', folder / 'coding_lessons.jsonl')
+    monkeypatch.setattr(formation, '_logger', None)
+    from cursiv_v215.core import curiosity, presence
+    monkeypatch.setattr(curiosity, 'path', lambda person: folder / 'curiosity' / (person + '.json'))
+    monkeypatch.setattr(presence, 'path', lambda person: folder / 'presence' / (person + '.json'))
+    real_submit = formation.submit
+    monkeypatch.setattr(formation, 'submit', lambda work, event_id: False)
+    # No diagnostic file handler opens in a unit test unless explicitly tested.
+    monkeypatch.setattr(formation, 'record', lambda stage, error=None: formation._counts.update([stage]))
+    yield real_submit
+
+
+def _real_data_state(watched=None):
     """The person's real records a test must never create or change."""
     from cursiv_v215.core import paths
     home = Path.home() / ".cursiv"
     out = {}
-    for p in (home / "fieldlog", home / "fieldlog" / "observations.jsonl", home / "device_key.json",
-              paths.APP_DATA / "memory_facts.jsonl", paths.APP_DATA / "config.json"):
+    for p in (watched if watched is not None else (
+            home / "fieldlog", home / "fieldlog" / "observations.jsonl", home / "device_key.json",
+            paths.APP_DATA / "memory_facts.jsonl", paths.APP_DATA / "config.json",
+            paths.APP_DATA / 'memory_settings.json', paths.APP_DATA / 'embeddings_cache.json')):
         try:
             st = p.stat()
             out[str(p)] = (st.st_size, st.st_mtime_ns)
@@ -43,7 +81,7 @@ def _real_data_untouched():
     its own redirection once pointed at them)."""
     before = _real_data_state()
     yield
-    after = _real_data_state()
+    after = _real_data_state(Path(p) for p in before)    # portable tests can change HOME mid-test
     changed = [p for p in before if before[p] != after[p]]
     assert not changed, f"this test touched real data: {changed}"
 

@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U79"
+VERSION = "3.14-U80"
 FACTS_FILE = Path(__file__).parent.parent / "council" / "cursiv_facts.md"
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
@@ -138,6 +138,11 @@ def live_report() -> str:
         lines.append("Recent errors this session: " + "; ".join(f"{t} {e}" for t, e in list(RECENT_ERRORS)[-5:]))
     else:
         lines.append("Recent errors this session: none")
+    try:
+        from . import presence
+        lines.append('Operational snapshot (observed now): ' + json.dumps(presence.snapshot()))
+    except (OSError, ValueError):
+        lines.append('Operational snapshot unavailable; state unknown.')
     return "\n".join(f"- {l}" for l in lines)
 
 
@@ -161,7 +166,7 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 - Tray menu: What I remember…, Phone…, Setup…, Send problem report…, Quit.
 - Chat commands: remember <fact>, forget <words>, what do you remember, memory learn on/off, free keys, cloud on/off/status, council <question>, codex <request> (codex help, codex keep, codex project <folder>, codex lessons, codex learn <lesson>), phases, help.
 - Cursiv Forge: evolve <idea> (writes a plugin, safety-checks it, tests it in a sandbox; installs only after evolve approve), plugins, plugin show/off/on/remove/approve <name>. Plugins live in .cursiv/plugins.
-- Tools: when a message is about this computer (files, folders, disk space, RAM), Cursiv reads it with read-only tools (system_info, list_folder, read_file, find_files) plus any plugin tools; private places are never read.
+- Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
 - Tone and style: tone blunt/warm/brief/playful/legacy/teacher/normal; style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agent council <question>.

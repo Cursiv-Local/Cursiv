@@ -34,15 +34,16 @@ def _path(person: str) -> Path:
 
 
 def load(person: str) -> dict:
-    try:
-        return json.loads(_path(person).read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+    from cursiv_v215.core import state_store
+    data = state_store.load(_path(person), {})
+    if not isinstance(data, dict):
+        raise ValueError('Invalid project notes; existing data preserved')
+    return data
 
 
 def _save(person: str, data: dict) -> None:
-    DIR.mkdir(parents=True, exist_ok=True)
-    _path(person).write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    from cursiv_v215.core import state_store
+    state_store.save(_path(person), data)
 
 
 def _words(text: str) -> set[str]:
@@ -86,22 +87,29 @@ If it's a one-off question, small talk, or not about a lasting project, reply {{
 
 
 def learn(user_text: str, reply: str, ask: Callable[[list[dict]], str], person: str) -> str | None:
+    from . import formation
+    from .semantic import generation
+    epoch = generation()
+    if not formation.enabled_for(user_text):
+        return None
     if len((user_text or "").strip()) < 25:
         return None
     data = load(person)
     existing = "\n".join(f"- {n}: {p['summary'][:300]}" for n, p in list(data.items())[-12:]) or "(none yet)"
     try:
         raw = ask([{"role": "system", "content": _LEARN.format(name=person.title(), existing=existing)},
-                   {"role": "user", "content": f"User:\n{user_text[:2500]}\n\nAssistant:\n{(reply or '')[:2500]}"}]) or ""
+                   {"role": "user", "content": f"User:\n{user_text[:2500]}"}]) or ""
         m = re.search(r"\{.*\}", raw, re.S)
         out = json.loads(m.group(0)) if m else {}
     except Exception:
         return None
     name = (out.get("project") or "").strip()[:40]
     summary = (out.get("summary") or "").strip()
-    if not name or len(summary) < 20:
+    if not name or len(summary) < 20 or not formation.permitted(name + ' ' + summary):
         return None
     with _lock:
+        if not formation.enabled_for(user_text) or generation() != epoch:
+            return None
         data = load(person)
         match = next((n for n in data if n.lower() == name.lower()), name)
         kws = [k.lower() for k in out.get("keywords", []) if isinstance(k, str)][:10]

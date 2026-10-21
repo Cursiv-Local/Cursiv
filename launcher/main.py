@@ -25,8 +25,13 @@ if str(_ROOT) not in sys.path:
 try:
     from portable import activate as _activate_portable
     _activate_portable()
-except Exception:
-    pass
+except Exception as exc:
+    # Never continue with host paths after detecting an unusable portable drive.
+    try:
+        import ctypes
+        ctypes.windll.user32.MessageBoxW(0, str(exc), 'Cursiv portable storage unavailable', 0x10)
+    finally:
+        raise SystemExit(f'Portable startup stopped: {exc}')
 
 try:
     from data_home import link_data_folders

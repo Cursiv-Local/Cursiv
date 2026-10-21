@@ -1179,6 +1179,7 @@ class ChatPanel(QWidget):
 
         path = pending.get("path", "?")
         content = pending.get("content", "")
+        self._pending_write_context['request'] = pending
         preview = content[:400] + ("..." if len(content) > 400 else "")
         approved = QMessageBox.question(
             self, "Cursiv — Write pending",
@@ -1198,7 +1199,11 @@ class ChatPanel(QWidget):
 
     def _run_write_approval(self, path: str, content: str, workspace: str) -> None:
         try:
-            result = cc.approve_write(path, content, workspace)
+            request = self._pending_write_context.get('request', {})
+            result = cc.approve_write(path, content, workspace,
+                                      operation=request.get('operation', 'write_file'),
+                                      expected_sha256=request.get('expected_sha256'),
+                                      remember=request.get('remember', False))
             self._signals.write_complete.emit(result.text)
         except Exception as e:
             self._signals.write_complete.emit(f"[Write failed: {e}]")

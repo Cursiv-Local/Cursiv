@@ -1,0 +1,8 @@
+[
+  {"name":"missing water conditions","values":["7","8"],"units":["pH","pH"],"notes":"water sample","expected":["collection conditions"]},
+  {"name":"incomparable units","values":["7","8"],"units":["pH","unknown"],"notes":"water sample","expected":[]},
+  {"name":"conditions already recorded","values":["7","8"],"units":["pH","pH"],"notes":"rainfall and temperature recorded","expected":[]},
+  {"name":"pattern without causal claim","values":["7","8","9"],"units":["pH","pH","pH"],"notes":"temperature recorded; flowers also changed","expected":["variation"]},
+  {"name":"reported assumption","values":[],"units":[],"notes":"","text":"I assume the equipment cannot drift.","expected":["assumption"]},
+  {"name":"single ambiguous observation","values":["7"],"units":["unknown"],"notes":"measurement method unknown","expected":[]}
+]

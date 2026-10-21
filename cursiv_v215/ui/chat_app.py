@@ -233,20 +233,6 @@ FILE_TOOLS = [
     {
         "type": "function",
         "function": {
-            "name": "delete_file",
-            "description": "Delete a file. Use with care — this is irreversible. Only delete files you created or that Josh explicitly asks you to remove.",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "path": {"type": "string", "description": "File path to delete."},
-                },
-                "required": ["path"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "submit_plan",
             "description": (
                 "REQUIRED first step before writing any files. "
@@ -381,131 +367,36 @@ CLAUDE_TOOLS = [
 
 # ── Tool execution engine ──────────────────────────────────────────────────
 
-def _resolve_path(raw: str, root: Path) -> Path | None:
-    """Resolve a path safely within root. Returns None if it escapes the workspace."""
+def _existing_file(args: dict, root: Path) -> bool:
+    from cursiv_v215.core import file_access
     try:
-        p = Path(raw)
-        resolved = p.resolve() if p.is_absolute() else (root / p).resolve()
-        resolved.relative_to(root.resolve())   # raises ValueError if outside
-        return resolved
-    except (ValueError, Exception):
-        return None
+        return file_access.resolve(args.get('path', ''), root).exists()
+    except (OSError, ValueError):
+        return False
 
 
-_BLOCKED_READ_PATHS = {
-    ".cursiv/config.json",
-    ".cursiv\\config.json",
-    "secrets.bat",
-}
+def _pending_file(args: dict, root: Path) -> dict:
+    from cursiv_v215.core import file_access
+    # Native model output cannot authorize a separate conversational-memory save.
+    return file_access.pending('write_file', {'path': args.get('path', ''), 'content': args.get('content', '')}, root)
 
-def execute_tool(name: str, args: dict, root: Path) -> str:
+
+def execute_tool(name: str, args: dict, root: Path, *, confirmed: bool = False) -> str:
     """Execute a file tool call. Returns a string result sent back to the model."""
 
-    if name == "read_file":
-        raw_path = args.get("path", "")
-        if _scan:
-            _scan.file_scan(raw_path)
-        # Block credential files — keys must never be exposed via tool reads
-        for blocked in _BLOCKED_READ_PATHS:
-            if blocked.replace("\\", "/") in raw_path.replace("\\", "/"):
-                return "Access denied: this file contains credentials and cannot be read via tools."
-        path = _resolve_path(raw_path, root)
-        if not path:
-            return "Error: path is outside the workspace root. Only paths inside the workspace are allowed."
-        if not path.exists():
-            return f"Error: file not found: {path}"
-        try:
-            content = path.read_text(encoding="utf-8", errors="ignore")
-            lines   = content.splitlines()
-            numbered = "\n".join(f"{i+1:4d}  {ln}" for i, ln in enumerate(lines))
-            if len(numbered) > 12000:
-                numbered = numbered[:12000] + f"\n... [truncated — {len(lines)} lines total]"
-            return f"File: {path}\nLines: {len(lines)}\n\n{numbered}"
-        except Exception as e:
-            return f"Error reading {path}: {e}"
+    if not isinstance(args, dict):
+        return 'Error: tool arguments must be an object.'
 
-    elif name == "write_file":
-        path    = _resolve_path(args.get("path", ""), root)
-        content = args.get("content", "")
-        if not path:
-            return "Error: path is outside the workspace root."
-        if _guardian_protected(args.get("path", "")):
-            return "Error: write blocked — Cursiv never lets the AI change its keys, logins or protection files."
+    if name in {"read_file", "write_file", "append_file", "create_file", "list_directory", "search_files", "create_directory", "delete_file"}:
+        from cursiv_v215.core import file_access
         try:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            existed = path.exists()
-            path.write_text(content, encoding="utf-8")
-            return f"{'Updated' if existed else 'Created'}: {path}  ({len(content.splitlines())} lines, {len(content)} chars)"
-        except Exception as e:
-            return f"Error writing {path}: {e}"
+            if name in {"write_file", "append_file", "create_file", "delete_file"} and _guardian_protected(args.get("path", "")):
+                return "Error: protected file cannot be changed."
+            return file_access.execute(name, args, root, confirmed=confirmed)
+        except (OSError, ValueError) as exc:
+            return f"Error: {type(exc).__name__}: {exc}"
 
-    elif name == "list_directory":
-        if _scan:
-            _scan.dir_scan(args.get("path", ".") or ".")
-        raw  = args.get("path", ".")
-        path = _resolve_path(raw, root) if raw and raw != "." else root
-        if not path:
-            return "Error: path is outside the workspace root."
-        if not path.exists():
-            return f"Error: directory not found: {path}"
-        try:
-            entries = sorted(path.iterdir(), key=lambda p: (p.is_file(), p.name.lower()))[:150]
-            lines   = [f"Directory: {path}", ""]
-            for e in entries:
-                tag  = "DIR " if e.is_dir() else "    "
-                size = f"  {e.stat().st_size:>8,} B" if e.is_file() else ""
-                lines.append(f"{tag} {e.name}{size}")
-            return "\n".join(lines)
-        except Exception as e:
-            return f"Error listing {path}: {e}"
-
-    elif name == "search_files":
-        if _scan:
-            _scan.dir_scan(args.get("directory", ".") or ".")
-        pattern   = args.get("pattern", "*")
-        dir_raw   = args.get("directory", ".")
-        base      = _resolve_path(dir_raw, root) if dir_raw and dir_raw != "." else root
-        if not base:
-            base = root
-        try:
-            matches = sorted(base.glob(pattern))[:80]
-            if not matches:
-                return f"No files matching '{pattern}' in {base}"
-            lines = [f"Found {len(matches)} match(es) for '{pattern}' in {base}:", ""]
-            for m in matches:
-                try:
-                    rel = m.relative_to(root)
-                except ValueError:
-                    rel = m
-                tag = "DIR " if m.is_dir() else "    "
-                lines.append(f"{tag} {rel}")
-            return "\n".join(lines)
-        except Exception as e:
-            return f"Error searching: {e}"
-
-    elif name == "create_directory":
-        path = _resolve_path(args.get("path", ""), root)
-        if not path:
-            return "Error: path is outside the workspace root."
-        try:
-            path.mkdir(parents=True, exist_ok=True)
-            return f"Created directory: {path}"
-        except Exception as e:
-            return f"Error creating directory: {e}"
-
-    elif name == "delete_file":
-        path = _resolve_path(args.get("path", ""), root)
-        if not path:
-            return "Error: path is outside the workspace root."
-        if not path.exists():
-            return f"File not found (already gone?): {path}"
-        try:
-            path.unlink()
-            return f"Deleted: {path}"
-        except Exception as e:
-            return f"Error deleting {path}: {e}"
-
-    elif name == "submit_plan":
+    if name == "submit_plan":
         plan = args.get("plan", "").strip()
         if not plan:
             return "Plan acknowledged (empty). Please provide a detailed plan next time."
@@ -813,6 +704,11 @@ def _call_ollama_raw(messages: list[dict], max_tokens: int = RESPONSE_MAX_TOKENS
                "Setup window and click Restart Ollama (or quit Ollama from its tray icon and open it again).]")
         return
     if model is None:
+        from cursiv_v215.core.paths import portable_root
+        if portable_root():
+            from cursiv_v215.core.ollama_host import diagnose
+            yield '\n[No usable local model. ' + diagnose() + ' No model was downloaded.]'
+            return
         # Ollama is running but has no models at all -- download the default
         # once (progress shown in the reply) instead of failing with a 404.
         yield from _pull_ollama_model(_speed.chat_model_prefs()[0])
@@ -1331,6 +1227,15 @@ def _quick_llm(messages: list[dict], max_tokens: int = 400) -> str:
             return ""
         return _local_llm(messages, max_tokens)
     return _free_key_llm(messages, max_tokens)
+
+
+def _memory_llm(messages: list[dict], max_tokens: int = 400) -> str:
+    """Optional memory extraction stays local even when cloud keys are configured."""
+    if _ollama_running() and _resolve_ollama_model():
+        from cursiv_v215.core import speed
+        if speed.wait_idle(30):
+            return _local_llm(messages, max_tokens)
+    return ''
 
 
 def _local_model_ready() -> bool:
@@ -2042,7 +1947,7 @@ def _call_claude_with_tools(
             fn_args = tc.get("input", {})
             tc_id   = tc["id"]
 
-            if fn_name == "write_file" and confirm_writes:
+            if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
                 path_arg    = fn_args.get("path", "")
                 content_arg = fn_args.get("content", "")
                 preview     = content_arg[:400] + ("…" if len(content_arg) > 400 else "")
@@ -2051,7 +1956,7 @@ def _call_claude_with_tools(
                     f"```\n{preview}\n```\n"
                     f"*Waiting for approval…*\n"
                 )
-                yield WRITE_SENTINEL + json.dumps({"path": path_arg, "content": content_arg})
+                yield WRITE_SENTINEL + json.dumps(_pending_file(fn_args, root))
                 return
 
             result = execute_tool(fn_name, fn_args, root)
@@ -2156,7 +2061,7 @@ def _call_xai_with_tools(
                 fn_args = {}
 
             # Confirm-before-write: pause and hand control back to the UI
-            if fn_name == "write_file" and confirm_writes:
+            if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
                 path_arg    = fn_args.get("path", "")
                 content_arg = fn_args.get("content", "")
                 preview     = content_arg[:600] + ("..." if len(content_arg) > 600 else "")
@@ -2165,7 +2070,7 @@ def _call_xai_with_tools(
                     f"```\n{preview}\n```\n"
                     f"*Waiting for approval…*\n"
                 )
-                yield WRITE_SENTINEL + json.dumps({"path": path_arg, "content": content_arg})
+                yield WRITE_SENTINEL + json.dumps(_pending_file(fn_args, root))
                 return   # stop the loop — resume after user approves
 
             # Code-gen enhancement before writing:
@@ -2484,6 +2389,16 @@ def _chat_inner(
         yield "Please type a message or upload a file."
         return
 
+    # Deterministic file dispatch works with every model, including no model.
+    from cursiv_v215.core import file_access as _files
+    _file_result = _files.command(user_text, history, Path(root_path) if file_access and root_path else None)
+    if _file_result is not None:
+        if _file_result.pending:
+            yield WRITE_SENTINEL + json.dumps(_file_result.pending)
+        else:
+            yield _file_result.text
+        return
+
     # ── Owner code setup (runs before Guardian — no API call, no log) ───
     if user_text.lower().startswith("owner setcode "):
         _new_code = user_text[len("owner setcode "):].strip()
@@ -2669,6 +2584,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         pass
 
     # ── How this person wants Cursiv to talk (core/style.py): tone + rules learned
+    try:
+        from cursiv_v215.core import presence
+        from cursiv_v215.memory import semantic as _presence_sem
+        messages[0]['content'] += presence.prompt(_presence_sem.current_person(), root_path, file_access)
+    except (OSError, ValueError):
+        messages[0]['content'] += '\nOperational context unavailable; do not infer missing state.\n'
     # from their corrections. Added to every kind of reply; corrections are learned
     # in the background from this message and the reply it's correcting.
     try:
@@ -2679,11 +2600,13 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             _add = _style.prompt_addendum(_who)
             if _add:
                 messages[0]["content"] += "\n\n" + _add + "\n"
-            if _style.looks_like_correction(user_text):
+            from cursiv_v215.memory import formation as _formation
+            if _style.looks_like_correction(user_text) and _formation.enabled_for(user_text):
                 _prev = next((m.get("content", "") for m in reversed(history or [])
                               if m.get("role") == "assistant" and isinstance(m.get("content"), str)), "")
-                threading.Thread(target=_style.learn_correction, args=(_who, user_text, _prev, _quick_llm),
-                                 daemon=True).start()
+                import uuid
+                _formation.submit(lambda: _style.learn_correction(_who, user_text, _prev, _memory_llm),
+                                  'style:' + uuid.uuid4().hex)
     except Exception:
         pass
 
@@ -2710,7 +2633,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             if _tools.might_need_tools(user_text):
                 _calls = _tools.plan(user_text, _router_llm)
                 if _calls:
-                    _results = _tools.run(_calls)
+                    _results = _tools.run(_calls, root=Path(root_path) if file_access and root_path else None)
                     _tool_ctx = _tools.context_for(_results)
                     _RETRIEVED.append(_tool_ctx)
                     messages[0]["content"] += "\n\n" + _tool_ctx + "\n"
@@ -2825,6 +2748,16 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         pass
 
     # Codex Agent is invoked explicitly via the `codex <prompt>` command only.
+    messages[0]['content'] += (
+        '\n\n## Actual local file capabilities\n'
+        + (f'File access is enabled only inside this authorized workspace: {root_path}. '
+           'Cursiv supports reading/listing UTF-8 text files and verified file writes through its application layer. '
+           if file_access else 'File access is currently off. The user can choose workspace <folder>, then files on. ')
+        + 'Explicit file commands also work offline without native model tools: file read <path>; file list <folder>; '
+        'file create|append|replace|remember <path> :: <text>; file save conversation <path>. '
+        'If a location or filename is unclear, ask for it. Never claim a write succeeded without an actual tool result. '
+        'An existing file requires confirmation. Protected credentials and paths outside the workspace are unavailable.\n'
+    )
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.
@@ -3150,38 +3083,45 @@ def _fallback_chain(text_msgs: list[dict], user_text: str, tried: list[str],
 
 
 
-def _learn_later(message, reply: str, *, origin: str = "inferred", skip: bool = False) -> None:
+def _learn_later(message, reply: str, *, origin: str = "inferred", skip: bool = False,
+                 person: str | None = None, event_id: str = '') -> None:
     """Save lasting facts from this exchange (memory/semantic.py), off the UI thread.
 
-    origin is verified only after the verification pass came back clean.
-    skip is set when that pass found problems, so the draft is not stored.
+    User facts are never extracted from the assistant's draft. A failed answer
+    check permits only directly matched user statements; origins stay inferred.
     """
-    if skip:
-        return
     if origin not in ("inferred", "verified"):
         origin = "inferred"
     text = message.get("text", "") if isinstance(message, dict) else str(message or "")
+    from cursiv_v215.core import file_access as _files
+    if _files.is_request(text):
+        return
+    from cursiv_v215.memory import semantic as _sem, formation as _formation
+    if skip and not _formation.candidates(text, person or _sem.current_person()):
+        return
+    if not _formation.enabled_for(text):
+        return
+    person = person or _sem.current_person()
+    _memory_generation = _sem.generation()
+    if not event_id:
+        import uuid
+        event_id = uuid.uuid4().hex
     # drop Cursiv's own status lines ("*[Answered by …]*", routing notes) before judging the reply
     reply = _strip_status_lines(reply or "")
-    if not reply.strip() or reply.lstrip().startswith("[") or len(text.strip()) < 15:
+    if not reply.strip() or len(text.strip()) < 4:
         return
     coding = _CODING_TURN
     def work():
-        try:
-            from cursiv_v215.memory import semantic as _sem
-            if len(text.strip()) >= 20:
-                _sem.learn_from_exchange(text, reply, _quick_llm, origin=origin)
-            try:              # project memory: running summary of ongoing projects
-                from cursiv_v215.memory import projects as _proj
-                _proj.learn(text, reply, _quick_llm, _sem.current_person())
-            except Exception:
-                pass
-            if coding:        # coding lessons: their setup, errors hit, fixes that worked
-                from cursiv_v215.coding import brain as _cb
-                _cb.learn_from_exchange(text, reply, _quick_llm, _sem.current_person())
-        except Exception:
-            pass
-    threading.Thread(target=work, daemon=True).start()
+        _sem.learn_from_exchange(text, reply, _memory_llm, person, origin=origin, event_id=event_id,
+                                 expected_generation=_memory_generation)
+        if _sem.generation() != _memory_generation:
+            return
+        from cursiv_v215.memory import projects as _proj
+        _proj.learn(text, reply, _memory_llm, person)
+        if coding:
+            from cursiv_v215.coding import brain as _cb
+            _cb.learn_from_exchange(text, reply, _memory_llm, person)
+    _formation.submit(work, event_id)
 
 
 _PHASE_AFTER = ""   # end-of-reply note from core/phases.py for the current message
@@ -3246,10 +3186,27 @@ def chat(
     background. Casual turns skip the pass.
     """
     global _PHASE_AFTER, _EMERGENCY_TURN, _CURSIV_REPLY
+    from cursiv_v215.core import field_recall
+    _field_text = message.get('text', '') if isinstance(message, dict) else str(message or '')
+    _field_reply = field_recall.command(_field_text)
+    if _field_reply is not None:
+        yield _field_reply
+        return
+    from cursiv_v215.core import curiosity_engine
+    from cursiv_v215.memory import semantic as _journal_sem
+    from cursiv_v215.core.paths import save_reference
+    _journal_scope = save_reference(root_path) if file_access and root_path else 'general'
+    _journal_reply = curiosity_engine.command(_field_text, _journal_sem.current_person(), _journal_scope)
+    if _journal_reply is not None:
+        yield _journal_reply
+        return
     _PHASE_AFTER = ""                # set by the phases for this message only
     _EMERGENCY_TURN = False
     _CURSIV_REPLY = False
     reply: list[str] = []
+    from cursiv_v215.memory import semantic as _memory
+    import uuid
+    _turn_person, _turn_id = _memory.current_person(), uuid.uuid4().hex
     from cursiv_v215.core import speed as _speed
     _speed.chat_started()
     origin, skip = "inferred", False
@@ -3257,6 +3214,10 @@ def chat(
     try:
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply)
+        from cursiv_v215.core import file_access as _files
+        _user = message.get('text', '') if isinstance(message, dict) else str(message or '')
+        if _files.is_request(_user):
+            return                 # actual file results need no AI check or automatic learning
         draft = _strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
         if _WORKED and _WORKED.lead and draft.startswith(_WORKED.lead.strip()):
             draft = draft[len(_WORKED.lead.strip()):].strip()    # nor Cursiv's own safety line
@@ -3339,7 +3300,15 @@ def chat(
             pass
     finally:
         _speed.chat_finished()
-    _learn_later(message, "".join(reply), origin=origin, skip=skip)
+    _learn_later(message, "".join(reply), origin=origin, skip=skip, person=_turn_person, event_id=_turn_id)
+    if not skip and not _EMERGENCY_TURN:
+        curiosity_engine.notify(_turn_person, _journal_scope, _field_text)
+        try:
+            _suggestion = curiosity_engine.suggestion(_turn_person, _journal_scope)
+            if _suggestion:
+                yield '\n\n' + _suggestion
+        except (OSError, ValueError):
+            pass
 
 
 class _SkipCheck(Exception):

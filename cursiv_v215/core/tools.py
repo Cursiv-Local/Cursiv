@@ -7,6 +7,7 @@ Works the same with every engine: a short routing step picks tool calls as
 JSON, Cursiv runs them, and the results are given to the answering model.
 
 Built-in tools are READ-ONLY. Plugins (core/plugins.py) can add more tools.
+Built-in file operations require the user's enabled, selected workspace.
 Sensitive places are never read: Cursiv's own data/keys, SSH/GPG keys, browser
 password stores, .env/key/pem files.
 """
@@ -86,73 +87,25 @@ def system_info() -> str:
     return "\n".join(lines)
 
 
-def list_folder(path: str = "home") -> str:
-    p = _resolve(path)
-    if (msg := _check(p)):
-        return msg
-    if not p.is_dir():
-        return f"No folder at {p}"
-    items = []
-    try:
-        entries = sorted(p.iterdir(), key=lambda e: (not e.is_dir(), e.name.lower()))
-    except PermissionError:
-        return f"Windows doesn't allow reading {p}"
-    for e in entries[:120]:
-        try:
-            if e.is_dir():
-                items.append(f"[folder] {e.name}")
-            else:
-                st = e.stat()
-                items.append(f"{e.name}  ({st.st_size / 1024:.0f} KB, modified {time.strftime('%Y-%m-%d', time.localtime(st.st_mtime))})")
-        except Exception:
-            items.append(e.name)
-    more = f"\n... and {len(entries) - 120} more" if len(entries) > 120 else ""
-    return f"{p} ({len(entries)} items):\n" + "\n".join(items) + more
+def list_folder(path: str = ".", *, root: Path | None = None) -> str:
+    from . import file_access
+    return file_access.execute("list_directory", {"path": str(_resolve(path))}, root)
 
 
-def read_file(path: str) -> str:
-    p = _resolve(path)
-    if (msg := _check(p)):
-        return msg
-    if not p.is_file():
-        return f"No file at {p}"
-    if p.stat().st_size > 2_000_000:
-        return f"{p.name} is too big to read here ({p.stat().st_size / 2**20:.1f} MB)."
-    try:
-        raw = p.read_bytes()
-        if b"\x00" in raw[:4000]:
-            return f"{p.name} isn't a text file."
-        text = raw.decode("utf-8", errors="replace")
-    except Exception as e:
-        return f"Couldn't read {p}: {e}"
-    cut = f"\n[... {len(text) - MAX_READ} more characters not shown]" if len(text) > MAX_READ else ""
-    return f"--- {p} ---\n{text[:MAX_READ]}{cut}"
+def read_file(path: str, *, root: Path | None = None) -> str:
+    from . import file_access
+    return file_access.execute("read_file", {"path": str(_resolve(path))}, root)
 
 
-def find_files(name: str, folder: str = "home") -> str:
-    root = _resolve(folder)
-    if (msg := _check(root)):
-        return msg
-    if not root.is_dir():
-        return f"No folder at {root}"
-    pat = name if any(c in name for c in "*?") else f"*{name}*"
-    found, t0 = [], time.time()
-    skip = {"node_modules", ".git", "AppData", "$Recycle.Bin", "Windows", "__pycache__", ".venv", "venv"}
-    for dirpath, dirnames, filenames in os.walk(root):
-        dirnames[:] = [d for d in dirnames if d not in skip and not d.startswith(".")]
-        for f in filenames:
-            if Path(f).match(pat):
-                full = Path(dirpath) / f
-                if not _check(full):
-                    found.append(str(full))
-        if len(found) >= 40 or time.time() - t0 > 8:
-            break
-    return ("Found:\n" + "\n".join(found[:40])) if found else f"No files matching {name!r} under {root}"
+def find_files(name: str, folder: str = ".", *, root: Path | None = None) -> str:
+    from . import file_access
+    pattern = name if any(c in name for c in "*?") else f"*{name}*"
+    return file_access.execute("search_files", {"directory": str(_resolve(folder)), "pattern": "**/" + pattern}, root)
 
 
 BUILTIN: dict[str, dict] = {
     "system_info": {"fn": system_info, "description": "This computer's OS, CPU, RAM, free disk space per drive, GPU memory. args: {}"},
-    "list_folder": {"fn": list_folder, "description": "List a folder's contents. args: {\"path\": \"C:/Users/...\" or downloads/desktop/documents/home}"},
+    "list_folder": {"fn": list_folder, "description": "List inside the authorized workspace. args: {\"path\": \".\" or an authorized path}"},
     "read_file": {"fn": read_file, "description": "Read a text file (first 12,000 characters). args: {\"path\": \"...\"}"},
     "find_files": {"fn": find_files, "description": "Find files by name or pattern. args: {\"name\": \"notes\" or \"*.py\", \"folder\": \"home\"}"},
 }
@@ -207,15 +160,23 @@ def plan(text: str, ask: Callable[[list[dict]], str]) -> list[dict]:
     return [c for c in calls[:3] if isinstance(c, dict) and c.get("tool") in tools]
 
 
-def run(calls: list[dict]) -> list[tuple[str, str]]:
+def run(calls: list[dict], *, root: Path | None = None) -> list[tuple[str, str]]:
     tools = all_tools()
     out = []
     for c in calls:
         t = tools[c["tool"]]
         args = c.get("args") or {}
         try:
-            res = t["fn"](**args) if isinstance(args, dict) else t["fn"](args)
+            if c['tool'] in ('read_file', 'list_folder', 'find_files'):
+                if not isinstance(args, dict) or 'root' in args:
+                    raise ValueError('Invalid file arguments')
+                res = t['fn'](**args, root=root)
+            else:
+                res = t["fn"](**args) if isinstance(args, dict) else t["fn"](args)
         except TypeError:
+            if c['tool'] in ('read_file', 'list_folder', 'find_files'):
+                out.append((c['tool'], 'Tool error: invalid file arguments'))
+                continue
             try:
                 res = t["fn"](*args.values()) if isinstance(args, dict) else t["fn"]()
             except Exception as e:

@@ -66,17 +66,12 @@ class _NoEngine(Exception):
 
 
 def _learner():
-    """Free keys / local model first (like desktop learning). Phone chats already
-    went through the Cursiv site, so Cursiv Cloud is an acceptable fallback here --
-    a busy 4 GB GPU can take minutes to load the local model."""
+    """Optional extraction uses only the local model, like desktop learning.
+    No ready model: defer this exchange; deterministic facts need no model."""
     from cursiv_v215.ui import chat_app as ca
 
     def ask(messages):
-        out = ca._quick_llm(messages)
-        if not out and ca.cloud_enabled():
-            out = "".join(ca._call_cursiv_cloud(messages, max_tokens=400)).strip()
-            if out.startswith("[Cursiv Cloud error"):
-                out = ""
+        out = ca._memory_llm(messages)
         if not out:
             raise _NoEngine()
         return out
@@ -118,7 +113,8 @@ def sync_once() -> str:
                 if m["role"] == "user":
                     pending_user = m
                 elif m["role"] == "assistant" and pending_user is not None:
-                    learned += len(semantic.learn_from_exchange(pending_user["text"], m["text"], ask, person))
+                    learned += len(semantic.learn_from_exchange(pending_user["text"], m["text"], ask, person,
+                                                               event_id='phone:' + str(m['created'])))
                     if failed:                # no AI available right now -- retry this pair next time
                         break
                     st["learned_until"] = m["created"]

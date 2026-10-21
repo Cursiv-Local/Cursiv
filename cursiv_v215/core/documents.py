@@ -111,8 +111,9 @@ def add(path: Path | str) -> dict:
     pages = _pages(path)
     if not any(p.strip() for p in pages):
         raise ValueError("no text could be read from it (a scanned PDF needs text recognition first)")
+    from cursiv_v215.core.paths import save_reference
     doc = {"id": fp[:12], "name": path.name, "fingerprint": fp, "pages": len(pages),
-           "imported": time.strftime("%Y-%m-%d %H:%M"), "path": str(path)}
+           "imported": time.strftime("%Y-%m-%d %H:%M"), "path": save_reference(path)}
     from cursiv_v215.core import atomic
     atomic.write_text(lib_dir() / f"{doc['id']}.json", json.dumps({"pages": pages}, ensure_ascii=False))
     items.append(doc)

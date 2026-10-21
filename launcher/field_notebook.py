@@ -231,6 +231,9 @@ class FieldNotebookDialog(QDialog):
                 e = fieldlog.correct(self._correcting, reason, **f)
             else:
                 e = fieldlog.add(**f)
+            from cursiv_v215.core import curiosity_engine
+            from cursiv_v215.memory import semantic
+            curiosity_engine.notify(semantic.current_person())
         except ValueError as exc:
             self._status.setText(f"Not saved: {exc}.")
             self._status.setStyleSheet(f"color: {theme.RED};")

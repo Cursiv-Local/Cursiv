@@ -56,7 +56,7 @@ def unlink_one(folder: Path, log: list[str]) -> None:
 def settle_data_folders() -> list[str]:
     """Frozen (installed) app only. Safe to call on every startup."""
     log: list[str] = []
-    if not getattr(sys, "frozen", False) or sys.platform != "win32":
+    if os.environ.get('CURSIV_PORTABLE') == '1' or not getattr(sys, "frozen", False) or sys.platform != "win32":
         return log
     app_dir = Path(sys.executable).resolve().parent
     internal = Path(getattr(sys, "_MEIPASS", app_dir / "_internal"))

@@ -76,7 +76,8 @@ def _save_profile(p: dict) -> None:
 
 def observe(text: str, person: str) -> None:
     """Remember environment facts visible in what the person pasted/typed."""
-    if not text:
+    from cursiv_v215.memory import formation
+    if not formation.enabled_for(text):
         return
     with _lock:
         prof = _load_profile()
@@ -180,17 +181,25 @@ _LEARN_PROMPT = (
 
 
 def learn_from_exchange(user_text: str, reply: str, ask: Callable[[list[dict]], str], person: str) -> list[str]:
+    from cursiv_v215.memory import formation
+    from cursiv_v215.memory.semantic import generation
+    epoch = generation()
+    if not formation.enabled_for(user_text):
+        return []
     if len((user_text or "").strip()) < 15:
         return []
     msgs = [{"role": "system", "content": _LEARN_PROMPT.format(name=person.title())},
-            {"role": "user", "content": f"User:\n{user_text[:3000]}\n\nAssistant:\n{(reply or '')[:3000]}"}]
+            {"role": "user", "content": f"User:\n{user_text[:3000]}"}]
     try:
         raw = ask(msgs) or ""
         m = re.search(r"\[.*\]", raw, re.S)
         items = json.loads(m.group(0)) if m else []
     except Exception:
         return []
-    return [it for it in items[:3] if isinstance(it, str) and add_lesson(it, person, "learned")]
+    if not isinstance(items, list):
+        return []
+    return [it for it in items[:3] if isinstance(it, str) and formation.enabled_for(user_text) and generation() == epoch
+            and formation.permitted(it) and add_lesson(it, person, "learned")]
 
 
 # ── Project folder ──────────────────────────────────────────────────────────
@@ -199,6 +208,9 @@ _CODE_EXT = {".py", ".js", ".ts", ".tsx", ".jsx", ".html", ".css", ".json", ".md
              ".txt", ".sh", ".ps1", ".bat", ".c", ".cpp", ".h", ".rs", ".go", ".java", ".cs", ".sql", ".urdf", ".xml"}
 _SKIP_DIRS = {".git", "node_modules", "venv", ".venv", "env", "__pycache__", "dist", "build", ".next", ".cursiv",
               "site-packages", ".idea", ".vscode", "_internal"}
+
+
+_session_projects: set[str] = set()
 
 
 def set_project(folder: str, person: str) -> str:
@@ -211,14 +223,27 @@ def set_project(folder: str, person: str) -> str:
     p = Path(folder.strip().strip('"')).expanduser()
     if not p.is_dir():
         return f"I can't find the folder {p}"
-    me["project"] = str(p.resolve())
+    from cursiv_v215.core.paths import save_reference
+    me["project"] = save_reference(p)
+    _session_projects.add(str(p.resolve()))
     _save_profile(prof)
     files = list(_project_files(p))
     return f"Project set: {p.resolve()}  ({len(files)} code files). Codex answers will use the relevant files."
 
 
 def project(person: str) -> str | None:
-    return _load_profile().get(person, {}).get("project")
+    from cursiv_v215.core.paths import resolve_reference, portable_root
+    value = _load_profile().get(person, {}).get('project')
+    if not value:
+        return None
+    try:
+        path = resolve_reference(value).resolve()
+        root = portable_root()
+        if root and not path.is_relative_to(root) and str(path) not in _session_projects:
+            return None  # host grants do not transfer to another computer
+        return str(path)
+    except (OSError, ValueError):
+        return None
 
 
 def _project_files(root: Path, cap: int = 2000):

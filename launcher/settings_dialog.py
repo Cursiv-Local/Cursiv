@@ -336,6 +336,14 @@ class SettingsDialog(QDialog):
         self._tone.activated.connect(lambda i: style.set_tone(person, self._tone.itemData(i)))
         v.addWidget(self._tone)
         v.addWidget(self._explain("How Cursiv talks to you. Brief keeps answers short; Teacher explains step by step."))
+        from cursiv_v215.core import presence
+        self._switch(lay, 'Adapt communication preferences',
+                     'Learn presentation preferences from explicit corrections. Accuracy and permissions take precedence.',
+                     presence.settings(person)['adapt_style'],
+                     lambda on: presence.configure(person, adapt_style=on))
+        journal_button = QPushButton('Curiosity Journal…')
+        journal_button.clicked.connect(self._open_curiosity)
+        lay.addWidget(journal_button)
         self._switch(lay, "Learn from our conversations",
                      "Cursiv picks out lasting facts about you (marked \"inferred\") so it can help better. "
                      "Off means it only remembers what you tell it with \"remember …\".",
@@ -356,6 +364,10 @@ class SettingsDialog(QDialog):
         v.addWidget(self._explain("Always on. After an answer with numbers, advice or technical claims, Cursiv checks "
                                   "the numbers, named sources and assumptions, fixes the answer once if needed, and "
                                   "otherwise adds a short note. Small local models still make mistakes."))
+
+    def _open_curiosity(self):
+        from curiosity_dialog import CuriosityDialog
+        CuriosityDialog(self).exec()
 
     def _page_appearance(self, lay):
         from cursiv_v215.core import profile as _profile

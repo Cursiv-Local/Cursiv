@@ -318,10 +318,12 @@ def _gate():
 
 def _default_cfg() -> dict:
     """Same shape as chat_cli.py's cfg dict, minus the terminal-only fields."""
+    from cursiv_v215.core.paths import portable_root
+    portable = portable_root()
     return {
-        "file_access":      False,
+        "file_access":      bool(portable),
         "confirm_mode":     "confirm",   # same safe default as the terminal CLI -- every write needs approval until "mode" toggles it
-        "workspace":        str(_CHAT_ROOT),
+        "workspace":        str(portable / 'Workspace' if portable else _CHAT_ROOT),
         "obsidian_enabled": False,
         "obsidian_path":    "",
         "offline_mode":     _gate().is_offline(),
@@ -488,11 +490,13 @@ def _codex_command(prompt: str, cfg: dict, history: list[dict]):
 
         def learn():
             try:
-                from cursiv_v215.ui.chat_app import _quick_llm
-                brain.learn_from_exchange(prompt, full, _quick_llm, person)
-            except Exception:
-                pass
-        threading.Thread(target=learn, daemon=True).start()
+                from cursiv_v215.ui.chat_app import _memory_llm
+                brain.learn_from_exchange(prompt, full, _memory_llm, person)
+            except Exception as exc:
+                formation.record('coding_failed', exc)
+        from cursiv_v215.memory import formation
+        import uuid
+        formation.submit(learn, 'coding:' + uuid.uuid4().hex)
 
     return StreamResult(f"Codex — {prompt[:60]}", stream(), _finish)
 
@@ -651,6 +655,8 @@ _HELP_TOPICS = {
   what do you remember        list what I know, with when and how I learned it
   forget <words>              remove a saved fact
   memory learn on / off       learn from our chats on my own (on by default)
+  file help                   authorized local text files and permanent file notes
+  file remember <path> :: <text>   save a file and conversational memory separately
   save this                   save the last answer as a note
   notes / notes search <words>   your saved notes
   clear                       clear this conversation from the screen"""),
@@ -755,6 +761,10 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     if not text:
         return None
     cmd = text.lower()
+
+    from cursiv_v215.core import file_access as _files
+    if _files.is_request(text):
+        return None                     # application-controlled file route in chat(), not the model
 
     # Plain names for older commands. The old names still work.
     if cmd in ("save this", "notes", "note export") or cmd.startswith(("save this ", "notes search ", "note import ")):
@@ -888,7 +898,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         new_ws = text[9:].strip()
         if not new_ws:
             return TextResult(f"Workspace: {cfg.get('workspace', '')}")
-        ws_path = Path(new_ws).expanduser().resolve()
+        from cursiv_v215.core.tools import _resolve
+        ws_path = _resolve(new_ws).resolve()
         if not ws_path.exists() or not ws_path.is_dir():
             return TextResult(f"Not a valid directory: {new_ws}")
         cfg["workspace"] = str(ws_path)
@@ -898,11 +909,33 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     _free_reply = _free_key_command(text)
     if _free_reply is not None:
         return TextResult(_free_reply)
+    from cursiv_v215.core import field_recall
+    _field_recall = field_recall.command(text)
+    if _field_recall is not None:
+        return TextResult(_field_recall)
+    from cursiv_v215.core import curiosity_engine, presence
+    from cursiv_v215.memory import semantic as _sem_curiosity
+    from cursiv_v215.core.paths import save_reference
+    _curiosity_person = _sem_curiosity.current_person()
+    _project_scope = save_reference(cfg['workspace']) if cfg.get('file_access') and cfg.get('workspace') else 'general'
+    _curiosity_reply = curiosity_engine.command(text, _curiosity_person, _project_scope)
+    if _curiosity_reply is not None:
+        return TextResult(_curiosity_reply)
+    if cmd in ('presence', 'presence status'):
+        import json
+        return TextResult(json.dumps(dict(identity=presence.settings(_curiosity_person),
+            observed=presence.snapshot(cfg.get('workspace', ''), cfg.get('file_access', False))), indent=2))
+    if cmd in ('style adapt on', 'style adapt off'):
+        try:
+            presence.configure(_curiosity_person, adapt_style=cmd.endswith(' on'))
+            return TextResult('Style adaptation setting saved and verified.')
+        except (OSError, ValueError) as exc:
+            return TextResult(f'Style setting not confirmed: {exc}')
     try:
         from cursiv_v215.memory.semantic import memory_command as _memory_command
         _mem_reply = _memory_command(text)
-    except Exception:
-        _mem_reply = None
+    except (OSError, ValueError) as exc:
+        _mem_reply = f'Memory operation could not be confirmed: {type(exc).__name__}: {exc}'
     if _mem_reply is not None:
         return TextResult(_mem_reply)
     # The paperclip: photo "<path>" <question> -- the image model reads a photo
@@ -928,8 +961,10 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             from cursiv_v215.core import fieldsync as _fieldsync
             _log_reply = _fieldsync.command(text, observer=_person().title())
     except Exception as _exc:
-        _log_reply = f"The field log couldn't be written: {_exc}" if cmd.startswith("log ") else None
+        _log_reply = f"Field-log operation failed: {_exc}" if re.match(r'^(log |field ?log|field notes|show field log|team log)', cmd) else None
     if _log_reply is not None:
+        if _log_reply.startswith('Saved to the field log:'):
+            curiosity_engine.notify(_curiosity_person, _project_scope)
         return TextResult(_log_reply)
     # The team's documents: "documents", "add document <path>" (core/documents.py)
     try:
@@ -2273,6 +2308,13 @@ def postal_compose(sender_user: str, recipient_raw: str, hint: str, content: str
 # dialog (needs Qt, on the main thread); the actual write happens here via
 # the same execute_tool() the terminal CLI's approval flow calls. ─────────
 
-def approve_write(path: str, content: str, workspace: str) -> TextResult:
-    result = _execute_tool("write_file", {"path": path, "content": content}, Path(workspace))
-    return TextResult(f"✓ {result}")
+def approve_write(path: str, content: str, workspace: str, *, operation: str = 'write_file',
+                  expected_sha256: str | None = None, remember: bool = False) -> TextResult:
+    from cursiv_v215.core import file_access
+    args = {'path': path, 'content': content}
+    if expected_sha256 is not None:
+        args['expected_sha256'] = expected_sha256
+    result = _execute_tool(operation, args, Path(workspace), confirmed=True)
+    if remember:
+        result += '\nConversational memory: ' + file_access.save_memory(content)
+    return TextResult(result)

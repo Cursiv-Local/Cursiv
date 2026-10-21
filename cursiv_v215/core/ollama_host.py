@@ -41,7 +41,7 @@ def exe() -> str | None:
     if found:
         return found
     if WINDOWS:
-        p = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
+        p = Path(os.environ.get('CURSIV_HOST_LOCALAPPDATA') or os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama" / "ollama.exe"
         return str(p) if p.exists() else None
     if MAC:
         app = mac_app()

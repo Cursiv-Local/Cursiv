@@ -30,3 +30,30 @@ def app_data_dir() -> Path:
 
 
 APP_DATA = app_data_dir()
+
+
+def portable_root() -> Path | None:
+    value = os.environ.get('CURSIV_USB_ROOT')
+    return Path(value).resolve() if os.environ.get('CURSIV_PORTABLE') == '1' and value else None
+
+
+def save_reference(path: Path | str) -> str:
+    """Portable references move with the drive; external references stay explicit."""
+    path = Path(path).resolve()
+    root = portable_root()
+    if root and path.is_relative_to(root):
+        return 'portable://' + path.relative_to(root).as_posix()
+    return str(path)
+
+
+def resolve_reference(value: str) -> Path:
+    if not value.startswith('portable://'):
+        return Path(value)
+    root = portable_root()
+    rel = Path(value[len('portable://'):])
+    if root is None or rel.is_absolute() or rel.drive or '..' in rel.parts:
+        raise ValueError('Portable reference unavailable or invalid')
+    result = (root / rel).resolve()
+    if not result.is_relative_to(root):
+        raise ValueError('Portable reference escapes the drive')
+    return result

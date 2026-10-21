@@ -1,5 +1,461 @@
 # Handoff — Cursiv verification overhaul
 
+## 2026-10-21: portable storage, historical recall, presence and curiosity (Claude review)
+
+**Status: uncommitted first implementation on `codex/autonomous-memory-v1`.**
+The owner approved working through the audited proposals "from the top down."
+The earlier memory/filesystem changes below were preserved. This section extends
+their scope; installer/updater/release configuration and website files were not
+changed. No feature commit, merge, push, deployment or installer rebuild was made.
+No real personal data migration was performed during development.
+
+### Architecture and execution paths
+
+1. `launcher/main.py` -> `portable.activate()` runs before data imports. A detected
+   portable drive that fails activation now stops startup rather than falling back
+   to host storage. Activation sets HOME/USERPROFILE, APP_DATA/data overrides,
+   APPDATA/LOCALAPPDATA and TEMP/TMP to drive-local locations before field defaults.
+2. Existing layout retained: `Cursiv/` binaries, `Home/.cursiv/` data,
+   `Workspace/` authorized user files, `Ollama/` runtime, `Models/` model store.
+   `data_home` skips its installed-app junction repair in portable mode.
+3. First portable startup snapshots legacy application `.cursiv` stores and the
+   destination with SHA-256 manifests, verifies copies, then copies missing files.
+   Differing same-path contents STOP migration with a backup location. Original
+   stores remain intact. There is no automatic merge or "newest file wins" rule.
+4. `core/paths.py` encodes portable references as `portable://...` and resolves
+   them from the current drive. Coding projects and newly imported document source
+   references use these helpers. Old absolute external coding projects are not
+   automatically authorized on a different host; explicit session selection is needed.
+   Parsed document text already survives independently of an original source file.
+5. `usb_maker.make_usb()` now preserves existing private destination files and no
+   longer invokes private-data wiping during a refresh. It no longer sweeps the
+   whole drive for `.part` files. Copy staging uses unique adjacent files, and
+   cleanup/pruning avoids linked directories and personal stores. New private
+   configuration copies alone are exported for portable credential readability.
+   The UI explicitly asks before required runtime/model downloads during USB creation.
+6. Portable chat with no usable model returns diagnostics instead of pulling one.
+   `ollama_host.exe()` retains host-runtime discovery after LOCALAPPDATA redirection.
+   An already-running host Ollama service still has its own model store; existing
+   diagnostics explain this. Cursiv does not silently reconfigure that service.
+7. `chat_commands.handle_command()` routes field recall BEFORE generic memory
+   commands; `chat_app.chat()` also supports the same reader directly. Exact
+   notebook commands and natural historical requests use `core/field_recall.py`.
+   Retrieval is deterministic, local, and independent of native model tool calling.
+8. `field_recall.query()` reads only the authorized notebook path, verifies records
+   and chain links, filters by text/sample/date/entry, follows correction links,
+   and returns structured bounded results. No index, migration, historical rewrite,
+   log repair, or signing-chain change was introduced. Read errors cannot become
+   a fabricated historical answer. Integrity warnings are shown explicitly.
+9. `core/state_store.py` supplies strict JSON reads, verified atomic writes,
+   content-addressed recovery backups, a shared lock, link checks and an 8 MB limit.
+   Style and project stores retain their existing JSON structures but use it for
+   safe writes; corrupt stores no longer silently become empty before rewriting.
+10. `core/presence.py` separates stable communication principles/preferences from
+    learned personal facts and produces an application-state snapshot. Existing
+    identity, style, self-report and answer-verification mechanisms are reused.
+    Presentation preferences explicitly defer to evidence, safety and permissions.
+    Style adaptation has an independent control; no subjective experience is claimed.
+11. `core/curiosity.py` holds per-person journal state; `curiosity_engine.py` owns
+    evidence retrieval, candidate rules, scoring, deduplication, event budgets and
+    reevaluation. `launcher/curiosity_dialog.py` presents the same backend used by
+    conversation commands. The settings Answer page opens the dialog.
+
+### Curiosity lifecycle and evidence
+
+- Eligible event -> authorized bounded retrieval -> deterministic candidate ->
+  validated source IDs -> deduplication -> budget/priority -> verified save ->
+  optional occasional suggestion. New related evidence updates review history;
+  it does not establish resolution or causation automatically.
+- Automatic evaluation and suggestions both default OFF. Frequency defaults to
+  every five eligible events; default active budget is five per project association.
+- Existing memory learning controls and non-retention/sensitive-content filters
+  gate automatic work. A separate single-flight daemon task is used, not the
+  memory queue. Captured memory generation and journal control epoch cancel stale
+  work after disable/clear. Retrieval happens outside the journal mutation lock.
+- This version makes **zero additional model inference calls** and has no cloud
+  fallback or recursive investigation loop. It does not autonomously execute
+  commands, fetch sources, edit research files, or write field observations.
+- Rules cover varying comparable measurements with missing collection context,
+  repeated variation, potential simultaneous sample conflicts, and explicitly
+  stated assumptions. Comparisons require matching stated units. Correction
+  originals are excluded from comparisons when their correction is selected.
+- Evidence distinguishes recorded observations, reported claims, inferred memory,
+  hypotheses and unknowns. Field and memory IDs are retained with digest/excerpt
+  snapshots. A field observation proves what was recorded, not independent truth.
+- Journal statuses: Proposed, Open, Investigating, Awaiting evidence, Resolved,
+  Dismissed, Superseded. Reopening enforces the active budget. Dismissed and resolved
+  questions remain in deduplication history. Suggestions are limited to one per day
+  and are never repeated for the same investigation automatically.
+- Explicit resolution requires a currently readable field or direct/manual memory
+  reference. Older field entries can be targeted individually, beyond the latest
+  50-record context window. User selection of supporting evidence is recorded;
+  Cursiv does not certify the scientific sufficiency of that resolution.
+- Journal data uses `Home/.cursiv/curiosity/<person>.json` in portable mode. Demo
+  journal data follows the existing isolated demo root. No absolute evidence-file
+  paths or search index are required for relocation. Journal versions allow future
+  extension without altering original evidence stores.
+
+### Files added in this phase
+
+- `cursiv_v215/core/state_store.py`: bounded strict/atomic JSON persistence.
+- `cursiv_v215/core/field_recall.py`: verified historical retrieval and routing.
+- `cursiv_v215/core/presence.py`: identity preferences and observed state.
+- `cursiv_v215/core/curiosity.py`: journal schema, lifecycle, evidence and budgets.
+- `cursiv_v215/core/curiosity_engine.py`: event-driven rules and commands.
+- `launcher/curiosity_dialog.py`: inspect/create/review/update/export controls.
+- `tests/test_portable_recall_curiosity.py`: deterministic integration/failure tests.
+- `tests/data/curiosity_cases.json`: reproducible six-scenario evaluation fixture.
+
+### Existing files modified in this phase
+
+- Startup/storage: `launcher/portable.py`, `launcher/main.py`,
+  `launcher/data_home.py`, `launcher/usb_maker.py`, `core/paths.py`.
+- References/runtime: `coding/brain.py`, `core/documents.py`, `core/ollama_host.py`.
+- Recall/events: `launcher/chat_commands.py`, `ui/chat_app.py`,
+  `launcher/field_notebook.py` (post-save notification only).
+- Presentation/UI: `core/style.py`, `core/selfknow.py`, `memory/projects.py`,
+  `launcher/settings_dialog.py`.
+- Test isolation: `tests/conftest.py`, `tests/test_core.py`.
+- This `HANDOFF.md`. The previous phase's other pending files remain present.
+
+Paths abbreviated above under `core/`, `memory/`, `coding/`, `ui/` are relative
+to `cursiv_v215/`. No changes to `core/fieldlog.py`, record formats or hash chaining.
+
+### Usage
+
+Historical recall examples:
+
+```text
+What did I record yesterday?
+Find the observation I made about water quality.
+Show me the last ten field log entries.
+field log sample ABC-45
+field log between 2026-10-01 2026-10-21
+field log entry <entry-id>
+field log recent offset 10
+Summarize my research notes from last week.
+```
+
+Summaries are extractive, cited record listings, not invented narrative analysis.
+"Last week" means the previous Monday–Sunday calendar week in local time.
+No session/project identifier is invented for records lacking that metadata;
+ambiguous last-session requests ask for a date range or sample ID.
+
+```text
+presence status
+style adapt off
+curiosity
+curiosity evaluate
+What are we missing?
+curiosity add What measurement would test this assumption?
+curiosity show CUR-<id>
+curiosity review CUR-<id>
+curiosity investigate CUR-<id>
+curiosity resolve CUR-<id> :: field:<entry-id>
+curiosity dismiss CUR-<id>
+curiosity reopen CUR-<id>
+curiosity automatic on
+curiosity suggestions on
+curiosity frequency 5
+curiosity max_active 5
+curiosity export
+curiosity clear confirm
+```
+
+Clear disables automatic curiosity, but verified recovery backups remain. It is
+not a secure erase operation. The dialog explicitly explains this before clearing.
+
+### Tests and measured scope
+
+All tests run in a Git-archive snapshot overlaid with pending edits, using an empty
+HOME and no copied personal data. Test subprocesses and relocation fixtures also
+use disposable stores. The source checkout's real memory/log data is not used.
+
+- Baseline before this phase: **790 passed, 1 skipped**, 128.85 s,
+  `cursiv-check-jpv5vjwi/pytest.log`.
+- First existing-feature focused regression: **123 passed**, 16.82 s,
+  `cursiv-check-bcd1zjyx/pytest.log`.
+- First new integration plus regression run: **103 passed**, 12.88 s,
+  `cursiv-check-56mloehl/pytest.log`.
+- First full implementation run: **811 passed, 1 skipped**, 145.67 s,
+  `cursiv-check-u1q9v8wk/pytest.log`.
+- Follow-up cancellation, USB, runtime, relocation checks: **54 passed**, 9.76 s,
+  `cursiv-check-dckahq2g/pytest.log`.
+- Final full implementation run: **817 passed, 1 skipped**, 137.69 s,
+  `cursiv-check-rwf65iku/pytest.log`.
+- After removing a duplicate router call and tightening benchmark assertions:
+  **46 passed**, 13.62 s, `cursiv-check-y6w84n34/pytest.log` (new integration suite
+  plus existing field-log regressions). No implementation edits followed this check.
+- `git diff --check` passed. Final review confirmed no installer, updater, website,
+  deployment, README or privacy-policy edits. Branch remains
+  `codex/autonomous-memory-v1`; all feature changes are uncommitted.
+
+Test snapshot folders live under:
+`C:\Users\joshu\.codex\visualizations\2026\10\21\01a15c12-fb2b-7d00-9f67-101caecdd403`.
+The only skipped baseline/full-suite test is Mac Keychain on Windows.
+
+The six-case benchmark compares the deterministic question-generation path OFF
+with ON, not two live LLMs or scientific reasoning quality. Fixtures cover missing
+conditions, mismatched units, already-documented conditions, noncausal variation,
+reported assumptions, and ambiguous single observations. It checks source IDs,
+duplicates, expected questions, unchanged original logs and verified persistence.
+Its JSON report separates retrieval/detection time from evaluation/persistence time.
+No general intelligence or model reasoning improvement is claimed from this fixture.
+
+Full-run benchmark artifact:
+`cursiv-check-rwf65iku/curiosity-benchmark.json`. Six scenarios produced three
+expected questions across the positive scenarios and none across the three negative
+scenarios, with no missing expected gaps, duplicates or unsupported references
+under the fixture assertions. All six persisted outcomes verified. Retrieval and
+detection took about 4.4–6.6 ms; full evaluation/persistence took 6.1–97.8 ms per
+scenario on this machine. Added model calls: zero. The final focused run reran the
+same fixture with stricter exact candidate-count assertions; its artifact is
+`cursiv-check-y6w84n34/curiosity-benchmark.json`. These small fixtures do not measure
+large-drive performance, ordinary model-response latency or broad research quality.
+
+### Known limitations / manual acceptance for Claude and owner
+
+- This is the smallest rule-based first version. Broad scientific hypothesis
+  generation, arbitrary conceptual contradictions and automatic conclusions are
+  not implemented. An optional bounded local-model proposer is a future extension.
+- Evaluation considers the latest 50 valid field records and up to 30 memory facts.
+  Those selected records cannot establish that a variable was never recorded.
+  Journal associations are selected scopes, not inferred ownership metadata for
+  all notebook entries. Review reports snapshots missing from the current selection
+  honestly; it does not silently remove old evidence.
+- No field-log index is needed initially. Scans are limited to 64 MB / 100,000
+  lines, individual lines to 1 MB, results to 50 with pagination. The journal has
+  a 1,000-entry and 8 MB review limit; export/archive is required at that point.
+- Extra work is event-driven and bounded, but large-drive/slow-USB latency and
+  full interactive responsiveness still need representative hardware testing.
+- Memory, style, project and journal data remain separate compatible stores.
+  Retention controls prevent new automatic learning; they do not securely erase
+  previously authorized journal snapshots or backups when a memory fact is forgotten.
+- Old arbitrary absolute references in historical prose/doc metadata are not
+  rewritten or guessed from a changed drive letter. Imported document text still
+  works; users can reselect/reimport a source when necessary.
+- Portable data and copied credentials are unencrypted unless the owner encrypts
+  the drive. Windows may retain OS-level traces. An existing host Ollama service
+  uses its own storage. Manually copied DPAPI-bound credentials may require reentry.
+- Existing atomic append/fsync logging and new atomic state writes reduce damage
+  risk; they cannot guarantee durability after unsafe unplugging or hardware failure.
+  Static path checks are not an OS sandbox against a hostile simultaneous racer.
+- **Still manual:** packaged Windows startup, actual Ollama interaction, two
+  compatible PCs/accounts, physical USB/SSD safe eject/reinsert, actual drive-letter
+  reassignment, and representative large/slow-drive performance. Tests simulate
+  relocation with fresh interpreters and moved directories, not a second PC.
+- Before shipping, build a separate review installer only after explicit owner
+  authorization. Do not overwrite U79 or publish this uncommitted feature as U79.
+
+---
+
+## 2026-10-21: automatic memory and explicit persistent file memory (Claude review)
+
+This section describes the current **uncommitted feature work**, not a shipped release.
+Branch: `codex/autonomous-memory-v1`. The owner approved implementation after the
+read-only memory audit and requested this handoff. Installer, updater, networking
+implementations, website, README and unrelated settings are outside scope.
+Do not commit, merge, push this feature, change the release tag, or publish an
+installer without another explicit owner instruction.
+
+### U79 recovery copy
+
+At the owner's separate request, the exact original U79 commit and source history
+were copied to `https://github.com/Cursiv-Local/Cursiv-Backup-u79`.
+Both `main` and `v3.14-U79` there were verified as
+`661d3183389226ca16a842235450da31c16da8cc`. No feature changes were pushed.
+This is a source backup; GitHub release binaries were not copied.
+
+### Read-only findings and scope presented before implementation
+
+The personal memory store already supported automatic learning. The missing work
+was reliability and policy, not a second database:
+
+* `launcher/chat_panel.py:_run_turn` routes explicit memory commands through
+  `launcher/chat_commands.py:handle_command` to `memory/semantic.py:memory_command`.
+  `remember` and the memory dialog call `add_fact`, then `_write_facts`, then
+  `core/atomic.py:write_text` (flush, fsync, replace).
+* Normal chat streams through `ui/chat_app.py:chat` / `_chat_inner`; `_learn_later`
+  formerly launched an independent daemon thread for every exchange. The learner
+  accepted model-generated JSON strings, weakly filtered them, and used the same
+  fact store. Exceptions and save outcomes were largely discarded.
+* `_quick_llm` could use free cloud keys for extraction. Phone memory additionally
+  permitted Cursiv Cloud fallback. The learning switch did not consistently gate
+  the separate project, coding-environment, coding-lesson and style learners.
+* `list_facts` suppressed read errors as an empty store and could trigger a legacy
+  repair write. That risked incomplete rewrites and needed locking/backups.
+* Retrieval is `phases.run` -> `_build_strand_context` -> `build_context` ->
+  `recall`, using local embeddings or keywords. Login sets the person; fact data
+  is reread from disk. `launcher/conversations.py` separately saves transcripts
+  and restores their messages; conversation context is not proof of fact storage.
+* Filesystem functionality already existed in `core/tools.py` (general read-only
+  tool routing) and `chat_app.execute_tool` (workspace read/write tools for cloud
+  models). Local models lacked a dependable write route. Credential protection
+  differed, broad read tools lacked workspace authorization, and writes were not
+  consistently atomic or verified. The additional filesystem audit and planned
+  shared validation/application-command route were presented before editing.
+
+### Changes and execution paths for review
+
+* **New `memory/formation.py`:** conservative direct-statement selection,
+  credential/sensitive-topic and non-retention exclusions, validation of optional
+  model suggestions against user evidence, bounded single-worker queue, dedup of
+  recent job IDs, content-free diagnostics in the existing local logs directory.
+* **`memory/semantic.py`:** preserves JSONL and existing API fields. New automatic
+  facts add optional category, evidence, provenance (message ID and supporting
+  user quote), event ID, slot, status and updated time. Automatic origin remains
+  `inferred`; a direct quote is evidence of what the user said, not independent
+  verification. Mutations abort on failed reads and confirm serialized writes by
+  read-back. A reentrant lock serializes repair and fact operations.
+* Before rewriting existing data, one byte-for-byte snapshot of the facts and
+  colocated memory settings is saved in
+  `APP_DATA/backups/autonomous-memory-v1/`, with SHA-256 files. Snapshots are
+  verified and not overwritten; a bad backup blocks the rewrite. The existing
+  learned-memory repair remains compatible and is now within this protection.
+* Repetitions do not create new facts. Different choices are checked for conflict
+  before similarity suppression. Explicit corrections can supersede automatic
+  preferences in a recognized matching topic; manual facts and ambiguous
+  contradictions are retained. Normal retrieval excludes superseded rows; the
+  memory dialog can include them. Legacy rows without status remain active.
+* **`ui/chat_app.py`:** capture the person and event before asynchronous work;
+  reuse the post-exchange trigger and bound jobs. Direct statements do not need
+  an extraction model. Optional extraction calls `_memory_llm`, which is local
+  only; `_quick_llm` remains unchanged for unrelated jobs such as titles.
+  Assistant drafts are not supplied as fact evidence. Direct user facts may be
+  retained even if answer verification failed; unsupported model suggestions may
+  not. File-command results bypass AI answering/checking and auto-learning.
+* **`memory/projects.py`, `coding/brain.py`, `core/style.py`:** automatic learners
+  honor the existing learning setting and exclusion policy. Explicit controls
+  remain available. **`launcher/chat_commands.py`** and **`launcher/phone_sync.py`**
+  use the local memory callback; the phone transport/endpoints/sharing controls
+  were not changed. A failed durable fact write propagates so phone progress is
+  not silently advanced past that exchange.
+* **`launcher/memory_dialog.py`:** source/evidence/status details, historical-row
+  toggle, and honest read/delete/write error handling. Existing settings UI and
+  the `learn` setting are reused.
+* **New `core/file_access.py`:** common authorization and validated dispatch used
+  by both existing file-tool paths. Resolves paths inside the selected workspace;
+  rejects traversal, alternate streams, symlinks, junctions, hard links, protected
+  paths and detected credential content. UTF-8 text operations have a 2 MB limit.
+  Writes use unique adjacent temporary files, flush/fsync, atomic replacement or
+  no-clobber creation, and exact read-back. Appends preserve existing bytes.
+* **`core/tools.py` / `chat_app.execute_tool`:** reuse this backend rather than
+  separate read/write implementations. General built-in file tools require the
+  authorized workspace; a model cannot supply its own authorization root.
+  Existing cloud tool calls cannot overwrite existing files without confirmation.
+* **`launcher/chat_panel.py` / `chat_commands.approve_write`:** reuse the existing
+  confirmation dialog, carrying operation and expected original hash. A file
+  changed while confirmation is pending is refused. Results no longer prepend a
+  success checkmark to errors. File and conversational memory outcomes are
+  independent when both are explicitly requested.
+
+### How to exercise the feature
+
+Automatic facts: ordinary statements such as `I prefer Rust over Python` and
+`I'm building Cursiv for field research`. Inspect with `what do you remember`,
+the existing memory window, or `memory diagnostics`. Disable with
+`memory learn off`; manual `remember` and `forget` still work.
+
+For explicit files, first choose `workspace <existing-folder>` and `files on`.
+`workspace desktop` resolves the normal/OneDrive Desktop alias. Then:
+
+```text
+file help
+file list .
+file read project.md
+file create project.md :: Exact notes to persist
+file append project.md :: Additional observations
+file replace project.md :: Complete replacement content
+file save conversation project-transcript.md
+file remember project-fact.txt :: The exact fact to save in both places
+```
+
+These are application commands and work without model-native tool calls or
+internet. Quoted natural forms such as `read "project.md"` are also accepted.
+Ambiguous natural requests ask for an exact authorized filename/content rather
+than claiming the application has no filesystem capability. Existing files need
+confirmation; deleting files is deliberately unavailable in this first version.
+Conversation export stores role-labelled actual messages, not invented
+"established facts" or a model-generated success claim.
+
+### Validation record
+
+Baseline used a clean `git archive HEAD` in an isolated source copy with an empty
+HOME/USERPROFILE/CURSIV_REAL_HOME: **727 passed, 1 skipped, 1 teardown error**
+in 123.60 seconds. The error was the real-data guard observing a copied
+`memory_facts.jsonl` change during an unrelated end-to-end field test. Actual
+user data was outside this test environment.
+
+The first substantive focused run was **269 passed, 1 failed, 1 teardown error**.
+It exposed the plural `passwords` exclusion and a guard that recomputed watched
+paths after a portable-mode test changed HOME. Both were corrected. A prior
+sandbox-only run could not create pytest fixtures; it is not a functional result.
+
+`tests/conftest.py` now isolates all memory/companion-store paths and prevents
+ordinary chat tests from starting background jobs that outlive monkeypatches.
+Dedicated tests explicitly exercise worker submission. The real-data guard
+keeps its original watched paths, including settings and embedding cache.
+
+New deterministic tests are in `tests/test_autonomous_memory.py` and
+`tests/test_file_access.py`; `tests/test_persistence.py` adds a genuinely fresh
+process auto-save/retrieval test with no conversation history. Existing memory,
+verification, reliability, network-gate, storage-failure and full-suite checks
+must remain green. Final executed results and log paths follow below.
+
+Final full-suite check of the reviewed implementation: **790 passed, 1 skipped**
+in 128.47 seconds. The only skip was
+`tests/test_keychain.py:33: needs a Mac's Keychain`. Windows symlink, junction,
+hard-link, socket-blocked offline and offscreen memory-dialog checks executed.
+This full run includes the final privacy-setting, pending-job invalidation,
+legacy-repair and native-model memory-authorization safeguards.
+
+Full-suite log:
+`C:\Users\joshu\.codex\visualizations\2026\10\21\01a15c12-fb2b-7d00-9f67-101caecdd403\cursiv-check-08hw6lfo\pytest.log`.
+The test snapshot has its own `src/` and empty test home. Source and real user
+memory were never used as writable test data. A local snapshot runner used for
+the checks is beside those test artifacts as `check_cursiv_memory.py`.
+
+After that full run, the unsupported `delete_file` declaration was removed from
+the native-model tool list (the backend already refused deletion), and a
+regression assertion was added. The final filesystem/UI/help result is recorded
+as **57 passed in 10.44 seconds**. Its log is
+`C:\Users\joshu\.codex\visualizations\2026\10\21\01a15c12-fb2b-7d00-9f67-101caecdd403\cursiv-check-zzateuty\pytest.log`.
+No other runtime changes followed the 790-pass full run.
+
+`git diff --check`, AST parsing of changed Python files, and an explicit
+17-file scope allowlist passed during review. Installer, updater, networking
+implementations, website, README, release versions and conversation-storage
+format have no changes. HEAD remains the original U79 commit; feature work is
+uncommitted and unpushed on `codex/autonomous-memory-v1`.
+
+### Limits and review priorities
+
+* This is conservative v1 selection, not perfect semantic understanding. Unknown
+  or ambiguous facts are skipped or remain labelled inferred. Sensitive-content
+  filters are conservative heuristics, not a promise to detect every secret.
+* Non-retention wording excludes that exchange. For continuing conversations,
+  `memory learn off` is the persistent global control; no new permanent per-topic
+  exclusion manager was introduced. This does not disable transcript autosave or
+  remove existing memories/files; those existing controls are separate.
+* Pending jobs are bounded in memory, not a durable queue. Closing Cursiv before
+  evaluation finishes can discard a pending candidate; no success is reported.
+  Confirmed fact/file writes survive restart. Model-call latency is optional and
+  background; direct common statements need no model call.
+  Forget/disable actions invalidate older queued or in-flight fact extraction;
+  the main fact writer rechecks that generation while holding its mutation lock.
+* Earlier releases ignore `superseded` metadata, so rollback can resurface older
+  facts. The original snapshot and U79 source recovery copy are retained.
+* Inspect read/repair locking, backup verification, correction topic matching,
+  filesystem authorization and confirmation, and the UI integration carefully.
+  Static path/reparse checks are not a full operating-system sandbox against a
+  hostile process racing filesystem changes; do not broaden the workspace grant.
+* No new dependency, mandatory cloud service or telemetry was added. Existing
+  explicit phone-memory sharing remains a separate pre-existing capability.
+* Real Ollama selection quality, a packaged installer, and interactive Qt/native
+  cloud-tool flows require manual review; deterministic tests do not prove those.
+
+---
+
 Repo: `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`
 Remote: `https://github.com/winklersllc2026-bit/Cursiv.git` (branch `main`)
 This is the winklersllc checkout. Do not edit `Cursiv-v2`, Desktop `Cursiv-V3`, or `joshua1993winkler-jpg/Cursiv`.

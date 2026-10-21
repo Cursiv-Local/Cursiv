@@ -108,3 +108,27 @@ def test_a_failed_save_leaves_the_old_file_intact(tmp_path, monkeypatch):
     except OSError:
         pass
     assert f.read_text(encoding="utf-8") == "old\n"            # never half of each
+
+
+def test_automatic_fact_survives_restart_and_is_retrieved_without_history(tmp_path):
+    import shutil
+    app, home = tmp_path / 'app', tmp_path / 'home'
+    home.mkdir()
+    for part in ('cursiv_v215', 'launcher'):
+        shutil.copytree(ROOT / part, app / part, ignore=shutil.ignore_patterns('__pycache__', '.cursiv'))
+    save = '''
+from cursiv_v215.core import netgate
+netgate.set_offline(True)
+from cursiv_v215.memory import semantic as sem
+sem.set_person('bob')
+sem.embed = lambda _: None
+print(sem.learn_from_exchange("I'm building Cursiv for field research", 'Okay', lambda _: '', person='bob'))
+'''
+    read = '''
+from cursiv_v215.memory import semantic as sem
+sem.embed = lambda _: None
+sem._strand_items = lambda: []
+print(sem.build_context('Bob building Cursiv field research', person='bob'))
+'''
+    assert 'Cursiv' in _run(save, home, app)
+    assert 'Cursiv' in _run(read, home, app)

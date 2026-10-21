@@ -49,15 +49,16 @@ def _path(person: str) -> Path:
 
 
 def load(person: str) -> dict:
-    try:
-        return json.loads(_path(person).read_text(encoding="utf-8"))
-    except Exception:
-        return {"tone": "normal", "rules": []}
+    from . import state_store
+    data = state_store.load(_path(person), {'tone': 'normal', 'rules': []})
+    if not isinstance(data, dict) or not isinstance(data.get('rules'), list):
+        raise ValueError('Invalid style preferences; existing data preserved')
+    return data
 
 
 def _save(person: str, data: dict) -> None:
-    DIR.mkdir(parents=True, exist_ok=True)
-    _path(person).write_text(json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8")
+    from . import state_store
+    state_store.save(_path(person), data)
 
 
 def looks_like_correction(text: str) -> bool:
@@ -89,6 +90,14 @@ _LEARN_PROMPT = (
 
 def learn_correction(person: str, user_text: str, previous_reply: str, ask: Callable[[list[dict]], str]) -> str | None:
     """Background: correction -> standing rule (AI-worded; falls back to the user's own words)."""
+    from cursiv_v215.memory import formation
+    from . import presence
+    if not presence.settings(person)['adapt_style']:
+        return None
+    from cursiv_v215.memory.semantic import generation
+    epoch = generation()
+    if not formation.enabled_for(user_text):
+        return None
     rule = None
     try:
         raw = ask([{"role": "system", "content": _LEARN_PROMPT},
@@ -101,7 +110,8 @@ def learn_correction(person: str, user_text: str, previous_reply: str, ask: Call
         pass
     if rule is None and re.search(r"\b(from now on|always|never|stop|don'?t|prefer)\b", user_text, re.I):
         rule = user_text.strip()[:160]              # their own words, when the AI isn't available
-    if rule and add_rule(person, rule):
+    if (rule and formation.enabled_for(user_text) and generation() == epoch
+            and formation.permitted(rule) and add_rule(person, rule)):
         return rule
     return None
 
@@ -153,7 +163,7 @@ def prompt_addendum(person: str) -> str:
     if not parts:
         return ""
     who = person.title() if person and person != "family" else "this person"
-    return f"## How {who} wants you to talk (their standing preferences — always follow these)\n" + \
+    return f"## How {who} wants you to talk (presentation only; accuracy, permissions and safety take precedence)\n" + \
            "\n".join(f"- {p}" for p in parts)
 
 
