@@ -5,9 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Cursiv — Download and setup</title>
 <meta name="description" content="Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.">
+<link rel="canonical" href="https://cursiv.us/start">
 <meta property="og:title" content="Cursiv — Download and setup">
 <meta property="og:description" content="Install Cursiv on Windows and run an AI model on your own computer.">
-<meta property="og:image" content="https://cursiv.winklers-llc.com/assets/og-image.png">
+<meta property="og:image" content="https://cursiv.us/assets/og-image.png">
+<meta property="og:url" content="https://cursiv.us/start">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cursiv — Download and setup">
+<meta name="twitter:description" content="Download Cursiv for Windows, install Ollama and a local model, and set up the local-first AI assistant.">
+<meta name="twitter:image" content="https://cursiv.us/assets/og-image.png">
 <meta name="theme-color" content="#07090e">
 <link rel="icon" type="image/png" href="/assets/cursiv_256.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -41,7 +48,9 @@
       <p class="fine"><b>Mac (early):</b> Apple Silicon (M1 or newer), macOS 12+. Drag Cursiv into Applications. It isn't
         signed by Apple yet, so the first time: try to open it, then System Settings → Privacy &amp; Security → Open Anyway.
         Built and tested automatically on Apple hardware, but not yet used by anyone on their own Mac. The USB drive is Windows-only.</p>
-      <p class="fine">Latest release: v3.14-U74 · about 80 MB · from GitHub · MIT license</p>
+      <p class="fine">Latest release and installer details: <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">GitHub Releases</a> · MIT license</p>
+      <p class="fine" id="code-signing">Cursiv is seeking open-source code-signing support from the <a href="https://signpath.org/" rel="noopener noreferrer">SignPath Foundation</a>.</p>
+      <p class="fine"><a href="/local-ai-hardware-requirements">Hardware requirements</a> · <a href="/open-source-offline-ai">Offline AI guide</a> · <a href="/ai-reliability-testing">Benchmark evidence</a> · <a href="/privacy/">Privacy Policy</a></p>
     </div>
     <dl class="facts" aria-label="Requirements">
       <div><span class="k">System</span><span class="v">Windows 10 or 11, 64-bit; or a Mac with Apple Silicon, macOS 12+ (early)</span></div>
@@ -53,7 +62,7 @@
 </section>
 
 <section id="steps">
-  <div class="wrap grid2">
+  <div class="wrap">
     <div>
       <div class="section-head"><span class="eyebrow">Steps</span><h2>From download to first answer.</h2></div>
       <ol class="steps">
@@ -64,7 +73,6 @@
         <li><div><b>Start asking</b><span>Type a question. Type <code>help</code> to see what Cursiv can do, and <code>offline on</code> if you want nothing to leave this computer.</span></div></li>
       </ol>
     </div>
-    <figure class="shot" style="margin:0"><img src="/assets/shots/setup.png" alt="Cursiv Setup window: Ollama ready, AI model ready, optional coding and image models" width="963" height="887"><figcaption>The Setup window on a computer with everything installed.</figcaption></figure>
   </div>
 </section>
 
@@ -78,8 +86,8 @@
       <table class="table">
         <thead><tr><th>Model</th><th>Download</th><th>When</th></tr></thead>
         <tbody>
-          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Recommended for every computer. It did best on Cursiv's side-by-side tests: 40 of 40, about 10 seconds an answer on a 4 GB graphics card. Without a graphics card it's slower (not yet measured).</td></tr>
-          <tr><td><b>qwen2.5 1.5B</b> (Apache 2.0)</td><td>1 GB</td><td>Only for computers too slow for qwen3 4B. Not yet tested by Cursiv's benchmark.</td></tr>
+          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Current default recommendation. It passed 40 of 40 cases in a 40-case suite 1.2 model comparison (October 18, 2026), averaging 9.8 seconds per answer on that test computer. This is a small comparison sample, not a full benchmark; speed varies by computer. Without a graphics card, speed has not been measured. See the <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/MODEL-COMPARISON.md">model comparison details</a>.</td></tr>
+          <tr><td><b>qwen2.5 1.5B</b> (Apache 2.0)</td><td>1 GB</td><td>Smaller alternative for systems that need a lighter model. Not yet tested in the published Cursiv model comparison.</td></tr>
         </tbody>
       </table>
     </div>
@@ -88,7 +96,7 @@
 </section>
 
 <section id="online">
-  <div class="wrap grid2">
+  <div class="wrap">
     <div class="stack">
       <span class="eyebrow">Optional online extras</span>
       <h2>Off unless you turn them on.</h2>
@@ -101,7 +109,6 @@
       </ul>
       <p>Free keys: <a href="https://aistudio.google.com/apikey">Google Gemini</a> · <a href="https://console.groq.com/keys">Groq</a></p>
     </div>
-    <figure class="shot" style="margin:0"><img src="/assets/shots/settings-light.png" alt="Cursiv Settings: Privacy and internet section with offline mode, automatic web search and Cursiv Cloud" width="963" height="650" loading="lazy"><figcaption>Settings → Privacy &amp; internet: the switches that control what goes online.</figcaption></figure>
   </div>
 </section>
 
@@ -121,7 +128,7 @@
 
 <footer>
   <div class="wrap">
-    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a> · <a href="/vision">Direction</a></span><span>MIT License</span></div>
+    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a> · <a href="/vision">Direction</a> · <a href="/privacy/">Privacy Policy</a></span><span>MIT License</span></div>
   </div>
 </footer>
 </body>

@@ -1,4 +1,4 @@
-# Cursiv website + API on Cloudflare, served at cursiv.winklers-llc.com.
+# Cursiv website + API on Cloudflare Workers with static assets.
 # Publish from this folder with:  node publish.mjs
 # (it rebuilds dist/ from an allowlist of public files, then runs `npx wrangler deploy`).
 name = "cursiv-web"
@@ -6,12 +6,14 @@ main = "worker.js"
 compatibility_date = "2026-09-01"
 routes = [
   { pattern = "cursiv.winklers-llc.com", custom_domain = true },
+  { pattern = "cursiv.us", custom_domain = true },
 ]
 
 [assets]
 directory = "dist"
 binding = "ASSETS"
 html_handling = "auto-trailing-slash"   # /board serves board.html, /vision serves vision.html, ...
+run_worker_first = true                  # needed to redirect legacy-host page requests
 
 [vars]
 GEMINI_MODEL = "gemini-3.8-flash"

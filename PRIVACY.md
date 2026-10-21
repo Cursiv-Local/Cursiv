@@ -4,6 +4,11 @@ Cursiv runs on your computer. This page lists every way it can connect to anythi
 outside it, so you can check rather than trust. The same summary, with your current
 settings, is in Cursiv under **Settings → Privacy & internet**.
 
+**Scope:** This document describes the desktop application. For the website, Phone AI
+Companion, public board, sealed letters, and other server-backed services, see the
+[Cursiv Website Privacy Policy](https://cursiv.us/privacy/). Those services have separate
+data flows and are not covered by the desktop-only statements below.
+
 ## Stays on this computer, always
 
 - Your conversations and memories.

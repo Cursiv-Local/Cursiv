@@ -46,6 +46,9 @@ def fresh(tmp_path, monkeypatch):
     from cursiv_v215.ui import chat_app as ca
     from cursiv_v215.memory import semantic as sem
     app_dir, home_dir = tmp_path / "app" / ".cursiv", tmp_path / "home" / ".cursiv"
+    # chat_app imports APP_DATA before this fixture runs; redirect it explicitly so
+    # config writes cannot reach the installed/source checkout's real .cursiv folder.
+    monkeypatch.setattr(ca, "APP_DATA", app_dir)
     monkeypatch.setattr(netgate, "CONFIG_FILE", app_dir / "config.json")
     from cursiv_v215.chat import keys
     monkeypatch.setattr(keys, "KEYS_FILE", app_dir / "config.json")

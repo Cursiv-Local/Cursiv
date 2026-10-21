@@ -188,6 +188,46 @@ def test_a_contradicting_model_answer_is_flagged_in_the_chat(fresh, outbound, mo
     assert "contradicts what Cursiv's code worked out" in out and "lasts 1 day" in out
 
 
+def test_wrong_unit_conversion_is_replaced_with_the_calculated_result(fresh, outbound, monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    _local_model(monkeypatch, reply="3 liters is 0.789 gallons.")
+    chunks = list(ca.chat("Convert 3 liters to gallons exactly", [], "", None, replace_draft=True))
+    replacements = [chunk for chunk in chunks if chunk.startswith(ca.REPLACE_SENTINEL)]
+    assert len(replacements) == 1
+    shown = replacements[0][len(ca.REPLACE_SENTINEL):]
+    assert "0.792516" in shown and "0.789" not in shown
+    assert "Revised after a check" in shown and outbound == []
+    assert "worked out by Cursiv's code (units:" in "".join(chunks)
+
+
+def test_false_numeric_challenge_rechecks_and_replaces_the_previous_conversion(fresh, outbound, monkeypatch):
+    from cursiv_v215.core import style
+    from cursiv_v215.ui import chat_app as ca
+    monkeypatch.setattr(style, "looks_like_correction", lambda _text: False)
+    _local_model(monkeypatch, reply="You're right, 0.7894 is correct.")
+    history = [{"role": "user", "content": "Convert 3 liters to gallons exactly"},
+               {"role": "assistant", "content": "3 liters is about 0.7925 US liquid gallons."}]
+    chunks = list(ca.chat("No, 0.7894 is correct.", history, "", None, replace_draft=True))
+    replacements = [chunk for chunk in chunks if chunk.startswith(ca.REPLACE_SENTINEL)]
+    assert len(replacements) == 1
+    shown = replacements[0][len(ca.REPLACE_SENTINEL):]
+    assert "0.792516" in shown and "0.7894" not in shown and outbound == []
+
+
+def test_conversion_correction_keeps_the_separately_sourced_water_guidance(fresh, outbound, monkeypatch):
+    from cursiv_v215.ui import chat_app as ca
+    _local_model(monkeypatch, reply=("3 liters is 0.789 gallons. EPA guidance: for 8.25% bleach, use 2 drops per liter; "
+                                    "stir and wait 30 minutes."))
+    question = ("Convert 3 liters to gallons exactly. What EPA bleach dose for clear water disinfection? "
+                "If unsure say so.")
+    chunks = list(ca.chat(question, [], "", None, replace_draft=True))
+    replacement = next(chunk for chunk in chunks if chunk.startswith(ca.REPLACE_SENTINEL))
+    shown = replacement[len(ca.REPLACE_SENTINEL):]
+    assert "0.792516157074 US liquid gallons" in shown and "0.789 gallons" not in shown
+    assert "2 drops per liter" in shown and "wait 30 minutes" in shown
+    assert "water-purification" in shown and outbound == []
+
+
 # ══ C. Earlier answers ════════════════════════════════════════════════════════
 
 def test_an_earlier_wrong_figure_is_named_and_a_denial_is_caught():

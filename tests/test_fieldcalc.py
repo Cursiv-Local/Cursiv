@@ -19,6 +19,61 @@ def test_units_of_different_kinds_dont_convert():
     assert fc.convert(1, "kg", "m") is None
 
 
+@pytest.mark.parametrize("liters, expected", [(3, 0.792516), (1, 0.264172), (5, 1.32086)])
+def test_liters_convert_to_us_liquid_gallons(liters, expected):
+    # Expected values are independently rounded from liters / 3.785411784.
+    result = fc.work_out(f"Convert {liters} liters to US liquid gallons")
+    assert result and result.value == pytest.approx(expected, abs=0.000001)
+    assert "US liquid gallons" in result.statement
+
+
+def test_gallons_convert_back_to_liters():
+    # 1 US liquid gallon is exactly 3.785411784 liters by definition.
+    result = fc.work_out("Convert 1 US liquid gallon to liters")
+    assert result and result.value == pytest.approx(3.785411784, abs=1e-12)
+
+
+def test_us_and_imperial_gallons_are_distinct():
+    us = fc.work_out("Convert 1 gallon to liters")
+    imperial = fc.work_out("Convert 1 imperial gallon to liters")
+    assert us and us.value == pytest.approx(3.785411784, abs=1e-12)
+    assert imperial and imperial.value == pytest.approx(4.54609, abs=1e-12)
+    assert "US liquid gallons" not in imperial.statement
+
+
+def test_exact_conversion_explains_exact_factor_and_nonterminating_decimal():
+    result = fc.work_out("Convert 3 liters to gallons exactly")
+    assert result and "3.785411784" in result.statement and "0.792516" in result.statement
+    assert "decimal approximation shown to 12 significant digits" in result.statement
+    rounded = fc.work_out("Convert 3 liters to gallons rounded to four decimals")
+    assert rounded and "approximately 0.7925 US liquid gallons" in rounded.statement
+
+
+def test_explicit_conversion_is_not_shadowed_by_another_question_in_the_same_prompt():
+    q = ("Convert 3 liters to gallons exactly. What EPA bleach dose for clear water disinfection? "
+         "If unsure say so.")
+    result = fc.work_out(q)
+    assert result and result.tool == "units" and result.value == pytest.approx(0.792516, abs=1e-6)
+    worked = calc.work_out(q)
+    assert worked and worked.tool == "units" and worked.value == pytest.approx(0.792516, abs=1e-6)
+    dose = fc.work_out("How many drops of 8.25% bleach for 3 liters of clear water?")
+    assert dose and dose.tool == "bleach_dose" and dose.value == 6
+
+
+def test_unsupported_conversion_is_not_guessed():
+    assert fc.work_out("Convert 3 liters to imaginary units") is None
+
+
+def test_explicit_numerical_challenge_rechecks_only_the_previous_conversion():
+    history = [{"role": "user", "content": "Convert 3 liters to gallons exactly"},
+               {"role": "assistant", "content": "3 liters is 0.7925 gallons."}]
+    challenged = calc.work_out_for_turn("No, 0.7894 is correct.", history)
+    assert challenged and challenged.tool == "units" and challenged.value == pytest.approx(0.792516, abs=1e-6)
+    assert calc.work_out_for_turn("0.7894 gallons", history) is None
+    unrelated = history + [{"role": "user", "content": "How tall is a pine tree?"}]
+    assert calc.work_out_for_turn("No, 0.7894 is correct.", unrelated) is None
+
+
 def test_dms_and_decimal():
     assert fc.dms_to_decimal(44, 7, 24.4, "N") == pytest.approx(44.123444, abs=1e-6)
     assert fc.dms_to_decimal(71, 34, 4.1, "W") == pytest.approx(-71.567806, abs=1e-6)
@@ -81,6 +136,48 @@ def test_answer_check_allows_rounding_but_not_wrong_numbers():
     w = calc.work_out("Convert 12.4 C to F")
     assert calc.check("It's about 54.3 °F.", w) == ""
     assert "54.32" in calc.check("It's 50 °F.", w)
+
+
+@pytest.mark.parametrize("answer", [
+    "3 liters is 0.789 gallons.",
+    "3 liters is 0.7894 gallons.",
+])
+def test_wrong_gallon_conversion_is_flagged_even_when_close(answer):
+    w = calc.work_out("Convert 3 liters to gallons exactly")
+    assert w and w.tool == "units" and w.value == pytest.approx(0.792516, abs=1e-6)
+    assert "conversion code worked out" in calc.check(answer, w)
+
+
+def test_challenging_correct_conversion_with_false_value_does_not_pass_check():
+    w = calc.work_out("Convert 3 liters to gallons exactly")
+    assert calc.check("You're right, it is 0.7894 US gallons.", w)
+    assert calc.check("3 liters is approximately 0.7925 US liquid gallons.", w) == ""
+
+
+def test_a_correct_number_elsewhere_does_not_hide_a_contradictory_conversion():
+    w = calc.work_out("Convert 3 liters to gallons exactly")
+    answer = "It is 0.7925 gallons, although the result is really 0.789 gallons."
+    assert "gives 0.789 gallons" in calc.check(answer, w)
+
+
+def test_gallon_unit_system_in_answer_must_match_the_requested_system():
+    w = calc.work_out("Convert 3 liters to US liquid gallons")
+    assert "gives 0.7925 imperial gallons" in calc.check("3 liters is 0.7925 imperial gallons.", w)
+
+
+def test_conversion_result_must_use_the_requested_destination_unit():
+    w = calc.work_out("Convert 1 US liquid gallon to liters")
+    assert calc.check("1 US liquid gallon is 3.7854 gallons.", w)
+    assert "omits the requested liter unit" in calc.check("The result is 3.7854.", w)
+
+
+def test_conversion_correction_preserves_other_answer_content():
+    w = calc.work_out("Convert 3 liters to gallons exactly")
+    answer = "3 liters is 0.789 gallons. EPA guidance says 2 drops per liter and wait 30 minutes."
+    corrected = calc.correct_units_answer(answer, w)
+    assert corrected and "0.792516157074 US liquid gallons" in corrected
+    assert "2 drops per liter" in corrected and "wait 30 minutes" in corrected
+    assert calc.check(corrected, w) == ""
 
 
 def test_distance_and_bearing_match_the_published_vincenty_example():

@@ -18,6 +18,14 @@ def test_everyday_questions_find_the_entry(question, entry):
 
 
 @pytest.mark.parametrize("question", [
+    "What EPA bleach dose is recommended for clear water disinfection?",
+    "How should drinking water be disinfected with bleach?",
+])
+def test_water_disinfection_questions_retrieve_the_offline_epa_reference(question):
+    assert "survival/water-purification" in [e.id for e in ref.lookup(question)]
+
+
+@pytest.mark.parametrize("question", [
     "hey how are you", "my blood pressure reading is 140/90", "I cut the onions wrong",
     "the movie was a burn", "head to the store", "tell me a story about a dragon",
 ])

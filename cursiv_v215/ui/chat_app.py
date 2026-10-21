@@ -1415,7 +1415,8 @@ def sources_line(answer: str = "", question: str = "") -> str:
     elif _DOCS_SEARCHED_EMPTY:
         parts.append("your documents searched, nothing on this; the rest is model knowledge (not checked)")
     if _WORKED:
-        parts.append("worked out by Cursiv's code" if _WORKED.ok else "Cursiv's calculator (it refused this question)")
+        parts.append((f"worked out by Cursiv's code ({_WORKED.tool}: {_WORKED.statement})" if _WORKED.ok else
+                      f"Cursiv's calculator ({_WORKED.tool}: it refused this question — {_WORKED.statement})"))
     if _WEB_SEARCHED:
         parts.append("web search results")
     if _MEMORY_RECALLED and _memory_used(answer, question):
@@ -2725,7 +2726,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if not (_self_turn or _CODING_TURN):
             from cursiv_v215.core import calc as _calc
             global _WORKED
-            _WORKED = _calc.work_out(user_text)
+            _WORKED = _calc.work_out_for_turn(user_text, history)
             if _WORKED:
                 messages[0]["content"] += "\n\n" + _calc.prompt_note(_WORKED) + "\n"
                 if _WORKED.lead:                 # a safety rule's answer, first, from Cursiv
@@ -3252,6 +3253,7 @@ def chat(
     from cursiv_v215.core import speed as _speed
     _speed.chat_started()
     origin, skip = "inferred", False
+    deterministic_correction = False
     try:
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply)
@@ -3282,7 +3284,20 @@ def chat(
             if _WORKED:
                 from cursiv_v215.core import calc as _calc
                 _miss = _calc.check(draft, _WORKED)
-                _flag += ("\n\n" + _miss) if _miss else ""
+                if _miss and replace_draft and _WORKED.tool == "units":
+                    # A note under a wrong conversion leaves the false number visible. Correct the
+                    # conversion claim in place when possible, preserving other answer content.
+                    corrected_draft = _calc.correct_units_answer(draft, _WORKED) or _WORKED.statement
+                    final = _replacement_reply(
+                        corrected_draft, "".join(reply),
+                        ["the streamed conversion conflicted with Cursiv's calculated result"],
+                    )
+                    reply[:] = [final]
+                    draft = corrected_draft
+                    deterministic_correction = True
+                    yield REPLACE_SENTINEL + final
+                else:
+                    _flag += ("\n\n" + _miss) if _miss else ""
             # What the answer says Cursiv did, against what Cursiv's code recorded (core/claims.py)
             from cursiv_v215.core import claims as _claims
             _flag += _claims.notes(draft, _evidence(message, history))
@@ -3294,7 +3309,7 @@ def chat(
         # Still inside this turn, so the check uses the fast router (no idle wait)
         # and background learning cannot take the local model yet.
         try:
-            if _EMERGENCY_TURN or _CURSIV_REPLY or _speed.battery_saver():
+            if _EMERGENCY_TURN or _CURSIV_REPLY or deterministic_correction or _speed.battery_saver():
                 raise _SkipCheck      # no slow check (or a wall of notes) after emergency steps
             from cursiv_v215.core import verify as _verify
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
@@ -3303,8 +3318,10 @@ def chat(
                 ask=lambda msgs: _router_llm(msgs, max_tokens=500),
                 memory_update=_verify.looks_like_memory_update(user_text),
                 context=_check_context(history, user_text),
-                sources="\n\n".join(_RETRIEVED + ([f"Worked out by Cursiv's code (exact): {_WORKED.statement}"]
-                                                    if _WORKED else [])),
+                sources="\n\n".join(_RETRIEVED + ([
+                    ("Calculated by Cursiv's code (decimal shown rounded): " if _WORKED.tool == "units" else
+                     "Worked out by Cursiv's code (exact): ") + _WORKED.statement
+                ] if _WORKED else [])),
             )
             origin, skip = outcome.learn_origin, outcome.skip_learn
             revised = outcome.append.split("**Revised after check:**\n", 1)

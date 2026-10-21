@@ -23,10 +23,13 @@ const PAGES = [
   ["website/start.html", "start.html"],
   ["website/letters.html", "letters.html"],
   ["website/story.html", "story.html"],
+  ["website/open-source-offline-ai.html", "open-source-offline-ai.html"],
+  ["website/ai-reliability-testing.html", "ai-reliability-testing.html"],
+  ["website/local-ai-hardware-requirements.html", "local-ai-hardware-requirements.html"],
   ["website/app.html", "app.html"],
   ["website/app.webmanifest", "app.webmanifest"],
 ];
-const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"]];  // notebook: the offline phone notebook
+const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"], ["website/privacy", "privacy"]];  // notebook and privacy policy directory routes
 
 // The phone notebook (/notebook/) is the only page that may use the GPS and the camera;
 // everywhere else both stay off. Its service worker and files are re-checked on each visit.
@@ -42,7 +45,11 @@ const HEADERS = `/*
   Cache-Control: no-cache
 `;
 
-const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\n";
+const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nSitemap: https://cursiv.us/sitemap.xml\n";
+const SITEMAP_URLS = [
+  "/", "/start", "/vision", "/story", "/open-source-offline-ai",
+  "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/",
+];
 
 rmSync(dist, { recursive: true, force: true });
 mkdirSync(dist, { recursive: true });
@@ -55,6 +62,7 @@ for (const [src, name] of PAGES) {
 for (const [src, name] of FOLDERS) cpSync(join(repo, src), join(dist, name), { recursive: true });
 writeFileSync(join(dist, "_headers"), HEADERS);
 writeFileSync(join(dist, "robots.txt"), ROBOTS);
+writeFileSync(join(dist, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${SITEMAP_URLS.map((path) => `  <url><loc>https://cursiv.us${path}</loc></url>`).join("\n")}\n</urlset>\n`);
 
 console.log(`Built dist/ with ${PAGES.length} pages + ${FOLDERS.map(f => f[1]).join(", ")}`);
 

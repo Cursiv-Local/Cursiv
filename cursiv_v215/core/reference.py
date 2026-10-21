@@ -61,6 +61,7 @@ ALIASES = {
     "diabetic emergency field": ("diabetic", "insulin"),     # low blood sugar: its own sourced entry (packs)
     "frostbite treatment": ("frostbite",),
     "water purification": ("purify", "purifying", "safe to drink", "boil water", "disinfect water", "treat water",
+                           "water disinfection", ("drinking", "water"), ("epa", "bleach"),
                            ("bleach", "liter"), ("bleach", "litre"), ("bleach", "gallon"), ("bleach", "quart"),
                            ("bleach", "drops"), ("bleach", "drink"), ("bleach", "drinking"), ("bleach", "cloudy"),
                            ("bleach", "creek"), ("bleach", "river"), ("bleach", "rainwater"), ("bleach", "well water")),

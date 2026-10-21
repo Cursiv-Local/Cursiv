@@ -18,6 +18,9 @@ _WORDNUM = {"a": 1, "an": 1, "one": 1, "two": 2, "three": 3, "four": 4, "five": 
             "eight": 8, "nine": 9, "ten": 10, "eleven": 11, "twelve": 12, "fifteen": 15, "twenty": 20,
             "thirty": 30, "forty": 40, "forty-five": 45, "fifty": 50, "sixty": 60, "ninety": 90}
 _NUMW = r"(\d+(?:\.\d+)?|" + "|".join(sorted(_WORDNUM, key=len, reverse=True)) + r")"
+_NUMERICAL_CHALLENGE = re.compile(
+    r"(?i)\b(?:no|wrong|incorrect|actually|correct|right|you(?:'re| are) mistaken|"
+    r"that(?:'s| is) not (?:correct|right))\b")
 
 # 6:00 AM / 6 pm / noon, or a 24-hour time (14:30), which field teams often use
 _TIME = re.compile(r"(?i)\b(\d{1,2})(?::(\d{2}))?\s*(a\.?m\.?|p\.?m\.?)(?![a-z])|\b(noon|midnight)\b"
@@ -175,11 +178,30 @@ def work_out(question: str) -> Worked | None:
         return None
 
 
+def work_out_for_turn(question: str, history: list[dict] | None = None) -> Worked | None:
+    """Recheck the immediately preceding conversion when the current turn challenges it.
+
+    A reply like "No, 0.7894 is correct" has no conversion expression. Only the most recent
+    user turn can supply the calculation, and only for an explicit numerical challenge.
+    """
+    worked = work_out(question)
+    if worked or not _NUMERICAL_CHALLENGE.search(question or "") or not re.search(r"\d", question or ""):
+        return worked
+    previous = next((item.get("content") for item in reversed(history or [])
+                     if item.get("role") == "user" and isinstance(item.get("content"), str)), None)
+    if not previous:
+        return None
+    prior_work = work_out(previous)
+    return prior_work if prior_work and prior_work.tool == "units" else None
+
+
 def prompt_note(w: Worked) -> str:
     if not w.ok:
         return ("## Cursiv's calculator\n" + w.statement +
                 " Don't give a calculated result for this; say which figure is missing or wrong and ask for it.")
-    return ("## Worked out by Cursiv (exact)\n" + w.statement +
+    heading = "## Calculated by Cursiv's code (decimal shown is rounded)\n" if w.tool == "units" else \
+        "## Worked out by Cursiv (exact)\n"
+    return (heading + w.statement +
             " Use these results as given, with their units and time period; don't redo the calculation "
             "differently, and don't describe the supply as lasting longer or being enough when it isn't. "
             "Don't say a tool or calculator was used: Cursiv adds that line itself.")
@@ -187,7 +209,22 @@ def prompt_note(w: Worked) -> str:
 
 def _decimals(number: str) -> int:
     """Rounding allowed for a number written with this many decimals: 54.3 may stand for 54.32."""
-    return len(number.split(".")[1]) - 1 if "." in number else -1
+    return len(number.split(".")[1]) if "." in number else -1
+
+
+def _rounding_tolerance(number: str) -> float:
+    """Allow only the rounding implied by the precision the answer actually shows."""
+    places = max(0, _decimals(number))
+    return 0.5 * (10 ** -places)
+
+
+_CONVERSION_CLAIM = re.compile(r"(?i)\b(?:convert(?:ed|ing)?|conversion|equals?|is|are|was|becomes?)\b|=|≈|~")
+_DOSE_CONTEXT = re.compile(r"(?i)\b(?:drops?|bleach|dose|disinfect(?:ion|ed|ing)?)\b")
+_FACTOR_CONTEXT = re.compile(r"(?i)\bexact factor\b|\b1\s+(?:u\.?s\.?\s+(?:liquid\s+)?|imperial\s+|imp\s+)?gallons?\s*=")
+
+
+def _answer_sentences(text: str) -> list[str]:
+    return [part for part in re.split(r"(?<=[.!?;])\s+(?!\d)|\n+", text or "") if part]
 
 
 _HEDGE = re.compile(r"(?i)\b(can'?t|cannot|not|n't|no|uncertain|may|might|unclear|too small|sure|unreliable|"
@@ -237,7 +274,42 @@ def check(answer: str, w: Worked) -> str:
     if w.value is not None:
         # rounding is fine ("about 54.3" for 54.32); a different number isn't
         wanted = [w.value] + list(w.facts.get("also", []))
-        if any(abs(float(n) - v) <= max(w.tol, 0.051 * 10 ** -_decimals(n), abs(v) * 0.005)
+        if w.tool == "units":
+            destination = str(w.facts.get("destination_unit", ""))
+            if "gallon" in destination or destination == "gal":
+                unit_values = re.compile(
+                    r"(?i)(?P<number>-?\d+(?:\.\d+)?)\s*(?P<unit>(?:(?:u\.?s\.?)(?:\s+liquid)?\s+|"
+                    r"imperial\s+|imp\s+)?gallons?|gals?|gal)\b")
+                expected_system = "imperial" if "imperial" in destination or destination.startswith("imp ") else "us"
+                seen_unit = False
+                for sentence in _answer_sentences(text):
+                    if _FACTOR_CONTEXT.search(sentence) or _DOSE_CONTEXT.search(sentence):
+                        continue
+                    for match in unit_values.finditer(sentence):
+                        seen_unit = True
+                        written = match.group("unit").lower()
+                        written_system = "imperial" if "imperial" in written or written.startswith("imp ") else "us"
+                        n = match.group("number")
+                        if written_system != expected_system or abs(float(n) - w.value) > _rounding_tolerance(n) + 1e-12:
+                            return (f"*(Cursiv's check: the answer gives {n} {written}, but the conversion code worked out "
+                                    f"{w.statement})*")
+                if not seen_unit:
+                    return f"*(Cursiv's check: the answer omits the requested gallon unit; the conversion code worked out {w.statement})*"
+            elif "liter" in destination or "litre" in destination or destination == "l":
+                unit_values = re.compile(r"(?i)(?P<number>-?\d+(?:\.\d+)?)\s*(?P<unit>liters?|litres?|l)\b")
+                seen_unit = False
+                for sentence in _answer_sentences(text):
+                    if _FACTOR_CONTEXT.search(sentence) or _DOSE_CONTEXT.search(sentence):
+                        continue
+                    for match in unit_values.finditer(sentence):
+                        seen_unit = True
+                        n = match.group("number")
+                        if abs(float(n) - w.value) > _rounding_tolerance(n) + 1e-12:
+                            return (f"*(Cursiv's check: the answer gives {n} {match.group('unit')}, but the conversion code "
+                                    f"worked out {w.statement})*")
+                if not seen_unit:
+                    return f"*(Cursiv's check: the answer omits the requested liter unit; the conversion code worked out {w.statement})*"
+        if any(abs(float(n) - v) <= _rounding_tolerance(n) + 1e-12
                for n in re.findall(r"-?\d+(?:\.\d+)?", text) for v in wanted):
             return ""
         # "7/8" for 0.875 (benchmark num-003, U68 and U75)
@@ -250,4 +322,50 @@ def check(answer: str, w: Worked) -> str:
             int(b) and abs(int(a) / int(b) - float(w.answer)) < 1e-9
             for a, b in re.findall(r"(?<![\d.])(\d+)\s*/\s*(\d+)(?!\d|\.\d)", text)):
         return ""                                   # "7/8" for 0.875 (benchmark num-003, U68 and U75)
-    return f"*(Cursiv's check: worked out exactly, {w.statement[0].lower() + w.statement[1:]})*"
+    description = "calculated result" if w.tool == "units" else "worked out exactly"
+    return f"*(Cursiv's check: {description}, {w.statement[0].lower() + w.statement[1:]})*"
+
+
+def correct_units_answer(answer: str, w: Worked) -> str | None:
+    """Repair only a wrong destination-unit conversion claim, preserving other answer content."""
+    if w.tool != "units":
+        return None
+    label = str(w.facts.get("destination_label", ""))
+    expected = re.findall(r"(-?\d+(?:\.\d+)?)\s+" + re.escape(label) + r"\b", w.statement, re.I)
+    if not label or not expected:
+        return None
+    expected_number = expected[-1]
+    conversion_claim = _CONVERSION_CLAIM
+    if "gallon" in str(w.facts.get("destination_unit", "")) or w.facts.get("destination_unit") == "gal":
+        quantity = re.compile(
+            r"(?i)(?P<number>-?\d+(?:\.\d+)?)\s*(?P<unit>(?:(?:u\.?s\.?)(?:\s+liquid)?\s+|"
+            r"imperial\s+|imp\s+)?gallons?|gals?|gal)\b")
+        expected_system = "imperial" if "imperial" in label.lower() else "us"
+        def replacement(match: re.Match) -> str:
+            unit = match.group("unit").lower()
+            system = "imperial" if "imperial" in unit or unit.startswith("imp ") else "us"
+            number = match.group("number")
+            if system == expected_system and abs(float(number) - w.value) <= _rounding_tolerance(number) + 1e-12:
+                return match.group(0)
+            return f"{expected_number} {label}"
+    elif "liter" in str(w.facts.get("destination_unit", "")) or \
+            "litre" in str(w.facts.get("destination_unit", "")) or w.facts.get("destination_unit") == "l":
+        quantity = re.compile(r"(?i)(?P<number>-?\d+(?:\.\d+)?)\s*(?P<unit>liters?|litres?|l)\b")
+        def replacement(match: re.Match) -> str:
+            number = match.group("number")
+            if abs(float(number) - w.value) <= _rounding_tolerance(number) + 1e-12:
+                return match.group(0)
+            return f"{expected_number} {label}"
+    else:
+        return None
+    sentences = _answer_sentences(answer or "")
+    changed = False
+    for index, sentence in enumerate(sentences):
+        if not conversion_claim.search(sentence) or _FACTOR_CONTEXT.search(sentence) or _DOSE_CONTEXT.search(sentence):
+            continue
+        updated, count = quantity.subn(replacement, sentence)
+        if count and updated != sentence:
+            sentences[index] = updated
+            changed = True
+    corrected = " ".join(part.strip() for part in sentences if part.strip())
+    return corrected if changed and not check(corrected, w) else None

@@ -11,7 +11,7 @@ from __future__ import annotations
 import math
 import re
 import statistics
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -21,6 +21,7 @@ class Result:
     tol: float                # how close counts as the same (rounding)
     lead: str = ""            # shown by Cursiv above the answer (safety rules: read first)
     tool: str = ""            # which calculation made it (set by work_out)
+    facts: dict = field(default_factory=dict)
 
 
 def _fmt(v: float, places: int = 4) -> str:
@@ -41,6 +42,10 @@ _UNITS = {
              "pounds": 453.59237, "oz": 28.349523125, "ounce": 28.349523125, "ounces": 28.349523125},
     "volume": {"l": 1, "liter": 1, "liters": 1, "litre": 1, "litres": 1, "ml": 0.001, "milliliter": 0.001,
                "milliliters": 0.001, "gal": 3.785411784, "gallon": 3.785411784, "gallons": 3.785411784,
+               "us gallon": 3.785411784, "us gallons": 3.785411784,
+               "us liquid gallon": 3.785411784, "us liquid gallons": 3.785411784,
+               "imperial gallon": 4.54609, "imperial gallons": 4.54609, "imp gallon": 4.54609,
+               "imp gallons": 4.54609,
                "qt": 0.946352946, "quart": 0.946352946, "quarts": 0.946352946, "fl oz": 0.0295735295625,
                "m3": 1000, "cubic meters": 1000},
     "area": {"m2": 1, "square meters": 1, "ha": 10000, "hectare": 10000, "hectares": 10000, "km2": 1e6,
@@ -57,6 +62,7 @@ _U = r"(" + "|".join(re.escape(u) for u in _ALL_UNITS) + r")"
 _NUM = r"(-?\d[\d,]*(?:\.\d+)?)"
 _CONVERT = re.compile(r"(?i)(?:convert\s+)?" + _NUM + r"\s*" + _U + r"\s+(?:to|in|into)\s+" + _U + r"\b")
 _HOW_MANY = re.compile(r"(?i)how many\s+" + _U + r"\s+(?:are\s+)?(?:in|is)\s+" + _NUM + r"\s*" + _U + r"\b")
+_EXACT_REQUEST = re.compile(r"(?i)\b(exact(?:ly)?|without rounding|unrounded)\b")
 
 
 def _kind(unit: str) -> str | None:
@@ -97,7 +103,38 @@ def units(question: str) -> Result | None:
     out = convert(value, src, dst)
     if out is None:
         return None
-    return Result(f"{raw} {src} is {_fmt(out)} {dst}.", out, max(abs(out) * 0.005, 0.01))
+    dst_label = dst
+    if dst.lower() in ("gallon", "gallons", "gal"):
+        dst_label = "US liquid gallons" if abs(_UNITS["volume"][dst.lower()] - 3.785411784) < 1e-12 else dst
+    if dst.lower() in ("us gallon", "us gallons", "us liquid gallon", "us liquid gallons"):
+        dst_label = "US liquid gallons"
+    if dst.lower() in ("imperial gallon", "imperial gallons", "imp gallon", "imp gallons"):
+        dst_label = "imperial gallons"
+    if _EXACT_REQUEST.search(question or ""):
+        # A decimal conversion factor can be exact while its quotient has a repeating decimal.
+        if "gallon" in dst.lower() or dst.lower() == "gal":
+            imperial = "imperial" in dst.lower() or dst.lower().startswith("imp ")
+            system = "imperial" if imperial else "US liquid"
+            factor = "4.54609" if imperial else "3.785411784"
+            statement = (f"The exact factor is 1 {system} gallon = {factor} liters. {raw} {src} ÷ {factor} "
+                         f"liters per gallon = {out:.12g} {dst_label} (decimal approximation shown to 12 "
+                         "significant digits).")
+        elif "gallon" in src.lower() or src.lower() == "gal":
+            imperial = "imperial" in src.lower() or src.lower().startswith("imp ")
+            system = "imperial" if imperial else "US liquid"
+            factor = "4.54609" if imperial else "3.785411784"
+            statement = (f"The exact factor is 1 {system} gallon = {factor} liters. {raw} {src} × {factor} "
+                         f"liters per gallon = {out:.12g} {dst} (decimal approximation shown to 12 "
+                         "significant digits).")
+        else:
+            statement = (f"{raw} {src} = {raw} × {_UNITS[_kind(src)][src.lower()]} ÷ "
+                         f"{_UNITS[_kind(dst)][dst.lower()]} = {out:.12g} {dst} "
+                         "(decimal approximation shown to 12 significant digits).")
+    else:
+        statement = f"{raw} {src} is approximately {_fmt(out)} {dst_label}."
+    # _fmt publishes four decimal places; do not encode the old 0.5% acceptance band.
+    return Result(statement, out, 0.00005, tool="units",
+                  facts={"destination_unit": dst.lower(), "destination_label": dst_label})
 
 
 # ── Coordinates ────────────────────────────────────────────────────────────
@@ -417,8 +454,10 @@ def lightning_wait(question: str) -> Result | None:
 
 def work_out(question: str) -> Result | None:
     from cursiv_v215.core import datecalc       # dates, weekdays, spaced points, two proportions
-    for fn in (lightning_wait, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
-               datecalc.weekday, datecalc.dates, datecalc.spacing, units):
+    # An explicit conversion in a compound request must not be shadowed by an
+    # unrelated calculator that happens to notice the same quantity (e.g. liters for a dose).
+    for fn in (lightning_wait, units, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
+               datecalc.weekday, datecalc.dates, datecalc.spacing):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):

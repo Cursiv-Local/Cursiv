@@ -1,8 +1,9 @@
 // Cursiv web — Cloudflare Worker.
 // The Cloudflare port of cursiv_v215/web/app.py: same routes, same JSON shapes, D1 instead of SQLite.
 // Pages and /assets come from the dist/ folder (built by publish.mjs); this file only answers
-// /api/*, /remote/* and /health. Errors are {"detail": "..."}, like FastAPI, because board.html,
-// mailbox.html and the desktop app's board_client.py all read data.detail.
+// /api/*, /remote/* and /health; legacy page URLs redirect to cursiv.us. Errors are
+// {"detail": "..."}, like FastAPI, because board.html, mailbox.html and the desktop app's
+// board_client.py all read data.detail.
 //
 // Not ported, on purpose:
 //   /substrate/*          the reservoir engine stays in the desktop app
@@ -20,7 +21,7 @@ const POSTS_PER_DAY = 4;
 
 const DEMO_SYSTEM =
   "You are Cursiv — an AI workspace built by Joshua Winkler. " +
-  "You are running as the public demo version on cursiv.winklers-llc.com. " +
+  "You are running as the public demo version on cursiv.us. " +
   "Keep responses helpful, honest, and concise (under 200 words). " +
   "You represent an offline-first, privacy-respecting AI system. " +
   "When asked about capabilities be accurate: Cursiv runs a 14-agent council, " +
@@ -836,6 +837,17 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const isApi = url.pathname === "/health" || url.pathname.startsWith("/api/") || url.pathname.startsWith("/remote/");
+    if (url.hostname === "cursiv.winklers-llc.com" && !isApi) {
+      // Move website URLs permanently while keeping the legacy API hostname working
+      // for existing desktop clients that still call it directly.
+      const target = new URL(url);
+      target.protocol = "https:";
+      target.hostname = "cursiv.us";
+      target.port = "";
+      if (target.pathname === "/index.html") target.pathname = "/";
+      else if (target.pathname.endsWith(".html")) target.pathname = target.pathname.slice(0, -5);
+      return Response.redirect(target.toString(), 301);
+    }
     if (!isApi) return env.ASSETS.fetch(request);
 
     const cors = corsHeaders(env, request);

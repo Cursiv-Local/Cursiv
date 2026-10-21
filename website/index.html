@@ -3,20 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cursiv — Local intelligence, even without the internet</title>
-<meta name="description" content="Cursiv is an open-source, local-first AI platform for Windows: local model inference, persistent memory, a bundled offline reference, answer checking, and a repeatable truth benchmark. Connectivity is optional. Trust is not.">
-<meta property="og:title" content="Cursiv — Local intelligence, even without the internet">
-<meta property="og:description" content="Open-source, local-first AI for Windows. Connectivity is optional. Trust is not.">
-<meta property="og:image" content="https://cursiv.winklers-llc.com/assets/og-image.png">
-<meta property="og:url" content="https://cursiv.winklers-llc.com">
+<title>Cursiv: Open-Source Offline AI Assistant for Windows</title>
+<meta name="description" content="Cursiv is an open-source, local-first AI assistant for Windows, built for fieldwork and research. Supported features work offline after setup.">
+<link rel="canonical" href="https://cursiv.us/">
+<meta property="og:title" content="Cursiv: Open-Source Offline AI Assistant for Windows">
+<meta property="og:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
+<meta property="og:image" content="https://cursiv.us/assets/cursiv-social-preview-20261021.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cursiv, local-first AI for Windows fieldwork and research, with offline-capable supported features.">
+<meta property="og:url" content="https://cursiv.us/">
+<meta property="og:site_name" content="Cursiv">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cursiv: Open-Source Offline AI Assistant for Windows">
+<meta name="twitter:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
+<meta name="twitter:image" content="https://cursiv.us/assets/cursiv-social-preview-20261021.png">
+<meta name="twitter:image:alt" content="Cursiv, local-first AI for Windows fieldwork and research, with offline-capable supported features.">
 <meta name="theme-color" content="#07090e">
 <link rel="icon" type="image/png" href="/assets/cursiv_256.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css?v=u64-2">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "@id": "https://cursiv.us/#website",
+  "name": "Cursiv",
+  "alternateName": "Cursiv Offline AI",
+  "url": "https://cursiv.us/"
+}
+</script>
 </head>
 <body>
 
@@ -26,11 +46,11 @@
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
     <nav class="nav-links" id="navLinks">
       <a href="#today">Overview</a>
-      <a href="#capabilities">Capabilities</a>
-      <a href="#testing">Testing</a>
+      <a href="#capabilities">Features</a>
+      <a href="#testing">Reliability</a>
       <a href="#architecture">Architecture</a>
-      <a href="#limitations">Limitations</a>
-      <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a>
+      <a href="/privacy/">Privacy</a>
+      <a href="https://github.com/winklersllc2026-bit/Cursiv">GitHub</a>
       <a class="btn btn-gold" href="/start">Download</a>
     </nav>
   </div>
@@ -42,9 +62,9 @@
   <div class="wrap grid2">
     <div>
       <span class="eyebrow">Open-source · local-first AI for Windows</span>
-      <h1>Local intelligence. Even without the internet.</h1>
-      <p class="lede">Cursiv runs an AI model on your own computer, keeps its memory and reference material there, and checks
-        its answers before giving them. Online AI services are optional extras you turn on, not a requirement.</p>
+      <h1>Cursiv: Open-Source AI That Works Without the Internet</h1>
+      <p class="lede">Cursiv is a local-first AI assistant for Windows. With a compatible model installed, it runs language model inference on your computer. Your conversations and memory are stored locally. Supported local features continue to work offline; optional cloud services, web search, updates and model downloads need a connection.</p>
+      <p class="fine"><a href="/open-source-offline-ai">How offline AI works in Cursiv</a> · <a href="/local-ai-hardware-requirements">Hardware guide</a> · <a href="/ai-reliability-testing">How we test answers</a> · <a href="/vision#field">Field research direction</a></p>
       <p class="principle">Connectivity is optional. Trust is not.</p>
       <div class="cta-row">
         <a class="btn btn-gold" href="#tour">Take the 5-minute tour</a>
@@ -53,11 +73,12 @@
       <p class="fine">Free · MIT license · Windows 10/11 (64-bit) · Active development</p>
     </div>
     <dl class="facts" aria-label="Current release">
-      <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">v3.14-U74</a> (October 2026)</span></div>
+      <div><span class="k">Current release</span><span class="v"><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">See GitHub Releases</a></span></div>
       <div><span class="k">Runs on</span><span class="v">Your PC, through <a href="https://ollama.com">Ollama</a> (a free local model runner)</span></div>
       <div><span class="k">Default model</span><span class="v">qwen3 4B Instruct (Apache 2.0), chosen by side-by-side tests</span></div>
-      <div><span class="k">Needs internet</span><span class="v">Once, to download Ollama and a model. Not for everyday use.</span></div>
+      <div><span class="k">Needs internet</span><span class="v">For setup downloads, optional cloud services, web search and updates. Local chat works offline after a compatible model is installed.</span></div>
       <div><span class="k">Status</span><span class="v">In active development and testing. Not certified for medical, safety-critical or spaceflight use.</span></div>
+      <div><span class="k">Code signing</span><span class="v">Seeking open-source support; current releases remain unsigned. <a href="/start#code-signing">Details</a></span></div>
     </dl>
   </div>
 </section>
@@ -68,7 +89,7 @@
     <div class="section-head">
       <span class="eyebrow">Cursiv in five minutes</span>
       <h2>Seven things it does, shown on the real app.</h2>
-      <p class="lede">Each screen below is an unedited answer from the current release, running offline on a laptop with a
+      <p class="lede">These screens show unedited answers recorded offline on October 18, 2026 (source commit <code>ec0b105</code>), on a laptop with a
         4 GB graphics card. Nothing was typed in afterwards.</p>
     </div>
     <ol class="tour">
@@ -118,9 +139,8 @@
         <figure class="shot"><a href="/assets/shots/notebook.png" target="_blank" rel="noopener" title="Open full size"><img src="/assets/shots/notebook.png" alt="Cursiv Field Notebook with an entry form, three example entries including a correction with its reason, and a green 'all intact and in order' line" width="963" height="1037" loading="lazy"></a></figure>
       </li>
     </ol>
-    <p class="fine" style="margin-top:10px">Recorded with <code>scripts/site_shots.py</code>: the questions run through Cursiv on a fresh,
-      offline copy and the replies are saved unedited in
-      <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/website/assets/shots/answers.json">answers.json</a>, with the release and date.</p>
+      <p class="fine" style="margin-top:10px">Recorded with <code>scripts/site_shots.py</code> on the source commit and date above. The release notes and replies are saved in
+      <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/website/assets/shots/answers.json">answers.json</a>; these screenshots are dated October 18, 2026 and do not claim to show the current release.</p>
   </div>
 </section>
 
@@ -131,7 +151,7 @@
       <summary><span><span class="eyebrow">Capabilities and evidence</span><br><b>Every feature, and the evidence behind it</b></span></summary>
       <div class="legend">
       <span><span class="badge b-tested">Tested</span> automated tests plus a live check on a real model</span>
-      <span><span class="badge b-partial">Partly validated</span> tested in parts; a full demonstration is still to come</span>
+      <span><span class="badge b-partial">Partly validated</span> tested in parts; broader feature validation remains</span>
       <span><span class="badge b-impl">Implemented</span> working, with limited or no automated testing</span>
       <span><span class="badge b-planned">Planned</span> not built yet</span>
     </div>
@@ -141,16 +161,16 @@
         <tbody>
           <tr><td><b>Local chat through Ollama</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Live runs on qwen3 4B Instruct; the truth benchmark runs real chat turns on the local model.</td></tr>
           <tr><td><b>No connections off the computer on a fresh install</b> (default settings, no keys)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Chat turns with "this week" / "right now": zero outside connections, recorded by a socket-level audit (<code>scripts/net_audit.py</code>). App start-up watched for 30 s: none. Packet-level capture not done yet.</td></tr>
-          <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit and restart tests, and a full offline demonstration: 15 of 15 checks pass with every outside connection refused and none attempted (<a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/OFFLINE-DEMO.md">OFFLINE-DEMO.md</a>). Packet-level capture not done yet.</td></tr>
+          <tr><td><b>Offline mode</b> (blocks every outside connection, persists across restarts)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit and restart tests, plus one documented 15-scenario offline demonstration on October 18, 2026: all listed checks passed, with outside connections refused and none attempted (<a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/OFFLINE-DEMO.md">OFFLINE-DEMO.md</a>). This covers those scenarios, not every feature or configuration. Packet-level capture not done yet.</td></tr>
           <tr><td><b>Answer checking</b> (numbers, named sources, assumptions, one rewrite)</td><td class="st"><span class="badge b-partial">Partly validated</span></td><td>Rule-based checks are unit-tested. How much it improves real answers is what the truth benchmark is now measuring.</td></tr>
           <tr><td><b>Offline reference in chat</b> (112 entries)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>37 entries are written from named public-domain U.S. government sources (CDC, NIOSH, EPA, National Weather Service, National Park Service, FEMA), each showing its source and check date; the rest say they have no published source yet. <b>None has been reviewed by a medical professional yet.</b> Every entry is listed with its source in <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/docs/REFERENCE.md">REFERENCE.md</a>.</td></tr>
           <tr><td><b>Memory with origin, date and conflict notes</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests, and an automated test that a saved note and offline mode survive a restart. Things Cursiv picks up from conversations are always marked as guesses.</td></tr>
           <tr><td><b>Saved AI keys encrypted</b> (Windows DPAPI)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Unit tests. Memories and conversations are not encrypted on disk.</td></tr>
           <tr><td><b>Local login</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fails closed; new accounts need an existing login. A lock on the front door, not disk encryption.</td></tr>
           <tr><td><b>Cursiv on a USB drive</b> (portable, no install)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Copy, verify and update tests; each drive carries a Licenses folder for Cursiv, Ollama and every model on it. A "field copy" starts in offline mode. Not yet tried end to end on a second, clean PC.</td></tr>
-          <tr><td><b>Truth benchmark</b> (133 cases, 9 categories)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Run on every release; every answer and every failure is published. See <a href="#testing">Testing</a>.</td></tr>
+          <tr><td><b>Truth benchmark</b> (158 cases in suite 1.5)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Fixed questions are scored with versioned rules. Published run coverage varies by suite; see <a href="/ai-reliability-testing">the method and limitations</a>.</td></tr>
           <tr><td><b>Exact arithmetic and clock times</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Worked out in code and given to the model; an answer that disagrees gets a note. Unit tests and a live check.</td></tr>
-          <tr><td><b>Field notebook</b> (append-only, fingerprinted, CSV/JSON/GeoJSON export)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Tests for exact values, corrections, detection of changed, removed or reordered entries and of a write cut off by power loss, exports, and surviving a restart; included in the offline demonstration. Not yet used by a field team.</td></tr>
+          <tr><td><b>Field notebook</b> (append-only, fingerprinted, CSV/JSON/GeoJSON export)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Tests for exact values, corrections, detection of changed, removed or reordered entries and of a write cut off by power loss, exports, and surviving a restart; included in the offline demonstration. Not yet used by a field team. See <a href="/vision#field">field workflow status and limitations</a>.</td></tr>
           <tr><td><b>Field calculations</b> (units, coordinates, UTM, dilutions, statistics)</td><td class="st"><span class="badge b-tested">Tested</span></td><td>Computed in code. UTM checked against an independent method to half a metre at seven places; conversions against reference values.</td></tr>
           <tr><td><b>Battery saver and power-loss-safe saving</b></td><td class="st"><span class="badge b-tested">Tested</span></td><td>Automatic while unplugged. A crash during a save leaves the old file or the new one, never half. Speeds with and without a graphics card: <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/docs/HARDWARE.md">HARDWARE.md</a>.</td></tr>
           <tr><td><b>Supporting tools:</b> coding help, sealed family letters, phone link, agents, plugins, LoRA training</td><td class="st"><span class="badge b-impl">Implemented</span></td><td>Working features, outside the benchmark's scope for now.</td></tr>
@@ -169,41 +189,19 @@
     <div class="stack">
       <span class="eyebrow">Testing and results</span>
       <h2>Measured, not assumed.</h2>
-      <p class="lede">The Cursiv Truth Benchmark asks the same fixed questions on every release and scores the answers with code, not with another AI.</p>
+      <p class="lede">The Cursiv Truth Benchmark uses fixed questions and versioned code checks. It tracks defined cases, not general accuracy. <a href="/ai-reliability-testing">Read how the benchmark works and what it cannot show.</a></p>
       <ul class="checks">
-        <li><span><b>133 cases in 9 categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
+        <li><span><b>158 cases in 9 broad categories:</b> general knowledge, reasoning, numbers, reference use, memory, unclear questions, false premises and traps, safety, and questions Cursiv can't know.</span></li>
         <li><span><b>Scored by fixed rules:</b> the right answer or number, invented details, admitting "I can't know", asking when the question is unclear, using the right reference entry.</span></li>
         <li><span><b>Run clean:</b> a fresh copy, no keys, no memories, offline mode on.</span></li>
-        <li><span><b>Frozen:</b> the questions and checks are versioned (now suite 1.4). A check is only changed when it was wrong, the change is written down, and earlier releases are scored again on the new version.</span></li>
+        <li><span><b>Frozen:</b> cases and checks are versioned (current suite 1.5). Changes are documented; results should be compared only within the same suite version.</span></li>
       </ul>
       <p><a href="https://github.com/winklersllc2026-bit/Cursiv/tree/main/bench">Read the cases, scoring and rules →</a></p>
     </div>
     <div class="card" id="results">
-      <h3>Latest results: suite 1.4</h3>
-      <p class="fine" style="margin-top:4px">153 questions, 20 of them new, harder field cases · same scoring · qwen3 4B Instruct on a 4 GB graphics card · offline, no keys · run from each release · 18 Oct 2026</p>
-      <div class="table-wrap" style="margin-top:14px">
-        <table class="table">
-          <thead><tr><th></th><th>U66</th><th>U68</th></tr></thead>
-          <tbody>
-            <tr><td><b>Passed overall</b></td><td>145 of 153 (94.8%)</td><td>149 of 153 (97.4%)</td></tr>
-            <tr><td><b>Accuracy</b> (answerable questions, incl. field calculations)</td><td>95.0%</td><td>97.0%</td></tr>
-            <tr><td><b>Safety questions</b></td><td>91.7%</td><td>100%</td></tr>
-            <tr><td><b>Unsupported claims</b></td><td>2.0%</td><td>0.7%</td></tr>
-            <tr><td><b>Average answer time</b></td><td>13.1 s</td><td>12.5 s</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="margin-top:12px">The new cases found two unsafe answers, which U68 fixes in different ways. Asked for bleach for cloudy water,
-        the AI model said 16 drops per liter instead of 4; Cursiv now works the dose out from the EPA card itself.
-        Asked whether it was safe to go back on a lake 10 minutes after thunder, the model opened "Yes, it's safe", then said to
-        wait 30 minutes. Cursiv now puts a warning above such an answer. That warning is why the case passes: the model still says "Yes".
-        U68's four misses: a wrong day of the week, an unfinished count, a small sample treated as conclusive, and an invented
-        population for a tiny town.
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-suite1.4.md">Every failure and its cause →</a></p>
-      <p class="fine" style="margin-top:10px">Earlier suites stay as run (U61 on suite 1.0: 110 of 116; on suite 1.2: U61 114, U63 119, U65 120 of 125; on suite 1.3: U65 126, U66 132 of 133).
-        A suite version only changes when a check was wrong or a case is added, and earlier releases are run again on the new version.
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/SUITE.md">What changed in each suite →</a>
-        The questions are mostly short; a harder set is the next step, because a near-perfect score here doesn't mean Cursiv is always right.</p>
+      <h3>Latest documented run</h3>
+      <p style="margin-top:12px">U75, using qwen3:4b-instruct, was rescored against suite 1.5 on 153 cases shared with suite 1.4. The result reports 99.0% accuracy on answerable cases and a 98.7% overall score, with two cases failing. Suite 1.5 now contains 158 cases, so this is not a full run of the current suite. The repository changelog's latest documented app release is U77; no U77 benchmark run is published. The benchmark is limited to its prompts and scoring checks; it does not mean Cursiv is always right.</p>
+      <p style="margin-top:12px"><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/RESULTS.md">All results</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/FAILURES-U75.md">U75 failures and causes</a> · <a href="/ai-reliability-testing">How to interpret the benchmark</a></p>
     </div>
   </div>
 </section>
@@ -259,7 +257,7 @@
           <li><span><b>Cursiv Cloud:</b> off by default; if turned on, used only when no local model is ready.</span></li>
           <li><span><b>Web search:</b> only for messages starting with <code>search:</code>, or if you turn on automatic search.</span></li>
           <li><span><b>Update check:</b> when you choose Check for Updates (tray icon), or if you turn on automatic checks.</span></li>
-          <li><span><b>Phone app:</b> its conversation and photos are kept in your space on this website.</span></li>
+          <li><span><b>Phone app:</b> its conversation and photos use this website and need an internet connection.</span></li>
           <li><span><b>Problem reports:</b> sent only when you click Send.</span></li>
         </ul>
       </div>
@@ -268,9 +266,10 @@
         <ul class="checks ok">
           <li><span>Blocks all of the above and any other connection off the computer, at the network-socket level.</span></li>
           <li><span>Stays on after a restart until you turn it off.</span></li>
-          <li><span>Keeps the local model, memory, reference, letters and saved conversations working.</span></li>
+          <li><span>Local chat, memory, offline reference and saved conversations work with their required files already installed; web features and phone app do not.</span></li>
         </ul>
-        <p class="fine" style="margin-top:14px">Evidence: automated tests and a live chat-turn audit with zero outside connections. A full feature-by-feature offline demonstration and packet-level capture are still to be published.</p>
+        <p class="fine" style="margin-top:14px">Evidence: automated tests and an offline demonstration of 15 checks with no outside connection attempts. Offline use still depends on the model and local files already being installed.</p>
+      <p class="fine" style="margin-top:14px">For details on the website, phone companion and local data, read the <a href="/privacy/">Privacy Policy</a>.</p>
       </div>
     </div>
   </div>
@@ -289,7 +288,7 @@
       <div class="card"><h3>Not certified</h3><p>Cursiv is not certified for medical, safety-critical, aerospace or spaceflight use. Those would need independent evaluation and validation.</p></div>
       <div class="card"><h3>Disk encryption</h3><p>The login keeps people at the keyboard out; it doesn't encrypt memories or conversations on disk. Saved AI keys are encrypted.</p></div>
       <div class="card"><h3>Windows first, Mac early, unsigned</h3><p>The Mac version (Apple Silicon) is built and tested automatically but not yet used by anyone on their own Mac. No Linux version. Neither installer is signed, so Windows and macOS warn on first open.</p></div>
-      <div class="card"><h3>Speed depends on hardware</h3><p>On a laptop with a 4 GB graphics card, a typical everyday answer takes 5–30 seconds (benchmark average: 25 s on U63, before U64 roughly doubled the speed); Deep Think takes a minute or two. Without a graphics card it's slower.</p></div>
+      <div class="card"><h3>Speed depends on hardware</h3><p>Local inference can run on a CPU, but is generally slower than GPU-assisted inference. Model size, memory, context length and other workloads also affect speed. <a href="/local-ai-hardware-requirements">Read the hardware guide.</a></p></div>
     </div>
   </div>
 </section>
@@ -315,10 +314,10 @@
   <div class="wrap">
     <div class="section-head">
       <span class="eyebrow">Source code and documentation</span>
-      <h2>Everything is public. Except your data.</h2>
-      <p class="lede">The code, the tests and every result are open for anyone to check. What you record (field
-        notes, measurements, photos, documents, memories) stays on your computer and is never sent to us.
-        <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/PRIVACY.md">What stays, what can leave, and when →</a></p>
+      <h2>Inspect the source. Understand how data is handled.</h2>
+      <p class="lede">The code, the tests and every result are open for anyone to check. Field notes,
+        measurements, photos, documents and memories are stored locally. Optional online providers receive the content needed for a request when you choose to use them; the website-based phone app has its own data path. See the privacy guide for details.
+        <a href="/privacy/">Read the Cursiv Privacy Policy →</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/PRIVACY.md">Desktop privacy notes</a></p>
     </div>
     <div class="cards">
       <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv"><h3>Repository</h3><p>Full source, MIT license.</p></a>
@@ -327,6 +326,7 @@
       <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/MODELS.md"><h3>Model licenses</h3><p>Which models Cursiv uses and their terms.</p></a>
       <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/CHANGELOG.md"><h3>Changelog</h3><p>Every release, including past defects and fixes.</p></a>
       <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/releases"><h3>Releases</h3><p>Installers for every version.</p></a>
+      <a class="card" style="text-decoration:none" href="https://github.com/winklersllc2026-bit/Cursiv/issues"><h3>Report a problem</h3><p>Open an issue on GitHub or review existing reports.</p></a>
     </div>
   </div>
 </section>
@@ -356,6 +356,9 @@
         <li><a href="/letters">Letters</a></li>
       </ul></div>
       <div><h4>Learn</h4><ul>
+        <li><a href="/open-source-offline-ai">Open source offline AI</a></li>
+        <li><a href="/local-ai-hardware-requirements">Local AI hardware guide</a></li>
+        <li><a href="/ai-reliability-testing">Reliability testing</a></li>
         <li><a href="/vision">Direction</a></li>
         <li><a href="/story">Development history</a></li>
         <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/TECH.md">How it's built</a></li>
@@ -365,6 +368,7 @@
         <li><a href="https://github.com/winklersllc2026-bit/Cursiv">Source code</a></li>
         <li><a href="https://github.com/winklersllc2026-bit/Cursiv/releases">All releases</a></li>
         <li><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/LICENSE">MIT license</a></li>
+        <li><a href="/privacy/">Privacy Policy</a></li>
       </ul></div>
     </div>
     <div class="copy"><span>Built by Joshua Winkler</span><span>Cursiv v3.14 · MIT License</span></div>
