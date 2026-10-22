@@ -1,9 +1,10 @@
 # Maintainability and verification hardening
 
-> Publication follow-up: the owner subsequently authorized U83 commit/push,
-> packaging, release and website deployment. The earlier status below records
-> the audit checkpoint. See [U83 verification](U83-RELEASE-VERIFICATION.md)
-> for the current publication results.
+> Publication follow-up: the owner subsequently authorized commit/push,
+> packaging, release and website deployment. U83 stayed an unpublished candidate
+> after a full-window smoke failure; U84 repairs it and expands that gate.
+> Earlier status statements below record audit checkpoints. See
+> [U84 verification](U84-RELEASE-VERIFICATION.md) for current publication results.
 
 ## Scope and status
 
@@ -262,9 +263,11 @@ candidate, repaired complete-window gate and final release results.
 - [README.md](../README.md)
 - [TECH.md](../TECH.md)
 - [bench/FAILURES-U83.md](../bench/FAILURES-U83.md)
+- [bench/FAILURES-U84.md](../bench/FAILURES-U84.md)
 - [bench/RESULTS.md](../bench/RESULTS.md)
 - [bench/results/U82-maintenance-baseline-20261022-qwen3_4b-instruct-subset-suite1.5.json](../bench/results/U82-maintenance-baseline-20261022-qwen3_4b-instruct-subset-suite1.5.json)
 - [bench/results/U83-qwen3_4b-instruct-suite1.5.json](../bench/results/U83-qwen3_4b-instruct-suite1.5.json)
+- [bench/results/U84-qwen3_4b-instruct-suite1.5.json](../bench/results/U84-qwen3_4b-instruct-suite1.5.json)
 - [bench/results/answer-review-background-20261022.json](../bench/results/answer-review-background-20261022.json)
 - [bench/results/answer-review-blocking-20261022.json](../bench/results/answer-review-blocking-20261022.json)
 - [bench/results/maintenance-after-20261022-qwen3_4b-instruct-subset-suite1.5.json](../bench/results/maintenance-after-20261022-qwen3_4b-instruct-subset-suite1.5.json)
@@ -275,6 +278,7 @@ candidate, repaired complete-window gate and final release results.
 - [bench/results/verification-hardening-20261022.json](../bench/results/verification-hardening-20261022.json)
 - [bench/results/verification-hardening-final-20261022.json](../bench/results/verification-hardening-final-20261022.json)
 - [bench/verification_cases.json](../bench/verification_cases.json)
+- [cloudflare/tests/release-evidence.test.mjs](../cloudflare/tests/release-evidence.test.mjs)
 - [cloudflare/worker.js](../cloudflare/worker.js)
 - [cursiv_v215/chat/cloud_providers.py](../cursiv_v215/chat/cloud_providers.py)
 - [cursiv_v215/chat/completion.py](../cursiv_v215/chat/completion.py)

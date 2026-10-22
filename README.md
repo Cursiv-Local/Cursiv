@@ -171,6 +171,9 @@ You can also install Ollama and a model through Cursiv's Setup window, or add a 
 #### Build the Windows Installer
 
 The installer uses PyInstaller (in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
+Use a fresh virtual environment with only `requirements.txt` for release builds;
+retain its exact package versions with the release evidence. This keeps unrelated
+optional developer packages out of the installer.
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
@@ -181,6 +184,7 @@ The installer uses PyInstaller (in `requirements.txt`) and [Inno Setup 6](https:
 A Git push does not update installed copies. Publish a GitHub release with the
 versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 `SHA256SUMS.txt`. The README, website and updater use that stable installer name.
+For each new release, substitute an unused higher version in these examples.
 
 ```powershell
 Copy-Item installer/Output/Cursiv-Setup-3.14-U84.exe installer/Output/Cursiv-Setup-latest.exe
@@ -191,6 +195,13 @@ gh release create v3.14-U84 installer/Output/Cursiv-Setup-3.14-U84.exe installer
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
 It requires a higher version; replacing assets under the same version will not
 trigger an update for that version. Offline mode blocks update checks.
+
+Run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
+v3.14-U84 --label U84 --model qwen3:4b-instruct`, substituting the new version),
+review every failure, and update the website's current test section from that
+artifact. `node --test cloudflare/tests/*.test.mjs` checks analytics and verifies
+that release labels, model scores and the separate software-test count match
+their recorded evidence. Keep historical runs labeled by their actual version.
 
 #### Publish the Website
 

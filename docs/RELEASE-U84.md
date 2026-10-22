@@ -49,6 +49,15 @@ the full unchanged-suite model run are recorded in
 [U84 verification](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U84-RELEASE-VERIFICATION.md)
 and the [public test page](https://cursiv.us/ai-reliability-testing).
 
+The fresh full suite 1.5 run from the exact U84 tag passed **156/158 cases
+(98.7% overall)** on `qwen3:4b-instruct`. The scorer recorded 100% answerable-case
+accuracy and 0% case-marked unsupported claims for this run. The
+[failure review](https://github.com/Cursiv-Local/Cursiv/blob/main/bench/FAILURES-U84.md)
+includes an undetected safety implication, a contradictory answer and unsupported
+reassurance in a passing case. These pattern scores are not general accuracy or
+medical validation. The previous candidate's different score is retained;
+model variability is not attributed to the GUI/import fixes.
+
 The controlled 10/100/1,000-message rendering test used a simulated 1-second
 verifier delay, not a measured model response time. Median final-token-to-ready
 latency changed from 1,014/1,021/1,076 ms to 21/25/83 ms with no full-document

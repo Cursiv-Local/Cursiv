@@ -1,5 +1,17 @@
 # Handoff — Cursiv verification overhaul
 
+## U84 final validation checkpoint
+
+Exact tagged source: `eede54a79b83c74186275ed4f1aff83bde788739`.
+Local Windows 1,248 passed/1 skipped; hosted Windows 1,248/1 and Mac 1,238/11.
+Both platform builds passed the expanded full-window self-test; Mac screenshots
+also passed. Fresh 158-case suite 1.5: 156 passed (98.7% overall). Both failures
+and additional uncaught implications in model prose are public in
+[the U84 failure review](bench/FAILURES-U84.md). All 20 website checks passed.
+The post-publication record below is maintained in
+[U84 verification](docs/U84-RELEASE-VERIFICATION.md); preparation is not a live
+publication claim. Personal test data is still excluded and preserved.
+
 ## 2026-10-22: U84 release follow-up
 
 U83's source CI and narrow packaged check passed, but the Mac screenshot step

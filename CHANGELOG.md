@@ -23,6 +23,12 @@
   Carry forward the U83 candidate's trust, review and maintainability changes below.
 - Final isolated U84 Windows source suite: 1,248 passed, one Mac Keychain skip
   (197.19 s). Complete launcher/Tools/Settings/Notebook offscreen smoke passed.
+- Run the full unchanged suite 1.5 from the U84 tag: 156/158 passed (98.7%
+  overall), with both failures and additional uncaught safety/reassurance issues
+  documented. Keep the prior candidate run and historical U75 records intact.
+- Add website release-evidence checks tying current labels, model metrics and
+  the separate software-test count to recorded artifacts. All 20 website tests
+  passed (18 analytics/security checks and 2 release-evidence checks).
 - Update website testing/download/research sections with current source checks,
   unchanged-suite model results, failures and clearly labeled historical U75 data.
   Record actual package, CI, hashes, deployment and remaining limits in

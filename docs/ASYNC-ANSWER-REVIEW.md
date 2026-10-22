@@ -1,9 +1,10 @@
 # Answer review without a post-generation wait
 
-> Publication follow-up: the owner subsequently authorized U83 commit/push,
-> packaging, release and website deployment. The earlier status below records
-> the audit checkpoint. See [U83 verification](U83-RELEASE-VERIFICATION.md)
-> for the current publication results.
+> Publication follow-up: the owner subsequently authorized commit/push,
+> packaging, release and website deployment. U83 stayed an unpublished candidate
+> after a full-window smoke failure; U84 repairs it and expands that gate.
+> Earlier status statements below record audit checkpoints. See
+> [U84 verification](U84-RELEASE-VERIFICATION.md) for current publication results.
 
 ## Status and confirmed cause
 
