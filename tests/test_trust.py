@@ -26,7 +26,9 @@ import usb_maker as um  # noqa: E402
 
 
 def _tmp() -> Path:
-    return Path(tempfile.mkdtemp(prefix="cursiv_test_"))
+    # macOS /var is an OS alias; authorize the canonical disposable directory.
+    # The production guard must continue refusing links inside state paths.
+    return Path(tempfile.mkdtemp(prefix="cursiv_test_")).resolve()
 
 
 def _write(p: Path, text: str, mtime: float | None = None) -> Path:

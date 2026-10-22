@@ -376,6 +376,11 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
                      'file list <folder>; file create|append|replace|remember <path> :: <text>; '
                      'file save conversation <path>. Set workspace <folder>, then files on first.')
     op, path, content = parsed
+    from .turn_policy import effective, DENIED
+    policy = effective(text)
+    action = {'read': 'read_file', 'verify': 'read_file', 'list': 'list_directory'}.get(op, 'write_file')
+    if policy.blocks(action):
+        return Reply(DENIED)
     if root is None:
         return Reply('File access is off. Choose workspace <folder>, then files on. No file was accessed.')
     if op in ('create', 'append', 'replace', 'remember') and not content:

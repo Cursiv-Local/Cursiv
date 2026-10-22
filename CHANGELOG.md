@@ -1,12 +1,41 @@
 # Changelog
 
+## v3.14-U82 - Grounded chat state, boundaries and dated memory (2026-10-22)
+
+- Enforce supported per-message conversation-only/read-only/no-memory limits
+  before tool planning and again at native/generic/provider execution. Treat
+  quoted examples and explicit content payloads as data; prevent retention opt-out
+  bypasses through automatic learning or unknown plugins.
+- Use the active session's workspace/file flag for state answers and self-report
+  context. Omitted state is unknown. Describe persistent selected-fact memory
+  accurately, distinguish it from model retraining, and correct concrete false
+  capability claims in drafts and later revisions.
+- Route natural dated recall, including "passed 2 weeks", to the local memory
+  backend. Report saved-date windows, actual IDs, bounded results and unavailable/
+  corrupt data. Keep recall/status read-only and preserve existing storage formats.
+- Preserve bounded current state and verified source excerpts during prompt
+  slimming and Claude tool routing. Reauthorize source follow-up reads; check
+  explicit source quotations against actual excerpts. Directory listings and
+  model prose cannot establish source evidence.
+- Add deterministic integration/regression coverage and a fresh-process memory
+  persistence check. Update README, HANDOFF and
+  [repair report](docs/GROUNDED-CHAT-REPAIR.md) with the audit, exact files,
+  test runs and limitations. Final complete post-repair suite: **1,080 passed,
+  1 skipped** (macOS Keychain on Windows), using isolated source/data snapshots.
+- Release preparation synchronizes application/installer versions at U82 so U81
+  installations can detect an update. Preserve previous release tags and user data.
+  Update installer project links to cursiv.us and Cursiv-Local/Cursiv.
+- Fix the Mac CI test paths to use canonical disposable folders and inject failed
+  writes through the platform's actual commit primitive. Canonicalize the packaged
+  notebook self-test directory too. Production symlink/junction protections remain.
+- No memory migration, updater/network-policy change or website deployment.
+
 ## v3.14-U81 - Verified local actions, faster chat and website updates (2026-10-22)
 
-These are working-tree changes, not a newly published release or rebuilt installer.
-The website analytics task preserves all earlier pending desktop code. The public
-GitHub latest-release endpoint was independently checked and returned v3.14-U79;
-the local source baseline is the owner's `4d24ffe` U80 commit. These are distinct
-states; no tag or release was changed.
+Published on 2026-10-22 from commit 3f58754, incorporating the prior U80 work.
+The earlier development reports below describe checks performed before that
+publication; their U79/latest references are historical observations. U82 builds
+on this source baseline.
 
 ### Homepage copy (2026-10-22)
 

@@ -1,5 +1,67 @@
 # Handoff — Cursiv verification overhaul
 
+## 2026-10-22: U82 publication authorization
+
+The owner explicitly approved committing, pushing, bumping and releasing the
+completed changes. A live GitHub check found U81 already public/latest, U80 still
+draft, and main at 3f58754. The owner chose U82 so installed U81 can detect the
+new build. Do not replace published U81 tags/assets.
+
+Release preparation synchronizes selfknow.VERSION, the launcher's current version
+and Inno Setup to 3.14-U82. Installer project URLs and README update instructions
+now use the current domain/repository. README and CHANGELOG no longer describe the
+already published U81 desktop improvements as pending work.
+
+The U81 Windows CI job passed. Its Mac job and release workflow failed on four
+USB tests using the /var temporary-path alias and a failed-write test mocking the
+Windows-only primitive. Test directories now resolve their disposable paths, and
+the failed-write test targets rename on Windows or link on POSIX. The packaged
+notebook self-test also resolves its scratch directory. Production path guards
+remain unchanged.
+
+Additional release files beyond the implementation report's inventory:
+installer/cursiv_setup.iss, launcher/cursiv_launcher.py, launcher/selftest.py,
+tests/test_trust.py, tests/test_verified_filesystem.py and docs/RELEASE-U82.md.
+The exact release commit/tag, checksums, CI and packaged-app verification are
+recorded after publication. Personal test_internals/ files remain excluded.
+
+## 2026-10-22: Grounded chat state, boundaries and dated recall
+
+Owner instruction: "start from the top, you have permissions", following the
+read-only audit and structured repair plan. Work is on codex/grounded-chat-state
+from U81 commit 3f58754. Existing test_internals/ files are preserved. Nothing
+has been committed, pushed, deployed, released or rebuilt as an installer.
+
+Read [docs/GROUNDED-CHAT-REPAIR.md](docs/GROUNDED-CHAT-REPAIR.md) first. It records
+the confirmed defects versus hypotheses, exact execution paths, all changed files,
+policy/recall/source semantics, test evidence and remaining risks. README and
+CHANGELOG are updated. Memory/notebook formats and original append-only notebook
+backend remain unchanged; there is no migration or real-data rewrite.
+
+Implemented in order: current-message tool/retention boundaries; actual session
+state and truthful memory capability context; native dated saved-fact retrieval;
+bounded verified source continuity and explicit quotation checks; deterministic
+regression coverage. New modules: core/turn_policy.py, core/grounding.py and
+memory/recall.py. UI/provider dispatch uses existing execution receipts and
+backends. Direct operational questions no longer depend on model guesses.
+
+Validation before changes: **1,008 passed, 1 skipped**. Final complete repair run:
+**1,080 passed, 1 skipped** in 166.81 seconds. All 16 changed Python files match
+the tested snapshot byte-for-byte; whitespace review passed. Absolute test-log
+paths and intermediate runs are recorded in the repair report.
+Tests run from disposable source/home/data
+snapshots, include existing offscreen Qt checks, and use mocked model/provider
+output for deterministic assertions. Fresh Python-process memory retrieval was
+tested; an installed executable restart and live qwen/cloud inference were not.
+
+Claude review priorities: opt-out false positives and literal payload handling;
+nested/generator policy cleanup; enabled versus proved file access; corrupt memory
+privacy settings staying unchanged; date-window/user/shared/superseded selection;
+source reauthorization and bounded excerpts; final checker revisions respecting
+the same guards. No new autonomous self-modification or subjective-awareness
+claim is intended. Installed U81 still needs an explicitly approved build/release
+and install to receive these source changes.
+
 ## 2026-10-22: Tighter homepage copy
 
 Website-only copy/layout edit, preserving all earlier pending application and

@@ -53,15 +53,16 @@ def _checks():
         from cursiv_v215.core import devicekey, fieldlog
         real, real_key = fieldlog.log_dir, devicekey.key_file
         with tempfile.TemporaryDirectory() as tmp:
-            fieldlog.log_dir = lambda: Path(tmp)
-            devicekey.key_file = lambda: Path(tmp) / "device_key.json"   # never this computer's real key
+            scratch = Path(tmp).resolve()       # macOS /var aliases /private/var
+            fieldlog.log_dir = lambda: scratch
+            devicekey.key_file = lambda: scratch / "device_key.json"   # never this computer's real key
             devicekey._cache.clear()
             try:
                 e = fieldlog.add(observer="selftest", site="Test", measurements=[{"name": "pH", "value": "7.20"}])
                 assert fieldlog.verify() == [] and e["measurements"][0]["value"] == "7.20"
-                paths = fieldlog.export(Path(tmp) / "export")
+                paths = fieldlog.export(scratch / "export")
                 assert {"csv", "json", "geojson", "report", "signature"} <= set(paths)
-                assert fieldlog.verify_export(Path(tmp) / "export") == []
+                assert fieldlog.verify_export(scratch / "export") == []
             finally:
                 fieldlog.log_dir, devicekey.key_file = real, real_key
                 devicekey._cache.clear()

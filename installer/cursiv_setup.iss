@@ -1,6 +1,6 @@
 ; ============================================================
-; Cursiv v3.14-U81 — Search fix
-; Produces: installer\Output\Cursiv-Setup-3.14-U81.exe
+; Cursiv v3.14-U82 — Grounded conversation and persistent memory
+; Produces: installer\Output\Cursiv-Setup-3.14-U82.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat
 ; panel, tray, guardian, feedback loops, and terminal/chat mode via -t).
@@ -11,10 +11,10 @@
 ; ============================================================
 
 #define AppName      "Cursiv"
-#define AppVer       "3.14-U81"
+#define AppVer       "3.14-U82"
 #define AppPublisher "Joshua Winkler"
-#define AppURL       "https://cursiv.winklers-llc.com"
-#define SourceURL    "https://github.com/winklersllc2026-bit/Cursiv"
+#define AppURL       "https://cursiv.us"
+#define SourceURL    "https://github.com/Cursiv-Local/Cursiv"
 #define AppVerNum    StringChange(AppVer, "-U", ".")
 #define AppExe       "Cursiv.exe"
 #define AppID        "{{A7B1C2D3-E4F5-4A6B-9C7D-8E0F1A2B3C4D}}"
@@ -44,7 +44,7 @@ InfoBeforeFile=BEFORE-INSTALL.txt
 InfoAfterFile=..\CHANGELOG.md
 AppComments=A personal AI assistant that runs on your own computer. The local model answers first; online features are optional, and offline mode blocks every connection off this computer.
 OutputDir=Output
-OutputBaseFilename=Cursiv-Setup-3.14-U81
+OutputBaseFilename=Cursiv-Setup-3.14-U82
 SetupIconFile=..\launcher\resources\icons\cursiv.ico
 WizardSmallImageFile=..\launcher\resources\icons\cursiv_256.png
 Compression=lzma2/ultra64

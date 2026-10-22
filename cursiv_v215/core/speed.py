@@ -313,18 +313,27 @@ def slim_messages(messages: list[dict], budget_chars: int, full_persona: str = "
                   compact: str = "") -> list[dict]:
     """Fit a conversation into a provider's budget: swap the full persona for the
     compact one, then keep the newest turns that fit. The system prompt keeps its
-    head (identity) and its tail (memory / coding context), losing the middle."""
+    head (identity) and its tail (memory / coding context), losing the middle.
+    Additional application system blocks carry bounded current state/evidence
+    separately, so persona replacement cannot silently remove them."""
     out = [dict(m) for m in messages]
     sys_i = next((i for i, m in enumerate(out) if m.get("role") == "system" and isinstance(m.get("content"), str)), None)
+    extra = [i for i, m in enumerate(out) if m.get('role') == 'system' and i != sys_i]
+    reserve = max(0, int(budget_chars * .45))
+    for i in extra:
+        content = str(out[i].get('content') or '')
+        out[i]['content'] = content[:reserve]
+        reserve -= len(out[i]['content'])
     if sys_i is not None:
         s = out[sys_i]["content"]
         if full_persona and compact and s.startswith(full_persona):
             s = compact + s[len(full_persona):]
-        cap = int(budget_chars * 0.6)
+        cap = max(0, int(budget_chars * 0.6) - sum(len(out[i]['content']) for i in extra))
         if len(s) > cap:
             head = s[: cap // 3]
-            tail = s[-(cap - len(head)):]
-            s = head + "\n\n[...]\n\n" + tail
+            tail_size = max(0, cap - len(head) - 12)
+            tail = s[-tail_size:] if tail_size else ''
+            s = (head + "\n\n[...]\n\n" + tail)[:cap]
         out[sys_i]["content"] = s
     used = sum(len(m.get("content") or "") for m in out if m.get("role") == "system")
     turns = [m for m in out if m.get("role") != "system"]

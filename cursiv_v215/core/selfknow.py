@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U81"
+VERSION = "3.14-U82"
 FACTS_FILE = Path(__file__).parent.parent / "council" / "cursiv_facts.md"
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
@@ -73,7 +73,7 @@ def _safe(fn, default="unknown"):
         return default
 
 
-def live_report() -> str:
+def live_report(*, observed=None) -> str:
     from cursiv_v215.ui import chat_app as ca
     from cursiv_v215.core import speed
     lines = [f"Version: Cursiv {VERSION} (Windows desktop app, PyQt window; phone app at cursiv.winklers-llc.com/app)"]
@@ -97,8 +97,10 @@ def live_report() -> str:
     try:
         from cursiv_v215.memory import semantic
         person = semantic.current_person()
-        lines.append(f"Talking with: {person}; memories saved about them: {len(semantic.list_facts(person))}; "
-                     f"learning from chats: {'on' if semantic.learning_enabled() else 'off'}")
+        from . import presence
+        state = observed.get('memory', {}) if observed is not None else presence.memory_state(person)
+        lines.append(f"Talking with: {person}; persistent memory: supported; active records: {state.get('active_records')}; "
+                     f"automatic learning setting: {state.get('automatic_learning')}; errors: {state.get('errors', [])}")
     except Exception:
         pass
     try:
@@ -140,7 +142,8 @@ def live_report() -> str:
         lines.append("Recent errors this session: none")
     try:
         from . import presence
-        lines.append('Operational snapshot (observed now): ' + json.dumps(presence.snapshot()))
+        lines.append('Operational snapshot (observed now): ' + json.dumps(
+            observed if observed is not None else presence.snapshot()))
     except (OSError, ValueError):
         lines.append('Operational snapshot unavailable; state unknown.')
     return "\n".join(f"- {l}" for l in lines)
@@ -181,9 +184,9 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 """
 
 
-def system_prompt() -> str:
+def system_prompt(*, observed=None) -> str:
     try:
         facts = re.sub(r"<!--.*?-->", "", FACTS_FILE.read_text(encoding="utf-8"), flags=re.S).strip()
     except Exception:
         facts = "(fact sheet unavailable)"
-    return SELF_PROMPT.format(facts=facts, report=live_report())
+    return SELF_PROMPT.format(facts=facts, report=live_report(observed=observed))

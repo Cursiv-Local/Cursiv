@@ -3,15 +3,15 @@
 Cursiv is a local-first AI assistant for Windows. It runs compatible language models on your computer and includes tools for field notes, documents, calculations, and offline use.
 
 <p align="center">
-  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">
+  <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">
     <img src="https://img.shields.io/badge/Download_Cursiv-Windows_10_%2F_11-2255DD?style=for-the-badge&logo=windows&logoColor=white" alt="Download Cursiv for Windows" height="48">
   </a>
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 80 MB) ·
-  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
-  <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">Release notes</a> ·
+  <b><a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 80 MB) ·
+  <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
+  <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a> ·
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
@@ -49,7 +49,7 @@ Cursiv is designed to remain useful when internet access is unavailable or an on
 
 **Requirements:** Windows 10 or 11 (64-bit), 8 GB RAM, and about 6 GB of free disk space for one model. Additional models need more space.
 
-1. [Download the latest Windows installer](https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe) and run it.
+1. [Download the latest Windows installer](https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe) and run it.
 2. If Windows displays “Windows protected your PC,” select **More info → Run anyway**. The installer is not code-signed yet.
 3. Create a local username and password, then set security questions for password recovery.
 4. In Setup, install Ollama and download a model. You can start chatting while the model finishes downloading.
@@ -58,7 +58,7 @@ The initial Ollama and model downloads need internet access. After a compatible 
 
 ### Mac Build (Early)
 
-An early build is available for Apple Silicon Macs (M1 or newer) running macOS 12 or later. Download the [latest Mac release](https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg), then drag Cursiv into Applications. The build is not signed by Apple. On first open, use **System Settings → Privacy & Security → Open Anyway** if macOS blocks it.
+An early build is available for Apple Silicon Macs (M1 or newer) running macOS 12 or later. Download the [latest Mac release](https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg), then drag Cursiv into Applications. The build is not signed by Apple. On first open, use **System Settings → Privacy & Security → Open Anyway** if macOS blocks it.
 
 Setup installs Ollama into Applications without an administrator password and downloads a model. The Mac build is tested automatically on Apple hardware at GitHub, including the test suite and an app self-test, but no one has yet tested it on their own Mac. Saved AI keys go into the macOS Keychain. The USB edition is Windows-only.
 
@@ -69,6 +69,25 @@ From the tray menu, choose **Make a Cursiv USB…**. Cursiv copies the app, Olla
 The complete copy is about 30 GB. Use a USB 3 drive or SSD with at least 64 GB, formatted as exFAT. By default, the USB starts fresh without your memories, keys, or settings. Select **Include my memories, keys and settings** to copy them; a private USB copy keeps saved AI keys readable so they can be used on other PCs. Keep that drive secure.
 
 The USB edition is Windows-only. The project has tested its copy, verification, and update steps, but has not yet completed an end-to-end test on a second clean PC. See the [field kit test checklist](docs/FIELD-KIT-TEST.md) for remaining checks.
+
+### Grounded conversation and memory (U82)
+
+Cursiv can retain selected facts across sessions; this does not retrain the
+underlying model or provide complete recall. Automatic learning and manual saves
+are separate. Ask "memory status" for saved-record/learning status, or "what do
+you remember from the past two weeks" for dated saved facts with record IDs.
+Dates describe when facts were saved, not necessarily when events happened.
+
+Clear "just talk", "don't inspect documents" and "don't save memories" requests
+restrict that turn's tools and retention. Conversation history still follows its
+existing save setting. Operational answers use the active workspace/file flag;
+file access being on does not prove a particular read/write succeeded. Source
+follow-ups use bounded verified excerpts, and explicit unsupported quotations
+are flagged. These checks reduce specific failures; model analysis can still err.
+
+These fixes are in the U82 source. Installed copies need the U82 installer.
+Implementation, test evidence, exact file inventory and limitations:
+[Grounded chat repair](docs/GROUNDED-CHAT-REPAIR.md).
 
 ## 3. Technical Details
 
@@ -121,21 +140,27 @@ You can also install Ollama and a model through Cursiv's Setup window, or add a 
 
 #### Build the Windows Installer
 
-The installer build uses PyInstaller (listed in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
+The installer uses PyInstaller (in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
-1. Update the version in `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Versions keep the major number and add an update suffix, such as `3.14-U55`.
-2. Build the app with `scripts\build.bat`. It runs `python -m PyInstaller launcher/build.spec`.
-3. Build the installer with `scripts\package.bat`. The installer is written to `installer\Output\Cursiv-Setup-<version>.exe`.
+1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
+2. Commit the reviewed source, pass the regression checks and tag that exact commit.
+3. Run `py -3.13 scripts/build_release.py v3.14-U82` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
-A Git push does not update installed copies. Publish a GitHub release and attach the installer using both the versioned filename and the stable `Cursiv-Setup-latest.exe` filename. The README download button and website depend on that exact stable asset name.
+A Git push does not update installed copies. Publish a GitHub release with the
+versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
+`SHA256SUMS.txt`. The README, website and updater use that stable installer name.
 
-```bash
-gh release create v3.14-U55 installer/Output/Cursiv-Setup-3.14-U55.exe Cursiv-Setup-latest.exe --title "Cursiv v3.14-U55" --notes-file notes.md --latest
+```powershell
+Copy-Item installer/Output/Cursiv-Setup-3.14-U82.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U82.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U82 installer/Output/Cursiv-Setup-3.14-U82.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U82" --notes-file docs/RELEASE-U82.md --latest --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
-The updater reads `https://api.github.com/repos/winklersllc2026-bit/Cursiv/releases/latest` and downloads the attached installer.
+The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
+It requires a higher version; replacing assets under the same version will not
+trigger an update for that version. Offline mode blocks update checks.
 
 #### Publish the Website
 
@@ -163,16 +188,16 @@ been deployed by this development task. Existing download links work without it.
 The homepage copy is tightened to an offline-first introduction, four benefits,
 expandable practical details and direct latest-installer download buttons.
 
-#### Pending Source Changes
+#### Included Desktop Improvements
 
-The working tree also contains earlier, unreleased desktop repairs: the Saved Notes
-viewer, incremental chat rendering, native Field Notebook chat tools, verified
-filesystem operations and natural-language memory handling. They are separate from
-the website-only analytics change; this task does not modify desktop code or build
-an installer. See [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
+U82 carries forward the U81 Saved Notes viewer, incremental chat rendering, native
+Field Notebook chat tools, verified filesystem operations and natural-language
+memory handling. It adds grounded operational state, per-message boundaries,
+dated recall and source checks. See [U82 release notes](docs/RELEASE-U82.md),
+[CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and
-[verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md) for scope and test evidence.
+[verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md) for scope and evidence.
 
 #### Optional Features
 

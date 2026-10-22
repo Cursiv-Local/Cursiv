@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Callable, Generator
 
 from cursiv_v215.core import netgate   # installs the offline backstop; see core/netgate.py
+from cursiv_v215.core import turn_policy
+from cursiv_v215.core import grounding
 from cursiv_v215.guardian.protected import is_protected_path as _guardian_protected
 
 from cursiv_v215.chat.optional import (  # noqa: E402,F401  (moved; chat_app re-exports)
@@ -383,16 +385,22 @@ def _pending_file(args: dict, root: Path) -> dict:
 
 def _file_tool_result(name: str, args: dict, root: Path | None, *, confirmed: bool = False):
     from cursiv_v215.core import file_access
+    if turn_policy.current().blocks(name):
+        return file_access.FileResult(name, ok=False, error=turn_policy.DENIED)
     if not isinstance(args, dict):
         return file_access.FileResult(name, ok=False, error='tool arguments must be an object')
     if name in {'write_file', 'append_file', 'create_file', 'delete_file'} and _guardian_protected(args.get('path', '')):
         return file_access.FileResult(name, ok=False, error='protected file cannot be changed')
-    return file_access.perform(name, args, root, confirmed=confirmed)
+    result = file_access.perform(name, args, root, confirmed=confirmed)
+    grounding.remember(result.receipt())
+    return result
 
 
 def execute_tool(name: str, args: dict, root: Path, *, confirmed: bool = False) -> str:
     """Execute a file tool call. Returns a string result sent back to the model."""
 
+    if turn_policy.current().blocks(name):
+        return 'Error: ' + turn_policy.DENIED
     if not isinstance(args, dict):
         return 'Error: tool arguments must be an object.'
 
@@ -1879,7 +1887,10 @@ def _call_claude_with_tools(
     Uses a compact system prompt (~200 tokens) instead of the full 12k-token
     codex to stay under the 30k input-tokens/min rate limit.
     """
-    system_str = _compact_system_for_tools(is_owner=is_owner)
+    system_str = _compact_system_for_tools(is_owner=is_owner) + turn_policy.current().note()
+    # The first block is the replaceable persona. Retain application-owned
+    # current-state/source blocks when this provider switches to its tool prompt.
+    system_str += '\n'.join(m['content'] for m in messages[1:] if m.get('role') == 'system')
     # Keep only the last 8 user/assistant turns to limit history overhead
     chat_only  = [m for m in messages if m["role"] in ("user", "assistant")]
     loop_msgs  = chat_only[-16:]   # 8 pairs = 16 messages
@@ -1964,7 +1975,7 @@ def _call_claude_with_tools(
             fn_args = tc.get("input", {})
             tc_id   = tc["id"]
 
-            if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
+            if fn_name == "write_file" and not turn_policy.current().blocks(fn_name) and (confirm_writes or _existing_file(fn_args, root)):
                 try:
                     request = _pending_file(fn_args, root)
                 except (OSError, ValueError, TypeError) as exc:
@@ -2093,7 +2104,7 @@ def _call_xai_with_tools(
                 fn_args = {}
 
             # Confirm-before-write: pause and hand control back to the UI
-            if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
+            if fn_name == "write_file" and not turn_policy.current().blocks(fn_name) and (confirm_writes or _existing_file(fn_args, root)):
                 try:
                     request = _pending_file(fn_args, root)
                 except (OSError, ValueError, TypeError) as exc:
@@ -2381,6 +2392,7 @@ def _connectivity_probe(*keys: str):
 
 # ── Core chat function ────────────────────────────────────────────────────
 
+@turn_policy.scoped
 def _chat_inner(
     message: dict | str,
     history: list[dict],
@@ -2453,10 +2465,22 @@ def _chat_inner(
         return
 
     # ── Process files ───────────────────────────────────────────────────
-    file_context, image_parts = process_uploaded_files(uploaded)
+    file_context, image_parts = process_uploaded_files(uploaded if turn_policy.current().inspect else [])
+
+    from cursiv_v215.core import presence
+    from cursiv_v215.memory import semantic as _presence_sem
+    _observed = grounding.state()
+    if _observed is None:
+        _observed = presence.snapshot(root_path, file_access, person=_presence_sem.current_person())
+    for _source in grounding.refresh_history(user_text, history, root_path if file_access else None):
+        if on_action:
+            on_action(_source)
+        yield _files.VerifiedText(_source.status_line() + '\n\n', _source)
 
     # ── Build system prompt ─────────────────────────────────────────────
-    system_text = load_system_prompt() + load_vault_context() + _load_session_ctx()
+    system_text = load_system_prompt()
+    if turn_policy.current().inspect:
+        system_text += load_vault_context() + _load_session_ctx()
     global _FULL_PERSONA
     _FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if _owner_active():
@@ -2485,6 +2509,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
     for h in history:
         role    = h.get("role", "user")
+        if role not in ('user', 'assistant'):
+            continue  # conversation data cannot introduce system authority
         content = h.get("content", "")
         if role == "assistant" and isinstance(content, str):
             content = _strip_status_lines(content)   # see _STATUS_LINE_RE
@@ -2513,7 +2539,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _search_failed = ""
     if netgate.is_offline() and user_text.lower().startswith(("search:", "search ")):
         yield f"*[Web search skipped. {netgate.OFFLINE_MESSAGE}]*\n\n"
-    elif _needs_search(user_text):
+    elif turn_policy.current().inspect and _needs_search(user_text):
         if _is_online():
             _web_ctx = _web_search(_search_q[:300])
             if not _web_ctx:
@@ -2547,7 +2573,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _PHASE_AFTER = ""
     try:
         from cursiv_v215.core import phases as _phases
-        _ph = _phases.run(user_text, memory_fn=_build_strand_context,
+        _ph = _phases.run(user_text, memory_fn=_build_strand_context if turn_policy.current().inspect else None,
                           online_fn=lambda: _connectivity_probe(api_key, openai_key, anthropic_key),
                           local_fn=lambda: _ollama_running() and _resolve_ollama_model() is not None)
         _addendum = _ph.system_addendum()
@@ -2570,7 +2596,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if _ph.before_reply:
             yield _ph.before_reply
     except Exception:
-        _strand_ctx = _build_strand_context(user_text) if len(user_text.strip()) >= 10 else ""
+        _strand_ctx = _build_strand_context(user_text) if turn_policy.current().inspect and len(user_text.strip()) >= 10 else ""
         if _strand_ctx:
             messages[0]["content"] += "\n\n## Personal Memory\n" + _strand_ctx + "\n"
 
@@ -2583,8 +2609,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _self_turn = False
     try:
         from cursiv_v215.core import selfknow as _sk
-        if not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
-            messages[0]["content"] = _sk.system_prompt()
+        if not turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
+            messages[0]["content"] = _sk.system_prompt(observed=_observed)
             _self_turn = True
     except Exception:
         pass
@@ -2592,7 +2618,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     global _CODING_TURN
     _CODING_TURN = False
     try:
-        if _self_turn:
+        if _self_turn or not turn_policy.current().inspect:
             raise RuntimeError("self question")      # skip the coding brain
         from cursiv_v215.coding import brain as _cb
         _emergency = bool(locals().get("_ph") and _ph.emergency)
@@ -2614,12 +2640,6 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         pass
 
     # ── How this person wants Cursiv to talk (core/style.py): tone + rules learned
-    try:
-        from cursiv_v215.core import presence
-        from cursiv_v215.memory import semantic as _presence_sem
-        messages[0]['content'] += presence.prompt(_presence_sem.current_person(), root_path, file_access)
-    except (OSError, ValueError):
-        messages[0]['content'] += '\nOperational context unavailable; do not infer missing state.\n'
     # from their corrections. Added to every kind of reply; corrections are learned
     # in the background from this message and the reply it's correcting.
     try:
@@ -2645,14 +2665,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         try:
             from cursiv_v215.memory import projects as _proj
             from cursiv_v215.memory import semantic as _sem3
-            _pc = _proj.context(user_text, _sem3.current_person())
+            _pc = _proj.context(user_text, _sem3.current_person()) if turn_policy.current().inspect else ''
             if _pc:
                 messages[0]["content"] += "\n\n" + _pc + "\n"
         except Exception:
             pass
         try:
             from cursiv_v215.core import plugins as _plugins
-            _hc = _plugins.message_context(user_text)
+            _hc = _plugins.message_context(user_text) if not turn_policy.current().blocks('plugin_context') else ''
             if _hc:
                 _RETRIEVED.append(_hc)
                 messages[0]["content"] += "\n\n## From your plugins\n" + _hc + "\n"
@@ -2665,6 +2685,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 if _calls:
                     _results = _tools.run(_calls, root=Path(root_path) if file_access and root_path else None)
                     _tool_ctx = _tools.context_for(_results)
+                    for _result in _results:
+                        grounding.remember(getattr(_result, 'receipt', None))
+                        if on_action and isinstance(getattr(_result, 'receipt', None), dict):
+                            _receipt = _result.receipt
+                            _fields = _files.FileResult.__dataclass_fields__
+                            on_action(_files.FileResult(**{k: v for k, v in _receipt.items() if k in _fields}))
                     _RETRIEVED.append(_tool_ctx)
                     messages[0]["content"] += "\n\n" + _tool_ctx + "\n"
                     checked = [r.label for r in _results if r.ok]
@@ -2737,7 +2763,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     try:
         if not (_self_turn or _CODING_TURN):
             from cursiv_v215.core import documents as _docs
-            if _docs.library():
+            if turn_policy.current().inspect and _docs.library():
                 _passages_found = _docs.search(user_text)
                 _emergency_now = bool(locals().get("_ph") and _ph.emergency)
                 if _passages_found:
@@ -2793,6 +2819,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         'If a location or filename is unclear, ask for it. Never claim a write succeeded without an actual tool result. '
         'An existing file requires confirmation. Protected credentials and paths outside the workspace are unavailable.\n'
     )
+    try:
+        _runtime = presence.prompt(_presence_sem.current_person(), observed=_observed)
+    except (OSError, ValueError):
+        _runtime = '\nOperational preferences unavailable; missing state is unknown.\n'
+    # Constructed here, never parsed out of user/model text. Compact providers
+    # retain this block separately from the long replaceable persona.
+    messages.insert(1, dict(role='system', content=(
+        (_runtime or presence.CAPABILITIES) + turn_policy.current().note() + '\n' + grounding.source_context())))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.
@@ -3204,6 +3238,8 @@ def _time_boxed(gen, seconds: float = RESPONSE_TIME_LIMIT, grace: float = 12.0):
         yield chunk
 
 
+@turn_policy.scoped
+@grounding.scoped
 def chat(
     message: dict | str,
     history: list[dict],
@@ -3257,7 +3293,12 @@ def chat(
         else:
             yield _file_ops.VerifiedText(_file_reply.text)
         return
-    _field_reply = field_recall.command(_field_text)
+    from cursiv_v215.core import presence
+    grounding.set_state(presence.snapshot(root_path, file_access, person=_notebook_person()))
+    if presence.answers_state_question(_field_text):
+        yield presence.state_answer(grounding.state())
+        return
+    _field_reply = field_recall.command(_field_text) if turn_policy.current().inspect else None
     if _field_reply is not None:
         yield _field_reply
         return
@@ -3265,7 +3306,8 @@ def chat(
     from cursiv_v215.memory import semantic as _journal_sem
     from cursiv_v215.core.paths import save_reference
     _journal_scope = save_reference(root_path) if file_access and root_path else 'general'
-    _journal_reply = curiosity_engine.command(_field_text, _journal_sem.current_person(), _journal_scope)
+    _journal_reply = (curiosity_engine.command(_field_text, _journal_sem.current_person(), _journal_scope)
+                      if turn_policy.current() == turn_policy.Policy() else None)
     if _journal_reply is not None:
         yield _journal_reply
         return
@@ -3296,6 +3338,18 @@ def chat(
         if _files.is_request(_user):
             return                 # actual file results need no AI check or automatic learning
         draft = _strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        _capability_problem = presence.contradiction(draft, grounding.state())
+        if _capability_problem:
+            reply[:] = [_capability_problem]
+            yield (REPLACE_SENTINEL if replace_draft else '\n\n') + _capability_problem
+            skip = deterministic_correction = True
+            draft = _capability_problem
+        _source_problem = grounding.quote_problem(_field_text, draft)
+        if _source_problem:
+            reply[:] = [_source_problem]
+            yield (REPLACE_SENTINEL if replace_draft else '\n\n') + _source_problem
+            skip = deterministic_correction = True
+            draft = _source_problem
         if _file_ops.unverified_claim(draft):
             # An LLM acknowledgement cannot establish a completed action. Native
             # action routes return earlier; provider receipts do not use this prose.
@@ -3389,8 +3443,16 @@ def chat(
             pass
     finally:
         _speed.chat_finished()
+    # The optional existing answer checker can itself revise prose. Apply the
+    # same deterministic checks to that final revision without another LLM call.
+    _final_problem = (presence.contradiction(_strip_status_lines(''.join(reply)), grounding.state())
+                      or grounding.quote_problem(_field_text, ''.join(reply)))
+    if _final_problem:
+        reply[:] = [_final_problem]
+        yield (REPLACE_SENTINEL if replace_draft else '\n\n') + _final_problem
+        skip = True
     _learn_later(message, "".join(reply), origin=origin, skip=skip, person=_turn_person, event_id=_turn_id)
-    if not skip and not _EMERGENCY_TURN:
+    if not skip and not _EMERGENCY_TURN and turn_policy.current().automatic_memory:
         curiosity_engine.notify(_turn_person, _journal_scope, _field_text)
         try:
             _suggestion = curiosity_engine.suggestion(_turn_person, _journal_scope)

@@ -129,8 +129,14 @@ def all_tools() -> dict[str, dict]:
 
 
 def might_need_tools(text: str) -> bool:
+    from .turn_policy import effective, Policy
+    policy = effective(text)
+    if not policy.inspect:
+        return False
     if _TRIGGER.search(text or ""):
         return True
+    if policy != Policy():
+        return False
     try:
         from cursiv_v215.core import plugins
         low = (text or "").lower()
@@ -149,7 +155,11 @@ File tools are confined to the person's explicitly enabled workspace. Use relati
 
 
 def plan(text: str, ask: Callable[[list[dict]], str]) -> list[dict]:
-    tools = all_tools()
+    from .turn_policy import effective, Policy
+    policy = effective(text)
+    if not policy.inspect:
+        return []
+    tools = all_tools() if policy == Policy() else dict(BUILTIN)
     desc = "\n".join(f"- {n}: {t['description']}" for n, t in tools.items())
     try:
         raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc, home=os.environ.get("CURSIV_REAL_HOME") or str(Path.home()))},
@@ -158,7 +168,8 @@ def plan(text: str, ask: Callable[[list[dict]], str]) -> list[dict]:
         calls = json.loads(m.group(0)).get("calls", []) if m else []
     except Exception:
         return []
-    return [c for c in calls[:3] if isinstance(c, dict) and c.get("tool") in tools]
+    return [c for c in calls[:3] if isinstance(c, dict) and c.get("tool") in tools
+            and not policy.blocks(c["tool"])]
 
 
 class ToolOutcome:
@@ -173,10 +184,18 @@ class ToolOutcome:
         return (self.label, self.output)[index]
 
 
-def run(calls: list[dict], *, root: Path | None = None) -> list[ToolOutcome]:
-    tools = all_tools()
+def run(calls: list[dict], *, root: Path | None = None, policy=None) -> list[ToolOutcome]:
+    from .turn_policy import current, Policy
+    policy = policy or current()
+    tools = None
     out = []
     for c in calls:
+        if policy is not None and isinstance(c, dict) and policy.blocks(c.get('tool', '')):
+            from .turn_policy import DENIED
+            out.append(ToolOutcome(c.get('tool', 'unsupported tool'), DENIED))
+            continue
+        if tools is None:
+            tools = all_tools() if policy == Policy() else dict(BUILTIN)
         if not isinstance(c, dict) or c.get('tool') not in tools:
             out.append(ToolOutcome('unsupported tool', 'Tool error: unsupported tool'))
             continue

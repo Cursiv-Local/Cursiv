@@ -244,14 +244,16 @@ def memory_status() -> dict:
     return out
 
 
-def list_facts(person: str | None = None, *, include_superseded: bool = False) -> list[dict[str, Any]]:
+def list_facts(person: str | None = None, *, include_superseded: bool = False,
+               repair: bool = True) -> list[dict[str, Any]]:
     with _lock:
         facts, _bad = _read_facts()
         try:
             repair_needed = not _settings().get(REPAIR_KEY)
         except (OSError, ValueError):
             repair_needed = False          # retrieval cannot repair/reset damaged privacy settings
-        if facts and repair_needed:
+        from cursiv_v215.core import turn_policy
+        if facts and repair_needed and repair and turn_policy.current().change:
             facts = repair_learned(facts)
     if not include_superseded:
         facts = [f for f in facts if f.get('status', 'active') == 'active']
@@ -555,7 +557,7 @@ def forget_selected(ids: list[str], *, person: str | None = None) -> list[dict]:
         return gone
 
 
-def find(query: str, person: str | None = None) -> list[dict]:
+def find(query: str, person: str | None = None, *, repair: bool = True) -> list[dict]:
     """Saved memories that contain the query's identifiers (FIELD-731, 18.6) and most of its words,
     exactly as stored. Plain text matching, no model and no embeddings, so it works offline."""
     q = (query or "").lower()
@@ -564,7 +566,7 @@ def find(query: str, person: str | None = None) -> list[dict]:
                                                          "record", "records", "memory", "saved", "stored", "data",
                                                          "details", "entry", "about", "what", "your", "my"}
     out = []
-    for f in list_facts(person or _person):
+    for f in list_facts(person or _person, repair=repair):
         t = f["text"].lower()
         if ids and not all(i in t for i in ids):
             continue
@@ -617,14 +619,14 @@ def _save_error(exc: OSError) -> str:
     return f"Not saved: Cursiv couldn't confirm its memory write ({type(exc).__name__}: {exc}). {detail}"
 
 
-def _recall_reply(query: str, person: str | None = None) -> str:
+def _recall_reply(query: str, person: str | None = None, *, repair: bool = True) -> str:
     status = memory_status()
     if status["error"]:
         return (f"Couldn't read Cursiv's saved memory ({status['error']}). This is a storage problem, not "
                 "'not found': the memory may still be there.")
-    hits = find(query, person)
+    hits = find(query, person, repair=repair)
     damaged = (f"\n(Note: {status['unreadable']} saved line(s) in the memory file are damaged and can't be read; "
-               f"they're kept in {UNREADABLE_FILE_NAME}, not used.)" if status["unreadable"] else "")
+               "they remain in the original file and aren't used by this retrieval.)" if status["unreadable"] else "")
     if not hits:
         return (f"Nothing in Cursiv's saved memory matches \"{query.strip()}\" ({status['saved']} memories saved). "
                 "It may have been only in the conversation; this search cannot establish whether it was never saved. "

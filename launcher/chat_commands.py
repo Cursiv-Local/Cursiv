@@ -855,6 +855,9 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     _memory = memory_command(text, history)
     if _memory is not None:
         return _memory
+    from cursiv_v215.core import turn_policy
+    if turn_policy.for_text(text) != turn_policy.Policy():
+        return None  # constrained conversation goes through the guarded chat path
 
     _notes_request = _notes_view_request(text)
     if _notes_request is not None:
@@ -1046,7 +1049,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
     if cmd in ('presence', 'presence status'):
         import json
         return TextResult(json.dumps(dict(identity=presence.settings(_curiosity_person),
-            observed=presence.snapshot(cfg.get('workspace', ''), cfg.get('file_access', False))), indent=2))
+            observed=presence.snapshot(cfg.get('workspace', ''), cfg.get('file_access', False),
+                                       person=_curiosity_person)), indent=2))
     if cmd in ('style adapt on', 'style adapt off'):
         try:
             presence.configure(_curiosity_person, adapt_style=cmd.endswith(' on'))

@@ -17,7 +17,8 @@ FORGET = 'FORGET_MEMORY'
 LIST = 'LIST_MEMORIES'
 OFF = 'DISABLE_AUTO_MEMORY'
 ON = 'ENABLE_AUTO_MEMORY'
-OPERATIONS = frozenset((SAVE, RECALL, UPDATE, FORGET, LIST, OFF, ON))
+STATUS = 'MEMORY_STATUS'
+OPERATIONS = frozenset((SAVE, RECALL, UPDATE, FORGET, LIST, OFF, ON, STATUS))
 _lock = threading.RLock()
 _pending: dict[tuple, tuple] = {}
 
@@ -29,6 +30,7 @@ class Action:
     query: str = ''
     reference: bool = False
     form: str = 'remember'
+    period: str = ''
 
 
 @dataclass
@@ -84,6 +86,14 @@ def _parse(text: str) -> list[Action] | None:
     low = t.lower().rstrip('.!?')
     if low == 'save this':
         return None              # existing Saved Notes action: anchor the previous exchange
+    if low == 'memory status':
+        return [Action(STATUS)]
+    m = re.fullmatch(r'(?is)what (?:do|can) you remember(?:\s+(?:from|over|during))?\s+(.+?)[.!?]?$', t)
+    if m and re.match(r'(?i)(?:the )?(?:past|passed|last|today|yesterday|between|\d{4}-\d{2}-\d{2})\b', m[1]):
+        return [Action(RECALL, period=m[1].strip())]
+    m = re.fullmatch(r'(?is)what (?:do|can) you remember about (.+?)[.!?]?$', t)
+    if m and m[1].lower() != 'me':
+        return [Action(RECALL, query=m[1])]
     if low in ('memory learn off', 'disable auto memory', 'disable automatic memory', 'turn off automatic memory',
                'stop learning from our conversations', 'stop learning from conversations'):
         return [Action(OFF)]
@@ -209,6 +219,16 @@ def execute(action: Action, *, person: str) -> Outcome:
         if not isinstance(action, Action) or action.operation not in OPERATIONS:
             raise ValueError('unsupported memory operation')
         op = action.operation
+        from cursiv_v215.core import turn_policy
+        if turn_policy.current().blocks(op):
+            return Outcome(op, False, turn_policy.DENIED, status='denied')
+        if op == STATUS:
+            from cursiv_v215.core import presence
+            state = presence.memory_state(person)
+            import json
+            return Outcome(op, not state['errors'], 'Persistent local memory status:\n' +
+                           json.dumps(state, indent=2) + '\nSelected saved facts can survive restarts. '
+                           'This does not retrain the model or establish complete recall.', status='read')
         if op in (OFF, ON):
             enabled = op == ON
             sem.set_learning(enabled)
@@ -218,17 +238,28 @@ def execute(action: Action, *, person: str) -> Outcome:
                        "I'll stop learning from conversations. Saved memories stay until you forget them.")
             return Outcome(op, True, message + '\nSetting saved and verified. Manual memory saves remain available.', status='verified')
         if op == LIST:
-            records = sem.list_facts(person)
+            records = sem.list_facts(person, repair=False)
             message = ('What I remember (' + str(len(records)) + '):\n' + '\n'.join(
-                '- ' + f['text'] + '  (' + sem.fact_subtitle(f) + ')' for f in records[-40:])) if records else \
-                "I don't have any saved memories yet. Tell me with: remember <something about you>"
+                '- [' + str(f.get('id', 'legacy')) + '] ' + f['text'] + '  (' + sem.fact_subtitle(f) + ')' for f in records[-40:])) if records else \
+                "No readable active saved facts are available to this user. To save one: remember <something about you>"
+            message += '\nSaved facts only; showing up to 40 active records, not a complete conversation history.'
+            unreadable = sem.memory_status()['unreadable']
+            if unreadable:
+                message += f'\n{unreadable} store line(s) are unreadable; missing facts may still exist.'
             return Outcome(op, True, message, records, 'read')
         if op == RECALL:
-            message = sem._recall_reply(action.query, person)
+            if action.period:
+                from . import recall
+                try:
+                    message, records = recall.retrieve(action.period, person)
+                except ValueError as exc:
+                    return Outcome(op, False, 'Memory date range needs clarification: ' + str(exc), status='clarification')
+                return Outcome(op, True, message, records, 'read')
+            message = sem._recall_reply(action.query, person, repair=False)
             status = sem.memory_status()
             if status['error']:
                 return Outcome(op, False, message, status='failed')
-            return Outcome(op, True, message, sem.find(action.query, person), 'read')
+            return Outcome(op, True, message, sem.find(action.query, person, repair=False), 'read')
         if op in (SAVE, UPDATE):
             content = re.sub(r'\s+', ' ', action.content.strip())
             if not 4 <= len(content) <= sem.MAX_FACT:
@@ -271,8 +302,14 @@ def execute(action: Action, *, person: str) -> Outcome:
         return Outcome(op, True, 'Forgotten:\n' + '\n'.join('- ' + f['text'] for f in gone) +
                        '\nRemoval verified in the memory store.', gone, 'forgotten')
     except OSError as exc:
+        if getattr(action, 'operation', '') in (RECALL, LIST, STATUS):
+            return Outcome(action.operation, False, 'Saved memory unavailable: ' + type(exc).__name__ +
+                           '. This is a storage error, not evidence of no memories.', status='failed')
         return Outcome(getattr(action, 'operation', ''), False, sem._save_error(exc), status='failed')
     except (ValueError, TypeError, KeyError, AttributeError) as exc:
+        if getattr(action, 'operation', '') in (RECALL, LIST, STATUS):
+            return Outcome(action.operation, False, 'Saved memory could not be read reliably: ' +
+                           type(exc).__name__ + '. The records may still exist.', status='failed')
         return Outcome(getattr(action, 'operation', ''), False, f'Not saved: memory operation not confirmed: {exc}.', status='failed')
 
 
@@ -334,6 +371,10 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
                 return Result(clarification='Memory details needed: specify what to remember or recall. No successful memory action is confirmed.')
         result = Result()
         for action in actions:
+            from cursiv_v215.core.turn_policy import effective, DENIED
+            if effective(text).blocks(action.operation):
+                result.outcomes.append(Outcome(action.operation, False, DENIED, status='denied'))
+                continue
             if action.reference:
                 choices = _context_candidates(history, action.content or action.query)
                 if action.operation == FORGET:

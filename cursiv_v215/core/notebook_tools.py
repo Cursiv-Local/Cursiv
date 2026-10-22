@@ -243,6 +243,10 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
     intent = _request(text, history)
     if intent is None:
         return None
+    from .turn_policy import effective, DENIED
+    operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)
+    if effective(text).blocks(operation):
+        return Result(operation, 'failed', error=DENIED)
     if intent.kind == 'clarification':
         return Result(CREATE, 'clarification', error='State the observation and native notebook destination explicitly. '
                       'No notebook operation was executed; model text, filesystem paths and memory claims cannot confirm a save.')

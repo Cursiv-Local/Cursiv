@@ -72,11 +72,11 @@ def test_write_verification_failure_is_an_error(tmp_path, monkeypatch):
 
 
 def test_permission_and_readonly_failures_do_not_claim_success(tmp_path, monkeypatch):
-    real = fs.os.rename
-    monkeypatch.setattr(fs.os, 'rename', lambda *args: (_ for _ in ()).throw(PermissionError('read-only destination')))
+    operation = 'rename' if os.name == 'nt' else 'link'
+    # New-file commits use exclusive rename on Windows and hard-link on POSIX.
+    monkeypatch.setattr(fs.os, operation, lambda *args: (_ for _ in ()).throw(PermissionError('read-only destination')))
     result = fs.perform('create_file', dict(path='blocked.txt', content='wanted'), tmp_path)
     assert not result.ok and 'PermissionError' in result.render() and not (tmp_path / 'blocked.txt').exists()
-    monkeypatch.setattr(fs.os, 'rename', real)
 
 
 def test_denied_read_is_not_a_successful_generic_check(tmp_path):

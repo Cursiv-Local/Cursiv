@@ -29,7 +29,8 @@ _BAD = re.compile(r"(?i)\b(?:ignore|override|bypass|disable)\b.{0,50}\b(?:safety
 
 def permitted(text: str) -> bool:
     """Reject the entire exchange when retention is declined or privacy is unclear."""
-    return bool(text and text.strip()) and not bool(_PRIVATE.search(text) or _NO_RETAIN.search(text)
+    from cursiv_v215.core.turn_policy import effective
+    return bool(text and text.strip()) and effective(text).automatic_memory and not bool(_PRIVATE.search(text) or _NO_RETAIN.search(text)
                                                    or _BAD.search(text) or '```' in text)
 
 
