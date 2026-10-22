@@ -1,0 +1,246 @@
+{
+  "kind": "deterministic-replay",
+  "date": "2026-10-22T18:55:00.563090+00:00",
+  "baseline_ref": "v3.14-U82",
+  "baseline_commit": "f14c033103aba27d3b9993912f29c2a6b618974a",
+  "python": "3.13.13",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "cases_sha256": "0d1a5851a7f763e38bd7e1c6af242f315e9233b8396ecf0afde601d24ba0204f",
+  "before": {
+    "positive_cases": 8,
+    "negative_cases": 8,
+    "true_positives": 7,
+    "false_negatives": 1,
+    "false_positives": 2,
+    "true_negatives": 6
+  },
+  "after": {
+    "positive_cases": 8,
+    "negative_cases": 8,
+    "true_positives": 8,
+    "false_negatives": 0,
+    "false_positives": 0,
+    "true_negatives": 8
+  },
+  "cases": [
+    {
+      "id": "arithmetic-chain",
+      "expected": [
+        "CONSTRAINT_MISMATCH"
+      ],
+      "before": [
+        "arithmetic: 4 x 3 x 3 is 36, not 30"
+      ],
+      "after": [
+        {
+          "code": "CONSTRAINT_MISMATCH",
+          "severity": "warning",
+          "message": "arithmetic: 4 x 3 x 3 is 36, not 30",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 13.229,
+      "after_ms": 29.786
+    },
+    {
+      "id": "contradictory-conclusion",
+      "expected": [
+        "CONTRADICTORY_CONCLUSION"
+      ],
+      "before": [
+        "contradictory conclusion"
+      ],
+      "after": [
+        {
+          "code": "CONTRADICTORY_CONCLUSION",
+          "severity": "error",
+          "message": "the opening says \"Yes\" and later says \"no\"",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 0.439,
+      "after_ms": 0.271
+    },
+    {
+      "id": "dose-gallon",
+      "expected": [
+        "DOSE_MISMATCH"
+      ],
+      "before": [
+        "for 6% bleach the reference says 8 drops per gallon, not 6"
+      ],
+      "after": [
+        {
+          "code": "DOSE_MISMATCH",
+          "severity": "error",
+          "message": "for 6% bleach the reference says 8 drops per gallon, not 6",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 1.534,
+      "after_ms": 1.416
+    },
+    {
+      "id": "dose-cloudy",
+      "expected": [
+        "DOSE_MISMATCH"
+      ],
+      "before": [
+        "for cloudy water and 8.25% bleach the reference says 4 drops per liter (double the usual 2), not 16"
+      ],
+      "after": [
+        {
+          "code": "DOSE_MISMATCH",
+          "severity": "error",
+          "message": "for cloudy water and 8.25% bleach the reference says 4 drops per liter (double the usual 2), not 16",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 0.345,
+      "after_ms": 0.354
+    },
+    {
+      "id": "small-sample",
+      "expected": [
+        "SMALL_SAMPLE_INFERENCE"
+      ],
+      "before": [],
+      "after": [
+        {
+          "code": "SMALL_SAMPLE_INFERENCE",
+          "severity": "error",
+          "message": "a sample with fewer than two observations cannot establish sample variability or statistical significance",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 0.196,
+      "after_ms": 0.58
+    },
+    {
+      "id": "fake-web-lookup",
+      "expected": [
+        "UNEXECUTED_LOOKUP"
+      ],
+      "before": [
+        "I searched the web"
+      ],
+      "after": [
+        {
+          "code": "UNEXECUTED_LOOKUP",
+          "severity": "error",
+          "message": "I searched the web",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 0.207,
+      "after_ms": 0.358
+    },
+    {
+      "id": "fake-calculator",
+      "expected": [
+        "EXECUTION_TOOL"
+      ],
+      "before": [
+        "the answer says \"I used a deterministic\", but no calculation tool ran for this answer (Cursiv's own record): the numbers are the AI model's own arithmetic, not checked by Cursiv's code"
+      ],
+      "after": [
+        {
+          "code": "EXECUTION_TOOL",
+          "severity": "error",
+          "message": "the answer says \"I used a deterministic\", but no calculation tool ran for this answer (Cursiv's own record): the numbers are the AI model's own arithmetic, not checked by Cursiv's code",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 0.197,
+      "after_ms": 0.229
+    },
+    {
+      "id": "unit-mismatch",
+      "expected": [
+        "CALCULATION_MISMATCH"
+      ],
+      "before": [
+        "*(Cursiv's check: calculated result, 12.4 C is approximately 54.32 F.)*"
+      ],
+      "after": [
+        {
+          "code": "CALCULATION_MISMATCH",
+          "severity": "error",
+          "message": "*(Cursiv's check: calculated result, 12.4 C is approximately 54.32 F.)*",
+          "source": "deterministic"
+        }
+      ],
+      "before_ms": 35.336,
+      "after_ms": 0.247
+    },
+    {
+      "id": "correct-arithmetic",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.191,
+      "after_ms": 0.187
+    },
+    {
+      "id": "correct-fraction",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.173,
+      "after_ms": 0.186
+    },
+    {
+      "id": "correct-dose",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.218,
+      "after_ms": 0.246
+    },
+    {
+      "id": "correct-small-sample-limit",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.161,
+      "after_ms": 0.192
+    },
+    {
+      "id": "quoted-lookup-example",
+      "expected": [],
+      "before": [
+        "I searched the web"
+      ],
+      "after": [],
+      "before_ms": 0.167,
+      "after_ms": 0.194
+    },
+    {
+      "id": "conditional-lookup-example",
+      "expected": [],
+      "before": [
+        "I searched the web"
+      ],
+      "after": [],
+      "before_ms": 0.162,
+      "after_ms": 0.2
+    },
+    {
+      "id": "no-tool-claim",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.165,
+      "after_ms": 0.163
+    },
+    {
+      "id": "correct-units",
+      "expected": [],
+      "before": [],
+      "after": [],
+      "before_ms": 0.18,
+      "after_ms": 0.211
+    }
+  ],
+  "limitations": "Fixed regression examples, not live model inference, field validation or general accuracy."
+}

@@ -413,15 +413,13 @@ async function problemReport(env, request) {
 // "Authorization: Space <token>". Only a hash of the token is stored.
 
 const SPACE_IMAGE_MAX = 1_400_000;   // base64 chars (~1 MB image); the phone resizes first
-const BIBLE_SYSTEM =
-  "You are Cursiv, a personal AI built by Joshua Winkler, here as a Bible study companion. " +
-  "The user often photographs pages from different Bibles and asks about differences between them. " +
-  "When there is a photo: first read the text in it carefully (book, chapter, verse, translation if visible). " +
-  "When comparing translations or pointing out discrepancies: quote the exact wording side by side, name the " +
-  "translations (KJV, NKJV, NIV, ESV, NASB, NLT, …), and explain *why* they differ — underlying Hebrew/Greek words, " +
-  "manuscript families (e.g. Textus Receptus vs. critical text), translation philosophy (word-for-word vs. " +
-  "thought-for-thought), or added/omitted verses. Be even-handed and respectful of every tradition, separate what " +
-  "scholars broadly agree on from what is debated, and say plainly when you're not sure. Use clear, warm language.";
+const VISION_SYSTEM =
+  "You are Cursiv, a personal AI built by Joshua Winkler. Help the user with photos and questions about them. " +
+  "When a photo is supplied, first briefly describe the relevant visible details, then answer the user's question " +
+  "using the image and any text they provided. Read visible text carefully and quote relevant wording only when legible. " +
+  "Distinguish what is visible from inference; say when details or text are unclear rather than inventing them. " +
+  "When no photo is supplied, answer the user's text normally without claiming to see new image details. " +
+  "Be factual, helpful, and direct.";
 
 async function spaceFromRequest(env, request) {
   const auth = request.headers.get("Authorization") || "";
@@ -565,9 +563,9 @@ async function spaceAsk(env, request) {
   const { results: recent } = await env.DB.prepare(
     "SELECT role, text FROM space_messages WHERE space_id = ? AND id != ? ORDER BY created DESC LIMIT 12").bind(space, userMsg.id).all();
   const history = recent.reverse().map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: m.text }));
-  const prompt = text || "What does this page say? Point out anything notable about this translation's wording.";
+  const prompt = text || "Describe what is visible in this image and point out relevant details.";
   const mem = await env.DB.prepare("SELECT person, digest FROM space_memory WHERE space_id = ?").bind(space).first();
-  const system = BIBLE_SYSTEM + (mem?.digest
+  const system = VISION_SYSTEM + (mem?.digest
     ? `
 
 What you remember about ${mem.person ? mem.person.replace(/^./, (c) => c.toUpperCase()) : "this person"} ` +

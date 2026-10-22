@@ -18,6 +18,7 @@ import re
 from dataclasses import dataclass
 
 MAX_CHARS = 8000           # the question and answer together; longer is cut, and the preview shows the cut
+MAX_OUTPUT_TOKENS = 400    # explicit second opinion; automatic fast review is shorter still
 
 # id: (who it goes to, the saved key's field, the model Cursiv's existing client uses)
 PROVIDERS = {
@@ -37,7 +38,7 @@ REVIEW_INSTRUCTION = (
     "3. Missing assumptions or information: what the answer takes for granted or should have asked.\n"
     "4. Differences in interpretation: where a reasonable reader could disagree, without either being wrong.\n"
     "5. Overall: one or two sentences.\n"
-    "Be specific and brief. Say when you are unsure. For medical or safety questions, say what a professional "
+    "Use one short bullet per section and stay under 200 words. Say when you are unsure. For medical or safety questions, say what a professional "
     "should confirm."
 )
 
@@ -117,11 +118,11 @@ _STATUS = re.compile(r"(?m)^[ \t]*\*[\[(][^\n]*[\])]\*[ \t]*$")
 def _caller(provider: str):
     from cursiv_v215.ui import chat_app as ca
     return {
-        "claude": lambda msgs, key: ca._call_claude_direct(msgs, key),
-        "openai": lambda msgs, key: ca._call_openai_direct(msgs, key),
-        "xai": lambda msgs, key: ca._call_xai_stream(msgs, key, False, 1500),
-        "gemini": lambda msgs, key: ca._call_gemini_direct(msgs, key, 1500),
-        "groq": lambda msgs, key: ca._call_groq_direct(msgs, key, 1500),
+        "claude": lambda msgs, key: ca._call_claude_direct(msgs, key, max_tokens=MAX_OUTPUT_TOKENS),
+        "openai": lambda msgs, key: ca._call_openai_direct(msgs, key, max_tokens=MAX_OUTPUT_TOKENS),
+        "xai": lambda msgs, key: ca._call_xai_stream(msgs, key, False, MAX_OUTPUT_TOKENS),
+        "gemini": lambda msgs, key: ca._call_gemini_direct(msgs, key, MAX_OUTPUT_TOKENS),
+        "groq": lambda msgs, key: ca._call_groq_direct(msgs, key, MAX_OUTPUT_TOKENS),
     }[provider]
 
 

@@ -136,10 +136,18 @@ def digest(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else 'missing'
 
 
+def _check_mutation(path: Path) -> None:
+    """Shared with confirmation preparation; no adapter can grant an exception."""
+    from cursiv_v215.guardian.protected import is_protected_path
+    if is_protected_path(str(path)) or is_protected_path(str(path) + '/'):
+        raise PermissionError('Protected login, key or guardian file cannot be changed')
+
+
 def pending(name: str, args: dict, root: Path) -> dict:
     if name not in ('write_file', 'append_file') or not isinstance(args.get('content', ''), str):
         raise ValueError('Invalid pending file operation')
     p = resolve(args.get('path', ''), root)
+    _check_mutation(p)
     if p.exists() and (not p.is_file() or p.stat().st_size > MAX_BYTES):
         raise ValueError('Existing target must be a text file under 2 MB')
     return dict(operation=name, path=str(p), content=args.get('content', ''), expected_sha256=digest(p),
@@ -203,6 +211,9 @@ def execute_result(name: str, args: dict, root: Path | None, *, confirmed: bool 
                 if '**' not in pattern:
                     dirs[:] = []
             return FileResult(name, str(p), entries=rows)
+        # Every mutation route (native, generic and provider) reaches this layer.
+        # The provider's additional guard is not an authorization boundary.
+        _check_mutation(p)
         if name == 'create_directory':
             p.mkdir(parents=True, exist_ok=True)
             resolve(str(p), root)
@@ -283,8 +294,15 @@ _REQUEST = re.compile(r'(?i)^(?:please\s+)?file\s+(?:read|list|create|append|rep
 
 
 def is_request(text: str, history: list[dict] | None = None) -> bool:
-    t = re.sub(r'(?i)^(?:can|could|would) you\s+', '', (text or '').strip())
-    return bool(_REQUEST.search(t) or (_location_request(t) and _previous(history or [])))
+    from .turn_policy import task_text
+    t = re.sub(r'(?i)^(?:(?:can|could|would) you\s+|now\s+)', '', task_text(text))
+    return bool(_REQUEST.search(t) or _workspace_listing(t) or (_location_request(t) and _previous(history or [])))
+
+
+def _workspace_listing(text: str) -> bool:
+    return bool(re.fullmatch(r"(?is)(?:look at|list|show(?: me)?)(?:\s+the)?\s+"
+                             r"(?:files in (?:the )?)?(?:current |authorized )?workspace"
+                             r"(?:\s+and (?:tell|show|give)\b.*)?[.?]?", text))
 
 
 def _location_request(text: str) -> bool:
@@ -293,11 +311,18 @@ def _location_request(text: str) -> bool:
 
 
 def _parse(text: str, history: list[dict]) -> tuple[str, str, str] | None:
-    t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+)', '', text.lstrip())
+    from .turn_policy import task_text
+    t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+|now\s+)', '', task_text(text))
+    if _workspace_listing(t):
+        return 'list', '.', ''
     m = re.fullmatch(r'(?is)file\s+(read|list|create|append|replace|remember|save conversation)\s+(.+)', t)
     if m:
         path, separator, content = m[2].partition(' :: ')
         return m[1].lower(), path.strip(), content if separator else ''
+    m = re.fullmatch(r'(?is)(read|list)\s+(?:the (?:file|folder)\s+)?["\']([^"\']+)["\']'
+                     r'\s+and (?:tell|show|give|summari[sz]e|explain|describe)\b.*', t)
+    if m:
+        return m[1].lower(), m[2], ''
     m = re.fullmatch(r'(?is)(read|list|create|append|replace)\s+(?:the (?:file|folder)\s+)?["\']([^"\']+)["\'](?:\s*:\s*(.*))?', t)
     if m:
         return m[1].lower(), m[2], m[3] or ''
@@ -310,11 +335,14 @@ def _parse(text: str, history: list[dict]) -> tuple[str, str, str] | None:
     if m:
         prior = _previous(history, require_content=True)
         return ('create', m[1].strip(), prior[2]) if prior and prior[2] else None
-    m = re.fullmatch(r'(?is)(read|list)\s+(?:(?:the|my)\s+)?(?:file\s+)?(.+?)(?:\s+and (?:tell|show|give)\b.*)?', t.strip())
+    m = re.fullmatch(r'(?is)(read|list)\s+(?:(?:the|my)\s+)?(?:files?\s+)?(.+?)(?:\s+and (?:tell|show|give|summari[sz]e|explain|describe)\b.*)?', t.strip())
     if m:
-        path = m[2].strip().rstrip('?')
-        if re.fullmatch(r'(?i)(?:(?:my|the) )?(?:authorized )?workspace', path):
+        path = m[2].strip().rstrip('?.').strip('"\'')
+        if re.fullmatch(r'(?i)(?:in )?(?:(?:my|the) )?(?:(?:current|authorized) )?workspace', path):
             path = '.'
+        # Do not turn an unrecognized prose instruction into a literal path.
+        if re.search(r'(?i)\b(?:and|then|please)\s+(?:tell|show|give|summari[sz]e|explain|describe|read|write)\b', path):
+            return None
         return m[1].lower(), path, ''
     if _location_request(t):
         prior = _previous(history)
@@ -402,12 +430,13 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
             receipt = FileResult(name, receipt.path, ok=False, error='Current file contents do not match the requested contents')
         result = receipt.render()
         if op == 'remember':
-            result += '\nConversational memory: ' + save_memory(content)
+            result += ('\nConversational memory: ' + save_memory(content) if receipt.ok else
+                       '\nConversational memory: not attempted because the file operation failed.')
         return Reply(result, receipts=[receipt])
     except (OSError, ValueError) as exc:
         result = f'File operation not confirmed: {type(exc).__name__}: {exc}'
         if op == 'remember':
-            result += '\nConversational memory: ' + save_memory(content)
+            result += '\nConversational memory: not attempted because the file operation failed.'
         return Reply(result)
 
 

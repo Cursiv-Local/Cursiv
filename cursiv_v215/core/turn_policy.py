@@ -41,6 +41,22 @@ class Policy:
                 ', automatic retention=' + str(self.automatic_memory) +
                 '. These limits override tool suggestions. No action is established by prose.\n')
 
+    def confirmation(self) -> str:
+        """Application-owned limits; do not promise deletion of chat history."""
+        if self == Policy():
+            return ''
+        limits = []
+        if not self.inspect:
+            limits.append('tools, saved-source lookup and built-in calculation/reference checks disabled')
+        if not self.change:
+            limits.append('changes disabled')
+        if not self.memory_write:
+            limits.append('memory saves disabled')
+        if not self.automatic_memory:
+            limits.append('automatic learning disabled')
+        return ('This turn: ' + '; '.join(limits) +
+                '. Conversation history still follows your chat-history settings.')
+
 
 def instruction_text(text: str) -> str:
     """Literal file/memory payloads and quoted examples are data, not new grants."""
@@ -59,8 +75,11 @@ def instruction_text(text: str) -> str:
 
 def for_text(text: str) -> Policy:
     body = instruction_text(text)
+    # Second-person obligations are instructions, unlike "I don't read books".
+    body = re.sub(r'(?i)^\s*(?:(?:for|during) (?:this|the current) turn[:,]?\s*)?'
+                  r'you\s+must\s+not\b', 'Do not', body)
     if re.search(r"(?i)\b(?:just|only)\s+(?:talk|chat|discuss|reason)\b|"
-                 r"\b(?:no (?:tool calls|tools|actions)|thought experiment only|hypothetical only)\b|"
+                 r"\b(?:no (?:tool calls|tools|actions)|conversation only|thought experiment only|hypothetical only)\b|"
                  r"\bdo not (?:perform|take|execute) (?:any )?actions\b", body):
         return Policy(False, False, False, False)
     inspect, change, memory, automatic = True, True, True, True
@@ -73,6 +92,8 @@ def for_text(text: str) -> Policy:
         if re.search(r'(?i)\b(?:I|you|we|they|he|she|it)\s*$', body[:match.start()]):
             continue
         clause = re.split(r'(?i)\b(?:but|however|instead|then)\b', match[1], maxsplit=1)[0]
+        if re.search(r'(?i)\b(?:use|call|invoke)\s+(?:(?:any|the)\s+)?(?:tools?|plugins?|functions?)\b', clause):
+            inspect = False
         if re.search(r'(?i)\b(?:inspect|read|browse|scan|search|list|access|look|check|open|analy[sz]e)\b', clause):
             inspect = False
         if re.search(r'(?i)\b(?:write|modify|edit|delete|change|create|append|replace|execute|run|install)\b', clause):
@@ -86,7 +107,32 @@ def for_text(text: str) -> Policy:
             change = False
     if not change:
         memory = automatic = False
+    # A leading privacy restriction is a conversation-only turn, not permission
+    # to inspect saved facts/reference cards or dispatch a different tool.
+    private_prefix = re.match(
+        r"(?i)^\s*(?:please\s+)?(?:do not|don't|dont|never)\s+"
+        r"(?:save|store|retain|remember|learn)\b", body)
+    if not inspect or (private_prefix and not memory):
+        return Policy(False, False, False, False)
     return Policy(inspect, change, memory, automatic)
+
+
+def task_text(text: str) -> str:
+    """Remove only leading read-only policy clauses, never literal file payloads.
+
+    Authorization always uses the original message. This text is solely for
+    parsing the requested filename/action after that authorization is known.
+    """
+    task = str(text or '')
+    for _ in range(8):
+        remaining = re.sub(
+            r"(?ix)^\s*(?:read[- ]only|inspect\s+but\s+do\s+not\s+modify|"
+            r"(?:do\s+not|don't|don’t)\s+(?:change|modify)\s+anything)"
+            r"\s*(?:[—–:;.]|\s+-\s+)\s*", '', task, count=1)
+        if remaining == task:
+            break
+        task = remaining
+    return task.strip()
 
 
 DENIED = 'This message does not authorize that operation. No action was executed.'

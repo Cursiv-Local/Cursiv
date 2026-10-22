@@ -13,6 +13,16 @@ from the launcher's Setup button or the tray menu.
 """
 from __future__ import annotations
 
+import sys as _sys
+from typing import cast as _cast
+from setup_checks_runtime import SetupRuntime
+import setup_checks as _setup_checks
+
+
+def _runtime() -> SetupRuntime:
+    """Explicit compatibility services: callables and per-turn records live here."""
+    return _cast(SetupRuntime, _sys.modules[__name__])
+
 import json
 import os
 import shutil
@@ -57,55 +67,54 @@ MODELS = [
 
 
 def recommended_index(options: list, small: bool) -> int:
-    """Which entry to preselect: qwen3 4B on every card (the model comparison)."""
-    return next((i for i, opt in enumerate(options) if opt[1] == "qwen3:4b-instruct"), 0)
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.recommended_index(_runtime(), options, small)
+
 _NO_WINDOW = getattr(subprocess, "CREATE_NO_WINDOW", 0)
 
 
 # ── Checks (plain functions, safe to call from any thread) ───────────────────
 
 def ollama_installed() -> bool:
-    return ollama_host.installed()
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.ollama_installed(_runtime())
+
 
 
 def ollama_running() -> bool:
-    return ollama_host.running()
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.ollama_running(_runtime())
+
 
 
 def installed_models() -> list[str]:
-    try:
-        with urllib.request.urlopen(f"{OLLAMA_API}/api/tags", timeout=4) as r:
-            names = [m.get("name", "") for m in json.loads(r.read().decode()).get("models", [])]
-        return [n for n in names if n and "embed" not in n.lower()]
-    except Exception:
-        return []
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.installed_models(_runtime())
+
 
 
 def _engine_env():
-    try:
-        from cursiv_v215.core import speed
-        return speed.ollama_env()          # flash attention + compact cache for this server
-    except Exception:
-        return None
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks._engine_env(_runtime())
+
 
 
 def start_ollama() -> bool:
-    """Start the Ollama server in the background if it isn't running."""
-    return ollama_host.start(_engine_env())
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.start_ollama(_runtime())
+
 
 
 def restart_ollama() -> bool:
-    """Quit and restart Ollama (fixes it not seeing downloaded models)."""
-    return ollama_host.restart(_engine_env())
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.restart_ollama(_runtime())
+
 
 
 def needs_setup() -> bool:
-    """True when this computer can't run Cursiv locally yet (no Ollama, or no model)."""
-    if not ollama_installed():
-        return True
-    if not ollama_running() and not start_ollama():
-        return True
-    return not installed_models()
+    """Compatibility entry point; implementation in chat.setup_checks."""
+    return _setup_checks.needs_setup(_runtime())
+
 
 
 # ── Background work → UI, through Qt signals ────────────────────────────────

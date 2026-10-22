@@ -1,5 +1,11 @@
 # Field kit test: Cursiv on an SSD
 
+**2026-10-22 status:** automated portable regressions are separate from this
+physical checklist. No second clean-PC/full-day run was performed by the
+maintenance task. Do not interpret unchecked steps as passes. Record the actual
+release, devices, drive and failures when the kit is available; use disposable
+observations for the deliberate failure tests.
+
 The checklist for research roadmap R5: show that a Cursiv drive works on laptops it has never
 seen, all day, with no internet. Do it before telling a research group the kit is ready.
 Write down what actually happened, including what failed; the result goes in
@@ -15,7 +21,7 @@ Write down what actually happened, including what failed; the result goes in
 ## 1. Make the drive
 
 - [ ] On the build computer: tray menu → **Make a Cursiv USB…**, "start fresh" (no memories or keys).
-- [ ] Note the release (e.g. v3.14-U67), the drive's size and free space after copying.
+- [ ] Note the actual release/tag, the drive's size and free space after copying.
 - [ ] Safely eject the drive.
 
 ## 2. First laptop, no internet
@@ -32,8 +38,9 @@ Write down what actually happened, including what failed; the result goes in
 - [ ] Import a PDF protocol in **Your documents**, ask about it: the answer quotes the page.
 - [ ] Field calculation: "What is 44.1234, -71.5678 in UTM?" gives zone 19, about 294554 E.
 - [ ] Time three ordinary answers (about a paragraph each): ____ s, ____ s, ____ s.
-- [ ] Close Cursiv. Check the laptop's own user folder: nothing new from Cursiv
-      (everything should be on the drive).
+- [ ] Close Cursiv. Confirm Cursiv-managed saved data is on the drive and record
+      any host files separately. Windows and an existing host Ollama service can
+      retain their own traces; portability is not a guarantee of zero host traces.
 
 ## 3. Second laptop
 

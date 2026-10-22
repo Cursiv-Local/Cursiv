@@ -12,13 +12,14 @@ from __future__ import annotations
 import re
 import time
 from dataclasses import dataclass, field
+from .problems import Problem, unique
 
 # The verifier is told this and nothing softer. A reply of CLEAR does not
 # override the deterministic checks below.
 VERIFIER_INSTRUCTION = (
     "List concrete problems only: unsupported claims, changed definitions, "
     "contradictions, assumptions presented as facts, answers to the wrong question. "
-    "If none, say CLEAR."
+    "Return at most three short problems, or CLEAR if none. No preamble."
 )
 
 LEDGER_INSTRUCTION = (
@@ -45,6 +46,15 @@ _REVIEW = re.compile(
     r"check this|review this|did i get this right|double[- ]check|verify this|fact[- ]check)\b"
 )
 _RECOMMEND = re.compile(r"(?i)\b(i recommend|you should|i suggest|recommend)\b")
+_RISK = re.compile(
+    r"(?i)\b(?:safe|safety|dos(?:e|age)|bleach|poison|overdose|medication|"
+    r"voltage|current draw|contraindication|contradict\w*|conflicting|statistical significance)\b|"
+    r"\b(?:I|we)\s+(?:checked|verified|tested|ran|executed|saved|created|searched)\b")
+_QUANTITY = re.compile(
+    r"(?i)\b\d+(?:\.\d+)?\s*(?:mg|mcg|ml|liters?|litres?|drops?|gallons?|"
+    r"volts?|amps?|watts?|degrees?|celsius|fahrenheit|retries|retry|seconds?|"
+    r"minutes?|hours?|meters?|metres?|miles?|feet|percent)\b|\d\s*%|"
+    r"\d\s*(?:[+*/=×÷]|\bplus\b|\bminus\b|\btimes\b)\s*\d|\d\s+-\s+\d")
 _TECH = re.compile(
     r"(?i)\b(api|function|traceback|sql|python|javascript|algorithm|voltage|"
     r"dosage|mg\b|mmol|celsius|fahrenheit|config|server|retry|retries|latency|timeout)\b"
@@ -105,8 +115,11 @@ class PassResult:
     append: str = ""
     learn_origin: str = "inferred"   # inferred unless this pass came back clean
     skip_learn: bool = False         # a failed check must not be stored as memory
-    clear: bool = True
+    clear: bool = False              # skipped/unavailable is never a successful check
     problems: list[str] = field(default_factory=list)
+    issues: list[Problem] = field(default_factory=list)
+    resolved: list[Problem] = field(default_factory=list)
+    status: str = 'skipped'
 
 
 def reset_session() -> None:
@@ -143,17 +156,13 @@ def should_verify(user_text: str, draft: str, *, memory_update: bool = False,
     head = body.lstrip()
     if head.startswith("[") and "error" in head[:120].lower():
         return False
-    if previous_failed or memory_update or looks_like_memory_update(user_text):
-        return True
     if _REVIEW.search(user_text or ""):
         return True
-    if re.search(r"\d", body):
-        return True
-    if _RECOMMEND.search(body):
-        return True
-    if _TECH.search(user_text or "") or _TECH.search(body):
-        return True
-    return False
+    # Years, list numbering, identifiers, generic advice and a previous failure
+    # do not turn an ordinary conversation into another model round-trip.
+    prose = re.sub(r'(?m)^\s*\d+[.)]\s+', '', body)
+    return bool(_RISK.search(user_text or '') or _RISK.search(prose) or
+                _QUANTITY.search(user_text or '') or _QUANTITY.search(prose))
 
 
 def number_bindings(text: str) -> dict[str, set[str]]:
@@ -489,22 +498,32 @@ def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
     return problems
 
 
-def _problems(user_text: str, text: str, context: str = "", sources: str = "") -> list[str]:
+def _issues(user_text: str, text: str, context: str = "", sources: str = "") -> list[Problem]:
     grounding = "\n".join(part for part in (user_text, context, sources) if part)
-    found = constraint_problems(user_text, text, sources)
-    found += assumptions_stated_as_facts(text)
-    found += known_problems(grounding, text)
-    found += citation_problems(f"{user_text}\n{context}", sources, text)
+    found = []
+    groups = (
+        ('CONSTRAINT_MISMATCH', 'warning', constraint_problems(user_text, text, sources)),
+        ('ASSUMPTION_AS_FACT', 'warning', assumptions_stated_as_facts(text)),
+        ('UNGROUNDED_KNOWN', 'warning', known_problems(grounding, text)),
+        ('UNSUPPORTED_CITATION', 'error', citation_problems(f"{user_text}\n{context}", sources, text)),
+    )
+    for code, severity, messages in groups:
+        found.extend(Problem(code, severity, message) for message in messages)
     if needs_ledger(user_text) and extract_ledger(text) is None:
-        found.append(_MISSING_LEDGER)
-    return found
+        found.append(Problem('MISSING_LEDGER', 'info', _MISSING_LEDGER))
+    return unique(found)
+
+
+def _problems(user_text: str, text: str, context: str = "", sources: str = "") -> list[str]:
+    """Compatibility for callers that display human-readable messages."""
+    return [item.message for item in _issues(user_text, text, context, sources)]
 
 
 def parse_verdict(text: str) -> tuple[bool, str]:
     """True when the verifier said CLEAR and nothing else. Empty means no opinion."""
     raw = (text or "").strip()
     if not raw:
-        return True, ""
+        return False, ""
     plain = re.sub(r"[*_`#>]", "", raw).strip().lower()
     if _NO_PROBLEM.fullmatch(plain):
         return True, ""
@@ -526,9 +545,9 @@ def _background(context: str, sources: str) -> str:
     """Conversation, memory, and looked-up text the draft may rely on."""
     parts = []
     if context:
-        parts.append(context[:4000])
+        parts.append(context[:1600])
     if sources:
-        parts.append("Looked up on this computer this turn:\n" + sources[:3000])
+        parts.append("Evidence supplied this turn:\n" + sources[:2400])
     if not parts:
         return ""
     return "Already established (the draft may rely on this; it is not a new claim):\n" + "\n\n".join(parts) + "\n\n"
@@ -550,9 +569,8 @@ def verifier_messages(user_text: str, draft: str, context: str = "", sources: st
             f"{_background(context, sources)}"
             f"Original user question:\n{user_text}\n\n"
             f"Constraints:\n{constraints}\n\n"
-            f"Draft answer:\n{draft}\n"
+            f"Draft answer:\n{draft[:8000]}\n"
             f"{extra}\n"
-            f"{VERIFIER_INSTRUCTION}"
         )},
     ]
 
@@ -569,6 +587,7 @@ def revise_messages(user_text: str, draft: str, problems: list[str],
     return [
         {"role": "system", "content": (
             "Rewrite the draft so the listed problems are gone. "
+            "Change only what is needed to address those listed problems; preserve unrelated content. "
             "Keep every number and definition from the user's question. "
             "Do not add new factual claims. If something is unknown, say so. "
             "Do not name or quote a source unless its text is in what was looked up. "
@@ -670,62 +689,98 @@ def _fill_ledger(user_text: str, draft: str, ask, context: str = "", sources: st
 
 
 def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = False,
-             context: str = "", sources: str = "") -> PassResult:
+             context: str = "", sources: str = "", assess=None, mode: str = 'full',
+             update_session: bool = True) -> PassResult:
     """Check one draft. `ask` is messages -> text. Casual turns return immediately.
 
     context is the recent conversation and recalled memory; sources is text looked
     up this turn. Both are what the draft may rely on without it being a new claim.
     """
     global _previous_failed
-    store_ledger_from(user_text, draft)
-    if not should_verify(user_text, draft, memory_update=memory_update,
-                         previous_failed=_previous_failed):
+    if update_session:
+        store_ledger_from(user_text, draft)
+
+    def evaluate(text):
+        try:
+            from .answer_assessment import assess as baseline
+            found = unique(_issues(user_text, text, context, sources) +
+                           (assess(text) if assess else baseline(user_text, text)))
+            return [p for p in found if mode == 'full' or p.code != 'MISSING_LEDGER']
+        except Exception:
+            return [Problem('CHECK_UNAVAILABLE', 'error',
+                            'A deterministic check was unavailable; this answer has not been verified.')]
+
+    def failed(issues, *, revised=False, status='problems', display_issues=None):
+        global _previous_failed
+        if update_session:
+            _previous_failed = True
+        notes = [item.message for item in (issues if display_issues is None else display_issues)]
+        if revised:
+            notes.append('A revised draft still had problems, so the original draft is unchanged.')
+        return PassResult(append=format_notes(notes), learn_origin='inferred',
+                          skip_learn=True, clear=False, problems=notes, issues=issues, status=status)
+
+    issues = evaluate(draft)
+    if mode == 'off':
+        return failed(issues) if issues else PassResult()
+    if not issues and not should_verify(user_text, draft, memory_update=memory_update,
+                                        previous_failed=_previous_failed):
         return PassResult()
+    # Safety, provenance, failed checks and unconfirmed actions get notes only.
+    # A language model cannot authorize an action or override source evidence.
+    if any(item.severity == 'error' for item in issues):
+        return failed(issues)
 
-    problems = _problems(user_text, draft, context, sources)
-    filled = ""
-    if problems == [_MISSING_LEDGER]:
-        filled = _fill_ledger(user_text, draft, ask, context, sources)
-        if filled:
-            problems = _problems(user_text, draft.rstrip() + filled, context, sources)
+    if mode == 'fast' and not any(p.severity == 'warning' for p in issues) and not should_verify(user_text, draft):
+        return failed(issues) if issues else PassResult()
 
-    checked = draft.rstrip() + filled
+    checked = draft.rstrip()
+    if len(checked) > 8000 or len(user_text) > 4000:
+        issues.append(Problem('CHECK_INPUT_LIMIT', 'info',
+                              'Model review was not run because this turn exceeds its short-input budget. Code checks still ran.'))
+        return failed(issues, status='unavailable')
     verdict = (_ask(ask, verifier_messages(user_text, checked, context, sources))
                if (ask and checked.strip()) else "")
     model_clear, model_issues = parse_verdict(verdict)
-    if verdict and not model_clear:
-        problems.append(model_issues)
+    if not verdict:
+        issues.append(Problem('CHECKER_UNAVAILABLE', 'error',
+                              'The answer checker returned no result; the draft is unverified.', 'model'))
+        return failed(unique(issues), status='unavailable')
+    if not model_clear:
+        issues.append(Problem('MODEL_FINDING', 'warning', model_issues, 'model'))
 
-    if not problems:
-        _previous_failed = False
-        store_ledger_from(user_text, checked)
-        # No checker, or it said nothing: not checked, so not "verified" (AUDIT C-001).
-        return PassResult(append=filled, learn_origin="verified" if verdict.strip() else "inferred", clear=True)
+    if not issues:
+        if update_session:
+            _previous_failed = False
+            store_ledger_from(user_text, checked)
+        return PassResult(learn_origin="verified", clear=True, status='checked')
 
+    if mode == 'fast':
+        return failed(issues)  # one small verdict, no ledger-fill/rewrite/second model call
+
+    problems = [item.message for item in issues]
     revised = _ask(ask, revise_messages(user_text, draft, problems, context, sources))
-    if revised and parse_verdict(revised)[0]:
+    if revised and (parse_verdict(revised)[0] or _norm(revised) == _norm(draft)):
         revised = ""          # "CLEAR" or "None." is a verdict, not a rewritten answer
     if revised:
-        revised_problems = _problems(user_text, revised, context, sources)
-        revised_problems += introduced_number_problems(f"{user_text}\n{context}\n{sources}", draft, revised)
+        revised_issues = evaluate(revised)
+        revised_issues += [Problem('REWRITE_NEW_NUMBER', 'error', item) for item in
+                           introduced_number_problems(f"{user_text}\n{context}\n{sources}", draft, revised)]
+        if revised_issues:
+            return failed(unique(issues + revised_issues), revised=True, display_issues=issues)
         second = _ask(ask, verifier_messages(user_text, revised, context, sources))
         second_clear, second_issues = parse_verdict(second)
-        if second and not second_clear:
-            revised_problems.append(second_issues)
-        if not revised_problems:
-            _previous_failed = False
-            store_ledger_from(user_text, revised)
+        if not second:
+            revised_issues.append(Problem('CHECKER_UNAVAILABLE', 'error',
+                                         'The replacement checker returned no result; the original draft is unchanged.', 'model'))
+        elif not second_clear:
+            revised_issues.append(Problem('MODEL_FINDING', 'warning', second_issues, 'model'))
+        if not revised_issues:
+            if update_session:
+                _previous_failed = False
+                store_ledger_from(user_text, revised)
             return PassResult(append=format_revision(revised),
-                              learn_origin="verified" if second.strip() else "inferred", clear=True)
+                              learn_origin="verified", clear=True, resolved=issues, status='revised')
+        return failed(unique(issues + revised_issues), revised=True, display_issues=issues)
 
-    _previous_failed = True
-    notes = list(problems)
-    if revised:
-        notes.append("A revised draft still had problems, so the original draft is unchanged.")
-    return PassResult(
-        append=format_notes(notes),
-        learn_origin="inferred",
-        skip_learn=True,
-        clear=False,
-        problems=notes,
-    )
+    return failed(issues)

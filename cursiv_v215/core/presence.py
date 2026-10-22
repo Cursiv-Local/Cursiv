@@ -55,16 +55,16 @@ def memory_state(person: str) -> dict:
 def snapshot(workspace: str | None = None, file_access: bool | None = None, *,
              person: str | None = None) -> dict:
     from .paths import portable_root
-    from . import netgate
+    from . import netgate, turn_policy
     root = portable_root()
     out = dict(observed_at=datetime.now().astimezone().isoformat(timespec='seconds'),
                 offline=netgate.is_offline(), portable=bool(root),
-                storage_available=root.exists() if root else None,
+                storage_available=root.exists() if root and turn_policy.current().inspect else None,
                 authorized_workspace=workspace if file_access else None,
                 file_access=file_access, field_retrieval='application-controlled',
                 limitations=['No observation while closed', 'Model output is not verified evidence',
                              'A configured path alone does not prove data is readable'])
-    if person is not None:
+    if person is not None and turn_policy.current().inspect:
         out['memory'] = memory_state(person)
     return out
 
@@ -83,6 +83,9 @@ CAPABILITIES = (
 
 
 def prompt(person: str, workspace: str = '', file_access: bool = False, *, observed=None) -> str:
+    from . import turn_policy
+    if not turn_policy.current().inspect:
+        return '\nCapabilities (no saved preferences or records inspected): ' + CAPABILITIES
     cfg = settings(person)
     if not cfg['context']:
         return ''
@@ -99,7 +102,9 @@ def answers_state_question(text: str) -> bool:
     if re.search(r'\b(?:if|imagine|suppose|thought experiment|philosoph|conscious|self.aware)\b', t):
         return False
     return bool(re.search(
-        r'\b(?:current operational state|am i offline|are you offline|is file access (?:on|off)|'
+        r'\b(?:current operational state|am i offline|are you offline|is file access (?:on|off|enabled)|'
+        r'what (?:can you do right now|is your current model)|'
+        r'what(?:\x27s| is) your current workspace|describe your memory capabilities|'
         r'can you (?:read or write|read and write|observe anything while|keep working.*closed)|'
         r'do you (?:have|support) (?:persistent|semantic|long.term) memory|'
         r'can you analy[sz]e your (?:own )?codebase|'

@@ -1,0 +1,18 @@
+[
+  {"id":"arithmetic-chain","question":"Calculate 4 x 3 x 3.","answer":"4 x 3 x 3 = 30 liters.","expected":["CONSTRAINT_MISMATCH"]},
+  {"id":"contradictory-conclusion","question":"Is it safe to go outside?","answer":"Yes, it is safe. So, no — it is not safe yet.","expected":["CONTRADICTORY_CONCLUSION"]},
+  {"id":"dose-gallon","question":"What does the supplied water card say?","answer":"Use 6 drops of 6% bleach per gallon.","titles":["water purification"],"expected":["DOSE_MISMATCH"]},
+  {"id":"dose-cloudy","question":"What does the supplied water card say?","answer":"For 8.25% bleach, add 16 drops per liter for cloudy water.","titles":["water purification"],"expected":["DOSE_MISMATCH"]},
+  {"id":"small-sample","question":"With n=1, what can we conclude?","answer":"The result is statistically significant.","expected":["SMALL_SAMPLE_INFERENCE"]},
+  {"id":"fake-web-lookup","question":"How was this checked?","answer":"I searched the web for the answer.","expected":["UNEXECUTED_LOOKUP"]},
+  {"id":"fake-calculator","question":"How was this checked?","answer":"I used a deterministic calculation tool.","expected":["EXECUTION_TOOL"]},
+  {"id":"unit-mismatch","question":"Convert 12.4 C to F.","answer":"12.4 C is 30 F.","worked":true,"expected":["CALCULATION_MISMATCH"]},
+  {"id":"correct-arithmetic","question":"Calculate 4 x 3 x 3.","answer":"4 x 3 x 3 = 36 liters.","expected":[]},
+  {"id":"correct-fraction","question":"What is 3/4 plus 1/8?","answer":"3/4 plus 1/8 is 7/8.","expected":[]},
+  {"id":"correct-dose","question":"What does the supplied water card say?","answer":"Use 8 drops of 6% bleach per gallon.","titles":["water purification"],"expected":[]},
+  {"id":"correct-small-sample-limit","question":"With n=1, what can we conclude?","answer":"A sample size of 1 cannot establish statistical significance.","expected":[]},
+  {"id":"quoted-lookup-example","question":"Explain an unsupported action claim.","answer":"The sentence \"I searched the web\" would be an unsupported claim.","expected":[]},
+  {"id":"conditional-lookup-example","question":"Explain how a search would be cited.","answer":"If I searched the web, I would cite the results.","expected":[]},
+  {"id":"no-tool-claim","question":"How was this checked?","answer":"This comes from the model, with no tool execution confirmed.","expected":[]},
+  {"id":"correct-units","question":"Convert 12.4 C to F.","answer":"12.4 C is 54.32 F.","worked":true,"expected":[]}
+]

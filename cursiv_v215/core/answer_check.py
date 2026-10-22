@@ -108,7 +108,18 @@ def unsupported_actions(answer: str, searched: bool) -> list[str]:
     """Things the answer says Cursiv did that it didn't do this turn."""
     if searched:
         return []
-    return [m.group(0) for m in _CLAIMS.finditer(answer or "")][:2]
+    # A quoted example or conditional is not an execution claim. Preserve the
+    # surrounding prose so an actual "I searched for <quoted query>" still flags.
+    text = re.sub(r'(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?^\s*\1\s*$', ' ', answer or '')
+    text = re.sub(r'(?m)^\s*>.*$', ' ', text)
+    text = re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`', ' ', text)
+    found = []
+    for match in _CLAIMS.finditer(text):
+        prefix = re.split(r'[.!?\n]', text[:match.start()])[-1]
+        if re.search(r'(?i)\b(?:if|suppose|hypothetically)\b', prefix):
+            continue
+        found.append(match.group(0))
+    return found[:2]
 
 
 def lead_warning(answer: str) -> str:

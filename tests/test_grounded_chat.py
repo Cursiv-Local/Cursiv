@@ -410,8 +410,8 @@ def test_final_model_check_cannot_reintroduce_false_capability_claim(monkeypatch
     monkeypatch.setattr(verify, 'run_pass', lambda *a, **k: SimpleNamespace(
         learn_origin='inferred', skip_learn=False, clear=True, problems=[],
         append="**Revised after check:**\nI don't store anything."))
-    reply = ''.join(ca.chat('Tell me about conversation.', [], '', None, file_access=True,
-                            root_path=str(tmp_path), replace_draft=True))
+    reply = ''.join(ca.chat('Tell me about conversation. Verify this.', [], '', None, file_access=True,
+                            root_path=str(tmp_path), replace_draft=True, review_mode='full'))
     final = reply.rsplit(ca.REPLACE_SENTINEL, 1)[1]
     assert 'persistent local memory' in final and 'misstated' in final
 

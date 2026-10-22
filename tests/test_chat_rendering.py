@@ -479,12 +479,12 @@ def test_core_announces_the_post_generation_stage_without_a_formatting_call(monk
     assert stages == ['last token', 'Checking the answer…']
 
 
-def test_existing_verification_can_make_four_post_answer_calls():
-    """Separate post-answer work from rendering; these calls are not formatting."""
+def test_full_verification_makes_at_most_three_post_answer_calls():
+    """Optional full review has no separate ledger-only model round trip."""
     from cursiv_v215.core import verify
     verify.reset_session()
     ledger = 'Known: none\nInferred: none\nAssumed: none\nUnknown: none'
-    outputs = iter([ledger, 'The explanation is unclear.', 'Inspect the input.\n\n' + ledger, 'CLEAR'])
+    outputs = iter(['The explanation is unclear.', 'Inspect the input.\n\n' + ledger, 'CLEAR'])
     seen = []
 
     def ask(messages):
@@ -492,10 +492,9 @@ def test_existing_verification_can_make_four_post_answer_calls():
         return next(outputs)
     try:
         outcome = verify.run_pass('Explain this Python function.', 'Check the function input.', ask=ask)
-        assert outcome.clear and len(seen) == 4
-        assert seen[0].startswith('Fill this block')
-        assert seen[1].startswith('You are a strict checker')
-        assert seen[2].startswith('Rewrite the draft')
-        assert seen[3].startswith('You are a strict checker')
+        assert outcome.clear and len(seen) == 3
+        assert seen[0].startswith('You are a strict checker')
+        assert seen[1].startswith('Rewrite the draft')
+        assert seen[2].startswith('You are a strict checker')
     finally:
         verify.reset_session()

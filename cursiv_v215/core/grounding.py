@@ -7,12 +7,16 @@ import re
 _reads: ContextVar[tuple] = ContextVar('cursiv_source_reads', default=())
 _state: ContextVar[dict | None] = ContextVar('cursiv_observed_state', default=None)
 _query: ContextVar[str] = ContextVar('cursiv_source_query', default='')
+_executions: ContextVar[tuple[str, ...]] = ContextVar('cursiv_executed_sources', default=())
+_memory_sources: ContextVar[tuple[str, ...]] = ContextVar('cursiv_supplied_memories', default=())
 
 
 def scoped(function):
     @wraps(function)
     def generate(*args, **kwargs):
         token = _reads.set(())
+        execution_token = _executions.set(())
+        memory_token = _memory_sources.set(())
         state_token = _state.set(None)
         message = kwargs.get('message', args[0] if args else '')
         query_token = _query.set(message.get('text', '') if isinstance(message, dict) else str(message or ''))
@@ -20,6 +24,8 @@ def scoped(function):
             yield from function(*args, **kwargs)
         finally:
             _reads.reset(token)
+            _executions.reset(execution_token)
+            _memory_sources.reset(memory_token)
             _state.reset(state_token)
             _query.reset(query_token)
     return generate
@@ -33,14 +39,39 @@ def state():
     return _state.get()
 
 
+def set_memory_sources(texts):
+    """Prompt assembly records supplied facts; model replies never call this."""
+    _memory_sources.set(tuple(text for text in texts if isinstance(text, str) and text.strip()))
+
+
+def memory_sources() -> tuple[str, ...]:
+    return _memory_sources.get()
+
+
 def remember(receipt):
     """Only execution sites call this; never ingest model prose/history as proof."""
-    if not isinstance(receipt, dict) or not receipt.get('ok') or receipt.get('operation') != 'read_file':
+    if not isinstance(receipt, dict) or not receipt.get('ok'):
+        return
+    record_execution(str(receipt.get('operation', 'file operation')) + ' ' + str(receipt.get('path', '')))
+    if receipt.get('operation') != 'read_file':
         return
     if not isinstance(receipt.get('content'), str) or not receipt.get('sha256'):
         return
     rows = [r for r in _reads.get() if r.get('path') != receipt.get('path')]
     _reads.set(tuple((rows + [dict(receipt)])[-2:]))
+
+
+def record_execution(label: str):
+    """Call only after a backend-confirmed result, never from model text."""
+    _executions.set(tuple(dict.fromkeys((*_executions.get(), label)))[:6])
+
+
+def executed_sources() -> tuple[str, ...]:
+    return _executions.get()
+
+
+def reset_executions():
+    _executions.set(())
 
 
 def wants_source(text):

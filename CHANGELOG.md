@@ -1,5 +1,88 @@
 # Changelog
 
+## Website - General phone photo questions (2026-10-22)
+
+- Replace the phone app's Bible-specific setup, chat example, placeholder and
+  loading text with general photo/chat wording. Update its title and description;
+  retain the existing visual style, manifest identity and device-linking flow.
+- Replace the website Worker's `BIBLE_SYSTEM` with `VISION_SYSTEM` and use a
+  neutral image-only fallback question. Ask for visible facts, legible wording
+  and clear uncertainty without inventing image details. Text-only chat remains
+  supported. Pairing, space tokens, storage and image upload handling are unchanged.
+- Record deployment/build details in [HANDOFF.md](HANDOFF.md). No desktop
+  application, installer or updater changes belong to this website follow-up.
+
+## v3.14-U83 - Trust boundaries and background answer review (2026-10-22)
+
+- Bump application, launcher and installer/output names together to 3.14-U83.
+  Final isolated versioned Windows suite: 1,246 passed, one Mac Keychain skip
+  (213.72 s); website analytics suite: 18 passed. Build from the immutable tag
+  and record frozen-app, hosted CI and public-download checks separately.
+- Close follow-up trust gaps: recognize explicit no-tool/second-person privacy
+  instructions, strip compound read-only prefixes without altering literal
+  paths/payloads, and stop `file remember` before a memory save if its file fails.
+- Generate source labels in a dedicated application module without inspecting
+  answer words. Record supplied memory separately from recalled/withheld facts;
+  use the same record for evidence checks and deferred review. Filter source
+  footers case-insensitively and report damaged-memory errors as storage failures.
+- Cap explicit Cross-check output at 400 tokens on all supported providers;
+  retain ordinary chat budgets and the automatic review's 180/300-token limits.
+  Explain readable API-key exports in the existing USB confirmation. Prepare
+  reciprocal online-photo-chat/offline-notebook links.
+  See the [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) for the exact
+  audit, reproduced failures, test runs, pending release wording and limits.
+- Finish desktop answers before optional model verification. Default fast mode
+  skips ordinary turns and permits one short local review on eligible turns;
+  deterministic evidence/safety checks remain immediate. Append labeled review
+  results in the background, with copied turn evidence and stale-result guards.
+- Add persistent `check off`, `check fast`, `check full` commands. Bound verdicts
+  to 180 tokens and full-mode rewrites to 300; remove the ledger-only model call
+  and skip a second verdict for an unchanged rewrite. Keep pending assistant
+  claims out of automatic verified-memory retention. Record regression coverage
+  and 10/100/1,000-message controlled measurements in
+  [the answer review report](docs/ASYNC-ANSWER-REVIEW.md).
+- Repair the reported U82 restricted-turn failures before notebook/memory/file
+  dispatch, reference/calculation lookup and automatic learning. Confirm limits
+  in application text, preserve them across draft replacement and reset per turn.
+  Distinguish memory opt-outs from separately saved conversation history.
+- Parse read-only workspace requests and read/summary filenames without treating
+  instructions as paths. Keep generic relative paths in the authorized workspace.
+- Label sources using confirmed tool results and reject model-authored source
+  status lines. Stop generic and provider-native continuation after failed file
+  operations. Add exact-prompt regressions and a [repair report](docs/U82-RESTRICTED-TURN-REPAIR.md).
+- Extract chat prompt/context, phase orchestration, local/cloud providers,
+  provider tools, streaming and completion into focused modules behind the stable
+  chat facade. Pass explicit runtime services; preserve caller overrides.
+- Split command dispatch into ordered domains and shared result types; separate
+  desktop controls/transcript views, auxiliary shell dialogs, login recovery,
+  setup checks and USB operations. Enforce a 1,200-line production module budget.
+- Add coded/severity-tagged verification findings. Empty/failed checks stay
+  unverified. Safety/provenance failures get notes; an eligible rewrite runs at
+  most once and must pass the same evidence checks and a nonempty second verdict.
+  Rejected revisions cannot leak invented replacement details into display notes.
+- Reduce false web-lookup alarms for quoted/conditional examples. Add bounded
+  n=0/1 inference checks and fail-closed handling in final chat checks.
+  Prevent optional verification context from recalling saved memory when the
+  current message forbids inspection.
+- A live test exposed a detected wrong dose left in the draft under a warning.
+  Detected dose/reference contradictions now withdraw model instructions and show
+  the actual supplied reference, without a model rewrite or learning that draft.
+- Enforce guardian/login/key protection in the shared filesystem mutation and
+  confirmation pathways, including when the repository is the workspace.
+- Harden the tagged Windows builder's inherited DLL search paths and packaged
+  self-test gate; generate identical versioned/latest installer aliases/checksums.
+- Add a separate deterministic replay and live unchanged-suite comparison;
+  record raw results without editing historical cases/results. Benchmark failures
+  now reject incomplete runs; new runs record a Python-source fingerprint.
+- Update README, TECH, HANDOFF, architecture, verification policy, threat model,
+  platform gates, public-claim evidence and the quality checklist. Encryption is
+  documented separately at the owner's request; no personal data migration.
+- Exact changed files, executed checks and remaining external signing/physical
+  validation requirements are in [the maintenance report](docs/MAINTENANCE-HARDENING.md).
+  U83 release preparation is authorized separately; publication evidence is recorded in
+  [U83 verification](docs/U83-RELEASE-VERIFICATION.md). Historical U75 scores
+  remain dated evidence, rather than being renamed as current-release results.
+
 ## v3.14-U82 - Grounded chat state, boundaries and dated memory (2026-10-22)
 
 - Enforce supported per-message conversation-only/read-only/no-memory limits

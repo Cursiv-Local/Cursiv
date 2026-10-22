@@ -488,12 +488,14 @@ def test_too_long_is_refused_not_cut_off(memory):
     assert memory.list_facts() == []
 
 
-def test_memory_is_named_as_a_source_only_when_the_answer_used_it(monkeypatch):
+def test_memory_source_reports_supplied_context_without_claiming_use(monkeypatch):
     from cursiv_v215.ui import chat_app as ca
     monkeypatch.setattr(ca, "_MEMORY_RECALLED", True)
     monkeypatch.setattr(ca, "_MEMORY_TEXTS", ["Jw keeps the generator key in the blue toolbox."])
+    monkeypatch.setattr(ca.grounding, 'memory_sources', lambda: tuple(ca._MEMORY_TEXTS))
     assert "your saved memories" not in ca.sources_line("240 liters lasts 1 day for 120 people.")
-    assert "your saved memories" in ca.sources_line("The generator key is in the blue toolbox.")
+    assert ca.sources_line("240 liters lasts 1 day for 120 people.") == ca.sources_line("The generator key is in the blue toolbox.")
+    assert 'saved memory context supplied' in ca.sources_line()
 
 
 # ══ G. Untrusted documents ════════════════════════════════════════════════════
@@ -550,6 +552,7 @@ def test_a_flagged_document_never_gets_the_saved_memories(fresh, outbound, monke
     assert "Saved memories withheld for this answer" in seen["system"]
     source_line = next(ln for ln in out.splitlines() if ln.startswith("*[Source"))
     assert "your saved memories" not in source_line
+    assert 'saved memory context supplied' not in source_line
 
 
 def _fake_memory(ca):
@@ -680,13 +683,14 @@ def test_a_note_about_the_allocation_isnt_calling_the_supply_enough():
     assert "shortfall of 240 L" in calc.check("Good news: the 240 liters is sufficient for the 48 hours.", w)
 
 
-def test_words_from_the_question_dont_make_a_memory_used(monkeypatch):
+def test_words_from_the_question_or_answer_cannot_create_a_memory_source(monkeypatch):
     from cursiv_v215.ui import chat_app as ca
     monkeypatch.setattr(ca, "_MEMORY_RECALLED", True)
     monkeypatch.setattr(ca, "_MEMORY_TEXTS", ["Jw stores drinking water for the family in 20-liter jugs in the barn."])
+    monkeypatch.setattr(ca.grounding, 'memory_sources', lambda: ())
     assert "your saved memories" not in ca.sources_line(U76_ANSWER, U76_Q)
     used = "Your 20-liter jugs in the barn hold the water."
-    assert "your saved memories" in ca.sources_line(used, U76_Q)
+    assert 'saved memory context supplied' not in ca.sources_line(used, U76_Q)
 
 
 

@@ -15,21 +15,21 @@ where data lives, and how to run, build and release it.
 | `cursiv_v215/` | The engine the app runs on (the folder name is historical). |
 | `installer/` | Inno Setup script (`cursiv_setup.iss`) that wraps the build into `Cursiv-Setup-<version>.exe`. |
 | `scripts/` | `build.bat` (PyInstaller), `package.bat` (installer), `verify_build.bat`, `seal_family_letters.py`. |
-| `website/` | The public website and phone web app (cursiv.winklers-llc.com). |
+| `website/` | The public website and phone web app (cursiv.us). |
 | `cloudflare/` | The Cloudflare Worker behind the website and phone app, plus `publish.mjs` to deploy it. |
 
 ### Inside `cursiv_v215/`
 
 | Package | Job |
 |---|---|
-| `ui/chat_app.py` | **The chat engine.** Builds the system prompt, runs the 8 phases, routes to a model (the local Ollama model first; keys you added and Cursiv Cloud are fallbacks), runs the answer check. No user interface of its own. |
-| `chat/` | Parts of the chat engine: saved keys (`keys.py`), web search (`web_search.py`), the AI's file tools (`file_tools.py`), paid providers (`paid.py`). `chat_app.py` re-exports them. |
+| `ui/chat_app.py` | Compatible chat entry points, configuration and legacy turn records; passes explicit runtime services to implementation modules. No Qt interface. |
+| `chat/` | Context/uploads, phase orchestration, routing, local/cloud/provider-tool adapters, streaming/completion, saved keys and web search. See [ARCHITECTURE.md](ARCHITECTURE.md) for exact module boundaries. |
 | `core/` | Phases (`phases.py`), speed tuning for small GPUs and free keys (`speed.py`), self-knowledge (`selfknow.py`), read-only computer tools (`tools.py`), plugins / Cursiv Forge (`plugins.py`), talking style (`style.py`), strand memory archive (`strand_store.py`), constitution. |
 | `memory/` | Semantic memory (find by meaning with `nomic-embed-text`, keyword fallback), project memory, session logs. |
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |
 | `agents/` | Custom agents (`agent new …`), Babel translation, coding agent, offline queue, reference brain, voice. |
 | `coding/` | The coding brain: playbooks, worked examples, error diagnosis, run-and-fix sandbox, `evolve` plugin writer. |
-| `guardian/` | Login (bcrypt), security questions, owner mode, the files the AI's write tool may never touch, and the identity line for helper prompts. The login fails closed (Cursiv exits if it can't load), new logins need an existing login, and it is a front-door lock only — memories on disk aren't encrypted; saved keys are (DPAPI, `core/keystore.py`). |
+| `guardian/` | Login (bcrypt), security questions, owner mode and protected paths. Shared filesystem mutations deny guardian/login/key targets. Login is a front-door lock, not data encryption; installed keys use platform protection where available (see [threat model](docs/THREAT-MODEL.md) for plaintext exceptions). |
 | `training/` | LoRA training (`lora_trainer.py`) and merging the adapter into Ollama (`ollama_merge.py`). |
 | `family/`, `postal/` | Sealed letters: per-person letters that open with a name and birth date, and signed letters between people. |
 | `council/cursiv_facts.md`, `codex/system_prompt.md` | What Cursiv knows about itself and its persona. Keep the fact sheet accurate when features change. |
@@ -44,7 +44,23 @@ where data lives, and how to run, build and release it.
    - runs the **8 phases** (`core/phases.py`): notices stress or a crisis (shows help lines first), recalls memories, picks a route and answer shape, checks connectivity;
    - builds the prompt from the persona, the fact sheet, the person's memories and project notes;
    - streams the answer from the first available model via **`cascade_stream()`**.
-4. After the reply, memory may learn a new fact about the person.
+4. Deterministic evidence checks finish in the foreground worker. The desktop
+   enables input before optional local model review starts. Fast mode permits one
+   short verdict on eligible turns; full mode permits one constrained rewrite
+   and recheck. Results are labeled follow-ups, with stale-result cancellation
+   and copied evidence. Missing/failed checks cannot establish a verified result.
+   See [verification policy](docs/VERIFICATION-POLICY.md) and the
+   [review implementation and measurements](docs/ASYNC-ANSWER-REVIEW.md).
+5. Policy-controlled background retention may learn selected facts; pending/failed checks
+   do not authorize assistant-derived facts. Existing native receipts and formats
+   remain unchanged.
+
+`chat/provenance.py` formats source labels without receiving the answer text.
+Grounding state records memory surviving final prompt assembly; the source line,
+evidence checker and deferred reviewer use that supplied record. Explicit
+Cross-check uses a 400-token provider cap; ordinary provider budgets are unchanged.
+The [trust follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) records new parser,
+failed-file-memory and damaged-recall safeguards and draft release wording.
 
 **Model order:** the local Ollama model first whenever it has one → paid keys the person added (xAI, OpenAI, Claude) → Groq → Gemini → Cursiv Cloud (off unless turned on, and only when no local model is ready). Pasted images skip the local chat model (it can't see them); with file access on and a paid key, the tool-using paid provider goes first because only it can write files. Every reply ends with "Answered by …", added by the code. Local-only use always works; keys are fallbacks, never requirements.
 

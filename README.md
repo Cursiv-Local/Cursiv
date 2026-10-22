@@ -28,7 +28,8 @@ Its tools include:
 - **Documents:** Import protocols and SOPs. Answers can quote a document by page, identify when it does not cover a question, or follow “Answer only from my documents” (except emergencies).
 - **Offline reference and answer checks:** Cursiv can answer from its bundled reference and label whether an answer came from that reference, your documents, a calculation, or unchecked model knowledge. Cursiv's code adds these source labels. Code checks selected claims, numbers, doses, and contradictions; these checks do not catch every error.
 - **Photos:** Attach photos to field entries or ask a compatible vision model to describe them. Reading photos depends on an available local vision model or an online provider; making images requires an online service.
-- **Phone notebook:** Capture field records on a phone without signal after opening the [phone notebook](https://cursiv.winklers-llc.com/notebook/) once. Transfer its export file to the laptop for import. This is a capture tool, not the desktop AI running on a phone. See [phone notebook details](docs/PHONE-NOTEBOOK.md).
+- **Phone notebook:** Capture field records on a phone without signal after opening the [phone notebook](https://cursiv.us/notebook/) once. Transfer its export file to the laptop for import. This has no AI chat and is separate from the online photo app. See [phone notebook details](docs/PHONE-NOTEBOOK.md).
+- **Phone photo chat:** Take or choose a picture and ask about visible details or text in the [phone app](https://cursiv.us/app). It accepts general photo questions and text chat, requires internet access, and uses the website's online AI providers. Existing device linking shares the conversation with Cursiv on your computer.
 - **Team log sharing:** Move signed field logs between computers using a USB drive or shared folder. Cursiv does not merge or overwrite entries; it reports conflicts.
 
 Older personal features—including family letters, a legacy vault, the phone app, coding help, the council, custom agents, and LoRA training—remain available under **Settings → Appearance → Show personal features**.
@@ -85,11 +86,13 @@ file access being on does not prove a particular read/write succeeded. Source
 follow-ups use bounded verified excerpts, and explicit unsupported quotations
 are flagged. These checks reduce specific failures; model analysis can still err.
 
-These fixes are in the U82 source. Installed copies need the U82 installer.
+U83 includes these U82 foundations and the trust-boundary repairs below.
+Installed copies need the new installer to receive source changes.
 Implementation, test evidence, exact file inventory and limitations:
 [Grounded chat repair](docs/GROUNDED-CHAT-REPAIR.md).
 Published installer hashes, CI and package checks:
-[U82 release verification](docs/U82-RELEASE-VERIFICATION.md).
+[U83 release verification](docs/U83-RELEASE-VERIFICATION.md)
+([historical U82 record](docs/U82-RELEASE-VERIFICATION.md)).
 
 ## 3. Technical Details
 
@@ -110,7 +113,32 @@ Offline mode (`offline on`, or the switch in **Settings → Privacy & internet**
 
 ### Guardrails and Limitations
 
-Cursiv includes a local login, prompts before file writes, and an offline mode that blocks network connections. The login limits access at the keyboard; it is not disk encryption. A new login can only be added by someone already logged in. The file-writing tool asks before writing and is designed not to touch its own login or key files. Saved AI keys are encrypted for the Windows account (or stored in the macOS Keychain); memories and conversations are not encrypted on disk.
+Cursiv includes a local login, confirmed file replacements, and an offline network gate. Login is not disk encryption. Workspace tools deny login/key paths and guardian code. Saved AI keys use Windows DPAPI or macOS Keychain where available; portable, legacy or fallback plaintext keys can exist. Conversations and memories are not encrypted on disk.
+
+See [PRIVACY.md](PRIVACY.md), the [threat model](docs/THREAT-MODEL.md), and
+[claim-to-evidence mapping](docs/CLAIM-EVIDENCE.md). A stolen private USB copy or
+someone with access to your OS account can expose local data. Optional data
+encryption has a [separate migration plan](docs/ENCRYPTION-MIGRATION-PLAN.md).
+Including private data in a USB copy exports copied API keys in readable form
+for use on other computers. Anyone with the drive can read and use those keys;
+the USB maker explains this before copying.
+
+U83 hardening repairs the U82 restricted-turn, filename parsing, source
+label and failed-tool continuation issues documented in the
+[repair report](docs/U82-RESTRICTED-TURN-REPAIR.md). A no-memory request disables
+memory saves/automatic learning for that turn; conversation-history storage is
+separate. See the U83 publication record for packaged checks and download hashes.
+
+U83 chat also finishes the draft before optional model review. The default
+`check fast` skips ordinary turns and adds a short local review as a follow-up
+when eligible. `check off` disables model review; `check full` permits a bounded
+review/rewrite/recheck. Pure-code checks stay on in every mode. See the
+[answer review report](docs/ASYNC-ANSWER-REVIEW.md) for measurements and limits.
+
+The latest [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) closes
+additional policy/source/error gaps. Source labels describe application-supplied
+evidence; a memory-context label does not claim the model used or verified it.
+These changes are included in the U83 release source.
 
 These controls are intended to help the person using Cursiv manage access, files, and network connections. They do not guarantee answer accuracy, privacy in every data path, or safety for high-risk use. Review the [benchmark cases and results](bench/) alongside the limitations above.
 
@@ -146,7 +174,7 @@ The installer uses PyInstaller (in `requirements.txt`) and [Inno Setup 6](https:
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
-3. Run `py -3.13 scripts/build_release.py v3.14-U82` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
+3. Run `py -3.13 scripts/build_release.py v3.14-U83` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
@@ -155,9 +183,9 @@ versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 `SHA256SUMS.txt`. The README, website and updater use that stable installer name.
 
 ```powershell
-Copy-Item installer/Output/Cursiv-Setup-3.14-U82.exe installer/Output/Cursiv-Setup-latest.exe
-Copy-Item installer/Output/SHA256SUMS-3.14-U82.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U82 installer/Output/Cursiv-Setup-3.14-U82.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U82" --notes-file docs/RELEASE-U82.md --latest --verify-tag --repo Cursiv-Local/Cursiv
+Copy-Item installer/Output/Cursiv-Setup-3.14-U83.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U83.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U83 installer/Output/Cursiv-Setup-3.14-U83.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U83" --notes-file docs/RELEASE-U83.md --latest --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
@@ -192,14 +220,24 @@ expandable practical details and direct latest-installer download buttons.
 
 #### Included Desktop Improvements
 
-U82 carries forward the U81 Saved Notes viewer, incremental chat rendering, native
+U83 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,
-dated recall and source checks. See [U82 release notes](docs/RELEASE-U82.md),
+dated recall and source checks. See [U83 release notes](docs/RELEASE-U83.md),
 [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and
 [verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md) for scope and evidence.
+
+U83 extracts chat, command and dialog modules,
+makes empty/failed answer checks explicitly unverified, and centralizes protected
+filesystem mutations. See [ARCHITECTURE.md](ARCHITECTURE.md),
+[verification policy](docs/VERIFICATION-POLICY.md), the
+[maintenance report](docs/MAINTENANCE-HARDENING.md), and the
+[quality checklist](docs/QUALITY-CHECKLIST.md). Signing, clean-machine USB/Mac
+validation and packaged Linux support remain open or unsupported as recorded in
+[platform readiness](docs/PLATFORM-READINESS.md). Current test and publication
+results are in [U83 verification](docs/U83-RELEASE-VERIFICATION.md).
 
 #### Optional Features
 

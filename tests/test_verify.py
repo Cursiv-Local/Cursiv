@@ -16,7 +16,9 @@ from cursiv_v215.core import phases, verify
 
 
 @pytest.fixture(autouse=True)
-def _fresh_verify_session():
+def _fresh_verify_session(monkeypatch):
+    from cursiv_v215.core import speed
+    monkeypatch.setattr(speed, 'battery_saver', lambda: False)  # independent of this PC's power state
     verify.reset_session()
     yield
     verify.reset_session()
@@ -241,11 +243,11 @@ def test_casual_chat_does_not_call_the_verifier():
 def test_review_request_and_numbers_trigger_a_check():
     assert verify.should_verify("is this correct?", "Yes.") is True
     assert verify.should_verify("how many?", "Use 3 retries.") is True
-    assert verify.should_verify("hey", "I recommend the shorter path.") is True
+    assert verify.should_verify("hey", "I recommend the shorter path.") is False
     assert verify.should_verify("hey how are you", "Doing well, thanks.") is False
 
 
-def test_previous_failure_checks_the_next_turn():
+def test_previous_failure_does_not_check_an_unrelated_casual_turn():
     def ask(messages):
         if messages[0]["content"].startswith("Fill this block"):
             return _ledger(known="none")
@@ -257,11 +259,11 @@ def test_previous_failure_checks_the_next_turn():
     assert first.clear is False
     called = []
     verify.run_pass("hey", "Hi.", ask=lambda _m: called.append(1) or "CLEAR")
-    assert called                      # the failed check forces the next turn
+    assert called == []                # no spillover into an unrelated casual turn
 
 
 def test_memory_statement_triggers_a_check():
-    assert verify.should_verify("remember that my name is Ada", "Got it.") is True
+    assert verify.should_verify("remember that my name is Ada", "Got it.") is False
     assert verify.looks_like_memory_update("I prefer short answers") is True
 
 
@@ -321,6 +323,7 @@ def test_system_prompt_states_the_safety_rule():
 
 def test_chat_appends_a_revision_after_the_draft(monkeypatch):
     from cursiv_v215.ui import chat_app as ca
+    monkeypatch.setattr(ca, '_WORKED', None)
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
                     confirm_writes, anthropic_key, force_provider, reply):
@@ -340,7 +343,7 @@ def test_chat_appends_a_revision_after_the_draft(monkeypatch):
 
     out = "".join(ca.chat(
         "The retry limit is exactly 3 retries. Is this correct?",
-        [], "", None,
+        [], "", None, review_mode='full',
     ))
     assert out.startswith("Set the retry limit to 5 retries.")
     assert "Revised after check" in out
@@ -431,12 +434,15 @@ def test_checker_prompt_carries_the_context():
 
 def test_chat_checks_the_model_text_with_history_and_memory(monkeypatch, memory):
     from cursiv_v215.ui import chat_app as ca
+    monkeypatch.setattr(ca, '_WORKED', None)
 
     memory.set_person("ada")
     memory.add_fact("Ada: I prefer tea in the morning", person="ada", source="manual")
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
                     confirm_writes, anthropic_key, force_provider, reply):
+        ca._MEMORY_CTX = memory.build_context('what do I drink in the morning?', person='ada')
+        ca.grounding.set_memory_sources([ca._MEMORY_CTX])  # fake prompt supplied this context
         for chunk in ("You prefer tea, and 6 people need 54 liters.",
                       "\n\n*[Answered by Ollama · qwen2.5:3b]*"):
             reply.append(chunk)

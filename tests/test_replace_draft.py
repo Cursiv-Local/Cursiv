@@ -5,6 +5,8 @@ from test_verify import _ledger
 
 
 def _revising(monkeypatch):
+    from cursiv_v215.core import speed
+    monkeypatch.setattr(speed, 'battery_saver', lambda: False)  # explicitly exercise the optional review
     from cursiv_v215.ui import chat_app as ca
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
@@ -19,6 +21,10 @@ def _revising(monkeypatch):
         return "CLEAR"
 
     learned = {}
+    # This fake stream bypasses _chat_stream's normal per-turn reset.
+    monkeypatch.setattr(ca, "_WORKED", None)
+    from cursiv_v215.chat import review
+    monkeypatch.setattr(review, 'mode', lambda: 'full')  # explicitly exercise legacy bounded rewrite behavior
     monkeypatch.setattr(ca, "_chat_stream", fake_stream)
     monkeypatch.setattr(ca, "_router_llm", ask)
     monkeypatch.setattr(ca, "_learn_later", lambda message, reply, **kw: learned.update(reply=reply, **kw))

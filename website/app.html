@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Cursiv</title>
+<title>Cursiv | Ask about a photo</title>
+<meta name="description" content="Ask Cursiv about a photo: describe visible details, read text, and explore questions about images.">
 <meta name="robots" content="noindex,follow">
 <meta name="theme-color" content="#08090C">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -63,8 +64,9 @@
 </header>
 
 <div id="setup">
-  <p style="color:var(--gold);font-size:20px;font-weight:700;margin-bottom:0">Bible study with Cursiv</p>
-  <p>Take a photo of any page from your Bibles and ask about it — differences between translations, what a word means in the original language, anything.</p>
+  <p style="color:var(--gold);font-size:20px;font-weight:700;margin-bottom:0">Ask about a photo</p>
+  <p>Take or choose a picture and ask about it. Cursiv can help describe visible details or read text in the image.</p>
+  <p class="note">Photo chat requires internet and uses online AI. For offline field capture with no AI chat, use the <a href="/notebook/" style="color:var(--gold)">Field Notebook</a>.</p>
   <button class="big" id="startBtn">Start</button>
   <button class="ghost" id="haveCode">I have a code from Cursiv</button>
   <div id="codebox" class="row"><input id="codeInput" inputmode="numeric" maxlength="6" placeholder="000000"><button class="big" id="joinBtn">Link</button></div>
@@ -78,7 +80,7 @@
   <div id="preview"><img id="previewImg" alt=""><span>Photo ready</span><button id="clearPhoto" aria-label="Remove photo">×</button></div>
   <div class="row">
     <button id="cam" aria-label="Take or choose a photo">📷</button>
-    <textarea id="text" rows="1" placeholder="Ask about this page…"></textarea>
+    <textarea id="text" rows="1" placeholder="Ask about a photo, or chat…"></textarea>
     <button id="send">Send</button>
   </div>
   <input id="file" type="file" accept="image/*" hidden>
@@ -145,7 +147,7 @@ async function poll() {
 function showChat() {
   $("setup").style.display = "none";
   $("chat").hidden = false; $("composer").hidden = false; $("menuBtn").hidden = false;
-  if (!$("chat").children.length) $("chat").innerHTML = '<div class="empty">Tap 📷 to photograph a page, then ask anything about it.<br><br>Example: "How does the NIV word this verse differently, and why?"</div>';
+  if (!$("chat").children.length) $("chat").innerHTML = '<div class="empty">Tap 📷 to take or choose a photo, then ask about it.<br><br>Example: "What can you tell me about this image?"</div>';
   poll(); clearInterval(polling); polling = setInterval(poll, 8000);
 }
 
@@ -179,7 +181,7 @@ async function send() {
   const shot = photo;
   photo = null; $("preview").style.display = "none"; $("text").value = ""; grow();
   const mine = bubble("user", (shot ? `<img src="${shot}" alt="photo">` : "") + fmt(text));
-  const wait = bubble("assistant", '<span class="thinking">Reading' + (shot ? " your page" : "") + "…</span>");
+  const wait = bubble("assistant", '<span class="thinking">' + (shot ? "Looking at your photo" : "Thinking") + "…</span>");
   try {
     const r = await api("/api/space/ask", { method: "POST", body: JSON.stringify({
       text, image: shot ? shot.split(",")[1] : "", image_mime: "image/jpeg", source: "phone" }) });

@@ -12,6 +12,16 @@ so updating a USB after a Cursiv update is quick.
 """
 from __future__ import annotations
 
+import sys as _sys
+from typing import cast as _cast
+from usb_ops_runtime import UsbRuntime
+import usb_ops as _usb_ops
+
+
+def _runtime() -> UsbRuntime:
+    """Explicit compatibility services: callables and per-turn records live here."""
+    return _cast(UsbRuntime, _sys.modules[__name__])
+
 import ctypes
 import json
 import os
@@ -113,50 +123,27 @@ More: https://cursiv.winklers-llc.com  ·  Source: https://github.com/winklersll
 # ── Sources ──────────────────────────────────────────────────────────────────
 
 def program_dir() -> Path | None:
-    """The built Cursiv folder to copy (the running app, or dist\\Cursiv in a dev checkout)."""
-    if getattr(sys, "frozen", False):
-        return Path(sys.executable).resolve().parent
-    dev = Path(__file__).resolve().parent.parent / "dist" / "Cursiv"
-    return dev if (dev / "Cursiv.exe").exists() else None
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.program_dir(_runtime())
+
 
 
 def models_dir() -> Path:
-    return Path(os.environ.get("OLLAMA_MODELS") or (Path.home() / ".ollama" / "models"))
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.models_dir(_runtime())
+
 
 
 def ollama_dir() -> Path | None:
-    exe = shutil.which("ollama")
-    if exe:
-        return Path(exe).resolve().parent
-    d = Path(os.environ.get("LOCALAPPDATA", "")) / "Programs" / "Ollama"
-    return d if (d / "ollama.exe").exists() else None
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.ollama_dir(_runtime())
+
 
 
 def list_models() -> list[dict]:
-    """Every pulled Ollama model: name, manifest path, blob files and total size."""
-    base = models_dir()
-    mroot = base / "manifests"
-    out = []
-    if not mroot.is_dir():
-        return out
-    for mf in mroot.rglob("*"):
-        if not mf.is_file():
-            continue
-        try:
-            data = json.loads(mf.read_text(encoding="utf-8"))
-        except Exception:
-            continue
-        digests = [l.get("digest", "") for l in data.get("layers", [])]
-        digests.append((data.get("config") or {}).get("digest", ""))
-        blobs = [base / "blobs" / d.replace(":", "-") for d in digests if d]
-        blobs = [b for b in blobs if b.exists()]
-        parts = mf.relative_to(mroot).parts          # registry / namespace / name / tag
-        name = f"{parts[-2]}:{parts[-1]}" if len(parts) >= 2 else mf.name
-        if len(parts) >= 3 and parts[-3] != "library":
-            name = f"{parts[-3]}/{name}"
-        out.append({"name": name, "manifest": mf, "blobs": blobs,
-                    "size": sum(b.stat().st_size for b in blobs)})
-    return sorted(out, key=lambda m: m["name"])
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.list_models(_runtime())
+
 
 
 # ── Licenses on the drive ────────────────────────────────────────────────────
@@ -177,172 +164,61 @@ _EXTRA_TERMS = {
 
 
 def model_license(model: dict) -> str:
-    """The license text Ollama stored with this model ("" if it has none)."""
-    try:
-        data = json.loads(Path(model["manifest"]).read_text(encoding="utf-8"))
-    except Exception:
-        return ""
-    parts = []
-    for layer in data.get("layers", []):
-        if layer.get("mediaType") == _LICENSE_LAYER and layer.get("digest"):
-            blob = models_dir() / "blobs" / layer["digest"].replace(":", "-")
-            try:
-                parts.append(blob.read_text(encoding="utf-8", errors="replace").strip())
-            except OSError:
-                pass
-    return "\n\n".join(p for p in parts if p)
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.model_license(_runtime(), model)
+
 
 
 def _safe_name(name: str) -> str:
-    return "".join(c if c.isalnum() or c in "-._" else "_" for c in name)
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._safe_name(_runtime(), name)
+
 
 
 def write_licenses(root: Path, models: list[dict]) -> list[str]:
-    """Licenses/ on the drive: Cursiv, Ollama, and one file per model. Returns the
-    names of models that came without a license (said so in the index)."""
-    folder = root / "Licenses"
-    folder.mkdir(parents=True, exist_ok=True)
-    for old in folder.glob("*.txt"):
-        old.unlink(missing_ok=True)          # models removed from the drive drop out
-    for name in ("Cursiv-LICENSE.txt", "Ollama-LICENSE.txt"):
-        src = _BUNDLED_LICENSES / name
-        if src.exists():
-            shutil.copyfile(src, folder / name)
-    lines = ["Licenses for what's on this drive", "=================================", "",
-             "Cursiv: MIT (Cursiv-LICENSE.txt)", "Ollama, the AI engine: MIT (Ollama-LICENSE.txt)", "",
-             "AI models (each file is the license the model came with):"]
-    missing = []
-    for m in sorted(models, key=lambda m: m["name"]):
-        text = model_license(m)
-        family = m["name"].split(":")[0].split("/")[-1]
-        extra = next((v for k, v in _EXTRA_TERMS.items() if family.startswith(k)), "")
-        if text:
-            fname = f"model-{_safe_name(m['name'])}.txt"
-            (folder / fname).write_text(text + (f"\n\n{extra}\n" if extra else "\n"), encoding="utf-8")
-            lines.append(f"  {m['name']}: {fname}")
-        else:
-            missing.append(m["name"])
-            lines.append(f"  {m['name']}: no license came with this model -- check its page before sharing")
-        if extra:
-            lines.append(f"    {extra}")
-    lines += ["", "Details: MODELS.md at https://github.com/winklersllc2026-bit/Cursiv"]
-    (folder / "README.txt").write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return missing
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.write_licenses(_runtime(), root, models)
+
 
 
 def required_names(models: list[dict]) -> list[str]:
-    names = {m["name"] for m in models}
-    chat = next((n for n in REQUIRED_CHAT if n in names), REQUIRED_CHAT[0])
-    return [chat, REQUIRED_EMBED]
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.required_names(_runtime(), models)
+
 
 
 def pull_model(tag: str, sig, cancel: threading.Event) -> None:
-    """Download a model into this computer's Ollama so it can be copied."""
-    from cursiv_v215.core import netgate
-    netgate.require(f"Downloading {tag}")
-    req = urllib.request.Request(f"{OLLAMA_API}/api/pull",
-                                 data=json.dumps({"name": tag, "stream": True}).encode(),
-                                 headers={"Content-Type": "application/json"})
-    try:
-        r = urllib.request.urlopen(req, timeout=3600)
-    except Exception:
-        raise RuntimeError(f"{tag} isn't downloaded yet and Ollama isn't running to fetch it. "
-                           "Open Setup, start Ollama, then try again.")
-    with r:
-        for line in r:
-            if cancel.is_set():
-                raise InterruptedError
-            try:
-                st = json.loads(line.decode())
-            except Exception:
-                continue
-            if st.get("error"):
-                raise RuntimeError(f"Downloading {tag} failed: {st['error']}")
-            total, done = st.get("total") or 0, st.get("completed") or 0
-            if total and done:
-                sig.progress.emit(int(done * 100 / total),
-                                  f"Downloading {tag} first… {done / 1e9:.2f} of {total / 1e9:.2f} GB")
-            if st.get("status") == "success":
-                return
-    raise RuntimeError(f"Downloading {tag} ended early — try again.")
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.pull_model(_runtime(), tag, sig, cancel)
+
 
 
 # ── Drives ───────────────────────────────────────────────────────────────────
 
 def _volume_info(root: str) -> tuple[str, str]:
-    label = ctypes.create_unicode_buffer(261)
-    fs = ctypes.create_unicode_buffer(261)
-    ok = ctypes.windll.kernel32.GetVolumeInformationW(
-        ctypes.c_wchar_p(root), label, 261, None, None, None, fs, 261)
-    return (label.value, fs.value) if ok else ("", "")
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._volume_info(_runtime(), root)
+
 
 
 def list_drives() -> list[dict]:
-    """Removable drives plus external fixed drives (USB SSDs report as fixed).
-    Never the Windows drive."""
-    drives = []
-    if sys.platform != "win32":
-        return drives
-    system = os.environ.get("SystemDrive", "C:").upper()[:1]
-    mask = ctypes.windll.kernel32.GetLogicalDrives()
-    for i, letter in enumerate(string.ascii_uppercase):
-        if not mask & (1 << i) or letter == system:
-            continue
-        root = f"{letter}:\\"
-        kind = ctypes.windll.kernel32.GetDriveTypeW(ctypes.c_wchar_p(root))
-        if kind not in (2, 3):                 # 2 = removable, 3 = fixed
-            continue
-        try:
-            usage = shutil.disk_usage(root)
-        except Exception:
-            continue                           # empty card reader etc.
-        label, fs = _volume_info(root)
-        drives.append({"root": root, "letter": letter, "label": label, "fs": fs.upper(),
-                       "removable": kind == 2, "free": usage.free, "total": usage.total})
-    return drives
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.list_drives(_runtime())
+
 
 
 # ── Copy plan ────────────────────────────────────────────────────────────────
 
 def _program_files(src: Path, include_private: bool) -> list[tuple[Path, Path]]:
-    skip_top = {"unins000.dat", "unins000.exe"}
-    pairs = []
-    for f in src.rglob("*"):
-        if not f.is_file():
-            continue
-        rel = f.relative_to(src)
-        top = rel.parts[0]
-        if top in skip_top or ".bak" in top:   # installer leftovers, old-version backups
-            continue
-        if ".cursiv" in rel.parts and not include_private:
-            continue                           # memories, keys, training data
-        pairs.append((f, Path("Cursiv") / rel))
-    return pairs
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._program_files(_runtime(), src, include_private)
+
 
 
 def build_plan(models: list[dict], include_private: bool, ollama_src: Path | None) -> list[tuple[Path, Path]]:
-    prog = program_dir()
-    if prog is None:
-        raise RuntimeError("Couldn't find the Cursiv program files to copy.")
-    pairs = _program_files(prog, include_private)
-    if ollama_src:
-        for f in ollama_src.rglob("*"):
-            if f.is_file() and not f.name.lower().startswith("unins"):
-                pairs.append((f, Path("Ollama") / f.relative_to(ollama_src)))
-    mbase = models_dir()
-    seen = set()
-    for m in models:
-        for f in [m["manifest"], *m["blobs"]]:
-            if f not in seen:
-                seen.add(f)
-                pairs.append((f, Path("Models") / f.relative_to(mbase)))
-    if include_private:
-        home_data = Path.home() / ".cursiv"
-        if home_data.is_dir():
-            for f in home_data.rglob("*"):
-                if f.is_file():
-                    pairs.append((f, Path("Home") / ".cursiv" / f.relative_to(home_data)))
-    return pairs
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.build_plan(_runtime(), models, include_private, ollama_src)
+
 
 
 MTIME_SLACK = 2.0      # seconds -- FAT-family drives store times in 2-second steps
@@ -351,132 +227,45 @@ PRUNED_DIRS = ("Cursiv", "Ollama")      # program files only; models and persona
 
 
 def _needs_copy(src: Path, dest: Path) -> bool:
-    """Copy unless the drive already has this exact file (same size and time --
-    copies keep the source's modified time, so a rebuilt file of the same size
-    still differs)."""
-    try:
-        s, d = src.stat(), dest.stat()
-    except Exception:
-        return True
-    return s.st_size != d.st_size or abs(s.st_mtime - d.st_mtime) > MTIME_SLACK
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._needs_copy(_runtime(), src, dest)
+
 
 
 def _is_personal(rel: Path) -> bool:
-    return ".cursiv" in rel.parts or rel.name == "portable.cursiv"
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._is_personal(_runtime(), rel)
+
 
 
 def stale_files(root: Path, plan: list[tuple[Path, Path]]) -> list[Path]:
-    """Files in the drive's program folders that the current build doesn't have
-    (e.g. a library a newer Cursiv dropped). Never personal data."""
-    wanted = {d.resolve() for _s, d in plan}
-    out = []
-    for top in PRUNED_DIRS:
-        base = root / top
-        if not base.is_dir():
-            continue
-        if base.is_symlink() or base.is_junction():
-            raise OSError(f'Linked USB program folder refused: {base}')
-        for folder, dirs, names in os.walk(base, followlinks=False):
-            dirs[:] = [name for name in dirs if not _is_personal((Path(folder) / name).relative_to(root))
-                       and not (Path(folder) / name).is_symlink() and not (Path(folder) / name).is_junction()]
-            for name in names:
-                f = Path(folder) / name
-                if not f.is_symlink() and f.resolve() not in wanted and not _is_personal(f.relative_to(root)):
-                    out.append(f)
-    return out
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.stale_files(_runtime(), root, plan)
+
 
 
 def verify_usb(plan: list[tuple[Path, Path]]) -> list[str]:
-    """Every planned file is on the drive with the right size and time.
-    Returns the problems (empty list = the drive matches the build)."""
-    problems = []
-    for src, dest in plan:
-        if not dest.exists():
-            problems.append(f"missing: {dest}")
-        elif _needs_copy(src, dest):
-            problems.append(f"different: {dest}")
-    return problems
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.verify_usb(_runtime(), plan)
+
 
 
 def wipe_private_copy(root: Path) -> bool:
-    """Remove personal data that an earlier private copy put on the drive.
-    Only acts when the marker says a private copy was made -- data the drive's
-    own user created later on a fresh copy is left alone."""
-    if not (root / PRIVATE_MARKER).exists():
-        return False
-    shutil.rmtree(root / "Home" / ".cursiv", ignore_errors=True)
-    prog = root / "Cursiv"
-    if prog.is_dir():
-        for d in sorted(prog.rglob(".cursiv"), key=lambda p: len(p.parts), reverse=True):
-            if d.is_dir():
-                shutil.rmtree(d, ignore_errors=True)
-    (root / PRIVATE_MARKER).unlink(missing_ok=True)
-    return True
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.wipe_private_copy(_runtime(), root)
+
 
 
 def copy_files(todo: list[tuple[Path, Path]], progress, cancel: threading.Event) -> None:
-    """Copy each file to a .part file, flush it to disk, then rename it into
-    place -- an interrupted copy never leaves a half-written file behind."""
-    total = sum(s.stat().st_size for s, _ in todo) or 1
-    copied = 0
-    for i, (src, dest) in enumerate(todo, 1):
-        from cursiv_v215.core.state_store import checked
-        checked(dest)
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        fd, temporary = tempfile.mkstemp(prefix='.' + dest.name, suffix='.part', dir=dest.parent)
-        part = Path(temporary)
-        try:
-            with os.fdopen(fd, 'wb') as fo, open(src, 'rb') as fi:
-                while chunk := fi.read(8 << 20):
-                    if cancel.is_set():
-                        raise InterruptedError
-                    fo.write(chunk)
-                    copied += len(chunk)
-                    progress(int(copied * 100 / total),
-                             f"Copying {i} of {len(todo)} files — {copied / GB:.1f} of {total / GB:.1f} GB")
-                fo.flush()
-                os.fsync(fo.fileno())
-            checked(dest)
-            os.replace(part, dest)
-            shutil.copystat(src, dest, follow_symlinks=False)
-        finally:
-            part.unlink(missing_ok=True)
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.copy_files(_runtime(), todo, progress, cancel)
+
 
 
 def _download_ollama(dest_dir: Path, progress, cancel: threading.Event) -> Path:
-    """Download Ollama's Windows zip from its latest GitHub release and check it
-    against the SHA-256 GitHub publishes for that file. Returns the unpacked folder."""
-    import hashlib
-    api = urllib.request.Request("https://api.github.com/repos/ollama/ollama/releases/latest",
-                                 headers={"User-Agent": "Cursiv-USB"})
-    with urllib.request.urlopen(api, timeout=30) as r:
-        release = json.loads(r.read())
-    asset = next((a for a in release.get("assets", []) if a.get("name") == "ollama-windows-amd64.zip"), None)
-    digest = (asset or {}).get("digest", "")
-    if not asset or not digest.startswith("sha256:"):
-        raise RuntimeError("Couldn't find a checksum for the Ollama download, so it wasn't used. "
-                           "Install Ollama on this computer (Setup window) and try again.")
-    zpath = dest_dir / "ollama.zip"
-    sha = hashlib.sha256()
-    req = urllib.request.Request(asset["browser_download_url"], headers={"User-Agent": "Cursiv-USB"})
-    with urllib.request.urlopen(req, timeout=60) as r, open(zpath, "wb") as out:
-        total = int(r.headers.get("Content-Length") or 0)
-        got = 0
-        while chunk := r.read(1 << 20):
-            if cancel.is_set():
-                raise InterruptedError
-            out.write(chunk)
-            sha.update(chunk)
-            got += len(chunk)
-            progress(int(got * 100 / total) if total else -1,
-                     f"Downloading Ollama… {got >> 20} MB" + (f" of {total >> 20} MB" if total else ""))
-    if "sha256:" + sha.hexdigest() != digest:
-        zpath.unlink(missing_ok=True)
-        raise RuntimeError("The Ollama download didn't match its published checksum, so it wasn't used. Try again.")
-    out_dir = dest_dir / "ollama"
-    with zipfile.ZipFile(zpath) as z:
-        z.extractall(out_dir)
-    return out_dir
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops._download_ollama(_runtime(), dest_dir, progress, cancel)
+
 
 
 # ── Worker ───────────────────────────────────────────────────────────────────
@@ -486,125 +275,22 @@ class _Signals(QObject):
     done     = pyqtSignal(bool, str)
 
 
-def make_usb(root: Path, models: list[dict], include_private: bool,
-             sig: _Signals, cancel: threading.Event, field: bool = False) -> None:
-    try:
-        have = {m["name"] for m in list_models()}
-        for tag in required_names(list_models()):
-            if tag not in have:
-                pull_model(tag, sig, cancel)
-        chosen = {m["name"] for m in models} | set(required_names(list_models()))
-        models = [m for m in list_models() if m["name"] in chosen]
+def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool=False) -> None:
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.make_usb(_runtime(), root, models, include_private, sig, cancel, field)
 
-        osrc = ollama_dir()
-        tmp_zip_dir = None
-        if osrc is None:
-            sig.progress.emit(-1, "Downloading the Ollama engine (about 1-2 GB)…")
-            tmp_zip_dir = Path(tempfile.mkdtemp(prefix="cursiv_ollama_"))
-            osrc = _download_ollama(tmp_zip_dir, sig.progress.emit, cancel)
-
-        # Updating binaries never resets existing personal data, even if private
-        # copying is unchecked. A fresh private copy only fills missing files.
-        wiped = False
-        plan = update_plan(root, build_plan(models, include_private, osrc))
-        todo = [(s, d) for s, d in plan if _needs_copy(s, d)]
-        total = sum(s.stat().st_size for s, _ in todo) or 1
-
-        _, fs = _volume_info(str(root))
-        if fs.upper() == "FAT32" and any(s.stat().st_size > FAT32_MAX for s, _ in todo):
-            raise RuntimeError("This drive is formatted FAT32, which can't hold files over 4 GB "
-                               "(some AI models are bigger). Reformat it as exFAT and try again.")
-        free = shutil.disk_usage(str(root)).free
-        if total > free:
-            raise RuntimeError(f"Not enough space: needs {total / GB:.1f} GB, the drive has "
-                               f"{free / GB:.1f} GB free. Untick some models and try again.")
-
-        copy_files(todo, sig.progress.emit, cancel)
-        for f in stale_files(root, plan):
-            f.unlink(missing_ok=True)
-        if include_private:
-            (root / PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
-            (root / PRIVATE_MARKER).write_text(
-                "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
-
-        sig.progress.emit(-1, "Checking the drive matches…")
-        problems = verify_usb(plan)
-        if problems:
-            raise RuntimeError(f"{len(problems)} file(s) didn't copy correctly (first: {problems[0]}). "
-                               "Click Make USB again to fix them.")
-
-        if include_private:
-            # Saved keys are encrypted for this Windows account; the USB runs on
-            # other PCs, so its copy holds them readable (the note below says so).
-            from cursiv_v215.core import keystore
-            for _src, cfg_file in plan:
-                if cfg_file.name == 'config.json' and cfg_file.parent.name == '.cursiv':
-                    keystore.export_readable(cfg_file)
-
-        write_licenses(root, models)
-
-        (root / "Cursiv" / "portable.cursiv").write_text(
-            "This copy of Cursiv runs from this drive. See README.txt.\n", encoding="utf-8")
-        field_marker = root / "Cursiv" / "field.cursiv"
-        if field:
-            field_marker.write_text("Field copy: on first start, offline mode on, break notes off, "
-                                    "learning off (portable.apply_field_defaults).\n", encoding="utf-8")
-        else:
-            field_marker.unlink(missing_ok=True)
-        (root / "Home").mkdir(exist_ok=True)
-        (root / "Start Cursiv.bat").write_bytes(START_BAT.encode("ascii"))
-        (root / "README.txt").write_text(README, encoding="utf-8")
-        tidy_root(root)
-        if tmp_zip_dir:
-            shutil.rmtree(tmp_zip_dir, ignore_errors=True)
-        note = ' Existing drive data was preserved. Private data on this drive is not encrypted by Cursiv.'
-        if wiped:
-            note += " The private data from the earlier copy was removed from the drive."
-        sig.done.emit(True, f"Done. Plug the drive into any Windows PC and double-click "
-                            f"\"Start Cursiv\".{note}")
-    except InterruptedError:
-        sig.done.emit(False, "Stopped. Click Make USB again to pick up where it left off.")
-    except Exception as exc:
-        sig.done.emit(False, f"Couldn't finish: {exc}")
 
 
 def update_plan(root: Path, pairs: list[tuple[Path, Path]]) -> list[tuple[Path, Path]]:
-    """Never overwrite a private file during a program refresh."""
-    root = root.resolve()
-    result = []
-    for source, relative in pairs:
-        if relative.is_absolute() or '..' in relative.parts:
-            raise ValueError('USB copy path must be relative and inside the drive')
-        target = root / relative
-        cursor = target
-        while cursor != root:
-            if cursor.is_symlink() or cursor.is_junction():
-                raise OSError(f'USB update refuses linked destination: {cursor}')
-            cursor = cursor.parent
-        if not target.resolve().is_relative_to(root):
-            raise OSError('USB destination escapes selected drive')
-        if '.cursiv' in relative.parts and target.exists():
-            continue
-        result.append((source, target))
-    return result
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.update_plan(_runtime(), root, pairs)
+
 
 
 def tidy_root(root: Path) -> None:
-    """The drive's top level shows only Start Cursiv.bat, README.txt and the folders.
-    The drive icon stays inside the Cursiv folder; autorun.inf (the drive's name and
-    icon in File Explorer) is hidden. Older USBs had a cursiv.ico at the top: removed."""
-    (root / "cursiv.ico").unlink(missing_ok=True)
-    ico = next((root / "Cursiv").rglob("cursiv.ico"), None)
-    inf = root / "autorun.inf"
-    try:
-        if inf.exists():
-            ctypes.windll.kernel32.SetFileAttributesW(str(inf), 0x80)     # normal, so it can be rewritten
-        if ico:
-            rel = str(ico.relative_to(root)).replace("/", "\\")
-            inf.write_text(f"[autorun]\r\nlabel=Cursiv\r\nicon={rel}\r\n", encoding="utf-8")
-            ctypes.windll.kernel32.SetFileAttributesW(str(inf), 0x02)     # hidden
-    except Exception:
-        pass
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.tidy_root(_runtime(), root)
+
 
 
 # ── Dialog ───────────────────────────────────────────────────────────────────
@@ -664,6 +350,8 @@ class UsbMakerDialog(QDialog):
         lay.addWidget(self._model_list)
 
         self._private = QCheckBox("Include my memories, keys and settings (private — only for your own USB)")
+        self._private.setToolTip('Copied API keys are exported in readable form for use on other computers. '
+                                 'Anyone with the drive can read and use those keys.')
         self._private.toggled.connect(self._update_total)
         lay.addWidget(self._private)
 
@@ -763,7 +451,8 @@ class UsbMakerDialog(QDialog):
             ok = QMessageBox.question(
                 self, "Private data on this drive",
                 "This drive has a private copy of your memories, keys and settings from an "
-                "earlier time. Updating preserves that data; this is not a way to reset a drive "
+                "earlier time. It may contain readable API keys that anyone with the drive can use. "
+                "Updating preserves that data; this is not a way to reset a drive "
                 "for another person.\n\nContinue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
@@ -771,8 +460,9 @@ class UsbMakerDialog(QDialog):
         if self._private.isChecked():
             ok = QMessageBox.question(
                 self, "Private data",
-                "Your memories, keys and conversations will be copied onto the drive. Anyone who "
-                "has the drive can read them.\n\nContinue?",
+                "Your memories, keys and conversations will be copied onto the drive. Copied API keys "
+                "are exported in readable form for use on other computers. Anyone with the drive can "
+                "read and use those keys and read the copied personal data.\n\nContinue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
                 return

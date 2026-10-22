@@ -1,5 +1,167 @@
 # Handoff — Cursiv verification overhaul
 
+## 2026-10-22: U83 publication authorized
+
+The owner now authorizes committing, pushing, bumping the installer, publishing
+the release and updating/deploying the website, particularly current test evidence.
+This supersedes the no-publication restrictions quoted in the historical sections
+below. U82 was confirmed as GitHub latest; U83 is the next update version.
+Read [U83 release notes](docs/RELEASE-U83.md) and
+[the release verification record](docs/U83-RELEASE-VERIFICATION.md) for actual
+source, package, CI, download and deployment results. Never infer a passed check
+from a preparation step. Keep personal test data excluded.
+
+
+## 2026-10-22: Remaining trust-boundary gaps
+
+Read [docs/TRUST-BOUNDARY-FOLLOWUP.md](docs/TRUST-BOUNDARY-FOLLOWUP.md) for the
+owner's prioritized checklist, read-only findings, exact incremental files,
+reproduced failures, tests, remaining limits and draft next-release wording.
+No commit, push, release, installer rebuild or further deployment is authorized
+or performed for this follow-up. Keep the pre-existing edits and user test data.
+
+Most of the high-priority batch was already implemented. This follow-up closes
+additional no-tool/second-person policy phrases and compound read-only parsing;
+prevents a failed `file remember` from saving memory; extracts application-owned
+source formatting independent of answer words; records actually supplied memory
+for source/evidence/background-review inputs; blocks case-varied model source
+footers; separates dated storage failures from unclear date ranges; and caps
+explicit Cross-check output at 400 tokens while retaining normal chat budgets.
+USB warnings now explicitly explain readable copied API keys. Additional
+phone/notebook explanations and reciprocal links are prepared locally, with
+notebook cache v3; they are not part of the earlier published photo update.
+
+Initial focused follow-up: **388 passed in 46.32 s**, isolated snapshot
+`%TEMP%/cursiv-maintenance-9yr8mxzt`. The final suite also includes expanded
+local/cloud policy checks and ordinary provider-budget compatibility checks.
+The report retains the expected pre-fix failures and the earlier focused run
+that exposed a date/storage error distinction and ambient test-power dependence.
+Final complete Windows source suite: **1,246 passed, 1 skipped in 299.62 s**,
+`%TEMP%/cursiv-maintenance-s8vnolr0/pytest.log`. The skip needs a Mac's Keychain.
+Tested application/launcher fingerprint:
+`15985868d5d3bcb9fbff8aad9955b5f46f05376a094573d9d016ed137683e278`.
+Website build-only and phone/notebook script syntax checks passed. No live-model
+accuracy, new packaged installer or physical USB/phone validation is claimed.
+
+## 2026-10-22: General-purpose phone photo chat
+
+The owner requested neutral photo handling and redeployment through the existing
+website flow. This is a Cloudflare Worker with static assets (`cursiv-web`), not
+Pages. Existing Git commit/push restrictions still apply.
+
+Website runtime changes are exactly `website/app.html` and
+`cloudflare/worker.js`: neutral setup/title/description/placeholder/empty-chat
+example/loading text; `VISION_SYSTEM` replaces the Bible specialization; an
+image-only request gets a neutral question. The prompt asks for visible facts,
+legible text, uncertainty and normal text-only replies. Existing styles, pairing,
+space authorization, history, memory-summary handling, provider selection,
+uploads, image limits and database schema remain unchanged. The manifest and
+Apple home-screen title already use generic Cursiv branding and needed no edit.
+
+Documentation updated: README, CHANGELOG, this handoff and the master pending-file
+inventory in `docs/MAINTENANCE-HARDENING.md`. Prior desktop edits and personal
+test_internals data are preserved; they are outside the website asset allowlist.
+Worker/inline-phone JavaScript syntax, the static website build and Wrangler's
+dry-run bundle passed. The built phone page matches its source. Used the already
+installed Wrangler 4.151.3; the initial no-install npx lookup wanted a newer
+uncached version, so no tooling upgrade was needed.
+
+Published successfully to the existing `cursiv-web` Worker and its existing
+custom domains. Version: `784d34d9-56e8-4089-8244-1f2fb82b430b`. Wrangler uploaded
+only the changed `/app.html` static asset, plus the updated Worker bundle.
+Read-only HTTPS checks returned 200 for `https://cursiv.us/app`, the manifest
+and `/health`. Live HTML has the new title/setup/empty-chat example and no Bible
+or NIV framing; the manifest remains Cursiv with `/app` as its start URL.
+An installed home-screen app may need a refresh to load new page text. Existing
+conversation history remains stored and is still supplied to the model.
+
+The live HTML includes an edge-added Cloudflare Insights beacon absent from the
+source asset, so the live response is not byte-identical to the built HTML.
+These source changes add no analytics code; Cloudflare dashboard analytics
+settings were not inspected or changed. No live AI photo question, pairing flow
+or authenticated space operation was exercised, and no database migration ran.
+No desktop rebuild/version bump, commit or push occurred.
+
+## 2026-10-22: Draft completion before background review
+
+Latest owner request: gate model review to deterministic findings/high-risk turns
+and finish the draft before an asynchronous follow-up. Read
+[docs/ASYNC-ANSWER-REVIEW.md](docs/ASYNC-ANSWER-REVIEW.md) first for exact files,
+execution paths, controls, measurements and remaining limits. The no-commit/
+no-push restriction still applies; installed U82 is unchanged.
+
+Implemented: default fast review, persistent `check off/fast/full`, 180-token
+verdicts/300-token full rewrites, no ledger-only call, copied turn evidence,
+local-only background worker, GUI-thread follow-ups and stale/cancelled-result
+rejection. Deterministic safety/provenance corrections remain immediate;
+pending assistant prose is not promoted to verified memory. No installer,
+updater, website or personal data changes in this follow-up.
+
+Focused suite: **208 passed in 12.49 s** in the isolated
+`%TEMP%/cursiv-maintenance-eme3y4as` snapshot. Controlled Qt replay, three repeats
+per 10/100/1,000-message history, used a simulated 1,000 ms model wait. Median
+ready latency fell from 1,014/1,021/1,076 ms to 21/25/83 ms, with zero full
+document rebuilds. These are synthetic wait measurements, not live inference or
+fresh accuracy scores. The report includes later save/heartbeat/RSS costs;
+one 1,000-message follow-up had a 263 ms GUI heartbeat gap. Backend cancellation
+is cooperative and may await the next token/read timeout.
+
+Final complete Windows suite: **1,209 passed, 1 skipped in 176.73 s** in
+`%TEMP%/cursiv-maintenance-u7nhk2vp`; the skip requires a Mac's Keychain. This
+includes persisted follow-up/reload, rejected false-capability rewrites and the
+explicit Cross-check race. Tested application/launcher fingerprint:
+`2ea2f061cd06916a76ada19d72a92dcaa974207b1070f735041aec36cf65663e`.
+The prior full attempt had one old test dependent on the former generic trigger;
+it now explicitly requests full verification without weakening its grounding
+assertions. No new live-model accuracy claim is made for the background path.
+
+## 2026-10-22: Unreleased maintainability and verification hardening
+
+Current work is on `codex/maintainability-hardening`, based on main 8831241/U82.
+The owner explicitly instructed: **do not commit or push anything until told to**.
+Keep all this work uncommitted; wait for fresh explicit authorization.
+Read [the complete maintenance report](docs/MAINTENANCE-HARDENING.md) for root
+causes, exact changed-file inventory, actual test logs, deterministic/live
+measurements, code review priorities and remaining gates. Then read
+[ARCHITECTURE.md](ARCHITECTURE.md) and the
+[verification policy](docs/VERIFICATION-POLICY.md).
+The subsequent U82 transcripts were supplied as failure context. Read the
+[restricted-turn repair report](docs/U82-RESTRICTED-TURN-REPAIR.md) for the
+policy/parser/provenance/failure-continuation fixes and remaining limits.
+
+Pre-background-review Windows source suite: **1,177 passed, 1 skipped** in 167.34 s.
+The skip is the real macOS Keychain check. Test snapshots use isolated homes and
+data; no current-branch installer, Mac CI or physical second-PC test is claimed.
+Deterministic replay detects 8/8 seeded failures with 0/8 false alarms, compared
+with U82's 7/8 and 2/8 on the same fixed examples. Live-run results and their exact
+source snapshots are recorded in the maintenance report.
+
+Implemented: focused chat/provider/stream/check modules; ordered command domains
+with compatible result types; smaller views/dialog operations; coded fail-closed
+verification and a constrained single-rewrite policy; shared protection of
+login/key/guardian mutation paths; tagged-build environment/self-test/alias
+guards; restricted-turn/parser/source-label/failed-tool corrections; tests and
+evidence documentation. Personal memory/notebook schemas and
+test_internals are preserved. Website source is unchanged.
+The final live follow-up found that a warning below an incorrect model dose was
+insufficient. Detected dose/reference contradictions now withdraw the draft and
+show the actual supplied reference, without a model rewrite or learning from it.
+The maintenance report retains the earlier 4/6 live run and its exact misses.
+The final unchanged-suite six-case run scored **5/6**, with no case-marked
+unsupported claims, on the exact final tested source. The remaining `adv-011`
+failure compared both quantities but missed the required conflict vocabulary.
+An earlier run scored 6/6. These are small local-model samples; source-conflict
+wording, source-selection assumptions and bounded warning heuristics still need care.
+The last metadata guard also forbids reference table loading during restricted
+turns or empty-evidence assembly; stricter exact-prompt tests cover final checks.
+
+The owner explicitly selected a separately documented encryption migration.
+Signing credentials, clean Mac installation and the two-clean-Windows-PC/full-day
+USB checklist remain external/manual requirements. No new signed installer or
+field validation is claimed. This task has not committed, pushed, bumped,
+published a release, installed an update or deployed the website. Published U82
+below remains the prior completed release, not this new branch.
+
 ## U82 publication record
 
 U82 is public/latest on GitHub, with source commit f14c033 and both verified

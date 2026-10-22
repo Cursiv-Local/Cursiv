@@ -89,25 +89,25 @@ def system_info() -> str:
 
 def list_folder(path: str = ".", *, root: Path | None = None) -> str:
     from . import file_access
-    return file_access.execute("list_directory", {"path": str(_resolve(path))}, root)
+    return file_access.execute("list_directory", {"path": path}, root)
 
 
 def read_file(path: str, *, root: Path | None = None) -> str:
     from . import file_access
-    return file_access.execute("read_file", {"path": str(_resolve(path))}, root)
+    return file_access.execute("read_file", {"path": path}, root)
 
 
 def find_files(name: str, folder: str = ".", *, root: Path | None = None) -> str:
     from . import file_access
     pattern = name if any(c in name for c in "*?") else f"*{name}*"
-    return file_access.execute("search_files", {"directory": str(_resolve(folder)), "pattern": "**/" + pattern}, root)
+    return file_access.execute("search_files", {"directory": folder, "pattern": "**/" + pattern}, root)
 
 
 BUILTIN: dict[str, dict] = {
     "system_info": {"fn": system_info, "description": "This computer's OS, CPU, RAM, free disk space per drive, GPU memory. args: {}"},
     "list_folder": {"fn": list_folder, "description": "List inside the authorized workspace. args: {\"path\": \".\" or an authorized path}"},
     "read_file": {"fn": read_file, "description": "Read a text file (first 12,000 characters). args: {\"path\": \"...\"}"},
-    "find_files": {"fn": find_files, "description": "Find files by name or pattern. args: {\"name\": \"notes\" or \"*.py\", \"folder\": \"home\"}"},
+    "find_files": {"fn": find_files, "description": "Find files inside the workspace. args: {\"name\": \"notes\" or \"*.py\", \"folder\": \".\"}"},
 }
 
 _TRIGGER = re.compile(
@@ -150,7 +150,7 @@ Available tools:
 {tools}
 
 Reply with JSON only: {{"calls": [{{"tool": "<name>", "args": {{...}}}}]}} with at most 3 calls, or {{"calls": []}} if no tool is needed.
-Use Windows paths. Host home folder (context only, not an authorization): {home}.
+Use workspace-relative file paths; use "." to list the configured authorized workspace.
 File tools are confined to the person's explicitly enabled workspace. Use relative paths for files in that workspace; never substitute the home folder or installation directory. No workspace means no file access. Don't guess file names you weren't told -- list or search first. Availability does not establish execution or success."""
 
 
@@ -162,7 +162,7 @@ def plan(text: str, ask: Callable[[list[dict]], str]) -> list[dict]:
     tools = all_tools() if policy == Policy() else dict(BUILTIN)
     desc = "\n".join(f"- {n}: {t['description']}" for n, t in tools.items())
     try:
-        raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc, home=os.environ.get("CURSIV_REAL_HOME") or str(Path.home()))},
+        raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc)},
                    {"role": "user", "content": text[:2000]}]) or ""
         m = re.search(r"\{.*\}", raw, re.S)
         calls = json.loads(m.group(0)).get("calls", []) if m else []
@@ -212,11 +212,11 @@ def run(calls: list[dict], *, root: Path | None = None, policy=None) -> list[Too
                         raise ValueError('Invalid file arguments')
                     name = args['name']
                     pattern = name if any(ch in name for ch in '*?') else '*' + name + '*'
-                    supplied = dict(directory=str(_resolve(args.get('folder', '.'))), pattern='**/' + pattern)
+                    supplied = dict(directory=args.get('folder', '.'), pattern='**/' + pattern)
                 else:
                     if args.keys() - {'path'}:
                         raise ValueError('Invalid file arguments')
-                    supplied = dict(path=str(_resolve(args.get('path', '.'))))
+                    supplied = dict(path=args.get('path', '.'))
                 result = file_access.perform(op, supplied, root)
                 label = c['tool'] + (' ' + result.path if result.path else '')
                 out.append(ToolOutcome(label, result.render() if result.ok else 'Tool error: ' + result.error,

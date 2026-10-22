@@ -251,9 +251,10 @@ def execute(action: Action, *, person: str) -> Outcome:
             if action.period:
                 from . import recall
                 try:
-                    message, records = recall.retrieve(action.period, person)
+                    recall.window(action.period)
                 except ValueError as exc:
                     return Outcome(op, False, 'Memory date range needs clarification: ' + str(exc), status='clarification')
+                message, records = recall.retrieve(action.period, person)
                 return Outcome(op, True, message, records, 'read')
             message = sem._recall_reply(action.query, person, repair=False)
             status = sem.memory_status()

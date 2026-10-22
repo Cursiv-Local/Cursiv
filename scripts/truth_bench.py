@@ -22,6 +22,7 @@ cloud keys can't help or leak.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -32,6 +33,17 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+
+
+def source_fingerprint(app: Path) -> str:
+    """Identity of the Python source actually copied for this run."""
+    digest = hashlib.sha256()
+    files = sorted(p for directory in ('cursiv_v215', 'launcher')
+                   for p in (app / directory).rglob('*.py') if '__pycache__' not in p.parts)
+    for path in files:
+        digest.update(path.relative_to(app).as_posix().encode('utf-8') + b'\0')
+        digest.update(path.read_bytes().replace(b'\r\n', b'\n') + b'\0')
+    return digest.hexdigest()
 
 CHILD = r'''
 import json, sys, time
@@ -159,8 +171,11 @@ def main() -> int:
                 t.extractall(scratch / "app", filter="data")
         for part in (("bench",) if args.source else ("cursiv_v215", "launcher", "bench")):
             shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
+        source_sha256 = source_fingerprint(scratch / 'app')
         (scratch / "home").mkdir()
         env = {**os.environ, "USERPROFILE": str(scratch / "home"), "HOME": str(scratch / "home"),
+               "CURSIV_REAL_HOME": str(scratch / "home"),
+               "CURSIV_APP_DATA": str(scratch / "app" / ".cursiv"),
                "QT_QPA_PLATFORM": "offscreen", "PYTHONIOENCODING": "utf-8"}
         for k in ("BRAVE_API_KEY", "CURSIV_RELAY_URL", "CURSIV_FLEET_TOKEN"):
             env.pop(k, None)
@@ -180,15 +195,22 @@ def main() -> int:
                 continue
             rows.append(row)
             print(f"[{len(rows)}/{len(chosen)}] {row['id']} {row['seconds']}s", flush=True)
-        proc.wait()
+        status = proc.wait()
+        if status or len(rows) != len(chosen):
+            raise RuntimeError(f'Incomplete benchmark: exit={status}, received={len(rows)}, expected={len(chosen)}')
     finally:
-        shutil.rmtree(scratch, ignore_errors=True)
+        resolved = scratch.resolve()
+        parent = Path(tempfile.gettempdir()).resolve()
+        if not resolved.is_relative_to(parent) or resolved == parent or not resolved.name.startswith('cursiv_bench_'):
+            raise RuntimeError('Refusing to clean an unexpected benchmark directory')
+        shutil.rmtree(resolved, ignore_errors=True)
 
     summary = summarize(cases, rows)
     import suite_hash
     suite = suite_hash.recorded()
     changed = suite_hash.current() != {k: suite.get(k) for k in ("cases", "scoring")}
     summary.update(label=label, model=model, date=time.strftime("%Y-%m-%d"),
+                   source_ref=args.source or 'working-tree', source_tree_sha256=source_sha256,
                    minutes=round((time.time() - t0) / 60, 1),
                    suite=(suite.get("version", "?") + ("-MODIFIED" if changed else "")), suite_hashes=suite_hash.current())
     out_dir = REPO / "bench" / "results"

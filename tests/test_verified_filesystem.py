@@ -121,12 +121,17 @@ def test_native_tool_receipts_are_authoritative_and_errors_roundtrip(tmp_path, m
     monkeypatch.setattr(ca, '_generate_with_claude', lambda *args: pytest.fail('Literal contents must not be rewritten'))
     if provider == 'claude':
         output = ''.join(ca._call_claude_with_tools([], 'dummy', tmp_path, on_action=receipts.append))
-        returned = calls[1]['messages'][-1]['content'][0]
-        assert returned['is_error'] is (not allowed)
-        data = json.loads(returned['content'])
+        if allowed:
+            returned = calls[1]['messages'][-1]['content'][0]
+            assert returned['is_error'] is False
+            data = json.loads(returned['content'])
     else:
         output = ''.join(ca._call_openai_with_tools([], 'dummy', tmp_path, anthropic_key='dummy', on_action=receipts.append))
-        data = json.loads(calls[1]['messages'][-1]['content'])
+        if allowed:
+            data = json.loads(calls[1]['messages'][-1]['content'])
+    if not allowed:
+        assert len(calls) == 1  # failed backend result exits before another provider request
+        data = receipts[0].receipt()
     assert data['ok'] is allowed and data['verified'] is allowed
     assert receipts[0].ok is allowed and 'invented.txt' not in output and '→ wrote' not in output
     if allowed:

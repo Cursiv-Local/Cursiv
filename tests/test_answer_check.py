@@ -46,7 +46,9 @@ def test_chat_flags_a_contradiction_on_an_emergency_turn(fresh, monkeypatch):
                         lambda messages, **kw: iter(["Stay calm. Do not use a tourniquet unless you are trained."]))
     out = "".join(ca.chat("my son cut his leg and it is bleeding badly", [], "", None))
     assert "From Cursiv's offline reference, severe bleeding control" in out
-    assert 'Cursiv\'s check: this answer advises against "tourniquet"' in out
+    assert 'model draft conflicted with the supplied reference and is withdrawn' in out
+    assert 'severe bleeding control [medical/' in out
+    assert 'Written by Cursiv, no AI model' in out
 
 
 @pytest.mark.parametrize("reply, flagged", [

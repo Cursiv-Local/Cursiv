@@ -84,7 +84,8 @@ def percentile(values, p):
     return sorted(values)[min(len(values) - 1, int((len(values) - 1) * p))] if values else 0
 
 
-def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_delay_ms=0):
+def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_delay_ms=0,
+        background_check=False):
     from PyQt6.QtCore import QCoreApplication, QEvent, QTimer
     from PyQt6.QtGui import QTextCursor, QTextDocument
     from PyQt6.QtWidgets import QApplication, QTextBrowser
@@ -171,13 +172,19 @@ def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_dela
                         memory_peak[0] = max(memory_peak[0], rss_bytes())
                 sampler = threading.Thread(target=sample_memory)
                 sampler.start()
-                ticks, last_token = [], [None]
+                ticks, last_token, reviewed = [], [None], [None]
                 heartbeat = QTimer()
 
                 def tick():
                     ticks.append(time.perf_counter())
                 heartbeat.timeout.connect(tick)
                 heartbeat.start(5)
+                if background_check:
+                    # Observe the real result slot, including its targeted render
+                    # and save. Only the local model wait itself is simulated.
+                    def review_finished(*args):
+                        reviewed[0] = time.perf_counter()
+                    panel._signals.review_done.connect(review_finished)
 
                 def generate():
                     for offset in range(0, len(RESPONSE), chunk_size):
@@ -185,9 +192,16 @@ def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_dela
                             last_token[0] = time.perf_counter()
                         panel._signals.chunk.emit(RESPONSE[offset:offset + chunk_size])
                         time.sleep(interval_ms / 1000 if interval_ms else 0)
-                    if hasattr(panel._signals, 'stage'):
+                    if not background_check and hasattr(panel._signals, 'stage'):
                         panel._signals.stage.emit('Checking the answer…')
-                    if check_delay_ms:
+                    if background_check:
+                        from cursiv_v215.chat.review import Job
+                        def delayed_check(messages, cancelled):
+                            cancelled.wait(check_delay_ms / 1000)
+                            return 'CLEAR'
+                        job = Job('Verify this.', RESPONSE, '', '', lambda _: [], delayed_check, 'fast')
+                        panel._queue_review(panel._review_generation, job, panel._cancel_event)
+                    elif check_delay_ms:
                         time.sleep(check_delay_ms / 1000)
                     panel._pending_history_append = [('user', 'Replay'), ('assistant', RESPONSE)]
                     panel._signals.done.emit()
@@ -207,9 +221,11 @@ def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_dela
                 assert not panel._streaming, 'Replay did not finish'
                 # Observe the background save too: moving a stall after "ready"
                 # must not hide it from the responsiveness or memory measurements.
-                while getattr(conversations, '_pending', {}) and time.perf_counter() < deadline:
+                while (getattr(conversations, '_pending', {}) or
+                       (background_check and reviewed[0] is None)) and time.perf_counter() < deadline:
                     app.processEvents()
                     time.sleep(.001)
+                assert not background_check or reviewed[0] is not None, 'Background review did not finish'
                 persisted = time.perf_counter()
                 stop_sample.set()
                 sampler.join()
@@ -221,6 +237,7 @@ def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_dela
                                                      - last_token[0]) * 1000,
                            final_token_to_ready_ms=(finished - last_token[0]) * 1000,
                            final_token_to_persisted_ms=(persisted - last_token[0]) * 1000,
+                           final_token_to_review_finished_ms=((reviewed[0] or finished) - last_token[0]) * 1000,
                            gui_gap_p95_ms=percentile(gaps, .95), gui_gap_max_ms=max(gaps, default=0),
                            rss_start_mib=memory_start / 2**20,
                            rss_peak_mib=memory_peak[0] / 2**20,
@@ -255,6 +272,8 @@ def main():
     parser.add_argument('--interval-ms', type=int, default=8)
     parser.add_argument('--check-delay-ms', type=int, default=0,
                         help='Synthetic post-generation check delay; no model is invoked')
+    parser.add_argument('--background-check', action='store_true',
+                        help='Exercise the real background review/result/save path with the synthetic delay')
     args = parser.parse_args()
     if min(args.counts) < 0 or args.repeats < 1 or args.chunk_size < 1 or min(args.interval_ms, args.check_delay_ms) < 0:
         parser.error('Counts/interval must be nonnegative; repeats/chunk size must be positive')
@@ -265,11 +284,13 @@ def main():
         root = Path(__file__).resolve().parent.parent
         sys.path[:0] = [str(root / 'launcher'), str(root)]
         sys.modules.update(codex_tool_bridge=None, knowledge_brain=None)
-        rows = run(args.counts, args.repeats, args.profile, args.chunk_size, args.interval_ms, args.check_delay_ms)
+        rows = run(args.counts, args.repeats, args.profile, args.chunk_size, args.interval_ms,
+                   args.check_delay_ms, args.background_check)
     report = dict(python=sys.version, platform=sys.platform,
                   method=f'Offscreen Qt; synthetic {args.chunk_size}-character/{args.interval_ms}ms stream; '
                          'real local autosave; 5ms GUI heartbeat and RSS sampler; no AI calls',
                   simulated_check_delay_ms=args.check_delay_ms,
+                  check_path='background' if args.background_check else 'blocking',
                   runs=rows)
     if args.output:
         args.output.write_text(json.dumps(report, indent=2), encoding='utf-8')
