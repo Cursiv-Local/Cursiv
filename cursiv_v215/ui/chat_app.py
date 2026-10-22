@@ -381,6 +381,15 @@ def _pending_file(args: dict, root: Path) -> dict:
     return file_access.pending('write_file', {'path': args.get('path', ''), 'content': args.get('content', '')}, root)
 
 
+def _file_tool_result(name: str, args: dict, root: Path | None, *, confirmed: bool = False):
+    from cursiv_v215.core import file_access
+    if not isinstance(args, dict):
+        return file_access.FileResult(name, ok=False, error='tool arguments must be an object')
+    if name in {'write_file', 'append_file', 'create_file', 'delete_file'} and _guardian_protected(args.get('path', '')):
+        return file_access.FileResult(name, ok=False, error='protected file cannot be changed')
+    return file_access.perform(name, args, root, confirmed=confirmed)
+
+
 def execute_tool(name: str, args: dict, root: Path, *, confirmed: bool = False) -> str:
     """Execute a file tool call. Returns a string result sent back to the model."""
 
@@ -388,13 +397,7 @@ def execute_tool(name: str, args: dict, root: Path, *, confirmed: bool = False) 
         return 'Error: tool arguments must be an object.'
 
     if name in {"read_file", "write_file", "append_file", "create_file", "list_directory", "search_files", "create_directory", "delete_file"}:
-        from cursiv_v215.core import file_access
-        try:
-            if name in {"write_file", "append_file", "create_file", "delete_file"} and _guardian_protected(args.get("path", "")):
-                return "Error: protected file cannot be changed."
-            return file_access.execute(name, args, root, confirmed=confirmed)
-        except (OSError, ValueError) as exc:
-            return f"Error: {type(exc).__name__}: {exc}"
+        return _file_tool_result(name, args, root, confirmed=confirmed).render()
 
     if name == "submit_plan":
         plan = args.get("plan", "").strip()
@@ -1382,6 +1385,7 @@ def _drop_fake_tool_lines(gen: Generator) -> Generator:
     """Pass the reply through, minus any "(Checked on this computer …)" line this
     code didn't emit. A line is held back only while it could still turn into
     one; everything else streams as it arrives."""
+    from cursiv_v215.core.file_access import VerifiedText
     line, holding = "", True
 
     def _is_fake(text: str) -> bool:
@@ -1389,6 +1393,12 @@ def _drop_fake_tool_lines(gen: Generator) -> Generator:
         return s.lstrip("*_ ").startswith(_TOOL_NOTE) and s not in _REAL_TOOL_NOTES
 
     for chunk in gen:
+        if isinstance(chunk, VerifiedText):
+            if line and holding and not _is_fake(line):
+                yield line
+            line, holding = "", True
+            yield chunk                 # preserve application-owned receipt provenance
+            continue
         if not isinstance(chunk, str) or chunk == RATE_SENTINEL or chunk.startswith(WRITE_SENTINEL):
             if line and holding and not _is_fake(line):
                 yield line
@@ -1862,6 +1872,7 @@ def _call_claude_with_tools(
     max_tokens: int = 4000,
     max_loops: int = 20,
     is_owner: bool = False,
+    on_action=None,
 ) -> Generator[str, None, None]:
     """
     Agentic file-access loop using Claude's native tool-calling API.
@@ -1872,6 +1883,7 @@ def _call_claude_with_tools(
     # Keep only the last 8 user/assistant turns to limit history overhead
     chat_only  = [m for m in messages if m["role"] in ("user", "assistant")]
     loop_msgs  = chat_only[-16:]   # 8 pairs = 16 messages
+    file_results = []
 
     import time as _time
 
@@ -1932,8 +1944,13 @@ def _call_claude_with_tools(
             elif block.get("type") == "tool_use":
                 tool_calls.append(block)
 
-        if text_parts:
-            for word in " ".join(text_parts).split(" "):
+        if (stop_reason == 'end_turn' or not tool_calls) and any(
+                r.operation not in ('read_file', 'list_directory', 'search_files') for r in file_results):
+            return                  # action acknowledgements already came from the backend
+        if text_parts and not tool_calls:
+            from cursiv_v215.core.file_access import model_prose
+            visible = model_prose(' '.join(text_parts))
+            for word in visible.split(" "):
                 yield word + " "
 
         if stop_reason == "end_turn" or not tool_calls:
@@ -1948,7 +1965,19 @@ def _call_claude_with_tools(
             tc_id   = tc["id"]
 
             if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
-                path_arg    = fn_args.get("path", "")
+                try:
+                    request = _pending_file(fn_args, root)
+                except (OSError, ValueError, TypeError) as exc:
+                    from cursiv_v215.core.file_access import FileResult, VerifiedText
+                    failed = FileResult(fn_name, ok=False, error=f'{type(exc).__name__}: {exc}')
+                    file_results.append(failed)
+                    if on_action:
+                        on_action(failed)
+                    yield VerifiedText(failed.render() + '\n', failed)
+                    tool_results.append({'type': 'tool_result', 'tool_use_id': tc_id,
+                                         'content': failed.model_output(), 'is_error': True})
+                    continue
+                path_arg    = request['path']
                 content_arg = fn_args.get("content", "")
                 preview     = content_arg[:400] + ("…" if len(content_arg) > 400 else "")
                 yield (
@@ -1956,34 +1985,31 @@ def _call_claude_with_tools(
                     f"```\n{preview}\n```\n"
                     f"*Waiting for approval…*\n"
                 )
-                yield WRITE_SENTINEL + json.dumps(_pending_file(fn_args, root))
+                yield WRITE_SENTINEL + json.dumps(request)
                 return
 
-            result = execute_tool(fn_name, fn_args, root)
-
-            # Brief status line for the user; full result back to Claude only for read_file
-            if fn_name == "read_file":
-                lines = result.count("\n") + 1
-                yield f"*`→ {fn_name}: {fn_args.get('path','?')} ({lines} lines)`*\n"
-                ctx_result = result          # Claude needs full content
-            elif fn_name in ("list_directory", "search_files"):
-                count = result.count("\n") + 1
-                yield f"*`→ {fn_name}: {fn_args.get('path', fn_args.get('pattern','?'))} ({count} entries)`*\n"
-                ctx_result = result[:1500]   # truncate — Claude only needs the structure
-            elif fn_name == "write_file":
-                yield f"*`→ wrote: {fn_args.get('path','?')}`*\n"
+            is_file = fn_name in {'read_file', 'write_file', 'append_file', 'create_file', 'list_directory', 'search_files', 'create_directory', 'delete_file'}
+            receipt = _file_tool_result(fn_name, fn_args, root) if is_file else None
+            result = receipt.model_output() if receipt else execute_tool(fn_name, fn_args, root)
+            if receipt:
+                from cursiv_v215.core.file_access import VerifiedText
+                file_results.append(receipt)
+                if on_action:
+                    on_action(receipt)
+                yield VerifiedText(receipt.status_line() + '\n', receipt)
                 ctx_result = result
             elif fn_name == "submit_plan":
                 yield f"*`→ plan submitted`*\n"
                 ctx_result = result
             else:
-                yield f"*`→ {fn_name}: {result[:120]}`*\n"
-                ctx_result = result
+                yield f"Unverified tool output ({fn_name}): {result[:120]}\n"
+                ctx_result = json.dumps({'confirmed': False, 'tool': fn_name, 'output': result})
 
             tool_results.append({
                 "type":        "tool_result",
                 "tool_use_id": tc_id,
                 "content":     ctx_result,
+                "is_error":    not receipt.ok if receipt else result.startswith('Error:'),
             })
 
         loop_msgs.append({"role": "user", "content": tool_results})
@@ -2004,15 +2030,17 @@ def _call_xai_with_tools(
     endpoint_url: str = "",    # override XAI_URL — allows reuse for OpenAI
     model_override: str = "",  # override XAI_MODEL
     provider_name: str = "xAI",
+    on_action=None,
 ) -> Generator[str, None, None]:
     """
     Agentic file-access tool loop (OpenAI-compatible API format).
     Works for xAI/Grok and GPT-4.1 — same wire format, different endpoint/model.
-    Code generation: Claude > OpenAI > none on write_file calls.
+    Tool arguments are written exactly; there is no secondary content rewrite.
     """
     url       = endpoint_url or XAI_URL
     model     = model_override or (XAI_MODEL_VIS if has_images else XAI_MODEL)
     loop_msgs = list(messages)
+    file_results = []
 
     for _ in range(max_loops):
         payload = json.dumps({
@@ -2046,8 +2074,12 @@ def _call_xai_with_tools(
 
         tool_calls = msg.get("tool_calls")
         if not tool_calls:
+            if any(r.operation not in ('read_file', 'list_directory', 'search_files') for r in file_results):
+                return              # never let a model replace the verified action receipts
             # Terminal response — fake-stream word by word for rolling feel
             content = msg.get("content") or ""
+            from cursiv_v215.core.file_access import model_prose
+            content = model_prose(content)
             for word in content.split(" "):
                 yield word + " "
             return
@@ -2062,7 +2094,18 @@ def _call_xai_with_tools(
 
             # Confirm-before-write: pause and hand control back to the UI
             if fn_name == "write_file" and (confirm_writes or _existing_file(fn_args, root)):
-                path_arg    = fn_args.get("path", "")
+                try:
+                    request = _pending_file(fn_args, root)
+                except (OSError, ValueError, TypeError) as exc:
+                    from cursiv_v215.core.file_access import FileResult, VerifiedText
+                    failed = FileResult(fn_name, ok=False, error=f'{type(exc).__name__}: {exc}')
+                    file_results.append(failed)
+                    if on_action:
+                        on_action(failed)
+                    yield VerifiedText(failed.render() + '\n', failed)
+                    loop_msgs.append({'role': 'tool', 'tool_call_id': tc['id'], 'content': failed.model_output()})
+                    continue
+                path_arg    = request['path']
                 content_arg = fn_args.get("content", "")
                 preview     = content_arg[:600] + ("..." if len(content_arg) > 600 else "")
                 yield (
@@ -2070,41 +2113,22 @@ def _call_xai_with_tools(
                     f"```\n{preview}\n```\n"
                     f"*Waiting for approval…*\n"
                 )
-                yield WRITE_SENTINEL + json.dumps(_pending_file(fn_args, root))
+                yield WRITE_SENTINEL + json.dumps(request)
                 return   # stop the loop — resume after user approves
 
-            # Code-gen enhancement before writing:
-            # Claude (Anthropic) takes priority when key is set; falls back to OpenAI.
-            if fn_name == "write_file" and (anthropic_key or openai_key):
-                grok_draft = fn_args.get("content", "")
-                filepath   = fn_args.get("path", "")
-                if grok_draft:
-                    if anthropic_key:
-                        yield f"*[Claude {ANTHROPIC_CODE_MODEL} generating production-ready code…]*\n"
-                        generated = _generate_with_claude(filepath, anthropic_key, loop_msgs, grok_draft)
-                    else:
-                        yield "*[OpenAI gpt-4.1 generating production-ready code…]*\n"
-                        generated = _generate_with_openai(filepath, openai_key, loop_msgs, grok_draft)
-                    if generated:
-                        fn_args["content"] = generated
-                        yield "*[Code generation complete — writing file]*\n"
-
-            result = execute_tool(fn_name, fn_args, root)
-
-            if fn_name == "read_file":
-                lines = result.count("\n") + 1
-                yield f"*`→ {fn_name}: {fn_args.get('path','?')} ({lines} lines)`*\n"
-                ctx_result = result
-            elif fn_name in ("list_directory", "search_files"):
-                count = result.count("\n") + 1
-                yield f"*`→ {fn_name}: {fn_args.get('path', fn_args.get('pattern','?'))} ({count} entries)`*\n"
-                ctx_result = result[:1500]
-            elif fn_name == "write_file":
-                yield f"*`→ wrote: {fn_args.get('path','?')}`*\n"
+            is_file = fn_name in {'read_file', 'write_file', 'append_file', 'create_file', 'list_directory', 'search_files', 'create_directory', 'delete_file'}
+            receipt = _file_tool_result(fn_name, fn_args, root) if is_file else None
+            result = receipt.model_output() if receipt else execute_tool(fn_name, fn_args, root)
+            if receipt:
+                from cursiv_v215.core.file_access import VerifiedText
+                file_results.append(receipt)
+                if on_action:
+                    on_action(receipt)
+                yield VerifiedText(receipt.status_line() + '\n', receipt)
                 ctx_result = result
             else:
-                yield f"*`→ {fn_name}: {result[:120]}`*\n"
-                ctx_result = result
+                yield f"Unverified tool output ({fn_name}): {result[:120]}\n"
+                ctx_result = json.dumps({'confirmed': False, 'tool': fn_name, 'output': result})
 
             loop_msgs.append({
                 "role":         "tool",
@@ -2123,6 +2147,7 @@ def _call_openai_with_tools(
     max_tokens: int = 4000,
     max_loops: int = 20,
     confirm_writes: bool = False,
+    on_action=None,
 ) -> Generator[str, None, None]:
     """GPT-4.1 tool loop — same OpenAI-compatible format as xAI, different endpoint/model."""
     yield from _call_xai_with_tools(
@@ -2136,6 +2161,7 @@ def _call_openai_with_tools(
         endpoint_url=OPENAI_URL,
         model_override=OPENAI_CODE_MODEL,
         provider_name="OpenAI",
+        on_action=on_action,
     )
 
 
@@ -2366,6 +2392,7 @@ def _chat_inner(
     confirm_writes: bool = False,
     anthropic_key: str = "",
     force_provider: str = "",   # "grok" | "claude" | "openai" — bypasses smart routing
+    on_action=None,
 ) -> Generator[str, None, None]:
     """
     Main streaming chat handler.
@@ -2393,6 +2420,9 @@ def _chat_inner(
     from cursiv_v215.core import file_access as _files
     _file_result = _files.command(user_text, history, Path(root_path) if file_access and root_path else None)
     if _file_result is not None:
+        if on_action:
+            for receipt in _file_result.receipts:
+                on_action(receipt)
         if _file_result.pending:
             yield WRITE_SENTINEL + json.dumps(_file_result.pending)
         else:
@@ -2637,9 +2667,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                     _tool_ctx = _tools.context_for(_results)
                     _RETRIEVED.append(_tool_ctx)
                     messages[0]["content"] += "\n\n" + _tool_ctx + "\n"
-                    _note = "*(Checked on this computer: " + "; ".join(l for l, _r in _results) + ")*"
-                    _REAL_TOOL_NOTES.add(_note)
-                    yield _note + "\n\n"
+                    checked = [r.label for r in _results if r.ok]
+                    if checked:
+                        _note = "*(Checked on this computer: " + "; ".join(checked) + ")*"
+                        _REAL_TOOL_NOTES.add(_note)
+                        yield _files.VerifiedText(_note + "\n\n")
+                    for attempted in _results:
+                        if not attempted.ok:
+                            yield _files.VerifiedText('Tool result unconfirmed: ' + attempted.output + '\n\n')
         except Exception:
             pass
 
@@ -2777,8 +2812,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             fp = "ollama"
 
     def _workspace() -> Path:
-        return (Path(root_path.strip()).expanduser().resolve()
-                if root_path.strip() else ROOT)
+        return _files.workspace_root(root_path)
 
     # ── Forced provider (grok / claude / openai commands) ───────────────
     if fp in ("grok", "claude", "openai", "ollama"):
@@ -2787,7 +2821,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if file_access and key:
             yield from _call_xai_with_tools(messages, key, _workspace(), oai,
                                              has_images, confirm_writes=confirm_writes,
-                                             anthropic_key="")
+                                             anthropic_key="", on_action=on_action)
         elif key:
             yield from _call_xai_stream(messages, key, has_images)
         else:
@@ -2797,14 +2831,17 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if file_access and ant:
             yield from _call_claude_with_tools(messages, ant, _workspace(),
                                                 confirm_writes=confirm_writes,
-                                                is_owner=_owner_active())
+                                                is_owner=_owner_active(), on_action=on_action)
         elif ant:
             yield from _call_claude_direct(messages, ant)
         else:
             yield "[No Anthropic key set — type: anthropic sk-ant-xxxxx]"
         return
     elif fp == "openai":
-        if oai:
+        if oai and file_access:
+            yield from _call_openai_with_tools(messages, oai, _workspace(), anthropic_key=ant,
+                                               confirm_writes=confirm_writes, on_action=on_action)
+        elif oai:
             yield from _call_openai_direct(messages, oai)
         else:
             yield "[No OpenAI key set — type: openai sk-xxxxx]"
@@ -2896,7 +2933,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
         if key and not _fa_done:
             gen   = _call_xai_with_tools(messages, key, _workspace(), oai, has_images,
-                                          confirm_writes=confirm_writes, anthropic_key=ant)
+                                          confirm_writes=confirm_writes, anthropic_key=ant, on_action=on_action)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "xAI"):
                 _set_answered("xAI")
@@ -2906,7 +2943,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
         if oai and not _fa_done:
             gen   = _call_openai_with_tools(messages, oai, _workspace(),
-                                             anthropic_key=ant, confirm_writes=confirm_writes)
+                                             anthropic_key=ant, confirm_writes=confirm_writes, on_action=on_action)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "OpenAI"):
                 _set_answered("OpenAI")
@@ -2917,7 +2954,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if ant and not _fa_done:
             gen   = _call_claude_with_tools(messages, ant, _workspace(),
                                              confirm_writes=confirm_writes,
-                                             is_owner=_owner_active())
+                                             is_owner=_owner_active(), on_action=on_action)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "Claude"):
                 _set_answered("Claude")
@@ -3140,9 +3177,13 @@ def _time_boxed(gen, seconds: float = RESPONSE_TIME_LIMIT, grace: float = 12.0):
         yield from gen          # no time limit
         return
     import time as _t
+    from cursiv_v215.core.file_access import VerifiedText
     start = _t.monotonic()
     stopping = False
     for chunk in gen:
+        if isinstance(chunk, VerifiedText):
+            yield chunk                 # a completed backend outcome must not be truncated
+            continue
         if not isinstance(chunk, str) or chunk in (RATE_SENTINEL, WRITE_SENTINEL) or chunk.startswith(WRITE_SENTINEL):
             yield chunk
             continue
@@ -3175,6 +3216,9 @@ def chat(
     anthropic_key: str = "",
     force_provider: str = "",
     replace_draft: bool = False,
+    on_stage: Callable[[str], None] | None = None,
+    notebook_scope: str = '',
+    on_action=None,
 ) -> Generator[str, None, None]:
     """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
 
@@ -3186,8 +3230,33 @@ def chat(
     background. Casual turns skip the pass.
     """
     global _PHASE_AFTER, _EMERGENCY_TURN, _CURSIV_REPLY
-    from cursiv_v215.core import field_recall
+    from cursiv_v215.core import field_recall, notebook_tools
     _field_text = message.get('text', '') if isinstance(message, dict) else str(message or '')
+    # Run before filesystem classification, model planning, answer checking or
+    # automatic memory. Only a native backend receipt can acknowledge a save.
+    from cursiv_v215.memory.semantic import current_person as _notebook_person
+    _notebook = notebook_tools.command(_field_text, history, observer=_notebook_person().title(), scope=notebook_scope)
+    if _notebook is not None:
+        from cursiv_v215.memory import intents as _native_memory
+        _native_memory.clear_pending(_notebook_person(), notebook_scope)
+        yield _notebook.render()
+        return
+    from cursiv_v215.memory import intents as _memory_intents
+    _memory_action = _memory_intents.command(_field_text, history, person=_notebook_person(), scope=notebook_scope)
+    if _memory_action is not None:
+        yield _memory_action.render()
+        return
+    from cursiv_v215.core import file_access as _file_ops
+    _file_reply = _file_ops.command(_field_text, history, root_path if file_access else None)
+    if _file_reply is not None:
+        if on_action:
+            for receipt in _file_reply.receipts:
+                on_action(receipt)
+        if _file_reply.pending:
+            yield WRITE_SENTINEL + json.dumps(_file_reply.pending)
+        else:
+            yield _file_ops.VerifiedText(_file_reply.text)
+        return
     _field_reply = field_recall.command(_field_text)
     if _field_reply is not None:
         yield _field_reply
@@ -3212,13 +3281,33 @@ def chat(
     origin, skip = "inferred", False
     deterministic_correction = False
     try:
+        action_options = {'on_action': on_action} if on_action is not None else {}
         yield from _chat_stream(message, history, api_key, files, file_access, root_path,
-                                openai_key, confirm_writes, anthropic_key, force_provider, reply)
+                                openai_key, confirm_writes, anthropic_key, force_provider, reply, **action_options)
+        if any(isinstance(chunk, _file_ops.VerifiedText)
+               and isinstance(chunk.result, _file_ops.FileResult)
+               and chunk.result.operation not in ('read_file', 'list_directory', 'search_files')
+               for chunk in reply):
+            return                 # a model checking pass cannot revise an executed mutation receipt
+        if on_stage:
+            on_stage("Checking the answer…")
         from cursiv_v215.core import file_access as _files
         _user = message.get('text', '') if isinstance(message, dict) else str(message or '')
         if _files.is_request(_user):
             return                 # actual file results need no AI check or automatic learning
         draft = _strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        if _file_ops.unverified_claim(draft):
+            # An LLM acknowledgement cannot establish a completed action. Native
+            # action routes return earlier; provider receipts do not use this prose.
+            correction = str(_file_ops.model_prose(draft))
+            reply[:] = [correction]
+            if replace_draft:
+                yield REPLACE_SENTINEL + correction
+            else:
+                yield '\n\n' + correction
+            skip = True
+            deterministic_correction = True
+            draft = correction
         if _WORKED and _WORKED.lead and draft.startswith(_WORKED.lead.strip()):
             draft = draft[len(_WORKED.lead.strip()):].strip()    # nor Cursiv's own safety line
         if _PHASE_AFTER:             # Route / Recovery notes from the phases
@@ -3395,7 +3484,7 @@ def _check_context(history: list[dict], user_text: str) -> str:
 
 
 def _chat_stream(message, history, api_key, files, file_access, root_path, openai_key,
-                 confirm_writes, anthropic_key, force_provider, reply: list[str]):
+                 confirm_writes, anthropic_key, force_provider, reply: list[str], on_action=None):
     from cursiv_v215.core import selfknow as _sk
     global _WEB_SEARCHED, _WORKED, _MEMORY_RECALLED
     _WORKED = None
@@ -3410,7 +3499,7 @@ def _chat_stream(message, history, api_key, files, file_access, root_path, opena
     _DOCS_SEARCHED_EMPTY.clear()
     _WEB_SEARCHED = False
     _set_answered("")
-    for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider)))):
+    for chunk in _drop_fake_tool_lines(_friendly(_sk, _time_boxed(_chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
         if isinstance(chunk, str) and chunk not in (RATE_SENTINEL,) and not chunk.startswith(WRITE_SENTINEL):
             reply.append(chunk)
         yield chunk

@@ -35,6 +35,9 @@ def permitted(text: str) -> bool:
 
 def enabled_for(text: str) -> bool:
     from . import semantic
+    from . import intents
+    if intents._parse(text) or intents._cue(text):
+        return False             # explicit actions use the verified manual route, not inferred learning
     return semantic.learning_enabled() and permitted(text)
 
 

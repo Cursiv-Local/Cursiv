@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U80"
+VERSION = "3.14-U81"
 FACTS_FILE = Path(__file__).parent.parent / "council" / "cursiv_facts.md"
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
@@ -167,6 +167,7 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 - Chat commands: remember <fact>, forget <words>, what do you remember, memory learn on/off, free keys, cloud on/off/status, council <question>, codex <request> (codex help, codex keep, codex project <folder>, codex lessons, codex learn <lesson>), phases, help.
 - Cursiv Forge: evolve <idea> (writes a plugin, safety-checks it, tests it in a sandbox; installs only after evolve approve), plugins, plugin show/off/on/remove/approve <name>. Plugins live in .cursiv/plugins.
 - Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.
+- Native notebook recording, retrieval and integrity verification use the Field Notebook backend, not field_log.txt. Explicit memory save/recall/list/correct/forget and automatic-learning controls use the memory backend; manual saves remain available with automatic learning off. These explicit local actions need no cloud model. Only application-verified results and actual paths/record IDs establish success; model prose never does.
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
 - Tone and style: tone blunt/warm/brief/playful/legacy/teacher/normal; style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agent council <question>.

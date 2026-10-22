@@ -21,6 +21,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css?v=u64-2">
+<script defer src="/assets/download-stats.js?v=1"></script>
 </head>
 <body>
 
@@ -41,10 +42,12 @@
       <h1>Install Cursiv.</h1>
       <p class="lede">About ten minutes, most of it downloading. You need internet once, for the downloads. After that, everyday use works without it.</p>
       <div class="cta-row">
-        <a class="btn btn-gold" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv-Setup.exe</a>
-        <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac (early): Cursiv.dmg</a>
+        <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv-Setup.exe</a>
+        <a class="btn btn-ghost" data-download-button="mac" href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac (early): Cursiv.dmg</a>
         <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">Release notes</a>
       </div>
+      <p class="fine" data-download-count role="status">Installer download counts are provided by GitHub.</p>
+      <p class="fine">Versioned installers only; duplicate “latest” copies excluded. GitHub counts are not installs or unique people. Button clicks are counted separately without visitor identifiers; <a href="/privacy/#download-analytics">privacy details</a>.</p>
       <p class="fine"><b>Mac (early):</b> Apple Silicon (M1 or newer), macOS 12+. Drag Cursiv into Applications. It isn't
         signed by Apple yet, so the first time: try to open it, then System Settings → Privacy &amp; Security → Open Anyway.
         Built and tested automatically on Apple hardware, but not yet used by anyone on their own Mac. The USB drive is Windows-only.</p>

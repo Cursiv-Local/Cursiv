@@ -45,7 +45,7 @@ const HEADERS = `/*
   Cache-Control: no-cache
 `;
 
-const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nSitemap: https://cursiv.us/sitemap.xml\n";
+const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n";
 const SITEMAP_URLS = [
   "/", "/start", "/vision", "/story", "/open-source-offline-ai",
   "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/",

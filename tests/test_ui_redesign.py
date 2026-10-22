@@ -200,7 +200,7 @@ def test_empty_state_and_example_links(panel, app):
 def test_conversations_save_themselves_unless_turned_off(panel, settings, monkeypatch):
     import chat_panel
     saved = []
-    monkeypatch.setattr(panel, "save_conversation", lambda title=None: saved.append(1) or "c1")
+    monkeypatch.setattr(panel, "save_conversation", lambda title=None, **kw: saved.append(1) or "c1")
     panel._history = [{"role": "user", "content": "hi"}, {"role": "assistant", "content": "hello"}]
     panel._after_turn()
     assert saved == [1]

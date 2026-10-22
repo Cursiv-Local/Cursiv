@@ -1,0 +1,8 @@
+/* Admin statistics only; public website layout is unchanged. */
+.facts dd { margin: 0; }
+.facts { margin: 20px 0; }
+.table td { overflow-wrap: anywhere; }
+@media (max-width: 680px) {
+  .facts div { grid-template-columns: 1fr; gap: 6px; }
+  .table td::before { content: attr(data-label) ": "; color: var(--text); font-weight: 600; }
+}

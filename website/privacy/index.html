@@ -34,7 +34,7 @@
     <div class="stack">
       <span class="eyebrow">Privacy and data handling</span>
       <h1>Cursiv Privacy Policy</h1>
-      <p><b>Effective date: October 20, 2026</b></p>
+      <p><b>Effective date: October 21, 2026</b></p>
       <p>This policy describes the Cursiv desktop software and the Cursiv website features reviewed for this release. Local processing is available for supported features, but some website and online features send information to servers or providers. Local storage does not by itself guarantee security.</p>
     </div>
   </section>
@@ -85,7 +85,8 @@
         <li><b>Sealed letters:</b> the Worker encrypts the subject and body with AES-GCM before storing them in D1. The encryption key is derived from the Worker's <code>CURSIV_BOARD_SECRET</code>, and the Worker also decrypts letters to display them. This is encryption at rest, not end-to-end encryption: the service can access plaintext. D1 also stores sender and recipient account identifiers/names, a record ID, creation/read timestamps, and encryption fields. The inspected app has no letter deletion or automatic expiry route.</li>
         <li><b>Problem reports:</b> only when you choose Send, the desktop app transmits an install ID, app version, operating-system and Python version information, selected diagnostics (such as Ollama status, installed model names, configured provider names, Cursiv Cloud status and data-folder names), your optional note, and a preview of recent Cursiv log excerpts. The app attempts to remove recognized key/token patterns, email addresses and the OS account name, but this is not a guarantee that all sensitive content is removed; review the preview before sending. The service stores the report and a truncated IP hash used for the daily limit. The inspected app has no user-facing deletion or automatic expiry route and publishes no retention period.</li>
         <li><b>Browser chat page:</b> the separate chat page stores its settings and memory in browser local storage and sends prompts to the Ollama URL configured on that page, which defaults to the local computer. If you change the URL to a remote server, that server receives the requests.</li>
-        <li><b>Analytics and cookies:</b> the website files reviewed contain no analytics or advertising scripts and do not set first-party tracking cookies. Cloudflare security features may process request details or use security cookies depending on the account configuration.</li>
+        <li id="download-analytics"><b>Download analytics and cookies:</b> the website retrieves public GitHub release metadata on the server and caches installer download counts. Its public counter excludes duplicate “latest” copies, source archives and unrelated files. GitHub counts download requests, not verified completed transfers, installations or unique people. GitHub receives your request when you follow a release or installer link, under its own privacy practices.</li>
+        <li><b>Website button-click totals:</b> when enabled, a small first-party script sends only the installer button category (Windows or Mac) to the website's Cloudflare Worker. The feature stores an aggregate count and the UTC day recording first began for each category in D1. It does not store individual events, visitor identifiers, IP addresses, user agents, referrers or browsing history; it sets no analytics cookies and uses no browser storage. Clicks are kept separate from GitHub download counts and do not prove a download completed. Global Privacy Control and Do Not Track requests are excluded. Aggregate totals have no automatic expiry and can be removed by the maintainer. The statistics page requires separate administrator authentication. There are no advertising scripts. Cloudflare security features and infrastructure logs may still process request details or use security cookies depending on account configuration.</li>
       </ul>
       <h2>Deletion, expiration and backups</h2>
       <p>The application behavior described above is based on the repository routes and database schema. Users can delete their own public-board posts and can clear the optional phone memory summary; the inspected app does not offer account removal, letter deletion, report deletion, or deletion of stored phone conversations and images. Some data has application-level expiry or display limits, as described above; these do not necessarily remove database records.</p>
@@ -103,7 +104,7 @@
     </div>
   </section>
 </main>
-<footer><div class="wrap"><div class="copy"><span><a href="/">Cursiv</a> · <a href="/start">Download</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">GitHub</a></span><span>Effective October 20, 2026</span></div></div></footer>
+<footer><div class="wrap"><div class="copy"><span><a href="/">Cursiv</a> · <a href="/start">Download</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">GitHub</a></span><span>Effective October 21, 2026</span></div></div></footer>
 <script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
 </body>
 </html>

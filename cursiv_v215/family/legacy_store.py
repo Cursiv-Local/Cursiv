@@ -14,13 +14,26 @@ import hashlib
 import hmac
 import json
 import re
+import threading
+import uuid
+from functools import wraps
 from datetime import datetime
 from pathlib import Path
+from cursiv_v215.core import atomic
 
 _LEGACY_DIR  = Path.home() / ".cursiv" / "family" / "legacy"
 # See cursiv_v215/guardian/access_gate.py for why this is Path.home().
 _LETTERS_DIR = _LEGACY_DIR / "letters"
 _INDEX_FILE  = _LEGACY_DIR / "index.json"
+_lock = threading.RLock()
+
+
+def _serialized(fn):
+    @wraps(fn)
+    def locked(*args, **kwargs):
+        with _lock:
+            return fn(*args, **kwargs)
+    return locked
 
 
 # ── Internal helpers ──────────────────────────────────────────────────────────
@@ -30,20 +43,20 @@ def _ensure_dirs() -> None:
 
 
 def _load_index() -> list[dict]:
-    if not _INDEX_FILE.exists():
-        return []
     try:
-        return json.loads(_INDEX_FILE.read_text(encoding="utf-8"))
-    except Exception:
+        entries = json.loads(_INDEX_FILE.read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return []
+    if not isinstance(entries, list) or any(not isinstance(e, dict) or not isinstance(e.get('id'), str)
+            or not isinstance(e.get('filename'), str) or re.search(r'[\\/:]', e['filename'])
+            or not e['filename'].lower().endswith('.letter') for e in entries):
+        raise ValueError('Legacy letter index is damaged; no existing records were replaced')
+    return entries
 
 
 def _save_index(index: list[dict]) -> None:
     _ensure_dirs()
-    _INDEX_FILE.write_text(
-        json.dumps(index, indent=2, ensure_ascii=False),
-        encoding="utf-8",
-    )
+    atomic.write_text(_INDEX_FILE, json.dumps(index, indent=2, ensure_ascii=False))
 
 
 # ── Public read API ───────────────────────────────────────────────────────────
@@ -87,6 +100,7 @@ def get_letter_content(letter_id: str) -> str | None:
 
 # ── Write / mutate API ────────────────────────────────────────────────────────
 
+@_serialized
 def save_letter(
     from_key: str,
     from_display: str,
@@ -96,13 +110,20 @@ def save_letter(
     content: str,
     access_type: str = "babel_pin",   # "babel_pin" | "letter_pin"
     access_hash: str = "",
+    written: str = "",
 ) -> str:
     """Save a new letter. Returns the letter ID."""
     _ensure_dirs()
 
-    now       = datetime.now()
+    existing = _load_index()
+    if not all(isinstance(v, str) for v in (from_key, from_display, for_key, for_display, subject, content, access_type, access_hash, written)):
+        raise ValueError('Letter fields must be text')
+    now       = datetime.fromisoformat(written) if written else datetime.now()
+    written_at = written or now.isoformat()
     timestamp = now.strftime("%Y%m%d%H%M%S")
-    letter_id = f"{from_key}_for_{for_key}_{timestamp}"
+    safe_from = re.sub(r'[^A-Za-z0-9_-]', '_', from_key) or 'unknown'
+    safe_for = re.sub(r'[^A-Za-z0-9_-]', '_', for_key) or 'unknown'
+    letter_id = f"{safe_from}_for_{safe_for}_{timestamp}_{uuid.uuid4().hex[:12]}"
     filename  = f"{letter_id}.letter"
 
     header = (
@@ -112,17 +133,14 @@ def save_letter(
         f"for: {for_key}\n"
         f"for_display: {for_display}\n"
         f"subject: {subject or '(no subject)'}\n"
-        f"written: {now.isoformat()}\n"
+        f"written: {written_at}\n"
         f"access_type: {access_type}\n"
         f"---\n"
     )
 
-    (_LETTERS_DIR / filename).write_text(
-        header + content.strip() + "\n",
-        encoding="utf-8",
-    )
+    atomic.write_text(_LETTERS_DIR / filename, header + content.strip() + '\n')
 
-    index = _load_index()
+    index = existing
     index.append({
         "id":           letter_id,
         "from_key":     from_key,
@@ -130,15 +148,18 @@ def save_letter(
         "for_key":      for_key,
         "for_display":  for_display,
         "subject":      subject or "(no subject)",
-        "written":      now.isoformat(),
+        "written":      written_at,
         "filename":     filename,
         "access_type":  access_type,
         "access_hash":  access_hash,
     })
     _save_index(index)
+    if get_letter_entry(letter_id) is None or get_letter_content(letter_id) != content.strip() + '\n':
+        raise OSError('Letter save read-back verification failed; inspect the vault before retrying')
     return letter_id
 
 
+@_serialized
 def rewrite_letter(letter_id: str, new_content: str) -> bool:
     """Replace the body of an existing letter. Adds a 'revised' timestamp."""
     index = _load_index()
@@ -162,24 +183,27 @@ def rewrite_letter(letter_id: str, new_content: str) -> bool:
         f"access_type: {entry['access_type']}\n"
         f"---\n"
     )
-    path.write_text(header + new_content.strip() + "\n", encoding="utf-8")
+    atomic.write_text(path, header + new_content.strip() + '\n')
 
     entry["revised"] = now_str
     _save_index(index)
+    if get_letter_content(letter_id) != new_content.strip() + '\n':
+        raise OSError('Letter update read-back verification failed')
     return True
 
 
+@_serialized
 def delete_letter(letter_id: str) -> bool:
     """Permanently delete a letter and remove it from the index."""
     index = _load_index()
     entry = next((e for e in index if e.get("id") == letter_id), None)
     if not entry:
         return False
-    try:
-        (_LETTERS_DIR / entry["filename"]).unlink(missing_ok=True)
-    except Exception:
-        pass
+    path = _LETTERS_DIR / entry['filename']
+    path.unlink(missing_ok=True)
     _save_index([e for e in index if e.get("id") != letter_id])
+    if path.exists() or get_letter_entry(letter_id) is not None:
+        raise OSError('Letter deletion could not be verified')
     return True
 
 
@@ -239,6 +263,8 @@ def export_pack(author_key: str, author_display: str) -> tuple[Path, int]:
     payload: list[dict] = []
     for entry in letters:
         content = get_letter_content(entry["id"])
+        if content is None:
+            raise OSError(f"Letter {entry['id']} cannot be read; export was not confirmed")
         payload.append({
             "from_key":     entry["from_key"],
             "from_display": entry["from_display"],
@@ -262,9 +288,10 @@ def export_pack(author_key: str, author_display: str) -> tuple[Path, int]:
     }
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename  = f"legacy_from_{author_key}_{timestamp}.legacypack"
+    safe_author = re.sub(r'[^A-Za-z0-9_-]', '_', author_key)
+    filename  = f"legacy_from_{safe_author}_{timestamp}_{uuid.uuid4().hex[:8]}.legacypack"
     dest      = export_destination() / filename
-    dest.write_text(json.dumps(pack, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic.write_text(dest, json.dumps(pack, indent=2, ensure_ascii=False))
     return dest, len(payload)
 
 
@@ -310,7 +337,9 @@ def import_pack(filepath: str | Path) -> tuple[int, list[str]]:
             content      = letter.get("content", ""),
             access_type  = letter.get("access_type", "babel_pin"),
             access_hash  = "",
+            written      = letter.get('written', ''),
         )
+        existing_sigs.add(sig)
         imported += 1
 
     return imported, skipped

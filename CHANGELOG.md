@@ -1,5 +1,71 @@
 # Changelog
 
+## v3.14-U81 - Verified local actions, faster chat and website updates (2026-10-22)
+
+These are working-tree changes, not a newly published release or rebuilt installer.
+The website analytics task preserves all earlier pending desktop code. The public
+GitHub latest-release endpoint was independently checked and returned v3.14-U79;
+the local source baseline is the owner's `4d24ffe` U80 commit. These are distinct
+states; no tag or release was changed.
+
+### Homepage copy (2026-10-22)
+
+- Reduce homepage body copy from about 2,475 to 759 words (including expandable
+  text). Lead with offline Windows AI through Ollama, use four short benefits,
+  and end with a direct latest-installer download. Keep setup, privacy, signing
+  and benchmark limitations in expandable sections and linked guides. Preserve
+  metadata, old anchors, responsive styles, the counter and separate click recording.
+
+### Website download analytics
+
+- Add a small download counter beside the homepage/download-page calls to action,
+  using public `Cursiv-Local/Cursiv` release metadata. Sum canonical Windows/macOS
+  installer asset counts across published releases; exclude duplicate latest
+  copies, repeated assets, source archives, checksums and unrelated files. Latest
+  stable release comes from GitHub's latest endpoint. Never infer daily history,
+  unique people, installations or completed transfers.
+- Reuse the existing Cloudflare Worker/static-asset/D1 deployment. Cache metadata
+  for one hour, coordinate refreshes, retain labelled stale data for up to seven
+  days, and back off on GitHub rate limits/network failures. Missing data never
+  becomes an invented zero or breaks an installer link.
+- Protect `/admin/downloads/` and its data endpoint with separate HTTPS HTTP Basic
+  authentication, using a minimum-32-character Worker secret. Admin HTML is served
+  only after authentication and is absent from public static assets and sitemap;
+  responses are no-store/noindex with a restrictive page policy.
+- Record optional installer-button clicks as Windows/Mac aggregate totals only.
+  No visitor IDs, cookies, browser storage, IP/user-agent/referrer fields or event
+  history are stored by this feature. Respect GPC/DNT; clicks remain separate from
+  GitHub download requests and never block navigation.
+- Update the website privacy policy, README, this changelog and handoff. Add
+  website-only tests and an additive database migration. Configuration, exact file
+  inventory, test results and publish/check steps: [DOWNLOAD-ANALYTICS.md](cloudflare/DOWNLOAD-ANALYTICS.md).
+- Validation: **18 website tests passed**, static build and Cloudflare Wrangler
+  deployment dry run passed. Production database/secret setup and deployment are
+  still owner actions; no desktop source changed during this website task.
+
+### Earlier pending desktop work (recorded here; code untouched by analytics task)
+
+- **Saved Notes viewer:** read/search/filter existing note categories and full
+  stored contents, integrate with chat/navigation, and preserve the existing
+  archive. No unsupported note deletion or data migration was introduced.
+- **Chat rendering:** 40 ms stream batches, completed-block formatting, targeted
+  active-message updates, cached unchanged history and background ordered saves.
+  Benchmarks cover 10/100/1,000 messages. The 1,000-message replay's median final
+  readiness changed from 493.2 to 71.5 ms; this is a synthetic rendering measurement,
+  not a live model-speed claim. See [performance report](docs/CHAT-RENDERING-PERFORMANCE.md).
+- **Native Field Notebook:** allowlisted recording/retrieval/chain verification,
+  user-only follow-up context, real record IDs, duplicate protection and GUI
+  persistence. Preserve append-only corrections and existing notebook data.
+- **Verified local actions:** authoritative absolute filesystem paths and exact
+  read-back receipts, persisted authorized workspaces, natural-language memory
+  save/recall/correct/forget/learning controls, independent outcomes, bounded local
+  intent classification, and concrete Saved Notes/letter/agent/image save fixes.
+- Existing desktop validation: **1,008 passed, 1 skipped** (macOS Keychain on
+  Windows), isolated source/data snapshots. Live model inference and an installed
+  executable restart were not claimed. No self-model/metacognition implementation,
+  installer/updater edits, commit, push or deployment is implied. Full per-file
+  evidence and remaining limits: [HANDOFF.md](HANDOFF.md).
+
 ## v3.14-U77 — Fixes from the first Cross-check tests (2026-10-19)
 Found by testing U76's Cross-check on real answers:
 - An answer that opened "No, site A does not have better survival" and ended "Therefore, site A has better survival" (3 of 4 frogs vs 60 of 100) passed Cursiv's own check; only the Cross-check reviewer caught it. Every sentence is now read: saying 75% is higher than 60% is fine, concluding one site is better is flagged, and a first line that says the opposite of the conclusion is called a contradiction.

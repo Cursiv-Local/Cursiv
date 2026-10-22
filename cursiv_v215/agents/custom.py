@@ -14,10 +14,22 @@ from __future__ import annotations
 import json
 import re
 import time
+import threading
+from functools import wraps
 from pathlib import Path
+from cursiv_v215.core import atomic
 
 DIR = Path.home() / ".cursiv" / "agents"
 _NAME_RE = re.compile(r"^[a-z][a-z0-9_-]{1,23}$")
+_lock = threading.RLock()
+
+
+def _serialized(fn):
+    @wraps(fn)
+    def locked(*args, **kwargs):
+        with _lock:
+            return fn(*args, **kwargs)
+    return locked
 
 
 def _person() -> str:
@@ -38,16 +50,25 @@ def clean_name(name: str) -> str:
 
 def load(name: str) -> dict | None:
     try:
-        return json.loads((_dir() / f"{clean_name(name)}.json").read_text(encoding="utf-8"))
-    except Exception:
+        value = json.loads((_dir() / f"{clean_name(name)}.json").read_text(encoding="utf-8"))
+    except FileNotFoundError:
         return None
+    if not isinstance(value, dict) or value.get('name') != clean_name(name) or not isinstance(value.get('job'), str) \
+            or not isinstance(value.get('knowledge'), list) or not all(isinstance(v, str) for v in value['knowledge']):
+        raise ValueError('Saved agent data is damaged; it was not replaced')
+    return value
 
 
+@_serialized
 def save(agent: dict) -> None:
+    if not isinstance(agent, dict) or not _NAME_RE.fullmatch(agent.get('name', '')):
+        raise ValueError('Invalid saved agent name')
     d = _dir()
     d.mkdir(parents=True, exist_ok=True)
     agent["updated"] = time.time()
-    (d / f"{agent['name']}.json").write_text(json.dumps(agent, indent=2, ensure_ascii=False), encoding="utf-8")
+    atomic.write_text(d / f"{agent['name']}.json", json.dumps(agent, indent=2, ensure_ascii=False))
+    if load(agent['name']) != agent:
+        raise OSError('Agent save read-back verification failed')
 
 
 def all_agents() -> list[dict]:
@@ -61,6 +82,7 @@ def all_agents() -> list[dict]:
     return out
 
 
+@_serialized
 def create(name: str, job: str) -> str:
     name = clean_name(name)
     if not _NAME_RE.match(name):
@@ -74,6 +96,7 @@ def create(name: str, job: str) -> str:
             f"Teach it: `agent teach {name} <something it should always know>`")
 
 
+@_serialized
 def edit(name: str, job: str) -> str:
     a = load(name)
     if not a:
@@ -83,6 +106,7 @@ def edit(name: str, job: str) -> str:
     return f"Updated {a['name']}'s job."
 
 
+@_serialized
 def teach(name: str, fact: str) -> str:
     a = load(name)
     if not a:
@@ -97,11 +121,14 @@ def teach(name: str, fact: str) -> str:
     return f"{a['name']} will remember: {fact}"
 
 
+@_serialized
 def delete(name: str) -> str:
     p = _dir() / f"{clean_name(name)}.json"
     if not p.exists():
         return f"No agent called {clean_name(name)}."
     p.unlink()
+    if p.exists():
+        raise OSError('Agent deletion could not be verified')
     return f"Deleted agent {clean_name(name)}."
 
 

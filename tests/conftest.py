@@ -49,6 +49,8 @@ Tests exercise learner work explicitly; ordinary chat tests never start jobs.
     monkeypatch.setattr(brain, 'LESSONS_FILE', folder / 'coding_lessons.jsonl')
     monkeypatch.setattr(formation, '_logger', None)
     from cursiv_v215.core import curiosity, presence
+    from cursiv_v215.core import workspace
+    monkeypatch.setattr(workspace, 'config_file', lambda: folder / 'workspace_access.json')
     monkeypatch.setattr(curiosity, 'path', lambda person: folder / 'curiosity' / (person + '.json'))
     monkeypatch.setattr(presence, 'path', lambda person: folder / 'presence' / (person + '.json'))
     real_submit = formation.submit

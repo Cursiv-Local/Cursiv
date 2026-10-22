@@ -1,5 +1,460 @@
 # Handoff — Cursiv verification overhaul
 
+## 2026-10-22: Tighter homepage copy
+
+Website-only copy/layout edit, preserving all earlier pending application and
+analytics work. `website/index.html` now leads with Cursiv's offline Windows/Ollama
+value in two short sentences, presents four brief benefits, keeps a compact Truth
+Benchmark section with an explicit scope qualifier, and ends with a direct latest
+Windows installer link. Main download buttons retain anonymous click-event tags.
+The counter and its duplicate-exclusion/unique-person limitations remain visible.
+
+Body copy drops from about 2,475 to 759 words (69% reduction), including text in
+closed details, with head/scripts excluded using the same counting rule. Long
+feature tables, diagrams and repetitive sections are replaced by links to existing
+offline, hardware, research, privacy and testing pages. Setup, encryption, unsigned
+installers, separate model licenses, platform limits and dated screenshot context
+remain in expandable details. The original section IDs are retained for inbound
+links; the formerly missing `today` anchor is now the hero. SEO metadata, canonical,
+WebSite JSON-LD, social image, navigation script and shared stylesheet are unchanged.
+
+README, CHANGELOG and this handoff record the edit. The analytics guide now correctly
+states that direct installer buttons on both the homepage and `/start` are tagged;
+ordinary setup navigation is not counted. No desktop/API/installer code, benchmark
+source, deployment configuration or production service is changed by this edit.
+The static build and whitespace review passed. Desktop browser inspection confirmed
+the rendered short hero, four benefits, closed details and direct download links;
+the static preview correctly shows a counter-unavailable fallback because it does
+not run the Worker API. SEO head markup is byte-identical after line-ending
+normalization, and every prior section anchor remains. Scope hashes identify only
+these five files: homepage, README, CHANGELOG, HANDOFF and the analytics guide;
+all other existing files, including pending application changes, are unchanged.
+No regression test suite was requested or run for this copy edit. Nothing was
+committed, pushed or deployed automatically. Preview screenshot:
+[homepage-tightened.png](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/homepage-tightened.png).
+
+## 2026-10-21: Website-only download analytics and documentation inventory
+
+The owner requested privacy-conscious download analytics for `cursiv.us`, then
+explicitly requested README/changelog updates recording all pending work. This
+task changes website/Cloudflare files and documentation only. Earlier desktop,
+installer, updater, memory, tests and benchmark source files are preserved.
+No commit, push, production migration, secret change, DNS change or deployment.
+
+Implementation and full per-file inventory:
+[cloudflare/DOWNLOAD-ANALYTICS.md](cloudflare/DOWNLOAD-ANALYTICS.md).
+The root README now links setup/test/publish instructions and the existing repair
+reports. CHANGELOG.md adds a clearly **Unreleased** section covering website
+analytics and the earlier pending Saved Notes/rendering/notebook/local-action work;
+it does not claim those changes are in an installed or published release.
+
+Architecture confirmed: existing `cursiv-web` Worker + static-asset binding + D1,
+not Cloudflare Pages. The new module uses public GitHub release metadata, one-hour
+D1 caching, a global refresh lease, bounded pagination, stale timestamps and
+rate-limit backoff. The homepage and download page display a small counter. The
+owner explicitly chose to exclude duplicate latest copies; counted canonical
+installers and excluded-copy request counts are shown separately in authenticated
+admin. GitHub counts are not completed transfers, installs or unique people.
+
+`/admin/downloads/` and `/admin/downloads/data` require a separate minimum-32-character
+Worker secret and HTTPS HTTP Basic authentication, with no-store/noindex responses.
+Admin HTML is Worker-only, never a public static asset. Click recording stores only
+Windows/Mac totals and first-recorded days, respects GPC/DNT and never blocks an
+installer link. It stores no visitor/event/IP/user-agent/referrer data or analytics
+cookies. The website privacy policy and date are updated; existing infrastructure
+logs/security handling remain subject to Cloudflare account configuration.
+
+The live read-only GitHub snapshot contained 67 releases/75 counted assets:
+10 canonical-installer downloads, 105 requests to excluded copies; latest U79 had
+0 counted versioned-installer downloads. These are audit values only, not hardcoded
+website counters. The existing published homepage returned HTTP 200. Local website
+tests/build and a Wrangler deployment **dry run** were performed; no upload or
+production update was made. Final verification: **18 tests passed, 0 failed/skipped**;
+static build and Wrangler 4.151.3 dry run passed, as did JavaScript syntax and
+`git diff --check`. Before/after hashes show exactly 18 intended website/doc files
+changed and all desktop/other existing sources unchanged. Full test evidence and
+limitations are recorded in the analytics guide.
+
+Deployment still requires the owner to apply `analytics-schema.sql`, set
+`DOWNLOAD_STATS_ADMIN_PASSWORD` on the existing Worker, publish through the existing
+script, and check authentication/data/links/privacy on production. The guide gives
+exact commands and dashboard steps. Basic authentication needs a strong unique
+password/private browsing; clicks are approximate and historical daily data is not
+reconstructed. Prior desktop handoff sections below are historical and unchanged.
+
+## 2026-10-21: Verified filesystem, natural-language memory and related saves
+
+Branch: `codex/verified-local-actions`, still based on the owner's U80 HEAD
+`4d24ffef078d7f72c6e5357b48f6facdd4415769`. The owner approved proceeding through
+the remaining audited action paths. All earlier pending notebook, Saved Notes and
+rendering work was preserved. No commit, push, merge, version bump, installer
+build, release or deployment was performed. The installed application is unchanged.
+
+Full root causes, exact file inventory, execution paths, examples, tests and limits:
+[Verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md).
+
+### What changed
+
+1. **Filesystem:** the original filename/content sentence and user-only follow-ups
+   execute directly through the real backend. Results carry its resolved absolute
+   path, byte count, hash and verified status. Reads use one actual byte snapshot.
+   Missing/invalid workspaces fail closed; no installation-directory fallback.
+   Workspace grants persist per person, move with portable references, and refuse
+   copied external-host grants. Existing authorization/link/credential protections,
+   approval and stale-file checks remain. Local and cloud use the same backend.
+2. **Native provider adapters:** actual errors are marked as errors, rather than
+   successful reads/writes. Application-owned receipts survive stream filters and
+   time limits and bypass model rewriting. Literal writes no longer get a second
+   model content-generation pass. Model-generated save transcripts are untrusted
+   prose, never execution; recognizable unsupported claims are corrected visibly.
+3. **Memory brief:** all seven operations have a validated interface and independent
+   persistence checks. Modifiers are separated from facts; context uses user turns;
+   ambiguity is scoped and clarified. Compound outcomes remain independent. Manual
+   saves still work with learning off, use exact deduplication without embeddings,
+   and return actual IDs. Corrections retain superseded history and existing backup
+   protection. Optional ambiguous classification is local-only, already-loaded,
+   strictly validated and bounded to two seconds, with no proxy/cloud/redirect path.
+4. **Other concrete failures:** verified shared atomic writes, flushed/read-back
+   Saved Notes appends, accurate failed-note replies, collision-safe letter/image
+   names, surfaced letter-delete/index failures, verified letter/agent persistence,
+   and refusal to treat corrupt letter/agent data as absent. Existing `save this`
+   still saves a Saved Note. Native capability text now reflects actual behavior.
+
+### Verification and review
+
+Before-change focused filesystem/notebook suite: **82 passed**, 12.59 s.
+Intermediate complete suite: **1,003 passed, 1 skipped**, 156.70 s, at
+`cursiv-check-d9emc9po/pytest.log` in the task visualization workspace. After final
+receipt/Saved Notes/read-only-file additions, focused suite: **209 passed**, 20.68 s,
+at `cursiv-check-_a7kf7b6/pytest.log`.
+
+**Final exact-source full suite: 1,008 passed, 1 skipped, 150.00 s.** The skip
+requires macOS Keychain. Final log:
+[pytest.log](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-check-2a48gvi8/pytest.log).
+All follow-up Python sources match this test snapshot byte-for-byte. Syntax and
+`git diff --check` pass. Comparison against the pre-follow-up snapshot finds exactly
+the intended 24 files (repository LF versus Windows CRLF normalized for clean
+tracked files). Earlier notebook/rendering/Saved Notes sources and original handoff
+sections are preserved. The real `.cursiv/strands.jsonl` remains 78 records with
+SHA-256 `ecc4173118c249396e58fd8aa60e04c213dd6bd856b7d8c7b7b46f12648e852b`.
+
+Tests use isolated source snapshots, disposable user data, actual byte reads,
+fresh Python processes, portable-drive relocation and stubbed provider protocols.
+No live qwen/cloud inference or rebuilt executable restart is claimed. Earlier
+failed/interrupted runs and their fixes are documented in the report. The existing
+Qt timer regression now waits for actual delivery for up to 250 ms while preserving
+its production 40 ms interval and single-batch/GUI-thread assertions. A new UI test
+also disables unrelated live title generation before closing its test panel.
+
+### Remaining limits
+
+Locks are process-local; simultaneous instances, hostile filesystem races and
+hardware power-loss/removal are not certified. A failed verification after an
+actual write may leave uncertain data or an orphan letter, which is preserved for
+inspection rather than deleted. Third-party plugin output is explicitly unverified.
+Unusual language may require clarification; the prose guard is not exhaustive proof.
+Real user memory/notebook data was not migrated or rewritten. Installer, updater,
+networking policy, website, README and benchmark sources were not modified.
+The earlier self-model/metacognition proposal remains outside these concrete
+action-path repairs; this handoff does not claim it was implemented.
+
+## 2026-10-21: Native Field Notebook repair
+
+Branch: `codex/native-field-notebook`. All pending Saved Notes/chat-rendering
+work below was preserved. No commit, push, release, installer build or deployment.
+
+Audit found that the graphical notebook already uses `core/fieldlog.py`'s real
+`add`/`correct`/`current`/`verify` APIs, while natural notebook requests could reach
+generic filesystem planning or ordinary local-model prose. Explicit command
+replies also disappeared from history, losing context for "add it" follow-ups.
+
+Changed for this task:
+
+- New `core/notebook_tools.py`: application-owned allowlist for native create,
+  retrieve and chain/photo verification; deterministic routing; user-only context;
+  actual record-ID/read-back/chain receipts; accurate unconfirmed-write errors.
+- `core/fieldlog.py`: optional hashed request metadata, duplicate checking under
+  the existing append lock. Original records, schema and chain logic remain.
+- `ui/chat_app.py`: route native notebook requests before models, files, memory
+  or verification; optional stable scope for non-GUI callers.
+- `launcher/chat_commands.py`: native NotebookResult and early notebook route.
+- `launcher/chat_panel.py`: provider prefixes cannot bypass native routing;
+  per-conversation request scope; persist user context and optional receipt data.
+- New `tests/test_notebook_integration.py` and
+  `docs/FIELD-NOTEBOOK-INTEGRATION.md` with audit, behavior, related-tool findings,
+  tests and limits. Existing regression files were not modified for this task.
+
+Corrections to existing records still use the graphical notebook's append-only
+correction workflow. No generic file, installer, updater, networking, memory-store
+or unrelated application behavior was repaired as part of this notebook patch.
+
+Baseline full suite was 864 passed / 1 skipped / 1 preexisting chat timer failure.
+A focused intermediate run passed 116 tests. Final exact-source full suite:
+**920 passed, 1 skipped, 140.34 s**; the skip requires macOS Keychain. The timer
+failure did not recur across three post-change full suites (913, 914, then 920
+passed). Final log: `cursiv-check-dhckjpb1/pytest.log` in this task's visualization
+workspace; see the notebook report for the full link and earlier test failures.
+Model paths are stubbed to prove the native route bypasses them; no live
+qwen/cloud model test or installed-executable restart is claimed. Fresh Python
+processes independently check actual disposable notebook bytes, restart
+persistence and portable storage. Changed Python files match the final test
+snapshot exactly; unrelated pending files and this handoff's earlier sections
+were preserved. Syntax/diff whitespace checks passed.
+
+## 2026-10-21: Chat rendering performance (subsequent uncommitted work)
+
+The latest request narrowed this work to the response formatting delay. The
+earlier approved self-model/metacognition implementation is **not implemented
+in this performance patch**. It remains separate work. Existing Saved Notes
+edits described below were preserved.
+
+Branch: `codex/chat-rendering-performance`, based on the owner's U80 commit
+`4d24ffef078d7f72c6e5357b48f6facdd4415769`. No commit, merge, push, release,
+version bump, installer build, or deployment was performed.
+
+### Read-only inspection and profiling findings
+
+- The old renderer already selects only the active response with QTextCursor.
+  It does not rebuild every previous message's Markdown after a turn.
+- Per-token document edits and synchronous whole-conversation export/save were
+  measured. The 1,000-message baseline's median final-token-to-ready time was
+  493.2 ms; 464.9 ms was spent in the synchronous save path.
+- No formatting-only secondary LLM call was found. Existing answer verification
+  can execute four sequential calls (ledger/check/revision/recheck). A regression
+  records that path without making a network/model request. The owner confirmed
+  scrolling/controls remain responsive during the reported long wait, supporting
+  background checking as its likely cause. No real model checking time was measured.
+
+### Files and execution paths changed for this task
+
+- `launcher/chat_rendering.py` (new): pure streaming boundary buffer and a GUI-thread
+  HTML export cache. Cache prefixes cover unchanged messages; new blocks alone are
+  exported. Older-content edits/theme switches invalidate the prefix. Clipboard
+  fragment markers are stripped to preserve history when reopening exports.
+- `launcher/chat_panel.py`: 40 ms batches, incremental completed blocks, one targeted
+  final parse, a final-message revision cache, immediate draft formatting when checks
+  start, preserved scroll/selection/following, and asynchronous autosave handoff.
+  Done/error/stop/image/write-approval paths flush queued fragments. Save failure
+  reporting and the existing leave confirmation retain the chance to retry.
+- `cursiv_v215/ui/chat_app.py`: optional `on_stage` callback announces the end of
+  initial generation. No changes to verifier decisions, model prompts or routing.
+- `launcher/conversations.py`: one ordered worker accepts plain Python snapshots;
+  streamed JSON and existing temporary-file replacement preserve the same storage
+  schema. Explicit save/open/rename/delete waits for queued saves. A storage lock
+  protects delayed title updates and manual changes from overwriting newer snapshots.
+  Person/directory context is captured at submission. Normal exit drains queued saves.
+- `tests/test_chat_rendering.py` (new): 30 deterministic, isolated regression cases.
+- `tests/test_ui_redesign.py`: the autosave test double accepts the new background
+  keyword; its original assertions remain.
+- `scripts/benchmark_chat_rendering.py` (new): isolated, offline replay at 10/100/1,000
+  messages, Markdown timings, document rebuild/edit counts, GUI heartbeat, native
+  memory sampling, and a controlled post-generation checking pause.
+- `docs/CHAT-RENDERING-PERFORMANCE.md` (new): complete measurements, method,
+  limitations, source observations, reproduction commands and regression coverage.
+- `bench/results/chat-rendering-20261021-{before,after}.json` and
+  `bench/results/chat-check-delay-20261021-{before,after}.json` (new): raw synthetic
+  measurements. These are separate from the existing model/reliability benchmarks.
+- This handoff section.
+
+All Qt document and widget operations remain on the GUI thread. An early worker
+fragment-export candidate crashed an isolated test and was removed. The final
+save worker receives immutable HTML/text and copied message data; it performs
+no Qt operations. Markdown parsing measured only milliseconds, so adding a new
+background parser and extra Markdown/HTML conversions was not justified.
+
+### Results and remaining limits
+
+Median end-of-source-token → ready timings (three offline replays, 898-character
+mixed Markdown response, real isolated autosave):
+
+| History messages | Before | After |
+| ---: | ---: | ---: |
+| 10 | 59.0 ms | 18.7 ms |
+| 100 | 103.9 ms | 30.4 ms |
+| 1,000 | 493.2 ms | 71.5 ms |
+
+Visible draft rendering finished in 14–18 ms median after the final source token
+in the optimized standard replay. Full-document rebuilds during streaming were
+zero before and after. Document edits fell from 67 to 12. The 1,000-message
+maximum GUI heartbeat gap fell from 487.9 to 65.4 ms (median of run maxima).
+Peak working set at that size rose from 166.8 to 173.2 MiB because of the HTML
+cache; working-set growth during the turn fell from 32.54 to 25.51 MiB.
+
+With a simulated 1,000 ms checking pause, formatting latency fell from 1,015.5 to
+14.8 ms. Input readiness still waited for checking (1,013.7 ms after). This fixes
+formatting being held behind verification; it does not accelerate the verifier
+itself or guarantee a short complete turn on every model/device. Later verified
+corrections still update the active message. Source generation, real model checks,
+the main-window sidebar, startup, loading history and explicit theme switches
+are outside the panel replay. Normal rendering and readiness meet the 250 ms
+target for this measured corpus. Disk completion remains separately measured.
+
+### Validation
+
+- Baseline before performance edits: **835 passed, 1 skipped**, in the isolated
+  `cursiv-check-zm6ue7e4` snapshot. The skip is macOS Keychain on Windows.
+- Focused UI/verification/replacement/Saved Notes checks: **144 passed**,
+  `cursiv-check-yudki3b1/pytest.log`.
+- Final full suite: **865 passed, 1 skipped in 132.88 s**,
+  `cursiv-check-xe9fd2rx/pytest.log`.
+- Regression coverage includes tables, code fences, links, cached final replies,
+  unchanged 10/100/1,000-message histories, selection/copy, scroll following,
+  replacement drafts, errors/stop, image order, theme changes, save round trips,
+  background saves/failures/retry/order, and delayed title/manual-rename races.
+- Initial test failures exposed Qt worker export and clipboard marker issues;
+  both candidates were corrected before the final passing full run. A test also
+  needed to reset the verifier's existing session state to be independent of
+  previous tests; verification behavior itself was preserved.
+- `git diff --check` passed. Only the performance files listed above and the
+  already pending Saved Notes files appear in the working tree.
+- Existing `chat_commands.py`, `nav_windows.py`, `saved_notes.py`,
+  `saved_notes_dialog.py` and `test_saved_notes_viewer.py` match the first
+  performance-task snapshot byte for byte. The two existing Saved Notes panel
+  action methods are AST-identical, and all prior handoff text was retained.
+- Source saved-note archive hash remains
+  `ecc4173118c249396e58fd8aa60e04c213dd6bd856b7d8c7b7b46f12648e852b`.
+  No real memories, conversations, field logs or note records were migrated or
+  rewritten. Tests and benchmarks used synthetic data in isolated homes/copies.
+
+The installed U80 application has not been replaced. Release/installer work
+requires the owner's separate instruction. Website, README, networking, updater,
+installer, memory algorithms and unrelated settings were not changed here.
+
+## 2026-10-21: Saved Notes viewer (new work after the U80 tag)
+
+The owner requested a saved-notes library consistent with What I Remember.
+An architecture audit was reported before edits. During that audit the owner
+committed/tagged the preceding work as `4d24ffe` / `v3.14-U80` on `main`.
+**This viewer is subsequent uncommitted work and is not part of that tag.**
+No commit, merge, push, tag replacement, version bump or installer build was
+performed for this viewer. Prior sections below describe their historical state;
+the earlier memory/portable/curiosity implementation is now in the owner's U80 commit.
+
+### Audit findings
+
+- What I Remember uses `memory/semantic.py` personal facts; Saved Notes uses the
+  separate `core/strand_store.py` archive at its existing `APP_DATA/strands.jsonl`.
+- Note categories already exist as `territory_tag`. Source, timestamp, score,
+  provenance, IDs and extra metadata are already in each original record.
+- `query` and `synthesis` display columns are shortened when notes are written,
+  but the encoded `strand` retains the original complete question/answer. The new
+  presentation decodes that existing payload; it does not rewrite shortened fields.
+- `notes`/`strands` previously formatted recent records directly into chat. The
+  Memory & Knowledge navigation button sent that same dump command.
+- There is no supported saved-note deletion API. Unlike personal fact deletion,
+  deleting these records would require new persistence behavior. That change is
+  explicitly outside this UI task, so Delete selected is disabled with an explanation.
+- Audit of the configured **source-checkout** archive found 78 notes, not 17,
+  in eight existing categories. All 78 encoded payloads decoded successfully.
+  The reported 17-note installed copy can use a different APP_DATA location; it
+  was not located, copied, migrated or replaced. Tests separately use the requested
+  17-note fixture: General 3, Worldmodel 13, Architecture 1.
+
+### Files changed and execution paths
+
+- **Added `launcher/saved_notes.py`:** pure presentation helpers read the existing
+  configured archive without calling category-definition initialization, decode
+  full content with the existing codec, filter/sort the viewer snapshot, and export
+  explicitly selected original records. Export uses Qt's atomic QSaveFile with
+  read-back verification and refuses Cursiv internal data destinations.
+- **Added `launcher/saved_notes_dialog.py`:** existing Qt/theme pattern, count
+  heading, category sidebar/counts, search, newest/oldest/category sort, expandable
+  read-only full text and a second expandable metadata section. Multi-selection,
+  copy, JSON export, Refresh and Done are provided. Text is rendered as plain text;
+  preview tooltips escape markup. No note editor or storage deletion was added.
+- **`launcher/chat_commands.py`:** a `NotesResult` UI action recognizes browsing
+  requests before the legacy text-dump alias. Explicit `note show <8-character-id>`
+  retrieves that complete note directly. Existing saved-memory retrieval/scoring
+  APIs and ordinary conversational requests remain available.
+- **`launcher/chat_panel.py`:** a Qt signal carries category/query from the command
+  worker to the GUI thread. The GUI opens or focuses one reusable notes dialog.
+  Widgets are never created in the command worker. Only a short opening message
+  is added to chat; note records are not dumped there or inserted into chat history.
+- **`launcher/nav_windows.py`:** Memory & Knowledge's Saved notes card opens the
+  viewer directly, closing its modal navigation window first.
+- **Added `tests/test_saved_notes_viewer.py`:** isolated 17-note fixture and UI,
+  command routing, export, persistence, offline/relocation and theme checks.
+- **This `HANDOFF.md`:** audit, limitations, validation and release-state record.
+
+No changes to `memory_dialog.py`, `strand_store.py`, note encodings, persistence,
+classification, scoring, automatic learning, retrieval algorithms or field logs.
+Search filtering here is a viewer-only keyword filter, not a replacement for
+the existing similarity/search API. No framework, dependency or network call added.
+
+### Usage
+
+```text
+Show my saved notes.
+What notes do you have?
+Open my notes.
+Show your worldmodel notes.
+notes architecture
+notes search <words>
+note show <note-id>
+```
+
+Or Memory & Knowledge -> Saved notes -> Open. Clicking the disclosure arrow
+expands a concise preview into scrollable full content. Metadata stays collapsed
+until requested. Repeating a browsing command reuses/focuses the same window.
+Copy copies full selected content; JSON export retains the original IDs and every
+original record field. It is an inspectable JSON export, not an existing signed
+`.cursivpack` import package. Export does not modify notes or grant model filesystem access.
+
+### Validation
+
+All automated runs use disposable snapshots/empty homes. The external test runner
+was updated to overlay `git diff HEAD`, so staged owner edits are included too;
+that runner is outside the repository. No index/staging changes were made by Codex.
+
+- Existing focused regressions after routing: **70 passed**, 9.99 s,
+  `cursiv-check-097mdybr/pytest.log`.
+- First viewer test run: **60 passed, 1 failed**. Failure was a test double that
+  had not initialized the chat panel's deferred backend reference. The test now
+  supplies the same backend reference as the running application.
+- Focused viewer/help/memory suite after correction: **61 passed**, 7.49 s,
+  `cursiv-check-arce08n2/pytest.log`.
+- Light/dark screenshots were visually inspected from that focused run. Windows
+  Segoe UI was explicitly loaded in the offscreen test setup so preview text is
+  readable; the production viewer uses the application's existing theme/font setup.
+- Fixture assertions cover all 17 records/counts; content beyond 1,000 characters;
+  exact original metadata; keyword filters/sorting; copy/export; disabled unsupported
+  deletion; GUI signal delivery; focus/reuse; honest read failures; existing note
+  retrieval and What I Remember; fresh-process offline reads before/after moving
+  the portable data directory. The fixture asserts byte-identical archive contents
+  after every test and no generated category-definition file.
+- Full regression suite: **835 passed, 1 skipped**, 141.91 s,
+  `cursiv-check-zm6ue7e4/pytest.log`. The skip is Mac Keychain on Windows.
+- After making the export's internal-directory check case-insensitive for Windows:
+  **18 passed**, 4.95 s, `cursiv-check-dxrr8oza/pytest.log` (entire saved-notes suite).
+  No implementation edits followed this check.
+- `git diff --check` passed. Final scope is the three existing launcher routing/UI
+  files, two new launcher viewer/helper files, one test file and this handoff.
+  No version, installer, store, memory-dialog or algorithm edits are present.
+- The real configured source archive remained byte-identical before/after work:
+  SHA-256 `ecc4173118c249396e58fd8aa60e04c213dd6bd856b7d8c7b7b46f12648e852b`.
+  Its original 78 records and all classifications remain untouched.
+- HEAD and the owner's U80 tag still resolve to
+  `4d24ffef078d7f72c6e5357b48f6facdd4415769`. This viewer is unstaged/uncommitted;
+  no Git cleanup, history rewrite, tag overwrite or release action was performed.
+
+Test snapshots and previews are under
+`C:\Users\joshu\.codex\visualizations\2026\10\21\01a15c12-fb2b-7d00-9f67-101caecdd403`.
+
+### Review limits
+
+- Delete remains unavailable because the current archive has no deletion API;
+  no unsafe file rewrite or pretend confirmation flow was introduced.
+- Existing notes that lack a valid encoded full payload can only show the text
+  actually available in their stored record, with a visible decoding warning.
+- Counts describe the current loaded snapshot; Refresh picks up external saves.
+- Actual two-PC removable-drive use and the packaged viewer still need manual
+  acceptance. Relocation is verified with moved temporary folders and two fresh
+  interpreters; this is not a physical two-PC claim.
+- The viewer is not in the owner's U80 tag/installer. Review and a new release are
+  required before distributing this subsequent change. Do not move the U80 tag.
+
+---
+
 ## 2026-10-21: portable storage, historical recall, presence and curiosity (Claude review)
 
 **Status: uncommitted first implementation on `codex/autonomous-memory-v1`.**

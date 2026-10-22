@@ -289,6 +289,90 @@ class TextResult:
         self.image_path = image_path   # set for image-generation/paste results
 
 
+class NotebookResult(TextResult):
+    """An application-owned notebook receipt, never an LLM's save claim."""
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipt = result.receipt()
+
+
+class FileActionResult(TextResult):
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipts = [result.receipt()]
+
+
+def _image_folder(cfg: dict) -> Path:
+    """Image cache is user data; an absent workspace never means the binary/CWD."""
+    from cursiv_v215.core.file_access import workspace_root
+    base = workspace_root(cfg['workspace']) if cfg.get('file_access') and cfg.get('workspace') else Path.home()
+    folder = base / '.cursiv' / 'images'
+    for p in (folder, folder.parent):
+        if p.is_symlink() or (hasattr(p, 'is_junction') and p.is_junction()):
+            raise PermissionError('Linked image cache folders are not allowed')
+    folder.mkdir(parents=True, exist_ok=True)
+    return folder.resolve()
+
+
+class MemoryResult(TextResult):
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipt = result.receipt()
+
+
+def memory_command(text: str, history: list[dict], *, scope: str = '') -> MemoryResult | None:
+    from cursiv_v215.memory import intents, semantic
+    result = intents.command(text, history, person=semantic.current_person(), scope=scope)
+    return MemoryResult(result) if result is not None else None
+
+
+def notebook_command(text: str, history: list[dict], *, scope: str = '', cfg: dict | None = None) -> NotebookResult | None:
+    from cursiv_v215.core import notebook_tools
+    from cursiv_v215.memory.semantic import current_person
+    result = notebook_tools.command(text, history, observer=current_person().title(), scope=scope)
+    if result is None:
+        return None
+    from cursiv_v215.memory import intents
+    intents.clear_pending(current_person(), scope)
+    if result.status == 'saved':
+        # Notification failure must never turn a confirmed append into a retry.
+        try:
+            from cursiv_v215.core import curiosity_engine
+            from cursiv_v215.core.paths import save_reference
+            cfg = cfg or {}
+            project = save_reference(cfg['workspace']) if cfg.get('file_access') and cfg.get('workspace') else 'general'
+            curiosity_engine.notify(current_person(), project)
+        except Exception:
+            pass
+    return NotebookResult(result)
+
+
+class NotesResult(TextResult):
+    """UI request; the chat panel opens/focuses the viewer on its GUI thread."""
+    def __init__(self, category: str = '', query: str = ''):
+        super().__init__('Opening saved notes…')
+        self.category, self.query = category, query
+
+
+def _notes_view_request(text: str) -> NotesResult | None:
+    low = text.strip().lower().rstrip('.?')
+    if low in ('notes', 'strands', 'saved notes', 'show my saved notes', 'show me my saved notes',
+               'what notes do you have', 'open my notes', 'open saved notes', 'show saved notes', 'show your saved notes'):
+        return NotesResult()
+    search = re.fullmatch(r'(?:notes|strands) search\s+(.+)', text.strip(), re.I)
+    if search:
+        return NotesResult(query=search[1])
+    category = re.fullmatch(r'(?:show (?:your|my)|open (?:your|my))\s+([\w-]+)\s+notes[.?]?', low)
+    if category:
+        return NotesResult(category=category[1])
+    category = re.fullmatch(r'(?:notes|strands)\s+([\w-]+)', low)
+    if category and _STRAND_OK:
+        stored = next((raw for raw in _strand_terr_counts() if raw.casefold() == category[1]), None)
+        if stored is not None:
+            return NotesResult(category=stored)
+    return None
+
+
 class StreamResult:
     """An intro line shown immediately, then a generator streamed in."""
     def __init__(
@@ -318,12 +402,14 @@ def _gate():
 
 def _default_cfg() -> dict:
     """Same shape as chat_cli.py's cfg dict, minus the terminal-only fields."""
-    from cursiv_v215.core.paths import portable_root
-    portable = portable_root()
+    from cursiv_v215.core import workspace
+    from cursiv_v215.memory.semantic import current_person
+    selected, enabled, workspace_error = workspace.load(current_person())
     return {
-        "file_access":      bool(portable),
+        "file_access":      enabled,
         "confirm_mode":     "confirm",   # same safe default as the terminal CLI -- every write needs approval until "mode" toggles it
-        "workspace":        str(portable / 'Workspace' if portable else _CHAT_ROOT),
+        "workspace":        selected,
+        "workspace_error":  workspace_error,
         "obsidian_enabled": False,
         "obsidian_path":    "",
         "offline_mode":     _gate().is_offline(),
@@ -762,6 +848,27 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         return None
     cmd = text.lower()
 
+    # Native notebook intent takes precedence over generic files and memory.
+    _notebook = notebook_command(text, history, cfg=cfg)
+    if _notebook is not None:
+        return _notebook
+    _memory = memory_command(text, history)
+    if _memory is not None:
+        return _memory
+
+    _notes_request = _notes_view_request(text)
+    if _notes_request is not None:
+        return _notes_request if _STRAND_OK else TextResult("Saved notes aren't available.")
+    _note_id = re.fullmatch(r'(?:note|notes) (?:show )?([a-f0-9]{8})[.?]?', cmd)
+    if _note_id:
+        from saved_notes import read_notes, full_text
+        try:
+            records, warnings = read_notes()
+            record = next((r for r in records if r.get('id') == _note_id[1]), None)
+            return TextResult(f"Note {_note_id[1]}\n\n" + full_text(record) if record else 'No saved note matches that ID.')
+        except (OSError, ValueError) as exc:
+            return TextResult(f'Could not read saved note: {exc}')
+
     from cursiv_v215.core import file_access as _files
     if _files.is_request(text):
         return None                     # application-controlled file route in chat(), not the model
@@ -887,8 +994,20 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
 
     if cmd in ("files on", "files off"):
-        cfg["file_access"] = cmd == "files on"
-        return TextResult(f"File access → {'ON' if cfg['file_access'] else 'OFF'}")
+        from cursiv_v215.core import workspace
+        from cursiv_v215.memory.semantic import current_person
+        enabled = cmd == 'files on'
+        try:
+            if not cfg.get('workspace'):
+                if enabled:
+                    return TextResult('Choose workspace <folder> before enabling file access. No folder was implicitly authorized.')
+            else:
+                workspace.save(current_person(), cfg['workspace'], enabled)
+        except (OSError, ValueError, TypeError) as exc:
+            cfg['file_access'] = False
+            return TextResult(f'File access not enabled: {exc}')
+        cfg['file_access'] = enabled
+        return TextResult(f"File access → {'ON' if enabled else 'OFF'}" + (f"\nWorkspace: {cfg['workspace']}" if enabled else ''))
 
     if cmd == "mode":
         cfg["confirm_mode"] = "confirm" if cfg.get("confirm_mode") == "auto" else "auto"
@@ -899,10 +1018,13 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not new_ws:
             return TextResult(f"Workspace: {cfg.get('workspace', '')}")
         from cursiv_v215.core.tools import _resolve
-        ws_path = _resolve(new_ws).resolve()
-        if not ws_path.exists() or not ws_path.is_dir():
-            return TextResult(f"Not a valid directory: {new_ws}")
-        cfg["workspace"] = str(ws_path)
+        from cursiv_v215.core import workspace
+        from cursiv_v215.memory.semantic import current_person
+        try:
+            ws_path = workspace.save(current_person(), str(_resolve(new_ws)), cfg.get('file_access', False))
+        except (OSError, ValueError, TypeError) as exc:
+            return TextResult(f'Workspace selection not confirmed: {exc}')
+        cfg["workspace"] = ws_path
         return TextResult(f"Workspace → {ws_path}")
 
     # ── Free AI keys (Gemini / Groq) and Cursiv Cloud ─────────────────────
@@ -1224,6 +1346,8 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
             return TextResult("Nothing to anchor yet — send a message first.")
         sid = _strand_save(last_user, last_ai, tags=["anchor"], score=0.85,
                             territory_tag=territory, source="anchor", model="gui")
+        if not sid:
+            return TextResult('Note save not confirmed. No saved-note ID was returned; check Saved Notes before retrying.')
         return TextResult(f"Saved as note {sid}" + (f"  [{territory}]" if territory != "general" else ""))
 
     if cmd == "strands" or cmd.startswith("strands "):
@@ -1407,7 +1531,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         gen = _chat(
             f"search: {query}", history,
             cfg.get("api_key", ""), None, cfg.get("file_access", False),
-            cfg.get("workspace", str(_CHAT_ROOT)), cfg.get("openai_key", ""),
+            cfg.get("workspace", ''), cfg.get("openai_key", ""),
             False, cfg.get("anthropic_key", ""),
         )
         return StreamResult(f"⊕ Web search — {query}\n\n{results}\n", gen)
@@ -1479,7 +1603,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not cfg.get("api_key"):
             return TextResult("No xAI key set. Type: key xai-xxxxx")
         gen = _chat(last, history[:-1] if history else [], cfg["api_key"], None, False,
-                    cfg.get("workspace", str(_CHAT_ROOT)), cfg.get("openai_key", ""), False, "",
+                    cfg.get("workspace", ''), cfg.get("openai_key", ""), False, "",
                     force_provider="grok")
         return StreamResult("⟳ Grok re-run", gen)
 
@@ -1490,7 +1614,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not cfg.get("anthropic_key"):
             return TextResult("No Anthropic key set. Type: anthropic sk-ant-xxxxx")
         gen = _chat(last, history[:-1] if history else [], "", None, False,
-                    cfg.get("workspace", str(_CHAT_ROOT)), "", False, cfg["anthropic_key"],
+                    cfg.get("workspace", ''), "", False, cfg["anthropic_key"],
                     force_provider="claude")
         return StreamResult("⟳ Claude re-run", gen)
 
@@ -1502,7 +1626,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not cfg.get("openai_key"):
             return TextResult("No OpenAI key set. Type: openai sk-xxxxx")
         gen = _chat(last, history[:-1] if history else [], "", None, False,
-                    cfg.get("workspace", str(_CHAT_ROOT)), cfg["openai_key"], False, "",
+                    cfg.get("workspace", ''), cfg["openai_key"], False, "",
                     force_provider="openai")
         return StreamResult("⟳ ChatGPT re-run", gen)
 
@@ -1725,9 +1849,10 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         cf_tok = cfg.get("cf_api_token", "") or _saved_key("cf_api_token")
         if not oai_key and not (cf_id and cf_tok):
             return TextResult(IMAGE_GEN_NEEDS_KEY)
-        img_dir = Path(cfg.get("workspace", str(_CHAT_ROOT))) / ".cursiv" / "images"
-        img_dir.mkdir(parents=True, exist_ok=True)
-        stamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        from cursiv_v215.core import atomic
+        import uuid
+        img_dir = _image_folder(cfg)
+        stamp = datetime.now().strftime('%Y%m%d_%H%M%S') + '_' + uuid.uuid4().hex[:8]
         img_path = img_dir / f"image_{stamp}.png"
         revised, used_model, errors = prompt, "", []
         if oai_key:
@@ -1744,9 +1869,13 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
                         continue
                     item = resp.data[0]
                     if getattr(item, "b64_json", None):
-                        img_path.write_bytes(_img_b64.b64decode(item.b64_json))
+                        atomic.write_bytes(img_path, _img_b64.b64decode(item.b64_json))
                     else:
                         _img_req.urlretrieve(item.url, str(img_path))
+                        received = img_path.read_bytes()
+                        if not received:
+                            raise OSError('Image download was empty')
+                        atomic.write_bytes(img_path, received)
                     revised = getattr(item, "revised_prompt", None) or prompt
                     used_model = model
                     break
@@ -1755,7 +1884,7 @@ def handle_command(raw: str, cfg: dict, history: list[dict]) -> Optional[TextRes
         if not used_model and cf_id and cf_tok:
             try:
                 img_path = img_dir / f"image_{stamp}.jpg"
-                img_path.write_bytes(_cloudflare_image(prompt, cf_id, cf_tok))
+                atomic.write_bytes(img_path, _cloudflare_image(prompt, cf_id, cf_tok))
                 used_model = "FLUX.1-schnell (Cloudflare, free)"
             except Exception as e:
                 errors.append(str(e))
@@ -2175,10 +2304,10 @@ def image_to_training_entry(image_bytes: bytes, cfg: dict, ext: str = "png") -> 
     """Run vision analysis on an uploaded image and store the description
     as a JSON training example. Mirrors analyze_pasted_image's vision call
     but writes to the training store instead of strand memory."""
-    img_dir = Path(cfg.get("workspace", str(_CHAT_ROOT))) / ".cursiv" / "images"
-    img_dir.mkdir(parents=True, exist_ok=True)
+    from cursiv_v215.core import atomic
+    img_dir = _image_folder(cfg)
     img_path = img_dir / f"train_{datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.{ext}"
-    img_path.write_bytes(image_bytes)
+    atomic.write_bytes(img_path, image_bytes)
 
     import base64 as _b64t
     img_b64 = _b64t.b64encode(image_bytes).decode()
@@ -2255,10 +2384,11 @@ def describe_photo(path: str, question: str, cfg: dict) -> TextResult:
 def analyze_pasted_image(png_bytes: bytes, cfg: dict, width: int, height: int) -> TextResult:
     import base64 as _b64img
 
-    img_dir = Path(cfg.get("workspace", str(_CHAT_ROOT))) / ".cursiv" / "images"
-    img_dir.mkdir(parents=True, exist_ok=True)
-    img_path = img_dir / f"paste_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
-    img_path.write_bytes(png_bytes)
+    from cursiv_v215.core import atomic
+    import uuid
+    img_dir = _image_folder(cfg)
+    img_path = img_dir / f"paste_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.png"
+    atomic.write_bytes(img_path, png_bytes)
 
     img_b64 = _b64img.b64encode(png_bytes).decode()
     vision_result, vision_provider = _vision_describe(
@@ -2314,7 +2444,9 @@ def approve_write(path: str, content: str, workspace: str, *, operation: str = '
     args = {'path': path, 'content': content}
     if expected_sha256 is not None:
         args['expected_sha256'] = expected_sha256
-    result = _execute_tool(operation, args, Path(workspace), confirmed=True)
+    from cursiv_v215.ui.chat_app import _file_tool_result
+    receipt = _file_tool_result(operation, args, workspace, confirmed=True)
+    result = FileActionResult(receipt)
     if remember:
-        result += '\nConversational memory: ' + file_access.save_memory(content)
-    return TextResult(result)
+        result.text += '\nConversational memory: ' + file_access.save_memory(content)
+    return result

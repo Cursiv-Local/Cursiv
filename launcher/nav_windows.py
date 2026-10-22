@@ -123,7 +123,7 @@ class KnowledgeDialog(_Window):
             self.body.addWidget(card)
         except Exception:
             pass
-        self.entry("Saved notes", "Answers you kept with \"save this\". Shows them in the chat.", "Show", self._send("notes"))
+        self.entry("Saved notes", "Browse, search and expand the answers you kept with \"save this\".", "Open", self._open_notes)
 
         self.section("YOUR DOCUMENTS")
         self.body.addWidget(self._explain(
@@ -136,6 +136,12 @@ class KnowledgeDialog(_Window):
             "Short entries on survival, first aid and science that Cursiv shows word for word when a question matches. "
             "Sourced entries name their source; none has been reviewed by a medical professional yet."))
         self._build_reference()
+
+    def _open_notes(self):
+        panel = self._panel()
+        self.accept()
+        if panel is not None:
+            panel._open_saved_notes()
 
     def _build_documents(self):
         from cursiv_v215.core import documents

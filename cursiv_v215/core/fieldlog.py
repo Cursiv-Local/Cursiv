@@ -186,10 +186,12 @@ def _coord(value, low: float, high: float):
 def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
         location_accuracy_m=None, location_fix_utc: str = "",
         measurements=None, note: str = "", photos=None, corrects: str = "", reason: str = "",
-        app_version: str = "", sample_id: str = "") -> dict:
+        app_version: str = "", sample_id: str = "", request_id: str = "") -> dict:
     """Append one entry and return it. Coordinates are decimal degrees (WGS84)."""
     if corrects and not reason.strip():
         raise ValueError("a correction needs a reason")
+    if request_id and not re.fullmatch(r"[0-9a-f]{64}", request_id):
+        raise ValueError("invalid notebook request identifier")
     lat_v, lon_v = _coord(lat, -90, 90), _coord(lon, -180, 180)
     if (lat_v is None) != (lon_v is None):
         raise ValueError("give both latitude and longitude, or neither")
@@ -241,6 +243,17 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         }
         if infos:
             entry["photo_info"] = infos
+        if request_id:
+            # Optional metadata, included in the existing fingerprint. Old records
+            # keep their schema and bytes; retries never edit the append-only log.
+            entry["chat_request_id"] = request_id
+            previous = next((e for e in existing if e.get("chat_request_id") == request_id), None)
+            if previous is not None:
+                fields = ("observer", "site", "lat", "lon", "location_source", "location_accuracy_m",
+                          "location_fix_utc", "measurements", "note", "photos", "sample_id", "corrects", "reason")
+                if any(previous.get(k) != entry.get(k) for k in fields):
+                    raise ValueError("notebook request was already used with different observation details")
+                return previous
         entry["hash"] = _fingerprint(entry)
         log_dir().mkdir(parents=True, exist_ok=True)
         # One line per entry, flushed to disk before returning, so a power cut can

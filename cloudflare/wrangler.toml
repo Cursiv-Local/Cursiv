@@ -23,12 +23,15 @@ DEMO_DAILY_LIMIT = "500"   # demo replies per day across the whole site
 CLOUD_PER_IP_DAILY = "150"   # Cursiv Cloud (desktop backup AI) messages per visitor per day
 CLOUD_DAILY_LIMIT = "1500"   # Cursiv Cloud messages per day across everyone
 ALLOWED_ORIGINS = "http://localhost:8787,http://127.0.0.1:8787,http://localhost:5500,http://127.0.0.1:5500,http://localhost:1969,http://127.0.0.1:1969,http://cursiv.local:1969"
+DOWNLOAD_CLICKS_ENABLED = "true"   # anonymous button totals only; set false to stop recording
 
 # Secrets (set once with `npx wrangler secret put NAME`, never written in this file):
 #   CURSIV_BOARD_SECRET  signs logins and seals mailbox letters (required)
 #   GEMINI_API_KEY       demo chat + Cursiv Cloud (optional but recommended; without it
 #                        Workers AI answers, whose free daily allowance is much smaller)
 #   CURSIV_FLEET_TOKEN   owner token for the desktop Fleet Dashboard (optional)
+#   DOWNLOAD_STATS_ADMIN_PASSWORD  separate random ASCII password, at least 32 characters;
+#                                  admin statistics fail closed until configured
 
 [observability]
 enabled = true

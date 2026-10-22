@@ -451,7 +451,8 @@ def _content_words(text: str) -> set[str]:
 
 
 def add_fact(text: str, person: str | None = None, source: str = "manual",
-             origin: str | None = None, *, metadata: dict | None = None, correction: bool = False) -> dict | None:
+             origin: str | None = None, *, metadata: dict | None = None, correction: bool = False,
+             exact: bool = False) -> dict | None:
     """Save a fact unless it's (nearly) already known. Returns it, or None if duplicate.
 
     A duplicate is not rewritten, so saying the same thing again cannot upgrade
@@ -475,10 +476,10 @@ def add_fact(text: str, person: str | None = None, source: str = "manual",
         if any(f["text"].lower() == text.lower() for f in same):
             return None
         comparable = [f for f in same if not conflict_reason(text, f['text'])]
-        vecs = embed([text] + [f["text"] for f in comparable]) if comparable else None
+        vecs = embed([text] + [f["text"] for f in comparable]) if comparable and not exact else None
         if vecs and any(_cos(vecs[0], v) > 0.92 for v in vecs[1:]):
             return None
-        if not vecs and any(_overlap(text, f["text"]) > 0.8 for f in comparable):
+        if not exact and not vecs and any(_overlap(text, f["text"]) > 0.8 for f in comparable):
             return None
         fact = {"id": uuid.uuid4().hex[:10], "person": person, "text": text,
                 "created": time.strftime("%Y-%m-%d %H:%M"),
@@ -502,6 +503,56 @@ def add_fact(text: str, person: str | None = None, source: str = "manual",
 
 
 MAX_FACT = 400
+
+
+def update_fact(fact_id: str, text: str, *, person: str | None = None) -> dict:
+    """One atomic manual correction, keeping the old record and its provenance."""
+    global _generation
+    text = re.sub(r'\s+', ' ', text.strip())
+    if not 4 <= len(text) <= MAX_FACT:
+        raise ValueError(f'a saved memory must contain 4..{MAX_FACT} characters')
+    person = (person or _person).lower()
+    with _lock:
+        facts = list_facts(include_superseded=True)
+        old = next((f for f in facts if f.get('id') == fact_id and f.get('person') in (person, SHARED)
+                    and f.get('status', 'active') == 'active'), None)
+        if old is None:
+            raise ValueError('the selected memory is no longer active or available to this person')
+        if old['text'].casefold() == text.casefold():
+            return old
+        now = time.strftime('%Y-%m-%d %H:%M')
+        replacement = next((f for f in facts if f.get('person') == old.get('person')
+                            and f.get('status', 'active') == 'active' and f['text'].casefold() == text.casefold()), None)
+        if replacement is None:
+            replacement = dict(id=uuid.uuid4().hex[:10], person=old.get('person'), text=text,
+                               created=now, date=time.strftime('%Y-%m-%d'), source='manual', origin='user_said',
+                               status='active', evidence='direct_statement', updated=now, corrects=old['id'])
+            facts.append(replacement)
+        old.update(status='superseded', superseded_by=replacement['id'], updated=now)
+        _write_facts(facts)
+        _generation += 1                 # an in-flight learner cannot restore the old statement
+        return replacement
+
+
+def forget_selected(ids: list[str], *, person: str | None = None) -> list[dict]:
+    """Forget selected records and their correction history in one verified write."""
+    global _generation
+    person = (person or _person).lower()
+    with _lock:
+        facts = list_facts(include_superseded=True)
+        permitted = [f for f in facts if f.get('person') in (person, SHARED)]
+        selected = set(ids)
+        if not selected or not selected <= {f.get('id') for f in permitted}:
+            raise ValueError('a selected memory is unavailable to this person')
+        for _ in range(len(permitted) + 1):
+            linked = {f['id'] for f in permitted if f.get('corrects') in selected or f.get('superseded_by') in selected}
+            if linked <= selected:
+                break
+            selected |= linked
+        gone = [f for f in permitted if f.get('id') in selected]
+        _write_facts([f for f in facts if f.get('id') not in selected])
+        _generation += 1
+        return gone
 
 
 def find(query: str, person: str | None = None) -> list[dict]:
@@ -566,12 +617,12 @@ def _save_error(exc: OSError) -> str:
     return f"Not saved: Cursiv couldn't confirm its memory write ({type(exc).__name__}: {exc}). {detail}"
 
 
-def _recall_reply(query: str) -> str:
+def _recall_reply(query: str, person: str | None = None) -> str:
     status = memory_status()
     if status["error"]:
         return (f"Couldn't read Cursiv's saved memory ({status['error']}). This is a storage problem, not "
                 "'not found': the memory may still be there.")
-    hits = find(query)
+    hits = find(query, person)
     damaged = (f"\n(Note: {status['unreadable']} saved line(s) in the memory file are damaged and can't be read; "
                f"they're kept in {UNREADABLE_FILE_NAME}, not used.)" if status["unreadable"] else "")
     if not hits:
@@ -824,7 +875,15 @@ def learnable(text: str, name: str = "") -> bool:
 
 # ── Commands ────────────────────────────────────────────────────────────────
 
-def memory_command(text: str) -> str | None:
+def memory_command(text: str, history: list[dict] | None = None, *, scope: str = '') -> str | None:
+    from . import intents
+    result = intents.command(text, history or [], person=_person, scope=scope)
+    if result is not None:
+        return result.render()
+    return _legacy_memory_command(text) if text.strip().lower() == 'memory diagnostics' else None
+
+
+def _legacy_memory_command(text: str) -> str | None:
     """remember <fact> · forget <words> · what do you remember · memory learn on|off.
     Returns the reply, or None if the text isn't a memory command."""
     t = (text or "").strip()

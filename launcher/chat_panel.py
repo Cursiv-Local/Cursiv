@@ -33,6 +33,7 @@ from PyQt6.QtWidgets import (
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
 import theme
 import re as _re
+from chat_rendering import MarkdownStream, TranscriptCache
 
 
 _HERE = Path(__file__).parent
@@ -118,6 +119,9 @@ class _ChatSignals(QObject):
     backend_ready = pyqtSignal(bool, str)  # chat_commands finished loading: ok, error message
     models = pyqtSignal(object)         # installed Ollama chat models (list), or None if Ollama is down
     crosscheck = pyqtSignal(object)     # core.crosscheck.Review, from the background thread
+    notes_view = pyqtSignal(str, str)   # category/query; widgets are opened on the GUI thread
+    stage = pyqtSignal(str)            # distinguish answer checks from streaming/rendering
+    saved = pyqtSignal(str, str, int)  # conversation id, error, snapshot revision
 
 
 class _ChatInput(QPlainTextEdit):
@@ -169,6 +173,9 @@ class ChatPanel(QWidget):
         self._backend_ready = False
         self._reply_text = ""
         self._pending_history_append: Optional[list[tuple[str, str]]] = None
+        self._pending_notebook_receipt: dict | None = None
+        self._pending_file_receipts: list[dict] = []
+        self._pending_memory_receipt: dict | None = None
         self._cancel_event: Optional[threading.Event] = None
         self._signals = _ChatSignals()
         self._signals.chunk.connect(self._on_chunk)
@@ -180,11 +187,23 @@ class ChatPanel(QWidget):
         self._signals.voice_result.connect(self._on_voice_result)
         self._signals.pending_write.connect(self._on_pending_write)
         self._signals.write_complete.connect(self._finish_pending_write)
+        self._signals.notes_view.connect(self._open_saved_notes)
+        self._signals.stage.connect(self._status_stage)
+        self._signals.saved.connect(self._on_saved)
         self._signals.backend_ready.connect(self._on_backend_ready)
         self._pending_write_context: dict = {}
         self._cfg: dict = {}
 
         self._build_ui()
+        self._pending_chunks: list[str] = []
+        self._markdown_stream = MarkdownStream()
+        self._render_cache = None
+        self._transcript_cache = TranscriptCache(self._transcript.document())
+        self._save_revision = 0
+        self._save_error = False
+        self._chunk_timer = QTimer(self)
+        self._chunk_timer.setInterval(40)
+        self._chunk_timer.timeout.connect(self._flush_reply_chunks)
         self._send_btn.setEnabled(False)
         self._voice_btn.setEnabled(False)
         self._append_system("Getting Cursiv ready…")
@@ -251,10 +270,27 @@ class ChatPanel(QWidget):
     def _after_turn(self) -> None:
         self._dirty = True
         if self._conv_id or autosave_enabled():    # new chats save themselves; saved ones stay current
-            self.save_conversation()
+            self.save_conversation(background=True)
+
+    def _on_saved(self, conv_id: str, error: str, revision: int) -> None:
+        if conv_id == self._conv_id and revision == self._save_revision:
+            self._dirty = bool(error)
+            self._save_error = bool(error)
+            if error:
+                self._status.setText("Conversation could not be saved. Use Save to retry.")
+                self._status.setToolTip(error)
+        self.conversation_changed.emit()
 
     def has_unsaved(self) -> bool:
-        return self._dirty and bool(self._history) and not self._conv_id
+        if self._conv_id:
+            # Called by the existing leave/quit confirmation, not by streaming.
+            # A completed-but-failed autosave must still offer Save/Don't Save.
+            import conversations
+            try:
+                conversations.wait_for_save(self._conv_id)
+            except Exception:
+                self._dirty = self._save_error = True
+        return self._dirty and bool(self._history) and (not self._conv_id or self._save_error)
 
     def is_busy(self) -> bool:
         return self._streaming
@@ -262,21 +298,41 @@ class ChatPanel(QWidget):
     def current_conversation_id(self) -> Optional[str]:
         return self._conv_id
 
-    def save_conversation(self, title: Optional[str] = None) -> Optional[str]:
+    def save_conversation(self, title: Optional[str] = None, *, background: bool = False) -> Optional[str]:
         if not self._history:
             return None
         import conversations
-        self._conv_id = conversations.save(self._conv_id, self._history, self._transcript.toHtml(), title,
+        if background:
+            # Only the new message blocks are exported here. JSON/disk work
+            # receives immutable text, never a widget or live QTextDocument.
+            self._save_revision += 1
+            revision, signals = self._save_revision, self._signals
+            self._conv_id = conversations.queue_save(
+                self._conv_id, self._history, self._transcript_cache.capture(),
+                on_titled=self.conversation_changed.emit,
+                on_done=lambda conv_id, error: signals.saved.emit(conv_id, error, revision))
+            return self._conv_id
+        self._save_revision += 1
+        html = self._transcript.toHtml()
+        self._conv_id = conversations.save(self._conv_id, self._history, html, title,
                                            on_titled=self.conversation_changed.emit)   # AI title -> sidebar
+        self._transcript_cache.reset(html)
         self._dirty = False
+        if self._save_error:
+            self._status.setText("")
+            self._status.setToolTip("")
+        self._save_error = False
         self.conversation_changed.emit()
         return self._conv_id
 
     def new_conversation(self) -> None:
+        self._reset_rendering()
         self._transcript.clear()
+        self._transcript_cache.reset()
         self._history = []
         self._conv_id = None
         self._dirty = False
+        self._save_error = False
         self._show_empty_state()
         self.conversation_changed.emit()
 
@@ -350,11 +406,14 @@ class ChatPanel(QWidget):
         data = conversations.load(conv_id)
         if not data:
             return False
+        self._reset_rendering()
         self._transcript.setHtml(theme.to_current(data.get("html", "")))
+        self._transcript_cache.reset(theme.to_current(data.get("html", "")))
         self._empty_shown = False
         self._history = list(data.get("messages", []))
         self._conv_id = conv_id
         self._dirty = False
+        self._save_error = False
         self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
         self.conversation_changed.emit()
         return True
@@ -685,14 +744,21 @@ class ChatPanel(QWidget):
     def _keep_line_breaks(md: str) -> str:
         """In Markdown a single newline joins lines; the model's single newlines
         (Known: / Inferred: lines, addresses, short steps) are meant as line breaks."""
-        out, in_code, under_item = [], False, False
+        out, fence, under_item = [], '', False
         lines = md.split("\n")
         item = _re.compile(r"\s*([-*+]|\d+[.)])\s")
         for i, line in enumerate(lines):
-            if line.lstrip().startswith("```"):
-                in_code = not in_code
+            marker = _re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+            if marker:
+                run, rest = marker.groups()
+                if not fence:
+                    fence = run
+                elif run[0] == fence[0] and len(run) >= len(fence) and not rest.strip():
+                    fence = ''
+                out.append(line)
+                continue
             nxt = lines[i + 1] if i + 1 < len(lines) else ""
-            if in_code or not line.strip():
+            if fence or not line.strip():
                 under_item = False if not line.strip() else under_item
                 out.append(line)
                 continue
@@ -722,6 +788,12 @@ class ChatPanel(QWidget):
         start = getattr(self, "_reply_start", None)
         if start is None or not text.strip():
             return
+        document = self._transcript.document()
+        key = (text, theme.CURRENT, document.revision())
+        if self._render_cache == key:
+            return                    # the live document is the cache for completed messages
+        at_bottom = self._at_bottom()
+        scroll = self._transcript.verticalScrollBar().value()
         top, body, bottom = [], [], []
         for line in text.splitlines():
             m = self._STATUS_LINE.match(line)
@@ -732,6 +804,7 @@ class ChatPanel(QWidget):
         body, details = self.split_details(body)
         md = self._keep_line_breaks("\n".join(body).strip())
         cursor = QTextCursor(self._transcript.document())
+        cursor.beginEditBlock()
         cursor.setPosition(start)
         cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         cursor.removeSelectedText()
@@ -750,6 +823,10 @@ class ChatPanel(QWidget):
             self._plain_block(cursor)
             cursor.insertHtml(theme.live(self._chip_html(inner)))
         self._plain_block(cursor)               # the next turn starts outside any list
+        cursor.endEditBlock()
+        self._render_cache = (text, theme.CURRENT, document.revision())
+        bar = self._transcript.verticalScrollBar()
+        bar.setValue(bar.maximum() if at_bottom else scroll)
 
     @staticmethod
     def _plain_block(cursor: QTextCursor) -> None:
@@ -817,7 +894,8 @@ class ChatPanel(QWidget):
         return out.replace("\n", "<br>")
 
     def _begin_ai_reply(self) -> None:
-        # Opens a paragraph the streamed chunks get appended into; closed in _on_done.
+        # Insert the reply heading and remember where its body begins. Qt closes
+        # each HTML fragment immediately; there is no open tag state to maintain.
         self._force_new_block()
         self._append_html_block(
             f'<p style="margin:4px 0 4px 0;">'
@@ -827,6 +905,8 @@ class ChatPanel(QWidget):
         cursor = QTextCursor(self._transcript.document())
         cursor.movePosition(QTextCursor.MoveOperation.End)
         self._reply_start = cursor.position()
+        self._stream_tail_start = self._reply_start
+        self._render_cache = None
 
     def _at_bottom(self) -> bool:
         sb = self._transcript.verticalScrollBar()
@@ -847,11 +927,45 @@ class ChatPanel(QWidget):
             self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
 
     def _end_ai_reply(self) -> None:
-        # Just closes the tags _begin_ai_reply opened, in the same block
-        # as the streamed content -- the *next* turn's own method
-        # (_append_system/_append_user/_begin_ai_reply) is what calls
-        # _force_new_block(), so nothing extra is needed here.
-        self._append_html_block("</span></p>")
+        # Qt parses insertHtml fragments immediately; there are no open HTML
+        # tags to close here. Moving the widget cursor would steal scroll/selection.
+        self._chunk_timer.stop()
+
+    def _reset_rendering(self) -> None:
+        self._chunk_timer.stop()
+        self._pending_chunks.clear()
+        self._markdown_stream = MarkdownStream()
+        self._render_cache = None
+
+    def _flush_reply_chunks(self, *, format_blocks: bool = True) -> None:
+        if not self._pending_chunks:
+            self._chunk_timer.stop()
+            return
+        chunk = ''.join(self._pending_chunks)
+        self._pending_chunks.clear()
+        if not self._reply_is_chat or not format_blocks:
+            self._append_reply_chunk(chunk)
+            return
+        stream = self._markdown_stream
+        stream.push(chunk)
+        ready = stream.take_ready()
+        if not ready.strip():
+            self._append_reply_chunk(chunk)
+            return
+        at_bottom = self._at_bottom()
+        bar = self._transcript.verticalScrollBar()
+        scroll = bar.value()
+        cursor = QTextCursor(self._transcript.document())
+        cursor.setPosition(self._stream_tail_start)
+        cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+        cursor.beginEditBlock()
+        cursor.removeSelectedText()
+        cursor.insertMarkdown(self._keep_line_breaks(ready.strip()))
+        self._plain_block(cursor)
+        self._stream_tail_start = cursor.position()
+        cursor.insertText(stream.tail)        # unfinished fences/tables stay literal and intact
+        cursor.endEditBlock()
+        bar.setValue(bar.maximum() if at_bottom else scroll)
 
     def _append_image(self, path: str) -> None:
         import base64
@@ -911,6 +1025,10 @@ class ChatPanel(QWidget):
         thread.start()
 
     def _begin_turn(self) -> None:
+        self._reset_rendering()
+        self._pending_notebook_receipt = None
+        self._pending_file_receipts = []
+        self._pending_memory_receipt = None
         self._streaming = True
         self._cancel_event = threading.Event()
         self._send_btn.setEnabled(False)
@@ -932,8 +1050,18 @@ class ChatPanel(QWidget):
     def _run_turn(self, text: str, history: list[dict]) -> None:
         try:
             force_provider, stripped = cc.hey_prefix(text)
-            result = None
-            if not force_provider:
+            # A provider prefix never transfers notebook execution to the model.
+            from cursiv_v215.core import notebook_tools
+            from cursiv_v215.memory import intents, semantic
+            native = notebook_tools.is_request(stripped, history) or intents.is_request(
+                stripped, history, person=semantic.current_person(), scope=self._conv_id or '')
+            if native and self._conv_id is None:
+                import uuid
+                self._conv_id = uuid.uuid4().hex[:12]
+            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg)
+            if result is None:
+                result = cc.memory_command(stripped, history, scope=self._conv_id or '')
+            if result is None and not force_provider:
                 result = cc.handle_command(text, self._cfg, history)
 
             if result is not None:
@@ -946,7 +1074,7 @@ class ChatPanel(QWidget):
             # `history` here is the snapshot from *before* this turn, so it
             # goes straight to chat() -- which appends the current user
             # turn itself -- with nothing to trim off the end.
-            workspace = self._cfg.get("workspace", str(_CHAT_ROOT))
+            workspace = self._cfg.get("workspace", '')
             gen = _cursiv_chat(
                 stripped, history,
                 api_key=self._cfg.get("api_key", ""), files=None,
@@ -957,9 +1085,11 @@ class ChatPanel(QWidget):
                 anthropic_key=self._cfg.get("anthropic_key", ""),
                 force_provider=force_provider,
                 replace_draft=True,
+                on_stage=self._signals.stage.emit,
+                on_action=self._capture_file_result,
             )
             self._cfg["last_user_msg"] = stripped
-            self._reply_is_chat = True          # rendered as Markdown when it finishes
+            self._reply_is_chat = True          # streamed Markdown; commands stay plain
             cancel_event = self._cancel_event
             full = ""
             for chunk in _iter_cancellable(gen, cancel_event):
@@ -1035,6 +1165,24 @@ class ChatPanel(QWidget):
 
     def _deliver_result(self, result, history: list[dict], text: str = "") -> None:
         """Runs on the background thread -- streams a command's TextResult/StreamResult."""
+        if isinstance(result, cc.NotebookResult):
+            self._pending_history_append = [("user", cc.hey_prefix(text)[1]), ("assistant", result.text)]
+            self._pending_notebook_receipt = result.receipt
+            self._signals.chunk.emit(result.text)
+            self._signals.done.emit()
+            return
+        if isinstance(result, cc.MemoryResult):
+            self._pending_history_append = [("user", cc.hey_prefix(text)[1]), ("assistant", result.text)]
+            self._pending_memory_receipt = result.receipt
+            self._signals.chunk.emit(result.text)
+            self._signals.done.emit()
+            return
+        if isinstance(result, cc.NotesResult):
+            self._pending_history_append = None
+            self._signals.notes_view.emit(result.category, result.query)
+            self._signals.chunk.emit(result.text)
+            self._signals.done.emit()
+            return
         if isinstance(result, cc.TextResult):
             if result.text:
                 self._signals.chunk.emit(result.text)
@@ -1089,11 +1237,43 @@ class ChatPanel(QWidget):
         self._signals.done.emit()
         self._pending_history_append = None
 
+    def _open_saved_notes(self, category: str = '', query: str = '') -> None:
+        try:
+            from saved_notes_dialog import SavedNotesDialog
+            dialog = getattr(self, '_notes_dialog', None)
+            if dialog is None:
+                dialog = SavedNotesDialog(self, category=category or None, query=query)
+                self._notes_dialog = dialog
+            else:
+                dialog.apply_request(category=category or None, query=query)
+            dialog.show()
+            dialog.raise_()
+            dialog.activateWindow()
+        except Exception as exc:
+            self._append_system(f'Could not open saved notes: {exc}')
+
     # ── Signal handlers (run on the GUI thread) ─────────────────────────
 
     def _on_chunk(self, chunk: str) -> None:
         self._reply_text += chunk
-        self._append_reply_chunk(chunk)
+        self._pending_chunks.append(chunk)
+        if not self._chunk_timer.isActive():
+            self._chunk_timer.start()
+
+    def _status_stage(self, text: str) -> None:
+        if self._streaming:
+            self._status.setText(text)
+            # The model has finished; checks can still take seconds. Finish
+            # the visible draft now, including a paragraph without a trailing
+            # blank line. Later corrections still replace this message in place.
+            self._flush_reply_chunks(format_blocks=False)
+            if self._reply_is_chat:
+                try:
+                    self._render_reply()
+                except Exception:
+                    pass                # preserve the plain draft if Markdown fails
+                self._markdown_stream = MarkdownStream()
+                self._stream_tail_start = self._transcript.document().characterCount() - 1
 
     def _on_replace(self, text: str) -> None:
         """Swap the streamed draft for the checked answer (same paragraph and style)."""
@@ -1101,16 +1281,24 @@ class ChatPanel(QWidget):
         if start is None:
             self._append_reply_chunk("\n\n" + text)
             return
+        if hasattr(self, '_pending_chunks'):
+            self._reset_rendering()
         cursor = QTextCursor(self._transcript.document())
         cursor.setPosition(start)
         cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         cursor.insertText(text)            # replaces the selected draft
         self._reply_text = text
+        if hasattr(self, '_markdown_stream'):
+            # Replacement is rare, and is always finalized as one checked message.
+            # Do not let a subsequent note append re-render an already displayed draft.
+            self._stream_tail_start = cursor.position()
 
     def _on_image(self, path: str) -> None:
+        self._flush_reply_chunks(format_blocks=False)
         self._append_image(path)
 
     def _on_done(self) -> None:
+        self._flush_reply_chunks(format_blocks=False)
         if getattr(self, "_reply_is_chat", False):
             try:
                 self._render_reply()
@@ -1120,6 +1308,15 @@ class ChatPanel(QWidget):
         self._refresh_status_pill()      # "offline on", a new key, ... change it
         for role, content in (getattr(self, "_pending_history_append", None) or []):
             self._history.append({"role": role, "content": content})
+        if self._pending_notebook_receipt is not None and self._history:
+            self._history[-1]['notebook_receipt'] = self._pending_notebook_receipt
+            self._pending_notebook_receipt = None
+        if self._pending_file_receipts and self._history:
+            self._history[-1]['file_receipts'] = self._pending_file_receipts
+            self._pending_file_receipts = []
+        if self._pending_memory_receipt is not None and self._history:
+            self._history[-1]['memory_receipt'] = self._pending_memory_receipt
+            self._pending_memory_receipt = None
         self._pending_history_append = None
         self._after_turn()
         self._streaming = False
@@ -1131,6 +1328,8 @@ class ChatPanel(QWidget):
         self._input.setFocus()
 
     def _on_cancelled(self) -> None:
+        self._flush_reply_chunks(format_blocks=False)
+        self._chunk_timer.stop()
         self._append_html_block(
             f'<span style="color:{SILV2}; font-style:italic;"> [Stopped]</span></p>'
         )
@@ -1147,6 +1346,8 @@ class ChatPanel(QWidget):
         self._input.setFocus()
 
     def _on_error(self, message: str) -> None:
+        self._flush_reply_chunks(format_blocks=False)
+        self._chunk_timer.stop()
         self._append_html_block(
             f'<span style="color:#ff6666;">[Error: {self._escape(message)}]</span></p>'
         )
@@ -1170,6 +1371,7 @@ class ChatPanel(QWidget):
         instead of a y/n prompt. Still "streaming" (buttons disabled) while
         this is open, matching the terminal blocking on the same decision.
         """
+        self._flush_reply_chunks(format_blocks=False)
         import json
         try:
             pending = json.loads(raw_json)
@@ -1192,7 +1394,7 @@ class ChatPanel(QWidget):
             return
 
         self._status.setText("Writing file...")
-        workspace = self._pending_write_context.get("workspace", str(_CHAT_ROOT))
+        workspace = self._pending_write_context.get("workspace", '')
         threading.Thread(
             target=self._run_write_approval, args=(path, content, workspace), daemon=True,
         ).start()
@@ -1204,6 +1406,7 @@ class ChatPanel(QWidget):
                                       operation=request.get('operation', 'write_file'),
                                       expected_sha256=request.get('expected_sha256'),
                                       remember=request.get('remember', False))
+            self._pending_file_receipts = getattr(result, 'receipts', [])
             self._signals.write_complete.emit(result.text)
         except Exception as e:
             self._signals.write_complete.emit(f"[Write failed: {e}]")
@@ -1217,6 +1420,9 @@ class ChatPanel(QWidget):
         self._end_ai_reply()
         self._history.append({"role": "user", "content": stripped})
         self._history.append({"role": "assistant", "content": full})
+        if self._pending_file_receipts:
+            self._history[-1]['file_receipts'] = self._pending_file_receipts
+            self._pending_file_receipts = []
         self._after_turn()
         self._pending_write_context = {}
         self._cancel_event = None
@@ -1227,6 +1433,11 @@ class ChatPanel(QWidget):
         self._status.setText("")
 
     # ── Commands that need a real dialog ─────────────────────────────────
+
+    def _capture_file_result(self, result) -> None:
+        from cursiv_v215.core.file_access import FileResult
+        if isinstance(result, FileResult):
+            self._pending_file_receipts.append(result.receipt())
 
     def _try_dialog_command(self, text: str) -> bool:
         """Returns True if `text` was handled here (a dialog was shown)."""

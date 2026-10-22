@@ -10,6 +10,8 @@
 //   /api/legacy/letters   family letters stay on the owner's machine (see letters.html)
 //   sentinel + maze       replaced by Cloudflare's own bot protection and rate limiting
 
+import { handleDownloadAnalytics } from './download-analytics.mjs';
+
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -848,6 +850,8 @@ export default {
       else if (target.pathname.endsWith(".html")) target.pathname = target.pathname.slice(0, -5);
       return Response.redirect(target.toString(), 301);
     }
+    const analytics = await handleDownloadAnalytics(request, env);
+    if (analytics) return request.method === 'HEAD' ? new Response(null, { status: analytics.status, headers: analytics.headers }) : analytics;
     if (!isApi) return env.ASSETS.fetch(request);
 
     const cors = corsHeaders(env, request);

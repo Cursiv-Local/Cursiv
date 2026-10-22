@@ -25,8 +25,10 @@ from __future__ import annotations
 
 import json
 import math
+import os
 import re
 import time
+import threading
 import uuid
 from pathlib import Path
 from typing import Any
@@ -46,6 +48,7 @@ ROOT             = Path(__file__).parent.parent.parent
 CURSIV_DIR       = APP_DATA
 STRANDS_FILE     = CURSIV_DIR / "strands.jsonl"
 TERRITORIES_FILE = CURSIV_DIR / "territories.json"
+_save_lock = threading.RLock()
 
 _DEFAULT_TERRITORIES: dict[str, dict] = {
     "coding":       {"description": "Software builds, Codex sessions, architecture decisions"},
@@ -369,8 +372,22 @@ def save_strand(
                 "confidence":    round(float(score), 3),
             },
         }
-        with STRANDS_FILE.open("a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        data = (json.dumps(entry, ensure_ascii=False) + '\n').encode('utf-8')
+        with _save_lock, STRANDS_FILE.open('ab+') as stream:
+            stream.seek(0, os.SEEK_END)
+            end = stream.tell()
+            if end:
+                stream.seek(-1, os.SEEK_END)
+                if stream.read(1) != b'\n':
+                    stream.write(b'\n')
+            stream.seek(0, os.SEEK_END)
+            start = stream.tell()
+            stream.write(data)
+            stream.flush()
+            os.fsync(stream.fileno())
+            stream.seek(start)
+            if stream.read(len(data)) != data:
+                raise OSError('Saved-note append read-back verification failed')
 
         _mx.invalidate()   # matrix rebuilt on next search with new strand included
         return strand_id

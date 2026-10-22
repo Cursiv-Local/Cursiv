@@ -149,6 +149,31 @@ This builds `cloudflare/dist/` from the website's allowlisted files, then deploy
 node cloudflare/publish.mjs --build-only
 ```
 
+The website uses **Cloudflare Workers with static assets and D1**. Its prepared
+download-analytics update adds a cached public GitHub installer counter and a
+password-protected `/admin/downloads/` page. Counts use versioned installer assets;
+duplicate “latest” copies, source archives and unrelated files are excluded.
+Optional Windows/Mac button-click totals are anonymous aggregates and are never
+treated as completed downloads. GPC and Do Not Track are respected.
+
+Before publishing this update, apply the additive analytics schema and configure
+the separate administrator secret. See [website analytics setup, counting rules,
+tests and deployment checks](cloudflare/DOWNLOAD-ANALYTICS.md). The feature has not
+been deployed by this development task. Existing download links work without it.
+The homepage copy is tightened to an offline-first introduction, four benefits,
+expandable practical details and direct latest-installer download buttons.
+
+#### Pending Source Changes
+
+The working tree also contains earlier, unreleased desktop repairs: the Saved Notes
+viewer, incremental chat rendering, native Field Notebook chat tools, verified
+filesystem operations and natural-language memory handling. They are separate from
+the website-only analytics change; this task does not modify desktop code or build
+an installer. See [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
+[rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
+[notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and
+[verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md) for scope and test evidence.
+
 #### Optional Features
 
 - **LoRA training** needs `torch`, `transformers`, `peft`, `accelerate`, and `datasets` in a normal (non-bundled) Python environment. The Training Data window checks for and installs them in a visible terminal. CPU training works but is slow—roughly six minutes per example per epoch on a typical CPU.
