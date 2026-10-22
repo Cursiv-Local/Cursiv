@@ -6,6 +6,38 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def test_complete_launcher_constructs_titlebar_and_chat(monkeypatch):
+    from PyQt6.QtCore import QTimer
+    from PyQt6.QtWidgets import QApplication
+    import cursiv_launcher as launcher
+    import shell_dialogs
+    app = QApplication.instance() or QApplication([])
+    # Build the real shell without running delayed setup/sync/model jobs.
+    monkeypatch.setattr(QTimer, 'singleShot', lambda *args: None)
+    window = launcher.CursivLauncher('Regression test')
+    try:
+        assert window.findChild(shell_dialogs.TitleBar) is not None
+        assert window._chat_panel._net_pill.text()
+    finally:
+        window._phone_sync_timer.stop()
+        window._tray.hide()
+        window.deleteLater()
+
+
+def test_extracted_notes_json_command_serializes_success_result():
+    import json
+    from types import SimpleNamespace
+    from command_results import TextResult
+    import commands_system
+    entry = {'instruction': 'Explain the sample', 'output': 'A "quoted" answer'}
+    runtime = SimpleNamespace(
+        _looks_like_text_to_json_request=lambda text: True,
+        text_to_training_entry=lambda text, cfg: (True, 'Converted', entry),
+        TextResult=TextResult)
+    result = commands_system.handle(runtime, 'convert notes to json', 'convert notes to json', {}, [])
+    assert json.loads(result.text.split('```json\n', 1)[1].split('\n```', 1)[0]) == entry
+
+
 def test_production_python_module_size_budget():
     oversized = []
     for package in ('cursiv_v215', 'launcher'):

@@ -1,5 +1,17 @@
 # Handoff — Cursiv verification overhaul
 
+## 2026-10-22: U84 release follow-up
+
+U83's source CI and narrow packaged check passed, but the Mac screenshot step
+caught a real main-window `theme` NameError introduced by extraction. A focused
+undefined-name review also found a notes-command JSON import; two isolated tests
+reproduced both failures before repair. U84 fixes the imports, checks the full
+launcher in packaged/offline tests and adds explicit regressions. The U83 draft
+and tag are preserved; no U83 installer was uploaded or publicly released.
+The owner already authorized commit/push/build/publication/deployment. Current
+results are in [U84 verification](docs/U84-RELEASE-VERIFICATION.md) and
+[release notes](docs/RELEASE-U84.md). Historical statuses below are checkpoints.
+
 ## 2026-10-22: U83 publication authorized
 
 The owner now authorizes committing, pushing, bumping the installer, publishing

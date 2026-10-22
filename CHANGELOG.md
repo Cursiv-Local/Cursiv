@@ -12,7 +12,23 @@
 - Record deployment/build details in [HANDOFF.md](HANDOFF.md). No desktop
   application, installer or updater changes belong to this website follow-up.
 
-## v3.14-U83 - Trust boundaries and background answer review (2026-10-22)
+## v3.14-U84 - Complete-window release validation (2026-10-22)
+
+- Keep U83 as an unpublished candidate after its Mac screenshot check exposed
+  a missing theme import in the extracted title bar. Preserve the existing tag.
+- Restore the theme/JSON runtime imports and related annotation dependencies;
+  add reproducing full-shell and notes-JSON regressions. Expand frozen and offline
+  self-tests to construct the complete launcher/title bar/tray/chat panel.
+- Bump application, launcher, installer and output names together to 3.14-U84.
+  Carry forward the U83 candidate's trust, review and maintainability changes below.
+- Final isolated U84 Windows source suite: 1,248 passed, one Mac Keychain skip
+  (197.19 s). Complete launcher/Tools/Settings/Notebook offscreen smoke passed.
+- Update website testing/download/research sections with current source checks,
+  unchanged-suite model results, failures and clearly labeled historical U75 data.
+  Record actual package, CI, hashes, deployment and remaining limits in
+  [U84 verification](docs/U84-RELEASE-VERIFICATION.md).
+
+## U83 unpublished candidate - Trust boundaries and background answer review (2026-10-22)
 
 - Bump application, launcher and installer/output names together to 3.14-U83.
   Final isolated versioned Windows suite: 1,246 passed, one Mac Keychain skip

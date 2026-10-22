@@ -9,10 +9,11 @@ from __future__ import annotations
 import json
 import threading
 import urllib.request
+import theme
 from datetime import datetime, timezone
 from PyQt6.QtCore import QPoint, Qt, QTimer
 from PyQt6.QtWidgets import (
-    QApplication, QDialog, QHBoxLayout, QLabel, QPushButton, QScrollArea, QVBoxLayout, QWidget,
+    QApplication, QDialog, QHBoxLayout, QLabel, QMainWindow, QPushButton, QScrollArea, QVBoxLayout, QWidget,
 )
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2, RED
 from relay_settings import RELAY_URL as _RELAY_URL, FLEET_TOKEN as _FLEET_TOKEN

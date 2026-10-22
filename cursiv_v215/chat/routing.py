@@ -145,7 +145,7 @@ def _call_provider_council(runtime: ChatRuntime, question: str, xai_key: str, op
         "anthropic_key": anthropic_key or "",
     }
 
-    q: "_queue_mod.Queue[str | None]" = runtime._queue_mod.Queue()
+    q = runtime._queue_mod.Queue()
 
     def _worker() -> None:
         try:

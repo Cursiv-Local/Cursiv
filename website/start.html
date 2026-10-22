@@ -44,14 +44,14 @@
       <div class="cta-row">
         <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv-Setup.exe</a>
         <a class="btn btn-ghost" data-download-button="mac" href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac (early): Cursiv.dmg</a>
-        <a class="btn btn-ghost" href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">Release notes</a>
+        <a class="btn btn-ghost" href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a>
       </div>
       <p class="fine" data-download-count role="status">Installer download counts are provided by GitHub.</p>
       <p class="fine">Versioned installers only; duplicate “latest” copies excluded. GitHub counts are not installs or unique people. Button clicks are counted separately without visitor identifiers; <a href="/privacy/#download-analytics">privacy details</a>.</p>
       <p class="fine"><b>Mac (early):</b> Apple Silicon (M1 or newer), macOS 12+. Drag Cursiv into Applications. It isn't
         signed by Apple yet, so the first time: try to open it, then System Settings → Privacy &amp; Security → Open Anyway.
         Built and tested automatically on Apple hardware, but not yet used by anyone on their own Mac. The USB drive is Windows-only.</p>
-      <p class="fine">Latest release and installer details: <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">GitHub Releases</a> · MIT license</p>
+      <p class="fine">Current release: U84. Installer checks and known limitations: <a href="/ai-reliability-testing#u84">test evidence</a> · <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">GitHub Releases</a> · MIT license</p>
       <p class="fine" id="code-signing">Cursiv is seeking open-source code-signing support from the <a href="https://signpath.org/" rel="noopener noreferrer">SignPath Foundation</a>.</p>
       <p class="fine"><a href="/local-ai-hardware-requirements">Hardware requirements</a> · <a href="/open-source-offline-ai">Offline AI guide</a> · <a href="/ai-reliability-testing">Benchmark evidence</a> · <a href="/privacy/">Privacy Policy</a></p>
     </div>
@@ -69,7 +69,7 @@
     <div>
       <div class="section-head"><span class="eyebrow">Steps</span><h2>From download to first answer.</h2></div>
       <ol class="steps">
-        <li><div><b>Check the download (optional)</b><span>Every release lists the installer's SHA-256 checksum in <code>SHA256SUMS.txt</code> on its <a href="https://github.com/winklersllc2026-bit/Cursiv/releases/latest">release page</a>. In PowerShell, <code>Get-FileHash .\Cursiv-Setup-latest.exe</code> must print the same value. The installer is built from the public <a href="https://github.com/winklersllc2026-bit/Cursiv">source code</a> at the release's tag.</span></div></li>
+        <li><div><b>Check the download (optional)</b><span>Every release lists the installer's SHA-256 checksum in <code>SHA256SUMS.txt</code> on its <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">release page</a>. In PowerShell, <code>Get-FileHash .\Cursiv-Setup-latest.exe</code> must print the same value. The installer is built from the public <a href="https://github.com/Cursiv-Local/Cursiv">source code</a> at the release's tag.</span></div></li>
         <li><div><b>Run the installer</b><span>Open <code>Cursiv-Setup-latest.exe</code>. It installs into your own user folder (no administrator rights), adds a Start menu entry, and nothing else: no services, drivers or browser changes. It isn't code-signed yet, so Windows may say "Windows protected your PC": click <b>More info</b>, then <b>Run anyway</b>. The first page of the installer says the same.</span></div></li>
         <li><div><b>Create your login</b><span>Pick a username and password, and answer the security questions; they're how you reset a forgotten password. Both stay on this computer. Cursiv doesn't open without this login.</span></div></li>
         <li><div><b>Let Setup install the local AI</b><span>The Setup window installs Ollama, the free engine that runs AI models on your computer, then downloads the model you pick (it suggests one for your graphics card). Progress bars show how far along it is.</span></div></li>
@@ -89,12 +89,12 @@
       <table class="table">
         <thead><tr><th>Model</th><th>Download</th><th>When</th></tr></thead>
         <tbody>
-          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Current default recommendation. It passed 40 of 40 cases in a 40-case suite 1.2 model comparison (October 18, 2026), averaging 9.8 seconds per answer on that test computer. This is a small comparison sample, not a full benchmark; speed varies by computer. Without a graphics card, speed has not been measured. See the <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/bench/MODEL-COMPARISON.md">model comparison details</a>.</td></tr>
+          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Current default recommendation. It passed 40 of 40 cases in a 40-case suite 1.2 model comparison (October 18, 2026), averaging 9.8 seconds per answer on that test computer. This is a small comparison sample, not a full benchmark; speed varies by computer. Without a graphics card, speed has not been measured. See the <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/bench/MODEL-COMPARISON.md">model comparison details</a>.</td></tr>
           <tr><td><b>qwen2.5 1.5B</b> (Apache 2.0)</td><td>1 GB</td><td>Smaller alternative for systems that need a lighter model. Not yet tested in the published Cursiv model comparison.</td></tr>
         </tbody>
       </table>
     </div>
-    <p class="fine" style="margin-top:12px">Optional extras in Setup: a coding model and an image-reading model. Each model has its own license; see <a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/MODELS.md">MODELS.md</a>.</p>
+    <p class="fine" style="margin-top:12px">Optional extras in Setup: a coding model and an image-reading model. Each model has its own license; see <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/MODELS.md">MODELS.md</a>.</p>
   </div>
 </section>
 
@@ -123,7 +123,7 @@
       <details><summary>How do I update?</summary><p>Right-click the Cursiv icon in the Windows tray (by the clock) and choose <b>Check for Updates</b>. If a newer version exists, Cursiv downloads its installer from GitHub and runs it. Your data is kept.</p></details>
       <details><summary>Can I run it from a USB drive?</summary><p>Yes: tray icon → <b>Make a Cursiv USB…</b> copies Cursiv, Ollama and your models to a 64 GB+ exFAT drive. Leave "Include my memories, keys and settings" unticked for a copy you give to someone else.</p></details>
       <details><summary>How do I uninstall?</summary><p>Windows Settings → Apps → Cursiv → Uninstall. Ollama and its models are separate; uninstall Ollama the same way to remove them.</p></details>
-      <details><summary>Something went wrong.</summary><p>Use tray icon → <b>Send problem report…</b> (it shows you what will be sent before sending), or open an issue on <a href="https://github.com/winklersllc2026-bit/Cursiv/issues">GitHub</a>.</p></details>
+      <details><summary>Something went wrong.</summary><p>Use tray icon → <b>Send problem report…</b> (it shows you what will be sent before sending), or open an issue on <a href="https://github.com/Cursiv-Local/Cursiv/issues">GitHub</a>.</p></details>
     </div>
   </div>
 </section>
@@ -131,7 +131,7 @@
 
 <footer>
   <div class="wrap">
-    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">Source</a> · <a href="/vision">Direction</a> · <a href="/privacy/">Privacy Policy</a></span><span>MIT License</span></div>
+    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a> · <a href="/vision">Direction</a> · <a href="/privacy/">Privacy Policy</a></span><span>MIT License</span></div>
   </div>
 </footer>
 </body>

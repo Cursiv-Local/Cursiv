@@ -7,6 +7,11 @@ Widgets and private-copy choices remain in usb_maker.
 """
 from __future__ import annotations
 from pathlib import Path
+import threading
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from usb_maker import _Signals
 
 from usb_ops_runtime import UsbRuntime
 

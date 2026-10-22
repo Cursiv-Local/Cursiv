@@ -6,6 +6,7 @@ original precedence order by command_dispatch; no widgets are loaded.
 """
 from __future__ import annotations
 
+import json
 from command_runtime import CommandRuntime, UNHANDLED
 
 

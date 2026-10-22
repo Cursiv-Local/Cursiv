@@ -86,12 +86,12 @@ file access being on does not prove a particular read/write succeeded. Source
 follow-ups use bounded verified excerpts, and explicit unsupported quotations
 are flagged. These checks reduce specific failures; model analysis can still err.
 
-U83 includes these U82 foundations and the trust-boundary repairs below.
+U84 includes these U82 foundations and the trust-boundary repairs below.
 Installed copies need the new installer to receive source changes.
 Implementation, test evidence, exact file inventory and limitations:
 [Grounded chat repair](docs/GROUNDED-CHAT-REPAIR.md).
 Published installer hashes, CI and package checks:
-[U83 release verification](docs/U83-RELEASE-VERIFICATION.md)
+[U84 release verification](docs/U84-RELEASE-VERIFICATION.md)
 ([historical U82 record](docs/U82-RELEASE-VERIFICATION.md)).
 
 ## 3. Technical Details
@@ -123,13 +123,13 @@ Including private data in a USB copy exports copied API keys in readable form
 for use on other computers. Anyone with the drive can read and use those keys;
 the USB maker explains this before copying.
 
-U83 hardening repairs the U82 restricted-turn, filename parsing, source
+U84 hardening repairs the U82 restricted-turn, filename parsing, source
 label and failed-tool continuation issues documented in the
 [repair report](docs/U82-RESTRICTED-TURN-REPAIR.md). A no-memory request disables
 memory saves/automatic learning for that turn; conversation-history storage is
-separate. See the U83 publication record for packaged checks and download hashes.
+separate. See the U84 publication record for packaged checks and download hashes.
 
-U83 chat also finishes the draft before optional model review. The default
+U84 chat also finishes the draft before optional model review. The default
 `check fast` skips ordinary turns and adds a short local review as a follow-up
 when eligible. `check off` disables model review; `check full` permits a bounded
 review/rewrite/recheck. Pure-code checks stay on in every mode. See the
@@ -138,7 +138,7 @@ review/rewrite/recheck. Pure-code checks stay on in every mode. See the
 The latest [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) closes
 additional policy/source/error gaps. Source labels describe application-supplied
 evidence; a memory-context label does not claim the model used or verified it.
-These changes are included in the U83 release source.
+These changes are included in the U84 release source.
 
 These controls are intended to help the person using Cursiv manage access, files, and network connections. They do not guarantee answer accuracy, privacy in every data path, or safety for high-risk use. Review the [benchmark cases and results](bench/) alongside the limitations above.
 
@@ -174,7 +174,7 @@ The installer uses PyInstaller (in `requirements.txt`) and [Inno Setup 6](https:
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
-3. Run `py -3.13 scripts/build_release.py v3.14-U83` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
+3. Run `py -3.13 scripts/build_release.py v3.14-U84` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
@@ -183,9 +183,9 @@ versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 `SHA256SUMS.txt`. The README, website and updater use that stable installer name.
 
 ```powershell
-Copy-Item installer/Output/Cursiv-Setup-3.14-U83.exe installer/Output/Cursiv-Setup-latest.exe
-Copy-Item installer/Output/SHA256SUMS-3.14-U83.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U83 installer/Output/Cursiv-Setup-3.14-U83.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U83" --notes-file docs/RELEASE-U83.md --latest --verify-tag --repo Cursiv-Local/Cursiv
+Copy-Item installer/Output/Cursiv-Setup-3.14-U84.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U84.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U84 installer/Output/Cursiv-Setup-3.14-U84.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U84" --notes-file docs/RELEASE-U84.md --latest --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
@@ -204,32 +204,35 @@ This builds `cloudflare/dist/` from the website's allowlisted files, then deploy
 node cloudflare/publish.mjs --build-only
 ```
 
-The website uses **Cloudflare Workers with static assets and D1**. Its prepared
-download-analytics update adds a cached public GitHub installer counter and a
+The website uses **Cloudflare Workers with static assets and D1**. Its
+download analytics provide a cached public GitHub installer counter and a
 password-protected `/admin/downloads/` page. Counts use versioned installer assets;
 duplicate “latest” copies, source archives and unrelated files are excluded.
 Optional Windows/Mac button-click totals are anonymous aggregates and are never
 treated as completed downloads. GPC and Do Not Track are respected.
 
-Before publishing this update, apply the additive analytics schema and configure
-the separate administrator secret. See [website analytics setup, counting rules,
-tests and deployment checks](cloudflare/DOWNLOAD-ANALYTICS.md). The feature has not
-been deployed by this development task. Existing download links work without it.
+For a new deployment, apply the additive analytics schema and configure the
+separate administrator secret. See [website analytics setup, counting rules,
+tests and deployment checks](cloudflare/DOWNLOAD-ANALYTICS.md). The existing site
+has the analytics tables and authenticated routes. During U84 preparation the
+public counter reported unavailable; installer links remain independent. The
+release verification record reports the final production check without inventing
+a total or treating an outage as zero.
 The homepage copy is tightened to an offline-first introduction, four benefits,
 expandable practical details and direct latest-installer download buttons.
 
 #### Included Desktop Improvements
 
-U83 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
+U84 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,
-dated recall and source checks. See [U83 release notes](docs/RELEASE-U83.md),
+dated recall and source checks. See [U84 release notes](docs/RELEASE-U84.md),
 [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and
 [verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md) for scope and evidence.
 
-U83 extracts chat, command and dialog modules,
+U84 extracts chat, command and dialog modules,
 makes empty/failed answer checks explicitly unverified, and centralizes protected
 filesystem mutations. See [ARCHITECTURE.md](ARCHITECTURE.md),
 [verification policy](docs/VERIFICATION-POLICY.md), the
@@ -237,7 +240,7 @@ filesystem mutations. See [ARCHITECTURE.md](ARCHITECTURE.md),
 [quality checklist](docs/QUALITY-CHECKLIST.md). Signing, clean-machine USB/Mac
 validation and packaged Linux support remain open or unsupported as recorded in
 [platform readiness](docs/PLATFORM-READINESS.md). Current test and publication
-results are in [U83 verification](docs/U83-RELEASE-VERIFICATION.md).
+results are in [U84 verification](docs/U84-RELEASE-VERIFICATION.md).
 
 #### Optional Features
 

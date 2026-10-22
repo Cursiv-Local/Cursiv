@@ -1,4 +1,17 @@
-# Cursiv v3.14-U83 — Trust boundaries and background answer review
+# U83: unpublished candidate
+
+**Do not install or publish this candidate.** The Mac screenshot smoke check
+found a missing theme import in the extracted full launcher. A second isolated
+regression also reproduced a missing JSON import in the notes-conversion command.
+Source CI and the narrower chat-panel self-test had passed, so those gates were
+insufficient. U84 adds both regressions, restores the imports and checks the full
+launcher in the packaged self-test. The U83 tag is preserved; no U83 installer was
+uploaded and no public U83 release was published.
+
+The original candidate notes below are historical preparation text. See
+[U84 release notes](RELEASE-U84.md) and [verification](U84-RELEASE-VERIFICATION.md).
+
+## Original U83 candidate scope
 
 ## What changed
 

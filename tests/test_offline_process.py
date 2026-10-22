@@ -91,6 +91,7 @@ def test_the_program_starts_and_works_with_no_connection_off_this_computer(tmp_p
     assert p.returncode == 0 and report.exists(), out[-3000:]
     text = report.read_text(encoding="utf-8")
     assert "ALL PASSED" in text, text
+    assert "full launcher, title bar, tray and chat window build" in text, text
     for part in ("imports", "offline reference", "calculations", "field notebook", "documents", "window"):
         assert f"PASS  {part}" in text, text
     tried = attempts.read_text(encoding="utf-8").splitlines() if attempts.exists() else []

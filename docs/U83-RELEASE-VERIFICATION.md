@@ -1,4 +1,14 @@
-# U83 release verification
+# U83 candidate verification — rejected before publication
+
+U83 remains a draft. Mac run 39856399578 failed while constructing the full
+launcher for screenshots: `shell_dialogs.TitleBar` used `theme` without importing
+it. The app self-test only built ChatPanel and missed the shell. Two new isolated
+regressions reproduced this and a missing `json` import in the extracted notes
+command (2 failed in 3.72 s; `%TEMP%/cursiv-maintenance-bogbokox/pytest.log`).
+No U83 artifact is published. U84 repairs these defects and expands the self-test;
+see [the U84 publication record](U84-RELEASE-VERIFICATION.md). Earlier passed
+checks below retain their actual, narrower meaning.
+
 
 ## Release preparation
 
@@ -54,3 +64,33 @@ exports and unencrypted local conversation/memory storage remain documented.
 The full 158-case live benchmark is running against a disposable copy with this
 same Python fingerprint and the installed `qwen3:4b-instruct` model. Its result
 will be recorded after completion; the run does not alter frozen cases/scoring.
+
+## Tagged source and hosted CI
+
+- Immutable tag `v3.14-U83` resolves to
+  `167834d601bf4319f8d0eab969b5930ef6b18e27`, pushed to main and the feature branch.
+- [Hosted source tests](https://github.com/Cursiv-Local/Cursiv/actions/runs/39856053174)
+  succeeded on that commit:
+  Windows **1,246 passed, 1 skipped, 113.66 s**;
+  macOS **1,236 passed, 11 skipped, 395.60 s**.
+  Platform-specific skips are retained, not counted as passes.
+- The Windows packaged self-test passed imports, disposable data folders,
+  112 offline reference entries, calculations, notebook write/chain/export/
+  signature checks, document search and offscreen chat-window construction.
+  Ollama availability is reported separately as information, not model accuracy.
+- Final Windows packaging uses a disposable environment containing only
+  `requirements.txt` dependencies, to avoid including unrelated optional packages
+  from the developer's Python environment. No source or public tag is changed
+  between packaging attempts. The earlier environment's candidate is not uploaded.
+- The [Mac tagged build](https://github.com/Cursiv-Local/Cursiv/actions/runs/39856399578)
+  was dispatched against U83 with uploads to the draft release. Completion,
+  packaged self-test and exact attached assets must be checked before publication.
+
+## Completed candidate model run
+
+Full unchanged suite 1.5: 153/158 passed, 96.8% overall, 98.1% answerable
+accuracy, 1.3% case-marked unsupported claims; 9.7 s/case, 25.6 minutes.
+[Raw answers](../bench/results/U83-qwen3_4b-instruct-suite1.5.json) and
+[failure review](../bench/FAILURES-U83.md) retain actual errors and likely regex
+false positives without editing the frozen scorer or increasing the score.
+This is evidence for the rejected candidate, not a U84 model run.

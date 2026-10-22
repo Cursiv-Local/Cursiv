@@ -78,11 +78,17 @@ def _checks():
         from PyQt6.QtWidgets import QApplication
         app = QApplication.instance() or QApplication([sys.argv[0]])
         import theme
-        import chat_panel
+        from cursiv_launcher import CursivLauncher
         theme.install()
-        panel = chat_panel.ChatPanel()
-        assert panel._net_pill.text()
-        return f"chat window builds (badge: {panel._net_pill.text().strip('● ')})"
+        shell = CursivLauncher('Self-test')
+        try:
+            assert shell._chat_panel._net_pill.text()
+            return ('full launcher, title bar, tray and chat window build '
+                    f"(badge: {shell._chat_panel._net_pill.text().strip('● ')})")
+        finally:
+            shell._phone_sync_timer.stop()
+            shell._tray.hide()
+            shell.deleteLater()
 
     def engine():
         from cursiv_v215.core import ollama_host

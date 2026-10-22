@@ -21,7 +21,7 @@ import urllib.request
 import webbrowser
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Callable, Optional
 
 from PyQt6.QtCore import QPoint, QSize, Qt, QTimer, pyqtSignal, QObject
 from PyQt6.QtGui import QAction, QColor, QFont, QFontDatabase, QIcon, QKeySequence, QPainter, QPixmap, QShortcut
@@ -63,7 +63,7 @@ _ICONS = (
 _LOCK_PORT       = 17_860        # local socket port for single-instance lock
 
 # ── Update checker ─────────────────────────────────────────────────────────────
-_CURRENT_VERSION   = "3.14-U83"
+_CURRENT_VERSION   = "3.14-U84"
 _GITHUB_API        = "https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/Cursiv-Local/Cursiv/releases"
 

@@ -247,7 +247,11 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
   and early failed-tool exits in generic, OpenAI/xAI and Claude routes.
 - Explicitly deferred encryption and external/manual platform gates.
 
-## Exact changed files
+## Combined release files versus main 8831241
+
+The inventory includes the committed U83 candidate and U84 publication follow-up,
+not just files currently uncommitted. See U84 verification for the rejected
+candidate, repaired complete-window gate and final release results.
 
 <!-- changed-files:start -->
 
@@ -257,7 +261,10 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
 - [PRIVACY.md](../PRIVACY.md)
 - [README.md](../README.md)
 - [TECH.md](../TECH.md)
+- [bench/FAILURES-U83.md](../bench/FAILURES-U83.md)
+- [bench/RESULTS.md](../bench/RESULTS.md)
 - [bench/results/U82-maintenance-baseline-20261022-qwen3_4b-instruct-subset-suite1.5.json](../bench/results/U82-maintenance-baseline-20261022-qwen3_4b-instruct-subset-suite1.5.json)
+- [bench/results/U83-qwen3_4b-instruct-suite1.5.json](../bench/results/U83-qwen3_4b-instruct-suite1.5.json)
 - [bench/results/answer-review-background-20261022.json](../bench/results/answer-review-background-20261022.json)
 - [bench/results/answer-review-blocking-20261022.json](../bench/results/answer-review-blocking-20261022.json)
 - [bench/results/maintenance-after-20261022-qwen3_4b-instruct-subset-suite1.5.json](../bench/results/maintenance-after-20261022-qwen3_4b-instruct-subset-suite1.5.json)
@@ -302,10 +309,12 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
 - [docs/PLATFORM-READINESS.md](../docs/PLATFORM-READINESS.md)
 - [docs/QUALITY-CHECKLIST.md](../docs/QUALITY-CHECKLIST.md)
 - [docs/RELEASE-U83.md](../docs/RELEASE-U83.md)
+- [docs/RELEASE-U84.md](../docs/RELEASE-U84.md)
 - [docs/THREAT-MODEL.md](../docs/THREAT-MODEL.md)
 - [docs/TRUST-BOUNDARY-FOLLOWUP.md](../docs/TRUST-BOUNDARY-FOLLOWUP.md)
 - [docs/U82-RESTRICTED-TURN-REPAIR.md](../docs/U82-RESTRICTED-TURN-REPAIR.md)
 - [docs/U83-RELEASE-VERIFICATION.md](../docs/U83-RELEASE-VERIFICATION.md)
+- [docs/U84-RELEASE-VERIFICATION.md](../docs/U84-RELEASE-VERIFICATION.md)
 - [docs/VERIFICATION-POLICY.md](../docs/VERIFICATION-POLICY.md)
 - [installer/cursiv_setup.iss](../installer/cursiv_setup.iss)
 - [launcher/chat_commands.py](../launcher/chat_commands.py)
@@ -332,6 +341,7 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
 - [launcher/login_recovery.py](../launcher/login_recovery.py)
 - [launcher/login_style.py](../launcher/login_style.py)
 - [launcher/relay_settings.py](../launcher/relay_settings.py)
+- [launcher/selftest.py](../launcher/selftest.py)
 - [launcher/setup_checks.py](../launcher/setup_checks.py)
 - [launcher/setup_checks_runtime.py](../launcher/setup_checks_runtime.py)
 - [launcher/setup_dialog.py](../launcher/setup_dialog.py)
@@ -348,6 +358,7 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
 - [tests/test_chat_rendering.py](../tests/test_chat_rendering.py)
 - [tests/test_grounded_chat.py](../tests/test_grounded_chat.py)
 - [tests/test_module_boundaries.py](../tests/test_module_boundaries.py)
+- [tests/test_offline_process.py](../tests/test_offline_process.py)
 - [tests/test_protected_mutations.py](../tests/test_protected_mutations.py)
 - [tests/test_release_build.py](../tests/test_release_build.py)
 - [tests/test_reliability.py](../tests/test_reliability.py)
@@ -357,8 +368,12 @@ Mac run. Linux packaged distribution remains explicitly unsupported. See
 - [tests/test_verification_hardening.py](../tests/test_verification_hardening.py)
 - [tests/test_verified_filesystem.py](../tests/test_verified_filesystem.py)
 - [tests/test_verify.py](../tests/test_verify.py)
+- [website/ai-reliability-testing.html](../website/ai-reliability-testing.html)
 - [website/app.html](../website/app.html)
+- [website/index.html](../website/index.html)
 - [website/notebook/index.html](../website/notebook/index.html)
 - [website/notebook/sw.js](../website/notebook/sw.js)
+- [website/start.html](../website/start.html)
+- [website/vision.html](../website/vision.html)
 
 <!-- changed-files:end -->
