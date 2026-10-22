@@ -1,6 +1,7 @@
 """Boundary, operational state, dated recall and source-grounding regressions."""
 from datetime import date
 import json
+import os
 import subprocess
 import sys
 
@@ -187,7 +188,9 @@ def test_recall_is_readonly_despite_unreadable_lines_and_settings():
     assert (sem.FACTS_FILE.read_bytes(), sem.SETTINGS_FILE.read_bytes()) == before
 
 
-def test_dated_recall_survives_a_fresh_python_process(tmp_path):
+def test_dated_recall_survives_a_fresh_python_process(tmp_path, monkeypatch):
+    # A Windows pipe may default to cp1252; this reader explicitly expects UTF-8.
+    monkeypatch.setenv('PYTHONIOENCODING', 'cp1252')
     saved = mi.command('remember My restart marker is GROUNDED-821.', [], person='dana')
     ident = saved.outcomes[0].records[0]['id']
     script = (
@@ -196,7 +199,8 @@ def test_dated_recall_survives_a_fresh_python_process(tmp_path):
         "r=intents.command('what do you remember from past 14 days',[],person='dana');"
         "assert r.ok; print(r.render())")
     ran = subprocess.run([sys.executable, '-B', '-c', script, str(sem.FACTS_FILE), str(sem.SETTINGS_FILE)],
-                         capture_output=True, text=True, encoding='utf-8', check=True)
+                         capture_output=True, text=True, encoding='utf-8', check=True,
+                         env=dict(os.environ, PYTHONIOENCODING='utf-8'))
     assert 'GROUNDED-821' in ran.stdout and ident in ran.stdout
 
 
