@@ -9,6 +9,10 @@ automatically from line counts or a passing test run.
 - [x] Deterministic findings have codes/severity; empty/failed checkers fail closed;
   one constrained rewrite maximum, with evidence rechecks.
 - [x] Fixed regression replay and unchanged-suite live subset results are retained.
+- [x] Full tagged U84 suite 1.5 run, raw answers and failure review are public;
+  website release/model/software-test claims have consistency regressions.
+- [x] Tagged unsigned Windows/Mac packages passed expanded full-window checks;
+  public stable downloads were independently hashed against published checksums.
 - [x] Shared native/provider filesystem backend protects login/key/guardian paths.
 - [x] Exact restricted-turn regressions cover dispatch/lookup/retention gates,
   clean paths, execution-owned source labels and failed-tool exits.

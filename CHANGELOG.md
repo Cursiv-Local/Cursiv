@@ -14,6 +14,11 @@
 
 ## v3.14-U84 - Complete-window release validation (2026-10-22)
 
+- Publish U84 as GitHub latest with verified Windows/Mac installers and checksums.
+  Deploy the updated website/test evidence to the existing Cloudflare Worker.
+  Independently verify public installer bytes, metadata, routes and admin auth.
+  Record the existing download-counter 503 separately; no total is invented.
+
 - Keep U83 as an unpublished candidate after its Mac screenshot check exposed
   a missing theme import in the extracted title bar. Preserve the existing tag.
 - Restore the theme/JSON runtime imports and related annotation dependencies;

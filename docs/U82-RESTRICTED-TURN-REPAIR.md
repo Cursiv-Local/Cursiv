@@ -1,5 +1,10 @@
 # Restricted turns, file parsing and execution provenance
 
+> Historical repair checkpoint: these changes subsequently shipped in U84.
+> The owner later authorized commit/push/build/publication. The initial status
+> below records the earlier restriction; current evidence is in
+> [U84 verification](U84-RELEASE-VERIFICATION.md).
+
 ## Status
 
 The subsequent [trust-boundary follow-up](TRUST-BOUNDARY-FOLLOWUP.md) audits the

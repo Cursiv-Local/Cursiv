@@ -1,5 +1,10 @@
 # U84 release verification
 
+**Published and independently verified.**
+Release: [v3.14-U84](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U84).
+Website: [current test evidence](https://cursiv.us/ai-reliability-testing#u84).
+
+
 ## Why U84
 
 The owner authorized source publication, version bump, installer release and
@@ -142,3 +147,58 @@ All seven changed generated assets match their source; the allowlisted build,
 Python syntax/module budget, frozen benchmark hashes and preserved user fixture
 passed. Website/source evidence commits after the immutable tag do not change
 application/launcher Python or the packaged installers.
+
+## Publication and production verification
+
+Published **2026-10-22 22:08:56 UTC** as GitHub latest, non-draft and non-prerelease.
+The public unauthenticated latest API reports U84 and the tag resolves to the
+expected application commit. Both stable Windows/Mac downloads were transferred
+without authentication and independently SHA-256 hashed; sizes and hashes match
+the verified local build/draft, checksum files and GitHub digests. Public checksum
+files list the matching versioned and stable filenames. The exact Windows build
+dependency list and machine-readable verification record are attached to the release.
+
+Website/evidence source commit: `34dacead80d14217a5f1b25f0f83625f3bfce80d`.
+Deployed to the existing `cursiv-web` Worker/custom domains with Wrangler 4.151.3.
+Worker version: `99bad8d6-d834-4bb5-94a5-c6eafdf798fc`.
+Seven changed assets uploaded: homepage, download, research, testing, phone app,
+notebook index and notebook service worker. Existing bindings/secrets/DNS and D1
+schema were preserved; no database migration or installer execution was performed.
+
+Twenty public checks passed: eight marketing/policy routes return HTTPS 200,
+canonical/OG/Twitter/JSON-LD metadata match the generated build, current release
+labels/model counts are present, app/notebook/health/robots/sitemap return 200,
+the 1200x630 social image is publicly readable, and both private admin endpoints
+return 401 without credentials with no-store caching. The old-domain testing URL
+returns **301** to the corresponding cursiv.us path. Cloudflare's pre-existing
+edge beacon remains outside the source asset; metadata comparison accounts for it.
+Full local public-response evidence: `cloudflare/.wrangler/u84-release-review/`.
+
+### Existing download-counter outage
+
+`/api/downloads` still returns **503**, `available:false`, `total:null`,
+`status:unavailable`. This is an unresolved existing analytics availability issue,
+not a zero-download result. Read-only production D1 queries confirmed both
+analytics tables and the empty/unavailable cache row; no rows/settings were
+changed manually. The same metadata fetch succeeds outside the Worker, but the
+production failure's exact cause is not established. Installer links work;
+admin authentication remains enforced. No credentials were read or login guessed.
+Further Worker/cache diagnostics are required for this separate existing issue.
+
+The redundant release-event Mac workflow was requested to stop after publication;
+the manually dispatched tagged build already passed and its verified bytes are
+preserved. The final workflow status is recorded separately below.
+
+### Duplicate workflow disposition
+
+[Run 39862777601](https://github.com/Cursiv-Local/Cursiv/actions/runs/39862777601),
+triggered automatically by publication, completed **cancelled** during its test
+step. Build/DMG/upload steps were skipped. This intentionally avoids rebuilding
+and overwriting the already verified public Mac assets. The successful tagged
+manual package run is 39859098510; source CI is independently successful.
+Public asset digests remained unchanged after cancellation.
+
+Current platform/evidence/checklist documents were synchronized after publication.
+The combined release inventory covers 123 intended source, test, website and
+record files versus main 8831241; generated installers/reports and the unchanged
+personal test directory are excluded from Git.

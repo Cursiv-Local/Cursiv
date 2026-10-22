@@ -37,8 +37,10 @@ existing updater when internet access and update checks are allowed. Offline
 mode blocks GitHub checks. A compatible installed Ollama model is still needed
 for local model answers. No memory/notebook schema migration is introduced.
 
-Installers remain unsigned. Only use a Mac package once its tagged-source build,
-packaged self-test and upload have succeeded and the DMG is attached here.
+Windows and Apple Silicon Mac packages are attached with matching stable aliases
+and separate checksum files. Both tagged builds passed the expanded frozen-app
+self-test; the Mac workflow also captured all four windows. Installers remain
+unsigned (the Mac package is not notarized).
 
 ## Tests and limits
 

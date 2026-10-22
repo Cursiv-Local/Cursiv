@@ -1,5 +1,22 @@
 # Handoff — Cursiv verification overhaul
 
+## U84 published
+
+Published GitHub latest U84 at 2026-10-22 22:08:56 UTC; Windows and Apple Silicon
+Mac stable downloads independently re-downloaded without authentication and hashed.
+The existing Cloudflare Worker now serves current U84 test evidence (156/158),
+updated homepage/download/research text, and phone/notebook clarification. Worker
+version: `99bad8d6-d834-4bb5-94a5-c6eafdf798fc`. All 20 website tests and 20
+public release/website checks passed; analytics availability is recorded separately.
+Source CI and packaged full-window checks passed on both platforms. U83 remains
+an unpublished rejected candidate, with its original tag and failures retained.
+[U84 verification](docs/U84-RELEASE-VERIFICATION.md) records hashes, commits, CI,
+deployment, exact observed failures and outstanding physical/signing checks.
+The existing download-counter endpoint still returns unavailable/503; tables
+exist and admin auth is enforced. This outage is not reported as zero downloads.
+Personal test files remain untracked, excluded and unchanged. No owner app was
+installed/restarted and no personal data/schema migration was performed.
+
 ## U84 final validation checkpoint
 
 Exact tagged source: `eede54a79b83c74186275ed4f1aff83bde788739`.

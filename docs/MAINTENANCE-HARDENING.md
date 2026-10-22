@@ -28,7 +28,7 @@ maintenance scope or authorize a desktop release.
 |---|---|---|
 | 1: structure | Chat/commands/views/dialog operations extracted with compatible APIs and explicit services; module-size regression guard. | Legacy mutable turn records remain; safe concurrent server sessions are separate work. |
 | 2: verification | Structured findings, fail-closed check results, bounded rewrites and identical evidence rechecks; deterministic replay and live fixed-suite subset. | Heuristic/model limits remain; a six-case subset is not full-suite accuracy or field validation. |
-| 3: packaging | Tagged-builder DLL-path isolation, packaged self-test gate, stable aliases/checksums; signing/Mac/Linux decisions documented. | Signing identity/service, future tagged package build, Mac CI/clean install and two physical Windows test PCs are external gates. |
+| 3: packaging | Tagged-builder DLL-path isolation, packaged self-test gate, stable aliases/checksums; signing/Mac/Linux decisions documented. | U84 tagged builds/CI/public hashes are now verified; signing, clean install and two physical Windows test PCs remain external gates. |
 | 4: security | Shared protected-mutation guard, protected-path regressions, portable-key/storage threat model. | Owner selected a separately documented encryption migration; no data migration is attempted here. |
 | 5: process | Architecture, policy, evidence map, public limitations, README/changelog/handoff and readiness checklist. | Long-term field/regression evidence cannot be substituted with a numeric rating. |
 

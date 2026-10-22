@@ -1,13 +1,15 @@
 # Packaging and platform readiness
 
-This is a release gate, not a claim that the maintenance branch is published.
-Published U82 evidence is in [U82 release verification](U82-RELEASE-VERIFICATION.md).
+U84 is published. Current source/CI/package/download evidence is in
+[U84 release verification](U84-RELEASE-VERIFICATION.md);
+[U82 verification](U82-RELEASE-VERIFICATION.md) is historical. Automated package
+checks and the remaining physical/signing gates are listed separately.
 
 | Platform / gate | Current evidence | Remaining action |
 |---|---|---|
-| Windows build | U82 source CI and frozen self-test passed; published installer aliases/checksums were independently downloaded. | Build the approved future tag and run packaged checks again after these changes. |
-| Windows Authenticode | Current account has zero code-signing certificates. Website accurately says SignPath support is being sought. | Owner must obtain/configure signing access. No signed installer was created or released by this task. |
-| macOS Apple Silicon | U82 hosted Mac source tests, frozen app self-test and DMG build succeeded. Existing API keys use the login Keychain. | Current branch still needs Mac CI and an independent clean-machine install check. |
+| Windows build | U84 source CI and expanded frozen full-launcher self-test passed; both public installer aliases/checksums were independently verified. | Clean-machine install/upgrade and physical portable checks remain unperformed. |
+| Windows Authenticode | Public U84 reports NotSigned. The website retains its unsigned warning and SignPath support note. | Owner must obtain/configure signing access. No signed installer was created or released by this task. |
+| macOS Apple Silicon | U84 hosted source tests, expanded full-launcher frozen self-test, four screenshots, DMG build and public download hash checks succeeded. Existing API keys use the login Keychain. | Independent clean-machine installation and minimum-OS compatibility checks remain open. |
 | macOS signing | Build spec currently sets `codesign_identity=None`; public guidance says unsigned. | Developer ID, hardened-runtime signing, notarization and stapling must be configured/tested. |
 | USB kit | Existing automated portable/copy/retrieval/integrity checks run in the regression suite. | The two-clean-Windows-PC/full-day checklist has not been performed in this environment. Record actual devices/times/failures. |
 | Linux | No Linux release artifact or Linux CI/package path. | Explicitly unsupported for packaged distribution for now; source use is experimental and not a compatibility promise. |
@@ -51,8 +53,11 @@ Do not describe this staged plan as completed signing/notarization.
 The tagged Windows builder now isolates inherited DLL/plugin search paths, requires
 the frozen app's self-test before staging an installer, and produces identical
 versioned/latest files with matching checksums. The U82 DLL collision motivated
-this guard. Helper tests use disposable mock artifacts; this branch has not built
-or signed a new release installer.
+this guard. Helper tests use disposable mock artifacts. U84 additionally passed actual tagged
+Windows/Mac builds and full-window frozen checks; both unsigned public packages
+were downloaded and hashed. Exact Windows dependency versions are attached to
+the release. The earlier U83 candidate was rejected after its screenshot failure;
+its narrower self-test was expanded before U84 publication.
 
 ## Physical kit checklist
 
