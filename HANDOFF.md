@@ -1,5 +1,18 @@
 # Handoff — Cursiv verification overhaul
 
+## U82 publication record
+
+U82 is public/latest on GitHub, with source commit f14c033 and both verified
+Windows installer filenames plus SHA256SUMS.txt. The actual public latest download
+was fetched without authentication and matched the local build. The frozen
+Windows app passed all self-test checks after an inherited build-PATH DLL
+collision was isolated; the rejected candidate was not uploaded.
+
+[U82 release verification](docs/U82-RELEASE-VERIFICATION.md) records the exact
+source/tag, hashes, source CI, packaged checks, build tools and corrective build
+environment. It also links the tag-specific Mac package workflow and its asset
+validation. The owner's installed app was not automatically updated.
+
 ## 2026-10-22: U82 publication authorization
 
 The owner explicitly approved committing, pushing, bumping and releasing the

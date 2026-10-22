@@ -9,7 +9,7 @@ Cursiv is a local-first AI assistant for Windows. It runs compatible language mo
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 80 MB) ·
+  <b><a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 53 MB) ·
   <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
   <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a> ·
   <a href="CHANGELOG.md">Changelog</a>
@@ -88,6 +88,8 @@ are flagged. These checks reduce specific failures; model analysis can still err
 These fixes are in the U82 source. Installed copies need the U82 installer.
 Implementation, test evidence, exact file inventory and limitations:
 [Grounded chat repair](docs/GROUNDED-CHAT-REPAIR.md).
+Published installer hashes, CI and package checks:
+[U82 release verification](docs/U82-RELEASE-VERIFICATION.md).
 
 ## 3. Technical Details
 

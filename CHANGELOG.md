@@ -29,6 +29,10 @@
   writes through the platform's actual commit primitive. Canonicalize the packaged
   notebook self-test directory too. Production symlink/junction protections remain.
 - No memory migration, updater/network-policy change or website deployment.
+- Publish and independently verify both Windows installer names/checksums and
+  the public latest-release endpoint. Record build-environment isolation,
+  source/package checks and platform automation in
+  [U82 release verification](docs/U82-RELEASE-VERIFICATION.md).
 
 ## v3.14-U81 - Verified local actions, faster chat and website updates (2026-10-22)
 
