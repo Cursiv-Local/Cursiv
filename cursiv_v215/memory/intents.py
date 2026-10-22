@@ -234,8 +234,8 @@ def execute(action: Action, *, person: str) -> Outcome:
             sem.set_learning(enabled)
             if sem.learning_enabled() is not enabled or sem._settings().get('learn') is not enabled:
                 raise OSError('automatic-memory setting did not match the requested value')
-            message = ("I'll keep learning lasting facts from our conversations." if enabled else
-                       "I'll stop learning from conversations. Saved memories stay until you forget them.")
+            message = ('Automatic learning on. Lasting facts may be saved from conversations.' if enabled else
+                       'Automatic learning off. Existing saved memories remain.')
             return Outcome(op, True, message + '\nSetting saved and verified. Manual memory saves remain available.', status='verified')
         if op == LIST:
             records = sem.list_facts(person, repair=False)
@@ -285,7 +285,7 @@ def execute(action: Action, *, person: str) -> Outcome:
             elif op == UPDATE:
                 message = 'Memory corrected and verified: ' + back['text'] + '\nThe previous record is retained as superseded history.'
             elif action.form == 'remember':
-                message = "Got it — I'll remember: " + back['text']
+                message = 'Saved to memory: ' + back['text']
             else:
                 message = f"Saved to Cursiv's memory on this computer ({back['created']}), exactly as:\n{back['text']}"
             separator = ' ' if action.form == 'remember' and op == SAVE and not duplicate else '\n'

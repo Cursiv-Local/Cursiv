@@ -244,10 +244,11 @@ def panel(monkeypatch):
 def blocked_job():
     started, release, finished = threading.Event(), threading.Event(), threading.Event()
     def ask(messages, cancelled):
-        started.set()
-        release.wait(3)
-        finished.set()
-        return 'CLEAR'
+        with review.model_activity():
+            started.set()
+            release.wait(3)
+            finished.set()
+            return 'CLEAR'
     return review.Job('Is this safe?', 'Wait for the storm to pass.', '', '', lambda _: [], ask, 'fast'), started, release, finished
 
 
@@ -260,14 +261,18 @@ def test_qt_buttons_are_ready_while_verifier_is_blocked(panel):
     assert started.wait(1) and not finished.is_set()
     assert not panel._streaming and panel._send_btn.isEnabled() and panel._voice_btn.isEnabled()
     assert 'Wait for the storm' in panel._transcript.toPlainText()
+    _APP[0].processEvents()
+    assert not panel._check_progress.isHidden() and 'checking answer' in panel._status.text()
     release.set()
     assert finished.wait(1)
     for _ in range(50):
         _APP[0].processEvents()
-        if 'Background model check' in panel._transcript.toPlainText():
+        if panel._history[-1].get('background_review'):
             break
         time.sleep(.005)
-    assert 'Background model check' in panel._transcript.toPlainText()
+    assert panel._transcript.toPlainText().count('Wait for the storm to pass.') == 1
+    assert 'Background model check' not in panel._transcript.toPlainText()
+    assert panel._status.text() == '' and panel._check_progress.isHidden()
     assert panel._history[-1]['background_review']['status'] == 'checked'
 
 
@@ -322,7 +327,7 @@ def test_background_followup_is_saved_and_reloads_with_original_answer(panel, mo
     saved = conversations.load(panel._conv_id)
     assert saved['messages'][-1]['background_review']['status'] == 'checked'
     assert saved['messages'][-1]['content'].startswith('Wait for the storm to pass.')
-    assert 'Background model check' in saved['messages'][-1]['content']
+    assert saved['messages'][-1]['content'] == 'Wait for the storm to pass.'
     document = QTextDocument()
     document.setHtml(saved['html'])
     assert document.toPlainText() == panel._transcript.toPlainText()

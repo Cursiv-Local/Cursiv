@@ -166,7 +166,8 @@ def test_recall_empty_error_and_bounded_output(monkeypatch):
     assert result.ok and 'No matching' in result.message and 'never discussed' in result.message
     write_records([record(str(i)) for i in range(45)])
     result = mi.execute(mi.Action(mi.RECALL, period='past two weeks'), person='dana')
-    assert len(result.records) == 40 and '45 matching; showing 40' in result.message
+    assert len(result.records) == 40 and result.message.startswith('45 matching saved memory records')
+    assert 'showing 40' in result.message
     monkeypatch.setattr(sem, '_read_facts', lambda: (_ for _ in ()).throw(PermissionError('denied')))
     failed = mi.execute(mi.Action(mi.RECALL, period='past two weeks'), person='dana')
     assert not failed.ok and 'storage error' in failed.message
@@ -204,7 +205,7 @@ def test_dated_recall_cannot_be_transferred_to_model(monkeypatch, provider):
     from cursiv_v215.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: pytest.fail('No model'))
     reply = ''.join(ca.chat('what do you remember from the passed 2 weeks', [], '', None, force_provider=provider))
-    assert 'Saved memory records dated' in reply and 'No matching' in reply
+    assert reply.startswith('0 matching saved memory records') and 'No matching' in reply
 
 
 def test_source_history_is_a_hint_not_proof_and_rechecks_authorization(tmp_path):

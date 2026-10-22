@@ -137,8 +137,10 @@ def test_disabled_learning_preserves_manual_commands_and_data(memory):
     learn('I prefer Rust.')
     memory.set_learning(False)
     assert learn("I'm building a new research project.") == []
-    assert 'remember' in memory.memory_command('remember the sample box is blue')
+    receipt = memory.memory_command('remember the sample box is blue')
+    assert receipt.startswith('Saved to memory:') and 'Memory ID:' in receipt
     assert len(memory.list_facts()) == 2
+    assert any(row['text'] == 'the sample box is blue' for row in memory.list_facts())
     assert memory.memory_command('forget sample box').startswith('Forgotten')
 
 

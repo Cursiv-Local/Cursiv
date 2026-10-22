@@ -264,6 +264,14 @@ def _clock_ahead_minutes(rows: list[dict]) -> int:
     return int(round(worst)) if worst > 5 else 0
 
 
+def _copy_import(src: Path, dest: Path, expected: list[dict]) -> None:
+    """A summary of success must describe the persisted copy, not just the source."""
+    _copy_atomic(src, dest)
+    actual = _read_lines(dest)
+    if actual != expected or chain_problems(actual):
+        raise OSError('import read-back verification failed; a copy may exist, but the import is not confirmed')
+
+
 def import_folder(folder: Path) -> dict:
     """Import every shared log in folder (or folder/cursiv-field-share). Returns a report:
     {"added": {device: new entries}, "unchanged": [...], "conflicts": [...], "rejected": [...], "own": bool}."""
@@ -273,7 +281,7 @@ def import_folder(folder: Path) -> dict:
     if not logs:
         raise ValueError(f"no shared field logs in {src}")
     report = {"added": {}, "unchanged": [], "conflicts": [], "rejected": [], "own": False,
-              "signed": {}, "unsigned": [], "photos_missing": {}}
+              "signed": {}, "unsigned": [], "photos_missing": {}, "chain_verified": []}
     me = fieldlog._device()
     team_dir().mkdir(parents=True, exist_ok=True)
     for log in logs:
@@ -305,8 +313,9 @@ def import_folder(folder: Path) -> dict:
             report["unsigned"].append(device)
         mine = team_dir() / f"{device}.jsonl"
         if not mine.exists():
-            _copy_atomic(log, mine)
+            _copy_import(log, mine, rows)
             report["added"][device] = len(rows)
+            report["chain_verified"].append(device)
             continue
         try:
             have = _read_lines(mine)
@@ -315,9 +324,12 @@ def import_folder(folder: Path) -> dict:
                                       "nothing was changed. Run 'team log' for details")
             continue
         hashes_have, hashes_new = [e["hash"] for e in have], [e["hash"] for e in rows]
+        if chain_problems(have) or any(fieldlog.record_problems(e) for e in have):
+            report['rejected'].append(f'{device}: the stored chain has problems; no successful import confirmed')
+            continue
         if hashes_new[:len(hashes_have)] == hashes_have:
             if len(rows) > len(have):
-                _copy_atomic(log, mine)                        # it only grew
+                _copy_import(log, mine, rows)                   # it only grew
                 report["added"][device] = len(rows) - len(have)
             else:
                 report["unchanged"].append(device)
@@ -331,6 +343,8 @@ def import_folder(folder: Path) -> dict:
             report["conflicts"].append(
                 f"{device}: its history differs from the copy imported earlier, from entry {first + 1} on. "
                 f"Both are kept ({mine.name} and {keep.name}); neither was chosen.")
+            continue
+        report['chain_verified'].append(device)
     return report
 
 
@@ -520,7 +534,16 @@ def report_text(r: dict) -> str:
         lines.append(f"- CHECK {c}")
     if r["own"] and len(lines) == 0:
         lines.append("- only this laptop's own share was there")
-    return "Imported field logs:\n" + "\n".join(lines)
+    total = sum(r['added'].values())
+    summary = f"{total} new entr" + ('y' if total == 1 else 'ies')
+    devices = set(r['added']) | set(r['unchanged'])
+    if r['conflicts'] or r['rejected']:
+        summary += ' · import needs attention'
+    elif devices and devices <= set(r.get('chain_verified', [])):
+        summary += ' · chain intact'
+    if r.get('photos_missing') or r.get('clock') or r.get('unsigned'):
+        summary += ' · see notes'
+    return summary + '\nImported field logs:\n' + '\n'.join(lines)
 
 
 def command(text: str, observer: str = "") -> str | None:

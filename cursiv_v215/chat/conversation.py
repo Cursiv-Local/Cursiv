@@ -298,6 +298,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                             _receipt = _result.receipt
                             _fields = _files.FileResult.__dataclass_fields__
                             on_action(_files.FileResult(**{k: v for k, v in _receipt.items() if k in _fields}))
+                        elif on_action:
+                            on_action(_result)
                     runtime._RETRIEVED.append(_tool_ctx)
                     messages[0]["content"] += "\n\n" + _tool_ctx + "\n"
                     checked = [r.label for r in _results if r.ok]
@@ -315,6 +317,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         except Exception as exc:
             runtime._CURSIV_REPLY = True
             failed = _files.FileResult('tool_execution', ok=False, error=type(exc).__name__)
+            if on_action:
+                on_action(failed)
             yield _files.VerifiedText('Tool execution unavailable: ' + type(exc).__name__ +
                 '. No successful access or action is confirmed.', failed)
             return
@@ -440,8 +444,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         _runtime = '\nOperational preferences unavailable; missing state is unknown.\n'
     # Constructed here, never parsed out of user/model text. Compact providers
     # retain this block separately from the long replaceable persona.
+    from cursiv_v215.core.feedback import VOICE
     messages.insert(1, dict(role='system', content=(
-        (_runtime or presence.CAPABILITIES) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context())))
+        (_runtime or presence.CAPABILITIES) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context()
+        + ('\n' + VOICE if not runtime._EMERGENCY_TURN else ''))))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.

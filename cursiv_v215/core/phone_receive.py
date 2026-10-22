@@ -70,6 +70,7 @@ class Receiver:
         self.idle_seconds = idle_minutes * 60
         self.wrong = 0
         self.received = 0
+        self.imported = 0  # entries confirmed by the importer; uploads counted separately
         self.last_activity = time.monotonic()
         self._lock = threading.Lock()                # one import at a time
         self._port = port
@@ -139,7 +140,9 @@ class Receiver:
                 dest.unlink(missing_ok=True)
                 raise ValueError("the file didn't arrive whole (the connection dropped): send it again")
             try:
-                text = fieldsync.report_text(fieldsync.import_phone_bundle(dest))
+                result = fieldsync.import_phone_bundle(dest)
+                text = fieldsync.report_text(result)
+                self.imported += sum(result['added'].values())
             except (OSError, ValueError) as exc:
                 text = f"NOT IMPORTED: {exc}"
         self.received += 1

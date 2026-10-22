@@ -160,12 +160,13 @@ def test_worker_delivers_action_via_signal(archive, monkeypatch):
     class Host:
         _pending_history_append = ['old']
         class _signals:
+            state_changed = Signal('state')
             notes_view = Signal('notes')
             chunk = Signal('chunk')
             done = Signal('done')
     host = Host()
     ChatPanel._deliver_result(host, cc.NotesResult('worldmodel', 'rain'), [])
-    assert emitted[0] == ('notes', ('worldmodel', 'rain'))
+    assert emitted[:2] == [('state', ()), ('notes', ('worldmodel', 'rain'))]
     assert host._pending_history_append is None
 
 

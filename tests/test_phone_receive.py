@@ -70,11 +70,13 @@ def test_a_phone_file_sent_with_the_code_is_imported_with_the_usual_checks(recei
     assert seen["data"] == b"PK pretend zip"
     assert list(phone_receive.received_dir().iterdir())          # a copy of what arrived is kept
     assert receiver.events[-1].startswith("Received send.cursivsync")
+    assert receiver.imported == 3 and receiver.received == 1
 
 
 def test_something_that_isnt_a_phone_file_is_reported_not_imported(receiver):
     status, j = _put(receiver, b"{}", receiver.code)
     assert status == 200 and not j["ok"] and "NOT IMPORTED" in j["message"]
+    assert receiver.imported == 0 and receiver.received == 1
 
 
 def test_too_big_or_empty_is_refused_before_reading(receiver, monkeypatch):

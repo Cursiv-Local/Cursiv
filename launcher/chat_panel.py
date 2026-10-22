@@ -37,6 +37,7 @@ from chat_rendering import MarkdownStream, TranscriptCache
 from chat_controls import ChatControlsMixin, _ChatInput
 from chat_transcript import ChatTranscriptMixin
 from chat_review import ChatReviewMixin
+from chat_feedback import ChatFeedbackMixin
 
 
 _HERE = Path(__file__).parent
@@ -123,6 +124,9 @@ class _ChatSignals(QObject):
     models = pyqtSignal(object)         # installed Ollama chat models (list), or None if Ollama is down
     crosscheck = pyqtSignal(object)     # core.crosscheck.Review, from the background thread
     review_done = pyqtSignal(object, object)
+    review_state = pyqtSignal(object, str)
+    tool_receipt = pyqtSignal(object)
+    state_changed = pyqtSignal()
     notes_view = pyqtSignal(str, str)   # category/query; widgets are opened on the GUI thread
     stage = pyqtSignal(str)            # distinguish answer checks from streaming/rendering
     saved = pyqtSignal(str, str, int)  # conversation id, error, snapshot revision
@@ -130,7 +134,7 @@ class _ChatSignals(QObject):
 
 
 
-class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget):
+class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, QWidget):
     conversation_changed = pyqtSignal()     # saved / opened / new / renamed -> sidebar refresh
     """
     Self-contained chat view: transcript + input box, wired to the real
@@ -224,6 +228,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
             self._cfg["postal_user"] = "joshua"
 
             self._backend_ready = True
+            self._refresh_status_pill()
             self._send_btn.setEnabled(True)
             self._voice_btn.setEnabled(True)
             # Replace "Getting Cursiv ready…" with one line -- unless the
@@ -310,6 +315,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         self._dirty = False
         self._save_error = False
         self._show_empty_state()
+        self._reset_feedback()
         self.conversation_changed.emit()
 
     # ── Empty state ─────────────────────────────────────────────────────
@@ -391,6 +397,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         self._conv_id = conv_id
         self._dirty = False
         self._save_error = False
+        self._reset_feedback()
         self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
         self.conversation_changed.emit()
         return True
@@ -402,6 +409,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         keys = _load_saved_keys()
         for field in ("api_key", "openai_key", "anthropic_key"):
             self._cfg[field] = keys.get(field, "")
+        self._refresh_status_pill()
 
 
 
@@ -483,7 +491,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
 
         self._input.clear()
         self._append_user(text)
-        self._begin_turn()
+        self._begin_turn(cc.hey_prefix(text)[1])
 
         # Snapshot deliberately excludes this turn -- built-in commands
         # (anchor this, etc.) inspect history for the *prior* exchange, and
@@ -496,8 +504,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         )
         thread.start()
 
-    def _begin_turn(self) -> None:
+    def _begin_turn(self, text: str = '') -> None:
         self._cancel_review()
+        self._set_turn_feedback(text)
         self._reset_rendering()
         self._pending_notebook_receipt = None
         self._pending_file_receipts = []
@@ -509,7 +518,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         self._stop_btn.setEnabled(True)
         self._cc_btn.setEnabled(False)
         self._last_exchange = None           # a new turn: nothing finished to cross-check yet
-        self._status.setText("Cursiv is thinking…")
+        self._status.setText("Preparing answer…")
         self._reply_text = ""
         self._reply_is_chat = False
         self._begin_ai_reply()
@@ -643,15 +652,18 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
 
     def _deliver_result(self, result, history: list[dict], text: str = "") -> None:
         """Runs on the background thread -- streams a command's TextResult/StreamResult."""
+        self._signals.state_changed.emit()
         if isinstance(result, cc.NotebookResult):
             self._pending_history_append = [("user", cc.hey_prefix(text)[1]), ("assistant", result.text)]
             self._pending_notebook_receipt = result.receipt
+            self._signals.tool_receipt.emit(('notebook', result.receipt))
             self._signals.chunk.emit(result.text)
             self._signals.done.emit()
             return
         if isinstance(result, cc.MemoryResult):
             self._pending_history_append = [("user", cc.hey_prefix(text)[1]), ("assistant", result.text)]
             self._pending_memory_receipt = result.receipt
+            self._signals.tool_receipt.emit(('memory', result.receipt))
             self._signals.chunk.emit(result.text)
             self._signals.done.emit()
             return
@@ -796,6 +808,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
             self._history[-1]['memory_receipt'] = self._pending_memory_receipt
             self._pending_memory_receipt = None
         self._pending_history_append = None
+        self._refresh_context_indicator()
         self._after_turn()
         self._streaming = False
         self._send_btn.setEnabled(True)
@@ -888,6 +901,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
                                       expected_sha256=request.get('expected_sha256'),
                                       remember=request.get('remember', False))
             self._pending_file_receipts = getattr(result, 'receipts', [])
+            for receipt in self._pending_file_receipts:
+                self._signals.tool_receipt.emit(('filesystem', receipt))
             self._signals.write_complete.emit(result.text)
         except Exception as e:
             self._signals.write_complete.emit(f"[Write failed: {e}]")
@@ -914,11 +929,6 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, QWidget
         self._status.setText("")
 
     # ── Commands that need a real dialog ─────────────────────────────────
-
-    def _capture_file_result(self, result) -> None:
-        from cursiv_v215.core.file_access import FileResult
-        if isinstance(result, FileResult):
-            self._pending_file_receipts.append(result.receipt())
 
     def _try_dialog_command(self, text: str) -> bool:
         """Returns True if `text` was handled here (a dialog was shown)."""

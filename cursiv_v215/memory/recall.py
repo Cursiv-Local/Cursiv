@@ -58,8 +58,8 @@ def retrieve(period: str, person: str) -> tuple[str, list[dict]]:
             matches.append(record)
     matches.sort(key=lambda f: (saved_day(f), str(f.get('created', '')), str(f.get('id', ''))))
     shown = matches[-40:]
-    head = (f'Saved memory records dated {start.isoformat()} through {end.isoformat()} '
-            f'(inclusive local calendar dates): {len(matches)} matching; showing {len(shown)}.')
+    head = (f'{len(matches)} matching saved memory records · {start.isoformat()} through {end.isoformat()} '
+            f'(inclusive local calendar dates); showing {len(shown)}.')
     rows = '\n'.join(f"- [{f.get('id', 'legacy record without ID')}] {f['text']} "
                      f"(saved {f.get('created') or f.get('date')}; {sem.origin_label(f)})" for f in shown)
     scope = ('This searches active saved facts visible to this user, not the complete conversation archive or Field Notebook. '

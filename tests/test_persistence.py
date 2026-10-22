@@ -51,7 +51,8 @@ def test_a_note_and_offline_mode_survive_a_restart(tmp_path):
     home = tmp_path / "home"
     home.mkdir()
 
-    assert "I'll remember" in _run(SAVE, home, app)
+    receipt = _run(SAVE, home, app)
+    assert receipt.startswith('Saved to memory:') and 'Memory ID:' in receipt
     after = json.loads(_run(READ, home, app))          # a new process: Cursiv opened again
 
     assert after["offline"] is True                    # offline mode is still on

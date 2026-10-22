@@ -1,5 +1,11 @@
 # Answer review without a post-generation wait
 
+> U85 interface follow-up: [quiet feedback and continuity](CHAT-FEEDBACK.md)
+> retains this scheduling architecture, adds actual-call progress signals and
+> makes clean reviews quiet. Its measurements and source checks are recorded
+> separately from the historical implementation checkpoints below.
+> [U85 verification](U85-RELEASE-VERIFICATION.md) records its publication gates.
+
 > Publication follow-up: the owner subsequently authorized commit/push,
 > packaging, release and website deployment. U83 stayed an unpublished candidate
 > after a full-window smoke failure; U84 repairs it and expands that gate.

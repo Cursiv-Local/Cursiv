@@ -135,6 +135,13 @@ when eligible. `check off` disables model review; `check full` permits a bounded
 review/rewrite/recheck. Pure-code checks stay on in every mode. See the
 [answer review report](docs/ASYNC-ANSWER-REVIEW.md) for measurements and limits.
 
+**U85 feedback polish:** quiet state and tool receipts, a progress line
+only during reviewer calls, and no extra paragraph for a clean review. Notebook
+receipts include a record ID/fingerprint; import summaries count new entries
+separately from uploads and duplicates. Turn restrictions do not disable chat
+history. See [scope, checks and limitations](docs/CHAT-FEEDBACK.md) and
+[U85 release verification](docs/U85-RELEASE-VERIFICATION.md).
+
 The latest [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) closes
 additional policy/source/error gaps. Source labels describe application-supplied
 evidence; a memory-context label does not claim the model used or verified it.
@@ -177,7 +184,7 @@ optional developer packages out of the installer.
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
-3. Run `py -3.13 scripts/build_release.py v3.14-U84` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
+3. Run `py -3.13 scripts/build_release.py v3.14-U85` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
@@ -187,9 +194,9 @@ versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 For each new release, substitute an unused higher version in these examples.
 
 ```powershell
-Copy-Item installer/Output/Cursiv-Setup-3.14-U84.exe installer/Output/Cursiv-Setup-latest.exe
-Copy-Item installer/Output/SHA256SUMS-3.14-U84.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U84 installer/Output/Cursiv-Setup-3.14-U84.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U84" --notes-file docs/RELEASE-U84.md --latest --verify-tag --repo Cursiv-Local/Cursiv
+Copy-Item installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U85.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --latest --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
@@ -197,7 +204,7 @@ It requires a higher version; replacing assets under the same version will not
 trigger an update for that version. Offline mode blocks update checks.
 
 Run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
-v3.14-U84 --label U84 --model qwen3:4b-instruct`, substituting the new version),
+v3.14-U85 --label U85 --model qwen3:4b-instruct`, substituting the new version),
 review every failure, and update the website's current test section from that
 artifact. `node --test cloudflare/tests/*.test.mjs` checks analytics and verifies
 that release labels, model scores and the separate software-test count match
@@ -234,10 +241,11 @@ expandable practical details and direct latest-installer download buttons.
 
 #### Included Desktop Improvements
 
-U84 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
+U85 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,
-dated recall and source checks. See [U84 release notes](docs/RELEASE-U84.md),
+dated recall and source checks. U85 adds quiet status/receipts and notebook
+continuity with read-back confirmation. See [U85 release notes](docs/RELEASE-U85.md),
 [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and
@@ -251,7 +259,7 @@ filesystem mutations. See [ARCHITECTURE.md](ARCHITECTURE.md),
 [quality checklist](docs/QUALITY-CHECKLIST.md). Signing, clean-machine USB/Mac
 validation and packaged Linux support remain open or unsupported as recorded in
 [platform readiness](docs/PLATFORM-READINESS.md). Current test and publication
-results are in [U84 verification](docs/U84-RELEASE-VERIFICATION.md).
+results are in [U85 verification](docs/U85-RELEASE-VERIFICATION.md).
 
 #### Optional Features
 

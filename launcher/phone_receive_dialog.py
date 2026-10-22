@@ -92,8 +92,7 @@ class PhoneReceiveDialog(QDialog):
         outer.addLayout(row)
 
     def _on_event(self, text: str) -> None:
-        if text.startswith("Received"):
-            self.imported += 1
+        self.imported = self._receiver.imported
         self._log.appendPlainText(text + "\n")
 
     def done(self, result: int) -> None:          # accept, reject, Esc and the window's X all come here

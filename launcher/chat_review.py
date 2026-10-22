@@ -8,6 +8,7 @@ class ChatReviewMixin:
         self._pending_review = None
         self._review_cancel = None
         self._signals.review_done.connect(self._on_review_done)
+        self._signals.review_state.connect(self._on_review_state)
         self.destroyed.connect(lambda: self._cancel_review())
 
     def _cancel_review(self):
@@ -19,6 +20,8 @@ class ChatReviewMixin:
         if event:
             event.set()
         self._pending_review = self._review_cancel = None
+        if hasattr(self, '_check_progress'):
+            self._check_progress.hide()
 
     def _queue_review(self, key, job, cancel_event):
         # Called by the chat worker; no Qt calls and no model calls here.
@@ -36,13 +39,14 @@ class ChatReviewMixin:
         if self._history[index].get('role') != 'assistant' or job.cancelled.is_set():
             return
         self._review_cancel = job.cancelled
-        self._status.setText('Answer ready · background check running')
+        if not getattr(self, '_save_error', False):
+            self._status.setText('Draft ready')
         signals = self._signals
 
         def work():
             from cursiv_v215.core.verify import PassResult
             try:
-                result = job.run()
+                result = job.run(on_model_state=lambda stage: signals.review_state.emit((key, index, original), stage))
             except Exception:
                 result = PassResult(status='unavailable', skip_learn=True,
                                     append='Model review unavailable; the answer is unverified.')
@@ -53,6 +57,16 @@ class ChatReviewMixin:
                     pass  # the window was destroyed; never touch a widget from this thread
         threading.Thread(target=work, daemon=True, name='cursiv-answer-review').start()
 
+    def _on_review_state(self, target, stage):
+        key, index, original = target
+        if (key != self._review_generation or self._streaming or index >= len(self._history)
+                or self._history[index].get('content') != original or self._review_cancel is None
+                or self._review_cancel.is_set()):
+            return
+        self._check_progress.setVisible(bool(stage))
+        if not getattr(self, '_save_error', False):
+            self._status.setText(f'Draft ready · {stage}…' if stage else 'Draft ready')
+
     def _on_review_done(self, target, result):
         key, index, original = target
         if (key != self._review_generation or self._streaming or index >= len(self._history)
@@ -60,18 +74,23 @@ class ChatReviewMixin:
                 or (self._review_cancel and self._review_cancel.is_set())):
             return
         self._review_cancel = None
-        self._status.setText('')
+        self._check_progress.hide()
+        from cursiv_v215.core.feedback import review_status
+        if not getattr(self, '_save_error', False):
+            self._status.setText(review_status(result))
         from cursiv_v215.chat.review import followup
         note = followup(result)
-        if not note:
+        if result is None:
             return
-        text = original + note
-        self._on_replace(text)  # this generation's latest message only; never rebuild history
-        self._render_reply()
-        self._end_ai_reply()
-        self._history[index]['content'] = text
+        if note:
+            text = original + note
+            self._on_replace(text)  # this generation's latest message only; never rebuild history
+            self._render_reply()
+            self._end_ai_reply()
+            self._history[index]['content'] = text
+            if self._last_exchange:
+                self._last_exchange = (self._last_exchange[0], text)
         self._history[index]['background_review'] = {
-            'status': result.status, 'issues': [p.record() for p in result.issues]}
-        if self._last_exchange:
-            self._last_exchange = (self._last_exchange[0], text)
+            'status': result.status, 'issues': [p.record() for p in result.issues],
+            'scope': 'bounded local model review; not a factual guarantee'}
         self._after_turn()

@@ -45,15 +45,19 @@ class Policy:
         """Application-owned limits; do not promise deletion of chat history."""
         if self == Policy():
             return ''
+        if not self.inspect and not self.change and not self.memory_write and not self.automatic_memory:
+            return ('This turn: talk-only; tools and saved-source lookup disabled; memory saves disabled. '
+                    'Conversation history still follows your chat-history settings.')
         limits = []
         if not self.inspect:
-            limits.append('tools, saved-source lookup and built-in calculation/reference checks disabled')
+            limits.append('tools and saved-source lookup disabled')
         if not self.change:
             limits.append('changes disabled')
         if not self.memory_write:
             limits.append('memory saves disabled')
         if not self.automatic_memory:
-            limits.append('automatic learning disabled')
+            if self.memory_write:
+                limits.append('automatic learning disabled')
         return ('This turn: ' + '; '.join(limits) +
                 '. Conversation history still follows your chat-history settings.')
 

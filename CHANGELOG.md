@@ -1,5 +1,26 @@
 # Changelog
 
+## v3.14-U85 - Quiet chat feedback and notebook continuity (2026-10-22)
+
+- Keep streamed drafts available while optional local reviews run. Show a small
+  progress indicator only around an actual reviewer invocation, then a note
+  count or an unavailable status. Clean reviews keep metadata without adding
+  prose or reparsing the answer.
+- Add application-owned tool, file, notebook and memory receipts; show current
+  file-access/workspace state and per-turn talk-only/read-only limits. Preserve
+  the last confirmed notebook site as conversation context, including on reopen.
+- Shorten restriction confirmations without promising offline execution or
+  disabling conversation history. Use restrained model guidance and precise
+  persistent-memory acknowledgements.
+- Include sample IDs/fingerprints in notebook confirmations. Read back saved
+  notebook entries and imported copies before confirming integrity; summarize
+  new-entry counts separately from received uploads, duplicates and warnings.
+  Keep append-only record formats and existing authorizations intact.
+- Record changed files, regressions, controlled rendering measurements and
+  remaining limits in [chat feedback](docs/CHAT-FEEDBACK.md). The owner authorized
+  U85 publication; tagged builds, fresh model results and actual publication are
+  recorded in [U85 verification](docs/U85-RELEASE-VERIFICATION.md).
+
 ## Website - General phone photo questions (2026-10-22)
 
 - Replace the phone app's Bible-specific setup, chat example, placeholder and

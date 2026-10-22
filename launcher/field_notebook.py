@@ -33,9 +33,8 @@ class FieldNotebookDialog(QDialog):
         title = QLabel("Field Notebook")
         title.setStyleSheet("font-size: 20px; font-weight: 600;")
         outer.addWidget(title)
-        intro = QLabel("Observations you record here are kept exactly as typed, apart from anything the AI says. "
-                       "Nothing is ever overwritten: a correction is added as a new entry with a reason, and every "
-                       "entry is fingerprinted so later changes can be detected.")
+        intro = QLabel("Recorded observations are kept as entered. Model suggestions stay in chat until you record them. "
+                       "Corrections append a new entry with a reason; fingerprints detect later changes.")
         intro.setWordWrap(True)
         intro.setStyleSheet(f"color: {theme.MUTED};")
         outer.addWidget(intro)
@@ -110,7 +109,7 @@ class FieldNotebookDialog(QDialog):
         self._integrity = QLabel("")
         outer.addWidget(self._integrity)
         self._table = QTableWidget(0, 5)
-        self._table.setHorizontalHeaderLabels(["#", "Recorded", "Site", "Measurements", "Note"])
+        self._table.setHorizontalHeaderLabels(["#", "Recorded", "Site", "Measurements", "Recorded note"])
         self._table.setEditTriggers(QAbstractItemView.EditTrigger.NoEditTriggers)
         self._table.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self._table.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
@@ -231,19 +230,26 @@ class FieldNotebookDialog(QDialog):
                 e = fieldlog.correct(self._correcting, reason, **f)
             else:
                 e = fieldlog.add(**f)
-            from cursiv_v215.core import curiosity_engine
-            from cursiv_v215.memory import semantic
-            curiosity_engine.notify(semantic.current_person())
+            actual = next((row for row in fieldlog.entries() if row.get('id') == e.get('id')), None)
+            if actual != e or actual is None or fieldlog.record_problems(actual) or fieldlog.verify():
+                raise OSError('read-back or chain verification failed; an entry may exist')
         except ValueError as exc:
             self._status.setText(f"Not saved: {exc}.")
             self._status.setStyleSheet(f"color: {theme.RED};")
             return
-        except OSError as exc:                 # disk full, read-only or pulled drive: nothing was written
-            self._status.setText(f"Not saved: couldn't write the field log ({exc}). Nothing was recorded; "
-                                 "free some space or check the drive, then save again.")
+        except OSError as exc:
+            self._status.setText(f"Not saved or not confirmed: {exc}. Check the notebook before retrying.")
             self._status.setStyleSheet(f"color: {theme.RED};")
             return
-        self._status.setText(f"Saved #{e['seq']} · fingerprint {e['hash'][:12]}")
+        try:
+            from cursiv_v215.core import curiosity_engine
+            from cursiv_v215.memory import semantic
+            curiosity_engine.notify(semantic.current_person())
+        except (OSError, ValueError):
+            pass  # an optional suggestion cannot turn a verified save into failure
+        sample = f" · sample {e['sample_id']}" if e.get('sample_id') else ''
+        self._status.setText(f"Saved #{e['seq']}{sample} · fingerprint {e['hash'][:12]} · chain intact")
+        self._status.setToolTip(f"Record ID: {e['id']}\nSHA-256: {e['hash']}")
         self._status.setStyleSheet(f"color: {theme.GREEN};")
         self._clear_form()
         self.refresh()
@@ -286,6 +292,10 @@ class FieldNotebookDialog(QDialog):
                 item = QTableWidgetItem(text)
                 if c == 0:
                     item.setData(Qt.ItemDataRole.UserRole, e)
+                item.setToolTip('Recorded observation · ' + ('entered through chat' if e.get('chat_request_id') else
+                                                          'notebook entry') +
+                                f"\nRecord ID: {e['id']}\nFingerprint: {e['hash']}\n"
+                                'Recording does not independently verify the observation.')
                 self._table.setItem(r, c, item)
         self._show_integrity()
 
@@ -414,5 +424,7 @@ class FieldNotebookDialog(QDialog):
             QMessageBox.warning(self, "Not imported", str(exc))
             return
         problem = any(w in text for w in ("CONFLICT", "NOT IMPORTED", "CHECK"))
+        self._status.setText(text.splitlines()[0])
+        self._status.setStyleSheet(f"color: {theme.AMBER if problem else theme.GREEN};")
         (QMessageBox.warning if problem else QMessageBox.information)(
             self, "Team field logs", text + "\n\nFor the whole team: type 'team log' or 'team log export' in the chat.")

@@ -1,5 +1,38 @@
 # Handoff — Cursiv verification overhaul
 
+## U85 publication authorized
+
+The owner now authorizes committing, pushing, version bump, installer release
+and website deployment for the newest feedback/notebook changes. U84 was
+confirmed as GitHub latest and both remote branches matched the local starting
+commit. U85 is a fresh version/tag; existing published tags/assets are preserved.
+See [U85 verification](docs/U85-RELEASE-VERIFICATION.md) for actual source,
+tests, Windows/Mac package, model benchmark and production verification results.
+Statuses below are earlier checkpoints, not the current publication state.
+
+## Pre-release checkpoint: quiet feedback and continuity
+
+The latest request adds restrained draft/review status, factual execution
+receipts, current workspace/file/turn indicators and notebook feedback.
+Implementation and exact file inventory are in [CHAT-FEEDBACK](docs/CHAT-FEEDBACK.md).
+Final isolated Windows suite: **1,267 passed, 1 skipped** (Mac Keychain only),
+154.66 s. Replays at 10/100/1,000 messages retained zero full-document rebuilds
+and median final-token-to-ready times of 17/22/76 ms; the one-second review wait
+is simulated. Read the report for notes-path fixture details and actual limits.
+The existing U84 streaming/deferred-review architecture is retained. Progress
+signals begin after local-model availability checks, around invocation only;
+clean results persist review metadata without rewriting the transcript.
+Notebook saves/imports are read back before success summaries. Existing chains
+are neither migrated nor rewritten. Suggestions remain prose until explicitly
+recorded by the user. Review the distinction between a saved historical receipt
+used as context and a newly executed/verified operation.
+
+Changes remain local on `codex/maintainability-hardening`; no commit, push,
+version bump, packaging or deployment has occurred for this follow-up.
+Published U84 and all historical release/benchmark records remain unchanged.
+Personal `test_internals/` stays excluded. The following U84 sections describe
+the completed earlier publication, not the unreleased changes above.
+
 ## U84 published
 
 Published GitHub latest U84 at 2026-10-22 22:08:56 UTC; Windows and Apple Silicon

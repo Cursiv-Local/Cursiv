@@ -72,6 +72,15 @@ one or falling back to an external service. Programmatic callers without the
 desktop callback retain a bounded synchronous path. See
 [implementation, controlled timings and limitations](ASYNC-ANSWER-REVIEW.md).
 
+U85 presentation follow-up: the draft status and small progress bar are
+driven by generation-bound Qt signals around actual local reviewer calls, after
+availability checks. Queued, skipped and unavailable checks do not animate.
+A clean result adds no transcript paragraph and triggers no Markdown parse;
+its bounded result still persists in `background_review`. Findings retain a
+labeled follow-up and short issue count. “Checked” does not guarantee truth.
+Execution receipts use typed application results, never model prose. See
+[chat feedback validation](CHAT-FEEDBACK.md).
+
 ## Stable code families
 
 The later [trust-boundary follow-up](TRUST-BOUNDARY-FOLLOWUP.md) makes source

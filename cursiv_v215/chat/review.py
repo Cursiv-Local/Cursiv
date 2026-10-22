@@ -1,7 +1,8 @@
 """Bounded, local answer review with immutable turn evidence and no widget access."""
 from __future__ import annotations
 
-from contextvars import copy_context
+from contextvars import copy_context, ContextVar
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass, field
 from functools import partial
@@ -14,6 +15,24 @@ TOKENS = 180
 REWRITE_TOKENS = 300
 MODES = ('off', 'fast', 'full')
 _MODEL_SLOT = threading.Lock()
+_MODEL_STATE = ContextVar('cursiv_review_model_state', default=None)
+
+
+@contextmanager
+def model_activity(stage='checking answer'):
+    """Notify only around a real model invocation, after availability checks."""
+    callback = _MODEL_STATE.get()
+    def notify(value):
+        if callback:
+            try:
+                callback(value)
+            except Exception:
+                pass  # presentation failure must not change a check's outcome
+    notify(stage)
+    try:
+        yield
+    finally:
+        notify('')
 
 
 def mode() -> str:
@@ -59,7 +78,7 @@ class Job:
     scope: object = field(default_factory=copy_context, repr=False)
     cancelled: threading.Event = field(default_factory=threading.Event, repr=False)
 
-    def run(self):
+    def run(self, on_model_state=None):
         if self.cancelled.is_set():
             return None
         acquired = self.mode == 'off' or _MODEL_SLOT.acquire(blocking=False)
@@ -68,6 +87,7 @@ class Job:
                                      append='Optional review not run: another local review is still stopping. Code checks still ran.')
 
         def run():
+            _MODEL_STATE.set(on_model_state)
             def ask(messages):
                 return '' if self.cancelled.is_set() else self.ask(messages, self.cancelled)
             return verify.run_pass(self.question, self.draft, ask=ask, context=self.context,
@@ -122,7 +142,8 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
     def ask(messages, cancelled):
         budget = REWRITE_TOKENS if messages[0]['content'].startswith('Rewrite') else TOKENS
         if not background:
-            return router(messages, max_tokens=budget)
+            with model_activity():
+                return router(messages, max_tokens=budget)
         if cancelled.is_set() or not running():
             return ''
         model = resolve(standard=True)
@@ -130,17 +151,18 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
             return ''  # optional review never starts/downloads a model or falls back to cloud
         system = '\n'.join(m['content'] for m in messages if m['role'] == 'system')
         prompt = '\n'.join(m['content'] for m in messages if m['role'] != 'system')
-        stream = generate(model, system, prompt, max_tokens=budget, collect=False)
         parts = []
-        try:
-            for chunk in stream:
-                if cancelled.is_set():
-                    return ''
-                parts.append(chunk)
-        finally:
-            close = getattr(stream, 'close', None)
-            if close:
-                close()
+        with model_activity('reviewing wording' if budget == REWRITE_TOKENS else 'checking answer'):
+            stream = generate(model, system, prompt, max_tokens=budget, collect=False)
+            try:
+                for chunk in stream:
+                    if cancelled.is_set():
+                        return ''
+                    parts.append(chunk)
+            finally:
+                close = getattr(stream, 'close', None)
+                if close:
+                    close()
         output = ''.join(parts).strip()
         return '' if output.startswith('[') and 'error' in output[:150].lower() else output
 
@@ -152,7 +174,7 @@ def followup(result) -> str:
     if result is None or result.status == 'skipped':
         return ''
     if result.status == 'revised' and result.clear:
-        return '\n\n**Background check — suggested revision:**\n' + result.append.split('**Revised after check:**\n', 1)[-1]
+        return '\n\n**Check — suggested revision:**\n' + result.append.split('**Revised after check:**\n', 1)[-1]
     if result.clear:
-        return '\n\n*(Background model check: no additional problems found. This is a bounded model review.)*'
-    return '\n\n**Background check:**\n' + (result.append.strip() or 'Review unavailable; the answer is unverified.')
+        return ''  # quiet when clean; the saved review metadata retains the result
+    return '\n\n**Check notes:**\n' + (result.append.strip() or 'Review unavailable; the answer is unverified.')

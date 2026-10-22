@@ -48,9 +48,8 @@ class Result:
         if self.status in ('saved', 'already_recorded'):
             row = self.records[0]
             lead = 'Saved to the field log:' if self.status == 'saved' else 'Already recorded in the Field Notebook; no duplicate added:'
-            return (f"{lead} {fieldlog.summary(row)}\nRecord ID: {row['id']}\n"
-                    f"SHA-256: {row['hash']}\nRead-back matched; notebook chain verified. "
-                    'Visible in Field Notebook. Corrections append new entries; originals remain.')
+            return (f"{lead} {fieldlog.summary(row)}\nRecord ID: {row['id']} · "
+                    f"fingerprint {row['hash'][:12]} · read-back matched · chain intact.")
         if self.status == 'verified':
             return f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified).'
         return ('Field Notebook: ' + str(self.count) + ' matching record(s).\n' +

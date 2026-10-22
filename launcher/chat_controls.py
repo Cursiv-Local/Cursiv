@@ -109,6 +109,7 @@ class ChatControlsMixin:
         lay.addLayout(header_row)
         self._signals.models.connect(self._on_models)
         self._signals.crosscheck.connect(self._on_cross_check)
+        self._build_feedback(lay)
         self._refresh_status_pill()
         self._load_models()
         self._pill_timer = QTimer(self)
@@ -196,7 +197,7 @@ class ChatControlsMixin:
 
         self._status = QLabel("")
         self._status.setStyleSheet(f"color: {theme.FAINT}; font-size: 12px;")
-        lay.addWidget(self._status)
+        self._build_check_progress(lay)
 
     def _icon_btn_style(self) -> str:
         return theme.ghost_button(10) + "QPushButton { font-size: 13px; padding: 0; }"
@@ -223,6 +224,7 @@ class ChatControlsMixin:
             self._demo_pill.setVisible(_demo.active())
         except Exception:
             self._demo_pill.setVisible(False)
+        self._refresh_context_indicator()
 
     _PHOTO_FILTER = "Photos (*.jpg *.jpeg *.png *.heic *.heif *.webp *.tif *.tiff *.gif *.bmp)"
 
