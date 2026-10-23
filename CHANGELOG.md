@@ -26,7 +26,9 @@
   evidence index and handoff. Flagged remaining non-UI launcher responsibilities.
 - Preserved historical-tag rebuild checks by discovering the engine version file
   inside immutable older tags. Checked both the actual U89 tag and current HEAD.
-- Final Windows source suite: **1,636 passed / 1 skipped** (220.71 s), compared
+- U90 Mac source/build checks passed **1,622 / 15 skips**; both tagged frozen
+  apps passed. Release dependency/static gates passed.
+- Final Windows source suite: **1,636 passed / 1 skipped** (222.38 s), compared
   with **1,594 / 1** before and after the mechanical rename. **21 website tests**
   passed after build-only. The frozen development bundle passed **ALL PASSED**,
   including full window construction, pinned release identity and notebook signing.

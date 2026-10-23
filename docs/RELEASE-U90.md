@@ -15,16 +15,23 @@
 
 ## Evidence and limits
 
-The pre-release Windows source suite passed 1,636 tests with one platform skip.
-The development frozen bundle passed its full self-test. Final tagged build,
-CI and publication checks will be recorded here when complete.
+Windows source checks passed **1,636 tests / 1 skip**; Mac passed **1,622 / 15**.
+Both tagged frozen applications passed their self-tests. The release dependency
+audit and static-security gate passed. Final bytes are authenticated by the
+existing owner-signed manifest. [Verification and hashes](U90-RELEASE-VERIFICATION.md).
 
 No new local-model truth benchmark score is claimed. Encryption is optional and
 was exercised only with disposable records; the owner's data was not migrated.
 Physical USB encrypted-memory persistence and clean-machine installation remain
-manual checks. Mac behavior requires the tagged Mac workflow to pass.
+manual checks; the tagged Mac build passed automated checks.
 
 Release manifests use the existing separately held owner signing key. These are
 not Windows-trusted Authenticode signatures or Apple notarization; operating-system
 publisher warnings remain. [Signing and recovery](OWNER-RELEASE-SIGNING.md).
 [Encryption scope and recovery](ENCRYPTION-MIGRATION-PLAN.md).
+
+## Installer SHA-256
+
+Windows: `d2feae8f3fa18e1195e0555872dba92c1dd907e67023a20a62266c672a7bb4a2`
+
+Mac (Apple Silicon): `6a1bd0baffc929af0ecde9d4a1a1390cc0b83acc956f1b6e8835bcea9a42669a`
