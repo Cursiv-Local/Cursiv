@@ -76,6 +76,11 @@ Qt offscreen and no automatic engine startup. Personal `test_internals/` is excl
   warning. The actual worker error received a narrow production fix and regression.
 - Final complete source, hosted CI, package and website counts are recorded in
   the U89 verification report after each run finishes.
+- Final U89 local suite: **1,594 passed, 1 skipped**, 175.16 s. Hosted Windows:
+  **1,594/1**, 155.74 s; hosted Mac: **1,580/15**, 380.97 s. Both packaged
+  self-tests passed, including owner-key presence and notebook signed exports;
+  all **21 website tests passed**. The tag/source/provenance and final hashes are
+  in `docs/U89-RELEASE-VERIFICATION.md`.
 - Locked dependency audit: **no known vulnerabilities found**, October 23, 2026,
   `pip-audit 2.10.1 -r requirements-release.lock --no-deps --disable-pip`.
 - Bandit 1.9.4 full scan initially reported 272 findings: two high/high-confidence

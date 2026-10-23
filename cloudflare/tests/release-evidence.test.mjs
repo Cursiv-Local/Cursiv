@@ -2,12 +2,33 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash, createPublicKey, verify } from 'node:crypto';
 
 const root = new URL('../../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
 const version = read('cursiv_v215/core/selfknow.py').match(/^VERSION\s*=\s*"([^"]+)"/m)[1];
 const update = version.match(/U\d+$/)[0];
 const fragment = update.toLowerCase();
+
+test('owner-signed installer manifest and website hash use the pinned public key', () => {
+  const identity = JSON.parse(read('cursiv_v215/core/release_public_key.json'));
+  assert.deepEqual(JSON.parse(read('website/assets/cursiv-owner-release-key.json')), identity);
+  const raw = Buffer.from(identity.public_key, 'base64');
+  assert.equal(createHash('sha256').update(raw).digest('hex'), identity.key_id);
+  const envelope = JSON.parse(read(`website/assets/cursiv-owner-release-${update}.json`));
+  assert.equal(envelope.key_id, identity.key_id);
+  assert.equal(envelope.signed.version, version);
+  const canonical = value => Array.isArray(value) ? value.map(canonical) :
+    value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(k => [k, canonical(value[k])])) : value;
+  const key = createPublicKey({ key: Buffer.concat([Buffer.from('302a300506032b6570032100', 'hex'), raw]), format: 'der', type: 'spki' });
+  assert.ok(verify(null, Buffer.from(JSON.stringify(canonical(envelope.signed))), key, Buffer.from(envelope.signature, 'base64')));
+  const binary = envelope.signed.assets[`Cursiv-Setup-${version}.exe`];
+  assert.match(binary.sha256, /^[a-f0-9]{64}$/);
+  assert.deepEqual(envelope.signed.assets['Cursiv-Setup-latest.exe'], binary);
+  assert.ok(read('website/start.html').includes(binary.sha256));
+  assert.ok(read('website/start.html').includes(identity.key_id));
+  assert.ok(read('website/index.html').includes(`/releases/download/v${version}/Cursiv-Setup-${version}.exe`));
+});
 
 test('current release labels, evidence anchors and homepage identity stay consistent', () => {
   for (const path of ['website/index.html', 'website/start.html', 'website/vision.html', 'website/ai-reliability-testing.html']) {

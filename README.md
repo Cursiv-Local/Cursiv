@@ -9,7 +9,7 @@ Cursiv is a local-first AI assistant for Windows. It runs compatible language mo
 </p>
 
 <p align="center">
-  <b><a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 53 MB) ·
+  <b><a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">Download Cursiv for Windows</a></b> (about 56 MB) ·
   <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-mac-latest.dmg">Mac, early (Apple Silicon)</a> ·
   <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a> ·
   <a href="CHANGELOG.md">Changelog</a>
