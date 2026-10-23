@@ -2,6 +2,9 @@
 
 ## 3.14-U90 — engine and local storage maintenance (2026-10-23)
 
+- Published owner-authenticated U90 Windows/Mac installers and deployed the website;
+  independently checked public installer hashes, tester links and counter removal.
+
 - Removed the public website download counter, its unavailable message and counting
   explanation from the homepage and download page. Public pages no longer request
   GitHub totals; installer links and private statistics remain unchanged.

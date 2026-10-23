@@ -3,8 +3,12 @@
 ## U90 engine/storage cleanup (2026-10-23)
 
 Work is on `codex/engine-storage-cleanup`. The owner subsequently authorized
-commit, push, website publication and an installer release as U90. Publication
-results will be recorded after the release checks complete.
+commit, push, website publication and an installer release as U90. U90 is now published as latest; source and documentation were pushed to main.
+The existing website Worker was deployed as `7d27b857-477f-4bcd-b15a-93038218ee63`.
+Windows passed 1,636/1; Mac passed 1,622/15; both tagged frozen apps and security
+CI passed. All 21 website checks passed. Both public installer downloads match
+the owner-signed manifest. Live tester/button/routing and counter-removal checks
+passed. [Final release evidence](docs/U90-RELEASE-VERIFICATION.md).
 The original personal `test_internals/` file is unchanged and untracked.
 
 - Mechanical rename to `cursiv_engine` is complete across tracked imports, build/CI,

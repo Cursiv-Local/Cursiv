@@ -52,8 +52,22 @@ final eight installer/checksum/provenance assets for source commit
 no private material was copied into the repository or CI.
 Public key fingerprint: `f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7`.
 
-Public release/download verification and website deployment are still in progress.
-Results will be recorded after they complete.
+U90 was published as latest at **2026-10-23 17:57:22 UTC** with all 11 intended
+assets. GitHub's uploaded asset sizes/digests matched the staged files. Independent
+unauthenticated downloads of both versioned installers matched their signed hashes;
+the public latest API returned U90 and the public owner manifest matched exactly.
+
+The existing `cursiv-web` Worker was deployed successfully, version
+`7d27b857-477f-4bcd-b15a-93038218ee63`, without a DNS or D1 schema change.
+Live HTTPS checks passed for homepage and setup-page U90 links, counter removal,
+script removal of the automatic totals request, the published checksum/owner proof,
+U90 evidence page, sitemap and unauthenticated admin denial (401).
+The homepage Help test Cursiv button and `/testers` page/contact link remain intact;
+the tester page retains its no-script policy. The legacy tester URL redirects to
+`https://cursiv.us/testers`.
+
+The release tag/source and signed assets remain immutable. Later main-branch
+commits record website release proof and publication outcomes, not rebuilt binaries.
 
 ## Remaining manual limits
 
