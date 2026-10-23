@@ -96,6 +96,10 @@ Published installer hashes, CI and package checks:
 
 ### Phone pointers and tester feedback (U87)
 
+U87 is published with verified Windows/Mac installers. Source tests passed
+1,495/1 on Windows and 1,485/11 on Mac (passed/skipped); 20 website tests and
+34 anonymous release/site checks passed.
+
 Type `help` for the phone notebook and separate photo-chat links, or `help field`
 for offline capture and the one-step export/import path. The Field Notebook and
 Help windows also expose clickable links; these instructions come from the app.
@@ -227,7 +231,7 @@ optional developer packages out of the installer.
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
-3. Run `py -3.13 scripts/build_release.py v3.14-U86` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
+3. Run `py -3.13 scripts/build_release.py v3.14-U87` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
@@ -237,9 +241,9 @@ versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 For each new release, substitute an unused higher version in these examples.
 
 ```powershell
-Copy-Item installer/Output/Cursiv-Setup-3.14-U86.exe installer/Output/Cursiv-Setup-latest.exe
-Copy-Item installer/Output/SHA256SUMS-3.14-U86.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U86 installer/Output/Cursiv-Setup-3.14-U86.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U86" --notes-file docs/RELEASE-U86.md --draft --verify-tag --repo Cursiv-Local/Cursiv
+Copy-Item installer/Output/Cursiv-Setup-3.14-U87.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U87.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U87 installer/Output/Cursiv-Setup-3.14-U87.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U87" --notes-file docs/RELEASE-U87.md --draft --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
@@ -253,12 +257,12 @@ replace already verified public bytes. The release report records the successful
 tagged build and any intentional duplicate cancellation separately.
 
 When publishing a new model score, run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
-v3.14-U86 --label U86 --model qwen3:4b-instruct`, substituting the new version),
+v3.14-U87 --label U87 --model qwen3:4b-instruct`, substituting the new version),
 review every failure, and update the website's current test section from that
 artifact. `node --test cloudflare/tests/*.test.mjs` checks analytics and verifies
 that release labels, model scores and the separate software-test count match
 their recorded evidence. Keep historical runs labeled by their actual version.
-U86 has no new full-suite model score: its nine-turn replay is unscored, and the
+U87 has no new full-suite model score. U86’s nine-turn replay is unscored, and the
 latest completed full-suite result remains historical U85.
 
 #### Publish the Website
@@ -296,7 +300,7 @@ U85 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, 
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,
 dated recall and source checks. U85 adds quiet status/receipts and notebook
-continuity with read-back confirmation. See [U85 release notes](docs/RELEASE-U86.md),
+continuity with read-back confirmation. See [U85 release notes](docs/RELEASE-U87.md),
 [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and

@@ -1,5 +1,9 @@
 # U87 release verification
 
+**Published and publicly verified.** GitHub latest is
+[v3.14-U87](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U87),
+published 2026-10-23 03:26:19 UTC (October 22, 11:26 pm Eastern).
+
 The owner authorized committing, pushing, releasing installers and publishing
 the website. GitHub latest was verified as U86; remote main was
 `82cf6c197419828b5bfbf8e03fc638427fd4eb55` before this release. Work uses
@@ -126,3 +130,48 @@ The downloaded DMG matches both draft alias digests and `SHA256SUMS-mac.txt`:
 Mac is unsigned/unnotarized. All seven expected draft assets are present.
 The release remains a draft until these checks are reviewed; anonymous download,
 website and tester-page privacy checks are recorded after actual publication.
+
+## Publication and live verification
+
+Evidence commit `828a8c0` followed the immutable application tag with docs/site
+copy only. Main and `codex/phone-help-testers` are pushed. The existing Cloudflare
+`cursiv-web` Worker was deployed with Wrangler 4.152.0, version
+`88365b00-a40a-441f-8658-86db16ba48a6`. Six static assets were uploaded: homepage,
+download, direction, test evidence, testers and sitemap. Static privacy headers
+are included. Worker source, domains, D1/AI bindings, secrets and schema are unchanged.
+
+All **34 anonymous public release/site checks passed** at 2026-10-23T03:27:46.304602+00:00:
+
+- Latest stable U87 and immutable tag commit match the tested source.
+- Both stable installers were downloaded in full without credentials; actual
+  bytes/hashes match their aliases, public checksum files and asset digests.
+- Nine marketing/policy pages return HTTPS 200 with correct canonical URLs,
+  parsed structured data when present, and no noindex. Current generated pages
+  match live content after removing only the exact pre-existing Cloudflare beacon
+  verified in the pre-deployment baseline; no other differences are ignored.
+- The homepage secondary tester button points to `/testers`. The new page matches
+  the generated file, retains the literal visible mailto and GitHub issue links,
+  and contains no form/input/iframe/script or Cloudflare Insights insertion.
+- Actual testers headers include no-transform, script-src none and connect-src
+  none. The clear email address is not rewritten. No signup or form handler exists.
+- Main social URLs are absolute/unique and the public preview PNG is 1200×630.
+- Existing phone app/notebook, health, robots and sitemap work; the sitemap
+  includes `/testers`. Private statistics routes reject anonymous requests with
+  401/no-store, and the legacy hostname preserves the tested path with 301.
+
+The pre-existing download counter still returns 503/unavailable with `total:null`.
+It is recorded separately from the 34 passing publication checks, never as zero
+downloads. No counter availability fix or analytics-setting change is claimed.
+The normal existing edge beacon remains on older pages; testers is specifically
+protected and its absence was verified in the live HTML.
+
+Publishing triggered redundant Mac run 39895019031. It completed as cancelled
+before the release-upload step (skipped), preserving the already verified bytes.
+The successful tagged Mac job is recorded separately. The public verification
+asset is `u87-release-verification.json`; raw public/CI evidence is retained under
+`cloudflare/.wrangler/u87-release-review/`.
+
+The owner app was not installed or restarted. U86 and earlier can receive U87
+through the normal online update check. Windows remains unsigned and Mac
+unsigned/unnotarized; physical USB memory persistence and independent clean-PC
+installation remain unverified. No new full truth-benchmark score is claimed.

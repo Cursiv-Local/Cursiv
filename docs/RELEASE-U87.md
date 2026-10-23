@@ -40,3 +40,12 @@ Installers remain unsigned; Mac is not notarized. Known small-model verbosity,
 closing-question and memory-description problems remain documented in U86's
 unscored replay. USB memory persistence/second-PC retrieval and independent
 clean-machine installation remain unverified; no storage migration was performed.
+
+## Publication
+
+Published as latest with verified public Windows/Mac downloads. All **34 public
+release/site checks passed**, including the live testers page, visible contact
+links and absence of injected analytics scripts. The website is deployed to
+the existing Worker. Detailed outcomes are attached as `u87-release-verification.json`.
+The pre-existing unavailable download counter remains separate from functional
+installer downloads.

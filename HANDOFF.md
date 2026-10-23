@@ -1,21 +1,24 @@
 # Handoff — Cursiv verification overhaul
 
-## U87 phone Help and tester-page release
+## U87 published and verified
 
+U87 is GitHub latest; tagged app commit `58a6d8d`. Windows passed 1,495 tests
+with 1 skip; hosted Mac passed 1,485 with 11 skips. Both frozen packages passed;
+public downloads were hashed, 20 website tests and 34 public checks passed.
 The owner authorized commit/push, installers and website publication.
 [U87 verification](docs/U87-RELEASE-VERIFICATION.md) records the current tag,
 actual tests, package hashes and live checks. Native strings are centralized in
 `launcher/phone_help.py`; GUI Help lifts them out of code blocks for clickable
 links. Notebook help uses the existing explanation, with no new dialog/tab.
 
-The pending testers page is included with its secondary homepage button,
+The live testers page includes its secondary homepage button,
 allowlisted route/sitemap and no-transform/CSP headers. Review actual deployed
 headers, clear mailto/GitHub links and absence of injected analytics. Notebook
 storage/import/chains remain untouched. Personal test files stay excluded.
 Earlier release sections below retain their own historical evidence.
 
 
-## U86 published and verified
+## Historical U86 publication
 
 U86 is GitHub latest and the website is deployed. Main and the feature branch
 are pushed; application tag commit is `31e9987`. Windows: 1,492 passed/1 skipped;

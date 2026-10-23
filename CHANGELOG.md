@@ -2,6 +2,11 @@
 
 ## v3.14-U87 - Phone Help links and tester feedback (2026-10-22)
 
+- Publish U87 as latest with publicly verified Windows/Mac installers and
+  checksums. Deploy the testers page and website evidence; 1,495 Windows tests
+  passed (1 skip), 1,485 on Mac (11 skips), plus 20 website tests and 34 public
+  release/site checks. Installers remain unsigned.
+
 - Add exact application-owned phone pointers to short Help, field help and the
   existing notebook explanation; keep graphical links clickable and avoid duplicate
   phone instructions. Preserve storage/import/chain and command behavior.
