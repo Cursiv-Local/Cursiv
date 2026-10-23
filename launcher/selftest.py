@@ -96,7 +96,11 @@ def _checks():
         return (f"Ollama found at {where}" + (" and running" if ollama_host.running() else ", not running")
                 if where else "Ollama not installed (Setup installs it)")
 
-    return [("imports", imports), ("data folders", data_folders), ("offline reference", reference),
+    def owner_identity():
+        from cursiv_v215.core import release_identity
+        return 'Pinned owner key ' + release_identity.public_identity()['key_id']
+
+    return [("imports", imports), ("owner release identity", owner_identity), ("data folders", data_folders), ("offline reference", reference),
             ("calculations", calculations), ("field notebook", field_notebook), ("documents", documents),
             ("window", window), ("AI engine (information only)", engine)]
 
