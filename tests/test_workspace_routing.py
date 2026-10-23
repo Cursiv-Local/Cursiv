@@ -77,7 +77,7 @@ def test_write_with_and_missing_filename(tmp_path):
     result = fs.command('write a file called notes.txt with "verified notes"', [], tmp_path)
     assert result.receipts[0].ok and (tmp_path / 'notes.txt').read_text() == 'verified notes'
     out = fs.command('create a file', [], tmp_path)
-    assert 'file create <name> :: <text>' in out.text and 'file append <name> :: <text>' in out.text
+    assert 'What should I name the file?' in out.text and 'Create field-notes.txt' in out.text
 
 
 @pytest.mark.parametrize('question', PROMPTS)

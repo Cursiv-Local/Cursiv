@@ -39,6 +39,18 @@ section:first-of-type { border-top: 0; }
 .btn-ghost:hover { border-color: var(--gold); }
 .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 14px; }
 
+/* Homepage tester invitation: wide and visible, with the gold download kept primary. */
+.tester-invite { padding: 12px 0 10px; background: var(--bg); }
+.tester-invite-link { position: relative; display: flex; align-items: center; justify-content: center;
+  min-height: 48px; padding: 11px 52px; border: 1px solid rgba(111,168,255,.46); border-radius: 10px;
+  background: linear-gradient(110deg, #102844, #193d68 55%, #102844); color: #dfedff;
+  font-size: 15px; font-weight: 600; text-decoration: none; letter-spacing: .01em;
+  box-shadow: 0 4px 22px rgba(47,106,194,.12); transition: border-color .16s, box-shadow .16s; }
+.tester-invite-link:hover { border-color: #80b3ff; box-shadow: 0 4px 26px rgba(47,106,194,.23); }
+.tester-invite-link:focus-visible { outline: 2px solid #9bc4ff; outline-offset: 4px; }
+.tester-invite-arrow { position: absolute; right: 20px; color: #9dc6ff; font-size: 20px; line-height: 1; }
+@media (prefers-reduced-motion: reduce) { .tester-invite-link { transition: none; } }
+
 /* nav */
 .nav { position: sticky; top: 0; z-index: 50; background: rgba(7,9,14,.88); backdrop-filter: blur(10px);
        -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }

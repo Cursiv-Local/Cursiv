@@ -1,5 +1,43 @@
 # Changelog
 
+## 3.14-U91 — workspace files and philosophical uncertainty (release preparation)
+
+- Added shared local/cloud instructions for contested philosophical and normative
+  questions: acknowledge disagreement, fairly present positions, separate empirical
+  evidence from value premises, and avoid unsupported definitive verdicts.
+- Added bounded application-owned overviews for moral truth, free will,
+  consciousness, ethical theories and aesthetics, including short follow-ups.
+  Explicitly requested arguments retain the conversational model path.
+- Preserved the complete policy through prompt compaction and provider tool mode;
+  native replies require no model, lookup or tool action. Factual/safety questions,
+  file commands and attached-document discussions keep their existing paths.
+- Added regression coverage for neutral overviews, perspective requests, provider
+  prompts, restricted turns, attachments and compaction. Technical guidance records
+  the implementation sources and model-compliance limits.
+- Validation: **171 focused/compatibility tests passed** (including 50 new
+  philosophy regressions); full isolated Windows suite **1,749 passed / 1 platform
+  skip** in 228.27 s. Tested Python files match the final working source.
+
+### Natural workspace file operations
+
+- Website: moved Help test Cursiv above the homepage navigation as a wide blue
+  gradient link to `/testers`; retained the primary gold download actions.
+- Expanded deterministic create/append/read/search phrasing, including empty file
+  creation, curly quotes, partial names and “the notes file”/“that file”.
+- Recent-file references use confirmed conversation receipts and bounded native
+  lookups. Measurement payloads use exact user text, never model claims or invented values.
+- Added concise native receipts, unique-file search counts and plain-language
+  missing-information/ambiguity messages. Existing-file approval, explicit overwrite
+  verification, workspace protection and restricted/offline gates remain intact.
+- Added exact-prompt and release-gate regressions, dedicated PR/main jobs, isolated
+  check runner and pre-tag main-CI validation. Main branch protection now requires
+  both workspace jobs, both source suites and security, including administrator pushes.
+- Final Windows checks: **63 focused gate tests passed**; full isolated suite
+  **1,699 passed / 1 platform skip** (215.21 s). Mac CI remains a required PR gate.
+- Updated native coding help and contributor/technical release guidance. U91
+  publication requires protected-main checks, tagged builds and owner proof;
+  final installer/platform results are recorded in the U91 verification report.
+
 ## 3.14-U90 — engine and local storage maintenance (2026-10-23)
 
 - Published owner-authenticated U90 Windows/Mac installers and deployed the website;

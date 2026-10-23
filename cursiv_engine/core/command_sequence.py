@@ -13,10 +13,11 @@ def split(text):
     for i, char in enumerate(text):
         if quote:
             masked[i] = ' '
-            if char == quote and (not i or text[i - 1] != '\\'):
+            interior_apostrophe = char in ("'", '’') and i > 0 and i + 1 < len(text) and text[i - 1].isalnum() and text[i + 1].isalnum()
+            if char == quote and not interior_apostrophe and (not i or text[i - 1] != '\\'):
                 quote = ''
-        elif char in ('"', "'") and (not i or not text[i - 1].isalnum()):
-            quote = char
+        elif char in ('"', "'", '“', '‘') and (not i or not text[i - 1].isalnum()):
+            quote = {'“': '”', '‘': '’'}.get(char, char)
             masked[i] = ' '
     match = _NEXT.search(''.join(masked))
     return (text[:match.start()].strip(), text[match.end():].strip()) if match else (text, '')

@@ -42,6 +42,8 @@ test('current release labels, evidence anchors and homepage identity stay consis
     assert.ok(read(path).includes(`/ai-reliability-testing#${fragment}`));
   }
   const homepage = read('website/index.html');
+  assert.match(homepage, /<body>\s*<div class="tester-invite">[\s\S]*?href="\/testers"[\s\S]*?Help test Cursiv[\s\S]*?<header class="nav">/);
+  assert.ok(read('website/assets/site.css').includes('.tester-invite-link'));
   assert.equal([...homepage.matchAll(/rel="canonical" href="https:\/\/cursiv\.us\/"/g)].length, 1);
   for (const key of ['og:image', 'og:url', 'twitter:image']) {
     const tags = [...homepage.matchAll(new RegExp(`(?:property|name)="${key}" content="([^"]+)"`, 'g'))];

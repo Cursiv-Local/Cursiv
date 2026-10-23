@@ -92,6 +92,12 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                 '\n\n*[Sources: User-supplied text conflict check (no AI model)]*')
             return
     from cursiv_engine.core import native_answers
+    from cursiv_engine.core import philosophy_policy
+    _philosophy = (philosophy_policy.answer(_field_text, history)
+                   if not files and not (isinstance(message, dict) and message.get('files')) else None)
+    if _philosophy is not None:
+        yield _file_ops.VerifiedText(_philosophy)
+        return
     from cursiv_engine.core import answer_evidence
     _source_answer = answer_evidence.reply(_field_text, history)
     if _source_answer is not None:

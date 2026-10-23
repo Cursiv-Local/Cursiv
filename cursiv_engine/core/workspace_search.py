@@ -11,6 +11,10 @@ def search(folder, args, root):
     needle, imports = args.get('contains'), args.get('imports')
     counts = args.get('line_counts', False)
     terms = args.get('terms')
+    names = args.get('name_terms')
+    if names is not None and (not isinstance(names, list) or not 1 <= len(names) <= 10 or
+                              any(not isinstance(t, str) or not re.fullmatch(r'[a-z0-9]{1,120}', t) for t in names)):
+        raise ValueError('Filename terms must be short literal words')
     if terms is not None and (not isinstance(terms, list) or not 1 <= len(terms) <= 5 or
                               any(not isinstance(t, str) or not 1 <= len(t) <= 120 for t in terms)):
         raise ValueError('Content terms must be a short list of literal strings')
@@ -23,6 +27,7 @@ def search(folder, args, root):
     if type(counts) is not bool:
         raise ValueError('line_counts must be a boolean')
     rows, scanned, size, output = [], 0, 0, 0
+    matched = set()
     started, limited = time.monotonic(), False
     import_re = (re.compile(r'^\s*(?:from\s+' + re.escape(imports) + r'(?:\b|\.)|import\s+[^#\n]*\b'
                             + re.escape(imports) + r'\b)') if imports else None)
@@ -46,6 +51,8 @@ def search(folder, args, root):
             try:
                 path = fs.resolve(str(child), root)
                 scanned += 1
+                if names and (not path.is_file() or not all(t in re.findall(r'[a-z0-9]+', path.stem.casefold()) for t in names)):
+                    continue
                 if needle is not None or imports or counts or terms:
                     if not path.is_file() or path.stat().st_size > fs.MAX_BYTES:
                         continue
@@ -66,6 +73,7 @@ def search(folder, args, root):
                     limited = True
                     break
                 rows.append(row)
+                matched.add(str(path))
                 output += len(row)
             if limited:
                 break
@@ -73,4 +81,4 @@ def search(folder, args, root):
             break
         if '**' not in pattern:
             dirs[:] = []
-    return fs.FileResult('search_files', str(folder), entries=rows, truncated=limited)
+    return fs.FileResult('search_files', str(folder), entries=rows, truncated=limited, matched_files=len(matched))

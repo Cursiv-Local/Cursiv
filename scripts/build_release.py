@@ -131,6 +131,13 @@ def main() -> int:
     git("worktree", "add", "--detach", str(work), tag)
     try:
         print(f"building {tag} ({git('rev-parse', '--short', tag).strip()}) in {work}", flush=True)
+        # Historical immutable tags predate this gate. New releases must pass
+        # exact-source main CI and rerun the focused checks from the tagged tree.
+        gate = work / 'scripts/check_workspace_files.py'
+        if gate.is_file():
+            from prepare_release import require_ci
+            require_ci(git('rev-parse', f'{tag}^{{commit}}').strip(), main_tip=False)
+            subprocess.run([sys.executable, str(gate)], cwd=work, check=True)
         from release_provenance import check_lock, record
         check_lock(work)
         env = build_environment()

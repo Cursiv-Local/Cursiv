@@ -1,5 +1,101 @@
 # Handoff — Cursiv verification overhaul
 
+## U91 publication authorized (2026-10-23)
+
+The owner authorized commit, push, website publication and installer release of
+the pending workspace, philosophical-policy and homepage invitation changes.
+U90 was confirmed as the latest public release; U91 is the next version.
+Main protection remains enabled. The release must pass a PR, merged-main checks,
+tagged Windows/Mac builds and independent owner signing before publication.
+See `docs/U91-RELEASE-VERIFICATION.md` for preparation and final outcomes.
+Existing untracked legal notes and `test_internals/` are outside this release.
+
+## Pending philosophical uncertainty policy (2026-10-23)
+
+Audit finding: reflective conversation already had concise-style guidance, but
+there was no shared rule requiring philosophical disagreement to be identified
+or a native guard against a definitive model verdict on foundational questions.
+The ordinary response could therefore present one model-generated position as fact.
+
+- New `cursiv_engine/core/philosophy_policy.py` contains the shared instruction and
+  five bounded, balanced overviews. Moral realism, error theory, expressivism and
+  relativism are distinguished; absence of measurement is not presented as disproof.
+- `cursiv_engine/chat/completion.py` and `chat/conversation.py` route matching
+  questions/follow-ups before model generation. Explicit perspective requests and
+  attached documents retain ordinary discussion. Native text is labeled as a
+  built-in overview, with no AI model or live lookup.
+- `chat/conversation.py` assembles a separate system block for every chat provider;
+  tool mode retains it. `chat/cloud_providers.py` reserves its full compaction
+  budget and avoids duplicate blocks. `core/conversation_kind.py` recognizes the
+  additional reflective topics. No tools, storage format or provider order changes.
+- `tests/test_philosophy_policy.py` covers exact moral-truth phrasing, other topics,
+  forced yes/no, follow-ups, explicit arguments, all four forced chat provider
+  paths, compaction, talk-only restrictions, attachments and non-target questions.
+  Focused/compatibility run: **171 passed in 9.01 s**, including 50 new philosophy
+  regressions, using fake providers and a disposable profile. Full isolated Windows
+  suite: **1,749 passed / 1 platform skip in 228.27 s**. All Python hashes match the
+  tested snapshot (`reports/live-followup/philosophy-full.json`, ignored evidence).
+- `TECH.md` records the authored SEP references checked during implementation,
+  runtime behavior and limits. Broader non-native topics use prompt guidance;
+  live qwen3 compliance has not been measured. No guarantee of universal neutrality.
+
+Files for this task only: `cursiv_engine/core/philosophy_policy.py`,
+`cursiv_engine/core/conversation_kind.py`, `cursiv_engine/chat/completion.py`,
+`cursiv_engine/chat/conversation.py`, `cursiv_engine/chat/cloud_providers.py`,
+`tests/test_philosophy_policy.py`, `TECH.md`, `CHANGELOG.md`, `HANDOFF.md`.
+Existing workspace-gate and website changes below are preserved. The owner later
+authorized their publication with this work; the U91 section above supersedes
+the earlier local-only status notes below.
+
+## Pending website tester invitation
+
+`website/index.html` now starts with a wide blue Help test Cursiv link above the
+navigation, replacing the older feature-section button. Scoped styles are in
+`website/assets/site.css`; the homepage stylesheet URL is cache-busted. The gold
+download buttons, tester page and routing are unchanged. No publication yet.
+
+## Unreleased workspace language/context and gates (2026-10-23)
+
+Branch: `codex/workspace-language-context`. No commit/push/release authorization is
+assumed for this new work. U90 remains the installed/published version.
+
+- `core/file_requests.py`: natural create/append/read/search parser; quoted content
+  remains literal. `core/file_context.py`: confirmed current-workspace receipts,
+  bounded partial-name lookup and exact user measurement references. No global cache
+  or new persistent data. `core/file_access.py` retains verified native writes and
+  approvals; `core/workspace_search.py` counts unique matching files.
+- `core/command_sequence.py` recognizes curly quoted payloads as data. Native help
+  in `launcher/chat_commands.py` includes examples. No notebook/backend redesign.
+- New workspace and release-gate tests, plus deliberately updated old assertions for
+  the replaced cryptic errors. `scripts/check_workspace_files.py` runs focused checks
+  with isolated data and no inference/windows. `scripts/prepare_release.py` requires
+  exact main source and all five successful Actions checks before creating a tag.
+  New Windows/Mac build paths require the same gates; historical rebuilds are retained.
+- GitHub main protection was applied and confirmed: strict/up-to-date checks for
+  Windows/Mac workspace jobs, Windows/Mac full suites and security, bound to Actions
+  app 15368; administrators are included; force pushes and branch deletion disabled.
+  The new workflow is local until this branch is pushed/PR'd; do not bypass the rule.
+- Final checks actually executed on Windows: focused required gate **63 passed in
+  2.84 s**; compatibility replay **228 passed in 26.81 s**; full isolated suite
+  **1,699 passed / 1 platform skip in 215.21 s**. The earlier full run caught three
+  compatibility issues (portable receipt wording, saved-notes routing and a legacy
+  adapter signature); all were repaired before this final run. No model inference
+  or full GUI was used for the focused gate. Mac hosted checks have not run for
+  this uncommitted source; both are required before main/release preparation.
+- Existing-user legal handoff and `test_internals/` remain untouched and untracked.
+  No version change, source commit, push, tag, installer build or deployment occurred.
+  The live change is main-branch protection; the new workflow/script code is local.
+
+Exact changed source/config files: `.github/workflows/tests.yml`,
+`.github/workflows/mac-build.yml`, `cursiv_engine/core/file_requests.py`,
+`cursiv_engine/core/file_context.py`, `cursiv_engine/core/file_access.py`,
+`cursiv_engine/core/workspace_search.py`, `cursiv_engine/core/command_sequence.py`,
+`launcher/chat_commands.py`, `scripts/check_workspace_files.py`,
+`scripts/prepare_release.py`, `scripts/build_release.py`,
+`tests/test_workspace_language.py`, `tests/test_workspace_release_gate.py`,
+`tests/test_workspace_routing.py`, `tests/test_file_access.py`. Documentation:
+`TECH.md`, `CONTRIBUTING.md`, `CHANGELOG.md`, `HANDOFF.md`.
+
 ## U90 engine/storage cleanup (2026-10-23)
 
 Work is on `codex/engine-storage-cleanup`. The owner subsequently authorized

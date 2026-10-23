@@ -51,6 +51,12 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
             yield _file_result.text
         return
 
+    from cursiv_engine.core.philosophy_policy import answer as philosophy_answer
+    _philosophy = philosophy_answer(user_text, history)
+    if _philosophy is not None and not uploaded:
+        yield _files.VerifiedText(_philosophy)
+        return
+
     # ── Owner code setup (runs before Guardian — no API call, no log) ───
     if runtime.turn_policy.current().change and user_text.lower().startswith("owner setcode "):
         _new_code = user_text[len("owner setcode "):].strip()
@@ -458,6 +464,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     messages.insert(1, dict(role='system', content=(
         (_runtime or presence.CAPABILITIES) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context()
         + ('\n' + VOICE + guidance(user_text) if not runtime._EMERGENCY_TURN else ''))))
+    # Keep this independent of persona/coding prompt replacements. Paid and
+    # local providers receive the same policy; _slim preserves it in full.
+    from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
+    messages.insert(2, dict(role='system', content=INSTRUCTIONS))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.

@@ -145,7 +145,7 @@ def test_save_conversation_uses_actual_transcript(tmp_path):
 def test_file_access_off_and_missing_paths_report_actual_errors(tmp_path):
     assert 'File access is off' in fs.command('file read notes.txt', [], None).text
     assert 'FileNotFoundError' in fs.command('file read missing.txt', [], tmp_path).text
-    assert 'exact filename' in fs.command('Save everything to a file on my desktop', [], tmp_path).text
+    assert 'Which file do you mean?' in fs.command('Save everything to a file on my desktop', [], tmp_path).text
 
 
 def test_credentials_inside_an_ordinary_named_file_are_protected(tmp_path):
