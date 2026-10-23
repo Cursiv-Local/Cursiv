@@ -29,7 +29,9 @@ blocks GitHub requests. No automatic installation on the owner's PC occurs.
 ## Evidence and limits
 
 The final isolated Windows source suite passed **1,492 tests with one Mac-only
-skip**. All **20 website tests passed**; generated HTML and JSON-LD were checked.
+skip**. Hosted source CI passed **1,492/1 on Windows** and **1,482/11 on Mac**
+(passed/skipped). Both tagged packages passed their frozen full-window/notebook
+checks. All **20 website tests passed**; generated HTML and JSON-LD were checked.
 
 See [U86 verification](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U86-RELEASE-VERIFICATION.md)
 for actual source tests, package checks and publication outcomes, and the
