@@ -1,9 +1,12 @@
 # Handoff — Cursiv verification overhaul
 
-## U86 combined release and conversation follow-up
+## U86 published and verified
 
-The owner authorized commit, push, version bump, installer publication and website
-updates. [U86 verification](docs/U86-RELEASE-VERIFICATION.md) is the authoritative
+U86 is GitHub latest and the website is deployed. Main and the feature branch
+are pushed; application tag commit is `31e9987`. Windows: 1,492 passed/1 skipped;
+hosted Mac: 1,482/11. Both frozen packages passed, public installers were hashed,
+and all 20 website tests plus 29 public release/site checks passed. The unavailable
+download counter remains separate. The owner authorized publication. [U86 verification](docs/U86-RELEASE-VERIFICATION.md) is the authoritative
 current publication record; earlier local/unreleased sections below describe
 their checkpoints before that authorization. Preserve the personal
 `test_internals/u81_test.txt` and all existing notebook/memory formats.
@@ -25,7 +28,7 @@ The combined release includes all intended previous live-test/native-boundary
 fixes below. Signing is deferred; physical USB memory/restart/second-PC results
 are not inferred from the owner's successful basic USB operation.
 
-## Native trust-boundary follow-up — local and unreleased
+## Historical native trust-boundary checkpoint before U86
 
 [NATIVE-TRUST-BOUNDARIES](docs/NATIVE-TRUST-BOUNDARIES.md) records the latest audit,
 files, actual regression runs and limits. The owner confirmed that read-only
@@ -40,7 +43,7 @@ The skip requires a real macOS Keychain. The current Python files match the
 final test snapshot; the report records its source fingerprint and all earlier
 failed runs/fixes. No fresh live-model benchmark or installer validation is claimed.
 
-## Local U84 live-test follow-up after U85
+## Historical local U84 live-test follow-up after U85
 
 Work on `codex/u85-live-test-followup` addresses the supplied findings and actual
 session transcript, plus the requested native help, short receipts, context and
@@ -62,9 +65,9 @@ the full field-kit checklist complete from basic launch success. Encryption
 remains the previously approved separate migration design. Personal records and
 `test_internals/` remain preserved and excluded from the repair/test snapshots.
 
-## U85 published and verified
+## Historical U85 publication
 
-GitHub latest is [v3.14-U85](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U85),
+At that checkpoint, GitHub latest was [v3.14-U85](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U85),
 published 2026-10-23 00:30:54 UTC (October 22 Eastern). Windows and Apple Silicon
 Mac installers passed frozen full-window checks and were re-downloaded publicly
 and independently hashed. Tagged application commit: `9770c2e`; application

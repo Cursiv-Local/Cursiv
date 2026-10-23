@@ -107,7 +107,11 @@ See [release notes](docs/RELEASE-U86.md),
 [actual release checks](docs/U86-RELEASE-VERIFICATION.md),
 [conversation repair evidence](docs/CONVERSATION-FOLLOWUP.md) and the
 [Claude handoff](HANDOFF.md). The historical U85 model score is not a U86 score.
-Unsigned packages and unverified physical USB memory persistence remain limits.
+U86 is published with 1,492 passing Windows regressions (one Mac-only skip),
+20 website tests and 29 public release/site checks. Both public installer
+platforms were independently hashed. Unsigned packages and unverified physical
+USB memory persistence remain limits; Qwen’s unscored conversation replay
+still shows verbosity, some closing questions and incorrect memory descriptions.
 
 ## 3. Technical Details
 
@@ -160,7 +164,7 @@ The fresh local-model run scored 153/158 (96.8%), below U84's 156/158;
 [the failure review](bench/FAILURES-U85.md) includes an unsafe allergy answer
 missed by the scorer. Passing patterns do not establish medical safety.
 
-**Local follow-up, not yet released:** native notebook how-to answers, flexible
+**Included in U86:** native notebook how-to answers, flexible
 field-entry parsing, short verified receipts, quieter source/policy display and
 safer demo switching are recorded in the [live-test report](docs/LIVE-TEST-FOLLOWUP.md).
 Basic physical USB operation works according to the owner; memory persistence
@@ -211,7 +215,7 @@ optional developer packages out of the installer.
 
 1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
-3. Run `py -3.13 scripts/build_release.py v3.14-U85` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
+3. Run `py -3.13 scripts/build_release.py v3.14-U86` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 
 #### Release an Update
 
@@ -221,9 +225,9 @@ versioned installer, its identical `Cursiv-Setup-latest.exe` copy and
 For each new release, substitute an unused higher version in these examples.
 
 ```powershell
-Copy-Item installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe
-Copy-Item installer/Output/SHA256SUMS-3.14-U85.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --draft --verify-tag --repo Cursiv-Local/Cursiv
+Copy-Item installer/Output/Cursiv-Setup-3.14-U86.exe installer/Output/Cursiv-Setup-latest.exe
+Copy-Item installer/Output/SHA256SUMS-3.14-U86.txt installer/Output/SHA256SUMS.txt
+gh release create v3.14-U86 installer/Output/Cursiv-Setup-3.14-U86.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U86" --notes-file docs/RELEASE-U86.md --draft --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
@@ -236,12 +240,14 @@ Publication triggers a second Mac workflow; stop a redundant run before it can
 replace already verified public bytes. The release report records the successful
 tagged build and any intentional duplicate cancellation separately.
 
-Run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
-v3.14-U85 --label U85 --model qwen3:4b-instruct`, substituting the new version),
+When publishing a new model score, run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
+v3.14-U86 --label U86 --model qwen3:4b-instruct`, substituting the new version),
 review every failure, and update the website's current test section from that
 artifact. `node --test cloudflare/tests/*.test.mjs` checks analytics and verifies
 that release labels, model scores and the separate software-test count match
 their recorded evidence. Keep historical runs labeled by their actual version.
+U86 has no new full-suite model score: its nine-turn replay is unscored, and the
+latest completed full-suite result remains historical U85.
 
 #### Publish the Website
 
@@ -278,7 +284,7 @@ U85 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, 
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,
 dated recall and source checks. U85 adds quiet status/receipts and notebook
-continuity with read-back confirmation. See [U85 release notes](docs/RELEASE-U85.md),
+continuity with read-back confirmation. See [U85 release notes](docs/RELEASE-U86.md),
 [CHANGELOG.md](CHANGELOG.md), [HANDOFF.md](HANDOFF.md),
 [rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
 [notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), and

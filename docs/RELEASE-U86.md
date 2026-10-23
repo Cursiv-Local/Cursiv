@@ -49,3 +49,11 @@ empty saved-context packets and native guidance, but Qwen still produces
 verbose philosophy, some closing questions and an incorrect memory-denial
 claim. Those model failures remain open; this is not a claim of perfect
 conversation or complete self-description reliability.
+
+## Publication
+
+U86 is published as latest. Both stable installers were downloaded publicly
+and hashed against their aliases/checksums; all 29 public release/site checks
+passed. The updated website is live on the existing Cloudflare Worker. The
+pre-existing unavailable download counter remains separate from successful
+installer downloads. Detailed evidence is attached as `u86-release-verification.json`.

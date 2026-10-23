@@ -2,6 +2,11 @@
 
 ## v3.14-U86 - Native trust boundaries and focused conversation (2026-10-22)
 
+- Publish U86 as GitHub latest, with verified Windows/Mac packages, checksums
+  and build/publication evidence. Deploy the website to the existing Worker;
+  29 public release/site checks pass. Preserve the unavailable-counter warning,
+  unsigned-package limits and historical model scores.
+
 - Extend conservative closer cleanup to casual/philosophical turns and inline
   sentences. Preserve explicit suggestions/questions, quotes, code and warnings.
 - Withhold unrelated saved facts and saved-conversation search in light chat;

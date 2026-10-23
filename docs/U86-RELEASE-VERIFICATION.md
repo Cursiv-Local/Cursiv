@@ -1,5 +1,9 @@
 # U86 release verification
 
+**Published and publicly verified.** GitHub latest is
+[v3.14-U86](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U86),
+published 2026-10-23 02:49:16 UTC (October 22, 10:49 pm Eastern).
+
 The owner authorized commit, push, version bump, installers, release publication
 and website updates. Before publication, GitHub latest was verified as U85;
 remote main was `b2321f0f4a1e3ec120d9703cf0747bd0bf9b917d`. This release keeps
@@ -179,3 +183,49 @@ GitHub draft lookup by REST tag returned 404 before publication; the authenticat
 release lookup resolved draft ID 421395410 with `tagName:v3.14-U86`, all seven
 expected assets and matching digests. No missing asset was assumed present.
 Anonymous publication/deployment checks follow below only after execution.
+
+## Publication and public verification
+
+Evidence/website commit `6d79750` followed the immutable application tag with
+documentation/copy changes only. Both main and the feature branch are pushed.
+The existing Cloudflare `cursiv-web` Worker was deployed with Wrangler 4.152.0:
+version `d7ed4d08-6450-4912-99ac-047db6ab9554`. Five static assets were uploaded
+(the four edited marketing pages and the existing committed `/app` asset).
+Worker source, domains, D1/AI bindings, variables, secrets and schema are preserved.
+The publisher uses unpinned npx; this run installed Wrangler 4.152.0, rather
+than the 4.151.3 used previously. No application dependency was changed by that.
+
+All **29 anonymous public release/site checks passed** at 2026-10-23T02:54:42.758335+00:00:
+
+- GitHub latest is stable U86 and its tag resolves to the tested application commit.
+- Both stable installers were downloaded in full without credentials. Received
+  sizes/hashes match the versioned aliases, public checksums and asset digests.
+- Eight marketing/policy pages return HTTPS 200 with correct canonical URLs,
+  indexability and parsed JSON-LD. Four pages serve the current generated U86 copy.
+- Homepage Open Graph/Twitter URLs are absolute and unique; the dedicated
+  1200×630 PNG is public. Phone app/notebook, health, robots and sitemap work.
+- Both private statistics routes return 401 and no-store anonymously.
+- The legacy hostname gives a 301 to the matching new-domain evidence path.
+
+The initial strict byte-comparison harness flagged four HTML mismatches: the
+edge inserts a Cloudflare Insights beacon. The exact same insertion was verified
+in the saved pre-deployment baseline. The corrected comparison removes only that
+known insertion and normalizes line endings, then compares all remaining HTML.
+No other difference is ignored and no tracking was added by the source changes.
+The first default-agent legacy request also failed its assertion; the explicit
+release-verification agent/no-cache request verified the 301 destination. Initial
+and corrected raw outcomes are retained under `cloudflare/.wrangler/u86-release-review/`.
+
+The existing download-counter 503/unavailable with `total:null` persists. It is
+reported separately from the 29 passing release checks, never as zero downloads.
+The pre-existing edge analytics setting and unavailable counter remain owner
+review items; this release did not change analytics settings or database state.
+
+Publishing triggered redundant Mac run 39891655805. Normal cancellation completed
+during its tests; build/DMG/release-upload steps were skipped. A later force-cancel
+request raced that completion and returned 409 (already completed). The successful
+tagged job is separate. All four published binary digests remained unchanged.
+
+The release includes `u86-release-verification.json` with these recorded outcomes.
+The owner app was not installed/restarted. Online update checks can now offer U86;
+physical USB persistence and independent clean-machine checks remain unverified.

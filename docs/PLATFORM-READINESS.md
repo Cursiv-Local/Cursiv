@@ -1,7 +1,8 @@
 # Packaging and platform readiness
 
-The U86 combined source and Windows/Mac package checks passed; publication
-checks are tracked in [U86 verification](U86-RELEASE-VERIFICATION.md).
+U86 is published as latest. Source/package checks and 29 anonymous public
+release/site checks passed; [U86 verification](U86-RELEASE-VERIFICATION.md) records
+installer hashes and the live website version.
 The previous U85 tagged packages, hosted source checks and anonymous public-download
 hashes remain recorded in [U85 verification](U85-RELEASE-VERIFICATION.md).
 [U84 verification](U84-RELEASE-VERIFICATION.md) and
