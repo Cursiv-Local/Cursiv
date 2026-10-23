@@ -1,7 +1,7 @@
 # Independent validation of the supplied engineering audit
 
 Review baseline: `32e955fc7bf29b4a45dd96e563da34459785d3f0` (published U87).
-Review date: October 23, 2026. U88 work includes the authorized earlier uncommitted
+Review date: October 23, 2026. U89 work includes the authorized earlier uncommitted
 live-transcript repairs. This validates the supplied findings and relevant paths;
 it is not a claim that every repository line received a separate manual audit.
 
@@ -57,7 +57,7 @@ recorded below. No supplied numerical engineering score was treated as a measure
 - `launcher/chat_controls.py`: ignore late delivery to a destroyed window.
 - `memory/semantic.py`, `launcher/phone_sync.py`: identify non-security cache hashes.
 - Version files (`core/selfknow.py`, launcher and Inno Setup), release docs,
-  changelog, README, handoff and website signing/test evidence record U88 accurately.
+  changelog, README, handoff and website signing/test evidence record U89 accurately.
   Earlier live-transcript changes and their exact files are separately listed in
   `docs/LIVE-TRANSCRIPT-GAPS.md`.
 
@@ -75,7 +75,7 @@ Qt offscreen and no automatic engine startup. Personal `test_internals/` is excl
 - Corrected regression subset: 141 passed, 21.61 s, with one observed late Qt worker
   warning. The actual worker error received a narrow production fix and regression.
 - Final complete source, hosted CI, package and website counts are recorded in
-  the U88 verification report after each run finishes.
+  the U89 verification report after each run finishes.
 - Locked dependency audit: **no known vulnerabilities found**, October 23, 2026,
   `pip-audit 2.10.1 -r requirements-release.lock --no-deps --disable-pip`.
 - Bandit 1.9.4 full scan initially reported 272 findings: two high/high-confidence
@@ -97,6 +97,8 @@ node --test cloudflare/tests/*.test.mjs
 The native routes are exercised with controlled local/cloud provider selection;
 no live paid provider request or new full truth benchmark was made. Actual files,
 memory restart, notebook chains and cryptographic failures use backend evidence.
+
+The U88 candidate was not published after Mac validation exposed native reverse-DNS/proxy lookup in the new HTTP test fixture. The corrected U89 fixture uses direct loopback TCP and no proxy discovery; no test or network assertion was removed. The candidate tag remains unchanged.
 
 ## D. Remaining risks and owner actions
 

@@ -1,5 +1,5 @@
 """
-Cursiv Desktop â€” the main window (chat panel), tray menu, login gate,
+Cursiv Desktop — the main window (chat panel), tray menu, login gate,
 and updater. One copy runs at a time (local socket lock), released by
 aboutToQuit cleanup on every quit path.
 """
@@ -44,7 +44,7 @@ if getattr(sys, "frozen", False):
     # PyInstaller's COLLECT layout puts bundled Python source/data (services/,
     # cursiv_v215/, etc.) under _internal/, not directly beside Cursiv.exe.
     # Anything launched as "python <relative path>" needs THIS as its cwd,
-    # not _ROOT â€” using _ROOT there silently fails (file/module not found),
+    # not _ROOT — using _ROOT there silently fails (file/module not found),
     # even though the spawned cmd window still opens with the right title.
     _DATA_ROOT = _HERE / "_internal"
 else:
@@ -62,7 +62,7 @@ _ICONS = (
 
 _LOCK_PORT       = 17_860        # local socket port for single-instance lock
 
-# â”€â”€ Update checker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Update checker ─────────────────────────────────────────────────────────────
 _CURRENT_VERSION   = "3.14-U89"
 _GITHUB_API        = "https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/Cursiv-Local/Cursiv/releases"
@@ -84,14 +84,14 @@ def _net_allowed() -> bool:
     except Exception:
         return True
 
-# â”€â”€ Fleet dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Fleet dashboard ────────────────────────────────────────────────────────────
 from relay_settings import RELAY_URL as _RELAY_URL, FLEET_TOKEN as _FLEET_TOKEN
 _MACHINE_NAME = platform.node()
 _MACHINE_ID   = hashlib.sha256(
     f"cursiv.local.{_MACHINE_NAME}.{os.environ.get('USERNAME', '')}".encode()
 ).hexdigest()[:24]
 
-# â”€â”€ Ollama (core/ollama_host.py: Windows and macOS) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Ollama (core/ollama_host.py: Windows and macOS) ──────────────────────────
 def _is_ollama_installed() -> bool:
     from cursiv_v215.core import ollama_host
     return ollama_host.installed()
@@ -151,12 +151,12 @@ def _mark_getting_started_seen() -> None:
         pass
 
 
-# â”€â”€ Palette â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Palette ───────────────────────────────────────────────────────────────────
 
 import theme
 QSS = theme.APP_QSS
 
-# â”€â”€ Single-instance lock â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Single-instance lock ──────────────────────────────────────────────────────
 
 _lock_socket: Optional[socket.socket] = None
 
@@ -188,7 +188,7 @@ def _release_instance_lock() -> None:
         _lock_socket = None
 
 
-# â”€â”€ Update checker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Update checker ────────────────────────────────────────────────────────────
 
 def _version_key(v: str) -> Optional[tuple[int, ...]]:
     """'3.14-U32' / 'v3.14-U32' / '3.14' -> (3, 14, 32) / (3, 14, 0). None if unparseable."""
@@ -274,7 +274,7 @@ class UpdateDialog(QDialog):
 
     def __init__(self, tag: str, body: str, exe_url: Optional[str], parent=None, exe_size: int = 0):
         super().__init__(parent)
-        self.setWindowTitle("Cursiv â€” Update Available")
+        self.setWindowTitle("Cursiv — Update Available")
         self.setFixedWidth(500)
         self.setStyleSheet(f"background: {BG}; color: {SILVER};")
         self._tag = tag
@@ -357,7 +357,7 @@ class UpdateDialog(QDialog):
         self._later_btn.setEnabled(False)
         self._progress.setValue(0)
         self._progress.setVisible(True)
-        self._status.setText("Downloading the updateâ€¦")
+        self._status.setText("Downloading the update…")
         self._status.setVisible(True)
         threading.Thread(target=self._do_download, args=(url,), daemon=True).start()
 
@@ -381,7 +381,7 @@ class UpdateDialog(QDialog):
     def _on_done(self, ok: bool, info: str):
         if not ok:
             self._progress.setVisible(False)
-            self._status.setText(f"Download failed: {info}  â€”  try again, or use 'Open Releases Page'.")
+            self._status.setText(f"Download failed: {info}  —  try again, or use 'Open Releases Page'.")
             self._dl_btn.setEnabled(True)
             self._later_btn.setEnabled(True)
             return
@@ -393,7 +393,7 @@ class UpdateDialog(QDialog):
             self._dl_btn.setEnabled(True)
             self._later_btn.setEnabled(True)
             return
-        self._status.setText("Installingâ€¦ Cursiv will close and reopen on its own in a minute.")
+        self._status.setText("Installing… Cursiv will close and reopen on its own in a minute.")
         try:
             _run_installer_and_quit(info)
         except Exception as exc:
@@ -402,7 +402,7 @@ class UpdateDialog(QDialog):
             self._later_btn.setEnabled(True)
 
 
-# â”€â”€ Command-access management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Command-access management ─────────────────────────────────────────────────
 
 
 
@@ -410,7 +410,7 @@ class UpdateDialog(QDialog):
 
 
 
-# â”€â”€ Fleet dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Fleet dashboard ───────────────────────────────────────────────────────────
 
 
 
@@ -418,7 +418,7 @@ class UpdateDialog(QDialog):
 
 
 
-# â”€â”€ Title bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+# ── Title bar ─────────────────────────────────────────────────────────────────
 
 
 
@@ -456,7 +456,7 @@ class CursivLauncher(QMainWindow):
             (screen.height() - self.height()) // 2,
         )
 
-        # Cleanup hook â€” fires on every quit path (TitleBar X, tray Quit, etc.)
+        # Cleanup hook — fires on every quit path (TitleBar X, tray Quit, etc.)
         QApplication.instance().aboutToQuit.connect(self._cleanup)
         # Look for a newer release shortly after startup, only if the person turned
         # that on ('autoupdate on' / Settings) and offline mode is off. Silent
@@ -480,16 +480,16 @@ class CursivLauncher(QMainWindow):
         # installer-time PowerShell setup windows).
         QTimer.singleShot(2500, self._maybe_open_setup)
 
-        # Fleet heartbeat â€” fires if relay URL + token are configured
+        # Fleet heartbeat — fires if relay URL + token are configured
         if _RELAY_URL and _FLEET_TOKEN:
             QTimer.singleShot(3000, self._start_fleet_heartbeat)
 
-    # â”€â”€ Cleanup (connected to aboutToQuit) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Cleanup (connected to aboutToQuit) ────────────────────────────────
 
     def _cleanup(self):
         _release_instance_lock()
 
-    # â”€â”€ UI â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── UI ────────────────────────────────────────────────────────────────
 
     def _build_ui(self):
         root = _ResizeRoot()
@@ -505,7 +505,7 @@ class CursivLauncher(QMainWindow):
         _title.setCursor(Qt.CursorShape.ArrowCursor)    # don't inherit the edge-resize cursor
         vlay.addWidget(_title)
 
-        # â”€â”€ Sidebar: no longer shown -- "Getting Started" moved into the
+        # ── Sidebar: no longer shown -- "Getting Started" moved into the
         # tray menu instead. Still built (not
         # skipped) and kept alive off-screen because _check_updates(),
         # _download_codex_models(), _install_ollama(), and the fleet
@@ -521,7 +521,7 @@ class CursivLauncher(QMainWindow):
         side_lay.addStretch(1)
         self._sidebar.hide()
 
-        # â”€â”€ Chat panel: the only view now
+        # ── Chat panel: the only view now
         chat_wrap = QWidget()
         chat_wrap.setStyleSheet(f"background: {BG};")
         body = QHBoxLayout(chat_wrap)
@@ -583,7 +583,7 @@ class CursivLauncher(QMainWindow):
         self._getting_started_btn.clicked.connect(self._show_getting_started)
         col.addWidget(self._getting_started_btn)
 
-        # â”€â”€ Ollama banner (only when Ollama not detected) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Ollama banner (only when Ollama not detected) ──────────────────
         if not _is_ollama_installed():
             ollama_box = QWidget()
             ollama_box.setStyleSheet(
@@ -593,7 +593,7 @@ class CursivLauncher(QMainWindow):
             ob_lay.setContentsMargins(12, 8, 12, 8)
             ob_lay.setSpacing(10)
 
-            warn_lbl = QLabel("âš   Ollama not found â€” required for local AI")
+            warn_lbl = QLabel("⚠  Ollama not found — required for local AI")
             warn_lbl.setStyleSheet(
                 "color: #e8a020; font-size: 11px; background: transparent; border: none;"
             )
@@ -681,7 +681,7 @@ class CursivLauncher(QMainWindow):
         self._codex_dl_btn.clicked.connect(self._download_codex_models)
         col.addWidget(self._codex_dl_btn)
 
-        # â”€â”€ Fleet strip (only when relay is configured) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+        # ── Fleet strip (only when relay is configured) ───────────────────
         if _RELAY_URL and _FLEET_TOKEN:
             fleet_box = QWidget()
             fleet_box.setStyleSheet(
@@ -691,7 +691,7 @@ class CursivLauncher(QMainWindow):
             fleet_lay.setContentsMargins(12, 7, 12, 7)
             fleet_lay.setSpacing(10)
 
-            self._fleet_lbl = QLabel("â¬¢  Fleet â€” connectingâ€¦")
+            self._fleet_lbl = QLabel("⬢  Fleet — connecting…")
             self._fleet_lbl.setStyleSheet(
                 "color: #9a9586; font-size: 11px; background: transparent; border: none;"
             )
@@ -700,7 +700,7 @@ class CursivLauncher(QMainWindow):
             fleet_btn = QPushButton("View Fleet")
             fleet_btn.setFixedHeight(24)
             fleet_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-            fleet_btn.setToolTip("Open the Fleet Dashboard â€” see all your machines")
+            fleet_btn.setToolTip("Open the Fleet Dashboard — see all your machines")
             fleet_btn.setStyleSheet("""
                 QPushButton {
                     background: #151821; color: #e6e2d8;
@@ -726,7 +726,7 @@ class CursivLauncher(QMainWindow):
         row = QHBoxLayout(footer)
         row.setContentsMargins(16, 0, 16, 0)
 
-        self._status_lbl = QLabel("Startingâ€¦")
+        self._status_lbl = QLabel("Starting…")
         self._status_lbl.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
         row.addWidget(self._status_lbl)
         row.addStretch()
@@ -736,7 +736,7 @@ class CursivLauncher(QMainWindow):
         row.addWidget(ver)
         return footer
 
-    # â”€â”€ Getting Started â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Getting Started ──────────────────────────────────────────────────
 
     def _show_getting_started(self):
         # Fired via QTimer.singleShot(1800, ...) on first run only; runs after
@@ -753,7 +753,7 @@ class CursivLauncher(QMainWindow):
     def _set_status(self, msg: str):
         self._status_lbl.setText(msg)
 
-    # â”€â”€ Security questions setup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Security questions setup ──────────────────────────────────────────
 
     def _setup_sq(self):
         try:
@@ -775,7 +775,7 @@ class CursivLauncher(QMainWindow):
         except Exception:
             pass
 
-    # â”€â”€ Update checker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Update checker ────────────────────────────────────────────────────
 
     def _check_updates(self, automatic: bool = False):
         """Manual (button/tray) or automatic (shortly after startup) update check.
@@ -789,8 +789,8 @@ class CursivLauncher(QMainWindow):
             return
         if not automatic:
             self._upd_btn.setEnabled(False)
-            self._upd_btn.setText("Checkingâ€¦")
-            self._set_status("Querying GitHub for updatesâ€¦")
+            self._upd_btn.setText("Checking…")
+            self._set_status("Querying GitHub for updates…")
         # Keep a reference -- the checker's signal object must outlive this call.
         self._update_checker = UpdateChecker(self._on_update_result)
         self._update_checker.check()
@@ -801,7 +801,7 @@ class CursivLauncher(QMainWindow):
         self._upd_btn.setText("Check for Updates")
         if not result.get("ok"):
             if not automatic:
-                self._set_status(f"Update check failed â€” {result.get('error', 'no internet?')}")
+                self._set_status(f"Update check failed — {result.get('error', 'no internet?')}")
             return
         tag = result["tag"]
         if not _version_is_newer(tag, _CURRENT_VERSION):
@@ -810,8 +810,8 @@ class CursivLauncher(QMainWindow):
             return
         if os.environ.get("CURSIV_PORTABLE") == "1":
             # The installer would install onto this PC, not the USB.
-            self._set_status(f"v{tag} is available â€” to update this USB, update Cursiv on your "
-                             "computer, then use \"Make a Cursiv USBâ€¦\" again.")
+            self._set_status(f"v{tag} is available — to update this USB, update Cursiv on your "
+                             "computer, then use \"Make a Cursiv USB…\" again.")
             return
         self._set_status(f"Update available: v{tag}")
         if automatic and self.isHidden():
@@ -819,7 +819,7 @@ class CursivLauncher(QMainWindow):
         dlg = UpdateDialog(tag, result["body"], result["exe_url"], self, exe_size=result.get("exe_size", 0))
         dlg.exec()
 
-    # â”€â”€ llama3.1 model download â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── llama3.1 model download ───────────────────────────────────────────
 
     def _download_llama_model(self, on_done: "Callable[[], None] | None" = None):
         """Model downloads happen in the Setup window (real progress, no console)."""
@@ -827,13 +827,13 @@ class CursivLauncher(QMainWindow):
         if on_done is not None:
             on_done()
 
-    # â”€â”€ Winkler-Codex model download â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Winkler-Codex model download ─────────────────────────────────────
 
     def _download_codex_models(self):
         """Coding models download in the Setup window (progress bar, no console)."""
         self._open_setup()
 
-    # â”€â”€ Ollama installer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Ollama installer ──────────────────────────────────────────────────
 
     def _install_ollama(self):
         """Installing Ollama happens in the Setup window (real progress, no console)."""
@@ -1000,7 +1000,7 @@ class CursivLauncher(QMainWindow):
                 pass
         threading.Thread(target=check, daemon=True).start()
 
-    # â”€â”€ Fleet heartbeat + dashboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Fleet heartbeat + dashboard ───────────────────────────────────────
 
     def _start_fleet_heartbeat(self):
         self._send_heartbeat()          # immediate first ping
@@ -1039,7 +1039,7 @@ class CursivLauncher(QMainWindow):
 
     def _fleet_ping_ok(self):
         if hasattr(self, "_fleet_lbl"):
-            self._fleet_lbl.setText("â¬¢  Fleet â€” this machine online")
+            self._fleet_lbl.setText("⬢  Fleet — this machine online")
             self._fleet_lbl.setStyleSheet(
                 "color: #44cc66; font-size: 11px; background: transparent; border: none;"
             )
@@ -1048,7 +1048,7 @@ class CursivLauncher(QMainWindow):
         dlg = FleetDialog(self)
         dlg.exec()
 
-    # â”€â”€ Tray â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Tray ──────────────────────────────────────────────────────────────
 
     def _build_tray(self):
         self._tray = QSystemTrayIcon(self._make_icon(), self)
@@ -1071,24 +1071,24 @@ class CursivLauncher(QMainWindow):
         gs_act.triggered.connect(self._show_getting_started)
         menu.addAction(gs_act)
 
-        memory_act = QAction("What I rememberâ€¦", self)
+        memory_act = QAction("What I remember…", self)
         memory_act.triggered.connect(lambda: self._open_memory())
         menu.addAction(memory_act)
 
-        phone_act = QAction("Phoneâ€¦", self)
+        phone_act = QAction("Phone…", self)
         phone_act.triggered.connect(lambda: self._open_phone())
         menu.addAction(phone_act)
 
-        setup_act = QAction("Setupâ€¦", self)
+        setup_act = QAction("Setup…", self)
         setup_act.triggered.connect(self._open_setup)
         menu.addAction(setup_act)
 
         if sys.platform == "win32":              # the USB edition is Windows-only for now
-            usb_act = QAction("Make a Cursiv USBâ€¦", self)
+            usb_act = QAction("Make a Cursiv USB…", self)
             usb_act.triggered.connect(lambda: self._open_usb_maker())
             menu.addAction(usb_act)
 
-        report_act = QAction("Send problem reportâ€¦", self)
+        report_act = QAction("Send problem report…", self)
         report_act.triggered.connect(lambda: self._send_problem_report())
         menu.addAction(report_act)
 
@@ -1102,7 +1102,7 @@ class CursivLauncher(QMainWindow):
         menu.addAction(upd_act)
 
         if _RELAY_URL and _FLEET_TOKEN:
-            fleet_act = QAction("â¬¢  Fleet Dashboard", self)
+            fleet_act = QAction("⬢  Fleet Dashboard", self)
             fleet_act.triggered.connect(self._show_fleet)
             menu.addAction(fleet_act)
 
@@ -1124,7 +1124,7 @@ class CursivLauncher(QMainWindow):
         painter = QPainter(pix)
         painter.setPen(QColor(GOLD))
         painter.setFont(QFont("Segoe UI", 18, QFont.Weight.Bold))
-        painter.drawText(pix.rect(), Qt.AlignmentFlag.AlignCenter, "âœ¦")
+        painter.drawText(pix.rect(), Qt.AlignmentFlag.AlignCenter, "✦")
         painter.end()
         return QIcon(pix)
 
@@ -1133,7 +1133,7 @@ class CursivLauncher(QMainWindow):
         self.raise_()
         self.activateWindow()
 
-    # â”€â”€ Lifecycle â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    # ── Lifecycle ─────────────────────────────────────────────────────────
 
     def closeEvent(self, e):
         e.ignore()

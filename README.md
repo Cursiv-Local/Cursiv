@@ -296,7 +296,7 @@ expandable practical details and direct latest-installer download buttons.
 
 #### Included Desktop Improvements
 
-U88 includes [remaining live-transcript fixes](docs/LIVE-TRANSCRIPT-GAPS.md),
+U89 includes [remaining live-transcript fixes](docs/LIVE-TRANSCRIPT-GAPS.md),
 native workspace search/write routing and [owner-authenticated release manifests](docs/OWNER-RELEASE-SIGNING.md).
 Owner signatures are independent of GitHub; Windows CA-issued signing remains
 pending. [Engineering validation and remaining risks](docs/ENGINEERING-AUDIT-20261023.md).

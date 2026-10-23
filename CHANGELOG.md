@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.14-U88 — workspace routing and owner release authentication (2026-10-23)
+## v3.14-U89 — workspace routing and owner release authentication (2026-10-23)
 
 - Add bounded local file/content search, natural creates/appends and source-file
   precedence over notebook keywords. Preserve authorization and confirmation;
@@ -18,7 +18,7 @@
   protection and physical clean-machine/USB persistence checks remain owner tasks.
 - [Owner signing and recovery](docs/OWNER-RELEASE-SIGNING.md),
   [engineering audit](docs/ENGINEERING-AUDIT-20261023.md), and
-  [U88 release notes](docs/RELEASE-U88.md) record evidence and limitations.
+  [U89 release notes](docs/RELEASE-U89.md) record evidence and limitations.
 
 ### Remaining 2026-10-22 live-transcript gaps
 
@@ -34,7 +34,7 @@
   action/medical-advice denials short.
 - Exact changes, regression results and limitations:
   [live-transcript follow-up](docs/LIVE-TRANSCRIPT-GAPS.md). These previously local
-  repairs are included in U88 after the owner's publication authorization.
+  repairs are included in U89 after the owner's publication authorization.
 
 ## v3.14-U87 - Phone Help links and tester feedback (2026-10-22)
 

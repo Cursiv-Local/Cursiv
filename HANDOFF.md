@@ -1,9 +1,9 @@
 # Handoff — Cursiv verification overhaul
 
-## U88 release preparation (2026-10-23)
+## U89 release preparation (2026-10-23)
 
 The owner authorized commit/push/release and explicitly selected independent
-owner release signatures. U88 includes the previous local follow-up below,
+owner release signatures. U89 includes the previous local follow-up below,
 workspace routing repairs and verified security findings from the supplied audit.
 See [engineering validation](docs/ENGINEERING-AUDIT-20261023.md) and
 [owner signing/recovery](docs/OWNER-RELEASE-SIGNING.md). Keep the private key outside

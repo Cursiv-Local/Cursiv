@@ -1,5 +1,5 @@
 ; ============================================================
-; Cursiv v3.14-U89 â€” Phone Help links and tester feedback page
+; Cursiv v3.14-U89 — Workspace routing and owner release authentication
 ; Produces: installer\Output\Cursiv-Setup-3.14-U89.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat
@@ -63,8 +63,8 @@ Name: "desktopicon";  Description: "{cm:CreateDesktopIcon}";                    
 Name: "autostart";    Description: "Start Cursiv when Windows starts";                                             GroupDescription: "Startup:"; Flags: unchecked
 
 [Files]
-; â”€â”€ Main application (PyInstaller bundle: single Cursiv.exe) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-; Includes groovy/version.txt and pandas stub patch â€” CLI no longer crashes.
+; ── Main application (PyInstaller bundle: single Cursiv.exe) ─────────────────
+; Includes groovy/version.txt and pandas stub patch — CLI no longer crashes.
 Source: "..\dist\Cursiv\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
@@ -78,11 +78,11 @@ Type: filesandordirs; Name: "{app}\scripts"
 Name: "{group}\{#AppName}";            Filename: "{app}\{#AppExe}"; IconFilename: "{app}\{#AppExe}"
 Name: "{group}\Uninstall {#AppName}";  Filename: "{uninstallexe}"
 
-; Desktop shortcut â€” main launcher (optional)
+; Desktop shortcut — main launcher (optional)
 Name: "{autodesktop}\{#AppName}";                  Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Registry]
-; Autostart (optional task) â€” HKCU so no admin needed
+; Autostart (optional task) — HKCU so no admin needed
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
   ValueType: string; ValueName: "{#AppName}"; \
   ValueData: """{app}\{#AppExe}"" --tray"; \

@@ -1,7 +1,8 @@
 # Owner release signatures
 
-Starting with U88, the installed app pins Joshua Winkler / Cursiv's Ed25519
+Starting with U89, the installed app pins Joshua Winkler / Cursiv's Ed25519
 release public key. This key is independent of the notebook's per-device keys.
+U88 was an unpublished validation candidate; its tag was preserved rather than moved.
 
 Public-key SHA-256 fingerprint:
 
@@ -34,6 +35,9 @@ the genuine pinned key. A new user who obtains both a malicious first installer
 and its claimed key from a compromised site has a bootstrap-trust problem.
 Compare this fingerprint through an independently trusted channel. A matching
 hash posted on the same compromised site alone does not establish ownership.
+U87 and older updaters do not enforce this new owner proof. Verify the first U89
+installer independently; installing the genuine pinned-key app establishes the
+check used for subsequent updates.
 
 ## Windows signing status
 

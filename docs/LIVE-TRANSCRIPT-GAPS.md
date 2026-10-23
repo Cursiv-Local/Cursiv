@@ -1,9 +1,9 @@
 # Remaining 2026-10-22 live-transcript gaps
 
 Historical local checkpoint: based on published U87 on `codex/live-transcript-gaps`.
-The owner subsequently authorized publication; these changes are included in U88.
+The owner subsequently authorized publication; these changes are included in U89.
 The results below retain the earlier checkpoint's counts. Current combined
-release evidence is recorded separately in the U88 verification report.
+release evidence is recorded separately in the U89 verification report.
 
 ## Read-only audit and causes
 
