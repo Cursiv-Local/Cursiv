@@ -1,14 +1,36 @@
 # Handoff — Cursiv verification overhaul
 
-## U91 publication authorized (2026-10-23)
+## U91 published and verified (2026-10-23)
 
-The owner authorized commit, push, website publication and installer release of
-the pending workspace, philosophical-policy and homepage invitation changes.
-U90 was confirmed as the latest public release; U91 is the next version.
-Main protection remains enabled. The release must pass a PR, merged-main checks,
-tagged Windows/Mac builds and independent owner signing before publication.
-See `docs/U91-RELEASE-VERIFICATION.md` for preparation and final outcomes.
-Existing untracked legal notes and `test_internals/` are outside this release.
+The owner authorized commit, push, website publication and installer release.
+U91 is GitHub latest, published at `2026-10-23T19:39:42Z`. Source PR #2
+passed all five protected checks and merged; exact-main CI passed before the
+supported helper created immutable tag `v3.14-U91` at
+`043f7b24b9f7e036f0363216c502e5640d346eb3`.
+
+- Windows source: **1,749 passed / 1 skip**; Mac: **1,735 / 15**. Both tagged frozen
+  apps passed. Required workspace gate **63**, website tests **21**, dependency and
+  static-security gates passed. The Windows locked-environment replay passed in
+  239.15 s. New workspace/context and philosophy modules are included in the package.
+- Existing independent owner tooling matched its trusted hashes and signed all
+  eight installer/checksum/provenance assets. All 11 public assets matched uploaded
+  digests; anonymous downloads matched the signed bytes. No private key material
+  entered GitHub, OneDrive, CI or the installers. OS publisher warnings remain.
+- The existing website Worker deployed as
+  `a5b407f1-bd38-44f9-a9a4-ae521bb950a3`. All **45 live checks passed**, including
+  the blue top tester link, tester privacy/contacts, U91 proof/hash, canonical URLs,
+  redirects and admin denial. Counter removal is retained; no DNS/schema change.
+- README, TECH, changelog, claim evidence and U91 release/verification records are
+  updated. The app tag/assets remain immutable; later commits record web proof and
+  publication. Main protections remain enabled; no force push was used.
+- Existing personal legal notes and `test_internals/` remain untracked/untouched.
+  No real owner memory was migrated. Physical encrypted USB persistence, clean-PC
+  installation and an owner recovery drill remain manual checks. No new model
+  truth benchmark, Windows-trusted signature or Apple notarization is claimed.
+
+See [U91 verification](docs/U91-RELEASE-VERIFICATION.md) and
+[release notes](docs/RELEASE-U91.md). The chronological local-only notes below
+are superseded by this completed release record.
 
 ## Pending philosophical uncertainty policy (2026-10-23)
 

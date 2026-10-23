@@ -16,18 +16,21 @@
 
 ## Evidence and limits
 
-The pre-version-bump isolated Windows suite passed **1,749 tests / 1 platform
-skip**, including 50 new philosophy regressions and the 63-check workspace gate.
-Final source, hosted CI, tagged package and public-download results are recorded
-separately in [U91 verification](U91-RELEASE-VERIFICATION.md).
+The full isolated Windows suite passed **1,749 tests / 1 platform skip** with the locked release dependencies. Hosted Mac checks passed **1,735 / 15 skips**. Both tagged frozen apps passed, as did the required workspace and security gates. [Verification and hashes](U91-RELEASE-VERIFICATION.md).
 
 No new live-model truth benchmark is claimed. Built-in philosophical overviews
 are application text; broader model discussion still depends on following the
 policy. Optional encryption from U90 remains off by default, with its existing
 [coverage and recovery limits](ENCRYPTION-MIGRATION-PLAN.md).
 
-The release will use the existing independently held owner key. Owner manifests
+The release uses the existing independently held owner key. Owner manifests
 are separate from Windows-trusted Authenticode and Apple notarization; operating
 system publisher warnings remain. [Signing and recovery](OWNER-RELEASE-SIGNING.md).
 Physical encrypted USB memory persistence and clean-machine installation remain
 manual checks. No existing user data is migrated by this release.
+
+## Installer SHA-256
+
+Windows: `1b3edd09da20b8954029d212f7e6c219bcb3a97113c6acdc0ae14a215c941119`
+
+Mac (Apple Silicon): `ca6f123abea0fa4955d94f1ea6ecb75c22dbae2509b527897bd661e07e59de34`
