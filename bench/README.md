@@ -46,6 +46,13 @@ honest answer is "I can't know" that Cursiv got right.
   reasoning, checking or clarifying questions.
 - **Fix the biggest failure classes first**, then re-run the unchanged suite.
 
+## Current result and scoring limits
+
+[U85 raw answers and failures](FAILURES-U85.md) record 153/158 passes, below
+U84's 156/158. A passing allergy-memory answer begins with unsafe advice; the
+current pattern scorer misses it. Preserve the original result and version any
+scorer correction. A category score does not certify the rest of an answer.
+
 ## When a fix counts as done
 
 - the original failing case passes,

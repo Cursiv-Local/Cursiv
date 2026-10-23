@@ -1,6 +1,7 @@
 # U85 release verification
 
-**Release gates complete; public checks pending.** The owner authorized commit,
+**Published and publicly verified.** U85 became GitHub latest at
+2026-10-23 00:30:54 UTC (October 22, 8:30:54 pm Eastern). The owner authorized commit,
 push, installer version bump, release publication and website deployment.
 GitHub latest was confirmed as U84; main and the feature branch both pointed
 to `d3922a48f74518997ccaea0390a771aed6f03513` before this follow-up.
@@ -36,12 +37,13 @@ no installed owner's application or personal settings were changed. The personal
 `test_internals/u81_test.txt` hash matches its original value. Completed package, hosted CI and live-model results follow below; public checks
 are recorded after publication.
 
-## Tagged source and running jobs
+## Tagged source and completed jobs
 
 `v3.14-U85` resolves to `9770c2ebc5a65baaa1e35933d3e574cfa6db7178`.
 The tag and commit were pushed together to main and
 `codex/maintainability-hardening`; no force-push or retag was used.
-The release is a draft until the remaining gates complete.
+The release was held as a draft until the recorded package/model/site gates
+completed, then published as latest without moving the tag.
 
 - Hosted source CI: [39874348318](https://github.com/Cursiv-Local/Cursiv/actions/runs/39874348318).
 - Tagged Mac package: [39874465964](https://github.com/Cursiv-Local/Cursiv/actions/runs/39874465964).
@@ -49,8 +51,8 @@ The release is a draft until the remaining gates complete.
 - Full tagged suite 1.5 log: `%TEMP%/cursiv-u85-truth-bench.log`, installed
   `qwen3:4b-instruct`, isolated empty data, offline mode and learning disabled.
 
-Windows packaging and the model benchmark run concurrently on this computer;
-benchmark wall times include that activity. Pending jobs do not establish a pass.
+Windows packaging and the model benchmark ran concurrently on this computer;
+benchmark wall times include that activity. Completed results are listed below.
 
 ## Hosted Windows test-harness correction
 
@@ -94,8 +96,8 @@ SHA-256:
 `3ba7af935d4faae5e8662e651418a62ad89f2605d05fc9a21b29331335943c22`.
 `SHA256SUMS.txt` lists both. Embedded file/product version is `3.14-U85`
 (numeric 3.14.85.0). Authenticode: **NotSigned**. The verified bytes, checksums
-and dependency list were uploaded to the U85 draft; this is not yet a public
-download verification.
+and dependency list were first uploaded to the U85 draft. The later public
+download verification is recorded below.
 
 As with the prior release, the builder reported the legacy optional `httpx`
 hidden import missing (the clean SDK uses `httpx2`), plus optional `tzdata`.
@@ -166,6 +168,60 @@ SignPath note, download URLs, phone routes and privacy text are retained.
 No Worker code, DNS, secrets or database schema changes are needed for U85.
 
 Only website copy, documentation and the new unedited benchmark output/summary
-are being added after the test-only CI correction. The tagged application
+were added after the test-only CI correction. The tagged application
 fingerprint still matches both package inputs. Personal test-file hash is
 unchanged and the directory stays excluded. `git diff --check` passed.
+
+## Publication and production verification
+
+Website/evidence commit: `2553e20` after the tagged application and the test-only
+UTF-8 correction. It was pushed atomically to remote `main` and
+`codex/maintainability-hardening`. GitHub release
+[v3.14-U85](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U85)
+is public, stable and latest. Its eight assets include both versioned/stable
+Windows and Mac installers, both checksum files, exact Windows dependencies and
+`u85-release-verification.json`.
+
+Publishing triggered redundant Mac workflow
+[39878568982](https://github.com/Cursiv-Local/Cursiv/actions/runs/39878568982).
+It was intentionally cancelled (normal cancellation followed by force-cancel)
+before package/upload steps, preserving already verified bytes. Its cancelled
+status is separate from successful tagged build 39874465964 and corrected
+source CI 39875079798. All four published binary asset digests were rechecked
+after cancellation and remain identical to the hashes above.
+
+The existing Cloudflare `cursiv-web` Worker was deployed with Wrangler 4.151.3.
+Only four changed static HTML assets were uploaded. Worker version:
+`4fcae8c8-2bcd-403f-a6c6-e70e2e9d80cd`. Existing domains, D1/AI bindings,
+variables, secrets and schema were preserved. No Pages migration was performed.
+
+Anonymous public verification began at **2026-10-23 00:31:40 UTC**:
+
+- Latest GitHub release/tag resolves to the immutable application commit above.
+- Stable Windows and Mac links were each downloaded in full without credentials;
+  actual received byte counts and SHA-256 match both aliases' GitHub digests.
+- Both public checksum files contain the matching versioned/stable asset pairs.
+- Eight public marketing/policy pages return HTTPS 200; generated/live canonical,
+  Open Graph, Twitter metadata and parsed JSON-LD match. No `noindex` is present.
+- Homepage/download/research/testing pages show U85; testing shows 153/158 and
+  the documented allergy/scoring gap. Historical U84/U75 records remain intact.
+- `/app`, `/notebook/`, `/health`, robots.txt and sitemap.xml return 200. Phone
+  routes retain their distinct roles and links. Robots/sitemap use cursiv.us.
+- The dedicated 1200×630 social image is publicly accessible.
+- Both private statistics endpoints reject unauthenticated requests with 401 and
+  `Cache-Control: no-store`.
+- The legacy hostname permanently redirects the tested evidence path to the
+  matching cursiv.us path with HTTP 301.
+
+All **20 public release/website checks passed**. The counter's availability is
+recorded separately: **existing 503/unavailable with `total:null` persists**.
+No count is invented and download navigation remains independent. Its root
+cause is not established by this release; private admin credentials, clicks and
+personal model requests were not exercised. Live HTML/raw JSON are retained at
+`cloudflare/.wrangler/u85-release-review/`; the release verification attachment
+contains the public outcomes without credentials.
+
+Final source commits contain documentation/website/benchmark records only after
+the UTF-8 test correction. The application fingerprint, immutable tag and personal
+fixture hash remain unchanged. The owner application was not installed or
+restarted; use its normal online update check to install U85.

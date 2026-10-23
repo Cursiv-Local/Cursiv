@@ -30,6 +30,14 @@ No personal-data/schema migration or automatic installation on the owner's
 computer is performed. Local model answers still need a compatible installed
 Ollama model. Windows/Mac installers remain unsigned; Mac is not notarized.
 
+## Publication checks
+
+Published as latest with verified Windows and Apple Silicon Mac assets. Both
+stable installers were re-downloaded publicly and hashed against the attached
+checksums. The updated website passed 20 tests and 20 public release/site checks.
+The existing download counter still reports unavailable; no total is invented.
+See `u85-release-verification.json` in the release assets for recorded outcomes.
+
 ## Tests and limits
 
 The final versioned Windows source suite passed **1,267 tests with one Mac

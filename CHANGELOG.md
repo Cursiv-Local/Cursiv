@@ -2,6 +2,15 @@
 
 ## v3.14-U85 - Quiet chat feedback and notebook continuity (2026-10-22)
 
+- Publish U85 as GitHub latest with independently hashed Windows/Mac installers,
+  both checksum files, exact Windows dependency versions and verification JSON.
+  Push reviewed source and deploy four updated pages to the existing Cloudflare
+  Worker. All 20 website tests and 20 public release/site checks passed.
+  The pre-existing counter remains unavailable; no download total is invented.
+- Hosted source checks: Windows 1,267 passed/1 skipped; Mac 1,257/11. Both
+  frozen full-window package checks passed. Stop the redundant publication-triggered
+  Mac rebuild before it can replace already verified assets.
+
 - Keep streamed drafts available while optional local reviews run. Show a small
   progress indicator only around an actual reviewer invocation, then a note
   count or an unavailable status. Clean reviews keep metadata without adding

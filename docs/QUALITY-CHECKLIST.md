@@ -3,7 +3,7 @@
 This is a readiness checklist, not a calculated rating. No score follows
 automatically from line counts or a passing test run.
 
-Current release preparation and actual publication gates:
+Current published release and completed publication gates:
 [U85 verification](U85-RELEASE-VERIFICATION.md). Earlier results retain their
 original release scope. U85 scored 153/158; the failure review includes an
 unsafe allergy answer missed by the scorer. Publication does not close that gap.

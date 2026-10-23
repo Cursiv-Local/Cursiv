@@ -1,11 +1,11 @@
 # Quiet chat feedback and notebook continuity
 
-> Release follow-up: the owner authorized commit, push, version bump, packaging
-> and publication as U85. [U85 verification](U85-RELEASE-VERIFICATION.md) records
+> Release follow-up: U85 is published, with verified Windows/Mac downloads
+> and the website deployed. [U85 verification](U85-RELEASE-VERIFICATION.md) records
 > actual release gates and results. The status, source fingerprint and test
 > records below describe the completed pre-release implementation checkpoint.
 
-## Status
+## Status at the pre-release implementation checkpoint
 
 Unreleased working-tree changes on `codex/maintainability-hardening`, based on
 `d3922a48f74518997ccaea0390a771aed6f03513` (published U84 source/evidence).

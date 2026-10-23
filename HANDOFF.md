@@ -1,14 +1,34 @@
 # Handoff — Cursiv verification overhaul
 
-## U85 publication authorized
+## U85 published and verified
 
-The owner now authorizes committing, pushing, version bump, installer release
-and website deployment for the newest feedback/notebook changes. U84 was
-confirmed as GitHub latest and both remote branches matched the local starting
-commit. U85 is a fresh version/tag; existing published tags/assets are preserved.
-See [U85 verification](docs/U85-RELEASE-VERIFICATION.md) for actual source,
-tests, Windows/Mac package, model benchmark and production verification results.
-Statuses below are earlier checkpoints, not the current publication state.
+GitHub latest is [v3.14-U85](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U85),
+published 2026-10-23 00:30:54 UTC (October 22 Eastern). Windows and Apple Silicon
+Mac installers passed frozen full-window checks and were re-downloaded publicly
+and independently hashed. Tagged application commit: `9770c2e`; application
+source is unchanged by later test/evidence commits. Corrected source CI passed
+1,267/1 on Windows and 1,257/11 on Mac (passed/skipped). The initial Windows
+UTF-8 subprocess fixture failure and exact repair are recorded, not hidden.
+
+The fresh suite 1.5 model run scored **153/158 (96.8%)**, below U84's 156/158.
+All five scoring failures and an unsafe allergy-memory answer that passed the
+scorer are documented. Retrieval, contradictory model wording and broader
+scoring coverage remain open; this release does not claim to solve them.
+
+The website now serves U85 evidence and quiet-feedback/notebook messaging.
+Worker version: `4fcae8c8-2bcd-403f-a6c6-e70e2e9d80cd`. All 20 website tests
+and 20 public release/site checks passed. The existing public counter still
+returns 503/unavailable, separately from functional installer downloads. Admin
+authentication remains enforced. No DNS, schema or secret change was made.
+The redundant release-triggered Mac build was cancelled before upload; the
+successful tagged build and verified public bytes remain intact.
+
+See [U85 verification](docs/U85-RELEASE-VERIFICATION.md),
+[release notes](docs/RELEASE-U85.md) and [failure review](bench/FAILURES-U85.md).
+README, architecture, changelog, platform/quality/claim records and benchmark
+results are updated. Personal `test_internals/` remains untracked and unchanged.
+No owner app installation/restart or personal-data migration occurred. Historical
+checkpoints below describe their own earlier status, not the current publication.
 
 ## Pre-release checkpoint: quiet feedback and continuity
 
