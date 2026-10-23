@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U88"
+VERSION = "3.14-U89"
 FACTS_FILE = Path(__file__).parent.parent / "council" / "cursiv_facts.md"
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
@@ -33,7 +33,7 @@ def is_self_question(text: str) -> bool:
     return bool(_SELF_RE.search(text or ""))
 
 
-# ── friendly errors ─────────────────────────────────────────────────────────
+# â”€â”€ friendly errors â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 _ERR_RE = re.compile(r"^\s*\*?\[(xAI|OpenAI|Claude|Gemini|Groq|Cursiv Cloud|Ollama)[^\]]*?(error|unavailable|not found)[^\]]*\]\*?", re.I)
 
@@ -48,23 +48,23 @@ def friendly_error(chunk: str) -> str | None:
     RECENT_ERRORS.append((time.strftime("%H:%M"), raw.strip()[:200]))
     low = raw.lower()
     if "401" in low or "403" in low or "invalid" in low and "key" in low:
-        why = f"{who} rejected the key. Check it in ⚙ Settings."
+        why = f"{who} rejected the key. Check it in âš™ Settings."
     elif "413" in low or "too large" in low:
         why = f"that message was too long for {who}'s free tier."
     elif "429" in low or "rate" in low:
-        why = f"{who} is busy (rate limit) — it frees up within a minute."
+        why = f"{who} is busy (rate limit) â€” it frees up within a minute."
     elif "503" in low or "high demand" in low or "overloaded" in low:
         why = f"{who}'s servers are overloaded right now."
     elif "timed out" in low or "timeout" in low:
         why = f"{who} took too long to answer."
     elif who.lower() == "ollama":
-        why = "the local AI (Ollama) isn't responding — open Setup and click Restart Ollama, or try again in a minute."
+        why = "the local AI (Ollama) isn't responding â€” open Setup and click Restart Ollama, or try again in a minute."
     else:
         why = f"{who} couldn't answer just now."
     return f"\n*(Couldn't get an answer: {why})*\n"
 
 
-# ── live report ─────────────────────────────────────────────────────────────
+# â”€â”€ live report â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 def _safe(fn, default="unknown"):
     try:
@@ -162,11 +162,11 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 - Be warm, direct and brief.
 
 ## Where things really are (only point people to these -- never invent other menus or settings)
-- Title bar buttons: ⚙ Settings, ☰ saved conversations sidebar, minimize, maximize, close (📱 Phone only with personal features shown).
-- ⚙ Settings: AI keys (xAI, OpenAI, Claude, Gemini, Groq -- show/save/remove/test, "Get a key" links), Cursiv Cloud on/off, data folder, "What I remember…".
-- Setup window (tray menu → Setup…, or opens when something is missing): install/start/Restart Ollama, download the chat model (qwen3 4B Instruct, the one Cursiv tested), download a coding model (qwen2.5-coder 3B/7B/14B), Cursiv Cloud + free key test.
+- Title bar buttons: âš™ Settings, â˜° saved conversations sidebar, minimize, maximize, close (ðŸ“± Phone only with personal features shown).
+- âš™ Settings: AI keys (xAI, OpenAI, Claude, Gemini, Groq -- show/save/remove/test, "Get a key" links), Cursiv Cloud on/off, data folder, "What I rememberâ€¦".
+- Setup window (tray menu â†’ Setupâ€¦, or opens when something is missing): install/start/Restart Ollama, download the chat model (qwen3 4B Instruct, the one Cursiv tested), download a coding model (qwen2.5-coder 3B/7B/14B), Cursiv Cloud + free key test.
 - "What I remember" window (Settings or tray): search, add, forget memories; learning on/off.
-- Tray menu: What I remember…, Phone…, Setup…, Send problem report…, Quit.
+- Tray menu: What I rememberâ€¦, Phoneâ€¦, Setupâ€¦, Send problem reportâ€¦, Quit.
 - Chat commands: remember <fact>, forget <words>, what do you remember, memory learn on/off, free keys, cloud on/off/status, council <question>, codex <request> (codex help, codex keep, codex project <folder>, codex lessons, codex learn <lesson>), phases, help.
 - Cursiv Forge: evolve <idea> (writes a plugin, safety-checks it, tests it in a sandbox; installs only after evolve approve), plugins, plugin show/off/on/remove/approve <name>. Plugins live in .cursiv/plugins.
 - Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.

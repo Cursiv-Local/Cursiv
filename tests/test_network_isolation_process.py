@@ -8,7 +8,8 @@ import sys
 def test_fresh_process_blocks_external_and_preserves_loopback(tmp_path):
     script = r'''
 import json, socket, sys, threading, urllib.request
-from http.server import BaseHTTPRequestHandler, HTTPServer
+from http.server import BaseHTTPRequestHandler
+from socketserver import TCPServer
 attempts = []
 def observe(event, args):
     if event.startswith('socket.') and event in ('socket.connect', 'socket.getaddrinfo'):
@@ -20,7 +21,7 @@ blocked = []
 for label, action in [
     ('socket', lambda: socket.create_connection(('203.0.113.1', 443), timeout=.1)),
     ('dns', lambda: socket.getaddrinfo('example.invalid', 443)),
-    ('http', lambda: urllib.request.urlopen('https://example.invalid/', timeout=.1)),
+    ('http', lambda: urllib.request.build_opener(urllib.request.ProxyHandler({})).open('https://example.invalid/', timeout=.1)),
 ]:
     try:
         action()
@@ -32,10 +33,11 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         self.send_response(200); self.end_headers(); self.wfile.write(b'local fixture')
     def log_message(self, *a): pass
-server = HTTPServer(('127.0.0.1', 0), Handler)
+server = TCPServer(('127.0.0.1', 0), Handler)  # no HTTPServer reverse-DNS lookup
 thread = threading.Thread(target=server.serve_forever, daemon=True); thread.start()
 try:
-    with urllib.request.urlopen('http://127.0.0.1:%s/' % server.server_port, timeout=2) as response:
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    with opener.open('http://127.0.0.1:%s/' % server.server_address[1], timeout=2) as response:
         assert response.read() == b'local fixture'
 finally:
     server.shutdown(); server.server_close(); thread.join(2)
