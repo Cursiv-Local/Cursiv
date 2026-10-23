@@ -21,6 +21,13 @@
   U85 publication; tagged builds, fresh model results and actual publication are
   recorded in [U85 verification](docs/U85-RELEASE-VERIFICATION.md).
 
+- Record fresh U85 suite 1.5 results: **153/158 (96.8%)**, below U84's
+  156/158. Preserve all five failures and document an unsafe allergy-memory
+  answer that passed the bounded scorer. Do not relabel historical results.
+- Update current website evidence, README/build instructions, architecture,
+  platform readiness and claim mapping. Record the Windows CI subprocess
+  encoding correction separately from the unchanged tagged application.
+
 ## Website - General phone photo questions (2026-10-22)
 
 - Replace the phone app's Bible-specific setup, chat example, placeholder and

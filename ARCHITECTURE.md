@@ -1,15 +1,17 @@
 # Cursiv architecture
 
-This describes the maintenance feature branch based on U82. The published U82
-installers retain their tagged source until a later release is approved.
+This describes the U85 source, carrying the U82–U84 architecture and trust
+repairs forward. [U85 verification](docs/U85-RELEASE-VERIFICATION.md) records the
+tagged package, tests and actual publication state.
 
 ## Desktop and chat
 
 | Boundary | Responsibility / entry point |
 |---|---|
-| `launcher/main.py`, `cursiv_launcher.py` | Startup, login gate, single instance, main window, updater. Version and stable installer names remain unchanged. |
+| `launcher/main.py`, `cursiv_launcher.py` | Startup, login gate, single instance, main window, updater. Release version matches the installer; stable asset names remain fixed. |
 | `launcher/shell_dialogs.py` | Fleet/access dialogs and Qt window frame. |
 | `launcher/chat_panel.py` | Turn lifecycle, conversation navigation and worker signals. |
+| `launcher/chat_feedback.py`, `core/feedback.py` | GUI-thread state/receipt presentation and short factual formatters; model prose cannot create execution receipts. |
 | `launcher/chat_review.py`, `chat/review.py` | Snapshot eligible review evidence; finish the draft before a local worker runs; apply labeled follow-ups in Qt with generation/cancellation guards. |
 | `launcher/chat_controls.py`, `chat_transcript.py`, `chat_rendering.py` | Controls, transcript operations, incremental Markdown and message cache. Qt widgets stay on the GUI thread. |
 | `launcher/chat_commands.py` | Compatible result types and command entry points. |
@@ -30,6 +32,11 @@ Compatibility wrappers pass an explicit runtime object. Implementations do not
 import the facade or install replacement module globals. Existing call overrides
 still reach extracted functions. The runtime protocols list their dependencies;
 some types remain broad to accommodate optional integrations.
+
+U85 progress events surround actual reviewer invocations after availability
+checks. Clean results persist bounded review metadata without reparsing the
+transcript. Notebook saves/imports read back stored data before success; existing
+append-only record formats and authorization boundaries remain in place.
 
 ## One response
 

@@ -12,9 +12,9 @@ measurement, not a feeling.
   (the reference card, "Answered by") and check notes aren't scored.
 - `results/`: every run's replies and failures. `RESULTS.md`: one row per run.
 
-Run (takes about 30 s per case on a 4 GB graphics card):
+Run from the exact release tag (time varies with model, hardware and checks):
 
-    py -3.13 scripts/truth_bench.py --label U62
+    py -3.13 scripts/truth_bench.py --source v3.14-U85 --label U85 --model qwen3:4b-instruct
 
 The run uses a fresh copy of the source, an empty home folder, offline mode on
 and background learning off, so results don't depend on this computer's memories

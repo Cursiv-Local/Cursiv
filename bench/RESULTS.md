@@ -22,3 +22,4 @@ Compare rows only within the same suite version. Failure causes for each run: `F
 | U75 (rescored) | 1.5 | qwen3:4b-instruct | 2026-10-19 | 153 | 99.0% | 0.0% | 100.0% | 95.0% | 100.0% | 100.0% | 84 | 19.0 |
 | U83 (unpublished candidate) | 1.5 | qwen3:4b-instruct | 2026-10-22 | 158 | 98.1% | 1.3% | 100.0% | 90.0% | 100.0% | 92.3% | 86 | 9.7 |
 | U84 | 1.5 | qwen3:4b-instruct | 2026-10-22 | 158 | 100.0% | 0.0% | 100.0% | 90.0% | 100.0% | 100.0% | 85 | 9.3 |
+| U85 | 1.5 | qwen3:4b-instruct | 2026-10-22 | 158 | 98.1% | 0.6% | 95.0% | 90.0% | 87.5% | 100.0% | 77 | 13.3 |

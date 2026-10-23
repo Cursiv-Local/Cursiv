@@ -32,11 +32,20 @@ Ollama model. Windows/Mac installers remain unsigned; Mac is not notarized.
 
 ## Tests and limits
 
-The final versioned Windows source suite passed 1,267 tests with one Mac
-Keychain skip. Hosted CI, packaged self-tests, fresh
-158-case model results and actual public-download hashes are recorded only
-after completion in [U85 verification](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U85-RELEASE-VERIFICATION.md)
+The final versioned Windows source suite passed **1,267 tests with one Mac
+Keychain skip**. Corrected hosted CI passed **1,267/1 on Windows** and
+**1,257/11 on Mac** (passed/skipped). Both tagged packages passed frozen
+full-window/notebook checks. The initial Windows CI exposed a subprocess
+encoding mismatch in a test; the later test-only correction leaves packaged
+application source unchanged. Exact records and public-download checks are in [U85 verification](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U85-RELEASE-VERIFICATION.md)
 and the [test page](https://cursiv.us/ai-reliability-testing#u85).
+
+The fresh unchanged suite 1.5 run with `qwen3:4b-instruct` scored **153/158
+(96.8% overall)**, below U84's 156/158. All five failures remain public, including
+time arithmetic and contradictory wording. **A passing allergy-memory answer
+still began with unsafe advice**; the scorer missed it. Do not rely on these
+pattern scores for medical or emergency decisions. [Raw answers and failure
+review](https://github.com/Cursiv-Local/Cursiv/blob/main/bench/FAILURES-U85.md).
 
 The controlled 10/100/1,000-message rendering replay kept zero full-document
 rebuilds and median final-token-to-ready times of 17/22/76 ms. It used a simulated

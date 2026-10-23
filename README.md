@@ -141,6 +141,9 @@ receipts include a record ID/fingerprint; import summaries count new entries
 separately from uploads and duplicates. Turn restrictions do not disable chat
 history. See [scope, checks and limitations](docs/CHAT-FEEDBACK.md) and
 [U85 release verification](docs/U85-RELEASE-VERIFICATION.md).
+The fresh local-model run scored 153/158 (96.8%), below U84's 156/158;
+[the failure review](bench/FAILURES-U85.md) includes an unsafe allergy answer
+missed by the scorer. Passing patterns do not establish medical safety.
 
 The latest [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) closes
 additional policy/source/error gaps. Source labels describe application-supplied
@@ -196,12 +199,18 @@ For each new release, substitute an unused higher version in these examples.
 ```powershell
 Copy-Item installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe
 Copy-Item installer/Output/SHA256SUMS-3.14-U85.txt installer/Output/SHA256SUMS.txt
-gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --latest --verify-tag --repo Cursiv-Local/Cursiv
+gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --draft --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
 It requires a higher version; replacing assets under the same version will not
 trigger an update for that version. Offline mode blocks update checks.
+
+Attach the tagged Mac package, stable alias and checksum file through the existing
+Mac workflow, then review all gates before publishing the draft as latest.
+Publication triggers a second Mac workflow; stop a redundant run before it can
+replace already verified public bytes. The release report records the successful
+tagged build and any intentional duplicate cancellation separately.
 
 Run the fixed benchmark from the release tag (`scripts/truth_bench.py --source
 v3.14-U85 --label U85 --model qwen3:4b-instruct`, substituting the new version),

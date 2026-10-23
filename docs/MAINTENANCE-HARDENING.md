@@ -1,5 +1,10 @@
 # Maintainability and verification hardening
 
+> U85 follow-up: quiet receipts/status and notebook continuity carry this work
+> forward. [U85 verification](U85-RELEASE-VERIFICATION.md) records the newly
+> authorized publication. Existing source, benchmark and release records below
+> remain historical evidence of their own checkpoints.
+
 > Publication follow-up: the owner subsequently authorized commit/push,
 > packaging, release and website deployment. U83 stayed an unpublished candidate
 > after a full-window smoke failure; U84 repairs it and expands that gate.

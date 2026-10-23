@@ -1,15 +1,17 @@
 # Packaging and platform readiness
 
-U84 is published. Current source/CI/package/download evidence is in
-[U84 release verification](U84-RELEASE-VERIFICATION.md);
-[U82 verification](U82-RELEASE-VERIFICATION.md) is historical. Automated package
-checks and the remaining physical/signing gates are listed separately.
+U85's tagged packages and hosted source checks are complete; publication and
+public-download verification are recorded in
+[U85 release verification](U85-RELEASE-VERIFICATION.md).
+[U84 verification](U84-RELEASE-VERIFICATION.md) and
+[U82 verification](U82-RELEASE-VERIFICATION.md) retain historical evidence.
+Automated package checks and remaining physical/signing gates are separate.
 
 | Platform / gate | Current evidence | Remaining action |
 |---|---|---|
-| Windows build | U84 source CI and expanded frozen full-launcher self-test passed; both public installer aliases/checksums were independently verified. | Clean-machine install/upgrade and physical portable checks remain unperformed. |
-| Windows Authenticode | Public U84 reports NotSigned. The website retains its unsigned warning and SignPath support note. | Owner must obtain/configure signing access. No signed installer was created or released by this task. |
-| macOS Apple Silicon | U84 hosted source tests, expanded full-launcher frozen self-test, four screenshots, DMG build and public download hash checks succeeded. Existing API keys use the login Keychain. | Independent clean-machine installation and minimum-OS compatibility checks remain open. |
+| Windows build | U85 source CI and expanded frozen full-launcher self-test passed; identical installer aliases and checksums are in the draft, with public checks recorded in the release report. | Clean-machine install/upgrade and physical portable checks remain unperformed. |
+| Windows Authenticode | U85 reports NotSigned. The website retains its unsigned warning and SignPath support note. | Owner must obtain/configure signing access. No signed installer was created or released by this task. |
+| macOS Apple Silicon | U85 hosted source tests, expanded frozen self-test, four screenshots, DMG build and draft-download hash checks succeeded. Existing API keys use the login Keychain. | Independent clean-machine installation and minimum-OS compatibility checks remain open. |
 | macOS signing | Build spec currently sets `codesign_identity=None`; public guidance says unsigned. | Developer ID, hardened-runtime signing, notarization and stapling must be configured/tested. |
 | USB kit | Existing automated portable/copy/retrieval/integrity checks run in the regression suite. | The two-clean-Windows-PC/full-day checklist has not been performed in this environment. Record actual devices/times/failures. |
 | Linux | No Linux release artifact or Linux CI/package path. | Explicitly unsupported for packaged distribution for now; source use is experimental and not a compatibility promise. |

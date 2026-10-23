@@ -1,6 +1,7 @@
 # Cursiv — how it's built
 
-Cursiv is a Windows desktop app written in Python (PyQt6). It talks to a local
+Cursiv is a desktop app for Windows, with an early Apple Silicon Mac build,
+written in Python (PyQt6). It talks to a local
 AI engine (Ollama) first and to online providers only when the person has
 added a key. This page explains the code layout, how a message is answered,
 where data lives, and how to run, build and release it.
@@ -97,19 +98,34 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 You need PyInstaller (in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
-1. Bump the version in three places: `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and `cursiv_v215/core/selfknow.py` (`VERSION`). Versions keep the major number and add an update suffix: `3.14-U55`.
-2. Build the app: `scripts\build.bat` (runs `python -m PyInstaller launcher/build.spec`). The Python you build with is the Python bundled into the app.
-3. Build the installer: `scripts\package.bat` → `installer\Output\Cursiv-Setup-<version>.exe`.
+1. Bump `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and `cursiv_v215/core/selfknow.py` (`VERSION`) together, using an unused higher suffix such as `3.14-U85`.
+2. Run the regression checks in isolated data, commit reviewed source and tag that exact commit. Use a clean environment containing only `requirements.txt`; retain the exact dependency list.
+3. Run `py -3.13 scripts/build_release.py v3.14-U85`, substituting the new tag for a future release. It builds a temporary tagged checkout, requires the frozen full-window self-test, compiles Inno Setup and stages identical versioned/latest installers plus SHA-256 checksums in `installer/Output/`.
+
+Working-tree build scripts remain useful for development, but the release
+builder uses the tag so unrelated or uncommitted files cannot enter an installer.
+See [U85 verification](docs/U85-RELEASE-VERIFICATION.md) for actual source,
+package, hosted CI, model benchmark and public-download evidence.
 
 ## Release an update
 
-The in-app updater reads `https://api.github.com/repos/winklersllc2026-bit/Cursiv/releases/latest` and downloads the attached installer. **A git push alone doesn't update anyone** — publish a GitHub release:
+The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
+It requires a higher version and online checks to be allowed. A source push alone
+does not update installed copies. Prepare the release as a draft:
 
 ```bash
-gh release create v3.14-U55 installer/Output/Cursiv-Setup-3.14-U55.exe Cursiv-Setup-latest.exe --title "Cursiv v3.14-U55" --notes-file notes.md --latest
+gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --draft --verify-tag --repo Cursiv-Local/Cursiv
 ```
 
 Upload the same installer twice: once with its version name and once as `Cursiv-Setup-latest.exe`. The README's download button and the website link to `releases/latest/download/Cursiv-Setup-latest.exe`; asset links are filename-exact, so without the stable name every download button breaks on the next release.
+
+Copy the builder's versioned checksum file to `SHA256SUMS.txt` before uploading.
+Run the existing tagged Mac workflow to attach its DMG, identical
+`Cursiv-mac-latest.dmg` alias and `SHA256SUMS-mac.txt`. Review CI, frozen checks,
+raw benchmark failures and both artifact hashes before making the draft latest.
+Publishing also triggers a Mac workflow: if the verified Mac assets are already
+attached, stop that redundant run before it rebuilds/overwrites them. Record the
+successful tagged run separately from this intentional cancellation.
 
 ## Publish the website
 

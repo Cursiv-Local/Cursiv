@@ -1,5 +1,9 @@
 # Reliability evidence: what was tested, what was fixed, what is still unproven
 
+> Later releases: [U85 verification](U85-RELEASE-VERIFICATION.md) records current
+> source, package and public-download gates. The sprint results below retain
+> their original source/platform scope and do not describe U85 measurements.
+
 Sprint of 2026-10-18 to 19, on branch `ui-redesign` (commits `22ce938` to the commit that adds this file),
 from three briefs: field-record integrity and recovery; calculation integrity and self-auditing; memory,
 provenance and untrusted documents. Everything below was run on **one Windows 11 Home laptop** (Python
