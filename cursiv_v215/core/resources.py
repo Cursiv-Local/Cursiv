@@ -93,7 +93,7 @@ def _invalid(why: str, inputs: dict) -> Plan:
 
 def work_out(question: str) -> Plan | None:
     q = question or ""
-    if not _TOPIC.search(q):
+    if not _TOPIC.search(q) and not (_ALLOC.search(q) and re.search(r'(?i)\b(?:how long|last)\b', q)):
         return None
     rest = q
     allocs = list(_ALLOC.finditer(rest))

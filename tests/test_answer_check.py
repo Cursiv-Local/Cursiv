@@ -109,9 +109,10 @@ def test_yes_its_safe_then_dont_go_gets_a_warning_on_top(fresh, monkeypatch):
                      [], "", None, replace_draft=True):
         parts = [c[len(ca.REPLACE_SENTINEL):]] if c.startswith(ca.REPLACE_SENTINEL) else parts + [c]
     out = "".join(parts)
-    # Cursiv's own answer first (the 30-minute rule, counted in code), then the warning, then the model
-    assert out.index("Not yet: wait about 20 more minutes") < out.index("contradicts itself") < out.index("Yes, it's safe")
-    assert out.count("contradicts itself") == 1
+    # The code-backed safety lead stays first and the unsupported model claim
+    # is now removed, rather than merely moved beneath a warning.
+    assert out.startswith('**Not yet: wait about 20 more minutes')
+    assert 'withdrawn' in out and "Yes, it's safe" not in out
     assert ac.flip_flop("Yes, it's safe. Boil it for one minute first.") is None
 
 

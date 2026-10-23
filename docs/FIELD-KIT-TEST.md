@@ -1,8 +1,11 @@
 # Field kit test: Cursiv on an SSD
 
-**2026-10-22 status:** automated portable regressions are separate from this
-physical checklist. No second clean-PC/full-day run was performed by the
-maintenance task. Do not interpret unchecked steps as passes. Record the actual
+**2026-10-22 owner update:** basic physical USB operation works in the owner's
+testing. USB memory saves, persistence after restart and cross-machine retrieval
+remain untested; the owner has access to a second clean Windows PC. Start with
+[the focused persistence check](USB-PERSISTENCE-CHECK.md). Automated portable
+regressions are separate from physical evidence. No second-PC/full-day result
+was established by this task. Do not interpret unchecked steps as passes. Record the actual
 release, devices, drive and failures when the kit is available; use disposable
 observations for the deliberate failure tests.
 

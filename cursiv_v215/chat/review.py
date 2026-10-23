@@ -122,7 +122,7 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
         return None
     immediate = any(item.severity == 'error' for item in issues) or (
         selected_mode == 'fast' and any(item.severity == 'warning' for item in issues)) or selected_mode == 'off'
-    if not immediate and not any(item.severity == 'warning' for item in issues) and not verify.should_verify(question, draft):
+    if selected_mode != 'full' and not immediate and not any(item.severity == 'warning' for item in issues) and not verify.should_verify(question, draft):
         return None
     observed = deepcopy(runtime.grounding.state())
     quote_problem = runtime.grounding.quote_problem

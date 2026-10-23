@@ -96,22 +96,36 @@ def prompt(person: str, workspace: str = '', file_access: bool = False, *, obser
             'A failed lookup is unknown, not a remembered event. Do not claim continuous activity.\n')
 
 
+_SHORT_STATE = re.compile(
+    r"am i offline|are you (?:online|offline|in offline mode)|is file access (?:on|off|enabled)|"
+    r"what(?:'s| is) (?:your|the) current workspace|where is (?:my|your|the)(?: current)? workspace|"
+    r'can you (?:read or write|read and write|read|write|access)(?: my| workspace)? files(?: right now)?|'
+    r'can you observe anything while (?:cursiv is |you are )?closed')
+
+
+def short_state_question(text: str) -> bool:
+    from .turn_policy import task_text
+    return bool(_SHORT_STATE.fullmatch(task_text(text).lower().strip().rstrip('.?!').replace('’', "'")))
+
+
 def answers_state_question(text: str) -> bool:
     """Only direct operational questions; leave hypotheticals and philosophy conversational."""
     t = text.lower().replace('’', "'")
     if re.search(r'\b(?:if|imagine|suppose|thought experiment|philosoph|conscious|self.aware)\b', t):
         return False
+    if short_state_question(text) or t.strip().rstrip('.?!') in ('status', 'presence status', "what's your status", 'what is your status'):
+        return True
     return bool(re.search(
-        r'\b(?:current operational state|am i offline|are you offline|is file access (?:on|off|enabled)|'
+        r'\b(?:current operational state|am i offline|are you (?:online|offline|in offline mode)|is file access (?:on|off|enabled)|'
         r'what (?:can you do right now|is your current model)|'
-        r'what(?:\x27s| is) your current workspace|describe your memory capabilities|'
+        r'what(?:\x27s| is) (?:your|the) current workspace|describe your memory capabilities|'
         r'can you (?:read or write|read and write|observe anything while|keep working.*closed)|'
         r'do you (?:have|support) (?:persistent|semantic|long.term) memory|'
         r'can you analy[sz]e your (?:own )?codebase|'
         r'(?:do|can) you (?:remember|learn) (?:from |across |between )?(?:past |previous )?sessions)\b', t))
 
 
-def state_answer(observed: dict) -> str:
+def state_answer(observed: dict, question: str = '') -> str:
     offline = observed.get('offline')
     network = ('Offline mode is on; external connections are blocked.' if offline is True else
                'Offline mode is off; that does not establish internet connectivity.' if offline is False else
@@ -120,6 +134,14 @@ def state_answer(observed: dict) -> str:
     files = (f'File access is on for {workspace}. Supported reads and writes are authorized there; '
              'a particular operation still has to succeed.' if access is True and workspace else
              'File access is off.' if access is False else 'Workspace file access is unknown or no destination was supplied.')
+    from .turn_policy import task_text
+    q = task_text(question).lower().strip().rstrip('.?!').replace('’', "'")
+    if short_state_question(question):
+        if 'offline' in q or 'online' in q:
+            return network
+        if 'closed' in q:
+            return 'Cursiv cannot observe or keep working while closed.'
+        return files
     mem = observed.get('memory', {})
     auto = {True: 'on', False: 'off', None: 'unknown'}.get(mem.get('automatic_learning'), 'unknown')
     count = mem.get('active_records')

@@ -1,19 +1,27 @@
 # Packaging and platform readiness
 
-U85 is published as GitHub latest. Tagged packages, hosted source checks and
-anonymous public-download hash verification are complete and recorded in
-[U85 release verification](U85-RELEASE-VERIFICATION.md).
+The U86 combined release is tracked in
+[U86 release verification](U86-RELEASE-VERIFICATION.md); pending gates are not passes.
+The previous U85 tagged packages, hosted source checks and anonymous public-download
+hashes remain recorded in [U85 verification](U85-RELEASE-VERIFICATION.md).
 [U84 verification](U84-RELEASE-VERIFICATION.md) and
 [U82 verification](U82-RELEASE-VERIFICATION.md) retain historical evidence.
 Automated package checks and remaining physical/signing gates are separate.
 
+Owner update, 2026-10-22: basic physical USB operation works; USB memory
+persistence/restart/second-PC retrieval remain unverified. A second clean PC is
+available to the owner. [Focused checklist](USB-PERSISTENCE-CHECK.md).
+Windows signing is deferred until next month at the owner's request; approval
+is hoped for, not confirmed. The current-user store has no valid code-signing
+certificate with a private key. Current public packages remain unsigned.
+
 | Platform / gate | Current evidence | Remaining action |
 |---|---|---|
-| Windows build | U85 source CI and expanded frozen full-launcher self-test passed; both public installer aliases/checksums were independently verified. | Clean-machine install/upgrade and physical portable checks remain unperformed. |
+| Windows build | U85 source CI and expanded frozen full-launcher self-test passed; both public installer aliases/checksums were independently verified. | Clean-machine install/upgrade and portable persistence checks remain unverified. |
 | Windows Authenticode | U85 reports NotSigned. The website retains its unsigned warning and SignPath support note. | Owner must obtain/configure signing access. No signed installer was created or released by this task. |
 | macOS Apple Silicon | U85 hosted source tests, expanded frozen self-test, four screenshots, DMG build and anonymous public-download hash checks succeeded. Existing API keys use the login Keychain. | Independent clean-machine installation and minimum-OS compatibility checks remain open. |
 | macOS signing | Build spec currently sets `codesign_identity=None`; public guidance says unsigned. | Developer ID, hardened-runtime signing, notarization and stapling must be configured/tested. |
-| USB kit | Existing automated portable/copy/retrieval/integrity checks run in the regression suite. | The two-clean-Windows-PC/full-day checklist has not been performed in this environment. Record actual devices/times/failures. |
+| USB kit | Automated portable/copy/retrieval/integrity regressions; owner reports basic physical operation works. | Memory saves, restart and second-PC retrieval are unverified. Complete the focused persistence and full field-kit checklists; record actual devices/times/failures. |
 | Linux | No Linux release artifact or Linux CI/package path. | Explicitly unsupported for packaged distribution for now; source use is experimental and not a compatibility promise. |
 
 The Linux decision reflects missing validation for credential storage, engine

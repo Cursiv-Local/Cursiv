@@ -1,5 +1,57 @@
 # Changelog
 
+## v3.14-U86 - Native trust boundaries and focused conversation (2026-10-22)
+
+- Extend conservative closer cleanup to casual/philosophical turns and inline
+  sentences. Preserve explicit suggestions/questions, quotes, code and warnings.
+- Withhold unrelated saved facts and saved-conversation search in light chat;
+  preserve explicit/relevant recall and active-thread history. Keep philosophical
+  questions out of operational FAQ/self-report interception and guide short,
+  specific answers without truncating the body.
+- Add native talk-only help and relayed-model/thread explanations, retaining the
+  actual offline provider-skip note. Pasted model labels grant no tool authority.
+- Final versioned Windows suite: 1,492 passed, one Mac-only skip; 20 website
+  tests passed. Retain the unscored nine-turn real-model replay and its remaining
+  verbosity, closer and memory-description failures.
+- Add exact transcript regression prompts, retrieval/call spies, prompt capture
+  and real Qt dispatch checks. Combine the earlier local fixes below in the new
+  immutable U86 release; retain U85's published benchmark and assets as history.
+- Bump app, launcher and installer together. Actual tests, hashes, hosted jobs
+  and publication outcomes: [U86 verification](docs/U86-RELEASE-VERIFICATION.md).
+
+### Earlier local U84 live-test follow-up on U85, included in U86
+
+- Expand native feature guidance and hard-stop blocked actions before backend,
+  source, model or memory-formation calls. Preserve read-only reads as requested.
+- Add explicit flow-rate/volume/duration calculations and deterministic draft
+  withdrawal for detected calculation, source and execution conflicts. Refuse to
+  select a dose from conflicting supplied instructions, including `adv-011`.
+- Keep pure state answers independent of memory reads; recognize sentence-prefixed
+  fake writes. Extract review eligibility and honor explicit full checking while
+  keeping desktop review after the streamed draft. See
+  [native trust-boundary evidence](docs/NATIVE-TRUST-BOUNDARIES.md).
+- Add 83 native-boundary regression cases; final isolated full suite: 1,428
+  passed, 1 macOS-only skip. Preserve the published model benchmark and installers.
+- Route phone capture, .cursivsync import, sample-ID clashes, correction and
+  second-laptop sharing questions to native feature help. Use application-owned
+  version/state replies; report recorded model identity without guessing a provider.
+- Accept observation/note aliases and explicit comma-delimited fields/measurements,
+  preserving ordinary/quoted commas and exact values. Clarify missing content.
+  Block restricted corrections before any model/backend continuation.
+- Return short verified notebook receipts with actual IDs/fingerprints, a clear
+  empty result, and relevant site/sample context without silently saving new entries.
+- Badge restrictions, expand routine source details on demand, retain meaningful
+  evidence and code examples, and narrowly suppress stock closers on bounded turns.
+- Strengthen proportion-draft withdrawal, retain dose/reference withdrawal, and
+  cover explicit supply-duration and common arrival-time phrasing in code.
+- Add guided demo prompts, verified mode changes, guarded sample cleanup and
+  honest rollback/error reports that preserve unrelated settings and real records.
+- Record the exact files, test runs and remaining model limits in
+  [the follow-up report](docs/LIVE-TEST-FOLLOWUP.md). Update the Claude handoff,
+  README, architecture, claim map and platform/USB checklists. Owner reports basic
+  USB operation works; memory persistence remains untested. Signing is deferred
+  until next month; encryption remains the separately approved migration plan.
+
 ## v3.14-U85 - Quiet chat feedback and notebook continuity (2026-10-22)
 
 - Publish U85 as GitHub latest with independently hashed Windows/Mac installers,

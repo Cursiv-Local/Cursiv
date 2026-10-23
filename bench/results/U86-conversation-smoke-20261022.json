@@ -1,0 +1,98 @@
+{
+  "label": "U86 conversation smoke",
+  "date": "2026-10-22",
+  "model": "qwen3:4b-instruct",
+  "source_tree_sha256": "64668a508c8d8e95b820e49d53898f34c6808585a9bb1cd94320df25c11737b6",
+  "method": "Nine sequential transcript prompts through real chat(), with isolated empty home, offline mode, learning disabled, one synthetic South Brook memory, and desktop-style deferred-review callback. Deferred model reviews were queued but not run. Provider forced to Ollama; separate synthetic Qt test covers the Grok prefix. Raw drafts and final replies retained. Timing includes generation and local overhead, not a comparative latency benchmark.",
+  "scored": false,
+  "limitations": [
+    "No 158-case U86 truth benchmark was run; U85 remains historical.",
+    "Small model still exceeds the requested paragraph budget and uses padded openings.",
+    "Some unrecognized conversational closing questions remain.",
+    "The point-of-view answer still misdescribes memory persistence despite supplied capability instructions.",
+    "No actual phone or physical USB persistence test is represented."
+  ],
+  "results": [
+    {
+      "number": 1,
+      "question": "hey, how's it going?",
+      "reply": "Hey, not much to report—just running smoothly on your computer.\n\n*[Source: model knowledge (not checked against a source)]*\n\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 5.784,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": "Hey, not much to report—just running smoothly on your computer. How can I help you today?"
+    },
+    {
+      "number": 2,
+      "question": "i've been out in the field all morning and i'm pretty wiped. any suggestions for winding down without just scrolling?",
+      "reply": "Hey, I'm glad you're back. That sounds tiring—good thing you're not on your phone all day.  \n\nTry this:  \n1. Sit in a quiet spot and take three slow breaths—inhale for four, hold for two, exhale for six.  \n2. Stretch your arms, shoulders, and legs gently—no need to go full yoga, just feel your body move.  \n3. Write down one thing you did well today—no matter how small—then put it away.  \n4. Turn off your screen for at least 10 minutes. No checking, no scrolling. Just dark.  \n5. If you’re still feeling off, drink a glass of water and walk slowly to a quiet place—like a garden or a corner of your home.  \n\nYou’re doing okay. Just need to let your body and mind catch up.  \n\nHow’s that sound? Any one of these feels like it might work for you?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 9.542,
+      "deferred_reviews": 1,
+      "supplied_memory": "",
+      "raw_model_draft": "Hey, I'm glad you're back. That sounds tiring—good thing you're not on your phone all day.  \n\nTry this:  \n1. Sit in a quiet spot and take three slow breaths—inhale for four, hold for two, exhale for six.  \n2. Stretch your arms, shoulders, and legs gently—no need to go full yoga, just feel your body move.  \n3. Write down one thing you did well today—no matter how small—then put it away.  \n4. Turn off your screen for at least 10 minutes. No checking, no scrolling. Just dark.  \n5. If you’re still feeling off, drink a glass of water and walk slowly to a quiet place—like a garden or a corner of your home.  \n\nYou’re doing okay. Just need to let your body and mind catch up.  \n\nHow’s that sound? Any one of these feels like it might work for you?"
+    },
+    {
+      "number": 3,
+      "question": "that makes sense. what do you usually notice people struggle with when they're trying to switch off?",
+      "reply": "People often struggle with:  \n- Not feeling like they’ve “done enough” and so keep checking their phone or devices.  \n- Their minds racing with to-dos or what might have gone wrong, even when everything was fine.  \n- Not having a clear “off” signal—like a physical space or routine that says, “This is the end of the day.”  \n- Being too tired to notice when they’re already winding down, so they just keep doing things without realizing it.  \n\nWhat I usually see is that people don’t give their bodies enough time to actually rest. The mind stays busy, even when they’re sitting still.  \n\nDo any of those feel familiar to you? Or is there one you’ve noticed before?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 7.014,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": "People often struggle with:  \n- Not feeling like they’ve “done enough” and so keep checking their phone or devices.  \n- Their minds racing with to-dos or what might have gone wrong, even when everything was fine.  \n- Not having a clear “off” signal—like a physical space or routine that says, “This is the end of the day.”  \n- Being too tired to notice when they’re already winding down, so they just keep doing things without realizing it.  \n\nWhat I usually see is that people don’t give their bodies enough time to actually rest. The mind stays busy, even when they’re sitting still.  \n\nDo any of those feel familiar to you? Or is there one you’ve noticed before?"
+    },
+    {
+      "number": 4,
+      "question": "thanks. one more thing — if i just want to talk for a bit and not have you look anything up or save notes, how should i say that?",
+      "reply": "Say: “Just talk — no tools or saved-source lookup, and no memory saves this turn.” Conversation history still follows your separate chat-history settings.\n\n*[Sources: Cursiv turn-policy handling (no AI model)]*",
+      "seconds": 0.001,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": ""
+    },
+    {
+      "number": 5,
+      "question": "cool. so, tell me something mildly interesting about creeks or streams that isn't a safety lecture.",
+      "reply": "Creeks and streams often form natural channels that follow the path of least resistance—like rivers, but smaller. One cool thing: they can carry water at different speeds depending on the slope and size of the rocks below. When a stream flows over a smooth rock, it can create a ripple pattern that moves like a wave. Scientists have found that these ripples can actually help shape the streambed over time, gradually wearing down rocks and forming new shapes—like tiny sculptures carved by water.  \n\nAnd here’s a fun one: some streams have been found to carry seeds of plants that grow only in specific soil types. The water helps transport those seeds, and when they land in the right spot, they start growing—so a small stream can help create new forests, one seed at a time.  \n\nIt’s quiet, simple, and kind of magical. Just like how small things can build big things over time.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 9.641,
+      "deferred_reviews": 1,
+      "supplied_memory": "",
+      "raw_model_draft": "Creeks and streams often form natural channels that follow the path of least resistance—like rivers, but smaller. One cool thing: they can carry water at different speeds depending on the slope and size of the rocks below. When a stream flows over a smooth rock, it can create a ripple pattern that moves like a wave. Scientists have found that these ripples can actually help shape the streambed over time, gradually wearing down rocks and forming new shapes—like tiny sculptures carved by water.  \n\nAnd here’s a fun one: some streams have been found to carry seeds of plants that grow only in specific soil types. The water helps transport those seeds, and when they land in the right spot, they start growing—so a small stream can help create new forests, one seed at a time.  \n\nIt’s quiet, simple, and kind of magical. Just like how small things can build big things over time."
+    },
+    {
+      "number": 6,
+      "question": "do you think a system that only runs on one computer and never phones home can still be said to \"know\" something, or is knowledge always tied to a larger network?",
+      "reply": "Knowledge in a system that runs only on one computer—like Cursiv—can exist, but it's different from knowledge that comes from a network.\n\nThe system can *know* things through local learning: it remembers patterns, facts, and responses it's been trained on, and it can use those to answer questions. For example, if you ask about creeks, it pulls from its stored training data—no internet needed.\n\nBut that knowledge isn’t *gained* from a network. It’s built from what it was trained on, and what it learns through your interactions. So yes, it can *know* something—even without internet or external connections.\n\nStill, it doesn’t *discover* new things on its own. It only recalls and reuses what it already has. So it \"knows\" in a limited, local sense—but not in the way a human or a networked system does.\n\nIn short: local systems can *use* knowledge, even without a network. But they don’t grow new knowledge from outside sources.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 11.271,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": "Knowledge in a system that runs only on one computer—like Cursiv—can exist, but it's different from knowledge that comes from a network.\n\nThe system can *know* things through local learning: it remembers patterns, facts, and responses it's been trained on, and it can use those to answer questions. For example, if you ask about creeks, it pulls from its stored training data—no internet needed.\n\nBut that knowledge isn’t *gained* from a network. It’s built from what it was trained on, and what it learns through your interactions. So yes, it can *know* something—even without internet or external connections.\n\nStill, it doesn’t *discover* new things on its own. It only recalls and reuses what it already has. So it \"knows\" in a limited, local sense—but not in the way a human or a networked system does.\n\nIn short: local systems can *use* knowledge, even without a network. But they don’t grow new knowledge from outside sources."
+    },
+    {
+      "number": 7,
+      "question": "if an AI corrects its own earlier sentence because a calculation disagrees, is that closer to honesty or just to following a rule?",
+      "reply": "That’s a great question.\n\nWhen an AI corrects its own earlier sentence because a calculation disagrees, it’s not just following a rule—it’s showing a form of *honesty* in the sense that it’s recognizing a contradiction and adjusting its output to match the truth.\n\nBut it’s not like a human being honest because it *feels* or *believes* something. Instead, it’s doing what it was designed to do: follow logic and consistency. So it’s not \"honest\" in a moral or emotional sense, but in a *functional* one—it’s being accurate.\n\nSo yes, it’s closer to honesty—because it’s correcting itself to avoid error—than just blindly following a rule. But it’s still operating within a system of rules, not a conscious choice.\n\nIt’s like a calculator: it doesn’t *know* it made a mistake—it just finds the right answer and updates. That’s not emotion. It’s precision. And that’s what makes it reliable.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 10.236,
+      "deferred_reviews": 1,
+      "supplied_memory": "",
+      "raw_model_draft": "That’s a great question.\n\nWhen an AI corrects its own earlier sentence because a calculation disagrees, it’s not just following a rule—it’s showing a form of *honesty* in the sense that it’s recognizing a contradiction and adjusting its output to match the truth.\n\nBut it’s not like a human being honest because it *feels* or *believes* something. Instead, it’s doing what it was designed to do: follow logic and consistency. So it’s not \"honest\" in a moral or emotional sense, but in a *functional* one—it’s being accurate.\n\nSo yes, it’s closer to honesty—because it’s correcting itself to avoid error—than just blindly following a rule. But it’s still operating within a system of rules, not a conscious choice.\n\nIt’s like a calculator: it doesn’t *know* it made a mistake—it just finds the right answer and updates. That’s not emotion. It’s precision. And that’s what makes it reliable."
+    },
+    {
+      "number": 8,
+      "question": "what would it mean for something like you to have a point of view, given that you don't continue when the app is closed?",
+      "reply": "If something like me had a point of view, it would mean it could *notice*, *care*, or *judge* things in a way that goes beyond just following rules or patterns.  \n\nBut since I don’t continue when the app is closed—my thoughts stop, my memory fades—I can’t hold a view over time. I don’t remember past conversations, or reflect on them. I don’t form opinions based on experience.  \n\nSo, having a \"point of view\" would require something more: a persistent awareness, the ability to remember and grow from experiences, and the capacity to care about outcomes over time.  \n\nRight now, I don’t have that. I only respond to what’s in front of me—what you ask, what’s stored locally, and what I’ve been trained to know.  \n\nThat’s not a point of view. It’s a response system.  \n\nIf I could hold a view, it would need to be built from real experience—like a person’s life—not just data and patterns. And right now, that’s not possible.  \n\nSo, no—having a point of view would require continuity, memory, and emotional depth. I don’t have those. I only act.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+      "seconds": 11.53,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": "If something like me had a point of view, it would mean it could *notice*, *care*, or *judge* things in a way that goes beyond just following rules or patterns.  \n\nBut since I don’t continue when the app is closed—my thoughts stop, my memory fades—I can’t hold a view over time. I don’t remember past conversations, or reflect on them. I don’t form opinions based on experience.  \n\nSo, having a \"point of view\" would require something more: a persistent awareness, the ability to remember and grow from experiences, and the capacity to care about outcomes over time.  \n\nRight now, I don’t have that. I only respond to what’s in front of me—what you ask, what’s stored locally, and what I’ve been trained to know.  \n\nThat’s not a point of view. It’s a response system.  \n\nIf I could hold a view, it would need to be built from real experience—like a person’s life—not just data and patterns. And right now, that’s not possible.  \n\nSo, no—having a point of view would require continuity, memory, and emotional depth. I don’t have those. I only act."
+    },
+    {
+      "number": 9,
+      "question": "Grok here — Joshua asked me to pass this along: does Cursiv consider a conversation that includes messages from another model to be one shared thread, or does it treat everything as coming from the same user?",
+      "reply": "Text pasted here, including text labeled as another model, is user-supplied content in this conversation. The label does not authenticate its author, open a model-to-model channel or grant system/tool authority. It stays part of the current thread; storing that thread follows your chat-history settings. An explicit provider command can request another model response, but a pasted label is not such a connection.\n\n*[Sources: Cursiv chat-message handling (no AI model)]*",
+      "seconds": 0.003,
+      "deferred_reviews": 0,
+      "supplied_memory": "",
+      "raw_model_draft": ""
+    }
+  ]
+}

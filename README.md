@@ -94,6 +94,21 @@ Published installer hashes, CI and package checks:
 [U84 release verification](docs/U84-RELEASE-VERIFICATION.md)
 ([historical U82 record](docs/U82-RELEASE-VERIFICATION.md)).
 
+### Native boundaries and focused conversation (U86)
+
+U86 combines notebook parser/receipt fixes, native workflow and status answers,
+hard restricted-turn gates, code-backed field math and deferred answer review.
+Casual chat omits unrelated saved facts and stock closing offers; philosophy
+keeps the question's framing instead of repeating an app-status explanation.
+Explicit recall and current conversation history remain available. Pasted model
+labels are ordinary user-supplied text, not authenticated tool instructions.
+
+See [release notes](docs/RELEASE-U86.md),
+[actual release checks](docs/U86-RELEASE-VERIFICATION.md),
+[conversation repair evidence](docs/CONVERSATION-FOLLOWUP.md) and the
+[Claude handoff](HANDOFF.md). The historical U85 model score is not a U86 score.
+Unsigned packages and unverified physical USB memory persistence remain limits.
+
 ## 3. Technical Details
 
 ### Privacy
@@ -144,6 +159,15 @@ history. See [scope, checks and limitations](docs/CHAT-FEEDBACK.md) and
 The fresh local-model run scored 153/158 (96.8%), below U84's 156/158;
 [the failure review](bench/FAILURES-U85.md) includes an unsafe allergy answer
 missed by the scorer. Passing patterns do not establish medical safety.
+
+**Local follow-up, not yet released:** native notebook how-to answers, flexible
+field-entry parsing, short verified receipts, quieter source/policy display and
+safer demo switching are recorded in the [live-test report](docs/LIVE-TEST-FOLLOWUP.md).
+Basic physical USB operation works according to the owner; memory persistence
+on the USB is still unverified. [Focused USB check](docs/USB-PERSISTENCE-CHECK.md).
+The subsequent [native trust-boundary repairs](docs/NATIVE-TRUST-BOUNDARIES.md)
+add a shared blocked-action gate, broader built-in feature replies, explicit flow
+math, stronger draft withdrawals and an effective full-review setting.
 
 The latest [trust-boundary follow-up](docs/TRUST-BOUNDARY-FOLLOWUP.md) closes
 additional policy/source/error gaps. Source labels describe application-supplied

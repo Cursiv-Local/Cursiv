@@ -138,6 +138,9 @@ def _build_strand_context(runtime: ChatRuntime, query: str, top_k: int) -> str:
     """Memory for the system prompt: the person's facts and related earlier
     conversations, matched by meaning (memory/semantic.py). Falls back to the
     keyword search over Strands if semantic memory isn't available."""
+    from cursiv_v215.core.conversation_kind import personal_context_allowed
+    if not personal_context_allowed(query):
+        return ''  # no saved facts or saved-conversation fallback for unrelated light chat
     try:
         from cursiv_v215.memory import semantic as _sem
         ctx = _sem.build_context(query)

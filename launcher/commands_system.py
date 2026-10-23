@@ -58,7 +58,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             model = None
         lines = [
             f"Mode:          {mode}",
-            f"AI model:      {(model + ', on this computer (Ollama)') if model else 'no local model running'}",
+            f"Local model:   {(model + ' (selection candidate, not proof it answered)') if model else 'no local selection established'}",
             f"AI engine:     {_engine_line()}",
             f"Offline mode:  {'ON' if runtime._gate().is_offline() else 'OFF'}",
             f"Web search:    {'automatic' if runtime._gate().setting('web_search_auto') else 'only search:'}",
@@ -78,6 +78,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             pass
         if cfg.get("file_access"):
             lines.append(f"Workspace:     {cfg.get('workspace', '')}")
+        lines.append('Sources: Cursiv application state (no AI model)')
         return runtime.TextResult("\n".join(lines))
 
     if cmd in runtime._RETIRED:

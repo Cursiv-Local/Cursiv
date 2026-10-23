@@ -32,7 +32,7 @@ _BACK = re.compile(r"(?i)\bwhat time (?:should|do|must|would) (?:i|we|he|she|the
                    r"go to sleep|sleep|leave|start|head out|begin|set off|put\b)|\bwhen (?:should|do) (?:i|we) "
                    r"(?:go to bed|leave|start|begin)")
 # "Start at 2 PM, it takes 3 hours: when will it be done / what time will I finish": count forward.
-_FORWARD = re.compile(r"(?i)\b(?:what time|when) (?:will|would) (?:it|i|we|they|that|the \w+) (?:be (?:done|ready|finished)|"
+_FORWARD = re.compile(r"(?i)\b(?:what time|when) (?:will|would|do|does) (?:it|i|we|they|that|the \w+) (?:be (?:done|ready|finished)|"
                       r"finish|end|arrive|get there|be back)|\bwhat time (?:is it|will it be) (?:after|in)\b")
 
 
@@ -165,6 +165,11 @@ def work_out(question: str) -> Worked | None:
         p = resources.work_out(question)
         if p:
             return Worked(p.statement, "", p.value, p.tol, facts=p.facts, tool="resources", inputs=p.inputs)
+        from . import fieldmath
+        flow = fieldmath.work_out(question)
+        if flow:
+            return Worked(flow.statement, '', flow.value, flow.tol, facts=flow.facts,
+                          tool=flow.tool, inputs=flow.inputs)
         # Units, coordinates, dilutions, statistics (core/fieldcalc.py, research roadmap R2)
         from cursiv_v215.core import fieldcalc
         r = fieldcalc.work_out(question)

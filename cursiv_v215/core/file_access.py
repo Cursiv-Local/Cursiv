@@ -371,12 +371,15 @@ def unverified_claim(text: str) -> bool:
     text = re.sub(r'(?ms)^\s*```[^\n]*\n.*?^\s*```\s*$', '', text)
     text = re.sub(r'(?ms)^\s*~~~[^\n]*\n.*?^\s*~~~\s*$', '', text)
     text = re.sub(r'(?m)^\s*(?:[-+•]\s+|\d+[.)]\s+)', '', text)
+    text = re.sub(r'(?<=[.!?])\s+(?=(?:I|we|Cursiv|the file|your file)\b)', '\n', text)
     return bool(re.search(r'(?im)^\s*[*_`]*(?:→\s*)?(?:file_create|create_file|write_file|append_file|read_file)\s*[:(]|'
         r'^\s*[*_`]*(?:got it\s*[,—–:-]\s*)?I(?:[\x27’]ll| will)\s+remember\b|'
         r'^\s*[*_`]*(?:I|we|Cursiv|the file|your file|it)\s+(?:(?:have|has|just|successfully|now|been|was|is|already)\s+)*'
         r'(?:saved|stored|remembered)\b|'
         r'^\s*[*_`]*(?:I|we|Cursiv|the file|your file|it)\s+(?:(?:have|has|just|successfully|now|been|was|is|already)\s+)*'
         r'(?:created|wrote|written|appended|deleted|updated)\b[^.\n]{0,80}\b(?:file|folder|directory|memory|letter|record)\b|'
+        r'^\s*[*_`]*(?:I|we|Cursiv)\s+(?:(?:have|just|successfully)\s+)*'
+        r'(?:created|wrote|written|appended|deleted|updated)\s+[^\n]{0,120}\.(?:txt|md|csv|json|log|py|pdf|docx)\b|'
         r'^\s*[*_`]*(?:created|saved|wrote|written|appended|deleted|updated)\s+(?:(?:the|your|a|new)\s+)?'
         r'(?:file|folder|directory|memory|letter|record)\b', text))
 

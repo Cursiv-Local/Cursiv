@@ -234,6 +234,7 @@ def test_casual_chat_does_not_call_the_verifier():
         "hey how are you",
         "Doing well, thanks.",
         ask=lambda _m: called.append(1) or "CLEAR",
+        mode='fast',
     )
     assert called == []
     assert result.append == ""
@@ -258,7 +259,7 @@ def test_previous_failure_does_not_check_an_unrelated_casual_turn():
     first = verify.run_pass("is this correct?", "Yes, the bridge is finished.", ask=ask)
     assert first.clear is False
     called = []
-    verify.run_pass("hey", "Hi.", ask=lambda _m: called.append(1) or "CLEAR")
+    verify.run_pass("hey", "Hi.", ask=lambda _m: called.append(1) or "CLEAR", mode='fast')
     assert called == []                # no spillover into an unrelated casual turn
 
 

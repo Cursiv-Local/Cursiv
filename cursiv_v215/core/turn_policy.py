@@ -122,7 +122,7 @@ def for_text(text: str) -> Policy:
 
 
 def task_text(text: str) -> str:
-    """Remove only leading read-only policy clauses, never literal file payloads.
+    """Remove leading delimited policy clauses, never literal file payloads.
 
     Authorization always uses the original message. This text is solely for
     parsing the requested filename/action after that authorization is known.
@@ -131,8 +131,9 @@ def task_text(text: str) -> str:
     for _ in range(8):
         remaining = re.sub(
             r"(?ix)^\s*(?:read[- ]only|inspect\s+but\s+do\s+not\s+modify|"
-            r"(?:do\s+not|don't|don’t)\s+(?:change|modify)\s+anything)"
-            r"\s*(?:[—–:;.]|\s+-\s+)\s*", '', task, count=1)
+            r"(?:just|only)\s+(?:talk|chat)|conversation\s+only|no\s+(?:tools?|tool\s+calls|actions)|"
+            r"(?:do\s+not|don't|don’t)\s+(?:change|modify|inspect|read|save|store|retain|remember|learn)\s+(?:anything|this|that))"
+            r"\s*(?:[—–:;.,]|\s+-\s+)\s*", '', task, count=1)
         if remaining == task:
             break
         task = remaining

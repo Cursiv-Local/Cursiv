@@ -48,7 +48,7 @@ def _readonly(*a, **k):
 # ── the laptop's own log ───────────────────────────────────────────────────────
 
 @pytest.mark.parametrize("fail", [_full, _readonly], ids=["disk full", "read-only"])
-def test_a_save_that_cant_be_written_says_not_saved_and_writes_nothing(team, monkeypatch, fail):
+def test_a_save_that_cant_be_written_is_unconfirmed_and_preserves_existing_bytes(team, monkeypatch, fail):
     laptop, _ = team
     with laptop("A"):
         fieldlog.add(note="first")
@@ -63,7 +63,8 @@ def test_a_save_that_cant_be_written_says_not_saved_and_writes_nothing(team, mon
         with monkeypatch.context() as m:
             m.setattr(Path, "open", guarded)
             out = fieldlog.command("log site: Ridge; pH 7.1")
-        assert out.startswith("Not saved: Cursiv couldn't write the field log") and "Nothing was recorded" in out
+        assert out.startswith("Not confirmed: Cursiv couldn't finish the field log write")
+        assert 'A record may exist' in out and 'Nothing was recorded' not in out and 'Logged.' not in out
         assert fieldlog.log_file().read_bytes() == before and fieldlog.verify() == []
 
 

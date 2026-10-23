@@ -1,5 +1,67 @@
 # Handoff — Cursiv verification overhaul
 
+## U86 combined release and conversation follow-up
+
+The owner authorized commit, push, version bump, installer publication and website
+updates. [U86 verification](docs/U86-RELEASE-VERIFICATION.md) is the authoritative
+current publication record; earlier local/unreleased sections below describe
+their checkpoints before that authorization. Preserve the personal
+`test_internals/u81_test.txt` and all existing notebook/memory formats.
+
+[Conversation follow-up](docs/CONVERSATION-FOLLOWUP.md) records the read-only
+root-cause audit, exact files, nine synthetic live prompts and remaining limits.
+Review classification false positives/negatives, conservative tail removal,
+no saved-conversation fallback in unrelated casual chat, retained current-thread
+history and the real GUI Grok-prefix/offline/native-answer path. No native
+philosophical essay or model-to-model authentication was added. Model output
+remains untrusted; small-model safety and recall limitations still apply.
+
+The actual nine-turn local-model replay is public and unscored. Qwen still
+overruns the paragraph preference, asks some unrecognized closing questions and
+misstates memory persistence in philosophy. Review these open model failures;
+passing code tests do not certify the prose.
+
+The combined release includes all intended previous live-test/native-boundary
+fixes below. Signing is deferred; physical USB memory/restart/second-PC results
+are not inferred from the owner's successful basic USB operation.
+
+## Native trust-boundary follow-up — local and unreleased
+
+[NATIVE-TRUST-BOUNDARIES](docs/NATIVE-TRUST-BOUNDARIES.md) records the latest audit,
+files, actual regression runs and limits. The owner confirmed that read-only
+retains requested reads, while talk-only blocks all tools and saved-source
+lookup. New focused modules own the pre-dispatch refusal, Cursiv feature facts,
+deterministic withdrawals, explicit flow math and review eligibility. Full check
+mode no longer silently skips ordinary answers; desktop review remains deferred.
+No new release, commit, push, installer or website deployment is part of this round.
+
+Final current-source regressions: **1,428 passed, 1 skipped in 168.62 seconds**.
+The skip requires a real macOS Keychain. The current Python files match the
+final test snapshot; the report records its source fingerprint and all earlier
+failed runs/fixes. No fresh live-model benchmark or installer validation is claimed.
+
+## Local U84 live-test follow-up after U85
+
+Work on `codex/u85-live-test-followup` addresses the supplied findings and actual
+session transcript, plus the requested native help, short receipts, context and
+demo improvements. [LIVE-TEST-FOLLOWUP](docs/LIVE-TEST-FOLLOWUP.md) contains the
+read-only audit, exact execution paths/file inventory, actual regression runs,
+failed-test explanations and remaining review points. These edits are local;
+published U85 and its original benchmark/installer evidence remain unchanged.
+
+Earlier-round isolated regression run: **1,345 passed, 1 skipped in 182.03 seconds**.
+The skip needs a real macOS Keychain. At that checkpoint production/test Python
+files matched the tested snapshot; the report records that source fingerprint.
+This is regression evidence, not a fresh live-model benchmark or installer test.
+
+The owner confirms signing is deferred until next month. Basic physical USB
+operation worked, but saving memories to that USB, restart persistence and
+second-PC retrieval have not been checked. A second clean PC is available to
+the owner. Use [USB-PERSISTENCE-CHECK](docs/USB-PERSISTENCE-CHECK.md); do not mark
+the full field-kit checklist complete from basic launch success. Encryption
+remains the previously approved separate migration design. Personal records and
+`test_internals/` remain preserved and excluded from the repair/test snapshots.
+
 ## U85 published and verified
 
 GitHub latest is [v3.14-U85](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U85),

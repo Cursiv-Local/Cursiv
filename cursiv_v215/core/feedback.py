@@ -36,13 +36,18 @@ def notebook_receipt(row: dict) -> str:
         return 'Field Notebook · ' + ('details needed' if status == 'clarification' else 'action not confirmed')
     records = row.get('records') or []
     if status in ('saved', 'already_recorded') and records:
-        record = records[0]
-        lead = 'Recorded' if status == 'saved' else 'Already recorded · no duplicate added'
-        sample = f' · sample {record["sample_id"]}' if record.get('sample_id') else ''
-        return f'{lead} · record {record["id"]}{sample} · fingerprint {record["hash"][:12]} · chain intact'
+        return logged_receipt(records[0], duplicate=status == 'already_recorded')
     if status == 'verified':
         return f'{row.get("count", 0)} notebook entries · chain intact'
     return f'{row.get("count", 0)} matching notebook entries'
+
+
+def logged_receipt(record: dict, *, duplicate: bool = False) -> str:
+    """One line from a verified notebook result; never called with model prose."""
+    lead = 'Already logged; no duplicate added.' if duplicate else 'Logged.'
+    sample = f' Sample {record["sample_id"]}.' if record.get('sample_id') else ''
+    return (f'{lead}{sample} Record {record["id"]} · fingerprint {record["hash"][:12]} · '
+            'read-back matched · chain intact.')
 
 
 def memory_receipt(row: dict) -> str:

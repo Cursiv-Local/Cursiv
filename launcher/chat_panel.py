@@ -535,13 +535,15 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             # A provider prefix never transfers notebook execution to the model.
             from cursiv_v215.core import notebook_tools
             from cursiv_v215.memory import intents, semantic
-            native = notebook_tools.is_request(stripped, history) or intents.is_request(
-                stripped, history, person=semantic.current_person(), scope=self._conv_id or '')
+            from cursiv_v215.core import turn_policy
+            unrestricted = turn_policy.effective(stripped) == turn_policy.Policy()
+            native = unrestricted and (notebook_tools.is_request(stripped, history) or intents.is_request(
+                stripped, history, person=semantic.current_person(), scope=self._conv_id or ''))
             if native and self._conv_id is None:
                 import uuid
                 self._conv_id = uuid.uuid4().hex[:12]
-            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg)
-            if result is None:
+            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted else None
+            if result is None and unrestricted:
                 result = cc.memory_command(stripped, history, scope=self._conv_id or '')
             if result is None and not force_provider:
                 result = cc.handle_command(text, self._cfg, history)
@@ -746,6 +748,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def _on_chunk(self, chunk: str) -> None:
         self._reply_text += chunk
+        policy = getattr(self, '_turn_policy', None)
+        if policy and chunk == policy.confirmation() + '\n\n' and policy.confirmation():
+            return  # quiet badge now; full policy evidence stays in the checks panel/history
         self._pending_chunks.append(chunk)
         if not self._chunk_timer.isActive():
             self._chunk_timer.start()

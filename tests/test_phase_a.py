@@ -45,7 +45,7 @@ def test_chat_gives_the_model_the_result_and_checks_it(fresh, monkeypatch):
     monkeypatch.setattr(ca, "_call_ollama", fake)
     out = "".join(ca.chat(BED, [], "", None))
     assert "Worked out by Cursiv (exact)" in seen["system"] and "9:30 PM" in seen["system"]
-    assert "Cursiv's check: worked out exactly" in out
+    assert 'withdrawn' in out and '9:30 PM' in out
 
 
 # ── ref-015: doses checked against the card ────────────────────────────────

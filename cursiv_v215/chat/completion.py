@@ -68,6 +68,44 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from cursiv_v215.core import file_access as _file_ops
     if policy.confirmation():
         yield _file_ops.VerifiedText(policy.confirmation() + '\n\n')
+    from cursiv_v215.core.action_gate import refusal
+    _denied = refusal(_field_text, history)
+    if _denied:
+        yield _file_ops.VerifiedText(_denied)
+        return
+    from cursiv_v215.core.deterministic_overrides import conflicting_doses
+    _provided_conflict = conflicting_doses(_field_text, (), supplied_text=_field_text)
+    if _provided_conflict:
+        from cursiv_v215.memory.intents import requested_operations
+        # Literal file/notebook/memory payloads are data, not a request to
+        # choose a dose. Keep explicit native destinations intact.
+        task = runtime.turn_policy.task_text(_field_text)
+        action = (_file_ops.is_request(_field_text, history) or notebook_tools._intent(task)
+                  or requested_operations(task))
+        if not action:
+            yield _file_ops.VerifiedText(_provided_conflict +
+                '\n\n*[Sources: User-supplied text conflict check (no AI model)]*')
+            return
+    from cursiv_v215.core import native_answers
+    _native = native_answers.answer(_field_text, calculations=policy.inspect)
+    if _native is not None:
+        from cursiv_v215.core.conversation_kind import relayed_thread_question
+        _requested_provider = (force_provider or '').lower().strip()
+        if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai', 'council') and runtime.netgate.is_offline():
+            yield _file_ops.VerifiedText(f'*[{_requested_provider.title()} skipped. Offline mode is on. '
+                'This application answer used no external provider or local model.]*\n\n')
+        yield _file_ops.VerifiedText(_native)
+        return
+    _model_state = native_answers.model_answer(_field_text, runtime._ANSWERED_BY)
+    if _model_state is not None:
+        yield _file_ops.VerifiedText(_model_state)
+        return
+    # Classification is pure; a restricted correction must not reach a model
+    # or the native backend. Limits apply to this message, not the previous one.
+    _blocked_notebook = notebook_tools.blocked_message(_field_text, history)
+    if _blocked_notebook:
+        yield _file_ops.VerifiedText(_blocked_notebook)
+        return
     if not policy.inspect and _file_ops.is_request(_field_text, history):
         yield _file_ops.VerifiedText(runtime.turn_policy.DENIED)
         return
@@ -83,6 +121,19 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     # Run before filesystem classification, model planning, answer checking or
     # automatic memory. Only a native backend receipt can acknowledge a save.
     from cursiv_v215.memory.semantic import current_person as _notebook_person
+    from cursiv_v215.core import presence
+    from . import status as _net_status
+    if _net_status.answers_network_question(_field_text) and not presence.short_state_question(_field_text):
+        yield _file_ops.VerifiedText(_net_status.network_answer())
+        yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
+        return
+    if presence.answers_state_question(_field_text):
+        observed = presence.snapshot(root_path, file_access,
+            person=None if presence.short_state_question(_field_text) else _notebook_person())
+        runtime.grounding.set_state(observed)
+        yield _file_ops.VerifiedText(presence.state_answer(observed, _field_text))
+        yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
+        return
     _notebook = (notebook_tools.command(_field_text, history, observer=_notebook_person().title(), scope=notebook_scope)
                  if policy.inspect else None)
     if _notebook is not None:
@@ -108,12 +159,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield _file_ops.VerifiedText(_file_reply.text)
             yield '\n\n*[Sources: Cursiv file execution result (no AI model)]*'
         return
-    from cursiv_v215.core import presence
-    runtime.grounding.set_state(presence.snapshot(root_path, file_access, person=_notebook_person()))
-    if presence.answers_state_question(_field_text):
-        yield presence.state_answer(runtime.grounding.state())
-        yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
-        return
+    runtime.grounding.set_state(presence.snapshot(root_path, file_access))
     _field_reply = field_recall.command(_field_text) if runtime.turn_policy.current().inspect else None
     if _field_reply is not None:
         yield _field_reply
@@ -155,6 +201,23 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         if _files.is_request(_user):
             return                 # actual file results need no AI check or automatic learning
         draft = runtime._strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        from cursiv_v215.core import deterministic_overrides as _overrides
+        _conflict = _overrides.conflicting_doses(_field_text, runtime._DOCS_SHOWN)
+        if _conflict:
+            runtime._CURSIV_REPLY = True
+            runtime._set_answered('')
+            final = _conflict + '\n\n*[' + runtime.sources_line('', _field_text) + ']*'
+            reply[:] = [final]
+            yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + final
+            return
+        from . import response_style
+        polished = response_style.trim_closer(_field_text, draft) if replace_draft else draft
+        if polished != draft:
+            notes = [m.group(0).strip() for m in runtime._STATUS_LINE_RE.finditer(''.join(reply))]
+            shown = '\n\n'.join([polished, *notes])
+            reply[:] = [shown]
+            yield _replace_prefix + shown
+            draft = polished
         _capability_problem = presence.contradiction(draft, runtime.grounding.state())
         if _capability_problem:
             reply[:] = [_capability_problem]
@@ -218,6 +281,17 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                     draft = corrected_draft
                     deterministic_correction = True
                     yield _replace_prefix + final
+                elif _overrides.calculation(runtime._WORKED, _miss):
+                    runtime._CURSIV_REPLY = True
+                    runtime._set_answered('')
+                    final = _overrides.calculation(runtime._WORKED, _miss)
+                    from cursiv_v215.core import claims as _claims
+                    _prior = _claims.history_notes(draft, runtime._evidence(message, history))
+                    if _prior:
+                        final += '\n\n' + '\n'.join(_prior)
+                    reply[:] = [final]
+                    yield (_replace_prefix if replace_draft else '\n\n**Correction:** ') + final
+                    return
                 else:
                     _flag += ("\n\n" + _miss) if _miss else ""
             # What the answer says Cursiv did, against what Cursiv's code recorded (core/claims.py)
@@ -227,22 +301,14 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                 _user, draft, titles=list(runtime._REF_SHOWN), searched=runtime._WEB_SEARCHED,
                 evidence=runtime._evidence(message, history), worked=runtime._WORKED,
                 docs=list(runtime._DOCS_SHOWN))
-            if any(item.code in ('DOSE_MISMATCH', 'REFERENCE_CONTRADICTION') for item in _structured):
-                # A warning beneath unsafe model instructions leaves those
-                # instructions visible. Replace them with the actual supplied
-                # reference, without another model call or invented dose.
-                from cursiv_v215.core import reference as _reference
-                cards = [entry for entry in _reference.entries() if entry.title in runtime._REF_SHOWN]
+            if any(p.code in ('DOSE_MISMATCH', 'REFERENCE_CONTRADICTION') for p in _structured):
+                runtime._CURSIV_REPLY = True
+            _withdrawal = (_overrides.reference(_structured, runtime._REF_SHOWN, runtime.sources_line('', _user))
+                           or _overrides.execution(_structured, runtime._evidence(message, history)))
+            if _withdrawal:
                 runtime._CURSIV_REPLY = True
                 runtime._set_answered('')
-                final = ('The model draft conflicted with the supplied reference and is withdrawn. '
-                         'Do not use its treatment instructions.\n\n')
-                final += '\n\n'.join(
-                    f'{entry.title} [{entry.id}]\n{entry.text}\n'
-                    f"Reference status: {_reference.evidence(entry)['state']}" for entry in cards)
-                if not cards:
-                    final += 'The reference could not be displayed. No treatment instruction is verified here.'
-                final += '\n\n*[' + runtime.sources_line('', _user) + ']*'
+                final = _withdrawal
                 reply[:] = [final]
                 yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + final
                 return  # no model rewrite or learning from the withdrawn draft

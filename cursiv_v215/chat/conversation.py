@@ -34,6 +34,8 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     if not user_text and not uploaded:
         yield "Please type a message or upload a file."
         return
+    from cursiv_v215.core.conversation_kind import personal_context_allowed, reflective
+    _use_memory = runtime.turn_policy.current().inspect and personal_context_allowed(user_text)
 
     # Deterministic file dispatch works with every model, including no model.
     from cursiv_v215.core import file_access as _files
@@ -178,7 +180,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     runtime._PHASE_AFTER = ""
     try:
         from cursiv_v215.core import phases as _phases
-        _ph = _phases.run(user_text, memory_fn=runtime._build_strand_context if runtime.turn_policy.current().inspect else None,
+        _ph = _phases.run(user_text, memory_fn=runtime._build_strand_context if _use_memory else None,
                           online_fn=(lambda: runtime._connectivity_probe(api_key, openai_key, anthropic_key))
                               if runtime.turn_policy.current().inspect else None,
                           local_fn=(lambda: runtime._ollama_running() and runtime._resolve_ollama_model() is not None)
@@ -202,7 +204,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         if _ph.before_reply:
             yield _ph.before_reply
     except Exception:
-        _strand_ctx = runtime._build_strand_context(user_text) if runtime.turn_policy.current().inspect and len(user_text.strip()) >= 10 else ""
+        _strand_ctx = runtime._build_strand_context(user_text) if _use_memory and len(user_text.strip()) >= 10 else ""
         if _strand_ctx:
             messages[0]["content"] += "\n\n## Personal Memory\n" + _strand_ctx + "\n"
 
@@ -215,7 +217,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _self_turn = False
     try:
         from cursiv_v215.core import selfknow as _sk
-        if not runtime.turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
+        if not reflective(user_text) and not runtime.turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
             messages[0]["content"] = _sk.system_prompt(observed=_observed)
             _self_turn = True
     except Exception:
@@ -236,7 +238,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 _sys = _cb.system_prompt(user_text, history, _person_now)
                 if _web_ctx:
                     _sys += "\n\n## Live Web Search Results\n" + _web_ctx
-                _mem = runtime._build_strand_context(user_text) if len(user_text.strip()) >= 10 else ""
+                _mem = runtime._build_strand_context(user_text) if _use_memory and len(user_text.strip()) >= 10 else ""
                 if _mem:
                     _sys += "\n\n## What you know about them\n" + _mem
                 messages[0]["content"] = _sys
@@ -400,6 +402,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                     messages[0]["content"] += "\n\n" + _doc_block + "\n"
                     runtime._RETRIEVED.append(_doc_block)
                     yield _docs.note_line(_passages_found) + "\n\n"
+                    from cursiv_v215.core.deterministic_overrides import conflicting_doses
+                    _conflict = conflicting_doses(user_text, _passages_found)
+                    if _conflict:
+                        runtime._CURSIV_REPLY = True
+                        yield _files.VerifiedText(_conflict)
+                        return  # no model is allowed to choose a disputed dose
                 elif _docs.only_mode() and not _emergency_now:
                     runtime._CURSIV_REPLY = True
                     yield _docs.NOT_IN_DOCS
@@ -445,9 +453,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # Constructed here, never parsed out of user/model text. Compact providers
     # retain this block separately from the long replaceable persona.
     from cursiv_v215.core.feedback import VOICE
+    from .response_style import guidance
     messages.insert(1, dict(role='system', content=(
         (_runtime or presence.CAPABILITIES) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context()
-        + ('\n' + VOICE if not runtime._EMERGENCY_TURN else ''))))
+        + ('\n' + VOICE + guidance(user_text) if not runtime._EMERGENCY_TURN else ''))))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.

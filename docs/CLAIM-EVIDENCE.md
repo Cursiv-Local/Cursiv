@@ -6,6 +6,26 @@ for one fixed suite/model/configuration, not a complete product evaluation. See
 [U85 verification](U85-RELEASE-VERIFICATION.md) and
 [its failure review](../bench/FAILURES-U85.md) for actual checks and missed claims.
 
+The U86 [live-test repairs](LIVE-TEST-FOLLOWUP.md) add deterministic
+workflow/status/calculation replies, expandable routine evidence, short verified
+notebook receipts and failure-safe demo switching. Their regression evidence is
+`test_live_test_followup.py` and `test_notebook_workflows.py`, together with the
+existing notebook, import, policy, rendering and portable suites. This does not
+replace the published model benchmark or establish physical USB persistence.
+
+The [native trust-boundary follow-up](NATIVE-TRUST-BOUNDARIES.md) adds
+`test_native_boundaries.py`: zero-call/write assertions for blocked turns,
+native feature/state replies, flow math, supplied-dose conflict refusal and
+explicit full-review deferral. Read-only still permits requested reads, as the
+owner specified. Bounded parser and model/safety limitations remain.
+
+[Conversation follow-up](CONVERSATION-FOLLOWUP.md) adds exact synthetic prompts,
+saved-context callback spies, quote/warning/explicit-dialogue preservation,
+philosophical prompt capture and actual Qt dispatch checks. These establish
+specific application paths, not subjective conversational quality or general
+model accuracy. [U86 verification](U86-RELEASE-VERIFICATION.md) records release
+checks; the U85 full model benchmark remains separately labeled historical data.
+
 | Public claim | Automated evidence | Manual evidence still needed / scope |
 |---|---|---|
 | Offline mode blocks external connections while local inference works | `test_netgate.py`, `test_offline_process.py`, full tagged U85 local-model run with offline mode on. | Host OS/other applications are outside this gate. Test downloaded releases on clean devices. |

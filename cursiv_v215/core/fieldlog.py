@@ -770,26 +770,48 @@ def report_html(rows: list[dict], title: str = "Field report", all_entries: list
 
 # ── Typed entries: "log ..." ───────────────────────────────────────────────
 
-_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|lat|lon|latitude|longitude|sample|sample id)\s*[:=]\s*(.+)$")
+_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|observation|observations|lat|lon|latitude|longitude|sample|sample id)\s*[:=]\s*(.*)$")
 _PAIR = re.compile(r"^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$")
 _MEASURE = re.compile(r"^\s*([A-Za-z][\w ./()%-]*?)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*([^\d\s][^;]*)?\s*$")
 
 
+def _parts(text: str):
+    """Commas delimit explicit fields/measurements, not coordinates or prose.
+
+    Double-quoted notes protect literal field-like text. Semicolons/newlines
+    remain the unambiguous delimiters supported by existing notebooks.
+    """
+    for line in re.split(r'[;\n]', text):
+        start, quoted = 0, False
+        for index, char in enumerate(line):
+            if char == '"' and (index == 0 or line[index - 1] != '\\'):
+                quoted = not quoted
+            if char == ',' and not quoted:
+                remaining = line[index + 1:]
+                candidate = remaining.split(',', 1)[0].strip()
+                coordinate = re.match(r'^\s*-?\d{1,2}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*(?=,|$)', remaining)
+                if _FIELD.fullmatch(candidate) or _MEASURE.fullmatch(candidate) or coordinate:
+                    yield line[start:index]
+                    start = index + 1
+        yield line[start:]
+
+
 def parse(text: str) -> dict:
     """'site: North transect; water temp 12.4 C; pH 7.2; 44.1234, -71.5678; note: turbid'
-    -> fields for add(). Parts are split on ';' or new lines. Anything that isn't a
+    -> fields for add(). Parts use ';', newlines or explicit comma-delimited fields. Anything that isn't a
     field, a coordinate pair or 'name number unit' goes into the note, word for word."""
     out = {"site": "", "observer": "", "lat": None, "lon": None, "measurements": [], "note": "", "sample_id": ""}
     notes = []
-    for part in re.split(r"[;\n]", text or ""):
+    for part in _parts(text or ''):
         part = part.strip()
         if not part:
             continue
         m = _FIELD.match(part)
         if m:
             key, value = m.group(1).lower(), m.group(2).strip()
-            if key in ("note", "notes"):
-                notes.append(value)
+            if key in ("note", "notes", "observation", "observations"):
+                if value:
+                    notes.append(value)
             elif key in ("lat", "latitude"):
                 out["lat"] = float(value)
             elif key in ("lon", "longitude"):
@@ -844,13 +866,16 @@ def command(text: str, observer: str = "") -> str | None:
             if fields["sample_id"].lower() in ("auto", "new", "next"):
                 fields["sample_id"] = new_sample_id(fields["site"])
             e = add(**fields)
+            actual = next((row for row in entries() if row.get('id') == e.get('id')), None)
+            if actual != e or verify():
+                return 'Not confirmed: notebook append/read-back verification failed. A record may exist; inspect it before retrying.'
         except ValueError as exc:
             return f"Not saved: {exc}."
         except OSError as exc:
-            return (f"Not saved: Cursiv couldn't write the field log ({type(exc).__name__}: {exc}). Nothing was "
-                    f"recorded. Check that {log_dir()} is on a drive with space that isn't read-only, then try again.")
-        return (f"Saved to the field log: {summary(e)}\nFingerprint {e['hash'][:12]}. "
-                "Corrections are added as new entries; nothing is overwritten.")
+            return (f"Not confirmed: Cursiv couldn't finish the field log write ({type(exc).__name__}: {exc}). "
+                    'A record may exist; check storage and notebook integrity before retrying.')
+        from .feedback import logged_receipt
+        return logged_receipt(e)
     if low in ("field log", "fieldlog", "field notes", "show field log"):
         rows = current()
         if not rows:

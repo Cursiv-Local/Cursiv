@@ -311,7 +311,9 @@ def test_full_conversation_only_turn_never_plans_or_reads_documents(monkeypatch,
 def test_absolute_false_capability_claims_are_corrected(monkeypatch, tmp_path, said):
     from cursiv_v215.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: iter([said]))
-    reply = ''.join(ca.chat('Tell me something about Cursiv.', [], '', None, file_access=True,
+    # Own-feature questions are now native. Exercise the post-model guard on
+    # an unrelated prompt so malicious capability prose still gets withdrawn.
+    reply = ''.join(ca.chat('Tell me something about research.', [], '', None, file_access=True,
                             root_path=str(tmp_path), replace_draft=True))
     assert ca.REPLACE_SENTINEL in reply
     final = reply.rsplit(ca.REPLACE_SENTINEL, 1)[1]

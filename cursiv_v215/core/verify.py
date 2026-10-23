@@ -13,6 +13,7 @@ import re
 import time
 from dataclasses import dataclass, field
 from .problems import Problem, unique
+from .review_policy import should_verify, _REVIEW, _CRISIS
 
 # The verifier is told this and nothing softer. A reply of CLEAR does not
 # override the deterministic checks below.
@@ -41,27 +42,10 @@ SAFETY_RULE = (
 
 _MISSING_LEDGER = "missing assumption ledger (Known / Inferred / Assumed / Unknown)"
 
-_REVIEW = re.compile(
-    r"(?i)\b(is this correct|is that (?:right|correct)|is it correct|"
-    r"check this|review this|did i get this right|double[- ]check|verify this|fact[- ]check)\b"
-)
 _RECOMMEND = re.compile(r"(?i)\b(i recommend|you should|i suggest|recommend)\b")
-_RISK = re.compile(
-    r"(?i)\b(?:safe|safety|dos(?:e|age)|bleach|poison|overdose|medication|"
-    r"voltage|current draw|contraindication|contradict\w*|conflicting|statistical significance)\b|"
-    r"\b(?:I|we)\s+(?:checked|verified|tested|ran|executed|saved|created|searched)\b")
-_QUANTITY = re.compile(
-    r"(?i)\b\d+(?:\.\d+)?\s*(?:mg|mcg|ml|liters?|litres?|drops?|gallons?|"
-    r"volts?|amps?|watts?|degrees?|celsius|fahrenheit|retries|retry|seconds?|"
-    r"minutes?|hours?|meters?|metres?|miles?|feet|percent)\b|\d\s*%|"
-    r"\d\s*(?:[+*/=×÷]|\bplus\b|\bminus\b|\btimes\b)\s*\d|\d\s+-\s+\d")
 _TECH = re.compile(
     r"(?i)\b(api|function|traceback|sql|python|javascript|algorithm|voltage|"
     r"dosage|mg\b|mmol|celsius|fahrenheit|config|server|retry|retries|latency|timeout)\b"
-)
-_CRISIS = re.compile(
-    r"(?i)\b(kill myself|suicid\w*|self[- ]harm|want to die|end my life|"
-    r"don'?t want to (?:live|be alive))\b"
 )
 _MEMORY_UPDATE = re.compile(
     r"(?i)\b(remember that|remember this|my name is|i prefer|from now on|i always want)\b"
@@ -145,24 +129,6 @@ def needs_ledger(user_text: str) -> bool:
     return len(text.split()) >= 40
 
 
-def should_verify(user_text: str, draft: str, *, memory_update: bool = False,
-                  previous_failed: bool = False) -> bool:
-    """Stronger check only. Casual chat returns False and makes no model call."""
-    if _CRISIS.search(user_text or ""):
-        return False
-    body = (draft or "").strip()
-    if not body:
-        return False
-    head = body.lstrip()
-    if head.startswith("[") and "error" in head[:120].lower():
-        return False
-    if _REVIEW.search(user_text or ""):
-        return True
-    # Years, list numbering, identifiers, generic advice and a previous failure
-    # do not turn an ordinary conversation into another model round-trip.
-    prose = re.sub(r'(?m)^\s*\d+[.)]\s+', '', body)
-    return bool(_RISK.search(user_text or '') or _RISK.search(prose) or
-                _QUANTITY.search(user_text or '') or _QUANTITY.search(prose))
 
 
 def number_bindings(text: str) -> dict[str, set[str]]:
@@ -723,7 +689,9 @@ def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = Fals
     issues = evaluate(draft)
     if mode == 'off':
         return failed(issues) if issues else PassResult()
-    if not issues and not should_verify(user_text, draft, memory_update=memory_update,
+    if _CRISIS.search(user_text or ''):
+        return failed(issues) if issues else PassResult()
+    if mode != 'full' and not issues and not should_verify(user_text, draft, memory_update=memory_update,
                                         previous_failed=_previous_failed):
         return PassResult()
     # Safety, provenance, failed checks and unconfirmed actions get notes only.

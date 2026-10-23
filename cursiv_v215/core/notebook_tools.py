@@ -46,12 +46,12 @@ class Result:
             return 'Field Notebook — ' + ('details needed: ' if self.status == 'clarification' else 'not confirmed: ') + \
                 self.error + (('\n' + '\n'.join(self.problems)) if self.problems else '')
         if self.status in ('saved', 'already_recorded'):
-            row = self.records[0]
-            lead = 'Saved to the field log:' if self.status == 'saved' else 'Already recorded in the Field Notebook; no duplicate added:'
-            return (f"{lead} {fieldlog.summary(row)}\nRecord ID: {row['id']} · "
-                    f"fingerprint {row['hash'][:12]} · read-back matched · chain intact.")
+            from .feedback import logged_receipt
+            return logged_receipt(self.records[0], duplicate=self.status == 'already_recorded')
         if self.status == 'verified':
             return f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified).'
+        if not self.records:
+            return 'No matching Field Notebook entries.'
         return ('Field Notebook: ' + str(self.count) + ' matching record(s).\n' +
                 ('\n'.join('[' + row['id'] + '] ' + fieldlog.summary(row) for row in self.records)
                  if self.records else 'No matching entries were found.'))
@@ -145,10 +145,13 @@ def _intent(text: str) -> _Intent | None:
     if re.fullmatch(r'(?i)(?:field\s*log check|check field log)', text) or re.search(
             rf'(?i)^(?:verify|check|validate)\b.*\b{_TARGET}\b', text):
         return _Intent('verify')
-    if re.fullmatch(rf'(?i)(?:show |read |list )?(?:the |my )?{_TARGET}[.?]?', text) or re.search(
+    if re.fullmatch(rf'(?i)(?:show |read |list |see )?(?:the |my )?{_TARGET}[.?]?', text) or re.search(
             rf'(?i)^(?:show|read|list|retrieve|find|search|what did i record|what is in|what\x27s in)\b.*\b{_TARGET}\b', text):
         return _Intent('read', text)
     if re.search(rf'(?i)^(?:correct|amend|edit|delete|remove|overwrite)\b.*\b(?:{_TARGET}|field observation)\b', text):
+        return _Intent('unsupported')
+    if re.match(r'(?i)^(?:correct|amend|edit|delete|remove|overwrite)\s+(?:the\s+)?'
+                r'(?:last|previous|selected)\s+(?:entry|observation)\b', text):
         return _Intent('unsupported')
     m = re.match(r'(?i)^(?:record|log|save|add)\s+(?:(?:a|an|this|that|the|my|new)\s+)?field observation\b\s*[:,-]?\s*(.*)$', text)
     if m:
@@ -237,15 +240,29 @@ def is_request(text: str, history: list[dict]) -> bool:
     return _request(text, history) is not None
 
 
+def blocked_message(text: str, history: list[dict]) -> str | None:
+    """Pure policy refusal: classify user text without calling any notebook API."""
+    from .turn_policy import effective, task_text
+    intent = _request(task_text(text), history)
+    if intent is None:
+        return None
+    operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)
+    if effective(text).blocks(operation):
+        return ('Corrections are blocked this turn. No action was executed.' if intent.kind == 'unsupported' else
+                'This notebook operation is blocked this turn. No action was executed.')
+    return None
+
+
 def command(text: str, history: list[dict], *, observer: str = '', scope: str = '') -> Result | None:
     """Route before models. Callers supply a stable conversation ID for retry scope."""
-    intent = _request(text, history)
+    from .turn_policy import task_text
+    intent = _request(task_text(text), history)
     if intent is None:
         return None
     from .turn_policy import effective, DENIED
     operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)
     if effective(text).blocks(operation):
-        return Result(operation, 'failed', error=DENIED)
+        return Result(operation, 'failed', error=blocked_message(text, history) or DENIED)
     if intent.kind == 'clarification':
         return Result(CREATE, 'clarification', error='State the observation and native notebook destination explicitly. '
                       'No notebook operation was executed; model text, filesystem paths and memory claims cannot confirm a save.')
@@ -284,6 +301,10 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
                 elif value not in ('', None):
                     fields[key] = value
         fields.update(measurements=list(measurements.values()), note='; '.join(notes))
+        if not (fields['measurements'] or fields['note'] or fields.get('sample_id')):
+            return Result(CREATE, 'clarification', error='Missing observation content: supply a measurement, '
+                          'note: or observation:. Example: log site: North Creek; temp 14.2 C; observation: clear water. '
+                          'No notebook append was attempted.')
         if fields.get('lat') is not None:
             fields['location_source'] = 'typed'
         prefix = [m['content'] for m in history[:parts[0][0]] if m.get('role') == 'user' and isinstance(m.get('content'), str)]

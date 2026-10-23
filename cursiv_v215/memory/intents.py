@@ -161,6 +161,14 @@ def is_request(text: str, history: list[dict] | None = None, *, person: str = ''
     return bool(_parse(text) or _cue(text) or _key(person, scope) in _pending)
 
 
+def requested_operations(text: str) -> tuple[str, ...]:
+    """Pure classification for the pre-dispatch gate; never read pending/storage."""
+    actions = _parse(text)
+    if actions:
+        return tuple(action.operation for action in actions)
+    return (SAVE,) if _cue(text) else ()
+
+
 def clear_pending(person: str, scope: str = '') -> None:
     with _lock:
         _pending.pop(_key(person, scope), None)

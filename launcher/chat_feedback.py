@@ -41,6 +41,7 @@ class ChatFeedbackMixin:
 
     def _set_turn_feedback(self, text=''):
         from cursiv_v215.core.turn_policy import for_text
+        self._turn_text = text
         self._turn_policy = for_text(text)
         self._receipt_line.clear()
         self._receipt_line.hide()
@@ -65,13 +66,18 @@ class ChatFeedbackMixin:
                 parts.append('This turn: memory restricted')
         # Only backend receipts establish notebook context. Reopening a saved
         # conversation restores the context without inventing an active project.
-        for row in reversed(getattr(self, '_history', [])):
+        import re
+        turn = getattr(self, '_turn_text', '')
+        relevant = not turn or re.search(r'(?i)\b(?:field|notebook|observations?|samples?|site|log|record|transect)\b', turn)
+        for row in reversed(getattr(self, '_history', []) if relevant else []):
             receipt = row.get('notebook_receipt') or {}
             if receipt.get('ok') and receipt.get('status') in ('saved', 'already_recorded'):
                 records = receipt.get('records') or []
                 if records:
                     record = records[0]
                     parts.append('Last notebook site: ' + str(record.get('site') or 'unnamed'))
+                    if record.get('sample_id'):
+                        parts.append('Last notebook sample: ' + str(record['sample_id']))
                     break
         self._context_indicator.setText(' · '.join(parts))
         self._context_indicator.setToolTip(
@@ -80,6 +86,7 @@ class ChatFeedbackMixin:
             'Turn limits do not change offline mode or conversation-history settings.')
 
     def _reset_feedback(self):
+        self._turn_text = ''
         self._turn_policy = None
         self._receipt_line.clear()
         self._receipt_line.hide()

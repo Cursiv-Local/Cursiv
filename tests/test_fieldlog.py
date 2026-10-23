@@ -79,7 +79,7 @@ def test_exports_match_what_was_entered(log, tmp_path):
 
 def test_typed_entries(log):
     reply = log.command("log site: North transect; water temp 12.4 C; pH 7.2; 44.1234, -71.5678; note: turbid", "Dana")
-    assert reply.startswith("Saved to the field log")
+    assert reply.startswith('Logged.') and 'read-back matched' in reply and 'chain intact' in reply
     e = log.entries()[0]
     assert e["site"] == "North transect" and e["observer"] == "Dana" and e["location_source"] == "typed"
     assert [(m["name"], m["value"], m["unit"]) for m in e["measurements"]] == [("water temp", "12.4", "C"), ("pH", "7.2", "")]
@@ -93,7 +93,7 @@ def test_chat_window_command_saves_an_entry(tmp_path, monkeypatch):
     import chat_commands
     monkeypatch.setattr(fl, "log_dir", lambda: tmp_path / "fieldlog")
     res = chat_commands.handle_command("log site: Pond 2; dissolved oxygen 8.1 mg/L", {}, [])
-    assert "Saved to the field log" in res.text
+    assert res.text.startswith('Logged.') and fl.entries()[0]['id'] in res.text
     assert fl.entries()[0]["measurements"][0]["unit"] == "mg/L"
 
 

@@ -180,7 +180,7 @@ def test_notebook_context_comes_from_receipt_and_resets_with_chat(panel, log):
     _APP[0].processEvents()
     row = log.entries()[0]
     assert row['id'] in panel._receipt_line.text() and row['hash'][:12] in panel._receipt_line.text()
-    assert 'sample NR-12' in panel._receipt_line.text()
+    assert 'Sample NR-12' in panel._receipt_line.text()
     assert 'Last notebook site: North Ridge' in panel._context_indicator.text()
     panel._begin_turn('What should I record next?')
     assert 'Last notebook site: North Ridge' in panel._context_indicator.text()

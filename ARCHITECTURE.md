@@ -1,8 +1,10 @@
 # Cursiv architecture
 
-This describes the U85 source, carrying the U82–U84 architecture and trust
-repairs forward. [U85 verification](docs/U85-RELEASE-VERIFICATION.md) records the
-tagged package, tests and actual publication state.
+This describes the U86 source, carrying the U82–U85 architecture forward.
+[U86 verification](docs/U86-RELEASE-VERIFICATION.md) records the combined source,
+tagged packages and actual publication state. The earlier
+[live-test follow-up](docs/LIVE-TEST-FOLLOWUP.md) and
+[conversation follow-up](docs/CONVERSATION-FOLLOWUP.md) explain the repairs.
 
 ## Desktop and chat
 
@@ -24,6 +26,10 @@ tagged package, tests and actual publication state.
 | `cursiv_v215/chat/runtime.py` | Explicit dependency protocol passed to extracted implementations. |
 | `chat/context.py`, `uploads.py` | Prompt/evidence assembly, upload text and tool receipts. |
 | `chat/provenance.py`, `core/grounding.py` | Application-owned source formatting and scoped supplied-memory/execution records; no answer-word attribution. |
+| `core/native_answers.py`, `chat/response_style.py` | Bounded feature/workflow/version/calculation replies before model generation; scoped style guidance and conservative final closer cleanup. Neither prose nor a help answer grants or proves tool execution. |
+| `core/conversation_kind.py` | Pure relevance/dialogue classification. Casual retrieval suppression leaves current-thread history, explicit recall and policy enforcement separate. Philosophy is model conversation, not native status boilerplate. |
+| `core/action_gate.py`, `feature_answers.py` | Pure pre-dispatch denial under effective turn policy; reviewed workflow facts and honest unavailable replies without model invention. |
+| `core/deterministic_overrides.py`, `fieldmath.py`, `review_policy.py` | Application-authored withdrawals from supplied evidence; full-match flow arithmetic; pure optional-review eligibility behind the existing verify compatibility API. |
 | `chat/conversation.py`, `routing.py` | Phase orchestration, model selection/fallback, short router calls. |
 | `chat/local_provider.py`, `cloud_providers.py`, `provider_tools.py` | Existing provider adapters and authenticated execution results. |
 | `chat/streaming.py`, `completion.py` | Stream filtering/sentinels, final checks, optional single rewrite, retention scheduling. |

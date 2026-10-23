@@ -133,14 +133,38 @@ class ChatTranscriptMixin:
             return                    # the live document is the cache for completed messages
         at_bottom = self._at_bottom()
         scroll = self._transcript.verticalScrollBar().value()
-        top, body, bottom = [], [], []
+        top, body, bottom, extra_details = [], [], [], []
+        fence = ''
         for line in text.splitlines():
+            marker = _re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+            if marker:
+                run, rest = marker.groups()
+                if not fence:
+                    fence = run
+                elif run[0] == fence[0] and len(run) >= len(fence) and not rest.strip():
+                    fence = ''
+                body.append(line)
+                continue
+            if fence or line.startswith(('    ', '\t')):
+                body.append(line)
+                continue
+            if line.startswith('This turn: ') and line.endswith('Conversation history still follows your chat-history settings.'):
+                # A badge shows current limits; retain the full historical note
+                # on demand instead of repeating a paragraph under every answer.
+                extra_details.append(line)
+                continue
             m = self._STATUS_LINE.match(line)
             if m:
-                (top if not body else bottom).append(m.group(2))
+                inner = m.group(2)
+                if (inner == 'Source: model knowledge (not checked against a source)' or
+                        inner.startswith('Sources: saved memory context supplied (use by the model is not established)')):
+                    extra_details.append(inner)
+                else:
+                    (top if not body else bottom).append(inner)
             else:
                 body.append(line)
         body, details = self.split_details(body)
+        details = '\n\n'.join(part for part in (details, *extra_details) if part)
         md = self._keep_line_breaks("\n".join(body).strip())
         cursor = QTextCursor(self._transcript.document())
         cursor.beginEditBlock()

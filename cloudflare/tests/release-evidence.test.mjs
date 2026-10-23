@@ -40,18 +40,24 @@ test('current release labels, evidence anchors and homepage identity stay consis
 });
 
 test('current model score and software count match their separate recorded evidence', () => {
-  const file = `bench/results/${update}-qwen3_4b-instruct-suite1.5.json`;
+  const html = read('website/ai-reliability-testing.html');
+  // A newer software release need not claim an older model run as its own.
+  const benchmark = html.match(/data-benchmark-release="(U\d+)"/)[1];
+  const file = `bench/results/${benchmark}-qwen3_4b-instruct-suite1.5.json`;
   const result = JSON.parse(read(file));
-  assert.equal(result.label, update);
-  assert.equal(result.source_ref, `v${version}`);
+  assert.equal(result.label, benchmark);
+  assert.equal(result.source_ref, `v3.14-${benchmark}`);
+  if (benchmark !== update) {
+    assert.ok(html.includes(`Historical ${benchmark} release checks`));
+    assert.ok(html.includes(`No new full 158-case ${update} model result is claimed`));
+  }
   assert.equal(result.suite, '1.5');
   assert.equal(result.cases, 158);
   assert.equal(result.results.length, result.cases);
   assert.equal(new Set(result.results.map(row => row.id)).size, result.cases);
   assert.equal(new Set(result.results.map(row => row.cat)).size, 9);
   const passed = result.results.filter(row => row.passed).length;
-  const html = read('website/ai-reliability-testing.html');
-  const paragraph = html.match(new RegExp(`<p id="${fragment}-truth-result">([\\s\\S]*?)<\\/p>`))[1];
+  const paragraph = html.match(new RegExp(`<p id="${benchmark.toLowerCase()}-truth-result"[^>]*>([\\s\\S]*?)<\\/p>`))[1];
   const plain = paragraph.replace(/<[^>]+>/g, '');
   for (const claim of [`${passed} / ${result.cases} cases passed`, `${result.overall}% overall`,
     `accuracy: ${result.accuracy}%`, `claims: ${result.unsupported_claims}%`, result.model]) assert.ok(plain.includes(claim), claim);
@@ -60,5 +66,5 @@ test('current model score and software count match their separate recorded evide
   const count = record.match(/Full isolated Windows suite:\s*\*\*([\d,]+) passed, ([\d,]+) skipped/)[1];
   assert.ok(html.includes(`${count} passed`));
   assert.ok(read('website/index.html').includes(count));
-  assert.ok(read('bench/FAILURES-' + update + '.md').includes(file.split('/').at(-1)));
+  assert.ok(read('bench/FAILURES-' + benchmark + '.md').includes(file.split('/').at(-1)));
 });

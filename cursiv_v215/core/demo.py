@@ -14,9 +14,12 @@ and the window badge say "sample data". Memories, keys and settings aren't touch
 from __future__ import annotations
 
 import shutil
+import json
+import threading
 from pathlib import Path
 
 DEMO_KEY = "demo_mode"
+_mode_lock = threading.RLock()
 OBSERVERS = ("Sample observer A", "Sample observer B")
 
 # A stream water-quality survey: three sites along one stream, written for the demo.
@@ -70,6 +73,8 @@ QUESTIONS = [
     ("Distance between sites", "What is the distance and bearing from 44.1234, -71.5678 to 44.1371, -71.5512?"),
     ("Calculation in code", "Convert 9.6 C to F"),
     ("A field entry", "log site: Upper Brook (site A); sample: auto; water temp 8.6 C; pH 7.18; note: demo entry"),
+    ("Comma-format field entry", "log site: North Creek, observation: SAMPLE DATA clear water, temp 14.2 C, sample ID: NC-DEMO-001"),
+    ("Inspect that sample", "field log sample NC-DEMO-001"),
     ("Sample history", "field log sample <ID from the entry above>"),
     ("Integrity check", "field log check"),
     ("The report", "field report"),
@@ -82,26 +87,74 @@ def root() -> Path:
     return Path.home() / ".cursiv" / "demo"
 
 
-def active() -> bool:
+def _settings() -> dict:
+    """An unreadable flag must not silently route demo writes into real records."""
+    from cursiv_v215.chat import keys
+    from .paths import portable_root
+    drive = portable_root()
+    if drive and not drive.exists():
+        raise OSError('Portable drive unavailable')
     try:
-        from cursiv_v215.chat import keys
-        return keys.saved_key(DEMO_KEY) == "on"
-    except Exception:
-        return False
+        data = json.loads(keys.KEYS_FILE.read_text(encoding='utf-8'))
+    except FileNotFoundError:
+        return {}
+    if not isinstance(data, dict) or data.get(DEMO_KEY, '') not in ('', 'on'):
+        raise ValueError('Demo setting is unreadable; no notebook destination is assumed')
+    return data
+
+
+def active() -> bool:
+    return _settings().get(DEMO_KEY) == 'on'
 
 
 def _set(on: bool) -> None:
     from cursiv_v215.chat import keys
     from cursiv_v215.core import documents
-    keys.store_key(DEMO_KEY, "on" if on else "")
+    from . import atomic
+    # The legacy key setter swallows errors and treats damaged JSON as empty.
+    # Update only this flag, retaining every unrelated key/value, and verify it.
+    with _mode_lock:
+        data = _settings()
+        if on:
+            data[DEMO_KEY] = 'on'
+        else:
+            data.pop(DEMO_KEY, None)
+        atomic.write_text(keys.KEYS_FILE, json.dumps(data, indent=2))
+        if _settings() != data:
+            raise OSError('Demo setting read-back failed')
     documents._passages.cache = None          # the library folder just changed
 
 
+def _clear_samples() -> None:
+    folder = root()
+    expected = Path.home() / '.cursiv' / 'demo'
+    if (folder.absolute() != expected.absolute() or folder.is_symlink() or folder.is_junction()
+            or folder.resolve().parent != expected.parent.resolve()):
+        raise OSError('Demo cleanup refused an unexpected or linked sample directory')
+    if folder.exists():
+        shutil.rmtree(folder)  # verified exact sample directory; never the real notebook/documents
+
+
 def load() -> dict:
-    """Turn the demo on with fresh sample data. Returns what was loaded."""
+    """Activate disposable sample data; restore the real view if setup fails."""
+    with _mode_lock:
+        _settings()  # validate before deleting or redirecting anything
+        _clear_samples()
+        _set(True)
+        try:
+            return _load_samples()
+        except Exception as exc:
+            try:
+                _set(False)
+            except (OSError, ValueError) as restore:
+                raise OSError('Demo setup failed and switching back could not be confirmed. '
+                              'Existing real records are untouched; repair the setting before continuing.') from restore
+            raise OSError('Demo setup failed; the real notebook/document view was restored. '
+                          'Partial sample data may remain in the demo folder.') from exc
+
+
+def _load_samples() -> dict:
     from cursiv_v215.core import documents, fieldlog
-    shutil.rmtree(root(), ignore_errors=True)
-    _set(True)
     made = []
     for site, who, with_sample, meas, note in ENTRIES:
         lat, lon = SITES[site]
@@ -121,14 +174,20 @@ def load() -> dict:
     return {"entries": len(fieldlog.entries()), "documents": 1, "folder": str(root())}
 
 
-def off() -> None:
-    """Back to the real notebook and documents; the sample data is removed."""
-    _set(False)
-    shutil.rmtree(root(), ignore_errors=True)
+def off() -> str:
+    """Restore the real view before cleanup; report retained sample files honestly."""
+    with _mode_lock:
+        _set(False)
+        try:
+            _clear_samples()
+        except OSError as exc:
+            return f'Sample cleanup incomplete ({exc}); retained samples are not the active notebook.'
+    return ''
 
 
 def questions_text() -> str:
-    lines = ["Things to try in the demo, in order (each one is typed in the chat):"]
+    lines = ['Type demo to start a separate SAMPLE DATA notebook. Type demo off to return to your own records.',
+             "Things to try in the demo, in order (each one is typed in the chat):"]
     for i, (what, q) in enumerate(QUESTIONS, 1):
         lines.append(f"{i}. {what}: {q}")
     lines.append("Turn it off with: demo off. Your real notebook and documents come back unchanged.")
@@ -136,6 +195,13 @@ def questions_text() -> str:
 
 
 def command(text: str) -> str | None:
+    try:
+        return _command(text)
+    except (OSError, ValueError) as exc:
+        return f'Demo change not confirmed: {exc}. No change to real notebook entries was requested.'
+
+
+def _command(text: str) -> str | None:
     low = (text or "").strip().lower()
     if low in ("demo", "load demo", "demo on", "field demo", "start demo"):
         info = load()
@@ -143,10 +209,11 @@ def command(text: str) -> str | None:
                 f"entry) and a sample protocol in Your documents. Everything is marked SAMPLE DATA, and your real "
                 f"notebook and documents are set aside, untouched, until you type demo off.\n\n" + questions_text())
     if low in ("demo off", "end demo", "stop demo", "leave demo"):
-        if not active():
+        if not active() and not root().exists():
             return "The demo isn't on."
-        off()
-        return "Demo off. Your own field notebook and documents are back; the sample data was removed."
+        warning = off()
+        return ('Demo off. Your own field notebook and documents are back; ' + warning if warning else
+                'Demo off. Your own field notebook and documents are back; the sample data was removed.')
     if low in ("demo questions", "demo help", "demo script"):
         return questions_text()
     return None
