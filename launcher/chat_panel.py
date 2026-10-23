@@ -323,11 +323,13 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
     # ── Empty state ─────────────────────────────────────────────────────
 
     # The research profile (core/profile.py, the default); EXAMPLES with personal features shown.
-    FIELD_EXAMPLES = ("What is the distance and bearing from 44.1234, -71.5678 to 44.1371, -71.5512?",
+    FIELD_EXAMPLES = (("New here? What can Cursiv do?", "What can Cursiv do?"),
+                      "What is the distance and bearing from 44.1234, -71.5678 to 44.1371, -71.5512?",
                       "log site: North transect; water temp 12.40 C; pH 7.2; note: first visit",
                       "How much 1 M stock do I need to make 500 mL of 0.1 M solution?",
                       ("Try everything with sample data: demo", "demo"))
-    EXAMPLES = ("How do I purify creek water so it's safe to drink?",
+    EXAMPLES = (("New here? What can Cursiv do?", "What can Cursiv do?"),
+                "How do I purify creek water so it's safe to drink?",
                 "Help me plan meals for a week on a tight budget.",
                 "Explain how a well pump works, simply.",
                 "What should go in a 72-hour emergency kit for a family of four?")
@@ -343,10 +345,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         """What a new chat looks like: a question, how Cursiv works in one line, examples to click."""
         from urllib.parse import quote
         if setup_needed:
-            body = (f'<p style="color:{theme.AMBER};">Cursiv needs an AI model before it can answer.</p>'
+            body = (f'<p style="color:{theme.AMBER};">Local AI chat needs an AI model. Built-in help is available now.</p>'
                     f'<p><a href="cursiv://setup" style="color:{theme.ACCENT};">Open Setup</a>'
                     f'<span style="color:{theme.MUTED};"> to install the free local engine and a model sized for this '
-                    f'computer, or add a free Gemini or Groq key in Settings.</span></p>')
+                    f'computer, or add a free Gemini or Groq key in Settings.</span></p>'
+                    f'<p><a href="cursiv://prompt/What%20can%20Cursiv%20do%3F" '
+                    f'style="color:{theme.ACCENT};">New here? What can Cursiv do?</a></p>')
         else:
             body = "".join(
                 f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(text)}" '
@@ -356,7 +360,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             f'<div style="margin-top:40px;">'
             f'<p style="font-size:22px; font-weight:600; color:{theme.TEXT};">What can I help with?</p>'
             f'<p style="color:{theme.MUTED}; margin:6px 0 18px 0;">Cursiv answers with an AI model on this computer. '
-            f'It can be wrong, so check anything that matters. Type <b>help</b> to see everything it can do.</p>'
+            f'It can be wrong, so check anything that matters. Choose an example to edit before '
+            f'sending, or type <b>help</b> for commands.</p>'
             f'{body}</div>'))
         self._empty_shown = True
 

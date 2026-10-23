@@ -256,14 +256,13 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # ── How this person wants Cursiv to talk (core/style.py): tone + rules learned
     # from their corrections. Added to every kind of reply; corrections are learned
     # in the background from this message and the reply it's correcting.
+    _style_addendum = ''
     try:
         if runtime.turn_policy.current().inspect and not (locals().get("_ph") and _ph.emergency):
             from cursiv_engine.core import style as _style
             from cursiv_engine.memory import semantic as _sem2
             _who = _sem2.current_person()
-            _add = _style.prompt_addendum(_who)
-            if _add:
-                messages[0]["content"] += "\n\n" + _add + "\n"
+            _style_addendum = _style.prompt_addendum(_who, user_text)
             from cursiv_engine.memory import formation as _formation
             if _style.looks_like_correction(user_text) and _formation.enabled_for(user_text):
                 _prev = next((m.get("content", "") for m in reversed(history or [])
@@ -422,6 +421,11 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 elif _docs.ASKS_ABOUT_DOCS.search(user_text):
                     _names = [d["name"] for d in _docs.library()]
                     runtime._DOCS_SEARCHED_EMPTY[:] = _names
+                    if not _emergency_now and not uploaded:
+                        runtime._CURSIV_REPLY = True
+                        yield _files.VerifiedText(_docs.nothing_found_note(_names) + '\n\n'
+                            'No matching passage was found. I cannot establish that from the imported documents.')
+                        return  # a model cannot turn a failed retrieval into a document claim
                     messages[0]["content"] += "\n\n" + _docs.nothing_found_block(_names) + "\n"
                     yield _docs.nothing_found_note(_names) + "\n\n"
     except Exception:
@@ -468,6 +472,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # local providers receive the same policy; _slim preserves it in full.
     from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
     messages.insert(2, dict(role='system', content=INSTRUCTIONS))
+    if _style_addendum:
+        # Separate from the replaceable persona so compaction and tool prompts
+        # retain the current preference, including a change made this session.
+        messages.insert(3, dict(role='system', content=_style_addendum))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.

@@ -35,7 +35,7 @@ ASKS_ABOUT_DOCS = re.compile(
 
 
 def nothing_found_note(names: list[str]) -> str:
-    return "*(Searched your documents (" + ", ".join(names) + "): nothing in them covers this.)*"
+    return "*(Searched your documents (" + ", ".join(names) + "): no matching passage found.)*"
 
 
 def nothing_found_block(names: list[str]) -> str:

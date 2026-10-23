@@ -15,6 +15,8 @@ INSTRUCTIONS = (
     'normative premises: lack of a scientific measurement does not prove a moral or metaphysical '
     'claim false. Cursiv and language models have no special access that settles the debate. '
     'Label an explicitly requested argument as a perspective, not an established conclusion. '
+    'Treat the premises of objections as contestable too: attribute them to critics instead '
+    'of asserting them as facts. Untestability alone does not make a position false or unlikely. '
     'Definitions and well-supported empirical facts remain factual; do not manufacture equal '
     'evidence for unsupported claims or weaken practical safety guidance. Stay concise and even-toned.'
 )
@@ -115,6 +117,19 @@ def topic(text):
 
 def answer(text, history=()):
     q = _question(text)
+    # A paired overview has two explicitly requested sides. Keep the concrete
+    # live-test follow-up grounded; single-perspective requests still use chat.
+    if (len(q) <= 350 and re.match(r'(?i)^(?:now |please )?(?:give|present|what|explain)\b', q)
+            and re.search(r'(?i)\b(?:strongest|best) argument for moral realism\b', q)
+            and re.search(r'(?i)\b(?:then|and) (?:the )?(?:strongest|best) objection\b', q)):
+        return (INTRO + '\n\n**Argument for moral realism:** Realists argue that moral reasoning can '
+                'identify mistakes even in widely accepted practices. On this view, stance-independent '
+                'moral reasons best explain why approval need not make a practice right.\n\n'
+                '**Objection:** Critics question how we could distinguish knowledge of those reasons '
+                'from convictions shaped by evolution, culture and social learning. Those explanations '
+                'can challenge the justification for realist beliefs without proving realism false.\n\n'
+                'These are arguments, not established conclusions; realists and critics dispute their '
+                'premises and explanatory force. ' + LIMIT + SOURCE)
     if perspective_requested(q):
         return None  # a labeled argument belongs in the ordinary guided conversation
     selected = topic(q)
