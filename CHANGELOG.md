@@ -1,6 +1,10 @@
 # Changelog
 
-## 3.14-U91 — workspace files and philosophical uncertainty (release preparation)
+## 3.14-U91 — workspace files and philosophical uncertainty (2026-10-23)
+
+- Final locked Windows source checks: **1,749 passed / 1 skipped**; hosted Mac
+  **1,735 / 15 skips**. Both tagged frozen apps and all protected-main gates passed.
+  All **21 website checks** passed. Final installer bytes have independent owner proof.
 
 - Added shared local/cloud instructions for contested philosophical and normative
   questions: acknowledge disagreement, fairly present positions, separate empirical
@@ -32,11 +36,11 @@
 - Added exact-prompt and release-gate regressions, dedicated PR/main jobs, isolated
   check runner and pre-tag main-CI validation. Main branch protection now requires
   both workspace jobs, both source suites and security, including administrator pushes.
-- Final Windows checks: **63 focused gate tests passed**; full isolated suite
-  **1,699 passed / 1 platform skip** (215.21 s). Mac CI remains a required PR gate.
+- Workspace checkpoint before the philosophy policy: **63 focused gate tests passed**; full isolated suite
+  **1,699 passed / 1 platform skip** (215.21 s). Mac CI is also a required PR gate.
 - Updated native coding help and contributor/technical release guidance. U91
-  publication requires protected-main checks, tagged builds and owner proof;
-  final installer/platform results are recorded in the U91 verification report.
+  passed protected-main checks, tagged builds and owner proof;
+  final installer/platform results are recorded in the [U91 verification report](docs/U91-RELEASE-VERIFICATION.md).
 
 ## 3.14-U90 — engine and local storage maintenance (2026-10-23)
 

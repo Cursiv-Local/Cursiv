@@ -140,7 +140,7 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 | Team sharing | Signed notebook chains move by USB/shared folder. Imports retain separate device chains and report conflicts rather than overwriting observations. [Phone notebook and transfer](docs/PHONE-NOTEBOOK.md). |
 | Personal features | Settings → Appearance → Show personal features exposes older letters/vault, council, coding and builder tools. Current source also gates typed letter/vault commands and dialog shortcuts; it retains existing data/backends. [Ownership map](ARCHITECTURE.md). |
 
-### Contested philosophical and value questions (current source)
+### Contested philosophical and value questions (U91)
 
 `core/philosophy_policy.py` holds a shared instruction: acknowledge unresolved
 disagreement first, present the main arguments fairly, distinguish evidence from
@@ -177,7 +177,7 @@ are distinguished rather than treated as interchangeable positions.
 
 ### Memory, permissions and conversation history
 
-#### Workspace files (current source; not yet in the U90 installer)
+#### Workspace files (U91)
 
 Choose `workspace <folder>` and enable `files on` once. Natural commands use the
 same verified local tools in local and cloud model modes, without model inference:
@@ -341,7 +341,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U90 source checks are recorded in the [changelog](CHANGELOG.md);
+U91 source and package checks are recorded in the [verification report](docs/U91-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -356,6 +356,8 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 
 | Historical change | Evidence |
 |---|---|
+| U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
+| U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |
 | U82: selected memory, dated recall, operational state | [Repair record](docs/GROUNDED-CHAT-REPAIR.md), [verification](docs/U82-RELEASE-VERIFICATION.md) |
 | U84: restricted turns, paths, source ownership, deferred review | [Verification](docs/U84-RELEASE-VERIFICATION.md), [maintenance](docs/MAINTENANCE-HARDENING.md) |
 | U85: quiet feedback, tool/notebook receipts | [Verification](docs/U85-RELEASE-VERIFICATION.md), [feedback details](docs/CHAT-FEEDBACK.md) |

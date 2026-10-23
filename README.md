@@ -15,6 +15,7 @@ Cursiv is an open-source AI assistant for Windows, built for field notes, docume
 - **Keep field notes:** Record observations, photos and sample IDs. Keep original entries and record corrections separately.
 - **Work with documents:** Import protocols and field guides, then ask questions about them with page references where available.
 - **Check calculations:** Convert units, work out distances and times, and calculate dilutions or statistics.
+- **Work with workspace files:** Create, read, append and search using plain requests inside a folder you authorize.
 - **Keep useful context:** Save selected facts and notes to find again later. Memory is selective, not a complete record of everything you say.
 - **Check answers:** See labels for supplied references, documents and calculations, alongside unchecked model replies.
 
@@ -50,7 +51,7 @@ AI answers can be confidently wrong. Cursiv's checks catch some mistakes, not al
 
 ## Releases, evidence and development
 
-Latest release: **[U90](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U90)**. See the [release notes](docs/RELEASE-U90.md) and [changelog](CHANGELOG.md).
+Latest release: **[U91](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U91)**. See the [release notes](docs/RELEASE-U91.md) and [changelog](CHANGELOG.md).
 
 - [Tests and evidence](docs/CLAIM-EVIDENCE.md): what has been checked and what remains unverified.
 - [Help test Cursiv](https://cursiv.us/testers): send a clear report of what you tried and what happened.
