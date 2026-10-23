@@ -1,5 +1,8 @@
 # Cursiv: phased plan (2026-10-18)
 
+Historical roadmap. The current code map and ownership table are in
+[ARCHITECTURE.md](../ARCHITECTURE.md); use [TECH.md](../TECH.md) for current storage/build details.
+
 The rule above everything: **when the internet is off, Cursiv is complete. When it's on,
 Cursiv gets more capabilities.** Online never makes it less private.
 

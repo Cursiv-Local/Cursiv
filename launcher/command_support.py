@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Callable, Generator, Optional
-from command_results import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
-from command_runtime import CommandRuntime
+from cursiv_engine.core.command_api import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
+from cursiv_engine.core.command_api import CommandRuntime
 
 def _image_folder(runtime: CommandRuntime, cfg: dict) -> Path:
     """Image cache is user data; an absent workspace never means the binary/CWD."""
@@ -127,6 +127,9 @@ def _is_builder(runtime: CommandRuntime) -> bool:
 def help_text(runtime: CommandRuntime, topic: str) -> str:
     """`help` -> the short list; `help more` -> topics; `help <topic>` -> one topic."""
     topic = topic.strip().lower()
+    if topic == 'family' and not runtime._personal():
+        from cursiv_engine.core.profile import PERSONAL_NOTE
+        return PERSONAL_NOTE
     if not topic:
         return runtime._HELP_TEXT if runtime._personal() else runtime._FIELD_HELP_TEXT
     if topic in runtime._HELP_TOPICS:

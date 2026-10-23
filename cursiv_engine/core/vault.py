@@ -53,8 +53,12 @@ def covered(relative: Path) -> bool:
     """Known conversation/memory stores and their in-place backups, never notebook data."""
     if not relative.parts or relative.parts[0].startswith('.vault-'):
         return False
+    if relative.parts[0] in FOLDERS:
+        return True
+    if len(relative.parts) > 1 and relative.parts[0] not in ('backups', 'archives'):
+        return False  # a similarly named attachment/document is not a memory store
     name = relative.name.lstrip('.')  # include leftovers from older interrupted atomic writes
-    return (relative.parts[0] in FOLDERS or name in NAMES or
+    return (name in NAMES or
             name.startswith('memory_') or
             any(name.startswith(base + ending) for base in NAMES for ending in ('.', '-')))
 

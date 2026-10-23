@@ -35,6 +35,7 @@ def startup(*, configure=False) -> bool:
             QMessageBox.warning(None, 'Encryption unchanged', 'Passphrases did not match. No data was changed.')
             return False
         try:
+            vault_migration.require_closed()
             counts = vault_migration.migrate(password)
         except Exception as exc:
             QMessageBox.critical(None, 'Encryption not completed',

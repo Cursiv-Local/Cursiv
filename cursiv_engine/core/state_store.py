@@ -24,9 +24,12 @@ def load(path: Path, default):
     checked(path)
     vault.ensure_access(path)
     try:
-        if path.stat().st_size > MAX_BYTES:
+        disk_limit = MAX_BYTES * 2 + 4096 if vault.owner(path) else MAX_BYTES
+        if path.stat().st_size > disk_limit:
             raise ValueError('State exceeds 8 MB review limit; archive it before continuing')
         text = private_store.read_text(path)
+        if len(text.encode('utf-8')) > MAX_BYTES:
+            raise ValueError('State exceeds 8 MB review limit; archive it before continuing')
     except FileNotFoundError:
         if not path.parent.exists():
             # A missing store is normal; a disconnected portable drive is not.

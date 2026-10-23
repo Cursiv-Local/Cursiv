@@ -43,6 +43,10 @@ Each active app-data, user-data and (when packaged) program-data root gets its o
 salt and marker, using the same chosen passphrase. The plaintext payload format
 is unchanged inside the encrypted envelope.
 
+The passphrase protects installation data across local profiles; it does not
+create a separate cryptographic identity for each login. Someone with that
+passphrase and filesystem access can decrypt all covered profiles.
+
 | Covered | Existing producer/read boundary |
 |---|---|
 | Saved conversations, titles, rendered HTML, pending legacy temporary copies | `launcher/conversations.py` |

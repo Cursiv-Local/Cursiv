@@ -14,6 +14,34 @@ from . import atomic, vault
 JOURNAL = Path('.vault-recovery/manifest.enc')
 
 
+def require_closed() -> None:
+    """Older releases predate the OS lease; refuse migration while they run too."""
+    import psutil
+    own_launchers = set()
+    for parent in psutil.Process().parents():
+        try:
+            if '--encrypt-data' in parent.cmdline():
+                own_launchers.add(parent.pid)  # venv/PyInstaller launcher for this configuration process
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            continue
+    for process in psutil.process_iter(['pid', 'name', 'cmdline']):
+        try:
+            info = process.info
+            if info['pid'] == os.getpid() or info['pid'] in own_launchers:
+                continue
+            name = (info.get('name') or '').lower()
+            command = info.get('cmdline') or []
+            source = any(str(arg).replace('\\', '/').lower().endswith('/launcher/main.py') or
+                         str(arg).replace('\\', '/').lower() == 'launcher/main.py' for arg in command)
+            module = any(command[i:i + 2] == ['-m', 'launcher'] for i in range(len(command)))
+            if name in ('cursiv.exe', 'cursiv') or source or module:
+                raise vault.VaultError('Close every other Cursiv process, including older versions, before migration')
+        except psutil.NoSuchProcess:
+            continue
+        except psutil.AccessDenied as exc:
+            raise vault.VaultError('Could not establish whether Cursiv data is in use; migration refused') from exc
+
+
 def inventory(root: Path) -> list[Path]:
     if not root.exists():
         return []

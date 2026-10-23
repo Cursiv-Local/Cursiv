@@ -6,7 +6,7 @@ original precedence order by command_dispatch; no widgets are loaded.
 """
 from __future__ import annotations
 
-from command_runtime import CommandRuntime, UNHANDLED
+from cursiv_engine.core.command_api import CommandRuntime, UNHANDLED
 
 
 def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: list[dict]):

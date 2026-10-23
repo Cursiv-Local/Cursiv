@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Callable, Generator, Optional
-from command_results import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
-from command_runtime import CommandRuntime
-from command_runtime import UNHANDLED
+from cursiv_engine.core.command_api import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
+from cursiv_engine.core.command_api import CommandRuntime
+from cursiv_engine.core.command_api import UNHANDLED
 import commands_system as _system
 import commands_research as _research
 import commands_credentials as _credentials
@@ -42,6 +42,9 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     from cursiv_engine.core import file_requests
     if file_requests.recognizes(text):
         return None  # local source/search intent must precede notebook and memory keywords
+    from cursiv_engine.core import profile
+    if profile.personal_command(text) and not runtime._personal():
+        return runtime.TextResult(profile.PERSONAL_NOTE)
 
     # Native notebook intent takes precedence over generic files and memory.
     _notebook = runtime.notebook_command(text, history, cfg=cfg)

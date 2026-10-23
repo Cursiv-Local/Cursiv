@@ -1,14 +1,20 @@
 # Cursiv architecture
 
-This describes the U87 source, carrying the U82–U86 architecture forward.
-[U87 verification](docs/U87-RELEASE-VERIFICATION.md) records the current source,
-tagged packages and actual publication state. The earlier
-[live-test follow-up](docs/LIVE-TEST-FOLLOWUP.md) and
-[conversation follow-up](docs/CONVERSATION-FOLLOWUP.md) explain the repairs.
+This is the current source map. Published artifacts and historical measurements
+remain documented separately in [U89 verification](docs/U89-RELEASE-VERIFICATION.md).
+The engine package is `cursiv_engine`; persistent data paths have not been renamed.
 
-U87 adds `launcher/phone_help.py` for exact native phone pointers shared by
-short Help, field help and the existing notebook/Help windows. Rich links open
-in the system browser on user action; notebook storage/import behavior is unchanged.
+## Start here for new contributors
+
+1. Read this message flow and ownership table.
+2. Read [TECH.md](TECH.md) for data locations, source setup and release safeguards.
+3. Open [the chat facade](cursiv_engine/ui/chat_app.py), then follow
+   `chat/conversation.py` and `chat/completion.py`. The desktop enters through
+   `launcher/chat_panel.py`; backend operations produce receipts before UI rendering.
+
+[CONTRIBUTING.md](CONTRIBUTING.md) gives the short setup and validation path.
+Short `core/`, `chat/` and `memory/` paths below are relative to `cursiv_engine/`.
+The engine has no Qt dependency; launcher owns widget lifecycles and entry points.
 
 ## Desktop and chat
 
@@ -20,7 +26,9 @@ in the system browser on user action; notebook storage/import behavior is unchan
 | `launcher/chat_feedback.py`, `core/feedback.py` | GUI-thread state/receipt presentation and short factual formatters; model prose cannot create execution receipts. |
 | `launcher/chat_review.py`, `chat/review.py` | Snapshot eligible review evidence; finish the draft before a local worker runs; apply labeled follow-ups in Qt with generation/cancellation guards. |
 | `launcher/chat_controls.py`, `chat_transcript.py`, `chat_rendering.py` | Controls, transcript operations, incremental Markdown and message cache. Qt widgets stay on the GUI thread. |
-| `launcher/chat_commands.py` | Compatible result types and command entry points. |
+| `launcher/personal_features.py` | Opt-in letter/vault dialogs separated from the research chat lifecycle; existing backend checks are retained. |
+| `launcher/chat_commands.py` | Compatibility facade and desktop command entry point; re-exports the engine result classes. |
+| `cursiv_engine/core/command_api.py` | Shared result types, command runtime protocol and `UNHANDLED` sentinel. Consolidates the former separate launcher type modules without changing result identity. |
 | `launcher/command_dispatch.py`, `commands_*.py` | Ordered command domains. `UNHANDLED` continues dispatch; intentional `None` defers to guarded chat. |
 | `launcher/command_agents.py`, `command_media.py`, `command_support.py` | Agent helpers, media/training adapters and supporting commands. |
 | `launcher/login_style.py`, `login_recovery.py`, `login_dialog.py` | Shared controls, security questions/recovery, login/account setup. Existing class imports are preserved. |
@@ -56,12 +64,13 @@ flowchart TD
   Policy --> Commands[Ordered native commands]
   Commands -->|chat path| Native[Notebook / memory / filesystem intents]
   Native -->|backend result| Receipt[Application-owned receipt or failure]
-  Native -->|model answer needed| Context[Evidence, references, calculations and context]
-  Context --> Provider[Selected provider and fallback]
+  Native -->|model answer needed| Context[Engine phases: evidence, references, calculations and context]
+  Context --> Provider[Local-first model cascade and existing fallbacks]
   Provider --> Stream[Incremental streamed reply]
   Provider -->|failed file tool| Receipt
   Stream --> Checks[Deterministic evidence checks]
-  Checks --> Ready[Finalize draft and enable input]
+  Checks --> Provenance[Application-owned provenance and check notes]
+  Provenance --> Ready[Finalize draft and enable input]
   Ready -->|eligible optional local review| Review[Background bounded verdict]
   Review -->|full mode noncritical problem| Rewrite[At most one constrained rewrite]
   Rewrite --> Recheck[Same checks plus second checker result]
@@ -101,9 +110,49 @@ assistant claims are not promoted to verified memory by a later review. See
 - `core/paths.py` and `launcher/portable.py`: installed/portable data locations;
   model weights and workspace grants retain their existing rules.
 - `website/` and `cloudflare/`: independent website deployment. This maintenance
-  work does not deploy it or change its source.
+  work does not deploy it; package-path references are updated mechanically.
 
-## Remaining coupling
+## Storage boundary
+
+`core/private_store.py` is the explicit read/append boundary for protected stores;
+`core/atomic.py` protects covered writes before creating a temporary file.
+`core/vault.py` owns coverage, passphrase-derived session keys and authenticated,
+path-bound envelopes. `core/vault_migration.py` owns the startup-only migration and
+encrypted recovery snapshot. The desktop holds `core/data_lease.py`'s OS lease and
+unlocks through `launcher/encryption_dialog.py` before importing chat stores.
+
+Encryption is opt-in and off by default. Notebook chains/signatures do not pass
+through this layer. [Coverage and recovery](docs/ENCRYPTION-MIGRATION-PLAN.md)
+explicitly exclude documents/workspace files, logs and intentional exports/training
+copies. No real owner stores were migrated by this development task.
+
+## Surface area and remaining coupling
+
+The research profile hides personal UI and blocks typed letter/vault operations
+until “Show personal features” is enabled. No existing letter data or active
+backend was deleted. Storage/permission controls still apply when enabled.
+
+Command audit: `commands_*` modules contain distinct ordered domains; `command_agents`,
+`command_media` and `command_support` supply adapters used by those domains.
+`chat_commands` remains the single compatible facade because tests and adapters
+replace its runtime services. Consolidating the two pure type modules into
+`core/command_api.py` removes one module without changing dispatch precedence.
+The remaining domain handlers are not duplicate pass-through entry points.
+
+Obvious remaining ownership exceptions in launcher:
+
+- `usb_ops.py` contains copy planning, drive verification and filesystem operations;
+  it belongs in an engine/platform service eventually. Moving it now would expand
+  a storage-security change into the portable release pipeline.
+- `conversations.py` contains storage scheduling as well as desktop conversation
+  lifecycle. Encryption integration centralizes its file boundary, but moving its
+  executor and title callbacks needs separate lifecycle work.
+- `command_media.py` contains provider/training operations mixed with command
+  adapters. Keep extracting only with tests for that specific domain.
+
+These exceptions are flagged rather than asserting launcher is already UI-only.
+No dead personal backend was identified with enough evidence to delete safely;
+existing letter/vault integrity tests are active.
 
 The facade still owns mutable per-turn records, and verification retains its
 session ledger/previous-failure state. The desktop serializes its active turns;

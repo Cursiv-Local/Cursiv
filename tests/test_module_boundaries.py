@@ -27,7 +27,7 @@ def test_complete_launcher_constructs_titlebar_and_chat(monkeypatch):
 def test_extracted_notes_json_command_serializes_success_result():
     import json
     from types import SimpleNamespace
-    from command_results import TextResult
+    from cursiv_engine.core.command_api import TextResult
     import commands_system
     entry = {'instruction': 'Explain the sample', 'output': 'A "quoted" answer'}
     runtime = SimpleNamespace(
@@ -67,7 +67,7 @@ def test_runtime_overrides_reach_provider_boundaries(monkeypatch):
 def test_command_domain_order_preserves_intentional_chat_fallback(monkeypatch):
     import chat_commands as cc
     import command_dispatch as dispatch
-    from command_runtime import UNHANDLED
+    from cursiv_engine.core.command_api import UNHANDLED
     called = []
     for name in ('system', 'research', 'credentials', 'extensions', 'notes', 'services', 'postal', 'images'):
         module = getattr(dispatch, '_' + name)
@@ -77,6 +77,13 @@ def test_command_domain_order_preserves_intentional_chat_fallback(monkeypatch):
     monkeypatch.setattr(cc, 'memory_command', lambda *a: None)
     assert cc.handle_command('ordinary conversation', {}, []) is None
     assert called == ['system', 'research']
+
+
+def test_command_api_keeps_facade_result_identity():
+    import chat_commands
+    from cursiv_engine.core import command_api
+    for name in ('TextResult', 'NotebookResult', 'FileActionResult', 'MemoryResult', 'NotesResult', 'StreamResult'):
+        assert getattr(chat_commands, name) is getattr(command_api, name)
 
 
 def test_extracted_view_classes_are_reexported():

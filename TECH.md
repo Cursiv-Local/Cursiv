@@ -77,6 +77,11 @@ failed-file-memory and damaged-recall safeguards and draft release wording.
 | Conversations, agents, plugins, projects, login | `%USERPROFILE%\.cursiv\` |
 | AI models | Ollama's folder (`%USERPROFILE%\.ollama\models`) |
 
+On macOS, engine data uses `~/Library/Application Support/Cursiv`; home data
+remains in `~/.cursiv`. `CURSIV_APP_DATA` explicitly overrides engine data locations.
+Installed Windows can also retain a legacy program-level `.cursiv` copy; encryption
+inventories that active location too. These paths do not depend on the package name.
+
 Nothing in these folders is part of the repository or the installer. On a **Cursiv USB** (`launcher/usb_maker.py`), `launcher/portable.py` points the home folder, the models and Ollama at the drive at startup, so everything stays on the drive.
 
 ### Optional conversation and memory encryption (unreleased source)
@@ -114,7 +119,7 @@ Use OS/full-drive encryption when those are in scope. See [threat model](docs/TH
 
 ## Run from source
 
-Python 3.11+ on Windows.
+Use Python 3.13 for the locked release/test environment on Windows.
 
 ```bash
 pip install -r requirements.txt
@@ -157,6 +162,11 @@ raw benchmark failures and both artifact hashes before making the draft latest.
 Publishing also triggers a Mac workflow: if the verified Mac assets are already
 attached, stop that redundant run before it rebuilds/overwrites them. Record the
 successful tagged run separately from this intentional cancellation.
+
+Older immutable tags can predate the engine package rename. The release helper
+finds their unique `core/selfknow.py` version source from the tag's tree; it still
+builds the tag's own specification and source. Keep using the helper's sanitized
+build environment, which excludes editor/tool DLL paths that can shadow Qt's ICU.
 
 ## Publish the website
 

@@ -26,6 +26,12 @@ def test_default_off_preserves_plaintext_schema(encrypted):
     assert not (encrypted / vault.MARKER).exists()
 
 
+@pytest.mark.parametrize('folder', ['fieldlog', 'documents', 'images', 'exports', 'training', 'plugins'])
+def test_similarly_named_user_files_are_never_encryption_targets(folder):
+    assert not vault.covered(Path(folder) / 'memory.json')
+    assert not vault.covered(Path(folder) / 'memory_facts.jsonl')
+
+
 def test_migration_exact_bytes_backups_and_notebook_unchanged(encrypted):
     values = {'memory_facts.jsonl': b'{"text":"unique secret marker"}\ninvalid-line\n',
               'backups/autonomous-memory-v1/memory_facts.jsonl': b'older secret marker\n',
@@ -162,6 +168,24 @@ def test_state_store_backups_are_encrypted_and_readable(encrypted):
     assert state_store.load(path, {}) == {'notes': 'second secret'}
 
 
+def test_encrypted_overhead_does_not_reduce_state_payload_limit(encrypted, monkeypatch):
+    vault_migration.migrate(PASSWORD, [encrypted])
+    monkeypatch.setattr(state_store, 'MAX_BYTES', 64)
+    path = encrypted / 'projects/small.json'
+    state_store.save(path, {'value':'secret'})
+    assert path.stat().st_size > state_store.MAX_BYTES
+    assert state_store.load(path, {}) == {'value':'secret'}
+
+
+def test_migration_refuses_running_older_release(monkeypatch):
+    from types import SimpleNamespace
+    import psutil
+    monkeypatch.setattr(psutil, 'process_iter', lambda *a: [SimpleNamespace(
+        info={'pid':os.getpid()+100, 'name':'Cursiv.exe', 'cmdline':[]})])
+    with pytest.raises(vault.VaultError, match='older versions'):
+        vault_migration.require_closed()
+
+
 def test_semantic_memory_and_conversation_roundtrip(encrypted, monkeypatch):
     from cursiv_engine.memory import semantic
     import conversations
@@ -195,6 +219,20 @@ def test_lease_blocks_second_process(encrypted):
                                 capture_output=True, timeout=30)
         assert result.returncode != 0
         assert b'data is in use' in result.stderr
+    with DataLease([encrypted]): pass
+
+
+def test_startup_lease_survives_local_reference_cleanup(encrypted):
+    code = ('from cursiv_engine.core.data_lease import DataLease; '
+            'from cursiv_engine.core.vault import VaultError; '
+            'from pathlib import Path; import sys,gc; '
+            'root=Path(sys.argv[1]); lease=DataLease([root]).__enter__(); '
+            'lease.hold_until_exit(); del lease; gc.collect(); '
+            '\ntry: DataLease([root]).__enter__()'
+            '\nexcept VaultError: pass'
+            '\nelse: raise AssertionError("startup lease was released early")')
+    subprocess.run([sys.executable, '-B', '-c', code, str(encrypted)], check=True, timeout=30)
+    from cursiv_engine.core.data_lease import DataLease
     with DataLease([encrypted]): pass
 
 

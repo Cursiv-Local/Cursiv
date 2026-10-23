@@ -1,10 +1,56 @@
-"""Services supplied by the command facade to ordered command domains.
+"""Shared command API: result types, runtime protocol and dispatch sentinel.
 
-The protocol lists existing optional integrations, result types, configuration
-and callable overrides. Dispatch receives it explicitly; result types also live
-in command_results for annotation and adapter use.
+The desktop compatibility facade re-exports result classes. Ordered command
+handlers consume this widget-free interface; model text cannot create receipts.
 """
-from typing import Any, Protocol
+from __future__ import annotations
+from typing import Any, Callable, Generator, Optional, Protocol
+
+
+class TextResult:
+    """A complete, ready-to-show result -- no streaming."""
+    def __init__(self, text: str, image_path: str = ""):
+        self.text = text
+        self.image_path = image_path   # set for image-generation/paste results
+
+
+class NotebookResult(TextResult):
+    """An application-owned notebook receipt, never an LLM's save claim."""
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipt = result.receipt()
+
+
+class FileActionResult(TextResult):
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipts = [result.receipt()]
+
+
+class MemoryResult(TextResult):
+    def __init__(self, result):
+        super().__init__(result.render())
+        self.receipt = result.receipt()
+
+
+class NotesResult(TextResult):
+    """UI request; the chat panel opens/focuses the viewer on its GUI thread."""
+    def __init__(self, category: str = '', query: str = ''):
+        super().__init__('Opening saved notes…')
+        self.category, self.query = category, query
+
+
+class StreamResult:
+    """An intro line shown immediately, then a generator streamed in."""
+    def __init__(
+        self,
+        intro: str,
+        generator: Generator[str, None, None],
+        on_complete: Optional[Callable[[str], None]] = None,
+    ):
+        self.intro = intro
+        self.generator = generator
+        self.on_complete = on_complete
 
 
 class CommandRuntime(Protocol):

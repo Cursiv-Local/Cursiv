@@ -1,5 +1,39 @@
 # Changelog
 
+## Unreleased — engine and local storage maintenance
+
+- Renamed the engine package to `cursiv_engine` throughout imports, build/CI,
+  tests and documentation. Persistent data folders and record formats are unchanged.
+- Added optional, default-off passphrase encryption for saved conversations,
+  memories and covered derived stores/backups. Startup unlocks before chat loads;
+  app-closed migration uses encrypted recovery snapshots, exact-byte checks,
+  resumable state and an OS data lease. Notebook data, workspace/documents, logs
+  and explicit exports/training data remain outside coverage.
+- Updated privacy, threat-model and data-location guidance. No owner data was
+  migrated; no installer version was bumped and no release/site was published.
+- Consolidated command results/runtime types in one engine API while retaining
+  the chat facade's class identities and command order. Moved personal dialogs
+  out of the main chat panel; letter/vault commands and shortcuts now respect
+  Show personal features. Existing personal data/backends are retained.
+- Updated the architecture flow/ownership map, contributor quick start, README,
+  evidence index and handoff. Flagged remaining non-UI launcher responsibilities.
+- Preserved historical-tag rebuild checks by discovering the engine version file
+  inside immutable older tags. Checked both the actual U89 tag and current HEAD.
+- Final Windows source suite: **1,636 passed / 1 skipped** (220.71 s), compared
+  with **1,594 / 1** before and after the mechanical rename. **21 website tests**
+  passed after build-only. The frozen development bundle passed **ALL PASSED**,
+  including full window construction, pinned release identity and notebook signing.
+  Its production Python matches the final source. Existing high-severity/
+  high-confidence Bandit gate: **0 findings, 0 scan errors**.
+- Packaging validation used the existing release builder's sanitized environment.
+  A direct diagnostic build inherited the editor's incompatible Poppler ICU DLL
+  and failed Qt loading; using the existing release environment resolved it.
+  No release-process workaround or system DLL change was introduced.
+- Not executed here: Mac runtime/packaging and physical encrypted USB persistence
+  on a second PC. Synthetic restart/drive relocation, read/write failures and
+  interrupted migration are tested. Encryption activation/passphrase backup are
+  deliberate owner actions; no real data was migrated.
+
 ## v3.14-U89 — workspace routing and owner release authentication (2026-10-23)
 
 - Published as latest with verified owner-signed Windows/Mac artifact manifests.
@@ -1061,18 +1095,3 @@ Cursiv now installs a real crash handler before anything else runs — always wr
 - Eye of Horus SVG in header
 - Cinzel + EB Garamond typography
 - 6 sections: Forge, Academy, Council, Dugout, Weave, Wiki
-# Unreleased — engine and local storage maintenance
-
-- Renamed the engine package to `cursiv_engine` throughout imports, build/CI,
-  tests and documentation. Persistent data folders and record formats are unchanged.
-- Added optional, default-off passphrase encryption for saved conversations,
-  memories and covered derived stores/backups. Startup unlocks before chat loads;
-  app-closed migration uses encrypted recovery snapshots, exact-byte checks,
-  resumable state and an OS data lease. Notebook data, workspace/documents, logs
-  and explicit exports/training data remain outside coverage.
-- Updated privacy, threat-model and data-location guidance. No owner data was
-  migrated; no installer version was bumped and no release/site was published.
-- Validation so far: baseline and mechanical rename each **1,594 passed / 1 skipped**;
-  encryption full suite **1,604 passed / 1 skipped**, followed by **93 passed**
-  focused storage/rendering/unlock tests after additional safeguards.
-

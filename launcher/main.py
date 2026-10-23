@@ -160,6 +160,7 @@ def main():
         from encryption_dialog import startup as _unlock_data
         _data_lease = DataLease()
         _data_lease.__enter__()
+        _data_lease.hold_until_exit()
         if not _unlock_data(configure='--encrypt-data' in sys.argv):
             _data_lease.__exit__(None, None, None)
             sys.exit(0)
@@ -220,6 +221,9 @@ def main():
     try:
         _FAMILY_FIRST = ("keiarra", "kain", "allan", "elijah", "eli", "naylie", "adaline", "tina")
         _lname = username.lower().strip()
+        from cursiv_engine.core import profile
+        if not profile.personal():
+            _lname = ''  # no name-triggered personal welcome in the research profile
         for _fn in _FAMILY_FIRST:
             if _lname == _fn or _lname.startswith(_fn + " ") or _lname.startswith(_fn + "_"):
                 from login_dialog import FamilyWelcomeDialog

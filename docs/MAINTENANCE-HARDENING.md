@@ -95,7 +95,7 @@ scores below apply to their recorded pre-background-review source snapshots.
 See [ARCHITECTURE.md](../ARCHITECTURE.md). The public chat facade and command
 entry points remain callable; extracted functions receive explicit runtime
 services, retaining optional integrations and call overrides. Result classes
-are shared in `launcher/command_results.py` and re-exported. `UNHANDLED` differs
+are shared in `cursiv_engine/core/command_api.py` and re-exported. `UNHANDLED` differs
 from an intentional `None`, preserving ordered command precedence.
 
 Chat controls/transcript methods remain Qt view methods on the GUI thread.
@@ -334,7 +334,7 @@ candidate, repaired complete-window gate and final release results.
 - [launcher/command_agents.py](../launcher/command_agents.py)
 - [launcher/command_dispatch.py](../launcher/command_dispatch.py)
 - [launcher/command_media.py](../launcher/command_media.py)
-- [launcher/command_results.py](../launcher/command_results.py)
+- [cursiv_engine/core/command_api.py](../cursiv_engine/core/command_api.py)
 - [launcher/command_runtime.py](../launcher/command_runtime.py)
 - [launcher/command_support.py](../launcher/command_support.py)
 - [launcher/commands_credentials.py](../launcher/commands_credentials.py)

@@ -15,6 +15,14 @@ Cursiv is a local-first AI assistant for Windows. It runs compatible language mo
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
+## Quick start for contributors
+
+Start with [ARCHITECTURE.md](ARCHITECTURE.md), [TECH.md](TECH.md), then the
+[main chat facade](cursiv_engine/ui/chat_app.py). [CONTRIBUTING.md](CONTRIBUTING.md)
+has setup, test and evidence guidance. Current source includes unreleased package,
+optional-encryption and maintenance changes; the current downloadable release
+remains U89.
+
 ## 1. Intro
 
 ### What It Is

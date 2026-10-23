@@ -93,8 +93,17 @@ def git(*args: str, cwd: Path = REPO) -> str:
 
 def versions_at(ref: str) -> dict[str, str]:
     out = {}
+    tree = git('ls-tree', '-r', '--name-only', ref).splitlines()
     for path, pattern in VERSION_FILES.items():
-        m = re.search(pattern, git("show", f"{ref}:{path}"))
+        source = path
+        if source not in tree and path.endswith('/core/selfknow.py'):
+            # Immutable older tags may predate the package rename. Discover the
+            # one engine version source instead of retaining a legacy import/path.
+            candidates = [name for name in tree if name.endswith('/core/selfknow.py')]
+            if len(candidates) != 1:
+                raise RuntimeError(f'Expected one engine version source at {ref}')
+            source = candidates[0]
+        m = re.search(pattern, git("show", f"{ref}:{source}"))
         out[path] = m.group(1) if m else "?"
     return out
 

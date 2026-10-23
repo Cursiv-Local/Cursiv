@@ -37,3 +37,8 @@ class DataLease:
         for stream in reversed(self._streams):
             stream.close()  # OS releases the lease, including after a crash.
         self._streams.clear()
+
+    def hold_until_exit(self):
+        """Keep the lease through interpreter shutdown and queued executor writes."""
+        import atexit
+        atexit.register(self.__exit__, None, None, None)

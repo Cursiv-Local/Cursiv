@@ -10,8 +10,8 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Callable, Generator, Optional
-from command_results import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
-from command_runtime import CommandRuntime
+from cursiv_engine.core.command_api import TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult
+from cursiv_engine.core.command_api import CommandRuntime
 
 def _babel_source(runtime: CommandRuntime, text: str) -> str:
     """The text to translate: drop a leading "translate" and surrounding quotes."""

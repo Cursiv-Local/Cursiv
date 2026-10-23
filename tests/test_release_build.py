@@ -7,6 +7,24 @@ import pytest
 from scripts import build_release as release
 
 
+@pytest.mark.parametrize('package', ['cursiv_engine', 'archived_engine'])
+def test_tag_version_check_survives_engine_package_rename(monkeypatch, package):
+    files = {f'{package}/core/selfknow.py':'VERSION = "3.14-TEST"',
+             'launcher/cursiv_launcher.py':'_CURRENT_VERSION = "3.14-TEST"',
+             'installer/cursiv_setup.iss':'#define AppVer "3.14-TEST"'}
+    def git(*args, **kwargs):
+        if args[0] == 'ls-tree': return '\n'.join(files)
+        return files[args[1].split(':', 1)[1]]
+    monkeypatch.setattr(release, 'git', git)
+    assert set(release.versions_at('v3.14-TEST').values()) == {'3.14-TEST'}
+
+
+def test_historical_tag_with_ambiguous_engine_version_is_refused(monkeypatch):
+    monkeypatch.setattr(release, 'git', lambda *a, **k: 'first/core/selfknow.py\nsecond/core/selfknow.py')
+    with pytest.raises(RuntimeError, match='one engine version source'):
+        release.versions_at('ambiguous-tag')
+
+
 def test_child_build_environment_excludes_editor_dll_paths(monkeypatch):
     monkeypatch.setenv('PATH', r'C:\unrelated\poppler;C:\unrelated\libheif')
     monkeypatch.setenv('PYTHONPATH', 'unexpected')

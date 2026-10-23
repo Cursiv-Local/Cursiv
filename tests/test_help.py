@@ -59,7 +59,8 @@ def test_builder_topic_listed_only_for_the_owner(monkeypatch):
 
 def test_help_me_is_still_chat(monkeypatch):
     assert _help("help me write a letter to my sister", monkeypatch) is None
-    assert _help("help family", monkeypatch).startswith("FAMILY")
+    assert 'Show personal features' in _help("help family", monkeypatch)
+    assert _help("help family", monkeypatch, personal=True).startswith("FAMILY")
 
 
 def test_tier_1_is_offline_mode(tmp_path, monkeypatch):

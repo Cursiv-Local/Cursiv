@@ -1,5 +1,42 @@
 # Handoff — Cursiv verification overhaul
 
+## Unreleased engine/storage cleanup (2026-10-23)
+
+Work is on `codex/engine-storage-cleanup`; no push, installer bump, publication or
+website deployment is part of this task. U89 remains the published baseline.
+The original personal `test_internals/` file is unchanged and untracked.
+
+- Mechanical rename to `cursiv_engine` is complete across tracked imports, build/CI,
+  tests and documentation. Persistent data directories, release key bytes and
+  independent external signing tools are unchanged. Baseline and rename each
+  passed 1,594 tests with 1 skip.
+- Optional encryption is off by default. Separate-passphrase unlock precedes chat
+  imports; migration requires a closed app, an OS lease and encrypted exact-byte
+  recovery copies. Interrupted migration resumes; locked/unauthenticated data
+  cannot fall back to plaintext or empty-store writes. The lease remains through
+  queued writes at interpreter shutdown. No real owner data was migrated.
+- Read [coverage/recovery](docs/ENCRYPTION-MIGRATION-PLAN.md) before activating:
+  notebook data, workspace/imported files, explicit exports/training data, logs and
+  old external copies are excluded. Login reset cannot recover a lost passphrase.
+  This is installation-wide encryption across local profiles, not per-user key isolation.
+- Personal letter/vault commands, their direct dialogs and name-based welcome now
+  require Show personal features. Existing backends/data remain; active storage
+  tests made deletion unjustified. Personal dialogs moved into a focused UI mixin.
+- The two shared command type modules are consolidated in `core/command_api.py`;
+  `chat_commands` re-exports the same result classes. Domain order stays unchanged.
+- [ARCHITECTURE](ARCHITECTURE.md) is the current ownership map, with a message-flow
+  diagram and explicit remaining launcher ownership exceptions. [CONTRIBUTING](CONTRIBUTING.md)
+  and README point to it, TECH and the chat facade. Existing evidence docs were
+  updated instead of creating another micro-repair report.
+
+Validation: **1,636 passed / 1 skipped**, **21 website tests passed**, final
+Windows development bundle **ALL PASSED**, high-severity/high-confidence security
+gate **0 findings / 0 errors**. See the Unreleased [CHANGELOG](CHANGELOG.md) for
+commands/scopes and the diagnosed editor-PATH ICU collision avoided by the existing
+release environment. Mac execution and a physical encrypted USB restart
+on the second Windows PC remain manual follow-ups; earlier portable tests do not
+establish that this new encrypted option has been physically exercised.
+
 ## U89 published and verified (2026-10-23)
 
 The owner authorized commit/push/release and explicitly selected independent

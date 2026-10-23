@@ -10,13 +10,13 @@ voice / listen / paste, write to / legacy (compose and PIN dialogs), and
 clear (the transcript widget).
 """
 from __future__ import annotations
-from command_results import (
+from cursiv_engine.core.command_api import (
     TextResult, NotebookResult, FileActionResult, MemoryResult, NotesResult, StreamResult,
 )
 
 import sys as _sys
 from typing import cast as _cast
-from command_runtime import CommandRuntime
+from cursiv_engine.core.command_api import CommandRuntime
 import command_agents as _agents
 import command_dispatch as _dispatch
 import command_media as _media
