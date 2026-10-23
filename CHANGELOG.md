@@ -1061,3 +1061,18 @@ Cursiv now installs a real crash handler before anything else runs — always wr
 - Eye of Horus SVG in header
 - Cinzel + EB Garamond typography
 - 6 sections: Forge, Academy, Council, Dugout, Weave, Wiki
+# Unreleased — engine and local storage maintenance
+
+- Renamed the engine package to `cursiv_engine` throughout imports, build/CI,
+  tests and documentation. Persistent data folders and record formats are unchanged.
+- Added optional, default-off passphrase encryption for saved conversations,
+  memories and covered derived stores/backups. Startup unlocks before chat loads;
+  app-closed migration uses encrypted recovery snapshots, exact-byte checks,
+  resumable state and an OS data lease. Notebook data, workspace/documents, logs
+  and explicit exports/training data remain outside coverage.
+- Updated privacy, threat-model and data-location guidance. No owner data was
+  migrated; no installer version was bumped and no release/site was published.
+- Validation so far: baseline and mechanical rename each **1,594 passed / 1 skipped**;
+  encryption full suite **1,604 passed / 1 skipped**, followed by **93 passed**
+  focused storage/rendering/unlock tests after additional safeguards.
+

@@ -9,6 +9,7 @@ Files:
   .cursiv/sessions/YYYY-MM-DD.jsonl  — one file per day, one JSON line per exchange
 """
 from __future__ import annotations
+from cursiv_engine.core import private_store, vault
 
 import json
 import time
@@ -27,7 +28,9 @@ def _append_memory_run(user_msg: str, ai_msg: str, model: str, quality: float = 
     """Write this exchange to memory.json["runs"] (the session record)."""
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
     try:
-        mem = json.loads(MEMORY_FILE.read_text(encoding="utf-8")) if MEMORY_FILE.exists() else {}
+        mem = json.loads(private_store.read_text(MEMORY_FILE, encoding="utf-8")) if MEMORY_FILE.exists() else {}
+    except vault.VaultError:
+        raise
     except Exception:
         mem = {}
     runs = mem.get("runs", [])
@@ -42,7 +45,7 @@ def _append_memory_run(user_msg: str, ai_msg: str, model: str, quality: float = 
         runs = runs[-500:]
     mem["runs"] = runs
     try:
-        MEMORY_FILE.write_text(
+        private_store.write_text(MEMORY_FILE,
             json.dumps(mem, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
@@ -76,8 +79,7 @@ def append_exchange(user_msg: str, ai_msg: str, model: str = "unknown") -> None:
         "model": model,
     }
     try:
-        with _today_file().open("a", encoding="utf-8") as f:
-            f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+        private_store.append_text(_today_file(), json.dumps(entry, ensure_ascii=False) + "\n")
     except Exception:
         pass
     _append_memory_run(user_msg, ai_msg, model)
@@ -86,7 +88,7 @@ def append_exchange(user_msg: str, ai_msg: str, model: str = "unknown") -> None:
 def _load_file(path: Path) -> list[dict]:
     entries: list[dict] = []
     try:
-        with path.open(encoding="utf-8") as f:
+        with private_store.lines(path) as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -94,6 +96,8 @@ def _load_file(path: Path) -> list[dict]:
                         entries.append(json.loads(line))
                     except Exception:
                         pass
+    except vault.VaultError:
+        raise
     except Exception:
         pass
     return entries

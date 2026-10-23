@@ -10,7 +10,7 @@ untrusted input. Native backends establish completed operations through receipts
 | Threat | Current protection | Residual risk |
 |---|---|---|
 | Someone using the keyboard | Local login, account-specific password recovery, owner controls. | Login is not encryption and does not stop an OS administrator. |
-| Someone copying local files | Windows DPAPI / macOS Keychain for saved API keys where available. | Conversations, memories, archives and other personal stores remain readable. Legacy/fallback plaintext keys can exist. |
+| Someone copying local files | Windows DPAPI / macOS Keychain for saved API keys where available. Current source additionally offers optional passphrase encryption for conversations/memories and covered derived stores/backups. | Encryption is off by default and not in published U89. Notebook data, documents, workspace files, logs and explicit exports/training data remain readable. Legacy/fallback plaintext keys can exist. |
 | A stolen private USB copy | Private content is excluded by default when making a fresh kit; explicit inclusion is warned about. | Portable keys are deliberately readable across computers. A private drive exposes copied keys, login hashes and personal data. Revoke copied cloud keys after loss. |
 | Model-directed file access | Explicit workspace, turn limits, sensitive-name/content checks, traversal/link/hard-link checks, confirmed replacement and verified writes. | These are application checks, not OS isolation from other programs or a local attacker racing filesystem changes. |
 | Changing login/key/security files through native file tools | Shared backend denies private data/credential paths and guardian code, even with confirmation. Provider adapters cannot grant an exception. | Legitimate login/setup/settings flows necessarily write their own stores. Trusted Python plugins/external helpers are not sandboxed by the file-tool guard. |
@@ -29,12 +29,31 @@ can protect a lost powered-off drive, but unlocked data is accessible to the hos
 The same-account attacker, malware, a compromised administrator and a malicious
 installed Python plugin remain outside Cursiv's confidentiality guarantees.
 
-## Encryption status
+## Optional conversation/memory encryption
 
-The owner selected a separately documented encryption migration on 2026-10-22.
-This work does not encrypt, migrate, rewrite or back up real personal stores.
-The [migration plan](ENCRYPTION-MIGRATION-PLAN.md) covers copies/derived data and
-unlock/recovery requirements before any such change can be enabled.
+The current source implements opt-in encryption; no real owner records were
+migrated during development. [Coverage, migration and recovery](ENCRYPTION-MIGRATION-PLAN.md)
+are explicit. A separate passphrase derives a Fernet key with scrypt. Random salts
+and authenticated, path-bound envelopes protect covered bytes against disclosure
+or unnoticed modification when copied without the passphrase. Filenames, lengths,
+timestamps and the existence of a vault are visible. Envelopes do not prevent
+deletion or replay of an older valid file. Notebook integrity remains a separate
+append-only SHA-256/signature pathway and is not encrypted by this option.
+
+Startup holds an OS data lease and unlocks before loading chat stores. Migration
+requires the same lease, backs up exact original bytes in encrypted recovery files,
+verifies replacements and leaves interrupted roots unavailable until resumed.
+Wrong keys/authentication failures never permit a plaintext fallback or empty-store
+overwrite. Passphrases are entered through password fields, never model prompts,
+command arguments, environment variables or saved settings. Login reset does not
+reset the encryption passphrase; there is no lost-passphrase recovery.
+
+This protects an offline copy of covered files, including a lost portable copy.
+It does not protect an unlocked process from malware, an administrator, plugins,
+memory dumps, swap/hibernation, screen capture or intentional export. It cannot
+erase plaintext disk remnants, previous external backups or OneDrive history.
+Use OS/full-drive encryption as a complementary control. No Windows trust-store,
+release signing key, provider order or network policy changes are involved.
 
 See [PRIVACY.md](../PRIVACY.md), [security tests and findings](MAINTENANCE-HARDENING.md),
 and [public claim evidence](CLAIM-EVIDENCE.md).

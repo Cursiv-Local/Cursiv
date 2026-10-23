@@ -17,12 +17,12 @@ overrides safety, and two conflicting facts are both shown. Commands:
 remember <fact>, forget <words>, what do you remember, memory learn on|off.
 """
 from __future__ import annotations
+from cursiv_engine.core import private_store, vault
 
 import hashlib
 import json
 import math
 import re
-import shutil
 import threading
 import time
 import urllib.request
@@ -70,7 +70,7 @@ def generation() -> int:
 
 def _settings() -> dict:
     try:
-        settings = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+        settings = json.loads(private_store.read_text(SETTINGS_FILE, encoding="utf-8"))
     except FileNotFoundError:
         return {}
     if not isinstance(settings, dict):
@@ -81,7 +81,7 @@ def _settings() -> dict:
 def learning_enabled() -> bool:
     try:
         if SETTINGS_FILE.exists():
-            s = json.loads(SETTINGS_FILE.read_text(encoding="utf-8"))
+            s = json.loads(private_store.read_text(SETTINGS_FILE, encoding="utf-8"))
             return isinstance(s, dict) and s.get("learn", True) is True
         return True
     except (OSError, ValueError):
@@ -106,7 +106,9 @@ def _load_cache() -> dict[str, list[float]]:
     global _emb_cache
     if _emb_cache is None:
         try:
-            _emb_cache = json.loads(EMB_CACHE_FILE.read_text(encoding="utf-8"))
+            _emb_cache = json.loads(private_store.read_text(EMB_CACHE_FILE, encoding="utf-8"))
+        except vault.VaultError:
+            raise
         except Exception:
             _emb_cache = {}
     return _emb_cache
@@ -215,7 +217,7 @@ def _read_facts() -> tuple[list[dict], list[str]]:
     """(saved memories, lines that aren't one). One damaged line used to make every memory
     disappear, and the next save then rewrote the file with only the new one."""
     try:
-        lines = FACTS_FILE.read_text(encoding="utf-8").splitlines()
+        lines = private_store.read_text(FACTS_FILE, encoding="utf-8").splitlines()
     except FileNotFoundError:
         return [], []
     facts, bad = [], []
@@ -271,15 +273,15 @@ def _backup_existing() -> None:
         target = folder / source.name
         checksum = folder / (source.name + '.sha256')
         if target.exists():
-            if not checksum.exists() and target.read_bytes() == source.read_bytes():
-                _atomic.write_text(checksum, hashlib.sha256(target.read_bytes()).hexdigest())
-            if not checksum.exists() or checksum.read_text(encoding='utf-8').strip() != hashlib.sha256(target.read_bytes()).hexdigest():
+            if not checksum.exists() and private_store.read_bytes(target) == private_store.read_bytes(source):
+                _atomic.write_text(checksum, hashlib.sha256(private_store.read_bytes(target)).hexdigest())
+            if not checksum.exists() or private_store.read_text(checksum, encoding='utf-8').strip() != hashlib.sha256(private_store.read_bytes(target)).hexdigest():
                 raise OSError('Existing memory backup cannot be verified')
             continue
         folder.mkdir(parents=True, exist_ok=True)
-        before = source.read_bytes()
-        shutil.copy2(source, target)
-        if target.read_bytes() != before:
+        before = private_store.read_bytes(source)
+        _atomic.write_bytes(target, before)
+        if private_store.read_bytes(target) != before:
             raise OSError('Memory backup verification failed')
         _atomic.write_text(checksum, hashlib.sha256(before).hexdigest())
 
@@ -290,14 +292,13 @@ def _write_facts(facts: list[dict]) -> None:
     _backup_existing()
     if bad:      # damaged lines are kept beside the file, never dropped by a rewrite
         keep = FACTS_FILE.with_name(UNREADABLE_FILE_NAME)
-        have = set(keep.read_text(encoding="utf-8").splitlines()) if keep.exists() else set()
+        have = set(private_store.read_text(keep, encoding="utf-8").splitlines()) if keep.exists() else set()
         new = [b for b in bad if b not in have]
         if new:
-            with keep.open("a", encoding="utf-8") as f:
-                f.write("".join(b + "\n" for b in new))
+            private_store.append_text(keep, "".join(b + "\n" for b in new))
     payload = "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in facts)
     _atomic.write_text(FACTS_FILE, payload)
-    if FACTS_FILE.read_text(encoding='utf-8') != payload:
+    if private_store.read_text(FACTS_FILE, encoding='utf-8') != payload:
         raise OSError('Memory write could not be verified')
 
 
@@ -327,8 +328,8 @@ def repair_learned(facts: list[dict]) -> list[dict]:
     try:
         _backup_existing()
         if removed:
-            with (CURSIV_DIR / REMOVED_FILE_NAME).open("a", encoding="utf-8") as out:
-                out.write("".join(json.dumps(f, ensure_ascii=False) + "\n" for f in removed))
+            private_store.append_text(CURSIV_DIR / REMOVED_FILE_NAME,
+                                      "".join(json.dumps(f, ensure_ascii=False) + "\n" for f in removed))
         _write_facts(kept)
         st = _settings()
         st[REPAIR_KEY] = {"kept": len(kept), "moved": len(removed)}

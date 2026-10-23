@@ -414,12 +414,21 @@ class SettingsDialog(QDialog):
 
     def _page_data(self, lay):
         data_dir = Path.home() / ".cursiv"
+        from cursiv_engine.core import vault
+        encrypted = any((p / vault.MARKER).exists() for p in vault.roots())
+        lay.addWidget(self._explain(
+            'Conversation and memory encryption: ' + ('enabled. Unlock is required at startup.' if encrypted else
+            'off (optional). Close Cursiv, then run Cursiv.exe --encrypt-data to enable it. '
+            'From source: python launcher/main.py --encrypt-data.') +
+            ' This uses a separate passphrase. Notebook data, workspace files, exports/training data and logs '
+            'remain outside this protection. See TECH.md for scope and recovery.'))
         self._action(lay, "What Cursiv remembers",
                      "See every saved memory, where it came from and when, and remove any of them.",
                      self._open_memory)
         self._action(lay, "Your data folder",
                      f"Memories, conversations and settings are ordinary files in {data_dir}. "
-                     "Saved keys are encrypted; the rest isn't encrypted on disk.",
+                     "Saved keys use platform protection where available. Optional conversation/memory encryption "
+                     "does not encrypt every file in this folder.",
                      lambda: os.startfile(str(data_dir)) if data_dir.exists() else None)
         try:
             from cursiv_engine.chat import keys as _keys

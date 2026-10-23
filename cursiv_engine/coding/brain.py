@@ -10,6 +10,7 @@ Cursiv's coding brain -- what every coding answer is built from.
   * Relevant files from the current project folder (`codex project <folder>`).
 """
 from __future__ import annotations
+from cursiv_engine.core import private_store, vault
 
 import json
 import re
@@ -64,14 +65,16 @@ _ENV_PATTERNS = [
 
 def _load_profile() -> dict:
     try:
-        return json.loads(PROFILE_FILE.read_text(encoding="utf-8"))
+        return json.loads(private_store.read_text(PROFILE_FILE, encoding="utf-8"))
+    except vault.VaultError:
+        raise
     except Exception:
         return {}
 
 
 def _save_profile(p: dict) -> None:
     CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-    PROFILE_FILE.write_text(json.dumps(p, indent=2), encoding="utf-8")
+    private_store.write_text(PROFILE_FILE, json.dumps(p, indent=2), encoding="utf-8")
 
 
 def observe(text: str, person: str) -> None:
@@ -119,7 +122,9 @@ def environment(person: str) -> str:
 
 def _lessons() -> list[dict]:
     try:
-        return [json.loads(l) for l in LESSONS_FILE.read_text(encoding="utf-8").splitlines() if l.strip()]
+        return [json.loads(l) for l in private_store.read_text(LESSONS_FILE, encoding="utf-8").splitlines() if l.strip()]
+    except vault.VaultError:
+        raise
     except Exception:
         return []
 
@@ -138,8 +143,8 @@ def add_lesson(text: str, person: str, source: str = "manual") -> bool:
         if any(l["text"].lower() == low for l in existing):
             return False
         CURSIV_DIR.mkdir(parents=True, exist_ok=True)
-        with LESSONS_FILE.open("a", encoding="utf-8") as f:
-            f.write(json.dumps({"text": text, "person": person, "source": source, "t": time.time()}) + "\n")
+        private_store.append_text(LESSONS_FILE,
+                                 json.dumps({"text": text, "person": person, "source": source, "t": time.time()}) + "\n")
     return True
 
 
@@ -152,7 +157,7 @@ def forget_lessons(words: str, person: str) -> list[str]:
         for l in _lessons():
             (gone if l.get("person") == person and words in l["text"].lower() else keep).append(l)
         if gone:
-            LESSONS_FILE.write_text("".join(json.dumps(l) + "\n" for l in keep), encoding="utf-8")
+            private_store.write_text(LESSONS_FILE, "".join(json.dumps(l) + "\n" for l in keep), encoding="utf-8")
     return [g["text"] for g in gone]
 
 
@@ -269,7 +274,7 @@ def project_context(query: str, person: str, budget: int = 9000) -> str:
     for f in files:
         rel = str(f.relative_to(rootp))
         try:
-            text = f.read_text(encoding="utf-8", errors="ignore")
+            text = private_store.read_text(f, encoding="utf-8", errors="ignore")
         except Exception:
             continue
         name_hits = sum(3 for w in q if w in rel.lower())
@@ -300,7 +305,7 @@ USER_EXAMPLES_DIR = CURSIV_DIR / "coding_examples"
 
 def _parse_example(path: Path) -> dict | None:
     try:
-        raw = path.read_text(encoding="utf-8")
+        raw = private_store.read_text(path, encoding="utf-8")
     except Exception:
         return None
     m = re.match(r"---\s*\n(.*?)\n---\s*\n(.*)", raw, re.S)
@@ -355,7 +360,7 @@ def keep_example(question: str, answer: str, person: str) -> str:
     triggers = "|".join(re.escape(w) for w in words) or re.escape(title.lower()[:20])
     slug = re.sub(r"[^a-z0-9]+", "_", title.lower()).strip("_")[:50] or "example"
     path = USER_EXAMPLES_DIR / f"{slug}_{int(time.time())}.md"
-    path.write_text(f"---\ntitle: {title}\ntriggers: {triggers}\nperson: {person}\n---\n"
+    private_store.write_text(path, f"---\ntitle: {title}\ntriggers: {triggers}\nperson: {person}\n---\n"
                     f"## Question\n{question}\n\n## Answer\n{answer}\n", encoding="utf-8")
     return f"Kept as a worked example — I'll answer questions like \"{title[:50]}\" to this standard."
 

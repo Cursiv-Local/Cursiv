@@ -144,7 +144,7 @@ still shows verbosity, some closing questions and incorrect memory descriptions.
 
 ### Privacy
 
-When a local model answers, inference happens on your computer. Conversations, memories, imported documents, and field records are stored locally. Local storage does not mean all files are encrypted: conversations and memories are not encrypted on disk. Saved AI keys have separate protection—Windows DPAPI on Windows and the Keychain on macOS.
+When a local model answers, inference happens on your computer. Conversations, memories, imported documents, and field records are stored locally. Local storage does not mean all files are encrypted. Conversations and memories are plaintext by default. Current source adds optional passphrase encryption for these and covered derived stores/backups; published U89 does not include it. [Scope and activation](docs/ENCRYPTION-MIGRATION-PLAN.md). Notebook records, documents, workspace files, logs and explicit exports/training data remain outside this protection. Saved AI keys have separate protection—Windows DPAPI on Windows and the Keychain on macOS.
 
 Online features work when used or enabled:
 

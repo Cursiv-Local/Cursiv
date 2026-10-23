@@ -13,7 +13,7 @@ where data lives, and how to run, build and release it.
 | Folder | What's in it |
 |---|---|
 | `launcher/` | The desktop app: main window, chat panel, tray menu, dialogs (Setup, Settings, Training Data, USB maker…), login, updater. `main.py` is the entry point. |
-| `cursiv_engine/` | The engine the app runs on (the folder name is historical). |
+| `cursiv_engine/` | Permanent engine package: core logic, model adapters, memory and field-notebook backends. |
 | `installer/` | Inno Setup script (`cursiv_setup.iss`) that wraps the build into `Cursiv-Setup-<version>.exe`. |
 | `scripts/` | `build.bat` (PyInstaller), `package.bat` (installer), `verify_build.bat`, `seal_family_letters.py`. |
 | `website/` | The public website and phone web app (cursiv.us). |
@@ -78,6 +78,37 @@ failed-file-memory and damaged-recall safeguards and draft release wording.
 | AI models | Ollama's folder (`%USERPROFILE%\.ollama\models`) |
 
 Nothing in these folders is part of the repository or the installer. On a **Cursiv USB** (`launcher/usb_maker.py`), `launcher/portable.py` points the home folder, the models and Ollama at the drive at startup, so everything stays on the drive.
+
+### Optional conversation and memory encryption (unreleased source)
+
+Off by default. Close Cursiv, then run `python launcher/main.py --encrypt-data`
+from source, or `Cursiv.exe --encrypt-data` after packaging this source. On macOS
+run the bundle's `Contents/MacOS/Cursiv --encrypt-data` executable. The startup
+dialog lists coverage and asks for a separate passphrase twice. Normal startup
+requires that passphrase before loading private stores or launching background work.
+There is no chat command that accepts the passphrase. Login recovery cannot recover it.
+
+`core/vault.py` uses the already required `cryptography` library: Fernet authenticated
+encryption, with a fresh 16-byte salt and scrypt (N=131072, r=8, p=1, 32-byte key).
+No derived key or passphrase is saved. JSON/JSONL bytes, record IDs and ordering
+remain intact inside path-bound encrypted envelopes. Keys are held for the process
+lifetime; close Cursiv to discard decrypted application caches. Python does not
+guarantee memory zeroization. Per-file plaintext is limited to 64 MB.
+
+Covered in each active data root: conversations, session logs, semantic facts and
+their removed/unreadable copies, embeddings, saved strands, project/style notes,
+curiosity/presence records, coding/council memory, related backups and old temporary
+files with recognized names. A full inventory, exclusions and recovery instructions
+are in [the encryption guide](docs/ENCRYPTION-MIGRATION-PLAN.md).
+`data-vault.json` stores only salt, a password check and migration state;
+`.vault-recovery/` contains authenticated encrypted copies of the original bytes.
+Keep both with the records and copy them in backups/portable private kits.
+The `.vault-lease` file is process state and is excluded from kit copies.
+
+Notebook records/photos, workspace/imported files, explicit exports/training data,
+API keys/login settings and logs keep their existing storage. Historical external
+copies, OneDrive versions and recoverable disk remnants remain sensitive.
+Use OS/full-drive encryption when those are in scope. See [threat model](docs/THREAT-MODEL.md).
 
 ---
 

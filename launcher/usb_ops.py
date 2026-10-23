@@ -182,6 +182,8 @@ def _program_files(runtime: UsbRuntime, src: Path, include_private: bool) -> lis
         if not f.is_file():
             continue
         rel = f.relative_to(src)
+        if f.name == '.vault-lease':
+            continue  # live OS lease is process state, never portable data
         top = rel.parts[0]
         if top in skip_top or ".bak" in top:   # installer leftovers, old-version backups
             continue
@@ -210,7 +212,7 @@ def build_plan(runtime: UsbRuntime, models: list[dict], include_private: bool, o
         home_data = runtime.Path.home() / ".cursiv"
         if home_data.is_dir():
             for f in home_data.rglob("*"):
-                if f.is_file():
+                if f.is_file() and f.name != '.vault-lease':
                     pairs.append((f, runtime.Path("Home") / ".cursiv" / f.relative_to(home_data)))
     return pairs
 

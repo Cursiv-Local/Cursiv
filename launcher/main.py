@@ -153,6 +153,20 @@ def main():
     app.setOrganizationName("Joshua Winkler")
     app.setQuitOnLastWindowClosed(False)
 
+    # Hold a separate OS lease before any chat module can load private stores.
+    # The offline migration uses the same lease; it cannot race autosave/learning.
+    try:
+        from cursiv_engine.core.data_lease import DataLease
+        from encryption_dialog import startup as _unlock_data
+        _data_lease = DataLease()
+        _data_lease.__enter__()
+        if not _unlock_data(configure='--encrypt-data' in sys.argv):
+            _data_lease.__exit__(None, None, None)
+            sys.exit(0)
+    except OSError as exc:
+        QMessageBox.critical(None, 'Cursiv data unavailable', str(exc))
+        sys.exit(1)
+
     # ── Single-instance enforcement ───────────────────────────────────────
     try:
         from cursiv_launcher import _acquire_instance_lock

@@ -61,14 +61,23 @@ pass, 0 attempts). `scripts/net_audit.py` logs every connection a fresh install 
 
 ## What Cursiv can't protect
 
-- Cursiv's login keeps people at your keyboard out. It is not encryption: anyone who can
-  open this computer's files can read Cursiv's data, like your other documents. Saved
-  AI keys are the exception (encrypted for your Windows account, or kept in the macOS Keychain).
+- Cursiv's login keeps people at your keyboard out. It is not encryption. Conversation
+  and memory encryption is **optional and off by default** in the current source.
+  An explicit, app-closed migration uses a separate passphrase; see
+  [encryption scope and recovery](docs/ENCRYPTION-MIGRATION-PLAN.md). U89 installers
+  do not include this unreleased option. Saved AI keys use separate protection
+  (encrypted for your Windows account, or kept in the macOS Keychain).
   Portable copies deliberately keep usable keys readable; legacy keys or a
   platform-protection failure can also leave plaintext. The
-  [threat model](docs/THREAT-MODEL.md) records these limits. Conversations and
-  memories have no app-level encryption; an optional migration is separately planned.
+  [threat model](docs/THREAT-MODEL.md) records these limits. Even after opting in,
+  notebook observations/photos, imported documents, workspace files, logs and explicit
+  exports/training data remain outside conversation/memory encryption. File names,
+  sizes and timestamps remain visible. Decrypted content and keys exist in memory
+  while Cursiv is open; malware or an administrator can still access them.
 - A private copy on a USB drive (made with "include my memories, keys and settings") holds
-  your data readable, so it can run on other PCs. Keep that drive safe.
+  usable keys and personal data. Opt-in encrypted stores stay encrypted and need
+  their passphrase on the other PC; the remaining copied data can be readable.
+  Keep that drive safe. Prior plaintext copies, disk remnants and cloud-backup
+  history are not erased by enabling encryption.
 - When you use a cloud AI or web search, that company's own privacy policy applies to
   what you send it.

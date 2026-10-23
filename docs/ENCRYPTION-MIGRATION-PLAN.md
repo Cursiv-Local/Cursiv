@@ -1,60 +1,98 @@
-# Optional encryption: separate migration plan
+# Optional conversation and memory encryption
 
-**Status:** design only. The owner explicitly chose to document this separately
-on 2026-10-22. Existing data formats and personal files are unchanged.
+**Status:** implemented in current source, off by default; not included in published
+U89. Development used disposable records. The owner's actual data was not migrated.
+This replaces the earlier design-only plan, following explicit owner authorization.
 
-## Why a primary-file switch would be unsafe
+## Enable, unlock and keep a recovery copy
 
-Conversations are not a single read/write pair. `launcher/conversations.py` has
-ordered background saves, title updates, listing, rename and direct JSON reads.
-Memory facts are JSONL; `memory/semantic.py` also preserves unreadable lines,
-removed records, correction history, migration backups and embeddings. Session,
-project, coding, saved-note and curiosity stores can retain related text. Exported
-files and backups can contain copies that app-level encryption cannot revoke.
+1. Close every Cursiv process, including the tray copy. Back up your existing data
+   to a drive you control. That pre-existing backup is plaintext unless you protect it.
+2. From source run `python launcher/main.py --encrypt-data`. For a build of this
+   source run `Cursiv.exe --encrypt-data`; on Mac use the executable inside
+   `Cursiv.app/Contents/MacOS/`. Read the scope notice, then set and confirm a
+   **separate encryption passphrase of at least 16 characters**. Do not type it
+   into a chat, shell argument, environment variable or issue report.
+3. Migration obtains an OS-held lease for all active data roots. The normal desktop
+   holds the same lease. It inventories covered records, refuses links/hard links,
+   and makes encrypted, authenticated exact-byte recovery copies before replacing
+   any original. Normal readers/writers cannot use a migrating or locked root.
+4. After success, open Cursiv normally and enter that passphrase at startup. The
+   existing login remains separate. Canceling unlock quits before chat/background
+   storage loads. A wrong passphrase leaves all records intact.
+5. Back up the entire data roots, including `data-vault.json` and `.vault-recovery/`,
+   to a separate drive. Keep the passphrase separately. Private USB kits copy the
+   ciphertext and metadata; a fresh kit still excludes private data. Root-relative
+   path bindings permit drive-letter changes. Do not move individual ciphertext
+   records to different relative paths.
 
-Changing only `_write_facts()` and conversation Save would leave readable copies,
-miss existing read paths, and risk treating a locked file as empty/corrupt data.
-The existing conversation loader catches read failures as `None`; a locked-store
-exception must never fall through that behavior and overwrite an existing record.
+If interrupted, keep every file and rerun `--encrypt-data` using the same passphrase.
+The authenticated recovery manifest distinguishes unchanged originals and already
+converted files; changed files are refused. Never delete the vault marker to
+"turn it off". There is intentionally no in-app switch that silently decrypts
+all records, password reset bypass, or automatic lost-passphrase recovery.
+To recover originals, an experienced operator can authenticate the marker with
+`vault.authenticate`, decrypt `.vault-recovery/manifest.enc` with `vault.unpack`,
+and decrypt the listed recovery files into a separate chosen directory. Their
+SHA-256 hashes must match the manifest. Do not overwrite a working vault during
+recovery. These originals represent the activation-time snapshot, not later edits.
 
-## Proposed smallest safe feature
+## Exact coverage
 
-1. Complete an inventory of primary stores, all backup/archive/quarantine paths,
-   derived stores, exports, portable copying and every reader/writer. Define exact
-   coverage publicly; use synthetic records and inspect the resulting files.
-2. Use a versioned authenticated-encryption envelope around the existing JSON/
-   JSONL payload, retaining IDs, ordering and original plaintext schemas after
-   decryption. A portable passphrase vault needs a reviewed password KDF, random
-   salts/nonces and a session unlock key. Never silently return plaintext after
-   crypto failure. Account-bound DPAPI is a separate installed-Windows option.
-3. Add distinct **locked**, **missing**, **corrupt**, **unavailable drive** and
-   **permission denied** results throughout readers. Disabled/locked encryption
-   must prevent retention/autosave and explain why; never create an empty view.
-4. Provide explicit opt-in, passphrase confirmation, unlock, lock and recovery
-   guidance. Do not promise recovery of a lost passphrase. Login credentials and
-   vault passphrases must have clearly distinct purposes.
-5. Pause/drain background writers before migration. Back up bytes and record a
-   manifest/hash before changing stores. Verify every encrypted copy by decrypting
-   and comparing exact original bytes. Atomically commit a migration manifest.
-   Resume safely after a crash; retain the original until verification succeeds.
-6. Explain that retained plaintext backups remain sensitive. Require a separate
-   explicit choice for their disposition; do not silently delete existing data.
-   Secure erasure on SSDs is not guaranteed by ordinary file deletion.
-7. Prevent derived stores from writing plaintext while encryption is enabled.
-   Define export and portable-copy behavior before enabling the UI switch.
+Each active app-data, user-data and (when packaged) program-data root gets its own
+salt and marker, using the same chosen passphrase. The plaintext payload format
+is unchanged inside the encrypted envelope.
 
-## Required acceptance tests
+| Covered | Existing producer/read boundary |
+|---|---|
+| Saved conversations, titles, rendered HTML, pending legacy temporary copies | `launcher/conversations.py` |
+| Semantic facts, superseded/removed/unreadable records, memory settings, embeddings, migration backups/checksums | `memory/semantic.py` |
+| Session logs and temporal memory | `memory/session_log.py`, `core/memory.py` |
+| Saved notes/strands and territory labels | `core/strand_store.py`, `launcher/saved_notes.py` |
+| Project/style notes, curiosity journal, presence preferences and their verified backups | `core/state_store.py` |
+| Coding profile/lessons and council memory | `coding/brain.py`, `council/council_memory.py` |
+| Legacy rated-exchange store and recognized backup/temporary filenames | `core/vault.py` coverage classifier |
 
-- Fresh opt-in, existing-data opt-in, restart/unlock, lock during idle and during
-  queued autosave, wrong passphrase and unavailable account-bound key.
-- Exact-byte recovery of existing JSON/JSONL including Unicode and malformed lines;
-  all prior IDs and notebook integrity tests remain valid.
-- Duplicate/correction history, missing store versus locked store, failed reads,
-  partial writes, disk full, abrupt shutdown and resumable migration/rollback.
-- Portable drive relocation, disconnect/reconnect, private/fresh kit copying,
-  backups/quarantine/embeddings and explicit export confidentiality.
-- Search synthetic markers across all covered primary and derived files;
-  report every intentional plaintext exception.
+The classifier covers those folders/names, not arbitrary user-named files. Covered
+plaintext records are limited to 64 MB each; oversized stores must be archived
+before activation. Authenticated-encryption operations hold a file in memory;
+appends to encrypted JSONL rewrite that file atomically. This is a deliberate
+small implementation, unsuitable for unbounded logs. Failed replacements retain
+the old ciphertext; temporary writes contain ciphertext only. An OS lease prevents
+simultaneous migrations/desktops, but does not sandbox arbitrary external writers.
 
-Do not advertise encrypted conversations or memories until the complete pathway,
-recovery behavior and independently inspected on-disk results pass these tests.
+## Outside coverage
+
+Notebook observations/photos/exports, imported documents, workspace files, explicit
+training saves and trained adapters, explicit exported packs/Obsidian notes, logs,
+login/settings, plugin/agent definitions, older external copies and cloud copies
+remain under their existing rules. Saving a response to training or exporting it
+can create plaintext even when the original conversation is encrypted. Previously
+uploaded or deleted plaintext is not recalled or securely erased. OneDrive history,
+backups, swap, crash dumps and hibernation need OS/drive and backup controls.
+API keys keep their existing DPAPI/Keychain/portable rules. Notebook chain/signing
+formats and the independent release-signing private key are unchanged.
+
+## Cryptography and limits
+
+Uses the already required `cryptography` package's Fernet authenticated encryption,
+with scrypt N=131072, r=8, p=1, a random 16-byte salt and a 32-byte derived key.
+See the [library's password-based encryption guidance](https://cryptography.io/en/latest/fernet/#using-passwords-with-fernet).
+KDF parameters/version are fixed and validated; metadata cannot request arbitrary
+KDF work. Ciphertext authenticates the root-relative filename and original bytes.
+No passphrase/derived key is written to disk. The process retains keys and decrypted
+caches until exit; Python cannot promise secure memory erasure. File metadata is
+visible, and valid old records can be replayed. A lost passphrase is unrecoverable.
+This is application-level confidentiality for copied covered files, not whole-device
+encryption or protection against a hostile unlocked host.
+
+## Evidence
+
+`tests/test_data_encryption.py` checks default plaintext compatibility, exact-byte
+migration (including Unicode/malformed lines), encrypted recovery snapshots,
+wrong/missing keys, tampering, record swapping, failed migration/resume, state
+backups, actual memory/conversation reads and writes, subprocess restart/relocation,
+exclusive leases and hard-link denial. Existing offline, restricted-turn, notebook,
+portable and storage regression tests remain the compatibility checks. Test results
+for this development change are recorded in `CHANGELOG.md`; historical release
+results remain labeled by their actual release.

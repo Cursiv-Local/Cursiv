@@ -10,6 +10,7 @@ exponential recency decay — no external dependencies, works fully offline.
 """
 
 from __future__ import annotations
+from cursiv_engine.core import private_store, vault
 
 import json
 import math
@@ -57,13 +58,15 @@ class CouncilMemory:
     def _load(self) -> None:
         if self._path.exists():
             try:
-                self._entries = json.loads(self._path.read_text(encoding="utf-8"))
+                self._entries = json.loads(private_store.read_text(self._path, encoding="utf-8"))
+            except vault.VaultError:
+                raise
             except Exception:
                 self._entries = []
 
     def _save(self) -> None:
         self._path.parent.mkdir(parents=True, exist_ok=True)
-        self._path.write_text(
+        private_store.write_text(self._path,
             json.dumps(self._entries, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )

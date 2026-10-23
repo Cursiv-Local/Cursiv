@@ -5,13 +5,14 @@ from datetime import datetime
 import json
 import math
 from pathlib import Path
+from cursiv_engine.core import private_store
 
 
 def read_notes() -> tuple[list[dict], list[str]]:
     from cursiv_engine.core import strand_store
     path = strand_store.STRANDS_FILE
     try:
-        stream = path.open(encoding='utf-8')
+        stream = private_store.lines(path)
     except FileNotFoundError:
         from cursiv_engine.core.paths import portable_root
         root = portable_root()

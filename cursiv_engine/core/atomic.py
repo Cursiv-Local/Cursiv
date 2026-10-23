@@ -14,10 +14,13 @@ def write_text(path: Path | str, text: str, encoding: str = "utf-8") -> None:
     write_bytes(path, text.encode(encoding))
 
 
-def write_bytes(path: Path | str, data: bytes) -> None:
+def write_bytes(path: Path | str, data: bytes, *, protect: bool = True) -> None:
     if not isinstance(data, (bytes, bytearray)):
         raise TypeError('Atomic binary writes require bytes')
     path = Path(path)
+    if protect:
+        from . import vault
+        data = vault.protect(path, data)
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, temporary = tempfile.mkstemp(prefix='.' + path.name + '-', suffix='.tmp', dir=path.parent)
     tmp = Path(temporary)

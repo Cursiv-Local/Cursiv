@@ -16,6 +16,7 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Optional
 from cursiv_engine.core import atomic as _atomic
+from cursiv_engine.core import private_store, vault
 
 DIR = Path.home() / ".cursiv" / "conversations"
 _writer = ThreadPoolExecutor(max_workers=1, thread_name_prefix="cursiv-chat-save")
@@ -199,11 +200,14 @@ def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, direct
         "messages": messages,
         "html": html,
     }
-    tmp = path.with_suffix(".tmp")
-    with tmp.open('w', encoding='utf-8') as stream:
-        # Streaming JSON avoids a second complete encoded conversation in RAM.
-        json.dump(data, stream, ensure_ascii=False)
-    tmp.replace(path)
+    if vault.owner(path):
+        # No plaintext temporary conversation, including titles and rendered HTML.
+        _atomic.write_text(path, json.dumps(data, ensure_ascii=False))
+    else:
+        tmp = path.with_suffix(".tmp")
+        with tmp.open('w', encoding='utf-8') as stream:
+            json.dump(data, stream, ensure_ascii=False)
+        tmp.replace(path)
     # AI title: once there's an exchange, and again as the topic develops
     if data["title_auto"] and len(messages) >= 2 and (
             data["titled_at"] == 0 or len(messages) - data["titled_at"] >= 10):
@@ -218,7 +222,9 @@ def load(conv_id: str) -> dict | None:
 
 def _load(path: Path) -> dict | None:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        return json.loads(private_store.read_text(path))
+    except vault.VaultError:
+        raise
     except Exception:
         return None
 
@@ -229,7 +235,9 @@ def list_all() -> list[dict]:
     out = []
     for f in DIR.glob("*.json") if DIR.exists() else []:
         try:
-            d = json.loads(f.read_text(encoding="utf-8"))
+            d = json.loads(private_store.read_text(f))
+        except vault.VaultError:
+            raise
         except Exception:
             continue
         if d.get("person", person) != person:
@@ -251,7 +259,9 @@ def retitle_old(on_done: Optional[Callable[[], None]] = None) -> None:
     def work():
         for f in sorted(DIR.glob("*.json")) if DIR.exists() else []:
             try:
-                d = json.loads(f.read_text(encoding="utf-8"))
+                d = json.loads(private_store.read_text(f))
+            except vault.VaultError:
+                raise
             except Exception:
                 continue
             if d.get("titled_at") or "title_auto" in d:

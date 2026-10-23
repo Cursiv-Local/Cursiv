@@ -35,6 +35,7 @@ from typing import Any
 
 from cursiv_engine.core.strand import encode as _strand_encode
 from cursiv_engine.core.paths import APP_DATA   # where program data lives (core/paths.py)
+from cursiv_engine.core import private_store, vault
 
 # ── Optional NumPy acceleration ───────────────────────────────────────────────
 try:
@@ -92,7 +93,7 @@ def _load_all() -> list[dict[str, Any]]:
         return []
     strands: list[dict] = []
     try:
-        with STRANDS_FILE.open(encoding="utf-8") as f:
+        with private_store.lines(STRANDS_FILE) as f:
             for line in f:
                 line = line.strip()
                 if line:
@@ -100,6 +101,8 @@ def _load_all() -> list[dict[str, Any]]:
                         strands.append(json.loads(line))
                     except Exception:
                         pass
+    except vault.VaultError:
+        raise
     except Exception:
         pass
     return strands
@@ -373,21 +376,34 @@ def save_strand(
             },
         }
         data = (json.dumps(entry, ensure_ascii=False) + '\n').encode('utf-8')
-        with _save_lock, STRANDS_FILE.open('ab+') as stream:
-            stream.seek(0, os.SEEK_END)
-            end = stream.tell()
-            if end:
-                stream.seek(-1, os.SEEK_END)
-                if stream.read(1) != b'\n':
-                    stream.write(b'\n')
-            stream.seek(0, os.SEEK_END)
-            start = stream.tell()
-            stream.write(data)
-            stream.flush()
-            os.fsync(stream.fileno())
-            stream.seek(start)
-            if stream.read(len(data)) != data:
-                raise OSError('Saved-note append read-back verification failed')
+        with _save_lock:
+            if vault.owner(STRANDS_FILE):
+                try:
+                    existing = private_store.read_bytes(STRANDS_FILE)
+                except FileNotFoundError:
+                    existing = b''
+                if existing and not existing.endswith(b'\n'):
+                    existing += b'\n'
+                from . import atomic
+                atomic.write_bytes(STRANDS_FILE, existing + data)
+                if private_store.read_bytes(STRANDS_FILE) != existing + data:
+                    raise OSError('Saved-note append read-back verification failed')
+            else:
+                with STRANDS_FILE.open('ab+') as stream:
+                    stream.seek(0, os.SEEK_END)
+                    end = stream.tell()
+                    if end:
+                        stream.seek(-1, os.SEEK_END)
+                        if stream.read(1) != b'\n':
+                            stream.write(b'\n')
+                    stream.seek(0, os.SEEK_END)
+                    start = stream.tell()
+                    stream.write(data)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                    stream.seek(start)
+                    if stream.read(len(data)) != data:
+                        raise OSError('Saved-note append read-back verification failed')
 
         _mx.invalidate()   # matrix rebuilt on next search with new strand included
         return strand_id

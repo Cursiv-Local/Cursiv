@@ -33,7 +33,7 @@ def _is_link(p: Path) -> bool:
 def copy_all(src: Path, dest: Path) -> int:
     copied = 0
     for f in src.rglob("*"):
-        if not f.is_file():
+        if not f.is_file() or f.name == '.vault-lease':
             continue
         target = dest / f.relative_to(src)
         if target.exists():

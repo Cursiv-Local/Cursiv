@@ -7,6 +7,7 @@ The MemoryField is the agent's lived experience layer.
 """
 
 from __future__ import annotations
+from cursiv_engine.core import private_store, vault
 
 import json
 import math
@@ -37,13 +38,15 @@ class MemoryField:
     def _load(self) -> None:
         if self.path.exists():
             try:
-                self._data = json.loads(self.path.read_text(encoding="utf-8"))
+                self._data = json.loads(private_store.read_text(self.path, encoding="utf-8"))
+            except vault.VaultError:
+                raise
             except Exception:
                 pass
 
     def save(self) -> None:
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(
+        private_store.write_text(self.path,
             json.dumps(self._data, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
