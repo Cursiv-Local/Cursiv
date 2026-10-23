@@ -1,7 +1,7 @@
 # Cursiv v3.14-U92 — feature discovery and live-transcript repairs
 
-Release candidate; package checks and final artifact hashes will be added after
-the tagged builds succeed.
+Released with owner-authenticated Windows and early Apple Silicon Mac packages.
+[Source, checks and hashes](U92-RELEASE-VERIFICATION.md).
 
 - Ask **“What can Cursiv do?”** for a concise, application-owned feature guide with
   practical notebook, calculation, document, file and memory examples. The starter
@@ -18,7 +18,8 @@ the tagged builds succeed.
 ## Evidence and limits
 
 The locked U92 source passed **1,798 Windows tests / 1 platform skip** and
-the **63-check workspace gate**. Hosted and packaged checks are pending. One synthetic
+the **63-check workspace gate**. Hosted checks passed Windows **1,798 / 1 skip**
+and Mac **1,784 / 15 skips**. Both tagged frozen apps passed. One synthetic
 Qwen brief-prompt spot check returned 42 words; it is not a full-app benchmark or
 a general model-accuracy claim. Broader wording still depends on model compliance.
 
@@ -27,6 +28,12 @@ portable paths, optional encryption and provider order remain intact. No existin
 user data is migrated. Physical encrypted USB persistence and clean-machine
 installation remain separate manual checks.
 
-Artifacts will use the existing independent owner key. Owner proof does not
+Artifacts use the existing independent owner key. Owner proof does not
 replace Windows-trusted Authenticode or Apple notarization; publisher warnings
 remain. See [owner signing and recovery](OWNER-RELEASE-SIGNING.md).
+
+## Installer SHA-256
+
+Windows: `b4d815f75befcfe75790924367aabd9a84ba97ecb692d6257b9a43432ca4bcc4`
+
+Mac (Apple Silicon): `f9e0781ecc4594aa01435015b712a330909fefb6435a1679aa92915f0398622c`

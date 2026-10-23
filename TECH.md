@@ -142,7 +142,7 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 ### Contested philosophical and value questions (U91)
 
-**U92 candidate transcript repairs:** `test_u91_transcript_followup.py` covers
+**U92 transcript repairs:** `test_u91_transcript_followup.py` covers
 punctuated version/offline questions, actual offscreen Qt placeholder rendering,
 document misses, the paired moral-realism discussion, memory/context comparison,
 and current tone across providers and compaction. Build/publication evidence is
@@ -372,7 +372,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U91 source and package checks are recorded in the [verification report](docs/U91-RELEASE-VERIFICATION.md);
+U92 source and package checks are recorded in the [verification report](docs/U92-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -387,6 +387,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 
 | Historical change | Evidence |
 |---|---|
+| U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |
 | U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
 | U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |
 | U82: selected memory, dated recall, operational state | [Repair record](docs/GROUNDED-CHAT-REPAIR.md), [verification](docs/U82-RELEASE-VERIFICATION.md) |

@@ -2,8 +2,11 @@
 
 ## 3.14-U92 — feature discovery and live-transcript repairs (2026-10-23)
 
-- Release preparation is in progress; package/publication evidence will be recorded
-  after successful builds. The published U91 assets remain unchanged.
+- Published latest U92 and deployed the website. All **47 anonymous production
+  checks** and **21 website tests** passed; current hashes and release evidence
+  are public. The existing tester banner and other chat’s artwork are preserved.
+- Tagged Windows/Mac packages passed their frozen checks and have independent
+  owner signatures. See [U92 release verification](docs/U92-RELEASE-VERIFICATION.md).
 - Ask “What can Cursiv do?” for a short application-owned explanation of notebook,
   calculations, documents, authorized files, memory/notes and ordinary conversation.
   A new-chat suggestion fills the input without sending; the guide works offline
@@ -26,7 +29,7 @@
   Final locked U92 Windows suite: **1,798 passed / 1 platform skip**; required
   workspace gate: **63 passed**. One synthetic local Qwen brief-prompt spot check
   returned 42 words; broader live-model compliance remains a manual check.
-  These fixes are included in the U92 candidate, not the published U91 installer.
+  These fixes are included in the U92 installers; historical U91 assets are unchanged.
 
 ## 3.14-U91 — workspace files and philosophical uncertainty (2026-10-23)
 
