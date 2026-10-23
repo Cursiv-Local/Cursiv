@@ -2,6 +2,10 @@
 
 ## v3.14-U89 — workspace routing and owner release authentication (2026-10-23)
 
+- Published as latest with verified owner-signed Windows/Mac artifact manifests.
+  Windows source checks passed 1,594/1; hosted Mac 1,580/15 (passed/skipped),
+  both packaged checks passed, all 21 website tests and 38 public checks passed.
+  The website now displays the actual installer hash and owner fingerprint.
 - Add bounded local file/content search, natural creates/appends and source-file
   precedence over notebook keywords. Preserve authorization and confirmation;
   compound file tasks explicitly leave later steps unexecuted.

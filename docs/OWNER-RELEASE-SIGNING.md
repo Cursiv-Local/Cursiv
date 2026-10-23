@@ -16,6 +16,14 @@ tools deny this directory. Do not upload it, put it in CI secrets, or copy it in
 an installer. DPAPI protection is not protection against compromise of this
 Windows account while it is signed in.
 
+A reviewed signing-tool copy is also installed outside the checkout at
+`%LOCALAPPDATA%/CursivReleaseSigning/signer/scripts/owner_release.py`, with its
+public-key/verification module and a `trusted-tool-manifest.json` of source hashes
+from commit `e9828f605e7da08fdb3b59fe3d3bd198ddf4a177`. Use that copy for owner
+operations. Do not replace it merely because GitHub supplies a different script:
+running an attacker-modified signing script as the owner could expose the key.
+The independent copy verified the final Windows release successfully.
+
 ## What is authenticated
 
 `owner-release.json` signs the release version, tagged source commit, artifact
@@ -62,7 +70,7 @@ In a local terminal, choose a removable/offline location outside the repository
 and OneDrive, then run:
 
 ```powershell
-py -3.13 scripts/owner_release.py backup E:\Cursiv-owner-release-recovery.pem
+py -3.13 "$env:LOCALAPPDATA\CursivReleaseSigning\signer\scripts\owner_release.py" backup E:\Cursiv-owner-release-recovery.pem
 ```
 
 The script prompts locally twice, requires at least 16 characters, writes an
@@ -73,7 +81,7 @@ actual offline backup drive.
 On a replacement Windows account with the genuine source/public-key file:
 
 ```powershell
-py -3.13 scripts/owner_release.py restore E:\Cursiv-owner-release-recovery.pem
+py -3.13 "$env:LOCALAPPDATA\CursivReleaseSigning\signer\scripts\owner_release.py" restore E:\Cursiv-owner-release-recovery.pem
 ```
 
 Restore verifies the public fingerprint before saving a new DPAPI-protected

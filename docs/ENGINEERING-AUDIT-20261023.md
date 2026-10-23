@@ -145,3 +145,76 @@ the assessment; implementing a check does not itself earn a perfect score.
 | Release engineering | 76 | Locked builds/provenance/owner manifests; no Windows CA signing or Mac notarization. |
 | Documentation | 88 | Explicit evidence and remaining risks; historical sections intentionally retained. |
 | Overall production readiness | 78 | Useful tested field/research software; not yet a fully validated high-assurance product. |
+
+## Complete changed-file inventory
+
+Repository paths relative to the reviewed U87 baseline; generated private keys,
+ignored build output and personal test files are excluded.
+
+```text
+.github/workflows/mac-build.yml
+.github/workflows/tests.yml
+CHANGELOG.md
+HANDOFF.md
+README.md
+cloudflare/tests/download-analytics.test.mjs
+cloudflare/tests/release-evidence.test.mjs
+cursiv_v215/chat/completion.py
+cursiv_v215/chat/conversation.py
+cursiv_v215/chat/web_search.py
+cursiv_v215/core/action_gate.py
+cursiv_v215/core/answer_evidence.py
+cursiv_v215/core/calc.py
+cursiv_v215/core/command_sequence.py
+cursiv_v215/core/export_paths.py
+cursiv_v215/core/fieldlog.py
+cursiv_v215/core/fieldmath.py
+cursiv_v215/core/file_access.py
+cursiv_v215/core/file_requests.py
+cursiv_v215/core/native_answers.py
+cursiv_v215/core/notebook_tools.py
+cursiv_v215/core/phone_help.py
+cursiv_v215/core/presence.py
+cursiv_v215/core/release_identity.py
+cursiv_v215/core/release_public_key.json
+cursiv_v215/core/selfknow.py
+cursiv_v215/core/workspace_search.py
+cursiv_v215/memory/intents.py
+cursiv_v215/memory/semantic.py
+docs/ENGINEERING-AUDIT-20261023.md
+docs/LIVE-TRANSCRIPT-GAPS.md
+docs/OWNER-RELEASE-SIGNING.md
+docs/RELEASE-U88.md
+docs/RELEASE-U89.md
+docs/U89-RELEASE-VERIFICATION.md
+installer/BEFORE-INSTALL.txt
+installer/cursiv_setup.iss
+launcher/chat_controls.py
+launcher/chat_feedback.py
+launcher/chat_panel.py
+launcher/command_dispatch.py
+launcher/cursiv_launcher.py
+launcher/phone_help.py
+launcher/phone_sync.py
+launcher/selftest.py
+launcher/update_security.py
+requirements-release.in
+requirements-release.lock
+scripts/build_release.py
+scripts/owner_release.py
+scripts/release_provenance.py
+tests/test_export_paths.py
+tests/test_model_lookup_shutdown.py
+tests/test_network_isolation_process.py
+tests/test_offline_process.py
+tests/test_owner_release.py
+tests/test_u86_remaining_gaps.py
+tests/test_update_security.py
+tests/test_workspace_routing.py
+website/ai-reliability-testing.html
+website/assets/cursiv-owner-release-U89.json
+website/assets/cursiv-owner-release-key.json
+website/index.html
+website/start.html
+website/vision.html
+```

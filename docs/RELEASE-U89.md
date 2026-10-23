@@ -32,3 +32,26 @@ No new full local-model truth benchmark score is claimed.
 
 Test, build, artifact-hash and publication outcomes are recorded only after they
 complete in the U89 verification report.
+
+## Completed release gates
+
+- Windows: 1,594 tests passed, one platform skip. Mac: 1,580 passed, 15 skips.
+- Both frozen app/notebook checks passed, including the bundled owner public key.
+- All 21 website tests passed; dependency and high-severity static gates passed.
+- Immutable application source: `e9828f605e7da08fdb3b59fe3d3bd198ddf4a177`.
+- Windows installer SHA-256:
+  `ea9768280e796b0a118ce85cfa5a7ccfbc7e268409615c2d27d7fa050b4e1351`.
+- Mac DMG SHA-256:
+  `f5e97bd78d841175a9deef9d0b44a8c2a61d215faffb894777fd0df6b159a338`.
+
+Download `owner-release.json` with the installer: it authenticates the exact
+binary/checksum/provenance files using the separately held owner key. The public
+key and fingerprint are published with the release and on the download page.
+U87 and earlier do not enforce this new signature: independently verify your
+first U89 installer. Genuine U89 installs pin the key for subsequent updates.
+
+[Full verification and limits](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U89-RELEASE-VERIFICATION.md)
+· [Owner key and recovery](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/OWNER-RELEASE-SIGNING.md).
+
+U88 was an unpublished validation candidate. Its tag remains unchanged; U89
+contains the corrected Mac fixture and all intended repairs.

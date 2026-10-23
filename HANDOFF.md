@@ -1,6 +1,6 @@
 # Handoff — Cursiv verification overhaul
 
-## U89 release preparation (2026-10-23)
+## U89 published and verified (2026-10-23)
 
 The owner authorized commit/push/release and explicitly selected independent
 owner release signatures. U89 includes the previous local follow-up below,
@@ -8,24 +8,31 @@ workspace routing repairs and verified security findings from the supplied audit
 See [engineering validation](docs/ENGINEERING-AUDIT-20261023.md) and
 [owner signing/recovery](docs/OWNER-RELEASE-SIGNING.md). Keep the private key outside
 GitHub, OneDrive and all build artifacts. Only the public JSON key is tracked.
-Publication evidence will be updated after actual builds and public checks.
+[U89 verification](docs/U89-RELEASE-VERIFICATION.md) records the immutable app
+commit `e9828f6`, 1,594/1 Windows source checks, 1,580/15 hosted Mac checks,
+both frozen packages, 21 website tests and 38 passing public checks. GitHub U89
+is latest and the existing Cloudflare Worker is deployed with matching owner
+proof/hashes. Owner signatures are detached proof, not Windows CA trust. The
+protected private key and a reviewed signing-tool copy both live outside GitHub
+and OneDrive. Owner recovery backup and protected main/release tags remain open.
 
-## Local follow-up to the U86 transcript (unreleased)
+## Historical local checkpoint before U89 publication
 
-Work is on `codex/live-transcript-gaps`; the application version remains U87.
+Work was on `codex/live-transcript-gaps`; the application version was then U87.
 [Live-transcript gaps](docs/LIVE-TRANSCRIPT-GAPS.md) records the audit, exact
 production changes and regression evidence. Review the new typed answer-evidence
 receipt and desktop persistence, bounded read authorization and descriptive forget
 ambiguity behavior. Phone wording now lives in `cursiv_v215/core/phone_help.py`;
 the launcher helper reexports it for existing graphical/command help.
 No installer, updater, notebook format, website or production service is changed.
-No commit, push or publication was requested for this follow-up.
+No commit, push or publication had yet been requested at that checkpoint;
+the owner later authorized the combined U89 publication above.
 Final isolated Windows regression run: 1,523 passed, 1 skipped in 157.29 seconds.
 No hosted Mac/package validation or live-model quality score is claimed.
 
-## U87 published and verified
+## Historical U87 publication
 
-U87 is GitHub latest; tagged app commit `58a6d8d`. Windows passed 1,495 tests
+U87 was GitHub latest at that checkpoint; tagged app commit `58a6d8d`. Windows passed 1,495 tests
 with 1 skip; hosted Mac passed 1,485 with 11 skips. Both frozen packages passed;
 public downloads were hashed, 20 website tests and 34 public checks passed.
 The owner authorized commit/push, installers and website publication.

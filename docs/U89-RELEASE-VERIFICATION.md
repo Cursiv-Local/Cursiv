@@ -84,3 +84,39 @@ historical benchmark consistency. The initial website check correctly rejected
 the retired moving `latest` URL expectation; the check now requires the exact
 current owner-signed versioned installer URL. Stable aliases remain on GitHub
 for existing clients and are covered by the same owner manifest.
+
+## Publication and public verification
+
+U89 is published as GitHub latest, not a draft/prerelease:
+https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U89
+
+Existing Cloudflare Worker `cursiv-web` deployed version
+`0872910f-4065-483b-9ce0-0344dabe4894`; no DNS or hosting migration was performed.
+
+All **38 anonymous public checks passed** at 2026-10-23 05:04:27 UTC:
+
+- Latest stable tag resolves to the tested app commit.
+- Public Windows/Mac stable binaries, versioned alias digests and checksum files
+  agree with the independently verified owner signature, exact sizes and hashes.
+- Website public key matches the app's pinned identity; its manifest matches
+  GitHub's signed manifest and `/start` displays the actual Windows hash/fingerprint.
+- HTTPS/canonical URLs, JSON-LD and indexability pass. Generated current HTML
+  matches production after removing only the exact pre-existing Cloudflare beacon
+  captured in the pre-deployment baseline, with line endings normalized.
+- Tester contact/privacy headers, social image dimensions/absolute metadata,
+  phone/app/notebook routes, robots, sitemap, health, anonymous admin rejection
+  and the legacy hostname's permanent path-preserving redirect pass.
+
+The existing public counter still reports 503/unavailable with `total:null`.
+No counter repair or zero-download claim is made. Public verification evidence is
+attached as `u89-release-verification.json`; raw checks are retained locally in
+`cloudflare/.wrangler/u89-release-review/`.
+
+Publishing triggered redundant Mac job `39903584651`; it was cancelled with its
+release-upload step skipped. Existing owner-signed assets were not replaced.
+Both main and the feature branch contain the reviewed changes; the app tag stays
+immutable while later documentation commits record completed verification.
+
+The owner’s installed desktop application was not replaced or restarted.
+Personal `test_internals/u81_test.txt` retains SHA-256
+`efb67cb4aa306cbe3daf6dafd432fa918fa91f7e21dd3278cdf2489b84e0cac7`.

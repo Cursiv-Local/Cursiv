@@ -46,6 +46,17 @@ Cursiv is designed to remain useful when internet access is unavailable or an on
 
 ## 2. Installation & Deployment
 
+### Current release: U89
+
+[U89 installers](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U89)
+include the workspace/live-transcript repairs and independently owner-signed
+release manifests. Source checks passed 1,594/1 on Windows and 1,580/15 on Mac
+(passed/skipped), both packaged self-tests passed, and 21 website tests plus
+38 public checks passed. [Verification](docs/U89-RELEASE-VERIFICATION.md).
+Windows-trusted certificate signing and Mac notarization remain pending.
+[Owner-key trust, first-install verification and recovery](docs/OWNER-RELEASE-SIGNING.md).
+The U88 candidate was not published; its existing tag was preserved.
+
 ### Windows Installer
 
 **Requirements:** Windows 10 or 11 (64-bit), 8 GB RAM, and about 6 GB of free disk space for one model. Additional models need more space.
