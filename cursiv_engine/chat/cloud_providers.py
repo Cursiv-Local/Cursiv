@@ -35,13 +35,29 @@ def _post_json(runtime: ChatRuntime, url: str, payload: dict, headers: dict, tim
 def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]:
     """Compact persona + newest turns that fit `budget` characters (core/speed.py)."""
     from cursiv_engine.core import speed
+    from cursiv_engine.core.style import PROMPT_HEADING
     from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
-    source = [m for m in runtime._text_messages(messages)
-              if not (m.get('role') == 'system' and m.get('content') == INSTRUCTIONS)]
-    result = speed.slim_messages(source, max(0, budget - len(INSTRUCTIONS)),
+    text = runtime._text_messages(messages)
+    styles = [m for m in text if m.get('role') == 'system' and m.get('content', '').startswith(PROMPT_HEADING)]
+    protected = [dict(role='system', content=INSTRUCTIONS)]
+    if styles:
+        # Current tone/guidance precedes older standing rules. Keep complete
+        # lines within a bounded share; preferences cannot exhaust state/history.
+        lines, used = [], 0
+        for line in styles[-1]['content'].splitlines():
+            if used + len(line) + 1 > min(1600, budget // 5):
+                break
+            lines.append(line)
+            used += len(line) + 1
+        if len(lines) > 1:
+            protected.append(dict(role='system', content='\n'.join(lines)))
+    source = [m for m in text if not (m.get('role') == 'system' and
+              (m.get('content') == INSTRUCTIONS or m.get('content', '').startswith(PROMPT_HEADING)))]
+    reserve = sum(len(m['content']) for m in protected)
+    result = speed.slim_messages(source, max(0, budget - reserve),
                                  runtime._FULL_PERSONA, speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))
-    result.insert(1 if result and result[0].get('role') == 'system' else 0,
-                  dict(role='system', content=INSTRUCTIONS))
+    at = 1 if result and result[0].get('role') == 'system' else 0
+    result[at:at] = protected
     return result
 
 def _call_gemini_direct(runtime: ChatRuntime, messages: list[dict], key: str, max_tokens: int) -> Generator[str, None, None]:

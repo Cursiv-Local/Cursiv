@@ -26,7 +26,8 @@ def sources_line(runtime: ChatRuntime) -> str:
         pages = dict.fromkeys(f'{p.name} p. {p.page}' for p in runtime._DOCS_SHOWN)
         parts.append('Your documents (' + ', '.join(pages) + ')')
     elif runtime._DOCS_SEARCHED_EMPTY:
-        parts.append('your documents searched, nothing on this; the rest is model knowledge (not checked)')
+        parts.append('your documents searched; no matching passage found' if runtime._CURSIV_REPLY else
+                     'your documents searched, nothing on this; the rest is model knowledge (not checked)')
     if runtime._WORKED:
         parts.append((f"worked out by Cursiv's code ({runtime._WORKED.tool}: {runtime._WORKED.statement})"
                       if runtime._WORKED.ok else

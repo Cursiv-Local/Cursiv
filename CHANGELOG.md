@@ -1,5 +1,33 @@
 # Changelog
 
+## 3.14-U92 — feature discovery and live-transcript repairs (2026-10-23)
+
+- Release preparation is in progress; package/publication evidence will be recorded
+  after successful builds. The published U91 assets remain unchanged.
+- Ask “What can Cursiv do?” for a short application-owned explanation of notebook,
+  calculations, documents, authorized files, memory/notes and ordinary conversation.
+  A new-chat suggestion fills the input without sending; the guide works offline
+  without model inference, file reads or saves, including before model setup.
+
+- Native combined version/offline replies accept punctuation and common wording.
+- Streaming and final Markdown preserve literal `<file>`/`<folder>` instructions;
+  reply HTML is disabled while Markdown links, tables and code remain supported.
+- An explicit imported-document question with no matching passage receives a
+  native retrieval result. No model continuation invents document access or facts;
+  attached material and emergency paths retain their existing handling.
+- Added bounded explanations of identical code versus different memory context,
+  and a balanced moral-realism argument/objection pair. Broader philosophical
+  prompts retain the shared uncertainty policy and model-compliance limits.
+- Current tone travels in a separate, bounded system block through compaction.
+  Brief mode requests 1–3 sentences/about 60 words for ordinary prose; explicit
+  detail, code, tables and necessary warnings take precedence. No answer truncation
+  or additional model formatting call was added.
+- Exact transcript regressions are in `tests/test_u91_transcript_followup.py`.
+  Final locked U92 Windows suite: **1,798 passed / 1 platform skip**; required
+  workspace gate: **63 passed**. One synthetic local Qwen brief-prompt spot check
+  returned 42 words; broader live-model compliance remains a manual check.
+  These fixes are included in the U92 candidate, not the published U91 installer.
+
 ## 3.14-U91 — workspace files and philosophical uncertainty (2026-10-23)
 
 - Published owner-authenticated Windows/Mac installers as latest and deployed the

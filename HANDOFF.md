@@ -1,5 +1,76 @@
 # Handoff — Cursiv verification overhaul
 
+## U92 release preparation and live-transcript repairs (2026-10-23)
+
+The owner subsequently authorized commit, push, installer build and publication.
+Work is on `codex/u91-live-transcript-fixes`, preparing U92 through the existing
+protected-main gates and independent owner-signing process. Existing personal
+legal notes, `field-notes.txt` and `test_internals/` remain untracked/untouched.
+
+The owner also requested feature discovery: `core/feature_answers.py` now owns
+the “What can Cursiv do?” overview, with practical examples and setup/permission
+limits. `launcher/chat_panel.py` places that prompt first in new-chat suggestions,
+including the no-model setup state. Clicking fills the input; it never sends or
+runs an example. `tests/test_feature_overview.py` covers native/no-model/no-action
+behavior and actual Qt links in both profiles/setup states. The three version
+sources and Inno output name are bumped together to U92.
+
+Locked U92 source check: **1,798 passed / 1 platform skip** in **206.99 s**;
+required local workspace gate **63 passed**. Focused feature/transcript/UI/help
+compatibility check **164 passed**. Protected hosted checks, tagged package builds,
+independent owner signatures and publication follow; do not treat source counts
+as packaged, physical or model-accuracy evidence.
+
+Root causes and production files:
+
+- `cursiv_engine/core/presence.py`: the combined state matcher rejected the comma
+  in “version, and”. Accept common wording/punctuation. Add a bounded code/context
+  comparison and prohibit invented memory mechanisms in operational guidance.
+- `cursiv_engine/core/native_answers.py`: route that comparison before model
+  generation; decline file/memory mutations and unrelated reflection.
+- `launcher/chat_transcript.py`: Qt's HTML-enabled Markdown swallowed `<file>`
+  and following text. Disable raw HTML in both streaming and final parsing;
+  retain Markdown and escaped trusted chips.
+- `cursiv_engine/chat/conversation.py`, `core/documents.py`, `chat/provenance.py`:
+  explicit document misses previously fed the model an instruction it could
+  contradict. Return a native retrieval miss, accurately sourced without model
+  authorship. Keep emergencies, supplied attachments and general questions working.
+- `cursiv_engine/core/philosophy_policy.py`: paired moral-realism argument and
+  objection receive balanced application text. Strengthen attribution of disputed
+  objections; individual perspectives and broader discussion still use the model.
+- `cursiv_engine/core/style.py`, `chat/cloud_providers.py`: tone was embedded in
+  the replaceable persona. Use a separate current-style block with complete-line
+  compaction bounds; prioritize brief guidance over older standing rules. Explicit
+  detail/formatting and warnings win; no hard truncation or added LLM pass.
+
+`tests/test_u91_transcript_followup.py` contains exact synthetic cases, real Qt
+checks, fake-provider capture, bounded style-budget, attachment and restriction
+regressions. CHANGELOG, TECH and claim evidence describe these pending changes;
+README claims and historical U91 release evidence remain accurate and unchanged.
+
+Validation: pre-change focused baseline **181 passed**. New cases first reproduced
+the reported failures. Focused compatibility pass **354 passed**. A first full run
+had **1,780 passed / 1 skip**, plus two failures and three teardown errors: the
+outer `CURSIV_APP_DATA` override leaked into restart subprocesses, causing shared
+temporary settings and an offline-state leak. All affected paths were in the
+temporary profile, not owner data. No production code or tests were relaxed to
+hide this. A disposable tracked-source copy without those overrides passed all
+**109 persistence/verification/transcript checks**. Final Windows source rerun:
+**1,782 passed / 1 platform skip** in **340.40 s**; the required workspace gate
+then passed **63 checks** in **4.72 s**. Final diff whitespace checks passed.
+The first sandbox attempt also could not create pytest temporary directories;
+isolated runs outside the sandbox worked.
+
+One live `qwen3:4b-instruct` synthetic prompt-only check returned **42 words** for
+observation versus inference in **13.15 s** with revised brief guidance. This was
+generation time, not final-formatting latency, a before/after benchmark or a full
+application session. No saved records were supplied. Tests and the live check use
+disposable profiles rather than the owner's notebook, memories or keys.
+
+Remaining limits: no new packaged/phone/USB verification or broad model benchmark;
+broader philosophy and short-answer wording remain model-dependent. All storage
+formats, notebook operations, authorization and provider cascade remain unchanged.
+
 ## U91 published and verified (2026-10-23)
 
 The owner authorized commit, push, website publication and installer release.

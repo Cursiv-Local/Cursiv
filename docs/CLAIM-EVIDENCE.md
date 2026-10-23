@@ -63,4 +63,18 @@ and actual deployed tester-page privacy/contact checks separately.
 
 ## U91 workspace and philosophical policy
 
+**U92 live-transcript follow-up:** `test_u91_transcript_followup.py` adds
+native punctuated state replies, placeholder preservation in actual Qt streaming
+and final rendering, document-miss hard stops, bounded argument/context replies,
+and current brief-style prompt capture across local/OpenAI/xAI/Claude paths.
+Compaction tests cover repeated calls and many standing rules. Attachment and
+talk-only tests retain their respective model/material and no-inspection paths.
+These tests use synthetic data/fake providers; they do not establish general
+model accuracy, brief-mode compliance in every live session, or a new release.
+
+`test_feature_overview.py` covers the native “What can Cursiv do?” guide, zero
+model/tool/save callbacks, restricted turns, and actual new-chat link behavior
+across personal/research and setup states. Examples prefill the input; they do
+not send or execute. Conversation history retains its separate save setting.
+
 Natural file context uses confirmed receipts and unique bounded name lookup, not model save claims. `test_workspace_language.py` covers exact create/append/search/read requests and authorization; `test_workspace_release_gate.py` checks that failed or missing gates prevent tagging. `test_philosophy_policy.py` covers balanced native overviews, perspective requests, provider prompts, compaction and restricted turns. Broader model wording remains dependent on compliance; no new live-model accuracy score is claimed. [U91 verification](U91-RELEASE-VERIFICATION.md).

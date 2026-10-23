@@ -16,6 +16,10 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
         return ('No. Cursiv provides information, not professional medical advice, diagnosis or treatment.'
                 '\n\n*[Sources: Cursiv capability limits (no AI model)]*')
     from .conversation_kind import relayed_thread_question, talk_help
+    from .presence import memory_comparison_answer
+    comparison = memory_comparison_answer(q)
+    if comparison is not None:
+        return comparison
     if relayed_thread_question(q):
         return ('Text pasted here, including text labeled as another model, is user-supplied content '
                 'in this conversation. The label does not authenticate its author, open a model-to-model '

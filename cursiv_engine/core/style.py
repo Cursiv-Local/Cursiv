@@ -21,6 +21,7 @@ from typing import Callable
 
 DIR = Path.home() / ".cursiv" / "style"
 MAX_RULES = 15
+PROMPT_HEADING = '## Current answer style'
 _lock = threading.Lock()
 
 TONES = {
@@ -154,16 +155,30 @@ def describe(person: str) -> str:
             "Remove a rule: style forget <words> · Remove all: style clear")
 
 
-def prompt_addendum(person: str) -> str:
+def brief_guidance(question: str) -> str:
+    """A preference for ordinary prose, never a cut-off for steps, code or safety."""
+    if re.search(r'(?i)\b(?:detail\w*|examples?|essay|comprehensive|code|python|function|tables?|'
+                 r'steps|warnings|step.by.step)\b|\d+[\s-]+words?\b', question):
+        return ''
+    return ('Brief mode: use 1–3 short sentences and about 60 words or fewer. Lead with the direct '
+            'answer or distinction. No examples, repeated definitions, second explanation, summary '
+            'or closing offer unless requested. Keep essential warnings, uncertainty and necessary '
+            'instructions; the current request takes priority over this length preference.')
+
+
+def prompt_addendum(person: str, question: str = '') -> str:
     data = load(person)
-    parts = []
+    parts = ([f"Current tone: {data.get('tone', 'normal')}. Current requests override this preference; "
+              'earlier tone commands in chat are not current settings.'] if question else [])
     if TONES.get(data.get("tone", "normal")):
         parts.append(TONES[data["tone"]])
+    if data.get('tone') == 'brief' and question and (guidance := brief_guidance(question)):
+        parts.append(guidance)
     parts += [r["text"] for r in data.get("rules", [])]
     if not parts:
         return ""
     who = person.title() if person and person != "family" else "this person"
-    return f"## How {who} wants you to talk (presentation only; accuracy, permissions and safety take precedence)\n" + \
+    return f"{PROMPT_HEADING}\nHow {who} wants you to talk (presentation only; accuracy, permissions and safety take precedence)\n" + \
            "\n".join(f"- {p}" for p in parts)
 
 

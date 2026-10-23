@@ -9,9 +9,37 @@ import re
 
 SOURCE = '\n\n*[Sources: Cursiv built-in feature guidance (no AI model)]*'
 
+OVERVIEW = (
+    "Cursiv is a local-first AI assistant for field notes, documents and practical questions. "
+    "You can talk normally; a few built-in commands give you predictable ways to save and check things.\n\n"
+    "- **Keep a Field Notebook.** Record observations, measurements and sample IDs. For example, "
+    "edit this before sending: `log site: Example; water temp 12.4 C; note: Example observation`. "
+    "Type `field log` to see entries or open Field Notebook in the sidebar. Corrections keep the original; "
+    "`field log check` checks the record chain.\n"
+    "- **Check field calculations.** Ask naturally, such as “Convert 12.4 C to F.” "
+    "Supported units, distances, times and rates are calculated in code, with a receipt.\n"
+    "- **Ask about your documents.** Import a protocol in Memory & Knowledge → Documents, "
+    "then ask about it. Matching passages can provide page references; missing evidence stays a limitation.\n"
+    "- **Work with files.** Choose a workspace and turn `files on`, then try "
+    "“Create notes.txt with the text: Site A, 14.2 C.” Reads, appends and local searches stay within "
+    "that authorized folder. Existing-file changes require approval.\n"
+    "- **Keep useful context.** Use `remember <fact>`, ask “What do you remember?”, or save an "
+    "answer with `save this` and find it through `notes`. Saved memory can survive restarts; it is selective.\n"
+    "- **Think things through.** Discuss an idea, compare explanations, translate text or ask for "
+    "coding help. Model answers can be wrong; source labels show what evidence was supplied.\n\n"
+    "Local chat works offline after Ollama and a compatible model are installed. Initial downloads "
+    "and optional online services need internet. Phone capture is at https://cursiv.us/notebook; "
+    "`help field` explains export/import. Type `help` for more examples. "
+    "This guide has not opened workspace files or added notebook entries or memories. "
+    "Chat history follows your separate save setting."
+)
+
 
 def answer(text: str) -> str | None:
     q = text.strip().lower().replace('’', "'")
+    if re.fullmatch(r"(?:what can (?:cursiv|you) do|what (?:are|is) cursiv's (?:main )?"
+                    r"(?:features|functionality)|(?:show|explain) cursiv's (?:main )?features)[?.!]*", q):
+        return OVERVIEW + SOURCE
     if re.match(r"(?:do not|don't|dont|never)\b", q):
         return None  # a retention restriction plus data is not a feature question
     if not re.match(r"(?:how|what|which|who|where|when|why|can|could|does|do|is|are|will|would|explain|describe|tell me)\b", q):

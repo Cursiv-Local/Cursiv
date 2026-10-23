@@ -9,7 +9,7 @@ import threading
 from pathlib import Path
 import re as _re
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QKeyEvent, QTextBlockFormat, QTextCharFormat, QTextCursor
+from PyQt6.QtGui import QKeyEvent, QTextBlockFormat, QTextCharFormat, QTextCursor, QTextDocument
 from PyQt6.QtWidgets import (
     QComboBox, QMenu, QWidget, QVBoxLayout, QHBoxLayout, QTextBrowser, QPlainTextEdit,
     QPushButton, QLabel, QSizePolicy,
@@ -20,6 +20,10 @@ from chat_rendering import MarkdownStream
 
 
 class ChatTranscriptMixin:
+    # Replies are Markdown, not trusted HTML. Literal <file>/<folder> otherwise
+    # become open HTML elements and can swallow the rest of an instruction.
+    _MARKDOWN = (QTextDocument.MarkdownFeature.MarkdownDialectGitHub |
+                 QTextDocument.MarkdownFeature.MarkdownNoHTML)
     _STATUS_LINE = _re.compile(r"^\s*\*([\[(])(.*)[\])]\*\s*$")
 
     _LEDGER_LINE = _re.compile(r"^[\s>*_-]*(Known|Inferred|Assumed|Unknown)[*_]*\s*:", _re.I)
@@ -176,7 +180,7 @@ class ChatTranscriptMixin:
         if md:
             if top:
                 cursor.insertBlock()
-            cursor.insertMarkdown(md)
+            cursor.insertMarkdown(md, self._MARKDOWN)
         if details:
             from urllib.parse import quote
             self._plain_block(cursor)
@@ -321,7 +325,7 @@ class ChatTranscriptMixin:
         cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         cursor.beginEditBlock()
         cursor.removeSelectedText()
-        cursor.insertMarkdown(self._keep_line_breaks(ready.strip()))
+        cursor.insertMarkdown(self._keep_line_breaks(ready.strip()), self._MARKDOWN)
         self._plain_block(cursor)
         self._stream_tail_start = cursor.position()
         cursor.insertText(stream.tail)        # unfinished fences/tables stay literal and intact

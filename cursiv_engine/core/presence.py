@@ -77,6 +77,7 @@ CAPABILITIES = (
     'Local inference can work offline with an installed compatible model; optional online providers exist. '
     'Authorized workspace access permits supported file tools, not unrestricted execution or self-modification. '
     'Code analysis requires actual file reads; a folder listing is not source evidence. '
+    'Do not invent memory decay, retrieval ordering or runtime mechanisms not established by supplied evidence. '
     'Never claim no persistent memory, perfect recall, exclusive capabilities, or verified actions from prose. '
     'Philosophical claims about awareness are speculation, not operational observations.'
 )
@@ -97,7 +98,7 @@ def prompt(person: str, workspace: str = '', file_access: bool = False, *, obser
 
 
 _SHORT_STATE = re.compile(
-    r'what is your version and are you offline right now|'
+    r"what(?:'s| is) your (?:current )?version(?: number)?\s*,?\s+and are you offline(?: right now)?|"
     r"am i offline|are you (?:online|offline|in offline mode)|is file access (?:on|off|enabled)|"
     r"what(?:'s| is) (?:your|the) current workspace|where is (?:my|your|the)(?: current)? workspace|"
     r'can you (?:read or write|read and write|read|write|access)(?: my| workspace)? files(?: right now)?|'
@@ -107,6 +108,30 @@ _SHORT_STATE = re.compile(
 def short_state_question(text: str) -> bool:
     from .turn_policy import task_text
     return bool(_SHORT_STATE.fullmatch(task_text(text).lower().strip().rstrip('.?!').replace('’', "'")))
+
+
+def memory_comparison_answer(text: str) -> str | None:
+    """Explain the code/context distinction without pretending to inspect memory."""
+    from .turn_policy import task_text
+    q = task_text(text).strip()
+    if (len(q) > 700 or not re.match(r'(?i)^(?:i (?:think|want)|what|would|do|must|can|could)\b', q)
+            or not re.search(r'(?i)\b(?:two (?:assistants|copies)|both assistants)\b', q)
+            or not re.search(r'(?i)\bidentical code\b', q)
+            or not re.search(r'(?i)\bdifferent (?:saved )?memories\b', q)
+            or not re.search(r'(?i)\b(?:behav\w*|overlooking|same (?:answer|output))\b', q)):
+        return None
+    from . import file_requests
+    if file_requests.recognizes(q) or re.search(
+            r'(?i)\b(?:remember|forget|create|write|append|overwrite|read|search|save|delete|'
+            r'execute|run|import|export|translate)\b', q):
+        return None
+    return ('Identical code can still receive different inputs. Different saved memories can change '
+            'the retrieved context supplied to the model, so the assistants need not answer alike. '
+            'Cursiv stores selected facts; it does not retrain model weights when saving them.\n\n'
+            'They can be the same software while differing in available context and behavior. '
+            'Even identical inputs do not guarantee identical wording with probabilistic generation. '
+            'No saved records were inspected for this explanation.\n\n'
+            '*[Sources: Cursiv memory/context design (no AI model)]*')
 
 
 def answers_state_question(text: str) -> bool:

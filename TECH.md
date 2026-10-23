@@ -142,6 +142,37 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 ### Contested philosophical and value questions (U91)
 
+**U92 candidate transcript repairs:** `test_u91_transcript_followup.py` covers
+punctuated version/offline questions, actual offscreen Qt placeholder rendering,
+document misses, the paired moral-realism discussion, memory/context comparison,
+and current tone across providers and compaction. Build/publication evidence is
+recorded separately from source checks.
+
+The live-test paired argument/objection request has a bounded built-in response;
+single-position requests remain conversational. The shared instruction also
+attributes disputed objections to their proponents instead of asserting them.
+The memory-comparison reply explains inputs/context without inspecting records,
+inventing memory decay or claiming model-weight training.
+
+An explicit imported-document question with no retrieved passage returns an
+application-authored miss before generation. This establishes a retrieval miss,
+not proof that the complete document lacks the information. Attached material
+and emergencies retain their existing paths. General questions still use the
+normal model route.
+
+`core/style.py` emits current tone in a separate system block. Compaction reserves
+a bounded share for complete style lines, prioritizing current tone over older
+standing rules. Brief guidance asks for 1–3 sentences/about 60 words for ordinary
+prose; explicit detail/format requests and essential warnings take priority.
+The current normal tone is also explicit after a reset, rather than leaving a
+previous brief command in chat history as the only visible tone instruction.
+There is no hard text cut-off or extra rewrite call; live model compliance still
+requires manual checks. Talk-only turns do not read stored style preferences.
+
+Qt streaming and final reply parsing use GitHub Markdown with raw HTML disabled.
+Literal placeholders stay visible; trusted application status chips still use
+escaped application HTML. Markdown links, tables, code and message caching remain.
+
 `core/philosophy_policy.py` holds a shared instruction: acknowledge unresolved
 disagreement first, present the main arguments fairly, distinguish evidence from
 normative premises, and never claim special model access to a philosophical verdict.
