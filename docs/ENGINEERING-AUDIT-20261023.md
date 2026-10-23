@@ -9,9 +9,9 @@ it is not a claim that every repository line received a separate manual audit.
 
 | Severity | Finding, cause and impact | Reproduction / affected path |
 | --- | --- | --- |
-| High | Update download completeness did not authenticate publisher identity; `_run_installer_and_quit` directly launched the downloaded executable. A compromised release could supply different installer bytes. | `launcher/cursiv_launcher.py`, `UpdateChecker._run`, `UpdateDialog._do_download`, `_run_installer_and_quit`. Now delegates to `launcher/update_security.py:39` and `:81`; owner manifest validation in `cursiv_v215/core/release_identity.py:23`. |
-| Medium | Notebook keyword classification could consume an explicit source-file read; file parsing could include task clauses in a path; local search could reach web routing. Writes lacked the requested natural forms. | `cursiv_v215/core/notebook_tools.py:136`, `core/file_access.py:401`, `chat/web_search.py:51`, plus the ten exact workspace transcript prompts in `tests/test_workspace_routing.py`. |
-| Medium | Signed export verification checked named paths but did not reject every unexpected symlink/object in the discovered export tree. | `cursiv_v215/core/fieldlog.py:605`, `verify_export`; new `core/export_paths.py`, `inventory`. Valid export + an unlisted symlink now fails before following it. |
+| High | Update download completeness did not authenticate publisher identity; `_run_installer_and_quit` directly launched the downloaded executable. A compromised release could supply different installer bytes. | `launcher/cursiv_launcher.py`, `UpdateChecker._run`, `UpdateDialog._do_download`, `_run_installer_and_quit`. Now delegates to `launcher/update_security.py:39` and `:81`; owner manifest validation in `cursiv_engine/core/release_identity.py:23`. |
+| Medium | Notebook keyword classification could consume an explicit source-file read; file parsing could include task clauses in a path; local search could reach web routing. Writes lacked the requested natural forms. | `cursiv_engine/core/notebook_tools.py:136`, `core/file_access.py:401`, `chat/web_search.py:51`, plus the ten exact workspace transcript prompts in `tests/test_workspace_routing.py`. |
+| Medium | Signed export verification checked named paths but did not reject every unexpected symlink/object in the discovered export tree. | `cursiv_engine/core/fieldlog.py:605`, `verify_export`; new `core/export_paths.py`, `inventory`. Valid export + an unlisted symlink now fails before following it. |
 | Medium | Runtime version ranges and a build from an arbitrary installed environment did not define a reproducible release dependency set. Tagged-source isolation and artifact hashes already existed. | `requirements.txt`, `scripts/build_release.py:main`; new hash-locked release input and provenance check. |
 | Medium | A background model-list worker could catch a deleted Qt signal error, then emit on the same deleted signal again. | `launcher/chat_controls.py`, `_load_models`; reproduced by a controlled deleted-signal adapter and observed as a test-thread warning. |
 | Test reliability | OS sampling could miss a quickly rejected external TCP control socket, making the positive-control test flaky. | `tests/test_offline_process.py:107`. Control now independently proves the external audit event and a held OS-observable socket; the actual offline no-external-socket assertions remain unchanged. |
@@ -159,28 +159,28 @@ HANDOFF.md
 README.md
 cloudflare/tests/download-analytics.test.mjs
 cloudflare/tests/release-evidence.test.mjs
-cursiv_v215/chat/completion.py
-cursiv_v215/chat/conversation.py
-cursiv_v215/chat/web_search.py
-cursiv_v215/core/action_gate.py
-cursiv_v215/core/answer_evidence.py
-cursiv_v215/core/calc.py
-cursiv_v215/core/command_sequence.py
-cursiv_v215/core/export_paths.py
-cursiv_v215/core/fieldlog.py
-cursiv_v215/core/fieldmath.py
-cursiv_v215/core/file_access.py
-cursiv_v215/core/file_requests.py
-cursiv_v215/core/native_answers.py
-cursiv_v215/core/notebook_tools.py
-cursiv_v215/core/phone_help.py
-cursiv_v215/core/presence.py
-cursiv_v215/core/release_identity.py
-cursiv_v215/core/release_public_key.json
-cursiv_v215/core/selfknow.py
-cursiv_v215/core/workspace_search.py
-cursiv_v215/memory/intents.py
-cursiv_v215/memory/semantic.py
+cursiv_engine/chat/completion.py
+cursiv_engine/chat/conversation.py
+cursiv_engine/chat/web_search.py
+cursiv_engine/core/action_gate.py
+cursiv_engine/core/answer_evidence.py
+cursiv_engine/core/calc.py
+cursiv_engine/core/command_sequence.py
+cursiv_engine/core/export_paths.py
+cursiv_engine/core/fieldlog.py
+cursiv_engine/core/fieldmath.py
+cursiv_engine/core/file_access.py
+cursiv_engine/core/file_requests.py
+cursiv_engine/core/native_answers.py
+cursiv_engine/core/notebook_tools.py
+cursiv_engine/core/phone_help.py
+cursiv_engine/core/presence.py
+cursiv_engine/core/release_identity.py
+cursiv_engine/core/release_public_key.json
+cursiv_engine/core/selfknow.py
+cursiv_engine/core/workspace_search.py
+cursiv_engine/memory/intents.py
+cursiv_engine/memory/semantic.py
 docs/ENGINEERING-AUDIT-20261023.md
 docs/LIVE-TRANSCRIPT-GAPS.md
 docs/OWNER-RELEASE-SIGNING.md

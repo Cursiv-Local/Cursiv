@@ -149,12 +149,12 @@ def list_models() -> list[dict]:
 # ── Licenses on the drive ────────────────────────────────────────────────────
 # Every model's license travels with it: Ollama stores the text as a layer of
 # the model ("application/vnd.ollama.image.license"). Cursiv's and Ollama's own
-# licenses ship with Cursiv in cursiv_v215/licenses/.
+# licenses ship with Cursiv in cursiv_engine/licenses/.
 
 _LICENSE_LAYER = "application/vnd.ollama.image.license"
-_BUNDLED_LICENSES = Path(__file__).resolve().parent.parent / "cursiv_v215" / "licenses"
+_BUNDLED_LICENSES = Path(__file__).resolve().parent.parent / "cursiv_engine" / "licenses"
 if getattr(sys, "frozen", False):
-    _BUNDLED_LICENSES = Path(sys.executable).resolve().parent / "_internal" / "cursiv_v215" / "licenses"
+    _BUNDLED_LICENSES = Path(sys.executable).resolve().parent / "_internal" / "cursiv_engine" / "licenses"
 
 _EXTRA_TERMS = {
     "llama": "Built with Llama. Meta's Acceptable Use Policy is at the end of the license file.",

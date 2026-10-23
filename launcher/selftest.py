@@ -18,14 +18,14 @@ from pathlib import Path
 
 def _checks():
     def imports():
-        import cursiv_v215.ui.chat_app      # noqa: F401
+        import cursiv_engine.ui.chat_app      # noqa: F401
         import chat_commands                # noqa: F401
         import cursiv_launcher              # noqa: F401
         import pypdf                        # noqa: F401
         return "chat engine, commands, window code and the PDF reader load"
 
     def data_folders():
-        from cursiv_v215.core import paths
+        from cursiv_engine.core import paths
         out = []
         for d in (paths.APP_DATA, Path.home() / ".cursiv"):
             d.mkdir(parents=True, exist_ok=True)
@@ -36,13 +36,13 @@ def _checks():
         return "writable: " + ", ".join(out)
 
     def reference():
-        from cursiv_v215.core import reference
+        from cursiv_engine.core import reference
         n = len(reference.entries())
         assert n >= 100, n
         return f"{n} offline reference entries"
 
     def calculations():
-        from cursiv_v215.core import calc
+        from cursiv_engine.core import calc
         w = calc.work_out("Convert 12.4 C to F")
         assert w and abs(w.value - 54.32) < 1e-6, w
         d = calc.work_out("What is the distance and bearing from 44.1234, -71.5678 to 44.1300, -71.5600?")
@@ -50,7 +50,7 @@ def _checks():
         return "12.4 C = 54.32 F; 963.1 m between two GPS points"
 
     def field_notebook():
-        from cursiv_v215.core import devicekey, fieldlog
+        from cursiv_engine.core import devicekey, fieldlog
         real, real_key = fieldlog.log_dir, devicekey.key_file
         with tempfile.TemporaryDirectory() as tmp:
             scratch = Path(tmp).resolve()       # macOS /var aliases /private/var
@@ -69,7 +69,7 @@ def _checks():
         return "an entry saved, fingerprint chain checked, exported and signed, signature verified"
 
     def documents():
-        from cursiv_v215.core import documents
+        from cursiv_engine.core import documents
         assert documents.search("anything at all") is not None
         return "document search works"
 
@@ -91,13 +91,13 @@ def _checks():
             shell.deleteLater()
 
     def engine():
-        from cursiv_v215.core import ollama_host
+        from cursiv_engine.core import ollama_host
         where = ollama_host.exe()
         return (f"Ollama found at {where}" + (" and running" if ollama_host.running() else ", not running")
                 if where else "Ollama not installed (Setup installs it)")
 
     def owner_identity():
-        from cursiv_v215.core import release_identity
+        from cursiv_engine.core import release_identity
         return 'Pinned owner key ' + release_identity.public_identity()['key_id']
 
     return [("imports", imports), ("owner release identity", owner_identity), ("data folders", data_folders), ("offline reference", reference),
@@ -113,7 +113,7 @@ def run(report: str | None = None) -> int:
     os.environ["CURSIV_NO_ENGINE_START"] = "1"         # check the window, but never start the AI engine
     lines, failed = [], 0
     try:
-        from cursiv_v215.core import selfknow
+        from cursiv_engine.core import selfknow
         version = selfknow.VERSION
     except Exception:
         version = "?"

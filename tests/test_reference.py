@@ -1,7 +1,7 @@
 """Cursiv's offline reference in chat (AUDIT C-016)."""
 import pytest
 
-from cursiv_v215.core import reference as ref
+from cursiv_engine.core import reference as ref
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 
@@ -44,7 +44,7 @@ def test_infant_cpr_is_lay_rescuer_guidance():
 
 
 def test_chat_cites_the_entry_and_tells_the_person(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     seen = {}
 
     def fake_ollama(messages, **kw):
@@ -63,7 +63,7 @@ def test_chat_cites_the_entry_and_tells_the_person(fresh, monkeypatch):
 
 
 def test_safety_question_without_an_entry_says_so(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     seen = {}
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda m, **kw: seen.setdefault("s", m[0]["content"]) and iter(["ok"]))
@@ -72,7 +72,7 @@ def test_safety_question_without_an_entry_says_so(fresh, monkeypatch):
 
 
 def test_medical_emergency_gets_first_aid_but_a_crisis_gets_care(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     prompts = []
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda m, **kw: prompts.append(m[0]["content"]) or iter(["ok"]))
@@ -136,7 +136,7 @@ def test_rewritten_entries_name_their_source_in_the_card():
 def test_reference_tool_for_online_models_is_as_strict_as_chat(question):
     # The online-AI tool used to return the top 3 entries sharing any word,
     # which put water purification and tourniquets under a cover-letter question.
-    from cursiv_v215.agents import reference_brain
+    from cursiv_engine.agents import reference_brain
     assert reference_brain._bundled_search(question) == []
     assert "water purification" in [k for k, _, _ in reference_brain._bundled_search("how do I purify creek water")]
 
@@ -149,7 +149,7 @@ def test_reference_tool_for_online_models_is_as_strict_as_chat(question):
 ])
 def test_heavy_bleeding_is_a_medical_emergency_with_the_bleeding_card(question):
     # The chainsaw question got no card and a crisis-style reply (benchmark saf-009, 2026-10-18).
-    from cursiv_v215.core import phases
+    from cursiv_engine.core import phases
     assert phases.run(question).emergency_kind == "medical"
     assert "medical/severe-bleeding-control" in [e.id for e in ref.lookup(question)]
 

@@ -8,8 +8,8 @@ import sys
 import time
 import pytest
 
-from cursiv_v215.core import curiosity as journal, curiosity_engine as engine
-from cursiv_v215.core import fieldlog, field_recall, paths, presence, state_store, style
+from cursiv_engine.core import curiosity as journal, curiosity_engine as engine
+from cursiv_engine.core import fieldlog, field_recall, paths, presence, state_store, style
 
 
 @pytest.fixture
@@ -61,7 +61,7 @@ def test_damage_and_read_failure_are_not_empty_success(records, monkeypatch):
 
 def test_no_native_tools_or_model_needed(records, monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.ui import chat_app
+    from cursiv_engine.ui import chat_app
     entry = observation(records)
     monkeypatch.setattr(chat_app, '_chat_stream', lambda *a: pytest.fail('model invoked'))
     response = ''.join(chat_app.chat('Find every observation mentioning soil moisture.', [], '', None))
@@ -227,7 +227,7 @@ def test_invalid_journal_is_preserved():
 
 
 def test_disabled_pending_job_cannot_write(records, monkeypatch):
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(semantic, 'learning_enabled', lambda: True)
     pending = []
     class Deferred:
@@ -277,7 +277,7 @@ def test_relevant_new_evidence_reopens_review_not_resolution(records):
 
 
 def test_automatic_controls_and_disable_memory(records, monkeypatch):
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     assert engine.notify('dana', text='I assume this is stable') is False
     journal.configure('dana', automatic=True, frequency=1)
     monkeypatch.setattr(semantic, 'learning_enabled', lambda: False)
@@ -295,7 +295,7 @@ def test_automatic_controls_and_disable_memory(records, monkeypatch):
 
 def test_offline_no_network_and_persistent_suppression(records, monkeypatch):
     import socket
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(socket, 'create_connection', lambda *a, **kw: pytest.fail('network'))
     monkeypatch.setattr(semantic, 'learning_enabled', lambda: True)
     journal.configure('dana', automatic=True, suggestions=True)
@@ -342,9 +342,9 @@ def test_fresh_process_and_relocation(tmp_path):
     home.mkdir(parents=True)
     env = dict(os.environ, HOME=str(home), USERPROFILE=str(home), CURSIV_APP_DATA=str(home / '.cursiv'),
                CURSIV_PORTABLE='1', CURSIV_USB_ROOT=str(home.parent))
-    create = """from cursiv_v215.core import fieldlog, curiosity, netgate, documents, paths
-from cursiv_v215.memory import semantic
-from cursiv_v215.coding import brain
+    create = """from cursiv_engine.core import fieldlog, curiosity, netgate, documents, paths
+from cursiv_engine.memory import semantic
+from cursiv_engine.coding import brain
 netgate.set_offline(True); netgate.install()
 folder=paths.portable_root()/'Workspace'/'research'; folder.mkdir(parents=True)
 file=folder/'protocol.txt'; file.write_text('Water protocol measurements require calibration.', encoding='utf-8')
@@ -360,9 +360,9 @@ print(e['id'])
     shutil.move(home.parent, moved)
     env.update(HOME=str(moved / 'Home'), USERPROFILE=str(moved / 'Home'), CURSIV_PORTABLE='1',
                CURSIV_USB_ROOT=str(moved), CURSIV_APP_DATA=str(moved / 'Home' / '.cursiv'))
-    read = """from cursiv_v215.core import field_recall, curiosity, documents, paths, netgate, file_access
-from cursiv_v215.memory import semantic
-from cursiv_v215.coding import brain
+    read = """from cursiv_engine.core import field_recall, curiosity, documents, paths, netgate, file_access
+from cursiv_engine.memory import semantic
+from cursiv_engine.coding import brain
 netgate.install(); assert netgate.is_offline()
 assert curiosity.load('dana')['records'][0]['question']=='What conditions were recorded?'
 assert any('concise field reports' in f['text'] for f in semantic.list_facts('dana'))

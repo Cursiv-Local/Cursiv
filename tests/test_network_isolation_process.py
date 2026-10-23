@@ -15,7 +15,7 @@ def observe(event, args):
     if event.startswith('socket.') and event in ('socket.connect', 'socket.getaddrinfo'):
         attempts.append([event, repr(args)[0:180]])
 sys.addaudithook(observe)
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
 blocked = []
 for label, action in [

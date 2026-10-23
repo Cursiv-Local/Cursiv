@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 
 
 # ── the key itself ────────────────────────────────────────────────────────────

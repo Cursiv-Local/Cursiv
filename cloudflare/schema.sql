@@ -1,5 +1,5 @@
 -- Cursiv web database (Cloudflare D1).
--- Same five tables as cursiv_v215/web/db.py, plus demo_sessions for the demo chat's
+-- Same five tables as cursiv_engine/web/db.py, plus demo_sessions for the demo chat's
 -- rate limit (the Python server kept that in memory, which reset on every restart).
 --   Local:  npx wrangler d1 execute cursiv --local  --file schema.sql
 --   Live:   npx wrangler d1 execute cursiv --remote --file schema.sql

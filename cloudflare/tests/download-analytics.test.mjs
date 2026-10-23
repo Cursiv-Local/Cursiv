@@ -246,7 +246,7 @@ test('build output retains SEO, canonical installer URLs, privacy disclosure and
     assert.match(html, /download-stats.js/);
   }
   const start = readFileSync(new URL('../dist/start.html', import.meta.url), 'utf8');
-  const version = readFileSync(new URL('../../cursiv_v215/core/selfknow.py', import.meta.url), 'utf8').match(/^VERSION\s*=\s*"([^"]+)"/m)[1];
+  const version = readFileSync(new URL('../../cursiv_engine/core/selfknow.py', import.meta.url), 'utf8').match(/^VERSION\s*=\s*"([^"]+)"/m)[1];
   assert.ok(start.includes(`https://github.com/Cursiv-Local/Cursiv/releases/download/v${version}/Cursiv-Setup-${version}.exe`));
   assert.match(start, /SignPath/); assert(!/<img\b/i.test(start.replace(/<header[\s\S]*?<\/header>/, '')));
   assert.match(readFileSync(new URL('../dist/privacy/index.html', import.meta.url), 'utf8'), /download-analytics/);

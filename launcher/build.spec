@@ -25,9 +25,9 @@ ROOT = Path(SPECPATH).parent          # repo root (one level above launcher/)
 MAC = sys.platform == "darwin"
 import re as _re
 VERSION = _re.search(r'VERSION\s*=\s*"([^"]+)"',
-                     (ROOT / "cursiv_v215" / "core" / "selfknow.py").read_text(encoding="utf-8")).group(1)
+                     (ROOT / "cursiv_engine" / "core" / "selfknow.py").read_text(encoding="utf-8")).group(1)
 LAUNCHER = ROOT / "launcher"
-CURSIV   = ROOT / "cursiv_v215"
+CURSIV   = ROOT / "cursiv_engine"
 
 block_cipher = None
 
@@ -35,41 +35,41 @@ block_cipher = None
 datas = [
     # Icons
     (str(LAUNCHER / "resources" / "icons"), "launcher/resources/icons"),
-    # cursiv_v215 package (everything — models, prompts, templates)
-    (str(CURSIV), "cursiv_v215"),
+    # cursiv_engine package (everything — models, prompts, templates)
+    (str(CURSIV), "cursiv_engine"),
 ]
 
 
 # ── Hidden imports that PyInstaller static analysis misses ───────────────────
 hiddenimports = [
-    # cursiv_v215 sub-packages
-    "cursiv_v215",
+    # cursiv_engine sub-packages
+    "cursiv_engine",
     "pypdf",                         # core/documents.py reads PDFs page by page
-    "cursiv_v215.core.documents",
-    "cursiv_v215.core.fieldsync",
-    "cursiv_v215.core.phone_receive",
-    "cursiv_v215.core.crosscheck",
-    "cursiv_v215.core.demo",
-    "cursiv_v215.core.profile",
-    "cursiv_v215.ui",
-    "cursiv_v215.ui.chat_app",
-    "cursiv_v215.core",
-    "cursiv_v215.core.agent",
-    "cursiv_v215.core.constitution",
-    "cursiv_v215.core.memory",
-    "cursiv_v215.core.rate_limiter",
-    "cursiv_v215.core.scan_display",
-    "cursiv_v215.core.strand",
-    "cursiv_v215.guardian",
-    "cursiv_v215.guardian.access_gate",
-    "cursiv_v215.guardian.security_questions",
-    "cursiv_v215.guardian.owner",
-    "cursiv_v215.guardian.protected",
-    "cursiv_v215.guardian.identity_core",
+    "cursiv_engine.core.documents",
+    "cursiv_engine.core.fieldsync",
+    "cursiv_engine.core.phone_receive",
+    "cursiv_engine.core.crosscheck",
+    "cursiv_engine.core.demo",
+    "cursiv_engine.core.profile",
+    "cursiv_engine.ui",
+    "cursiv_engine.ui.chat_app",
+    "cursiv_engine.core",
+    "cursiv_engine.core.agent",
+    "cursiv_engine.core.constitution",
+    "cursiv_engine.core.memory",
+    "cursiv_engine.core.rate_limiter",
+    "cursiv_engine.core.scan_display",
+    "cursiv_engine.core.strand",
+    "cursiv_engine.guardian",
+    "cursiv_engine.guardian.access_gate",
+    "cursiv_engine.guardian.security_questions",
+    "cursiv_engine.guardian.owner",
+    "cursiv_engine.guardian.protected",
+    "cursiv_engine.guardian.identity_core",
     "bcrypt",
-    "cursiv_v215.memory",
-    "cursiv_v215.council",
-    "cursiv_v215.obsidian",
+    "cursiv_engine.memory",
+    "cursiv_engine.council",
+    "cursiv_engine.obsidian",
     # launcher
     "cursiv_launcher",
     "login_dialog",

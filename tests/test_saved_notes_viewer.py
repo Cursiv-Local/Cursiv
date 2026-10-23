@@ -9,7 +9,7 @@ import sys
 
 import pytest
 from PyQt6.QtWidgets import QApplication, QFileDialog, QPlainTextEdit, QWidget
-from cursiv_v215.core import strand_store, strand
+from cursiv_engine.core import strand_store, strand
 import saved_notes as notes
 from saved_notes_dialog import SavedNotesDialog
 

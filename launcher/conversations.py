@@ -15,7 +15,7 @@ import uuid
 from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 from typing import Callable, Optional
-from cursiv_v215.core import atomic as _atomic
+from cursiv_engine.core import atomic as _atomic
 
 DIR = Path.home() / ".cursiv" / "conversations"
 _writer = ThreadPoolExecutor(max_workers=1, thread_name_prefix="cursiv-chat-save")
@@ -85,7 +85,7 @@ def queue_save(conv_id: str | None, messages: list[dict], html: str, *,
 
 def _person() -> str:
     try:
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.memory import semantic
         return semantic.current_person()
     except Exception:
         return "family"
@@ -139,7 +139,7 @@ def _smart_title(conv_id: str, messages: list[dict], on_done: Optional[Callable[
             parts.append(f"{'User' if m.get('role') == 'user' else 'Assistant'}: {' '.join(c.split())[:400]}")
     convo = "\n".join(parts)[:3000]
     try:
-        from cursiv_v215.ui.chat_app import _quick_llm
+        from cursiv_engine.ui.chat_app import _quick_llm
         title = _clean_title(_quick_llm([{"role": "system", "content": _TITLE_PROMPT},
                                          {"role": "user", "content": convo}], max_tokens=24))
     except Exception:

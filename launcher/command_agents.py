@@ -54,8 +54,8 @@ def _cascade_gen(runtime: CommandRuntime, cfg: dict, messages: list[dict], max_t
     return _labelled(), (used[0] if used else "")
 
 def _codex_command(runtime: CommandRuntime, prompt: str, cfg: dict, history: list[dict]):
-    from cursiv_v215.coding import brain, runner
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.coding import brain, runner
+    from cursiv_engine.memory import semantic
     person = semantic.current_person()
     low = prompt.lower()
 
@@ -95,7 +95,7 @@ def _codex_command(runtime: CommandRuntime, prompt: str, cfg: dict, history: lis
     msgs = brain.build_messages(prompt, history, person)
 
     try:
-        from cursiv_v215.ui.chat_app import _local_model_ready, _ollama_pulled_models
+        from cursiv_engine.ui.chat_app import _local_model_ready, _ollama_pulled_models
         has_coder = _local_model_ready() and any("coder" in m for m in _ollama_pulled_models())
     except Exception:
         has_coder = False
@@ -130,11 +130,11 @@ def _codex_command(runtime: CommandRuntime, prompt: str, cfg: dict, history: lis
 
         def learn():
             try:
-                from cursiv_v215.ui.chat_app import _memory_llm
+                from cursiv_engine.ui.chat_app import _memory_llm
                 brain.learn_from_exchange(prompt, full, _memory_llm, person)
             except Exception as exc:
                 formation.record('coding_failed', exc)
-        from cursiv_v215.memory import formation
+        from cursiv_engine.memory import formation
         import uuid
         formation.submit(learn, 'coding:' + uuid.uuid4().hex)
 
@@ -142,7 +142,7 @@ def _codex_command(runtime: CommandRuntime, prompt: str, cfg: dict, history: lis
 
 def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[dict]):
     import re as _re
-    from cursiv_v215.agents import custom
+    from cursiv_engine.agents import custom
     t = text.strip()
     low = t.lower()
     if low in ("agents", "agent", "agent list", "agent help"):
@@ -165,7 +165,7 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
         return runtime.TextResult(custom.describe(m.group(2)))
 
     try:
-        from cursiv_v215.ui.chat_app import _build_strand_context
+        from cursiv_engine.ui.chat_app import _build_strand_context
     except Exception:
         _build_strand_context = lambda q: ""
 

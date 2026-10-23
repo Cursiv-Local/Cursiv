@@ -7,7 +7,7 @@ import threading
 
 import pytest
 
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 
 
 # ── Harness: record every connection off this computer, and refuse it ───────
@@ -43,14 +43,14 @@ def outbound():
 @pytest.fixture
 def fresh(tmp_path, monkeypatch):
     """A fresh install: empty .cursiv folders, no keys, default settings."""
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.memory import semantic as sem
     app_dir, home_dir = tmp_path / "app" / ".cursiv", tmp_path / "home" / ".cursiv"
     # chat_app imports APP_DATA before this fixture runs; redirect it explicitly so
     # config writes cannot reach the installed/source checkout's real .cursiv folder.
     monkeypatch.setattr(ca, "APP_DATA", app_dir)
     monkeypatch.setattr(netgate, "CONFIG_FILE", app_dir / "config.json")
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     monkeypatch.setattr(keys, "KEYS_FILE", app_dir / "config.json")
     monkeypatch.setattr(ca, "_CLOUD_FILE", home_dir / "cursiv_cloud.json")
     monkeypatch.setattr(sem, "CURSIV_DIR", app_dir)
@@ -59,9 +59,9 @@ def fresh(tmp_path, monkeypatch):
     monkeypatch.setattr(sem, "EMB_CACHE_FILE", app_dir / "embeddings_cache.json")
     monkeypatch.setattr(sem, "_strand_items", lambda: [])
     monkeypatch.delenv("BRAVE_API_KEY", raising=False)
-    from cursiv_v215.chat import web_search
+    from cursiv_engine.chat import web_search
     monkeypatch.setattr(web_search, "BRAVE_KEY", "")
-    from cursiv_v215.core import phases
+    from cursiv_engine.core import phases
     monkeypatch.setitem(phases._conn_cache, "t", 0.0)
     monkeypatch.setitem(phases._conn_cache, "online", None)
     return app_dir
@@ -69,8 +69,8 @@ def fresh(tmp_path, monkeypatch):
 
 def _local_model(monkeypatch, reply="Here is what I know."):
     """Ollama 'running' with a model, answering without a server."""
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(ca, "_ollama_running", lambda: True)
     monkeypatch.setattr(ca, "_resolve_ollama_model", lambda: "qwen2.5:3b")
     monkeypatch.setattr(ca, "_local_model_ready", lambda: True)
@@ -89,18 +89,18 @@ def _local_model(monkeypatch, reply="Here is what I know."):
     "What's the latest on the storm today ?",
 ])
 def test_trigger_words_no_longer_search(fresh, text):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     assert ca._needs_search(text) is False
 
 
 def test_explicit_search_prefix_still_searches(fresh):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     assert ca._needs_search("search: county burn ban")
     assert ca._needs_search("search county burn ban")
 
 
 def test_automatic_search_is_an_opt_in_setting(fresh):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     assert netgate.setting("web_search_auto") is False
     netgate.set_setting("web_search_auto", True)
     assert ca._needs_search("What should we stock up on this week?")
@@ -110,7 +110,7 @@ def test_automatic_search_is_an_opt_in_setting(fresh):
 
 
 def test_web_search_does_not_go_out_offline(fresh, outbound):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     netgate.set_offline(True)
     assert ca._web_search("search: weather") == ""
     assert outbound == []
@@ -146,7 +146,7 @@ def test_websearch_and_autoupdate_commands_save_settings(fresh):
 
 
 def test_offline_keeps_saved_keys(fresh):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     ca._store_key("groq_key", "gsk_" + "x" * 30)
     netgate.set_offline(True)
     netgate.set_offline(False)
@@ -179,7 +179,7 @@ def test_closed_gate_still_allows_loopback(fresh):
 
 
 def test_offline_cloud_callers_stop_before_the_network(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     ca._store_key("groq_key", "gsk_" + "x" * 30)
     netgate.set_offline(True)
     assert ca.cloud_enabled() is False
@@ -192,7 +192,7 @@ def test_offline_cloud_callers_stop_before_the_network(fresh, outbound, monkeypa
 
 def test_offline_with_keys_and_a_trigger_word_answers_locally(fresh, outbound, monkeypatch):
     """C-010 acceptance: offline on, saved keys, a trigger word -> zero external connections."""
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="Boil it for a minute.")
     ca._store_key("groq_key", "gsk_" + "x" * 30)
     ca._store_key("gemini_key", "AIza" + "x" * 30)
@@ -213,7 +213,7 @@ def test_offline_with_keys_and_a_trigger_word_answers_locally(fresh, outbound, m
 ])
 def test_fresh_install_chat_turn_makes_no_outside_connections(fresh, outbound, monkeypatch, text):
     """The 'done' check: empty .cursiv, no keys, default settings, local model ready."""
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch)
     probes = []
     real_is_online = ca._is_online
@@ -225,7 +225,7 @@ def test_fresh_install_chat_turn_makes_no_outside_connections(fresh, outbound, m
 
 
 def test_connectivity_probe_runs_only_when_something_would_use_it(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     calls = []
     monkeypatch.setattr(ca, "_is_online", lambda: calls.append(1) or True)
     monkeypatch.setattr(ca, "_local_model_ready", lambda: True)
@@ -239,7 +239,7 @@ def test_connectivity_probe_runs_only_when_something_would_use_it(fresh, monkeyp
 
 
 def test_connectivity_phase_reports_not_checked(fresh):
-    from cursiv_v215.core import phases
+    from cursiv_engine.core import phases
     r = phases.PhaseResult()
     phases._connectivity(r, lambda: None, lambda: True)
     assert ("Connectivity", "not checked, local model ready") in r.trace
@@ -265,7 +265,7 @@ def test_launcher_update_check_follows_the_setting(fresh):
 
 
 def test_embedding_model_is_not_pulled_offline(fresh, monkeypatch):
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "_embed_ok", None)
     monkeypatch.setattr(sem, "_http", lambda path, payload=None, timeout=30: {"models": [{"name": "qwen2.5:3b"}]})
     started = []
@@ -278,7 +278,7 @@ def test_embedding_model_is_not_pulled_offline(fresh, monkeypatch):
 
 
 def test_first_model_download_is_refused_offline(fresh):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     netgate.set_offline(True)
     out = "".join(ca._pull_ollama_model("qwen2.5:3b"))
     assert "offline mode is on" in out
@@ -290,7 +290,7 @@ class _NoThread:
 
 
 def test_cursiv_cloud_is_off_on_a_fresh_install(fresh):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     assert ca.cloud_enabled() is False
     ca.set_cloud_enabled(True)
     assert ca.cloud_enabled() is True
@@ -298,7 +298,7 @@ def test_cursiv_cloud_is_off_on_a_fresh_install(fresh):
 
 def test_memory_search_never_starts_a_download_even_online(fresh, monkeypatch):
     # The embedding model comes only with Setup's model download (review 2026-10-18).
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "_embed_ok", None)
     monkeypatch.setattr(sem, "_http", lambda path, payload=None, timeout=30: {"models": [{"name": "qwen3:4b-instruct"}]})
     started = []

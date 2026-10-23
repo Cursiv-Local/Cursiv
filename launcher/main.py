@@ -9,7 +9,7 @@ import os
 import sys
 from pathlib import Path
 
-# ── Ensure repo root is on sys.path so cursiv_v215 imports work ─────────────
+# ── Ensure repo root is on sys.path so cursiv_engine imports work ─────────────
 if getattr(sys, "frozen", False):
     _ROOT = Path(sys.executable).parent
 else:
@@ -172,7 +172,7 @@ def main():
     # opening without it. (It used to warn and continue as "Joshua".)
     username = ""
     try:
-        from cursiv_v215.guardian.access_gate import is_setup_complete
+        from cursiv_engine.guardian.access_gate import is_setup_complete
         from login_dialog import LoginDialog, SetupDialog
 
         if not is_setup_complete():
@@ -201,7 +201,7 @@ def main():
     # ── Family member welcome ─────────────────────────────────────────────
     # If the username matches a family member's first name, point them at
     # the babel activation before the main launcher opens. The letter itself
-    # is sealed (cursiv_v215/family/sealed_letters.json) and only opens with
+    # is sealed (cursiv_engine/family/sealed_letters.json) and only opens with
     # their name + birth date -- a username alone must never reveal it.
     try:
         _FAMILY_FIRST = ("keiarra", "kain", "allan", "elijah", "eli", "naylie", "adaline", "tina")
@@ -222,7 +222,7 @@ def main():
         sys.exit(1)
 
     # Constructing the window does real work now (the chat panel loads its
-    # own command router, which pulls in a long chain of cursiv_v215
+    # own command router, which pulls in a long chain of cursiv_engine
     # modules) -- previously nothing here caught a failure, so any error
     # partway through construction meant total silence: no window, no tray
     # icon, no message, the process just exits. Surfacing it explicitly so

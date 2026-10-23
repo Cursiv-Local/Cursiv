@@ -41,7 +41,7 @@ def machine() -> dict:
                                   timeout=20).stdout.strip()
         except Exception:
             return ""
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     return {
         "cpu": ps("(Get-CimInstance Win32_Processor | Select-Object -First 1).Name") or platform.processor(),
         "cores": os.cpu_count(),
@@ -53,7 +53,7 @@ def machine() -> dict:
 
 
 def run(model: str, options: dict) -> dict:
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     speed.make_room(model)
     body = {"model": model, "prompt": PROMPT, "stream": False, "keep_alive": "5m",
             "options": {"num_predict": 220, "num_ctx": speed.num_ctx(), **options}}
@@ -69,7 +69,7 @@ def run(model: str, options: dict) -> dict:
 
 
 def main() -> int:
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     models = sys.argv[1:] or ["qwen3:4b-instruct", "qwen2.5:1.5b"]
     m = machine()
     rows = []

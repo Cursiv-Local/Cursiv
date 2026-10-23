@@ -12,8 +12,8 @@ from command_runtime import CommandRuntime, UNHANDLED
 def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: list[dict]):
     if cmd in ("tone", "style", "my style", "style show", "style clear") or cmd.startswith(("tone ", "style ")):
         try:
-            from cursiv_v215.core import style as _style
-            from cursiv_v215.memory import semantic as _sem
+            from cursiv_engine.core import style as _style
+            from cursiv_engine.memory import semantic as _sem
             _reply = _style.command(text, _sem.current_person())
             if _reply is not None:
                 return runtime.TextResult(_reply)
@@ -22,7 +22,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
 
     # ── Cursiv Forge: plugins + evolve; project memory (U52) ──────────────────
     if cmd in ("plugins", "plugin") or cmd.startswith("plugin "):
-        from cursiv_v215.core import plugins as _pl
+        from cursiv_engine.core import plugins as _pl
         _m = __import__("re").match(r"(?i)^plugin\s+(show|off|on|remove|delete|approve)\s+(\w+)\s*$", text.strip())
         if not _m:
             return runtime.TextResult(_pl.listing())
@@ -35,7 +35,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             return runtime.TextResult(_pl.approve_existing(_name))
         return runtime.TextResult(_pl.remove(_name))
     if cmd == "evolve" or cmd.startswith("evolve "):
-        from cursiv_v215.coding import forge as _forge
+        from cursiv_engine.coding import forge as _forge
         _idea = text[6:].strip()
         if _idea.lower() in ("approve", "yes", "install"):
             return runtime.TextResult(_forge.approve())
@@ -47,7 +47,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
                               "`evolve approve`.\nExamples:\n  evolve a command that converts recipe amounts between cups and grams\n"
                               "  evolve a tool that tells me how many days until a date\n  evolve a tracker for my kids' chores")
         try:
-            from cursiv_v215.ui.chat_app import _local_model_ready, _ollama_pulled_models
+            from cursiv_engine.ui.chat_app import _local_model_ready, _ollama_pulled_models
             _coder = _local_model_ready() and any("coder" in m for m in _ollama_pulled_models())
         except Exception:
             _coder = False
@@ -58,13 +58,13 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             return g
         return runtime.StreamResult(f"Forge — {_idea[:60]}", _forge.evolve(_idea, _gen), None)
     if cmd in ("projects", "topics", "my projects") or __import__("re").match(r"(?i)^project (show|forget|delete) ", text.strip()):
-        from cursiv_v215.memory import projects as _projmem
-        from cursiv_v215.memory import semantic as _sem
+        from cursiv_engine.memory import projects as _projmem
+        from cursiv_engine.memory import semantic as _sem
         _r = _projmem.command(text, _sem.current_person())
         if _r is not None:
             return runtime.TextResult(_r)
     try:                     # commands added by installed plugins
-        from cursiv_v215.core import plugins as _pl
+        from cursiv_engine.core import plugins as _pl
         _out = _pl.run_command(text)
         if _out is not None:
             return runtime.TextResult(_out)
@@ -113,7 +113,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
         if runtime._ASYNC_COUNCIL_OK:
             # Bridges run_council()'s blocking/asyncio interior to a live
             # generator via a background thread + queue -- the exact
-            # pattern cursiv_v215.ui.chat_app.py's Gradio surface already
+            # pattern cursiv_engine.ui.chat_app.py's Gradio surface already
             # uses (_call_provider_council), so the GUI streams each
             # provider's response as it actually arrives (write_fn fires
             # for the session banner, each provider's own streamed text,

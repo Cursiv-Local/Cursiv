@@ -31,7 +31,7 @@ def register(cursiv):
 
 @pytest.fixture
 def plugins(tmp, monkeypatch):
-    from cursiv_v215.core import plugins as pl
+    from cursiv_engine.core import plugins as pl
     d = tmp / "plugins"
     monkeypatch.setattr(pl, "DIR", d)
     monkeypatch.setattr(pl, "STATE_FILE", d / "_plugins.json")
@@ -73,7 +73,7 @@ def test_switched_off_plugin_does_not_run(plugins):
 
 @pytest.fixture
 def memory(tmp, monkeypatch):
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "CURSIV_DIR", tmp)
     monkeypatch.setattr(sem, "FACTS_FILE", tmp / "memory_facts.jsonl")
     monkeypatch.setattr(sem, "embed", lambda texts: None)       # keyword matching, no Ollama

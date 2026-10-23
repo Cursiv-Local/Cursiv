@@ -3,7 +3,7 @@ Cursiv — Postal compose dialog (native GUI edition of the terminal CLI's
 "write to <name>" sealed-letter flow).
 
 Recipient + optional hint + multi-line body, then seals via the exact
-same cursiv_v215.postal.sealed_store.seal_letter() call the terminal CLI
+same cursiv_engine.postal.sealed_store.seal_letter() call the terminal CLI
 uses (through chat_commands.postal_compose) -- machine-bound encryption,
 Ed25519 signing if an identity is set up. Sealing does real key-derivation
 work (tens of thousands of PBKDF2 iterations), so it runs on a background

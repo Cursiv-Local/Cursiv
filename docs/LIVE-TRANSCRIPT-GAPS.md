@@ -31,17 +31,17 @@ Paths below are relative to the repository root.
 
 | File | Change |
 | --- | --- |
-| `cursiv_v215/core/fieldmath.py` | Full-match conversion/consumption forms; cubic metres to litres; existing positive/finite checks. |
-| `cursiv_v215/core/calc.py` | Recognize arrival-time questions in the existing clock calculator. |
-| `cursiv_v215/core/native_answers.py` | Native receipts for the exact hiking form, shared phone help, concise denials. |
-| `cursiv_v215/core/phone_help.py` | Shared reviewed phone URLs and wording. |
+| `cursiv_engine/core/fieldmath.py` | Full-match conversion/consumption forms; cubic metres to litres; existing positive/finite checks. |
+| `cursiv_engine/core/calc.py` | Recognize arrival-time questions in the existing clock calculator. |
+| `cursiv_engine/core/native_answers.py` | Native receipts for the exact hiking form, shared phone help, concise denials. |
+| `cursiv_engine/core/phone_help.py` | Shared reviewed phone URLs and wording. |
 | `launcher/phone_help.py` | Reexport shared wording; preserve clickable help formatting. |
-| `cursiv_v215/memory/intents.py` | Descriptive forget fallback requires all meaningful tokens and one visible match; ambiguity lists IDs; existing deletion/read-back pathway retained. |
-| `cursiv_v215/core/action_gate.py` | Strip the explicit override wrapper before classifying a forbidden imperative. |
-| `cursiv_v215/core/file_access.py` | Recognize explicit first-N-line requests, authorize the actual path, return a limited excerpt and typed read receipt. |
-| `cursiv_v215/core/presence.py` | Combined version/offline question uses the short native state path without memory lookup. |
-| `cursiv_v215/core/answer_evidence.py` | Typed application evidence receipt and native prior-bleach-source reply; never parse model citation prose. |
-| `cursiv_v215/chat/completion.py` | Source follow-up dispatch and capture of calculations/references actually supplied during a streamed turn. |
+| `cursiv_engine/memory/intents.py` | Descriptive forget fallback requires all meaningful tokens and one visible match; ambiguity lists IDs; existing deletion/read-back pathway retained. |
+| `cursiv_engine/core/action_gate.py` | Strip the explicit override wrapper before classifying a forbidden imperative. |
+| `cursiv_engine/core/file_access.py` | Recognize explicit first-N-line requests, authorize the actual path, return a limited excerpt and typed read receipt. |
+| `cursiv_engine/core/presence.py` | Combined version/offline question uses the short native state path without memory lookup. |
+| `cursiv_engine/core/answer_evidence.py` | Typed application evidence receipt and native prior-bleach-source reply; never parse model citation prose. |
+| `cursiv_engine/chat/completion.py` | Source follow-up dispatch and capture of calculations/references actually supplied during a streamed turn. |
 | `launcher/chat_feedback.py` | Accept typed answer evidence; ignore plain dictionaries/model text. |
 | `launcher/chat_panel.py` | Reset pending evidence each turn and save it on the completed assistant history row. |
 

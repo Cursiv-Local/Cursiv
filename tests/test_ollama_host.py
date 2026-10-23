@@ -1,7 +1,7 @@
 """Where the local AI engine lives, on Windows and macOS (core/ollama_host.py)."""
 from pathlib import Path
 
-from cursiv_v215.core import ollama_host as oh
+from cursiv_engine.core import ollama_host as oh
 
 
 def _no_path(monkeypatch):

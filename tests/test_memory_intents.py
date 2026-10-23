@@ -10,7 +10,7 @@ import time
 
 import pytest
 
-from cursiv_v215.memory import intents as mi, semantic as sem
+from cursiv_engine.memory import intents as mi, semantic as sem
 
 
 @pytest.fixture
@@ -205,7 +205,7 @@ def test_classifier_cannot_invent_data_or_authorize_other_operations(memory, pro
 
 
 def test_local_classifier_is_bounded_and_has_no_cloud_fallback(monkeypatch):
-    from cursiv_v215.core import local_intent
+    from cursiv_engine.core import local_intent
     release = threading.Event()
     def stuck(*args, **kwargs):
         release.wait(2)
@@ -222,8 +222,8 @@ def test_local_classifier_is_bounded_and_has_no_cloud_fallback(monkeypatch):
 
 @pytest.mark.parametrize('provider', ['ollama', 'openai', 'claude', 'grok'])
 def test_offline_memory_routes_bypass_models_files_and_verification(memory, monkeypatch, provider):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import file_access, netgate
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import file_access, netgate
     def forbidden(*args, **kwargs):
         pytest.fail('Explicit memory must not reach files, models or post-generation verification')
     monkeypatch.setattr(ca, '_chat_inner', forbidden)
@@ -258,7 +258,7 @@ def test_memory_ui_history_and_scoped_clarification_survive_command_delivery(mem
 def test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation(tmp_path):
     env = dict(os.environ, CURSIV_APP_DATA=str(tmp_path / 'app'), HOME=str(tmp_path / 'home'), USERPROFILE=str(tmp_path / 'home'))
     write = '''
-from cursiv_v215.memory import semantic
+from cursiv_engine.memory import semantic
 semantic.set_person('dana')
 result = semantic.memory_command('Remember permanently: HAWK-217')
 assert 'Memory ID:' in result
@@ -266,7 +266,7 @@ assert 'Memory ID:' in result
     read = '''
 import json, os
 from pathlib import Path
-from cursiv_v215.memory import semantic
+from cursiv_engine.memory import semantic
 semantic.set_person('dana')
 raw = Path(os.environ['CURSIV_APP_DATA']) / 'memory_facts.jsonl'
 rows = [json.loads(line) for line in raw.read_text(encoding='utf-8').splitlines()]
@@ -283,7 +283,7 @@ def test_portable_memory_survives_drive_relocation_and_fresh_process(tmp_path):
     drive.mkdir()
     env = dict(os.environ, CURSIV_PORTABLE='1', CURSIV_USB_ROOT=str(drive),
                CURSIV_APP_DATA=str(drive / 'Home' / '.cursiv'), HOME=str(drive / 'Home'), USERPROFILE=str(drive / 'Home'))
-    write = "from cursiv_v215.memory import intents; assert intents.command('remember permanently: USB-217', [], person='dana').ok"
+    write = "from cursiv_engine.memory import intents; assert intents.command('remember permanently: USB-217', [], person='dana').ok"
     result = subprocess.run([sys.executable, '-B', '-c', write], env=env, capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, result.stderr
     before = (drive / 'Home' / '.cursiv' / 'memory_facts.jsonl').read_bytes()
@@ -292,7 +292,7 @@ def test_portable_memory_survives_drive_relocation_and_fresh_process(tmp_path):
     env.update(CURSIV_USB_ROOT=str(moved), CURSIV_APP_DATA=str(moved / 'Home' / '.cursiv'),
                HOME=str(moved / 'Home'), USERPROFILE=str(moved / 'Home'))
     read = """
-from cursiv_v215.memory import intents
+from cursiv_engine.memory import intents
 result = intents.command('recall USB-217', [], person='dana')
 assert result.ok and 'USB-217' in result.render()
 assert intents.command('remember permanently: USB-217', [], person='dana').outcomes[0].status == 'already_saved'
@@ -303,7 +303,7 @@ assert intents.command('remember permanently: USB-217', [], person='dana').outco
 
 
 def test_local_classifier_validates_schema_and_only_sends_to_loopback(monkeypatch):
-    from cursiv_v215.core import local_intent as li
+    from cursiv_engine.core import local_intent as li
     monkeypatch.setattr(li, '_loaded', ('', 0))
     monkeypatch.setenv('OLLAMA_HOST', 'https://remote.example')
     def forbidden(*args, **kwargs):
@@ -337,7 +337,7 @@ def test_local_classifier_validates_schema_and_only_sends_to_loopback(monkeypatc
 
 
 def test_local_classifier_disables_proxies_and_redirects(monkeypatch):
-    from cursiv_v215.core import local_intent as li
+    from cursiv_engine.core import local_intent as li
     handlers = []
     class Opener:
         def open(self, request, *, timeout):

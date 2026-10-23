@@ -56,7 +56,7 @@ jobs:
         run: python scripts/mac_shots.py mac-shots || QT_QPA_PLATFORM=offscreen python scripts/mac_shots.py mac-shots
       - name: Make the .dmg
         run: |
-          VERSION=$(python -c "import re;print(re.search(r'VERSION\s*=\s*\"([^\"]+)\"',open('cursiv_v215/core/selfknow.py').read()).group(1))")
+          VERSION=$(python -c "import re;print(re.search(r'VERSION\s*=\s*\"([^\"]+)\"',open('cursiv_engine/core/selfknow.py').read()).group(1))")
           DMG="Cursiv-${VERSION}-mac-arm64.dmg"
           mkdir -p dmg
           cp -R dist/Cursiv.app dmg/

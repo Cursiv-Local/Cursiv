@@ -44,7 +44,7 @@ def save_token(token: str) -> None:
     except Exception:
         state = {}
     try:
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.memory import semantic
         state["person"] = semantic.current_person()
     except Exception:
         pass

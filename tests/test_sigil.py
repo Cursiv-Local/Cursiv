@@ -1,4 +1,4 @@
-"""Zero-width text helpers in cursiv_v215/core/sigil.py.
+"""Zero-width text helpers in cursiv_engine/core/sigil.py.
 
 Run:  python -m pytest tests/   (or just: python tests/test_sigil.py)
 """
@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from cursiv_v215.core import sigil  # noqa: E402
+from cursiv_engine.core import sigil  # noqa: E402
 
 
 def test_round_trip_message_that_contains_the_sentinel():

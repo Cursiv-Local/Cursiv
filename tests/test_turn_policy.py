@@ -1,6 +1,6 @@
 """Conversation-only requests cannot be converted into actions by a model."""
 import pytest
-from cursiv_v215.core import turn_policy as tp
+from cursiv_engine.core import turn_policy as tp
 
 
 @pytest.mark.parametrize('text', [
@@ -37,7 +37,7 @@ def test_payloads_and_examples_are_not_instructions(text):
 
 
 def test_tool_planning_and_execution_both_enforce_limits(monkeypatch, tmp_path):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     policy = tp.for_text('Just talk about my files.')
     monkeypatch.setattr(tools, 'system_info', lambda: pytest.fail('No inspection'))
     assert tools.plan('Just talk about my files.', lambda _: pytest.fail('No planner call')) == []
@@ -46,13 +46,13 @@ def test_tool_planning_and_execution_both_enforce_limits(monkeypatch, tmp_path):
 
 
 def test_automatic_learning_respects_coordinated_negative():
-    from cursiv_v215.memory import formation
+    from cursiv_engine.memory import formation
     assert not formation.permitted("For now, don't inspect documents, save memories, or change anything.")
 
 
 def test_native_file_and_memory_routes_respect_limits(tmp_path):
-    from cursiv_v215.core import file_access
-    from cursiv_v215.memory import intents
+    from cursiv_engine.core import file_access
+    from cursiv_engine.memory import intents
     result = file_access.command('Create new.txt containing: marker. Do not change anything.', [], tmp_path)
     assert result.receipts[0].ok  # The explicitly supplied file contents are data.
     denied = intents.command('Remember TEST-81, but do not save memories.', [], person='tester')

@@ -5,9 +5,9 @@ from test_verify import _ledger
 
 
 def _revising(monkeypatch):
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     monkeypatch.setattr(speed, 'battery_saver', lambda: False)  # explicitly exercise the optional review
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
                     confirm_writes, anthropic_key, force_provider, reply):
@@ -23,7 +23,7 @@ def _revising(monkeypatch):
     learned = {}
     # This fake stream bypasses _chat_stream's normal per-turn reset.
     monkeypatch.setattr(ca, "_WORKED", None)
-    from cursiv_v215.chat import review
+    from cursiv_engine.chat import review
     monkeypatch.setattr(review, 'mode', lambda: 'full')  # explicitly exercise legacy bounded rewrite behavior
     monkeypatch.setattr(ca, "_chat_stream", fake_stream)
     monkeypatch.setattr(ca, "_router_llm", ask)
@@ -69,7 +69,7 @@ def test_chat_panel_swaps_the_draft_in_place():
 
 def test_check_notes_are_short_and_plain():
     from types import SimpleNamespace
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     raw = ("- **Unsupported Claims:**\n- \"The creek quality might matter.\" This is unsupported.\n"
            "**Answers to the Wrong Question:**\n**None**: CLEAR.")
     text = ca._compact_notes(SimpleNamespace(problems=[raw, "Known says 50 liters, which nobody gave."]))

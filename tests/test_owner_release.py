@@ -6,7 +6,7 @@ import pytest
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 from cryptography.exceptions import InvalidSignature
-from cursiv_v215.core import release_identity as identity
+from cursiv_engine.core import release_identity as identity
 
 
 @pytest.fixture

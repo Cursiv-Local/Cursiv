@@ -13,13 +13,13 @@ where data lives, and how to run, build and release it.
 | Folder | What's in it |
 |---|---|
 | `launcher/` | The desktop app: main window, chat panel, tray menu, dialogs (Setup, Settings, Training Data, USB maker…), login, updater. `main.py` is the entry point. |
-| `cursiv_v215/` | The engine the app runs on (the folder name is historical). |
+| `cursiv_engine/` | The engine the app runs on (the folder name is historical). |
 | `installer/` | Inno Setup script (`cursiv_setup.iss`) that wraps the build into `Cursiv-Setup-<version>.exe`. |
 | `scripts/` | `build.bat` (PyInstaller), `package.bat` (installer), `verify_build.bat`, `seal_family_letters.py`. |
 | `website/` | The public website and phone web app (cursiv.us). |
 | `cloudflare/` | The Cloudflare Worker behind the website and phone app, plus `publish.mjs` to deploy it. |
 
-### Inside `cursiv_v215/`
+### Inside `cursiv_engine/`
 
 | Package | Job |
 |---|---|
@@ -98,7 +98,7 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 You need PyInstaller (in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
-1. Bump `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and `cursiv_v215/core/selfknow.py` (`VERSION`) together, using an unused higher suffix such as `3.14-U85`.
+1. Bump `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and `cursiv_engine/core/selfknow.py` (`VERSION`) together, using an unused higher suffix such as `3.14-U85`.
 2. Run the regression checks in isolated data, commit reviewed source and tag that exact commit. Use a clean environment containing only `requirements.txt`; retain the exact dependency list.
 3. Run `py -3.13 scripts/build_release.py v3.14-U85`, substituting the new tag for a future release. It builds a temporary tagged checkout, requires the frozen full-window self-test, compiles Inno Setup and stages identical versioned/latest installers plus SHA-256 checksums in `installer/Output/`.
 

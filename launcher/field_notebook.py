@@ -1,7 +1,7 @@
 """
 Field Notebook window (research roadmap R1): record observations, see them,
 correct one (a new entry with a reason), check the log is intact, export.
-All storage and checks are in cursiv_v215/core/fieldlog.py.
+All storage and checks are in cursiv_engine/core/fieldlog.py.
 """
 from __future__ import annotations
 
@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (
 )
 
 import theme
-from cursiv_v215.core import fieldlog
+from cursiv_engine.core import fieldlog
 
 ROWS = 2      # measurement rows shown at first; "+ Another measurement" adds more
 
@@ -247,8 +247,8 @@ class FieldNotebookDialog(QDialog):
             self._status.setStyleSheet(f"color: {theme.RED};")
             return
         try:
-            from cursiv_v215.core import curiosity_engine
-            from cursiv_v215.memory import semantic
+            from cursiv_engine.core import curiosity_engine
+            from cursiv_engine.memory import semantic
             curiosity_engine.notify(semantic.current_person())
         except (OSError, ValueError):
             pass  # an optional suggestion cannot turn a verified save into failure
@@ -347,7 +347,7 @@ class FieldNotebookDialog(QDialog):
             return
         folder = fieldlog.log_dir() / "reports"
         from datetime import datetime
-        from cursiv_v215.core import atomic
+        from cursiv_engine.core import atomic
         path = Path(folder) / f"field-report-{datetime.now():%Y-%m-%d_%H%M%S}.html"
         try:
             atomic.write_text(path, fieldlog.report_html(rows))
@@ -359,7 +359,7 @@ class FieldNotebookDialog(QDialog):
     # ── team sync (core/fieldsync.py): a USB drive or a shared folder, no internet ──
     def _share(self):
         from pathlib import Path
-        from cursiv_v215.core import fieldsync
+        from cursiv_engine.core import fieldsync
         folder = QFileDialog.getExistingDirectory(self, "Share the field log to (a USB drive or shared folder)…")
         if not folder:
             return
@@ -374,7 +374,7 @@ class FieldNotebookDialog(QDialog):
 
     def _revoke(self):
         """The team lead marks a lost, stolen or retired phone or laptop: its new files are refused."""
-        from cursiv_v215.core import fieldsync
+        from cursiv_engine.core import fieldsync
         devices = sorted(p.name[:-len(".key.json")] for p in fieldsync.team_dir().glob("*.key.json")) \
             if fieldsync.team_dir().is_dir() else []
         gone = {v["device"] for v in fieldsync.revoked().values()}
@@ -400,7 +400,7 @@ class FieldNotebookDialog(QDialog):
     def _import_phone(self):
         """A file from the phone notebook (website/notebook), sent by USB, AirDrop or Quick Share."""
         from pathlib import Path
-        from cursiv_v215.core import fieldsync
+        from cursiv_engine.core import fieldsync
         f, _ = QFileDialog.getOpenFileName(self, "Import from the phone notebook", "",
                                            "Phone notebook (*.cursivsync)")
         if f:
@@ -416,13 +416,13 @@ class FieldNotebookDialog(QDialog):
 
     def _import(self):
         from pathlib import Path
-        from cursiv_v215.core import fieldsync
+        from cursiv_engine.core import fieldsync
         folder = QFileDialog.getExistingDirectory(self, "Import field logs from…")
         if folder:
             self._show_import(lambda: fieldsync.import_folder(Path(folder)))
 
     def _show_import(self, run):
-        from cursiv_v215.core import fieldsync
+        from cursiv_engine.core import fieldsync
         try:
             text = fieldsync.report_text(run())
         except (OSError, ValueError) as exc:

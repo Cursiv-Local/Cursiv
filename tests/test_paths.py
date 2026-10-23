@@ -2,7 +2,7 @@
 import sys
 from pathlib import Path
 
-from cursiv_v215.core import paths
+from cursiv_engine.core import paths
 
 
 def test_source_and_windows_keep_the_folder_next_to_the_program(monkeypatch):
@@ -27,6 +27,6 @@ def test_an_explicit_folder_wins(monkeypatch, tmp_path):
 
 
 def test_every_settings_reader_uses_the_same_file():
-    from cursiv_v215.chat import keys
-    from cursiv_v215.core import netgate
+    from cursiv_engine.chat import keys
+    from cursiv_engine.core import netgate
     assert keys.KEYS_FILE == netgate.CONFIG_FILE == paths.APP_DATA / "config.json"

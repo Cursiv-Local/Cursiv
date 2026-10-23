@@ -6,12 +6,12 @@ import { createHash, createPublicKey, verify } from 'node:crypto';
 
 const root = new URL('../../', import.meta.url);
 const read = path => readFileSync(new URL(path, root), 'utf8');
-const version = read('cursiv_v215/core/selfknow.py').match(/^VERSION\s*=\s*"([^"]+)"/m)[1];
+const version = read('cursiv_engine/core/selfknow.py').match(/^VERSION\s*=\s*"([^"]+)"/m)[1];
 const update = version.match(/U\d+$/)[0];
 const fragment = update.toLowerCase();
 
 test('owner-signed installer manifest and website hash use the pinned public key', () => {
-  const identity = JSON.parse(read('cursiv_v215/core/release_public_key.json'));
+  const identity = JSON.parse(read('cursiv_engine/core/release_public_key.json'));
   assert.deepEqual(JSON.parse(read('website/assets/cursiv-owner-release-key.json')), identity);
   const raw = Buffer.from(identity.public_key, 'base64');
   assert.equal(createHash('sha256').update(raw).digest('hex'), identity.key_id);

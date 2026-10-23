@@ -40,7 +40,7 @@ def test_extracted_notes_json_command_serializes_success_result():
 
 def test_production_python_module_size_budget():
     oversized = []
-    for package in ('cursiv_v215', 'launcher'):
+    for package in ('cursiv_engine', 'launcher'):
         for path in (ROOT / package).rglob('*.py'):
             count = len(path.read_text(encoding='utf-8').split('\n'))
             if count > 1200:
@@ -49,14 +49,14 @@ def test_production_python_module_size_budget():
 
 
 def test_extracted_chat_modules_import_without_widgets():
-    code = ('import sys; from cursiv_v215.chat import context, routing, completion, '
+    code = ('import sys; from cursiv_engine.chat import context, routing, completion, '
             'local_provider, cloud_providers, provider_tools, conversation, streaming, provenance; '
             'assert not any(n.startswith("PyQt6") for n in sys.modules)')
     subprocess.run([sys.executable, '-B', '-c', code], cwd=ROOT, check=True)
 
 
 def test_runtime_overrides_reach_provider_boundaries(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_ollama_running', lambda: True)
     monkeypatch.setattr(ca, '_resolve_ollama_model', lambda: 'test-local')
     monkeypatch.setattr(ca, '_call_ollama', lambda *a, **kw: iter(['provider boundary']))

@@ -1,5 +1,5 @@
 """Model choice and licenses (MODELS.md)."""
-from cursiv_v215.core import speed
+from cursiv_engine.core import speed
 
 RESEARCH_ONLY = {"qwen2.5:3b", "qwen2.5-coder:3b"}
 

@@ -12,7 +12,7 @@ from command_runtime import CommandRuntime, UNHANDLED
 
 def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: list[dict]):
     if cmd in ('check', 'check status', 'check off', 'check fast', 'check full'):
-        from cursiv_v215.chat import review
+        from cursiv_engine.chat import review
         try:
             if cmd in ('check off', 'check fast', 'check full'):
                 review.set_mode(cmd.split()[1])
@@ -39,7 +39,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
     # ── Simple state toggles ────────────────────────────────────────────
     def _engine_line() -> str:
         try:
-            from cursiv_v215.core import ollama_host
+            from cursiv_engine.core import ollama_host
             return ollama_host.diagnose()
         except Exception as exc:
             return f"unknown ({exc})"
@@ -47,12 +47,12 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
     if cmd == "status":
         # What a reviewer asks first: is it local only, and which model answers (MRS feedback, 2026-10-18).
         try:
-            from cursiv_v215.chat import status as _status
+            from cursiv_engine.chat import status as _status
             mode = _status.network_status()["label"]
         except Exception:
             mode = "unknown"
         try:
-            from cursiv_v215.ui.chat_app import _resolve_ollama_model
+            from cursiv_engine.ui.chat_app import _resolve_ollama_model
             model = _resolve_ollama_model()
         except Exception:
             model = None
@@ -67,7 +67,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             f"File access:   {'ON' if cfg.get('file_access') else 'OFF'}",
         ]
         try:
-            from cursiv_v215.core import demo as _demo, documents as _documents, fieldlog as _fieldlog
+            from cursiv_engine.core import demo as _demo, documents as _documents, fieldlog as _fieldlog
             n, bad = len(_fieldlog.entries()), _fieldlog.verify()
             lines.append(f"Field notebook: {n} entr{'y' if n == 1 else 'ies'}, "
                          + ("intact" if not bad else f"{len(bad)} problem(s): type field log check"))
@@ -87,7 +87,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
     if cmd == "tier 1":
         cmd = "offline on"           # tier 1 meant "local only": the same as offline mode
     if cmd in ("offline on", "offline off"):
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         try:
             netgate.set_offline(cmd == "offline on")
         except Exception as exc:
@@ -101,7 +101,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
                           "Automatic web search and update checks stay as set ('websearch on', 'autoupdate on').")
 
     if cmd in ("websearch on", "websearch off", "websearch"):
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         if cmd != "websearch":
             netgate.set_setting("web_search_auto", cmd == "websearch on")
         on = netgate.setting("web_search_auto")
@@ -112,7 +112,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
 
     if cmd in ("autoupdate on", "autoupdate off", "autoupdate"):
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         if cmd != "autoupdate":
             netgate.set_setting("update_check_auto", cmd == "autoupdate on")
         on = netgate.setting("update_check_auto")
@@ -122,8 +122,8 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             + (f"\n{netgate.OFFLINE_MESSAGE}" if netgate.is_offline() else ""))
 
     if cmd in ("files on", "files off"):
-        from cursiv_v215.core import workspace
-        from cursiv_v215.memory.semantic import current_person
+        from cursiv_engine.core import workspace
+        from cursiv_engine.memory.semantic import current_person
         enabled = cmd == 'files on'
         try:
             if not cfg.get('workspace'):
@@ -145,9 +145,9 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
         new_ws = text[9:].strip()
         if not new_ws:
             return runtime.TextResult(f"Workspace: {cfg.get('workspace', '')}")
-        from cursiv_v215.core.tools import _resolve
-        from cursiv_v215.core import workspace
-        from cursiv_v215.memory.semantic import current_person
+        from cursiv_engine.core.tools import _resolve
+        from cursiv_engine.core import workspace
+        from cursiv_engine.memory.semantic import current_person
         try:
             ws_path = workspace.save(current_person(), str(_resolve(new_ws)), cfg.get('file_access', False))
         except (OSError, ValueError, TypeError) as exc:

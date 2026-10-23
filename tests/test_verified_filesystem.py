@@ -11,7 +11,7 @@ import uuid
 
 import pytest
 
-from cursiv_v215.core import file_access as fs
+from cursiv_engine.core import file_access as fs
 
 
 def user(text):
@@ -21,7 +21,7 @@ def user(text):
 @pytest.mark.parametrize('provider', ['ollama', 'openai', 'claude', 'grok'])
 @pytest.mark.parametrize('absolute', [False, True])
 def test_original_request_writes_exact_marker_with_actual_path(tmp_path, monkeypatch, provider, absolute):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **kwargs: pytest.fail('No model or generic planner'))
     marker = 'Cursiv filesystem test successful. ' + uuid.uuid4().hex
     target = tmp_path / 'cursiv_test.txt'
@@ -80,7 +80,7 @@ def test_permission_and_readonly_failures_do_not_claim_success(tmp_path, monkeyp
 
 
 def test_denied_read_is_not_a_successful_generic_check(tmp_path):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     results = tools.run([dict(tool='read_file', args=dict(path='missing.txt'))], root=tmp_path)
     assert not results[0].ok and results[0].receipt['verified'] is False
     context = tools.context_for(results)
@@ -101,7 +101,7 @@ class Response:
 @pytest.mark.parametrize('provider', ['openai', 'claude'])
 @pytest.mark.parametrize('allowed', [True, False])
 def test_native_tool_receipts_are_authoritative_and_errors_roundtrip(tmp_path, monkeypatch, provider, allowed):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     calls = []
     receipts = []
     path = 'native.txt' if allowed else '../denied.txt'
@@ -142,8 +142,8 @@ def test_native_tool_receipts_are_authoritative_and_errors_roundtrip(tmp_path, m
 
 def test_workspace_selection_is_explicit_persisted_and_closed_on_error(tmp_path, monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.core import workspace, paths
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.core import workspace, paths
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(paths, 'portable_root', lambda: None)
     cfg = cc._default_cfg()
     assert cfg['workspace'] == '' and not cfg['file_access']
@@ -164,7 +164,7 @@ def test_actual_file_and_workspace_survive_fresh_process(tmp_path):
     marker = uuid.uuid4().hex
     first = '''
 import sys
-from cursiv_v215.core import workspace, file_access
+from cursiv_engine.core import workspace, file_access
 workspace.save('tester', sys.argv[1], True)
 result = file_access.perform('create_file', dict(path='restart.txt', content=sys.argv[2]), sys.argv[1])
 assert result.ok
@@ -172,7 +172,7 @@ assert result.ok
     second = '''
 import sys
 from pathlib import Path
-from cursiv_v215.core import workspace, file_access
+from cursiv_engine.core import workspace, file_access
 root, enabled, error = workspace.load('tester')
 assert enabled and not error
 p = Path(root) / 'restart.txt'
@@ -186,7 +186,7 @@ assert result.ok and result.path == str(p) and result.content == sys.argv[2]
 
 
 def test_portable_workspace_relocates_and_external_host_grants_fail_closed(tmp_path, monkeypatch):
-    from cursiv_v215.core import workspace
+    from cursiv_engine.core import workspace
     drive = tmp_path / 'usb-before'
     root = drive / 'Workspace' / 'research'
     root.mkdir(parents=True)
@@ -236,8 +236,8 @@ def test_actual_readonly_file_never_reports_an_overwrite_success(tmp_path):
 
 
 def test_native_mutation_receipt_survives_stream_filters_and_cannot_be_revised(tmp_path, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import verify
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import verify
     def generate(**kwargs):
         result = fs.perform('create_file', dict(path='native.txt', content='actual marker'), tmp_path)
         yield fs.VerifiedText(result.status_line() + '\n', result)
@@ -250,7 +250,7 @@ def test_native_mutation_receipt_survives_stream_filters_and_cannot_be_revised(t
 
 
 def test_fabricated_model_save_is_replaced_without_executing_anything(tmp_path, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **kwargs: iter(['- file_create: imaginary.txt\n', 'I saved it to C:\\invented.txt']))
     output = ''.join(ca.chat('Explain your workflow', [], '', None, root_path=str(tmp_path), replace_draft=True))
     assert ca.REPLACE_SENTINEL in output

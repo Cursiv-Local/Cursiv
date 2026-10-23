@@ -8,12 +8,12 @@ from pathlib import Path
 
 
 def read_notes() -> tuple[list[dict], list[str]]:
-    from cursiv_v215.core import strand_store
+    from cursiv_engine.core import strand_store
     path = strand_store.STRANDS_FILE
     try:
         stream = path.open(encoding='utf-8')
     except FileNotFoundError:
-        from cursiv_v215.core.paths import portable_root
+        from cursiv_engine.core.paths import portable_root
         root = portable_root()
         if root and not root.exists():
             raise OSError('Portable storage is unavailable')
@@ -42,7 +42,7 @@ def content(record: dict) -> tuple[str, str, str]:
     query, answer, warning = str(record.get('query', '')), str(record.get('synthesis', '')), ''
     if record.get('strand'):
         try:
-            from cursiv_v215.core.strand import decode
+            from cursiv_engine.core.strand import decode
             decoded = decode(record['strand'])
             if isinstance(decoded, dict):
                 query = str(decoded.get('query', query))
@@ -109,7 +109,7 @@ def select(records: list[dict], query: str = '', selected_category: str | None =
 def export_selected(records: list[dict], destination: str) -> None:
     """Explicit user-chosen export only; never change the archive or its metadata."""
     from PyQt6.QtCore import QIODevice, QSaveFile
-    from cursiv_v215.core import strand_store, state_store
+    from cursiv_engine.core import strand_store, state_store
     target = Path(destination).absolute()
     state_store.checked(target)
     if target.resolve().is_relative_to(strand_store.CURSIV_DIR.resolve()) or any(part.casefold() == '.cursiv' for part in target.parts):

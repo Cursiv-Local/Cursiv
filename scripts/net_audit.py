@@ -45,7 +45,7 @@ def child(offline: bool) -> int:
             host, addr = args[0], args[0]
         else:
             return
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         if not netgate.is_local(host):
             log.append(f"{event} {addr}")
 
@@ -65,10 +65,10 @@ def child(offline: bool) -> int:
 
     urllib.request.urlopen = watched
 
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     if offline:
         netgate.set_offline(True)
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     print(f"  .cursiv: {netgate.CONFIG_FILE.parent}  home: {Path.home()}")
     print(f"  offline={netgate.is_offline()} web_search_auto={netgate.setting('web_search_auto')} "
           f"local model ready={ca._local_model_ready()}")
@@ -93,7 +93,7 @@ def main() -> int:
     for offline in modes:
         scratch = Path(tempfile.mkdtemp(prefix="cursiv_netaudit_"))
         try:
-            for part in ("cursiv_v215", "launcher", "services"):
+            for part in ("cursiv_engine", "launcher", "services"):
                 if (REPO / part).exists():
                     shutil.copytree(REPO / part, scratch / "app" / part,
                                     ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))

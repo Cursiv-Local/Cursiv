@@ -5,7 +5,7 @@ Re-seal the family letters after editing them.
   2. python scripts/seal_family_letters.py
   3. Rebuild (scripts/build.bat) so the new sealed_letters.json ships.
 
-Writes cursiv_v215/family/sealed_letters.json, which is safe to commit and ship:
+Writes cursiv_engine/family/sealed_letters.json, which is safe to commit and ship:
 each letter opens only with that person's name + birth date.
 """
 from __future__ import annotations
@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from cursiv_v215.family.family_seal import SEALED_FILE, build_sealed  # noqa: E402
+from cursiv_engine.family.family_seal import SEALED_FILE, build_sealed  # noqa: E402
 
 SOURCE = ROOT / "private" / "family_source.json"
 

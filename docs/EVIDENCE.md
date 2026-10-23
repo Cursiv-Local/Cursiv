@@ -200,17 +200,17 @@ passing check means "not contradicted by the record", not "true". The model-base
 
 | File | Defect or risk | Benefit |
 |---|---|---|
-| `cursiv_v215/core/fieldlog.py` | 1, 5, 8, 10, 18 | No lost entry after a power cut; photos checked; exports swapped in only once verified; signer named |
-| `cursiv_v215/core/fieldsync.py` | 4, 6, 7, 19, 23 | Invalid or impersonating shares refused whole; damaged team copies left out and named; atomic copies |
-| `cursiv_v215/core/resources.py` (new) | 11 | Supplies, need, shortfall, time it lasts; contradictions found |
-| `cursiv_v215/core/datecalc.py` (new) | 24 | Dates, weekdays, transect points, two proportions |
-| `cursiv_v215/core/fieldcalc.py`, `calc.py` | 12; tool record | Stats with units, sample vs population; every result says what ran |
-| `cursiv_v215/core/claims.py` (new) | 13 | Tool, memory, source, certainty, blanket, document and earlier-answer claims checked against the record |
-| `cursiv_v215/core/reference.py` | 15, 16 | Evidence state per entry; relevance; unsafe entries withheld |
-| `cursiv_v215/core/documents.py` | 17 | Untrusted framing; instruction flags |
-| `cursiv_v215/memory/semantic.py`, `launcher/memory_dialog.py` | 2, 3 | Damaged lines kept aside; saves exact or refused with a reason; `recall` |
-| `cursiv_v215/ui/chat_app.py` | 13, 14, 17, 21 | Checks wired in; honest sources line; memories withheld when a document is flagged |
-| `cursiv_v215/core/phone_receive.py` | 20 | Refused uploads answered; size checked on the phone first |
+| `cursiv_engine/core/fieldlog.py` | 1, 5, 8, 10, 18 | No lost entry after a power cut; photos checked; exports swapped in only once verified; signer named |
+| `cursiv_engine/core/fieldsync.py` | 4, 6, 7, 19, 23 | Invalid or impersonating shares refused whole; damaged team copies left out and named; atomic copies |
+| `cursiv_engine/core/resources.py` (new) | 11 | Supplies, need, shortfall, time it lasts; contradictions found |
+| `cursiv_engine/core/datecalc.py` (new) | 24 | Dates, weekdays, transect points, two proportions |
+| `cursiv_engine/core/fieldcalc.py`, `calc.py` | 12; tool record | Stats with units, sample vs population; every result says what ran |
+| `cursiv_engine/core/claims.py` (new) | 13 | Tool, memory, source, certainty, blanket, document and earlier-answer claims checked against the record |
+| `cursiv_engine/core/reference.py` | 15, 16 | Evidence state per entry; relevance; unsafe entries withheld |
+| `cursiv_engine/core/documents.py` | 17 | Untrusted framing; instruction flags |
+| `cursiv_engine/memory/semantic.py`, `launcher/memory_dialog.py` | 2, 3 | Damaged lines kept aside; saves exact or refused with a reason; `recall` |
+| `cursiv_engine/ui/chat_app.py` | 13, 14, 17, 21 | Checks wired in; honest sources line; memories withheld when a document is flagged |
+| `cursiv_engine/core/phone_receive.py` | 20 | Refused uploads answered; size checked on the phone first |
 | `launcher/field_notebook.py`, `chat_panel.py`, `selftest.py` | 9, 22 | Failures said plainly; no engine start in self-test or tests |
 | `website/notebook/core.js`, `app.js`, `sw.js` | phone honesty | Storage never called permanent; failed saves, unsigned files and missing photos named |
 | `website/index.html`, `docs/PILOT-INTERVIEW-NOTES.md` | claims | "can't be quietly changed" → tamper-evident, with the limit; five held-back entries |

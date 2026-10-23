@@ -18,7 +18,7 @@ from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2  # one palette for every 
 class MemoryDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        from cursiv_v215.memory import semantic as sem
+        from cursiv_engine.memory import semantic as sem
         self._sem = sem
         self.setWindowTitle("Cursiv — What I Remember")
         self.resize(660, 600)

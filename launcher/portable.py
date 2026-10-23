@@ -166,9 +166,9 @@ def apply_field_defaults(home: Path) -> None:
     if done.exists():
         return
     try:
-        from cursiv_v215.core import netgate
-        from cursiv_v215.chat import keys
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.core import netgate
+        from cursiv_engine.chat import keys
+        from cursiv_engine.memory import semantic
         netgate.set_offline(True)
         keys.store_key("break_notes", "off")
         semantic.set_learning(False)

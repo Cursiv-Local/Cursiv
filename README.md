@@ -240,7 +240,7 @@ Use a fresh virtual environment with only `requirements.txt` for release builds;
 retain its exact package versions with the release evidence. This keeps unrelated
 optional developer packages out of the installer.
 
-1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_v215/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
+1. Update `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer` and `OutputBaseFilename`), and `cursiv_engine/core/selfknow.py` (`VERSION`). Use a higher update suffix for each release so installed copies detect it.
 2. Commit the reviewed source, pass the regression checks and tag that exact commit.
 3. Run `py -3.13 scripts/build_release.py v3.14-U87` (substitute the next tag for future releases). It builds in a clean temporary checkout of the tag and writes the installer/checksums to `installer/Output/`.
 

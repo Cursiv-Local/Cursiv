@@ -14,7 +14,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 
 
 @pytest.fixture
@@ -237,7 +237,7 @@ def test_a_team_copy_damaged_on_disk_is_left_out_and_named(team, tmp_path):
 # ── memory ─────────────────────────────────────────────────────────────────────
 
 def test_memory_on_a_read_only_drive_says_not_saved(tmp_path, monkeypatch):
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "CURSIV_DIR", tmp_path / "app")
     monkeypatch.setattr(sem, "FACTS_FILE", tmp_path / "app" / "memory_facts.jsonl")
     monkeypatch.setattr(sem, "SETTINGS_FILE", tmp_path / "app" / "memory_settings.json")

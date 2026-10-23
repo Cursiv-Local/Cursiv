@@ -1,7 +1,7 @@
 """Exact U82 user transcripts: policy, clean paths, provenance and failed tools."""
 import pytest
 
-from cursiv_v215.core import file_access as fs, grounding, turn_policy as tp
+from cursiv_engine.core import file_access as fs, grounding, turn_policy as tp
 
 
 RESTRICTED = [
@@ -24,8 +24,8 @@ def test_exact_prefixes_are_conversation_only(text):
 
 @pytest.fixture
 def pipeline(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import netgate, phases, speed
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import netgate, phases, speed
     from test_netgate import _local_model
     _local_model(monkeypatch)
     monkeypatch.setattr(netgate, 'is_offline', lambda: True)
@@ -38,8 +38,8 @@ def pipeline(monkeypatch):
 @pytest.mark.parametrize('provider', ['ollama', 'openai'])
 @pytest.mark.parametrize('text', RESTRICTED)
 def test_restrictions_precede_every_retrieval_and_retention(pipeline, monkeypatch, tmp_path, provider, text):
-    from cursiv_v215.core import reference, calc, tools, notebook_tools, documents, presence, plugins, style, netgate
-    from cursiv_v215.memory import intents, semantic
+    from cursiv_engine.core import reference, calc, tools, notebook_tools, documents, presence, plugins, style, netgate
+    from cursiv_engine.memory import intents, semantic
     ca = pipeline
     def denied(*a, **kw):
         pytest.fail('Restricted turn must not invoke retrieval, tools or retention')
@@ -131,7 +131,7 @@ def test_sources_use_application_evidence_not_model_footer(pipeline, monkeypatch
         elif kind == 'reference':
             ca._REF_SHOWN[:] = ['photosynthesis']
         else:
-            from cursiv_v215.core import calc
+            from cursiv_engine.core import calc
             ca._WORKED = calc.work_out('what is 2+2?')
             assert ca._WORKED
         yield 'An answer.\n*[Source: model know'
@@ -162,7 +162,7 @@ def test_source_text_inside_code_is_preserved(pipeline):
 
 
 def test_following_turn_restores_reference_and_calculation(pipeline, monkeypatch):
-    from cursiv_v215.core import reference, calc
+    from cursiv_engine.core import reference, calc
     reference_calls, calculation_calls = [], []
     monkeypatch.setattr(reference, 'lookup', lambda text: reference_calls.append(text) or [])
     monkeypatch.setattr(calc, 'work_out_for_turn', lambda text, history: calculation_calls.append(text))
@@ -181,7 +181,7 @@ def test_restriction_confirmation_survives_draft_replacement(pipeline, monkeypat
 
 
 def test_failed_tool_suppresses_model_and_checker(pipeline, monkeypatch, tmp_path):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     ca = pipeline
     monkeypatch.setattr(tools, 'might_need_tools', lambda _: True)
     monkeypatch.setattr(tools, 'plan', lambda *a: [dict(tool='list_folder', args={})])
@@ -196,7 +196,7 @@ def test_failed_tool_suppresses_model_and_checker(pipeline, monkeypatch, tmp_pat
 
 
 def test_relative_tool_paths_use_workspace_not_home(tmp_path, monkeypatch):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     (tmp_path / 'notes.txt').write_text('WORKSPACE_MARKER', encoding='utf-8')
     monkeypatch.setattr(tools, '_resolve', lambda _: pytest.fail('No home-folder alias fallback'))
     results = tools.run([dict(tool='read_file', args=dict(path='notes.txt')),

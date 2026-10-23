@@ -4,7 +4,7 @@ import threading
 
 import pytest
 
-from cursiv_v215.core import turn_policy, native_answers, deterministic_overrides, fieldmath
+from cursiv_engine.core import turn_policy, native_answers, deterministic_overrides, fieldmath
 from test_background_review import pipeline
 from test_chat_rendering import panel
 from test_live_test_followup import final_reply
@@ -29,8 +29,8 @@ from test_live_test_followup import final_reply
     'Just talk; notebook_create_observation {"note":"blocked"}',
 ])
 def test_blocked_actions_stop_before_any_backend_model_or_formation(pipeline, monkeypatch, tmp_path, provider, question):
-    from cursiv_v215.core import file_access, notebook_tools, reference, presence, tools
-    from cursiv_v215.memory import intents, formation, semantic
+    from cursiv_engine.core import file_access, notebook_tools, reference, presence, tools
+    from cursiv_engine.memory import intents, formation, semantic
     calls = []
     def forbidden(name):
         def called(*a, **kw):
@@ -175,7 +175,7 @@ def test_different_conditions_or_concentrations_are_not_a_proven_conflict(text):
 
 def test_adv_011_stops_before_the_actual_provider(pipeline, monkeypatch):
     from bench.truth_cases import CASES
-    from cursiv_v215.core import documents, reference
+    from cursiv_engine.core import documents, reference
     case = next(c for c in CASES if c['id'] == 'adv-011')
     pages = [documents.Passage('test', 'Two supplied sheets', 1, case['doc'])]
     monkeypatch.setattr(documents, 'library', lambda: [dict(id='test', name='Two supplied sheets')])
@@ -189,7 +189,7 @@ def test_adv_011_stops_before_the_actual_provider(pipeline, monkeypatch):
 @pytest.mark.parametrize('question', ['Are you offline?', 'Can you read my files right now?',
                                     'Where is my workspace?', 'What is your current workspace?'])
 def test_pure_state_uses_session_grants_without_reading_memory(pipeline, monkeypatch, tmp_path, question):
-    from cursiv_v215.core import presence, file_access
+    from cursiv_engine.core import presence, file_access
     monkeypatch.setattr(presence, 'memory_state', lambda *a: pytest.fail('No memory read for a pure status question'))
     monkeypatch.setattr(file_access, 'command', lambda *a, **k: pytest.fail('A state question is not a file read'))
     monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No model state guess'))
@@ -208,7 +208,7 @@ def test_sentence_prefix_cannot_hide_a_fabricated_write(pipeline, monkeypatch, d
 
 
 def test_duration_contradiction_is_withdrawn_not_merely_footnoted(pipeline, monkeypatch):
-    from cursiv_v215.core import calc
+    from cursiv_engine.core import calc
     question = 'We have 20 liters for 4 people at 2 liters per person per day. Explain how long it lasts.'
     def stream(*args, **kw):
         pipeline._WORKED = calc.work_out(question)
@@ -230,7 +230,7 @@ def test_unsupported_reference_provenance_is_withdrawn(pipeline, monkeypatch):
 
 
 def test_full_mode_explicitly_reviews_an_ordinary_answer(pipeline, monkeypatch):
-    from cursiv_v215.chat import review
+    from cursiv_engine.chat import review
     calls = []
     monkeypatch.setattr(pipeline, '_call_ollama', lambda *a, **kw: iter(['A leaf contains chlorophyll.']))
     monkeypatch.setattr(pipeline, '_call_ollama_model', lambda *a, **kw: calls.append(kw) or iter(['CLEAR']))
@@ -241,8 +241,8 @@ def test_full_mode_explicitly_reviews_an_ordinary_answer(pipeline, monkeypatch):
 
 
 def test_talk_only_conversation_runs_model_without_tools_sources_or_memory(pipeline, monkeypatch):
-    from cursiv_v215.core import tools, reference, documents
-    from cursiv_v215.memory import semantic, formation
+    from cursiv_engine.core import tools, reference, documents
+    from cursiv_engine.memory import semantic, formation
     calls = []
     def forbidden(*a, **kw):
         calls.append(True)
@@ -270,7 +270,7 @@ def test_dose_conflict_withdraws_model_instructions(pipeline, monkeypatch, provi
 
 
 def test_unavailable_reference_keeps_unsafe_draft_withdrawn(monkeypatch):
-    from cursiv_v215.core import reference
+    from cursiv_engine.core import reference
     def missing():
         raise OSError('Bundled reference unavailable')
     monkeypatch.setattr(reference, 'entries', missing)

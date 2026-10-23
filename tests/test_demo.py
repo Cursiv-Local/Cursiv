@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import demo, documents, fieldlog
+from cursiv_engine.core import demo, documents, fieldlog
 from test_netgate import fresh  # noqa: F401  (fixture)
 
 

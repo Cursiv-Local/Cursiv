@@ -5,7 +5,7 @@ by a recorder, and any other outside connection is refused by test_netgate's har
 import pytest
 from PyQt6.QtWidgets import QApplication, QDialog
 
-from cursiv_v215.core import crosscheck, netgate
+from cursiv_engine.core import crosscheck, netgate
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 QUESTION = "How long can water samples stay on ice before the lab?"
@@ -31,7 +31,7 @@ class Recorder:
 @pytest.fixture
 def keys(tmp_path, monkeypatch):
     """No saved keys unless a test gives one in cfg; offline mode off (a fresh install)."""
-    from cursiv_v215.chat import keys as k
+    from cursiv_engine.chat import keys as k
     monkeypatch.setattr(netgate, "CONFIG_FILE", tmp_path / "config.json")
     monkeypatch.setattr(k, "KEYS_FILE", tmp_path / "config.json")
     return {"anthropic_key": "sk-test-not-real"}
@@ -75,7 +75,7 @@ def panel(keys, monkeypatch):
     if not _APP:
         _APP.append(QApplication.instance() or QApplication([]))
     import chat_panel
-    from cursiv_v215.chat import status
+    from cursiv_engine.chat import status
     monkeypatch.setattr(status, "local_models", lambda timeout=2.0: ["qwen3:4b-instruct"])
     p = chat_panel.ChatPanel()
     p._cfg.update(keys)
@@ -115,7 +115,7 @@ def test_confirming_sends_only_the_last_question_and_answer(panel, monkeypatch):
 
 
 def test_a_normal_chat_turn_never_calls_a_reviewer(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="Within 24 hours, on ice.")
     monkeypatch.setattr(crosscheck, "review", lambda *a, **k: pytest.fail("a review was sent"))
     monkeypatch.setattr(ca, "_call_claude_direct", lambda *a, **k: pytest.fail("Claude was called"))
@@ -131,7 +131,7 @@ def test_the_button_waits_for_a_finished_answer(panel):
 # ── 4. no key: explained, nothing sent ──────────────────────────────────────────
 
 def test_no_key_means_no_provider_and_a_plain_message(keys, monkeypatch):
-    from cursiv_v215.chat import keys as k
+    from cursiv_engine.chat import keys as k
     monkeypatch.setattr(k, "saved_key", lambda field: "")
     assert crosscheck.available({}) == []
     rec = Recorder()

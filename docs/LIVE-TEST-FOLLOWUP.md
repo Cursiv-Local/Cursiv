@@ -53,18 +53,18 @@ record bytes, workspace authorization and symlink protections are preserved.
 
 Production:
 
-- `cursiv_v215/core/native_answers.py` — new bounded native help/version/calculation/model-record replies.
-- `cursiv_v215/chat/response_style.py` — new scoped guidance and conservative closer cleanup.
-- `cursiv_v215/chat/completion.py` — native routing, blocked-action stop, style replacement and proportion withdrawal.
-- `cursiv_v215/chat/conversation.py` — keep scoped style guidance through provider compaction.
-- `cursiv_v215/core/fieldlog.py` — parser aliases/delimiters and verified short legacy receipts.
-- `cursiv_v215/core/notebook_tools.py` — correction intents, policy refusals, missing/empty results and short receipts.
-- `cursiv_v215/core/turn_policy.py` — remove leading delimited policy clauses for intent parsing; authorization still uses the original message.
-- `cursiv_v215/core/resources.py` — explicit volume/rate/duration coverage without a literal water keyword.
-- `cursiv_v215/core/calc.py` — arrival-time phrasing.
-- `cursiv_v215/core/presence.py` — short state replies and workspace/network variants.
-- `cursiv_v215/core/feedback.py` — shared short verified save receipt.
-- `cursiv_v215/core/demo.py` — verified mode switching, guarded cleanup, rollback and guided prompts.
+- `cursiv_engine/core/native_answers.py` — new bounded native help/version/calculation/model-record replies.
+- `cursiv_engine/chat/response_style.py` — new scoped guidance and conservative closer cleanup.
+- `cursiv_engine/chat/completion.py` — native routing, blocked-action stop, style replacement and proportion withdrawal.
+- `cursiv_engine/chat/conversation.py` — keep scoped style guidance through provider compaction.
+- `cursiv_engine/core/fieldlog.py` — parser aliases/delimiters and verified short legacy receipts.
+- `cursiv_engine/core/notebook_tools.py` — correction intents, policy refusals, missing/empty results and short receipts.
+- `cursiv_engine/core/turn_policy.py` — remove leading delimited policy clauses for intent parsing; authorization still uses the original message.
+- `cursiv_engine/core/resources.py` — explicit volume/rate/duration coverage without a literal water keyword.
+- `cursiv_engine/core/calc.py` — arrival-time phrasing.
+- `cursiv_engine/core/presence.py` — short state replies and workspace/network variants.
+- `cursiv_engine/core/feedback.py` — shared short verified save receipt.
+- `cursiv_engine/core/demo.py` — verified mode switching, guarded cleanup, rollback and guided prompts.
 - `launcher/chat_feedback.py` — relevant receipt-derived site/sample context.
 - `launcher/chat_panel.py` — badge the streamed policy note while keeping raw evidence.
 - `launcher/chat_transcript.py` — expandable routine evidence and literal code preservation.

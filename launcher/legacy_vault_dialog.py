@@ -600,7 +600,7 @@ class _ComposeLegacyLetterDialog(QDialog):
 
 def _pin_looks_valid(pin: str) -> bool:
     try:
-        from cursiv_v215.family.family_profiles import is_valid_pin
+        from cursiv_engine.family.family_profiles import is_valid_pin
         return is_valid_pin(pin)
     except Exception:
         return False
@@ -608,7 +608,7 @@ def _pin_looks_valid(pin: str) -> bool:
 
 def _make_pin_hash(pin: str) -> str:
     try:
-        from cursiv_v215.family.legacy_store import make_letter_pin_hash
+        from cursiv_engine.family.legacy_store import make_letter_pin_hash
         return make_letter_pin_hash(pin)
     except Exception:
         return ""

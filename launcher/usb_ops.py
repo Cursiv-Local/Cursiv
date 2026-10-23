@@ -116,7 +116,7 @@ def required_names(runtime: UsbRuntime, models: list[dict]) -> list[str]:
 
 def pull_model(runtime: UsbRuntime, tag: str, sig, cancel: threading.Event) -> None:
     """Download a model into this computer's Ollama so it can be copied."""
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     netgate.require(f"Downloading {tag}")
     req = runtime.urllib.request.Request(f"{runtime.OLLAMA_API}/api/pull",
                                  data=runtime.json.dumps({"name": tag, "stream": True}).encode(),
@@ -279,7 +279,7 @@ def copy_files(runtime: UsbRuntime, todo: list[tuple[Path, Path]], progress, can
     total = sum(s.stat().st_size for s, _ in todo) or 1
     copied = 0
     for i, (src, dest) in enumerate(todo, 1):
-        from cursiv_v215.core.state_store import checked
+        from cursiv_engine.core.state_store import checked
         checked(dest)
         dest.parent.mkdir(parents=True, exist_ok=True)
         fd, temporary = runtime.tempfile.mkstemp(prefix='.' + dest.name, suffix='.part', dir=dest.parent)
@@ -385,7 +385,7 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         if include_private:
             # Saved keys are encrypted for this Windows account; the USB runs on
             # other PCs, so its copy holds them readable (the note below says so).
-            from cursiv_v215.core import keystore
+            from cursiv_engine.core import keystore
             for _src, cfg_file in plan:
                 if cfg_file.name == 'config.json' and cfg_file.parent.name == '.cursiv':
                     keystore.export_readable(cfg_file)

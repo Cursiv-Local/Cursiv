@@ -5,8 +5,8 @@ import time
 
 import pytest
 
-from cursiv_v215.chat import review
-from cursiv_v215.core import verify, turn_policy
+from cursiv_engine.chat import review
+from cursiv_engine.core import verify, turn_policy
 
 
 @pytest.mark.parametrize('question,draft', [
@@ -59,7 +59,7 @@ def test_off_still_checks_number_drift_without_a_model():
 
 
 def test_review_setting_preserves_other_settings_and_refuses_damage(tmp_path, monkeypatch):
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     path = tmp_path / 'config.json'
     monkeypatch.setattr(keys, 'KEYS_FILE', path)
     original = dict(openai_key='protected-value', offline_mode=True, other=dict(keep=1))
@@ -77,8 +77,8 @@ def test_review_setting_preserves_other_settings_and_refuses_damage(tmp_path, mo
 
 @pytest.fixture
 def pipeline(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import netgate, phases, speed
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import netgate, phases, speed
     from test_netgate import _local_model
     _local_model(monkeypatch, '4.')
     monkeypatch.setattr(ca, '_resolve_ollama_model', lambda standard=False: 'test-standard')
@@ -111,7 +111,7 @@ def test_foreground_finishes_before_review_and_uses_short_standard_local_call(pi
 
 def test_review_uses_snapshot_and_does_not_mutate_new_turn_state(pipeline, monkeypatch):
     ca = pipeline
-    from cursiv_v215.core import calc
+    from cursiv_engine.core import calc
     monkeypatch.setattr(ca, '_call_ollama_model', lambda *a, **kw: iter(['CLEAR']))
     jobs = []
     ''.join(ca.chat('What is 2+2?', [], '', None, force_provider='ollama', on_review=jobs.append))
@@ -209,7 +209,7 @@ def test_background_full_rewrite_cannot_reintroduce_false_capabilities(pipeline,
 
 def test_check_command_persists_mode_without_touching_history(tmp_path, monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     monkeypatch.setattr(keys, 'KEYS_FILE', tmp_path / 'config.json')
     history = [dict(role='assistant', content='Keep this')]
     for value in review.MODES:
@@ -290,7 +290,7 @@ def test_switching_conversation_cancels_and_discards_result(panel):
 
 
 def test_new_turn_rejects_a_late_review_result(panel):
-    from cursiv_v215.core.verify import PassResult
+    from cursiv_engine.core.verify import PassResult
     panel._on_done()
     old = (panel._review_generation, len(panel._history)-1, panel._history[-1]['content'])
     panel._begin_turn()
@@ -334,7 +334,7 @@ def test_background_followup_is_saved_and_reloads_with_original_answer(panel, mo
 
 
 def test_explicit_crosscheck_result_is_not_erased_by_a_late_automatic_review(panel):
-    from cursiv_v215.core import crosscheck, verify
+    from cursiv_engine.core import crosscheck, verify
     panel._on_done()
     target = (panel._review_generation, len(panel._history)-1, panel._history[-1]['content'])
     panel._on_cross_check(crosscheck.Review(True, 'claude', 'Anthropic (Claude)', 'Separate second opinion.'))

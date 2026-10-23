@@ -5,8 +5,8 @@ import pytest
 
 @pytest.fixture
 def ag(tmp_path, monkeypatch):
-    from cursiv_v215.guardian import access_gate as ag
-    from cursiv_v215.guardian import security_questions as sq
+    from cursiv_engine.guardian import access_gate as ag
+    from cursiv_engine.guardian import security_questions as sq
     rt = tmp_path / "runtime"
     monkeypatch.setattr(ag, "_RUNTIME", rt)
     for name in ("_HASH_FILE", "_META_FILE", "_FLAG_FILE", "_ACCOUNTS_FILE"):
@@ -19,7 +19,7 @@ def ag(tmp_path, monkeypatch):
 
 
 def _sq_ready():
-    from cursiv_v215.guardian import security_questions as sq
+    from cursiv_engine.guardian import security_questions as sq
     return sq.is_setup_complete()
 
 

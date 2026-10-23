@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from cursiv_v215.core import atomic
+from cursiv_engine.core import atomic
 
 
 def test_atomic_write_verifies_bytes_and_preserves_unrelated_temporary_files(tmp_path):
@@ -39,7 +39,7 @@ def test_atomic_failure_preserves_original_and_readback_failure_raises(tmp_path,
 
 @pytest.fixture
 def vault(tmp_path, monkeypatch):
-    from cursiv_v215.family import legacy_store as store
+    from cursiv_engine.family import legacy_store as store
     folder = tmp_path / 'vault'
     monkeypatch.setattr(store, '_LEGACY_DIR', folder)
     monkeypatch.setattr(store, '_LETTERS_DIR', folder / 'letters')
@@ -115,7 +115,7 @@ def test_legacy_letter_exports_and_reimports_are_verified_and_duplicate_safe(vau
 
 
 def test_agent_mutations_use_verified_storage_and_do_not_replace_corrupt_data(tmp_path, monkeypatch):
-    from cursiv_v215.agents import custom
+    from cursiv_engine.agents import custom
     monkeypatch.setattr(custom, 'DIR', tmp_path / 'agents')
     assert 'Created agent' in custom.create('researcher', 'helps record precise field observations')
     path = custom._dir() / 'researcher.json'
@@ -130,7 +130,7 @@ def test_agent_mutations_use_verified_storage_and_do_not_replace_corrupt_data(tm
 
 
 def test_agent_save_failure_and_unverified_backend_return_do_not_succeed(tmp_path, monkeypatch):
-    from cursiv_v215.agents import custom
+    from cursiv_engine.agents import custom
     monkeypatch.setattr(custom, 'DIR', tmp_path / 'agents')
     monkeypatch.setattr(custom.atomic, 'write_text', lambda *_a, **_kw: None)
     with pytest.raises(OSError, match='read-back'):
@@ -138,7 +138,7 @@ def test_agent_save_failure_and_unverified_backend_return_do_not_succeed(tmp_pat
 
 
 def test_saved_notes_append_is_flushed_and_verified_before_returning_id(tmp_path, monkeypatch):
-    from cursiv_v215.core import strand_store as store
+    from cursiv_engine.core import strand_store as store
     monkeypatch.setattr(store, 'CURSIV_DIR', tmp_path / 'strands')
     monkeypatch.setattr(store, 'STRANDS_FILE', tmp_path / 'strands' / 'strands.jsonl')
     monkeypatch.setattr(store, '_strand_encode', lambda *_: 'encoded')
@@ -165,7 +165,7 @@ def test_image_cache_uses_user_storage_and_verified_bytes(tmp_path, monkeypatch)
 
 
 def test_model_action_transcripts_are_not_execution_and_code_examples_remain_prose():
-    from cursiv_v215.core import file_access
+    from cursiv_engine.core import file_access
     for text in ('→ file_create: test.txt', '- `file_create: test.txt`', 'Created file: test.txt',
                  'I saved it to C:\\fake.txt', "Got it — I'll remember HAWK-217."):
         assert 'not confirmed' in file_access.model_prose(text)
@@ -176,7 +176,7 @@ def test_model_action_transcripts_are_not_execution_and_code_examples_remain_pro
 
 def test_saved_notes_alias_is_preserved_and_failed_append_has_no_success(monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.memory import intents
+    from cursiv_engine.memory import intents
     history = [dict(role='user', content='field question'), dict(role='assistant', content='field answer')]
     assert intents.command('save this', history, person='dana') is None
     monkeypatch.setattr(cc, '_STRAND_OK', True)

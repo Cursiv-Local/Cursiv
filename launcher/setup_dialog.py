@@ -42,7 +42,7 @@ from PyQt6.QtWidgets import (
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
 
 
-from cursiv_v215.core import ollama_host   # where Ollama lives on Windows and macOS
+from cursiv_engine.core import ollama_host   # where Ollama lives on Windows and macOS
 
 OLLAMA_INSTALLER_URL = ollama_host.INSTALLER_URL
 OLLAMA_API = ollama_host.API
@@ -180,7 +180,7 @@ class SetupDialog(QDialog):
         for label, tag, _size in MODELS:
             self._model_box.addItem(label, tag)
         try:
-            from cursiv_v215.core import speed
+            from cursiv_engine.core import speed
             _small = speed.small_gpu()
         except Exception:
             _small = False
@@ -252,7 +252,7 @@ class SetupDialog(QDialog):
         lay.addLayout(bottom)
 
         try:
-            from cursiv_v215.ui.chat_app import cloud_enabled
+            from cursiv_engine.ui.chat_app import cloud_enabled
             self._cloud_box.setChecked(cloud_enabled())
         except Exception:
             self._cloud_box.setEnabled(False)
@@ -403,7 +403,7 @@ class SetupDialog(QDialog):
 
     def _do_pull(self, tag: str, step: str = "s2"):
         try:
-            from cursiv_v215.core import netgate
+            from cursiv_engine.core import netgate
             if not netgate.allowed():
                 self._sig.done.emit(step, False, f"Can't download {tag}. {netgate.OFFLINE_MESSAGE}")
                 return
@@ -442,7 +442,7 @@ class SetupDialog(QDialog):
         """With the chat model, the small model memory search uses (~270 MB).
         Nothing else downloads it."""
         try:
-            from cursiv_v215.memory import semantic
+            from cursiv_engine.memory import semantic
             if not semantic.embeddings_available():
                 self._sig.progress.emit("s2", -1, "Also downloading the memory-search model (about 270 MB)…")
                 semantic._pull_embed_model()
@@ -452,7 +452,7 @@ class SetupDialog(QDialog):
     # ── Step 3 ───────────────────────────────────────────────────────────
     def _toggle_cloud(self, on: bool):
         try:
-            from cursiv_v215.ui.chat_app import set_cloud_enabled
+            from cursiv_engine.ui.chat_app import set_cloud_enabled
             set_cloud_enabled(on)
         except Exception:
             pass
@@ -467,7 +467,7 @@ class SetupDialog(QDialog):
 
         def work():
             try:
-                from cursiv_v215.ui.chat_app import free_key_command
+                from cursiv_engine.ui.chat_app import free_key_command
                 reply = free_key_command(f"{kind} {key}") or ""
                 self._sig.done.emit("s3", "saved and working" in reply, reply.split("\n")[0])
             except Exception as exc:

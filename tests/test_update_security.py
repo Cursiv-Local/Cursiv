@@ -43,7 +43,7 @@ def test_authenticode_status_and_independent_publisher_allowlist(tmp_path, monke
 
 @pytest.mark.parametrize('failure', ['interrupted', 'signature', 'offline'])
 def test_failed_download_removes_partial_files(tmp_path, monkeypatch, failure):
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     folder = tmp_path / 'download'; folder.mkdir()
     monkeypatch.setattr(security.tempfile, 'mkdtemp', lambda **kw: str(folder))
     monkeypatch.setattr(security, 'TRUSTED_PUBLISHERS', ('ABC',))

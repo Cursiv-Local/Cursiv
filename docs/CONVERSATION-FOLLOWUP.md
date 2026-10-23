@@ -17,24 +17,24 @@ instructions to inspect personal data. The source audit found three causes:
 
 ## Minimal changes
 
-- `cursiv_v215/core/conversation_kind.py`: bounded pure classification for casual,
+- `cursiv_engine/core/conversation_kind.py`: bounded pure classification for casual,
   reflective, explicitly requested dialogue, relevant memory, relayed-thread
   questions and talk-only help. This never grants tools or changes retention.
-- `cursiv_v215/chat/response_style.py`: remove trailing stock sentences and emoji
+- `cursiv_engine/chat/response_style.py`: remove trailing stock sentences and emoji
   on casual/reflective turns, including inline closers. Preserve requested
   options/questions, code, quoted text, warnings and a substantive answer.
   Prompt philosophical answers for 1–3 short paragraphs addressing the actual
   question. This is guidance, not a hard length cutoff or native philosophy.
-- `cursiv_v215/chat/conversation.py` and `chat/context.py`: withhold unrelated
+- `cursiv_engine/chat/conversation.py` and `chat/context.py`: withhold unrelated
   saved facts and saved-conversation fallback in light chat. Keep explicit recall,
   recognized field context, safety questions and current-thread history eligible.
   Skip the broad self-report prompt for reflective questions.
-- `cursiv_v215/core/feature_answers.py`: decline philosophical framing so it can
+- `cursiv_engine/core/feature_answers.py`: decline philosophical framing so it can
   reach ordinary model conversation instead of a basic closed-app FAQ.
-- `cursiv_v215/core/native_answers.py`: native talk-only instructions and accurate
+- `cursiv_engine/core/native_answers.py`: native talk-only instructions and accurate
   explanation that a pasted model label is still user-supplied thread text,
   not authentication, a separate channel or tool/system authority.
-- `cursiv_v215/chat/completion.py`: retain an accurate offline provider-skip note
+- `cursiv_engine/chat/completion.py`: retain an accurate offline provider-skip note
   when a relayed-thread question used the existing provider shortcut. A native
   answer does not claim that a local model answered.
 - `tests/test_conversation_followup.py`: exact synthetic transcript prompts,

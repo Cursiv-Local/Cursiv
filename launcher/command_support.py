@@ -15,7 +15,7 @@ from command_runtime import CommandRuntime
 
 def _image_folder(runtime: CommandRuntime, cfg: dict) -> Path:
     """Image cache is user data; an absent workspace never means the binary/CWD."""
-    from cursiv_v215.core.file_access import workspace_root
+    from cursiv_engine.core.file_access import workspace_root
     base = workspace_root(cfg['workspace']) if cfg.get('file_access') and cfg.get('workspace') else runtime.Path.home()
     folder = base / '.cursiv' / 'images'
     for p in (folder, folder.parent):
@@ -25,23 +25,23 @@ def _image_folder(runtime: CommandRuntime, cfg: dict) -> Path:
     return folder.resolve()
 
 def memory_command(runtime: CommandRuntime, text: str, history: list[dict], *, scope: str) -> MemoryResult | None:
-    from cursiv_v215.memory import intents, semantic
+    from cursiv_engine.memory import intents, semantic
     result = intents.command(text, history, person=semantic.current_person(), scope=scope)
     return runtime.MemoryResult(result) if result is not None else None
 
 def notebook_command(runtime: CommandRuntime, text: str, history: list[dict], *, scope: str, cfg: dict | None) -> NotebookResult | None:
-    from cursiv_v215.core import notebook_tools
-    from cursiv_v215.memory.semantic import current_person
+    from cursiv_engine.core import notebook_tools
+    from cursiv_engine.memory.semantic import current_person
     result = notebook_tools.command(text, history, observer=current_person().title(), scope=scope)
     if result is None:
         return None
-    from cursiv_v215.memory import intents
+    from cursiv_engine.memory import intents
     intents.clear_pending(current_person(), scope)
     if result.status == 'saved':
         # Notification failure must never turn a confirmed append into a retry.
         try:
-            from cursiv_v215.core import curiosity_engine
-            from cursiv_v215.core.paths import save_reference
+            from cursiv_engine.core import curiosity_engine
+            from cursiv_engine.core.paths import save_reference
             cfg = cfg or {}
             project = save_reference(cfg['workspace']) if cfg.get('file_access') and cfg.get('workspace') else 'general'
             curiosity_engine.notify(current_person(), project)
@@ -68,13 +68,13 @@ def _notes_view_request(runtime: CommandRuntime, text: str) -> NotesResult | Non
     return None
 
 def _gate(runtime: CommandRuntime):
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     return netgate
 
 def _default_cfg(runtime: CommandRuntime) -> dict:
     """Same shape as chat_cli.py's cfg dict, minus the terminal-only fields."""
-    from cursiv_v215.core import workspace
-    from cursiv_v215.memory.semantic import current_person
+    from cursiv_engine.core import workspace
+    from cursiv_engine.memory.semantic import current_person
     selected, enabled, workspace_error = workspace.load(current_person())
     return {
         "file_access":      enabled,
@@ -105,7 +105,7 @@ def _auto_territory(runtime: CommandRuntime, q: str) -> str:
 
 def _personal(runtime: CommandRuntime) -> bool:
     try:
-        from cursiv_v215.core import profile
+        from cursiv_engine.core import profile
         return profile.personal()
     except Exception:
         return False
@@ -113,13 +113,13 @@ def _personal(runtime: CommandRuntime) -> bool:
 def _is_builder(runtime: CommandRuntime) -> bool:
     """The owner: a verified owner session, or this is one of Joshua's machines."""
     try:
-        from cursiv_v215.ui.chat_app import _owner_active
+        from cursiv_engine.ui.chat_app import _owner_active
         if _owner_active():
             return True
     except Exception:
         pass
     try:
-        from cursiv_v215.guardian.access_gate import is_setup_complete
+        from cursiv_engine.guardian.access_gate import is_setup_complete
         return bool(is_setup_complete())
     except Exception:
         return False

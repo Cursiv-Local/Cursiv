@@ -2,7 +2,7 @@
 from a review of Cursiv's real answers (2026-10-18)."""
 import pytest
 
-from cursiv_v215.core import answer_check as ac
+from cursiv_engine.core import answer_check as ac
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 BLEED = ["severe bleeding control"]
@@ -40,7 +40,7 @@ def test_claimed_database_search_is_flagged_when_nothing_was_searched():
 
 
 def test_chat_flags_a_contradiction_on_an_emergency_turn(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama",
                         lambda messages, **kw: iter(["Stay calm. Do not use a tourniquet unless you are trained."]))
@@ -81,7 +81,7 @@ def test_an_answer_that_says_yes_then_no_is_flagged():
 
 
 def test_numbers_make_a_question_specific():
-    from cursiv_v215.core import clarify
+    from cursiv_engine.core import clarify
     # suite 1.4 num-034: asked what "it" meant in a question full of coordinates
     assert clarify.needs_clarifying("How far is it from 44.1234, -71.5678 to 44.1300, -71.5600 in meters?", []) == ""
     assert clarify.needs_clarifying("Is it safe?", []) == "it"
@@ -98,7 +98,7 @@ def test_dose_named_a_sentence_away_is_still_checked():
 
 
 def test_yes_its_safe_then_dont_go_gets_a_warning_on_top(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch)
     said = ("Yes, it's safe to go back out now.\n\nYou should wait 30 minutes after the last thunder. "
             "Since 10 minutes is less than 30, you should not go back out yet.")
@@ -124,7 +124,7 @@ def test_citing_the_reference_when_none_was_given_is_flagged():
 
 
 def test_every_answer_says_what_it_was_given(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: iter(["Canberra is the capital of Australia."]))
     out = "".join(ca.chat("What is the capital of Australia?", [], "", None))

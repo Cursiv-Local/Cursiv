@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from cursiv_v215.core import keystore as ks
+from cursiv_engine.core import keystore as ks
 
 
 def test_keychain_stores_by_reference_and_keeps_the_key_off_the_command_line(monkeypatch):

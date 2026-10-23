@@ -162,11 +162,11 @@ disposable file paths/content, persistence, receipts and failed-tool exits.
 
 ## Exact incremental files
 
-- Application: `cursiv_v215/core/turn_policy.py`, `core/file_access.py`,
+- Application: `cursiv_engine/core/turn_policy.py`, `core/file_access.py`,
   `core/grounding.py`, `core/crosscheck.py`, `memory/intents.py`,
   `chat/provenance.py`, `chat/context.py`, `chat/conversation.py`,
   `chat/streaming.py`, `chat/review.py`, `chat/cloud_providers.py`,
-  `ui/chat_app.py` (all under `cursiv_v215/`), and `launcher/usb_maker.py`.
+  `ui/chat_app.py` (all under `cursiv_engine/`), and `launcher/usb_maker.py`.
 - Website: `website/app.html`, `website/notebook/index.html`,
   `website/notebook/sw.js`. The prior general-vision Worker change is preserved.
 - Tests: `tests/test_trust_boundary_followup.py`, `tests/test_restricted_regressions.py`,

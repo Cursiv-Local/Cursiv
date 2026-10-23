@@ -113,7 +113,7 @@ class KnowledgeDialog(_Window):
                    "Every saved fact, where it came from (you said it, or Cursiv inferred it) and when. Remove any of them.",
                    "Open", self._window("_open_memory"))
         try:
-            from cursiv_v215.memory import semantic
+            from cursiv_engine.memory import semantic
             card = QFrame(); card.setObjectName("card")
             v = QVBoxLayout(card); v.setContentsMargins(16, 12, 16, 12)
             box = QCheckBox("Learn from our conversations"); box.setChecked(semantic.learning_enabled())
@@ -144,7 +144,7 @@ class KnowledgeDialog(_Window):
             panel._open_saved_notes()
 
     def _build_documents(self):
-        from cursiv_v215.core import documents
+        from cursiv_engine.core import documents
         self._doc_list = QListWidget(); self._doc_list.setMinimumHeight(110)
         self.body.addWidget(self._doc_list)
         row = QHBoxLayout()
@@ -186,7 +186,7 @@ class KnowledgeDialog(_Window):
         fill()
 
     def _build_reference(self):
-        from cursiv_v215.core import reference
+        from cursiv_engine.core import reference
         search = QLineEdit(); search.setPlaceholderText("Search the reference…")
         self.body.addWidget(search)
         row = QHBoxLayout()
@@ -231,7 +231,7 @@ class ToolsDialog(_Window):
                          "Extra things Cursiv can do. Each one opens its own window or puts a starting command in the chat box.",
                          width=760, height=680)
         try:
-            from cursiv_v215.core import profile as _profile
+            from cursiv_engine.core import profile as _profile
             personal = _profile.personal()
         except Exception:
             personal = False
@@ -356,7 +356,7 @@ class WelcomeDialog(_Window):
 
     def __init__(self, parent=None, setup_needed: bool = False):
         try:
-            from cursiv_v215.core import profile as _profile
+            from cursiv_engine.core import profile as _profile
             personal = _profile.personal()
         except Exception:
             personal = False

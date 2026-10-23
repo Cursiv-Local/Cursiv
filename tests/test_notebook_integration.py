@@ -11,7 +11,7 @@ import sys
 
 import pytest
 
-from cursiv_v215.core import fieldlog, notebook_tools as nt
+from cursiv_engine.core import fieldlog, notebook_tools as nt
 
 DETAILS = 'site: Pond 2; observer: Dana; water temp 12.40 C; pH 7.20; 44.5, -71.1; note: turbid'
 
@@ -249,8 +249,8 @@ def test_followup_does_not_reuse_stale_observation_across_a_different_action(log
 
 @pytest.mark.parametrize('provider', ['ollama', 'openai', 'claude', 'grok'])
 def test_every_backend_uses_native_route_offline_without_models_or_files(log, monkeypatch, provider):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import netgate, file_access, tools
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import netgate, file_access, tools
     def forbidden(*args, **kwargs):
         pytest.fail('Notebook requests must not reach models, filesystem tools or automatic memory')
     for name in ('_chat_inner', '_router_llm', '_call_ollama', '_learn_later'):
@@ -265,8 +265,8 @@ def test_every_backend_uses_native_route_offline_without_models_or_files(log, mo
 
 def test_chat_commands_precede_generic_files_and_memory(log, monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.core import file_access
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.core import file_access
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(file_access, 'is_request', lambda *_: pytest.fail('filesystem intent must not run'))
     monkeypatch.setattr(semantic, 'memory_command', lambda *_: pytest.fail('memory must not capture notebook saves'))
     result = cc.handle_command('remember this in the field notebook: ' + DETAILS, {}, [])
@@ -325,7 +325,7 @@ def test_identical_observations_in_different_chats_are_distinct(log):
 
 
 def test_existing_records_and_export_chain_remain_compatible(log, tmp_path):
-    from cursiv_v215.core import fieldsync
+    from cursiv_engine.core import fieldsync
     old = log.add(site='Original', note='preexisting schema-one record')
     before = log.log_file().read_bytes()
     assert 'chat_request_id' not in old
@@ -375,7 +375,7 @@ def deny(event, args):
     if event in ('socket.connect', 'socket.getaddrinfo', 'socket.sendto', 'socket.bind'):
         raise AssertionError('Network is forbidden')
 sys.addaudithook(deny)
-from cursiv_v215.core import notebook_tools as nt, fieldlog as fl
+from cursiv_engine.core import notebook_tools as nt, fieldlog as fl
 text = 'record a field observation: site: Restart; note: ' + sys.argv[1]
 result = nt.command(text, [], observer='Dana')
 assert result.ok
@@ -407,7 +407,7 @@ sys.path.insert(0, 'launcher')
 import portable
 portable.usb_root = lambda: Path(sys.argv[1])
 assert portable.activate()
-from cursiv_v215.core import notebook_tools as nt, fieldlog as fl
+from cursiv_engine.core import notebook_tools as nt, fieldlog as fl
 result = nt.command('record a field observation: site: USB; note: portable-marker', [], observer='Dana')
 assert result.ok and fl.verify() == []
 assert fl.log_file() == Path(sys.argv[1]) / 'Home' / '.cursiv' / 'fieldlog' / 'observations.jsonl'

@@ -1,13 +1,13 @@
 """Small Qt journal panel using the same validated commands as conversation."""
 from PyQt6.QtWidgets import (QDialog, QVBoxLayout, QHBoxLayout, QListWidget, QPlainTextEdit,
                             QLineEdit, QPushButton, QComboBox, QCheckBox, QLabel, QMessageBox)
-from cursiv_v215.core import curiosity, curiosity_engine
+from cursiv_engine.core import curiosity, curiosity_engine
 
 
 class CuriosityDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.memory import semantic
         self.person = semantic.current_person()
         self.setWindowTitle('Curiosity Journal')
         self.resize(820, 650)

@@ -7,7 +7,7 @@ import json
 
 import pytest
 
-from cursiv_v215.chat import web_search as ws
+from cursiv_engine.chat import web_search as ws
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 BOT_PAGE = ("<html><body><div class='anomaly-modal'>DuckDuckGo Unfortunately, bots use DuckDuckGo too. "
@@ -30,7 +30,7 @@ class _Resp(io.BytesIO):
 @pytest.fixture
 def net(monkeypatch, tmp_path):
     """DuckDuckGo stand-in: the Instant Answer API has nothing, the lite page is `page[0]`."""
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     monkeypatch.setattr(netgate, "CONFIG_FILE", tmp_path / "config.json")
     monkeypatch.setattr(ws, "BRAVE_KEY", "")
     cache = {}
@@ -77,7 +77,7 @@ def test_the_search_command_says_why_nothing_came_back(net, monkeypatch):
 
 
 def test_a_chat_turn_with_a_failed_search_says_so_and_claims_no_web_source(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     seen = {}
     _local_model(monkeypatch, reply="The search didn't return anything this time.")
     monkeypatch.setattr(ca, "_call_ollama", lambda messages, **kw: (seen.setdefault("sys", messages[0]["content"]),

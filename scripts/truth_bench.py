@@ -38,7 +38,7 @@ REPO = Path(__file__).resolve().parent.parent
 def source_fingerprint(app: Path) -> str:
     """Identity of the Python source actually copied for this run."""
     digest = hashlib.sha256()
-    files = sorted(p for directory in ('cursiv_v215', 'launcher')
+    files = sorted(p for directory in ('cursiv_engine', 'launcher')
                    for p in (app / directory).rglob('*.py') if '__pycache__' not in p.parts)
     for path in files:
         digest.update(path.relative_to(app).as_posix().encode('utf-8') + b'\0')
@@ -50,11 +50,11 @@ import json, sys, time
 sys.path[:0] = [".", "launcher", "bench"]
 for m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(m, None)
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
-from cursiv_v215.ui import chat_app as ca
-from cursiv_v215.memory import semantic as sem
-from cursiv_v215.core import phases, verify
+from cursiv_engine.ui import chat_app as ca
+from cursiv_engine.memory import semantic as sem
+from cursiv_engine.core import phases, verify
 import truth_cases
 
 ca._learn_later = lambda *a, **k: None            # no memories leak from one case into the next
@@ -64,11 +64,11 @@ except Exception:
     _cc = None                                     # an older release run with --source
 cases = [c for c in truth_cases.CASES if c["id"] in set(json.loads(sys.argv[1]))]
 if len(sys.argv) > 2 and sys.argv[2]:
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     keys.store_key("chat_model", sys.argv[2])
     keys.store_key("show_all_models", "on")       # a specific model is an Advanced choice
 if len(sys.argv) > 3 and sys.argv[3] == "deep":
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     keys.store_key("answer_mode", "deep")
 model = ca._resolve_ollama_model()
 print(json.dumps({"model": model}), flush=True)
@@ -145,7 +145,7 @@ def main() -> int:
     ap.add_argument("--label", help="results label (default: version from the launcher)")
     ap.add_argument("--model", default="", help="local model to answer with (default: Cursiv's own choice)")
     ap.add_argument("--deep", action="store_true", help="answer in Deep Think (reasoning on)")
-    ap.add_argument("--source", default="", help="git ref whose cursiv_v215 and launcher code to run (default: this tree)")
+    ap.add_argument("--source", default="", help="git ref whose cursiv_engine and launcher code to run (default: this tree)")
     args = ap.parse_args()
 
     sys.path[:0] = [str(REPO / "bench")]
@@ -165,11 +165,11 @@ def main() -> int:
         if args.source:
             import io
             import tarfile
-            tar = subprocess.run(["git", "-C", str(REPO), "archive", "--format=tar", args.source, "cursiv_v215", "launcher"],
+            tar = subprocess.run(["git", "-C", str(REPO), "archive", "--format=tar", args.source, "cursiv_engine", "launcher"],
                                  capture_output=True, check=True).stdout
             with tarfile.open(fileobj=io.BytesIO(tar)) as t:
                 t.extractall(scratch / "app", filter="data")
-        for part in (("bench",) if args.source else ("cursiv_v215", "launcher", "bench")):
+        for part in (("bench",) if args.source else ("cursiv_engine", "launcher", "bench")):
             shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
         source_sha256 = source_fingerprint(scratch / 'app')
         (scratch / "home").mkdir()

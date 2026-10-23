@@ -1,7 +1,7 @@
 """
 Cursiv — Training Data dialog.
 
-A storage box for cursiv_v215/training/paths.py's TRAINING_JSONL -- the
+A storage box for cursiv_engine/training/paths.py's TRAINING_JSONL -- the
 file LoRA training reads from. This dialog gives three ways to add to it:
 
   - Upload an image: run vision analysis on it and store the description
@@ -265,7 +265,7 @@ class TrainingDataDialog(QDialog):
     # so it's safe to call even before those packages are installed.
 
     def _start_lora_training(self) -> None:
-        from cursiv_v215.training import lora_trainer as lt
+        from cursiv_engine.training import lora_trainer as lt
         # Asks the system Python which packages it has -- a few seconds.
         QGuiApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
         self._status.setText("Checking Python and training packages…")
@@ -383,13 +383,13 @@ class TrainingDataDialog(QDialog):
         return "'" + text.replace("'", "''") + "'"
 
     def _train_script(self, python_exe: str) -> str:
-        from cursiv_v215.training import lora_trainer as lt
+        from cursiv_engine.training import lora_trainer as lt
         data_root = str(cc._CHAT_ROOT)
         return (
             "Write-Host '' ;"
             "Write-Host '  Cursiv — LoRA Training' -ForegroundColor DarkYellow ;"
             "Write-Host '' ;"
-            f"& '{python_exe}' -E -u -c {self._ps_quote(lt.module_launch_code(data_root, 'cursiv_v215.training.lora_trainer'))} ;"
+            f"& '{python_exe}' -E -u -c {self._ps_quote(lt.module_launch_code(data_root, 'cursiv_engine.training.lora_trainer'))} ;"
             "Write-Host '' ;"
             "Write-Host '  Press Enter to close...' -NoNewline ;"
             "Read-Host"
@@ -404,7 +404,7 @@ class TrainingDataDialog(QDialog):
     # ~1GB base model, first time only) and a step that can take a minute.
 
     def _merge_into_ollama(self) -> None:
-        from cursiv_v215.training import ollama_merge as om
+        from cursiv_engine.training import ollama_merge as om
         req = om.check_merge_requirements()
 
         if req["adapter_count"] == 0:
@@ -455,14 +455,14 @@ class TrainingDataDialog(QDialog):
         )
 
     def _merge_script(self, python_exe: str, model_name: str) -> str:
-        from cursiv_v215.training import lora_trainer as lt
+        from cursiv_engine.training import lora_trainer as lt
         data_root = str(cc._CHAT_ROOT)
         safe_name = model_name.replace("'", "''")
         return (
             "Write-Host '' ;"
             "Write-Host '  Cursiv — Merging LoRA Adapter into Ollama' -ForegroundColor DarkYellow ;"
             "Write-Host '' ;"
-            f"& '{python_exe}' -E -u -c {self._ps_quote(lt.module_launch_code(data_root, 'cursiv_v215.training.ollama_merge'))} --name '{safe_name}' ;"
+            f"& '{python_exe}' -E -u -c {self._ps_quote(lt.module_launch_code(data_root, 'cursiv_engine.training.ollama_merge'))} --name '{safe_name}' ;"
             "Write-Host '' ;"
             "Write-Host '  Press Enter to close...' -NoNewline ;"
             "Read-Host"

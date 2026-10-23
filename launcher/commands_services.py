@@ -52,7 +52,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
         results = runtime._web_search(query)
         if not results:
             try:
-                from cursiv_v215.chat import web_search as _ws
+                from cursiv_engine.chat import web_search as _ws
                 why = _ws.last_problem
             except Exception:
                 why = ""

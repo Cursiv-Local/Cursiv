@@ -18,7 +18,7 @@ OUT = REPO / "docs" / "REFERENCE.md"
 
 def render() -> str:
     sys.path[:0] = [str(REPO)]
-    from cursiv_v215.core import reference as ref
+    from cursiv_engine.core import reference as ref
     entries = sorted(ref.entries(), key=lambda e: (e.category, e.title))
     sourced = [e for e in entries if ref.source(e.title)]
     reviewed = [e for e in sourced if ref.source(e.title).get("reviewed")]

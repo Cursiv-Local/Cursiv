@@ -5,7 +5,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "scripts"))
 import review_sheet  # noqa: E402
 
-from cursiv_v215.core import reference as ref  # noqa: E402
+from cursiv_engine.core import reference as ref  # noqa: E402
 
 
 def test_every_medical_entry_is_on_the_sheet_with_its_fingerprint():

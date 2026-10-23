@@ -44,7 +44,7 @@ class ChatReviewMixin:
         signals = self._signals
 
         def work():
-            from cursiv_v215.core.verify import PassResult
+            from cursiv_engine.core.verify import PassResult
             try:
                 result = job.run(on_model_state=lambda stage: signals.review_state.emit((key, index, original), stage))
             except Exception:
@@ -75,10 +75,10 @@ class ChatReviewMixin:
             return
         self._review_cancel = None
         self._check_progress.hide()
-        from cursiv_v215.core.feedback import review_status
+        from cursiv_engine.core.feedback import review_status
         if not getattr(self, '_save_error', False):
             self._status.setText(review_status(result))
-        from cursiv_v215.chat.review import followup
+        from cursiv_engine.chat.review import followup
         note = followup(result)
         if result is None:
             return

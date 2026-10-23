@@ -7,7 +7,7 @@ import sys
 
 import pytest
 
-from cursiv_v215.core import file_access as fs
+from cursiv_engine.core import file_access as fs
 
 
 def test_read_create_list_and_atomic_append(tmp_path):
@@ -40,7 +40,7 @@ def test_approved_overwrite_and_fresh_process_read(tmp_path):
     p.write_text('old', encoding='utf-8')
     request = fs.command('file replace notes.txt :: permanent research notes', [], tmp_path).pending
     fs.execute('write_file', request, tmp_path, confirmed=True)
-    script = ('from pathlib import Path; from cursiv_v215.core.file_access import execute; '
+    script = ('from pathlib import Path; from cursiv_engine.core.file_access import execute; '
               'print(execute("read_file", {"path":"notes.txt"}, Path(__import__("sys").argv[1])))')
     r = subprocess.run([sys.executable, '-B', '-c', script, str(tmp_path)], capture_output=True, text=True, timeout=20)
     assert r.returncode == 0, r.stderr
@@ -123,7 +123,7 @@ def test_failed_atomic_replace_preserves_original(tmp_path, monkeypatch):
 
 
 def test_both_explicit_memory_and_file_save_report_independent_outcomes(tmp_path, monkeypatch):
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(semantic, 'embed', lambda _: None)
     out = fs.command('file remember project.txt :: The project is Cursiv', [], tmp_path)
     assert 'Saved and verified' in out.text and 'Conversational memory: saved and verified' in out.text
@@ -159,14 +159,14 @@ def test_credentials_inside_an_ordinary_named_file_are_protected(tmp_path):
 
 def test_confirmed_gui_dispatch_reports_file_and_memory_failures_separately(tmp_path, monkeypatch):
     import chat_commands as cc
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(semantic, 'embed', lambda _: None)
     text = cc.approve_write('../outside.txt', 'A project fact', str(tmp_path), remember=True).text
     assert text.startswith('Error:') and 'Conversational memory: saved and verified' in text
 
 
 def test_full_chat_file_result_does_not_call_a_cloud_verifier(tmp_path, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_router_llm', lambda *_a, **_kw: pytest.fail('No model should see a file command'))
     out = ''.join(ca.chat('file create offline.txt :: private research notes', [], '', None,
                           file_access=True, root_path=str(tmp_path)))
@@ -174,8 +174,8 @@ def test_full_chat_file_result_does_not_call_a_cloud_verifier(tmp_path, monkeypa
 
 
 def test_filesystem_route_is_offline_and_needs_no_model_tools(tmp_path, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import netgate
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import netgate
     monkeypatch.setattr(netgate, 'allowed', lambda: False)
     monkeypatch.setattr(ca, '_call_ollama', lambda *_a, **_k: pytest.fail('No native tool calling needed'))
     out = ''.join(ca._chat_inner('file create research.txt :: offline data', [], '', None,
@@ -185,7 +185,7 @@ def test_filesystem_route_is_offline_and_needs_no_model_tools(tmp_path, monkeypa
 
 
 def test_legacy_file_tools_share_workspace_checks(tmp_path):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     (tmp_path / 'notes.txt').write_text('data', encoding='utf-8')
     calls = [{'tool': 'read_file', 'args': {'path': str(tmp_path / 'notes.txt')}}]
     assert 'File access is off' in tools.run(calls)[0][1]
@@ -195,7 +195,7 @@ def test_legacy_file_tools_share_workspace_checks(tmp_path):
 
 
 def test_native_file_dispatch_cannot_bypass_confirmation_or_protection(tmp_path):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     assert 'delete_file' not in {t['function']['name'] for t in ca.FILE_TOOLS}
     (tmp_path / 'notes.txt').write_text('original', encoding='utf-8')
     assert 'Confirmation' in ca.execute_tool('write_file', {'path': 'notes.txt', 'content': 'new'}, tmp_path)
@@ -214,7 +214,7 @@ def deny_network(event, args):
     if event in ('socket.connect', 'socket.getaddrinfo', 'socket.sendto'):
         raise OSError('No network permitted by this test')
 sys.addaudithook(deny_network)
-from cursiv_v215.core.file_access import command
+from cursiv_engine.core.file_access import command
 root = Path(sys.argv[1])
 assert 'Saved and verified' in command('file create offline.txt :: offline content', [], root).text
 print(command('file read offline.txt', [], root).text)

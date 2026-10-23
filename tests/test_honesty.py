@@ -12,7 +12,7 @@ sys.path.insert(0, str(ROOT / "launcher"))
 for _m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(_m, None)
 
-from cursiv_v215.ui import chat_app as ca  # noqa: E402
+from cursiv_engine.ui import chat_app as ca  # noqa: E402
 
 
 # ── Status lines ────────────────────────────────────────────────────────────

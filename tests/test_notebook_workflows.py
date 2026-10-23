@@ -3,8 +3,8 @@ import json
 
 import pytest
 
-from cursiv_v215.core import demo, fieldlog, notebook_tools, native_answers
-from cursiv_v215.chat import keys
+from cursiv_engine.core import demo, fieldlog, notebook_tools, native_answers
+from cursiv_engine.chat import keys
 from test_background_review import pipeline
 from test_demo import home
 from test_netgate import fresh
@@ -29,7 +29,7 @@ def test_requested_howto_workflows_never_use_a_model(pipeline, monkeypatch, ques
 
 
 def test_howto_does_not_execute_the_described_workflow(monkeypatch):
-    from cursiv_v215.core import fieldsync
+    from cursiv_engine.core import fieldsync
     monkeypatch.setattr(fieldsync, 'share', lambda *a: pytest.fail('Help must not share'))
     monkeypatch.setattr(fieldsync, 'import_phone_bundle', lambda *a: pytest.fail('Help must not import'))
     monkeypatch.setattr(fieldlog, 'correct', lambda *a: pytest.fail('Help must not correct'))
@@ -119,7 +119,7 @@ def test_demo_cleanup_failure_restores_real_view_and_reports_retained_samples(ho
 
 
 def test_demo_flag_write_failure_is_not_reported_as_off(home, monkeypatch):
-    from cursiv_v215.core import atomic
+    from cursiv_engine.core import atomic
     demo.load()
     monkeypatch.setattr(atomic, 'write_text', lambda *a, **kw: (_ for _ in ()).throw(PermissionError('read only')))
     out = demo.command('demo off')
@@ -162,7 +162,7 @@ def test_demo_cleanup_cannot_delete_an_unexpected_directory(home, tmp_path, monk
     ("We leave camp at 14:30. The hike takes 3 h 45 min and we'll take a 20 min break. When do we arrive?", '18:35'),
 ])
 def test_field_clock_phrasing_has_a_code_receipt(question, answer):
-    from cursiv_v215.core import calc
+    from cursiv_engine.core import calc
     worked = calc.work_out(question)
     assert worked and worked.tool == 'clock' and answer in worked.statement
     assert worked.record()['ok'] is True

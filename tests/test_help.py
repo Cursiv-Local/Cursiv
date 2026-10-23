@@ -63,7 +63,7 @@ def test_help_me_is_still_chat(monkeypatch):
 
 
 def test_tier_1_is_offline_mode(tmp_path, monkeypatch):
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     monkeypatch.setattr(netgate, "CONFIG_FILE", tmp_path / "config.json")
     cfg = cc._default_cfg()
     assert "Offline mode ON" in cc.handle_command("tier 1", cfg, []).text
@@ -80,6 +80,6 @@ def test_removed_commands_say_so_and_longer_text_is_chat(monkeypatch):
 def test_persona_is_plain():
     from pathlib import Path
     text = Path(__file__).resolve().parent.parent.joinpath(
-        "cursiv_v215", "codex", "system_prompt.md").read_text(encoding="utf-8").lower()
+        "cursiv_engine", "codex", "system_prompt.md").read_text(encoding="utf-8").lower()
     for word in ("evocore", "sovereign", "yin", "meta", "nexus", "soul", "drift", "33π", "decal"):
         assert word not in text, word

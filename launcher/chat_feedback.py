@@ -40,7 +40,7 @@ class ChatFeedbackMixin:
         layout.addLayout(row)
 
     def _set_turn_feedback(self, text=''):
-        from cursiv_v215.core.turn_policy import for_text
+        from cursiv_engine.core.turn_policy import for_text
         self._turn_text = text
         self._turn_policy = for_text(text)
         self._receipt_line.clear()
@@ -94,7 +94,7 @@ class ChatFeedbackMixin:
         self._refresh_context_indicator()
 
     def _on_tool_receipt(self, payload):
-        from cursiv_v215.core import feedback
+        from cursiv_engine.core import feedback
         domain, receipt = payload
         formatter = {'filesystem': feedback.file_receipt, 'notebook': feedback.notebook_receipt,
                      'memory': feedback.memory_receipt}.get(domain)
@@ -106,9 +106,9 @@ class ChatFeedbackMixin:
 
     def _capture_file_result(self, result):
         """Worker-side adapter. Typed executed results only; never inspect prose."""
-        from cursiv_v215.core.file_access import FileResult
-        from cursiv_v215.core.tools import ToolOutcome
-        from cursiv_v215.core.answer_evidence import AnswerEvidence
+        from cursiv_engine.core.file_access import FileResult
+        from cursiv_engine.core.tools import ToolOutcome
+        from cursiv_engine.core.answer_evidence import AnswerEvidence
         if isinstance(result, AnswerEvidence):
             self._pending_answer_evidence = result.receipt()
             return

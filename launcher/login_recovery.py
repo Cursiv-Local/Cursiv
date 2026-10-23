@@ -16,7 +16,7 @@ from login_style import _BaseDialog
 
 
 def _sq():
-    from cursiv_v215.guardian.security_questions import (
+    from cursiv_engine.guardian.security_questions import (
         QUESTIONS, setup_security_questions,
         is_setup_complete as sq_ready,
         get_selected_questions, verify_answers,
@@ -214,7 +214,7 @@ class ResetPasswordDialog(_BaseDialog):
             return
 
         try:
-            from cursiv_v215.guardian.access_gate import username_exists
+            from cursiv_engine.guardian.access_gate import username_exists
             if not username_exists(username):
                 self._p0_err.setText("Username not found.")
                 return
@@ -338,7 +338,7 @@ class ResetPasswordDialog(_BaseDialog):
             return
 
         try:
-            from cursiv_v215.guardian.access_gate import reset_password
+            from cursiv_engine.guardian.access_gate import reset_password
             reset_password(pw, username=self._verified_username)     # only the account that answered
         except Exception as exc:
             self._p2_err.setText(f"Error saving password: {exc}")

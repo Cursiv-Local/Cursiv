@@ -4,7 +4,7 @@ import sys
 
 import pytest
 
-from cursiv_v215.core import keystore
+from cursiv_engine.core import keystore
 
 pytestmark = pytest.mark.skipif(sys.platform != "win32", reason="DPAPI is Windows-only")
 
@@ -13,7 +13,7 @@ KEY = "gsk_" + "k" * 40
 
 @pytest.fixture
 def keys_file(tmp_path, monkeypatch):
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     path = tmp_path / ".cursiv" / "config.json"
     monkeypatch.setattr(keys, "KEYS_FILE", path)
     monkeypatch.delenv("CURSIV_PORTABLE", raising=False)
@@ -29,14 +29,14 @@ def test_round_trip_and_foreign_blob():
 
 
 def test_saved_keys_are_not_plain_on_disk(keys_file):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     ca._store_key("groq_key", KEY)
     assert KEY not in keys_file.read_text(encoding="utf-8")
     assert ca._saved_key("groq_key") == KEY
 
 
 def test_other_settings_stay_readable(keys_file):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     ca._store_key("cf_account_id", "abc123")
     assert json.loads(keys_file.read_text(encoding="utf-8"))["cf_account_id"] == "abc123"
 
@@ -61,7 +61,7 @@ def test_usb_copy_keeps_keys_plain(keys_file, monkeypatch):
 
 
 def test_settings_window_and_chat_panel_see_readable_keys(keys_file, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     import settings_dialog
     ca._store_key("openai_key", KEY)
     assert settings_dialog.load_keys()["openai_key"] == KEY

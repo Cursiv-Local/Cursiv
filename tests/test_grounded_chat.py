@@ -7,8 +7,8 @@ import sys
 
 import pytest
 
-from cursiv_v215.core import grounding, presence, turn_policy as tp
-from cursiv_v215.memory import intents as mi, recall, semantic as sem
+from cursiv_engine.core import grounding, presence, turn_policy as tp
+from cursiv_engine.memory import intents as mi, recall, semantic as sem
 
 
 def write_records(records):
@@ -40,7 +40,7 @@ def test_scope_resets_on_generator_close_and_exception():
 
 
 def test_native_provider_executor_cannot_bypass_current_limits(tmp_path):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     path = tmp_path / 'existing.txt'
     path.write_text('original', encoding='utf-8')
     with tp.scope('Just talk about the files'):
@@ -93,8 +93,8 @@ def test_damaged_memory_setting_is_unknown_not_reset():
 
 @pytest.mark.parametrize('provider', ['', 'ollama', 'openai', 'grok', 'claude'])
 def test_live_status_is_native_with_no_model_or_workspace_scan(monkeypatch, tmp_path, provider):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import tools
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import tools
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: pytest.fail('No model'))
     monkeypatch.setattr(tools, 'plan', lambda *_: pytest.fail('No planner'))
     monkeypatch.setattr(tools, 'list_folder', lambda *_: pytest.fail('No scan'))
@@ -194,7 +194,7 @@ def test_dated_recall_survives_a_fresh_python_process(tmp_path, monkeypatch):
     saved = mi.command('remember My restart marker is GROUNDED-821.', [], person='dana')
     ident = saved.outcomes[0].records[0]['id']
     script = (
-        "import sys; from pathlib import Path; from cursiv_v215.memory import intents,semantic as s;"
+        "import sys; from pathlib import Path; from cursiv_engine.memory import intents,semantic as s;"
         "s.FACTS_FILE=Path(sys.argv[1]);s.SETTINGS_FILE=Path(sys.argv[2]);"
         "r=intents.command('what do you remember from past 14 days',[],person='dana');"
         "assert r.ok; print(r.render())")
@@ -206,7 +206,7 @@ def test_dated_recall_survives_a_fresh_python_process(tmp_path, monkeypatch):
 
 @pytest.mark.parametrize('provider', ['ollama', 'openai', 'grok', 'claude'])
 def test_dated_recall_cannot_be_transferred_to_model(monkeypatch, provider):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: pytest.fail('No model'))
     reply = ''.join(ca.chat('what do you remember from the passed 2 weeks', [], '', None, force_provider=provider))
     assert reply.startswith('0 matching saved memory records') and 'No matching' in reply
@@ -262,7 +262,7 @@ def test_exact_quotes_are_checked_but_proposed_code_is_not():
 
 
 def test_slimming_preserves_separate_current_state_and_evidence():
-    from cursiv_v215.core.speed import slim_messages
+    from cursiv_engine.core.speed import slim_messages
     persona = 'long persona ' * 10000
     protected = 'file_access=true; persistent_memory=supported; VERIFIED SOURCE: return True'
     messages = [dict(role='system', content=persona), dict(role='system', content=protected),
@@ -275,8 +275,8 @@ def test_slimming_preserves_separate_current_state_and_evidence():
 
 
 def test_full_conversation_only_turn_never_plans_or_reads_documents(monkeypatch, tmp_path):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import tools, documents, phases, plugins, netgate, speed
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import tools, documents, phases, plugins, netgate, speed
     from test_netgate import _local_model
     _local_model(monkeypatch)
     monkeypatch.setattr(netgate, 'is_offline', lambda: True)
@@ -309,7 +309,7 @@ def test_full_conversation_only_turn_never_plans_or_reads_documents(monkeypatch,
     "File access is off.",
 ])
 def test_absolute_false_capability_claims_are_corrected(monkeypatch, tmp_path, said):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: iter([said]))
     # Own-feature questions are now native. Exercise the post-model guard on
     # an unrelated prompt so malicious capability prose still gets withdrawn.
@@ -341,7 +341,7 @@ def test_qualified_limitations_are_not_false_capability_claims(said):
 
 
 def test_provider_native_and_generic_source_results_reach_quote_checker(monkeypatch, tmp_path):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     path = tmp_path / 'source.py'
     path.write_text('def settings():\n    return True\n', encoding='utf-8')
     fence = chr(96)*3
@@ -356,7 +356,7 @@ def test_provider_native_and_generic_source_results_reach_quote_checker(monkeypa
 
 
 def test_readonly_native_commands_cannot_expand_an_outer_restriction(tmp_path):
-    from cursiv_v215.core import file_access, notebook_tools
+    from cursiv_engine.core import file_access, notebook_tools
     with tp.scope('No tools.'):
         file = file_access.command('file create no.txt :: marker', [], tmp_path)
         note = notebook_tools.command('record a field observation: North Ridge', [])
@@ -368,7 +368,7 @@ def test_readonly_native_commands_cannot_expand_an_outer_restriction(tmp_path):
 
 
 def test_restricted_tools_do_not_even_load_plugin_catalog(monkeypatch):
-    from cursiv_v215.core import tools
+    from cursiv_engine.core import tools
     monkeypatch.setattr(tools, 'all_tools', lambda: pytest.fail('No plugin discovery'))
     with tp.scope('No tools'):
         assert not tools.run([dict(tool='system_info', args={})])[0].ok
@@ -379,8 +379,8 @@ def test_restricted_tools_do_not_even_load_plugin_catalog(monkeypatch):
 
 
 def test_readonly_chat_skips_unknown_plugin_hooks_and_full_self_probe(monkeypatch, tmp_path):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import plugins, selfknow, netgate, speed
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import plugins, selfknow, netgate, speed
     from test_netgate import _local_model
     _local_model(monkeypatch)
     monkeypatch.setattr(netgate, 'is_offline', lambda: True)
@@ -408,8 +408,8 @@ def test_source_excerpt_targets_named_function_without_inventing_lines():
 
 
 def test_final_model_check_cannot_reintroduce_false_capability_claim(monkeypatch, tmp_path):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import speed, verify
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import speed, verify
     from types import SimpleNamespace
     monkeypatch.setattr(ca, '_chat_inner', lambda **_: iter(['A research partner can help explore ideas.']))
     monkeypatch.setattr(ca, '_learn_later', lambda *a, **k: None)

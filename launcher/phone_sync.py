@@ -49,14 +49,14 @@ def _person(st: dict) -> str:
     if st.get("person"):
         return st["person"]
     try:
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.memory import semantic
         return semantic.current_person()
     except Exception:
         return "family"
 
 
 def _digest(person: str) -> str:
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     facts = semantic.list_facts(person)
     return "\n".join(f"- {f['text']}" for f in facts[-25:])
 
@@ -68,7 +68,7 @@ class _NoEngine(Exception):
 def _learner():
     """Optional extraction uses only the local model, like desktop learning.
     No ready model: defer this exchange; deterministic facts need no model."""
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
 
     def ask(messages):
         out = ca._memory_llm(messages)
@@ -98,7 +98,7 @@ def sync_once() -> str:
         except Exception as exc:
             return f"couldn't reach the phone space: {exc}"
         if msgs:
-            from cursiv_v215.memory import semantic
+            from cursiv_engine.memory import semantic
             base = _learner()
             failed = []
 

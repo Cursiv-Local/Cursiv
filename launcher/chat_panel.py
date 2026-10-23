@@ -4,7 +4,7 @@ Cursiv — in-app chat panel.
 Replaces the old terminal-spawned CLI with a real chat view living inside
 the main Cursiv window. Plain messages go through the exact same core
 chat() call the terminal CLI and web demo already use
-(cursiv_v215/ui/chat_app.py); the terminal CLI's ~40 built-in commands
+(cursiv_engine/ui/chat_app.py); the terminal CLI's ~40 built-in commands
 (key management, council, Babel, Codex, strand memory, blast, postal
 letters, voice, etc.) are routed through chat_commands.py, which calls the
 same underlying functions the CLI does. No subprocess, no console window
@@ -45,7 +45,7 @@ _ROOT = _HERE.parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-# chat_commands.py pulls in roughly a dozen cursiv_v215 subsystems (postal,
+# chat_commands.py pulls in roughly a dozen cursiv_engine subsystems (postal,
 # family, voice, babel, council, strand memory, board client, obsidian,
 # substrate...) that, before this chat panel existed, were only ever loaded
 # by the terminal CLI running as its own separate process -- never by the
@@ -68,8 +68,8 @@ _RATE_SENTINEL = object()
 def _load_saved_keys() -> dict:
     import json
     try:
-        from cursiv_v215.chat.keys import KEYS_FILE as keys_file     # the one settings file
-        from cursiv_v215.core import keystore
+        from cursiv_engine.chat.keys import KEYS_FILE as keys_file     # the one settings file
+        from cursiv_engine.core import keystore
         data = keystore.reveal_all(json.loads(keys_file.read_text(encoding="utf-8")))
         return {k: v for k, v in data.items() if isinstance(v, str)}
     except Exception:
@@ -79,7 +79,7 @@ def _load_saved_keys() -> dict:
 def autosave_enabled() -> bool:
     """Conversations save themselves unless turned off in Settings → Your data & account."""
     try:
-        from cursiv_v215.chat import keys
+        from cursiv_engine.chat import keys
         return keys.saved_key("autosave_chats") != "off"
     except Exception:
         return True
@@ -333,7 +333,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def _examples(self) -> tuple:
         try:
-            from cursiv_v215.core import profile as _profile
+            from cursiv_engine.core import profile as _profile
             return self.EXAMPLES if _profile.personal() else self.FIELD_EXAMPLES
         except Exception:
             return self.FIELD_EXAMPLES
@@ -535,9 +535,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         try:
             force_provider, stripped = cc.hey_prefix(text)
             # A provider prefix never transfers notebook execution to the model.
-            from cursiv_v215.core import notebook_tools, file_requests
-            from cursiv_v215.memory import intents, semantic
-            from cursiv_v215.core import turn_policy
+            from cursiv_engine.core import notebook_tools, file_requests
+            from cursiv_engine.memory import intents, semantic
+            from cursiv_engine.core import turn_policy
             unrestricted = turn_policy.effective(stripped) == turn_policy.Policy()
             workspace_request = file_requests.recognizes(stripped)
             native = unrestricted and not workspace_request and (notebook_tools.is_request(stripped, history) or intents.is_request(
@@ -618,7 +618,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     # ── Cross-check: a second AI reviews the last answer, only on request (core/crosscheck.py) ──
     def _cross_check(self) -> None:
-        from cursiv_v215.core import crosscheck
+        from cursiv_engine.core import crosscheck
         exchange = getattr(self, "_last_exchange", None)
         if not exchange or self._streaming:
             return
@@ -645,7 +645,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         # A late automatic review must not replace a block appended by the
         # person's explicit second-opinion request.
         self._cancel_review()
-        from cursiv_v215.core import crosscheck
+        from cursiv_engine.core import crosscheck
         colour = theme.AMBER if r.ok else theme.RED
         self._force_new_block()
         self._append_html_block(

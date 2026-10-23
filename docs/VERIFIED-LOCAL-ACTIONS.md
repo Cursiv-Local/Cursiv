@@ -128,26 +128,26 @@ same verified writer. No migration or rewrite of real user data was performed.
 
 Production:
 
-- `cursiv_v215/core/file_access.py`: parsing, structured receipts, explicit path
+- `cursiv_engine/core/file_access.py`: parsing, structured receipts, explicit path
   authority, shared execution, read snapshots, unsupported-prose guard.
-- `cursiv_v215/core/workspace.py` (new): persisted explicit grants and portability.
-- `cursiv_v215/core/tools.py`: verified lookup outcomes and neutral failure context.
-- `cursiv_v215/core/local_intent.py` (new): bounded optional local classifier.
-- `cursiv_v215/memory/intents.py` (new): validated seven-operation memory interface.
-- `cursiv_v215/memory/semantic.py`: exact manual deduplication and atomic corrections
+- `cursiv_engine/core/workspace.py` (new): persisted explicit grants and portability.
+- `cursiv_engine/core/tools.py`: verified lookup outcomes and neutral failure context.
+- `cursiv_engine/core/local_intent.py` (new): bounded optional local classifier.
+- `cursiv_engine/memory/intents.py` (new): validated seven-operation memory interface.
+- `cursiv_engine/memory/semantic.py`: exact manual deduplication and atomic corrections
   / selected forget, reusing existing JSONL, provenance and backup facilities.
-- `cursiv_v215/memory/formation.py`: keep explicit operations out of automatic learning.
-- `cursiv_v215/ui/chat_app.py`: shared file dispatch/receipts, native routes, precise
+- `cursiv_engine/memory/formation.py`: keep explicit operations out of automatic learning.
+- `cursiv_engine/ui/chat_app.py`: shared file dispatch/receipts, native routes, precise
   provider failures, no implicit root/content rewrite or later mutation rewrite.
 - `launcher/chat_commands.py`: workspace persistence, native memory delivery,
   verified approval/cache/note outcomes; retain existing Saved Notes alias.
 - `launcher/chat_panel.py`: native memory routing/history and actual file receipts.
-- `cursiv_v215/core/atomic.py`: unique temporary files, fsync and exact read-back.
-- `cursiv_v215/core/strand_store.py`: locked flushed/read-back-verified note appends.
-- `cursiv_v215/family/legacy_store.py`: verified letter/index changes, unique names,
+- `cursiv_engine/core/atomic.py`: unique temporary files, fsync and exact read-back.
+- `cursiv_engine/core/strand_store.py`: locked flushed/read-back-verified note appends.
+- `cursiv_engine/family/legacy_store.py`: verified letter/index changes, unique names,
   strict corrupt-index handling and retained import timestamps for duplicate checks.
-- `cursiv_v215/agents/custom.py`: serialized verified saves/deletes, corrupt-data refusal.
-- `cursiv_v215/codex/system_prompt.md`, `cursiv_v215/core/selfknow.py`: accurate
+- `cursiv_engine/agents/custom.py`: serialized verified saves/deletes, corrupt-data refusal.
+- `cursiv_engine/codex/system_prompt.md`, `cursiv_engine/core/selfknow.py`: accurate
   native capabilities and backend-only evidence descriptions.
 
 Tests/docs:

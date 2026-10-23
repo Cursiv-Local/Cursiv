@@ -5,7 +5,7 @@ from contextlib import contextmanager
 
 import pytest
 
-from cursiv_v215.core import fieldlog, fieldsync
+from cursiv_engine.core import fieldlog, fieldsync
 
 
 @pytest.fixture

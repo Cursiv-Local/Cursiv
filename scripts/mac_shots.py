@@ -25,7 +25,7 @@ home = Path(tempfile.mkdtemp(prefix="cursiv_shots_home_"))
 os.environ["HOME"] = os.environ["USERPROFILE"] = str(home)
 os.environ["CURSIV_APP_DATA"] = str(home / "appdata")
 
-from cursiv_v215.core import demo, netgate  # noqa: E402
+from cursiv_engine.core import demo, netgate  # noqa: E402
 
 netgate.set_offline(True)
 demo.load()

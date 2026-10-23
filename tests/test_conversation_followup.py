@@ -3,8 +3,8 @@ import threading
 
 import pytest
 
-from cursiv_v215.chat import response_style
-from cursiv_v215.core import conversation_kind as kind, native_answers, turn_policy
+from cursiv_engine.chat import response_style
+from cursiv_engine.core import conversation_kind as kind, native_answers, turn_policy
 from test_background_review import pipeline
 from test_chat_rendering import panel
 from test_live_test_followup import final_reply
@@ -77,7 +77,7 @@ def test_warnings_code_and_quotes_unchanged(answer):
 
 @pytest.mark.parametrize('question', [PROMPTS[2], PROMPTS[4], *PROMPTS[5:8]])
 def test_context_guard_precedes_semantic_and_conversation_search(pipeline, monkeypatch, question):
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(semantic, 'build_context', lambda *a, **k: pytest.fail('No saved personal facts'))
     monkeypatch.setattr(pipeline, '_strand_count', lambda: pytest.fail('No history fallback'))
     monkeypatch.setattr(pipeline, '_strand_search', lambda *a, **k: pytest.fail('No history fallback'))

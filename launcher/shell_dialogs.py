@@ -21,7 +21,7 @@ from relay_settings import RELAY_URL as _RELAY_URL, FLEET_TOKEN as _FLEET_TOKEN
 def _is_owner_machine() -> bool:
     """True when the local access_gate is configured — identifies Joshua's machines."""
     try:
-        from cursiv_v215.guardian.access_gate import is_setup_complete
+        from cursiv_engine.guardian.access_gate import is_setup_complete
         return is_setup_complete()
     except ImportError:
         return False
@@ -86,7 +86,7 @@ class _UnlockDialog(QDialog):
     def _verify(self):
         pw = self._pw.text()
         try:
-            from cursiv_v215.guardian.access_gate import verify_credentials
+            from cursiv_engine.guardian.access_gate import verify_credentials
             import os as _os
             ok = verify_credentials(_os.environ.get("USERNAME", "Joshua"), pw)
         except Exception:
@@ -595,7 +595,7 @@ class TitleBar(QWidget):
             row.addWidget(u)
 
         try:
-            from cursiv_v215.core import profile as _profile
+            from cursiv_engine.core import profile as _profile
             _show_phone = _profile.personal()
         except Exception:
             _show_phone = False

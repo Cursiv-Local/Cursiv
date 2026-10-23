@@ -4,8 +4,8 @@ import threading
 
 import pytest
 
-from cursiv_v215.core import feedback, fieldlog, fieldsync, notebook_tools, turn_policy, verify
-from cursiv_v215.chat import review
+from cursiv_engine.core import feedback, fieldlog, fieldsync, notebook_tools, turn_policy, verify
+from cursiv_engine.chat import review
 from test_background_review import pipeline  # shared isolated, deterministic provider fixture
 
 _APP = []
@@ -60,7 +60,7 @@ def test_restricted_confirmation_makes_no_false_offline_or_history_promise():
 
 
 def test_persistent_memory_acknowledgement_is_brief_and_keeps_its_true_scope():
-    from cursiv_v215.memory import intents, semantic
+    from cursiv_engine.memory import intents, semantic
     result = intents.command('remember My field site is North Ridge.', [], person='dana')
     assert result.ok and result.render().startswith('Saved to memory:')
     assert 'conversation only' not in result.render()
@@ -76,7 +76,7 @@ def test_model_prose_cannot_set_tool_receipt(panel):
 
 
 def test_tool_receipts_arrive_while_model_is_still_working(panel):
-    from cursiv_v215.core.file_access import FileResult
+    from cursiv_engine.core.file_access import FileResult
     panel._begin_turn()
     result = FileResult('list_directory', path='workspace', entries=['a', 'b'])
     worker = threading.Thread(target=panel._capture_file_result, args=(result,))
@@ -101,7 +101,7 @@ def test_clean_check_saves_metadata_without_reformatting_answer(panel, monkeypat
 
 
 def test_notes_and_unavailable_check_do_not_claim_a_clean_answer(panel):
-    from cursiv_v215.core.problems import Problem
+    from cursiv_engine.core.problems import Problem
     target = finished(panel)
     result = verify.PassResult(status='problems', append='Compare these measurements.',
                                issues=[Problem('TEST1', 'warning', 'First'), Problem('TEST2', 'warning', 'Second')])
@@ -154,7 +154,7 @@ def test_actual_model_calls_emit_balanced_progress_even_on_error(pipeline, monke
 
 
 def test_voice_survives_small_model_prompt_compaction(pipeline, monkeypatch, tmp_path):
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     captured = []
     def answer(messages, *args, **kwargs):
         captured.extend(messages)

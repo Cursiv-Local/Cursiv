@@ -12,12 +12,12 @@ import time
 
 import pytest
 
-from cursiv_v215.core import phases, verify
+from cursiv_engine.core import phases, verify
 
 
 @pytest.fixture(autouse=True)
 def _fresh_verify_session(monkeypatch):
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     monkeypatch.setattr(speed, 'battery_saver', lambda: False)  # independent of this PC's power state
     verify.reset_session()
     yield
@@ -26,7 +26,7 @@ def _fresh_verify_session(monkeypatch):
 
 @pytest.fixture
 def memory(tmp_path, monkeypatch):
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "CURSIV_DIR", tmp_path)
     monkeypatch.setattr(sem, "FACTS_FILE", tmp_path / "memory_facts.jsonl")
     monkeypatch.setattr(sem, "SETTINGS_FILE", tmp_path / "memory_settings.json")
@@ -310,7 +310,7 @@ def test_casual_prompt_has_the_safety_rule_and_no_ledger_form():
 def test_system_prompt_states_the_safety_rule():
     from pathlib import Path
     prompt = Path(__file__).resolve().parent.parent.joinpath(
-        "cursiv_v215", "codex", "system_prompt.md").read_text(encoding="utf-8")
+        "cursiv_engine", "codex", "system_prompt.md").read_text(encoding="utf-8")
     assert "Memory never outranks safety." in prompt
     # The four-line ledger is asked for only when needs_ledger() says so (prompt_addendum),
     # not on every answer by the persona.
@@ -323,7 +323,7 @@ def test_system_prompt_states_the_safety_rule():
 # ── chat() appends the revision after the draft ────────────────────────────
 
 def test_chat_appends_a_revision_after_the_draft(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_WORKED', None)
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
@@ -434,7 +434,7 @@ def test_checker_prompt_carries_the_context():
 
 
 def test_chat_checks_the_model_text_with_history_and_memory(monkeypatch, memory):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_WORKED', None)
 
     memory.set_person("ada")
@@ -470,7 +470,7 @@ def test_chat_checks_the_model_text_with_history_and_memory(monkeypatch, memory)
 
 
 def test_casual_turn_with_the_engine_footer_is_not_checked(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
 
     def fake_stream(message, history, api_key, files, file_access, root_path, openai_key,
                     confirm_writes, anthropic_key, force_provider, reply):
@@ -489,8 +489,8 @@ def test_casual_turn_with_the_engine_footer_is_not_checked(monkeypatch):
 # ── C-008: the local model first; a saved key is a fallback, not the default ─
 
 def _routing(monkeypatch, local_ready: bool):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import speed
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import speed
     used = []
 
     def engine(name, reply):
@@ -577,7 +577,7 @@ def test_c006_a_number_in_a_simple_question_needs_no_ledger(question):
     ("I have a dog", "I have a cat", False),
 ])
 def test_preference_conflicts_beyond_shared_words(a, b, conflict):
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.memory import semantic
     assert (semantic.conflict_reason(a, b) is not None) is conflict
 
 

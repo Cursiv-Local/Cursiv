@@ -61,7 +61,7 @@ def saved_mode() -> str:
     """"dark", "light" or "system" (match Windows). Dark until the person picks
     something else in Settings, on every install and every Cursiv USB."""
     try:
-        from cursiv_v215.chat import keys
+        from cursiv_engine.chat import keys
         mode = keys.saved_key("ui_theme")
         return mode if mode in MODES else "dark"
     except Exception:
@@ -69,7 +69,7 @@ def saved_mode() -> str:
 
 
 def set_mode(mode: str) -> None:
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     keys.store_key("ui_theme", mode if mode in MODES else "")
 
 

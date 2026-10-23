@@ -29,7 +29,7 @@ def _memory_isolated(tmp_path, monkeypatch):
 The baseline suite changed the copied app's memory during an unrelated test.
 Tests exercise learner work explicitly; ordinary chat tests never start jobs.
 """
-    from cursiv_v215.memory import semantic, formation
+    from cursiv_engine.memory import semantic, formation
     folder = tmp_path / 'memory'
     for key, value in (('CURSIV_DIR', folder), ('FACTS_FILE', folder / 'memory_facts.jsonl'),
                        ('SETTINGS_FILE', folder / 'memory_settings.json'),
@@ -39,17 +39,17 @@ Tests exercise learner work explicitly; ordinary chat tests never start jobs.
     monkeypatch.setattr(semantic, '_generation', 0)
     monkeypatch.setattr(semantic, '_embed_ok', False)
     monkeypatch.setattr(semantic, '_emb_cache', {})
-    from cursiv_v215.memory import projects
-    from cursiv_v215.core import style
-    from cursiv_v215.coding import brain
+    from cursiv_engine.memory import projects
+    from cursiv_engine.core import style
+    from cursiv_engine.coding import brain
     monkeypatch.setattr(projects, 'DIR', folder / 'projects')
     monkeypatch.setattr(style, 'DIR', folder / 'style')
     monkeypatch.setattr(brain, 'CURSIV_DIR', folder)
     monkeypatch.setattr(brain, 'PROFILE_FILE', folder / 'coding_profile.json')
     monkeypatch.setattr(brain, 'LESSONS_FILE', folder / 'coding_lessons.jsonl')
     monkeypatch.setattr(formation, '_logger', None)
-    from cursiv_v215.core import curiosity, presence
-    from cursiv_v215.core import workspace
+    from cursiv_engine.core import curiosity, presence
+    from cursiv_engine.core import workspace
     monkeypatch.setattr(workspace, 'config_file', lambda: folder / 'workspace_access.json')
     monkeypatch.setattr(curiosity, 'path', lambda person: folder / 'curiosity' / (person + '.json'))
     monkeypatch.setattr(presence, 'path', lambda person: folder / 'presence' / (person + '.json'))
@@ -62,7 +62,7 @@ Tests exercise learner work explicitly; ordinary chat tests never start jobs.
 
 def _real_data_state(watched=None):
     """The person's real records a test must never create or change."""
-    from cursiv_v215.core import paths
+    from cursiv_engine.core import paths
     home = Path.home() / ".cursiv"
     out = {}
     for p in (watched if watched is not None else (
@@ -91,7 +91,7 @@ def _real_data_untouched():
 @pytest.fixture(autouse=True)
 def _signing_key_in_tmp(tmp_path_factory, monkeypatch):
     """Never create or use the real installation key (~/.cursiv/device_key.json) in a test."""
-    from cursiv_v215.core import devicekey
+    from cursiv_engine.core import devicekey
     folder = tmp_path_factory.mktemp("devicekey")
     monkeypatch.setattr(devicekey, "key_file", lambda: folder / "device_key.json")
     devicekey._cache.clear()

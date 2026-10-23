@@ -34,13 +34,13 @@ PROVIDERS = [
 
 
 def _keys_file() -> Path:
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     return keys.KEYS_FILE
 
 
 def load_keys() -> dict:
     try:
-        from cursiv_v215.core import keystore
+        from cursiv_engine.core import keystore
         return keystore.reveal_all(json.loads(_keys_file().read_text(encoding="utf-8")))
     except Exception:
         return {}
@@ -50,9 +50,9 @@ def test_key(field: str, key: str) -> tuple[bool, str]:
     """Live test call. Returns (works, message)."""
     try:
         if field in ("gemini_key", "groq_key"):
-            from cursiv_v215.ui import chat_app as ca
+            from cursiv_engine.ui import chat_app as ca
             return ca.check_free_key(field, key)
-        from cursiv_v215.chat import keys
+        from cursiv_engine.chat import keys
         probe = {"api_key": keys.probe_xai, "openai_key": keys.probe_openai, "anthropic_key": keys.probe_claude}[field]
         ok = bool(probe(key))
         return ok, "Working." if ok else "The provider rejected this key, or couldn't be reached."
@@ -176,8 +176,8 @@ class SettingsDialog(QDialog):
 
     # ── pages ──
     def _page_privacy(self, lay):
-        from cursiv_v215.chat import status
-        from cursiv_v215.core import netgate
+        from cursiv_engine.chat import status
+        from cursiv_engine.core import netgate
         self._status_lbl = self._explain("")
         self._status_lbl.setStyleSheet("font-size: 14px;")
         lay.addWidget(self._status_lbl)
@@ -209,7 +209,7 @@ class SettingsDialog(QDialog):
                      "Off means only messages you start with search: go online.",
                      netgate.setting("web_search_auto"), setting("web_search_auto"))
         try:
-            from cursiv_v215.ui.chat_app import cloud_enabled, set_cloud_enabled
+            from cursiv_engine.ui.chat_app import cloud_enabled, set_cloud_enabled
 
             def cloud(on):
                 set_cloud_enabled(on)
@@ -223,7 +223,7 @@ class SettingsDialog(QDialog):
 
     def _refresh_status(self):
         try:
-            from cursiv_v215.chat import status
+            from cursiv_engine.chat import status
             st = status.network_status()
             col = theme.GREEN if st["level"] in ("local", "offline") else theme.AMBER
             self._status_lbl.setText(f'<span style="color:{col}; font-weight:600;">● {st["label"]}</span>'
@@ -232,7 +232,7 @@ class SettingsDialog(QDialog):
             pass
 
     def _page_model(self, lay):
-        from cursiv_v215.chat import status
+        from cursiv_engine.chat import status
         lay.addWidget(self._explain("Cursiv answers with an AI model that runs on this computer through Ollama. "
                                     "Standard picks the model that did best on Cursiv's own tests for this computer."))
         v = self._card(lay)
@@ -260,7 +260,7 @@ class SettingsDialog(QDialog):
         saver = QComboBox()
         for label, value in (("Automatic: on while the laptop is unplugged", ""), ("Always on", "on"), ("Off", "off")):
             saver.addItem(label, value)
-        from cursiv_v215.chat import keys as _keys
+        from cursiv_engine.chat import keys as _keys
         saver.setCurrentIndex(max(0, saver.findData(_keys.saved_key("battery_saver"))))
         saver.activated.connect(lambda i: _keys.store_key("battery_saver", saver.itemData(i) or ""))
         b.addWidget(saver)
@@ -321,8 +321,8 @@ class SettingsDialog(QDialog):
         lay.addWidget(self._explain("Gemini and Groq have free keys that take about two minutes to get.", "small"))
 
     def _page_answers(self, lay):
-        from cursiv_v215.core import style
-        from cursiv_v215.memory import semantic
+        from cursiv_engine.core import style
+        from cursiv_engine.memory import semantic
         person = semantic.current_person()
         v = self._card(lay)
         t = QLabel("Tone"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
@@ -336,7 +336,7 @@ class SettingsDialog(QDialog):
         self._tone.activated.connect(lambda i: style.set_tone(person, self._tone.itemData(i)))
         v.addWidget(self._tone)
         v.addWidget(self._explain("How Cursiv talks to you. Brief keeps answers short; Teacher explains step by step."))
-        from cursiv_v215.core import presence
+        from cursiv_engine.core import presence
         self._switch(lay, 'Adapt communication preferences',
                      'Learn presentation preferences from explicit corrections. Accuracy and permissions take precedence.',
                      presence.settings(person)['adapt_style'],
@@ -348,7 +348,7 @@ class SettingsDialog(QDialog):
                      "Cursiv picks out lasting facts about you (marked \"inferred\") so it can help better. "
                      "Off means it only remembers what you tell it with \"remember …\".",
                      semantic.learning_enabled(), semantic.set_learning)
-        from cursiv_v215.chat import keys as _keys
+        from cursiv_engine.chat import keys as _keys
         self._switch(lay, "Answer only from my documents",
                      "When you've imported documents (Memory & Knowledge → Your documents), answer only from them and "
                      "say \"that isn't in your documents\" otherwise. Emergencies are always answered.",
@@ -370,7 +370,7 @@ class SettingsDialog(QDialog):
         CuriosityDialog(self).exec()
 
     def _page_appearance(self, lay):
-        from cursiv_v215.core import profile as _profile
+        from cursiv_engine.core import profile as _profile
         self._switch(lay, "Show personal features",
                      "Family letters, the legacy vault, the phone app, coding help, the council and builder tools. "
                      "Off keeps Cursiv focused on field work; their commands still work if typed. "
@@ -398,7 +398,7 @@ class SettingsDialog(QDialog):
         v.addWidget(note)
 
     def _page_updates(self, lay):
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         try:
             import cursiv_launcher
             version = cursiv_launcher._CURRENT_VERSION
@@ -422,7 +422,7 @@ class SettingsDialog(QDialog):
                      "Saved keys are encrypted; the rest isn't encrypted on disk.",
                      lambda: os.startfile(str(data_dir)) if data_dir.exists() else None)
         try:
-            from cursiv_v215.chat import keys as _keys
+            from cursiv_engine.chat import keys as _keys
             self._switch(lay, "Save conversations automatically",
                          "Each conversation is kept in the sidebar so you can come back to it. Off means you choose "
                          "what to keep with the Save button. Right-click a conversation to delete it.",
@@ -458,7 +458,7 @@ class SettingsDialog(QDialog):
         self._refresh_accounts()
 
     def _refresh_accounts(self):
-        from cursiv_v215.guardian import access_gate as ag
+        from cursiv_engine.guardian import access_gate as ag
         me = self._signed_in()
         mine = 1 if me and ag.username_exists(me) else 0
         others = max(ag.account_count() - mine, 0)
@@ -501,7 +501,7 @@ class SettingsDialog(QDialog):
 
     def remove_account(self, username: str, password: str) -> str:
         """Do the removal; returns the sentence to show. Removing yourself closes Cursiv."""
-        from cursiv_v215.guardian import access_gate as ag
+        from cursiv_engine.guardian import access_gate as ag
         me = self._signed_in()
         try:
             if not (me and password and ag.verify_credentials(me, password)):
@@ -536,7 +536,7 @@ class SettingsDialog(QDialog):
 
     def start_over(self, password: str) -> str:
         """Remove every login; returns the sentence to show. Closes Cursiv on success."""
-        from cursiv_v215.guardian import access_gate as ag
+        from cursiv_engine.guardian import access_gate as ag
         me = self._signed_in()
         try:
             if not (me and password and ag.verify_credentials(me, password)):
@@ -612,13 +612,13 @@ class SettingsDialog(QDialog):
         if not ok:
             self._set_status(field, False, f"Not saved — {msg}")
             return
-        from cursiv_v215.ui.chat_app import _store_key
+        from cursiv_engine.ui.chat_app import _store_key
         _store_key(field, key)
         self._set_status(field, True, "Saved and working.")
         self.keys_changed.emit()
 
     def _remove(self, field: str):
-        from cursiv_v215.ui.chat_app import _store_key
+        from cursiv_engine.ui.chat_app import _store_key
         _store_key(field, "")
         self._rows[field]["edit"].clear()
         self._set_status(field, None, "Removed.")

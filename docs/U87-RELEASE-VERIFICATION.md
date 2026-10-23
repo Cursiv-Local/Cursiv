@@ -78,7 +78,7 @@ Existing metadata, primary download links and historical model artifacts remain.
 - `HANDOFF.md`
 - `README.md`
 - `cloudflare/publish.mjs`
-- `cursiv_v215/core/selfknow.py`
+- `cursiv_engine/core/selfknow.py`
 - `docs/RELEASE-U87.md`
 - `docs/U87-RELEASE-VERIFICATION.md`
 - `installer/cursiv_setup.iss`

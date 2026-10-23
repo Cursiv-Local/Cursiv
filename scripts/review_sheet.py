@@ -32,7 +32,7 @@ def entry_fingerprint(e) -> str:
 def render(categories: tuple[str, ...] = ("medical", "survival")) -> tuple[str, str]:
     """(html, fingerprint of everything on the sheet)."""
     sys.path[:0] = [str(REPO)]
-    from cursiv_v215.core import reference as ref
+    from cursiv_engine.core import reference as ref
     rows = sorted((e for e in ref.entries() if e.category in categories), key=lambda e: (e.category, e.title))
     whole = hashlib.sha256("".join(entry_fingerprint(e) for e in rows).encode()).hexdigest()
     try:

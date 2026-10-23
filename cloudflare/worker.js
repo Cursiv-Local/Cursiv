@@ -1,5 +1,5 @@
 // Cursiv web — Cloudflare Worker.
-// The Cloudflare port of cursiv_v215/web/app.py: same routes, same JSON shapes, D1 instead of SQLite.
+// The Cloudflare port of cursiv_engine/web/app.py: same routes, same JSON shapes, D1 instead of SQLite.
 // Pages and /assets come from the dist/ folder (built by publish.mjs); this file only answers
 // /api/*, /remote/* and /health; legacy page URLs redirect to cursiv.us. Errors are
 // {"detail": "..."}, like FastAPI, because board.html, mailbox.html and the desktop app's
@@ -168,7 +168,7 @@ async function openLetter(env, key, row) {
   }
 }
 
-// ── Guardian probe scan (port of cursiv_v215/guardian/temple_guardian.py) ────
+// ── Guardian probe scan (port of cursiv_engine/guardian/temple_guardian.py) ────
 // Same patterns, weights, pi-squared compounding and threshold. The per-visitor score
 // lives in D1 (demo_sessions.guard_score) instead of process memory.
 

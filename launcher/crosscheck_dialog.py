@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (QComboBox, QDialog, QHBoxLayout, QLabel, QPlainText
                              QVBoxLayout)
 
 import theme
-from cursiv_v215.core import crosscheck
+from cursiv_engine.core import crosscheck
 
 
 class CrossCheckDialog(QDialog):

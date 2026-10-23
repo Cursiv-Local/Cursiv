@@ -6,7 +6,7 @@ import time
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync, phone_receive
+from cursiv_engine.core import devicekey, fieldlog, fieldsync, phone_receive
 
 
 @pytest.fixture

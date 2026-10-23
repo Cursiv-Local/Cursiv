@@ -6,7 +6,7 @@ from urllib.parse import unquote
 
 import pytest
 
-from cursiv_v215.core import fieldlog, notebook_tools as nt, resources, selfknow, turn_policy
+from cursiv_engine.core import fieldlog, notebook_tools as nt, resources, selfknow, turn_policy
 from test_background_review import pipeline
 from test_chat_rendering import panel
 
@@ -101,7 +101,7 @@ def test_proportion_native_summary_has_no_unsupported_yes(pipeline, monkeypatch)
 
 
 def test_compound_proportion_answer_withdraws_the_wrong_model_claim(pipeline, monkeypatch):
-    from cursiv_v215.core import calc
+    from cursiv_engine.core import calc
     question = '3 of 4 survived at A and 60 of 100 at B. Is A better? Explain.'
     def stream(*args, **kwargs):
         pipeline._WORKED = calc.work_out(question)
@@ -123,14 +123,14 @@ def test_exact_restricted_factual_turn_has_no_unsolicited_closer(pipeline, monke
 
 
 def test_philosophy_drops_unsolicited_closer_but_requested_question_stays():
-    from cursiv_v215.chat import response_style
+    from cursiv_engine.chat import response_style
     text = 'A perspective.\n\nWould you like to explore another angle?'
     assert response_style.trim_closer("Just talk with me naturally; let's explore identity.", text) == 'A perspective.'
     assert response_style.trim_closer('Just talk. Ask me one useful question.', text) == text
 
 
 def test_quoted_and_fenced_closers_are_not_edited():
-    from cursiv_v215.chat import response_style
+    from cursiv_engine.chat import response_style
     for text in ['The quote is:\n\n> Let me know if you want a script.',
                  'Example:\n\n```text\nLet me know if you want a script.\n```']:
         assert response_style.trim_closer('Just talk. Explain this.', text) == text
@@ -177,7 +177,7 @@ def test_comma_parser_keeps_coordinates_quoted_notes_and_exact_values():
 
 
 def test_restricted_calculations_never_dispatch_a_calculator(monkeypatch):
-    from cursiv_v215.core import calc, native_answers
+    from cursiv_engine.core import calc, native_answers
     monkeypatch.setattr(calc, 'work_out', lambda _: pytest.fail('No code calculation in talk-only turn'))
     assert native_answers.answer('Just talk — ' + DURATION, calculations=False) is None
     with turn_policy.scope('No tools.'):
@@ -189,19 +189,19 @@ def test_restricted_calculations_never_dispatch_a_calculator(monkeypatch):
                                 'What would a more self-aware Cursiv be like?',
                                 'How long will two supplies last?'])
 def test_native_guidance_does_not_steal_other_intents(text):
-    from cursiv_v215.core import native_answers
+    from cursiv_engine.core import native_answers
     assert native_answers.answer(text) is None
 
 
 @pytest.mark.parametrize('answer', ['An answer.\n\nWould you like help? Call emergency services now.',
                                   'An answer.\n\nLet me know if you have questions. Avoid the damaged cable.'])
 def test_closer_cleanup_preserves_mixed_warning_paragraphs(answer):
-    from cursiv_v215.chat import response_style
+    from cursiv_engine.chat import response_style
     assert response_style.trim_closer('Just talk. Explain this.', answer) == answer
 
 
 def test_requested_closing_text_is_preserved():
-    from cursiv_v215.chat import response_style
+    from cursiv_engine.chat import response_style
     answer = 'A fact.\n\nThanks for sharing. 😊'
     assert response_style.trim_closer('Just talk. Finish with Thanks for sharing.', answer) == answer
 

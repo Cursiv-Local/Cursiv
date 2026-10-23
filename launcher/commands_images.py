@@ -15,13 +15,13 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
         prompt = img_prompt
         if not prompt:
             return runtime.TextResult("Usage: image <description>")
-        from cursiv_v215.ui.chat_app import _saved_key
+        from cursiv_engine.ui.chat_app import _saved_key
         oai_key = cfg.get("openai_key", "")
         cf_id = cfg.get("cf_account_id", "") or _saved_key("cf_account_id")
         cf_tok = cfg.get("cf_api_token", "") or _saved_key("cf_api_token")
         if not oai_key and not (cf_id and cf_tok):
             return runtime.TextResult(runtime.IMAGE_GEN_NEEDS_KEY)
-        from cursiv_v215.core import atomic
+        from cursiv_engine.core import atomic
         import uuid
         img_dir = runtime._image_folder(cfg)
         stamp = runtime.datetime.now().strftime('%Y%m%d_%H%M%S') + '_' + uuid.uuid4().hex[:8]

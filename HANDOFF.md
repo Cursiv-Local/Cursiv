@@ -22,7 +22,7 @@ Work was on `codex/live-transcript-gaps`; the application version was then U87.
 [Live-transcript gaps](docs/LIVE-TRANSCRIPT-GAPS.md) records the audit, exact
 production changes and regression evidence. Review the new typed answer-evidence
 receipt and desktop persistence, bounded read authorization and descriptive forget
-ambiguity behavior. Phone wording now lives in `cursiv_v215/core/phone_help.py`;
+ambiguity behavior. Phone wording now lives in `cursiv_engine/core/phone_help.py`;
 the launcher helper reexports it for existing graphical/command help.
 No installer, updater, notebook format, website or production service is changed.
 No commit, push or publication had yet been requested at that checkpoint;
@@ -680,7 +680,7 @@ version bump, installer build, or deployment was performed.
   start, preserved scroll/selection/following, and asynchronous autosave handoff.
   Done/error/stop/image/write-approval paths flush queued fragments. Save failure
   reporting and the existing leave confirmation retain the chance to retry.
-- `cursiv_v215/ui/chat_app.py`: optional `on_stage` callback announces the end of
+- `cursiv_engine/ui/chat_app.py`: optional `on_stage` callback announces the end of
   initial generation. No changes to verifier decisions, model prompts or routing.
 - `launcher/conversations.py`: one ordered worker accepts plain Python snapshots;
   streamed JSON and existing temporary-file replacement preserve the same storage
@@ -996,11 +996,11 @@ No real personal data migration was performed during development.
 
 ### Files added in this phase
 
-- `cursiv_v215/core/state_store.py`: bounded strict/atomic JSON persistence.
-- `cursiv_v215/core/field_recall.py`: verified historical retrieval and routing.
-- `cursiv_v215/core/presence.py`: identity preferences and observed state.
-- `cursiv_v215/core/curiosity.py`: journal schema, lifecycle, evidence and budgets.
-- `cursiv_v215/core/curiosity_engine.py`: event-driven rules and commands.
+- `cursiv_engine/core/state_store.py`: bounded strict/atomic JSON persistence.
+- `cursiv_engine/core/field_recall.py`: verified historical retrieval and routing.
+- `cursiv_engine/core/presence.py`: identity preferences and observed state.
+- `cursiv_engine/core/curiosity.py`: journal schema, lifecycle, evidence and budgets.
+- `cursiv_engine/core/curiosity_engine.py`: event-driven rules and commands.
 - `launcher/curiosity_dialog.py`: inspect/create/review/update/export controls.
 - `tests/test_portable_recall_curiosity.py`: deterministic integration/failure tests.
 - `tests/data/curiosity_cases.json`: reproducible six-scenario evaluation fixture.
@@ -1018,7 +1018,7 @@ No real personal data migration was performed during development.
 - This `HANDOFF.md`. The previous phase's other pending files remain present.
 
 Paths abbreviated above under `core/`, `memory/`, `coding/`, `ui/` are relative
-to `cursiv_v215/`. No changes to `core/fieldlog.py`, record formats or hash chaining.
+to `cursiv_engine/`. No changes to `core/fieldlog.py`, record formats or hash chaining.
 
 ### Usage
 
@@ -1373,7 +1373,7 @@ A quick overhaul so Cursiv stops declaring an answer correct without checking. F
 
 ## Where the draft actually comes from
 
-`chat()` in `cursiv_v215/ui/chat_app.py` does **not** call `cascade_stream()`. The desktop window streams `_chat_inner` via `_chat_stream`, which collects the draft in the `reply` list while yielding tokens. `cascade_stream()` is the one-shot helper used by Babel, council, and other commands.
+`chat()` in `cursiv_engine/ui/chat_app.py` does **not** call `cascade_stream()`. The desktop window streams `_chat_inner` via `_chat_stream`, which collects the draft in the `reply` list while yielding tokens. `cascade_stream()` is the one-shot helper used by Babel, council, and other commands.
 
 The verification pass runs in `chat()` **after** `_chat_stream` returns and after `speed.chat_finished()`, so the local model is free. The user already sees the streamed draft. The pass then appends either nothing, a revised answer, or notes.
 
@@ -1390,11 +1390,11 @@ Two deterministic checks were added (C-025): `known_problems` (a Known item with
 
 | File | Role |
 |---|---|
-| `cursiv_v215/core/verify.py` | Triggers, ledger, deterministic checks, one revise, session ledgers |
-| `cursiv_v215/ui/chat_app.py` | Prompt addendum at the end of prompt build; `chat()` runs `verify.run_pass` |
-| `cursiv_v215/core/phases.py` | Grounding trace notes when a ledger is required |
-| `cursiv_v215/memory/semantic.py` | `origin`, `date`, conflict surfacing, safety quarantine |
-| `cursiv_v215/codex/system_prompt.md` | Hard rule in Section 2 (kept by the compact persona) |
+| `cursiv_engine/core/verify.py` | Triggers, ledger, deterministic checks, one revise, session ledgers |
+| `cursiv_engine/ui/chat_app.py` | Prompt addendum at the end of prompt build; `chat()` runs `verify.run_pass` |
+| `cursiv_engine/core/phases.py` | Grounding trace notes when a ledger is required |
+| `cursiv_engine/memory/semantic.py` | `origin`, `date`, conflict surfacing, safety quarantine |
+| `cursiv_engine/codex/system_prompt.md` | Hard rule in Section 2 (kept by the compact persona) |
 | `launcher/memory_dialog.py` | “What I remember” shows the origin tag |
 | `tests/test_verify.py` | Benchmarks. No network. |
 
@@ -1480,7 +1480,7 @@ Not every turn that background-learning might touch is verified. Learning still 
 - Do not buffer the whole answer before the first token. The check is after the draft.
 - Do not auto-revise more than once.
 - Do not let a `CLEAR` string override number drift, a changed definition, or an assumption stated as fact.
-- Do not let a saved preference override `cursiv_v215/core/constitution.py` or the Section 2 safety paragraph.
+- Do not let a saved preference override `cursiv_engine/core/constitution.py` or the Section 2 safety paragraph.
 - The 8 phase names stay as they are. The ledger is an extra note on the Grounding trace, not a 9th phase.
 
 ## Not done
@@ -1491,7 +1491,7 @@ Not every turn that background-learning might touch is verified. Learning still 
 
 ## Network gate (Lane 2, 2026-10-17)
 
-`cursiv_v215/core/netgate.py` is the one switch for connections off this computer (AUDIT C-009, C-010, C-011). Settings live in `.cursiv/config.json` next to the keys:
+`cursiv_engine/core/netgate.py` is the one switch for connections off this computer (AUDIT C-009, C-010, C-011). Settings live in `.cursiv/config.json` next to the keys:
 
 | Setting | Default | Command | What it does |
 |---|---|---|---|

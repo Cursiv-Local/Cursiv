@@ -15,7 +15,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 
 
 @pytest.fixture

@@ -48,9 +48,9 @@ import json, sys, time
 sys.path[:0] = [".", "launcher"]
 for m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(m, None)
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
-from cursiv_v215.ui import chat_app as ca
+from cursiv_engine.ui import chat_app as ca
 import chat_commands as cc
 ca._learn_later = lambda *a, **k: None            # the replay mustn't learn from itself
 history = []
@@ -85,7 +85,7 @@ def main() -> int:
     scratch = Path(tempfile.mkdtemp(prefix="cursiv_phase1_"))
     rows = []
     try:
-        for part in ("cursiv_v215", "launcher"):
+        for part in ("cursiv_engine", "launcher"):
             shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
         if args.memory:
             (scratch / "app" / ".cursiv").mkdir(parents=True, exist_ok=True)

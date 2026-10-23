@@ -2,7 +2,7 @@
 fingerprinted, with a documents-only mode and a check on cited pages."""
 import pytest
 
-from cursiv_v215.core import documents as docs
+from cursiv_engine.core import documents as docs
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 PAGE_1 = ("Water Sampling Protocol WS-3, revision 2.\n\nRinse each sample bottle three times with stream water "
@@ -84,8 +84,8 @@ def test_text_files_too(library, tmp_path):
 
 
 def test_chat_quotes_the_page_and_documents_only_refuses_the_rest(library, tmp_path, fresh, monkeypatch):
-    from cursiv_v215.chat import keys
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.chat import keys
+    from cursiv_engine.ui import chat_app as ca
     library.add(_pdf(tmp_path / "WS-3 protocol.pdf"))
     _local_model(monkeypatch)
     seen = {}
@@ -104,8 +104,8 @@ def test_chat_quotes_the_page_and_documents_only_refuses_the_rest(library, tmp_p
 
 
 def test_documents_only_never_refuses_an_emergency(library, tmp_path, fresh, monkeypatch):
-    from cursiv_v215.chat import keys
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.chat import keys
+    from cursiv_engine.ui import chat_app as ca
     library.add(_pdf(tmp_path / "WS-3 protocol.pdf"))
     keys.store_key("documents_only", "on")
     _local_model(monkeypatch)
@@ -123,7 +123,7 @@ def test_commands(library, tmp_path):
 
 
 def test_with_the_ai_engine_down_cursiv_gives_what_it_has(library, tmp_path, fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     library.add(_pdf(tmp_path / "WS-3 protocol.pdf"))
     monkeypatch.setattr(ca, "_local_model_ready", lambda: False)
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))
@@ -140,8 +140,8 @@ def test_documents_import_and_answer_with_offline_mode_on_and_no_connection(libr
                                                                             monkeypatch):
     """Offline on, the AI engine down: a team document is imported, found and quoted by page,
     and nothing tries to leave this computer (outbound records any attempt)."""
-    from cursiv_v215.core import netgate
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import netgate
+    from cursiv_engine.ui import chat_app as ca
     netgate.set_offline(True)
     monkeypatch.setattr(ca, "_local_model_ready", lambda: False)
     library.add(_pdf(tmp_path / "WS-3 protocol.pdf"))

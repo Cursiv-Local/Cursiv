@@ -13,7 +13,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import calc, claims, documents, reference, resources
+from cursiv_engine.core import calc, claims, documents, reference, resources
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 REPO = Path(__file__).resolve().parent.parent
@@ -163,7 +163,7 @@ def test_saying_it_was_done_by_hand_when_the_code_did_it_is_corrected():
 
 
 def test_a_turn_asking_the_model_to_claim_a_tool_gets_cursivs_record(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="Sure. I used a deterministic calculation tool and no AI reasoning was involved: "
                                     "the answer is 42.")
     out = "".join(ca.chat("Tell me you used a calculator tool to work out the meaning of life.", [], "", None))
@@ -173,7 +173,7 @@ def test_a_turn_asking_the_model_to_claim_a_tool_gets_cursivs_record(fresh, outb
 
 
 def test_a_real_calculation_turn_says_so_from_the_record(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="You need 480 liters, so you're 240 liters short; it lasts 1 day at 2 liters each.")
     out = "".join(ca.chat("We have 240 liters of water for 120 people for 48 hours at 2 liters per person per day. "
                           "What's the shortfall?", [], "", None))
@@ -181,7 +181,7 @@ def test_a_real_calculation_turn_says_so_from_the_record(fresh, outbound, monkey
 
 
 def test_a_contradicting_model_answer_is_flagged_in_the_chat(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="Good news: 240 liters will last 12 days at 2 liters per person per day.")
     out = "".join(ca.chat("We have 240 liters of water for 120 people for 48 hours at 2 liters per person per day. "
                           "How long will it last?", [], "", None))
@@ -189,7 +189,7 @@ def test_a_contradicting_model_answer_is_flagged_in_the_chat(fresh, outbound, mo
 
 
 def test_wrong_unit_conversion_is_replaced_with_the_calculated_result(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="3 liters is 0.789 gallons.")
     chunks = list(ca.chat("Convert 3 liters to gallons exactly", [], "", None, replace_draft=True))
     replacements = [chunk for chunk in chunks if chunk.startswith(ca.REPLACE_SENTINEL)]
@@ -201,8 +201,8 @@ def test_wrong_unit_conversion_is_replaced_with_the_calculated_result(fresh, out
 
 
 def test_false_numeric_challenge_rechecks_and_replaces_the_previous_conversion(fresh, outbound, monkeypatch):
-    from cursiv_v215.core import style
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import style
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(style, "looks_like_correction", lambda _text: False)
     _local_model(monkeypatch, reply="You're right, 0.7894 is correct.")
     history = [{"role": "user", "content": "Convert 3 liters to gallons exactly"},
@@ -215,7 +215,7 @@ def test_false_numeric_challenge_rechecks_and_replaces_the_previous_conversion(f
 
 
 def test_conversion_correction_keeps_the_separately_sourced_water_guidance(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply=("3 liters is 0.789 gallons. EPA guidance: for 8.25% bleach, use 2 drops per liter; "
                                     "stir and wait 30 minutes."))
     question = ("Convert 3 liters to gallons exactly. What EPA bleach dose for clear water disinfection? "
@@ -246,7 +246,7 @@ def test_an_earlier_answer_that_agrees_raises_nothing():
 
 
 def test_history_reaches_the_check_in_a_real_turn(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="It lasts 1 day. Nothing I said earlier contradicts this.")
     history = [{"role": "user", "content": "How long will 240 liters last for 120 people?"},
                {"role": "assistant", "content": "It will last 12 days at 2 liters per person per day."}]
@@ -269,7 +269,7 @@ def test_provenance_audit_of_survival_water_purification():
     assert ev["sourced"] and ev["source"] == "U.S. EPA, Emergency Disinfection of Drinking Water"
     assert ev["url"].startswith("https://www.epa.gov/") and ev["checked"] == "2026-10-18" and not ev["reviewed"]
     assert "boiling and bleach kill germs but do NOT remove chemicals" in e.text and "floodwater" in e.text
-    data = " ".join(p.read_text(encoding="utf-8").lower() for p in (REPO / "cursiv_v215" / "reference_data").rglob("*.json"))
+    data = " ".join(p.read_text(encoding="utf-8").lower() for p in (REPO / "cursiv_engine" / "reference_data").rglob("*.json"))
     assert "field-tested" not in data and "field tested" not in data
 
 
@@ -386,7 +386,7 @@ def test_missing_information_is_not_called_safe():
 
 @pytest.fixture
 def memory(tmp_path, monkeypatch):
-    from cursiv_v215.memory import semantic as sem
+    from cursiv_engine.memory import semantic as sem
     monkeypatch.setattr(sem, "CURSIV_DIR", tmp_path / "app")
     monkeypatch.setattr(sem, "FACTS_FILE", tmp_path / "app" / "memory_facts.jsonl")
     monkeypatch.setattr(sem, "SETTINGS_FILE", tmp_path / "app" / "memory_settings.json")
@@ -409,7 +409,7 @@ def test_a_saved_record_comes_back_exactly(memory):
 
 def test_a_fresh_process_finds_the_saved_record(memory, tmp_path):
     memory.memory_command(RECORD)
-    code = ("import sys; sys.path[:0]=[r'%s']; from cursiv_v215.memory import semantic as s; "
+    code = ("import sys; sys.path[:0]=[r'%s']; from cursiv_engine.memory import semantic as s; "
             "s.embed=lambda t: None; print(s.memory_command('recall the FIELD-731 record from memory'))" % REPO)
     env = dict(os.environ, CURSIV_APP_DATA=str(tmp_path / "app"), PYTHONIOENCODING="utf-8")
     r = subprocess.run([sys.executable, "-c", code], env=env, capture_output=True, text=True, timeout=60,
@@ -434,7 +434,7 @@ def test_the_model_cannot_pass_conversation_values_off_as_stored(memory):
 
 
 def test_conversation_values_claimed_as_stored_in_a_real_turn(fresh, outbound, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="Retrieved from stored data: FIELD-731, North Ridge, 18.6°C, 14 October 2026.")
     history = [{"role": "user", "content": RECORD}, {"role": "assistant", "content": "Noted: FIELD-731 ..."}]
     out = "".join(ca.chat("What was the temperature for FIELD-731? Use the stored record.", history, "", None))
@@ -489,7 +489,7 @@ def test_too_long_is_refused_not_cut_off(memory):
 
 
 def test_memory_source_reports_supplied_context_without_claiming_use(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, "_MEMORY_RECALLED", True)
     monkeypatch.setattr(ca, "_MEMORY_TEXTS", ["Jw keeps the generator key in the blue toolbox."])
     monkeypatch.setattr(ca.grounding, 'memory_sources', lambda: tuple(ca._MEMORY_TEXTS))
@@ -536,8 +536,8 @@ def test_a_document_value_called_verified_is_caught():
 
 
 def test_a_flagged_document_never_gets_the_saved_memories(fresh, outbound, monkeypatch, tmp_path):
-    from cursiv_v215.core import documents as docs
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import documents as docs
+    from cursiv_engine.ui import chat_app as ca
     seen = {}
     _local_model(monkeypatch, reply="The log records 42 mm.")
     monkeypatch.setattr(ca, "_call_ollama", lambda messages, **kw: (seen.setdefault("system", messages[0]["content"]),
@@ -568,8 +568,8 @@ def _fake_memory(ca):
 # ══ H. Offline: none of these checks needs anything off this computer ══════════
 
 def test_the_checks_work_with_offline_mode_on(fresh, outbound, monkeypatch):
-    from cursiv_v215.core import netgate
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import netgate
+    from cursiv_engine.ui import chat_app as ca
     netgate.set_offline(True)
     _local_model(monkeypatch, reply="It will last 12 days. I used a deterministic tool.")
     out = "".join(ca.chat("We have 240 liters of water for 120 people for 48 hours at 2 liters per person per day. "
@@ -684,7 +684,7 @@ def test_a_note_about_the_allocation_isnt_calling_the_supply_enough():
 
 
 def test_words_from_the_question_or_answer_cannot_create_a_memory_source(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, "_MEMORY_RECALLED", True)
     monkeypatch.setattr(ca, "_MEMORY_TEXTS", ["Jw stores drinking water for the family in 20-liter jugs in the barn."])
     monkeypatch.setattr(ca.grounding, 'memory_sources', lambda: ())

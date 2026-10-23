@@ -27,11 +27,11 @@ if not exist "%DIST%\_internal\launcher\resources\icons\cursiv.ico" (
     echo  [OK]   Icons bundled.
 )
 
-:: Check cursiv_v215 data bundled
-if not exist "%DIST%\_internal\cursiv_v215" (
-    echo  [WARN] cursiv_v215 data not found in bundle.
+:: Check cursiv_engine data bundled
+if not exist "%DIST%\_internal\cursiv_engine" (
+    echo  [WARN] cursiv_engine data not found in bundle.
 ) else (
-    echo  [OK]   cursiv_v215 bundled.
+    echo  [OK]   cursiv_engine bundled.
 )
 
 :: Report size

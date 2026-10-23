@@ -5,7 +5,7 @@ import json
 import pytest
 from PyQt6.QtWidgets import QApplication
 
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 
 
 @pytest.fixture
@@ -15,7 +15,7 @@ def app():
 
 @pytest.fixture
 def settings(tmp_path, monkeypatch):
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     monkeypatch.setattr(netgate, "CONFIG_FILE", tmp_path / "config.json")
     monkeypatch.setattr(keys, "KEYS_FILE", tmp_path / "config.json")
     monkeypatch.setenv("USERPROFILE", str(tmp_path))
@@ -26,7 +26,7 @@ def settings(tmp_path, monkeypatch):
 @pytest.fixture
 def panel(app, settings, monkeypatch):
     import chat_panel
-    from cursiv_v215.chat import status
+    from cursiv_engine.chat import status
     monkeypatch.setattr(status, "local_models", lambda timeout=2.0: ["qwen3:4b-instruct", "llama3.1:latest"])
     p = chat_panel.ChatPanel()
     app.processEvents()
@@ -34,7 +34,7 @@ def panel(app, settings, monkeypatch):
 
 
 def test_status_pill_follows_the_real_switches(settings):
-    from cursiv_v215.chat import keys, status
+    from cursiv_engine.chat import keys, status
     assert status.network_status()["level"] == "local"
     keys.store_key("groq_key", "gsk_" + "x" * 30)
     st = status.network_status()
@@ -65,9 +65,9 @@ def test_model_picker_offers_standard_only(panel, settings, app, monkeypatch):
     items = [box.itemText(i) for i in range(box.count())]
     assert items[0].startswith("Standard")
     assert not any("Deep Think" in t or t.startswith("Model:") for t in items)   # Deep Think not offered (comparison)
-    from cursiv_v215.chat import keys, status
-    from cursiv_v215.core import speed
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.chat import keys, status
+    from cursiv_engine.core import speed
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, "_ollama_tags", lambda: ["qwen3:4b-instruct", "llama3.1:latest", speed.DEEP_THINK_MODEL])
     keys.store_key("answer_mode", "deep")                 # chosen in U64
     assert ca._resolve_ollama_model() == "qwen3:4b-instruct" and status.current_choice() == "standard"
@@ -76,8 +76,8 @@ def test_model_picker_offers_standard_only(panel, settings, app, monkeypatch):
 
 
 def test_advanced_lists_every_model_and_honours_the_pick(panel, monkeypatch):
-    from cursiv_v215.chat import status
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.chat import status
+    from cursiv_engine.ui import chat_app as ca
     installed = ["qwen3:4b-instruct", "llama3.1:latest"]
     assert [c for _, c, _ in status.menu_choices(installed)] == ["standard"]
     status.set_show_all_models(True)
@@ -147,7 +147,7 @@ def test_settings_switches_change_the_real_setting(app, settings):
 
 def test_knowledge_window_browses_the_reference(app, settings):
     import nav_windows
-    from cursiv_v215.core import reference
+    from cursiv_engine.core import reference
     k = nav_windows.KnowledgeDialog()
     assert k._list.count() == len(reference.entries())
     k.findChildren(nav_windows.QLineEdit)[0].setText("bleeding")
@@ -156,7 +156,7 @@ def test_knowledge_window_browses_the_reference(app, settings):
 
 def test_tools_hides_advanced_and_help_explains(app, settings):
     import nav_windows
-    from cursiv_v215.core import profile
+    from cursiv_engine.core import profile
     t = nav_windows.ToolsDialog()                       # research profile (the default)
     text = _labels(t)
     assert "Field Notebook" in text and "Field demo" in text
@@ -209,7 +209,7 @@ def test_conversations_save_themselves_unless_turned_off(panel, settings, monkey
     panel._history = [{"role": "user", "content": "hi"}, {"role": "assistant", "content": "hello"}]
     panel._after_turn()
     assert saved == [1]
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     keys.store_key("autosave_chats", "off")
     assert chat_panel.autosave_enabled() is False
     panel._conv_id = None

@@ -58,7 +58,7 @@ Desktop entry: launcher/chat_panel.py::_run_turn passes current workspace and
 file_access into ui/chat_app.py::chat. Native notebook and memory dispatch precede
 provider routing; launcher/chat_commands.py handles built-in commands. These entry
 points continue to use existing backends and receipts.
-Table paths starting core/, memory/ or ui/ are under cursiv_v215/.
+Table paths starting core/, memory/ or ui/ are under cursiv_engine/.
 
 | Layer / file | Repair |
 | --- | --- |

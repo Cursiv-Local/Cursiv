@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 
-from cursiv_v215.memory import semantic as sem, formation
+from cursiv_engine.memory import semantic as sem, formation
 
 
 @pytest.fixture
@@ -169,9 +169,9 @@ def test_concurrent_saves_preserve_each_record_and_deduplicate(memory):
 
 
 def test_existing_companion_learners_honor_off_and_nonretention(memory, monkeypatch, tmp_path):
-    from cursiv_v215.memory import projects
-    from cursiv_v215.coding import brain
-    from cursiv_v215.core import style
+    from cursiv_engine.memory import projects
+    from cursiv_engine.coding import brain
+    from cursiv_engine.core import style
     monkeypatch.setattr(projects, 'DIR', tmp_path / 'projects')
     monkeypatch.setattr(style, 'DIR', tmp_path / 'style')
     monkeypatch.setattr(brain, 'PROFILE_FILE', tmp_path / 'coding.json')
@@ -203,7 +203,7 @@ def test_one_worker_is_bounded_and_skips_reprocessed_event(_memory_isolated):
 
 
 def test_chat_captures_person_before_background_execution(memory, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     jobs = []
     monkeypatch.setattr(formation, 'submit', lambda work, _id: jobs.append(work))
     monkeypatch.setattr(ca, '_memory_llm', lambda _: '')
@@ -231,7 +231,7 @@ def test_forget_cancels_an_extraction_already_waiting_for_a_model(memory):
 
 
 def test_optional_memory_model_never_uses_cloud_fallback(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_ollama_running', lambda: False)
     monkeypatch.setattr(ca, '_free_key_llm', lambda *_: pytest.fail('Cloud extraction forbidden'))
     assert ca._memory_llm([{'role': 'user', 'content': 'Fact'}]) == ''

@@ -195,7 +195,7 @@ def run(counts, repeats, profile=False, chunk_size=16, interval_ms=8, check_dela
                     if not background_check and hasattr(panel._signals, 'stage'):
                         panel._signals.stage.emit('Checking the answer…')
                     if background_check:
-                        from cursiv_v215.chat.review import Job
+                        from cursiv_engine.chat.review import Job
                         def delayed_check(messages, cancelled):
                             cancelled.wait(check_delay_ms / 1000)
                             return 'CLEAR'

@@ -49,18 +49,18 @@ Execution paths:
 
 New production modules:
 
-- `cursiv_v215/core/action_gate.py`
-- `cursiv_v215/core/feature_answers.py`
-- `cursiv_v215/core/deterministic_overrides.py`
-- `cursiv_v215/core/fieldmath.py`
-- `cursiv_v215/core/review_policy.py`
+- `cursiv_engine/core/action_gate.py`
+- `cursiv_engine/core/feature_answers.py`
+- `cursiv_engine/core/deterministic_overrides.py`
+- `cursiv_engine/core/fieldmath.py`
+- `cursiv_engine/core/review_policy.py`
 
 Integration changes:
 
-- `cursiv_v215/core/native_answers.py`, `presence.py`, `turn_policy.py`, `calc.py`,
+- `cursiv_engine/core/native_answers.py`, `presence.py`, `turn_policy.py`, `calc.py`,
   `file_access.py`, `verify.py`
-- `cursiv_v215/memory/intents.py`
-- `cursiv_v215/chat/completion.py`, `conversation.py`, `review.py`
+- `cursiv_engine/memory/intents.py`
+- `cursiv_engine/chat/completion.py`, `conversation.py`, `review.py`
 - `launcher/chat_panel.py`, `commands_system.py`
 
 Tests: new `tests/test_native_boundaries.py`; update `tests/test_verify.py` to

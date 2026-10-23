@@ -7,7 +7,7 @@ from contextlib import contextmanager
 import pytest
 from PIL import Image
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 from test_netgate import fresh  # noqa: F401  (fixture)
 
 
@@ -102,7 +102,7 @@ def test_team_sharing_carries_photos_and_checks_them(team, tmp_path):
 
 def test_photo_is_read_locally_and_never_sent_online_when_blocked(tmp_path, monkeypatch, fresh):
     import chat_commands as cc
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     p = _photo(tmp_path / "plot 4.jpg")
     asked = []
 

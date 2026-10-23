@@ -335,7 +335,7 @@ def test_queued_saves_and_manual_rename_preserve_the_latest_messages(panel):
 @pytest.mark.parametrize('renamed', [False, True])
 def test_delayed_title_does_not_overwrite_newer_history_or_a_manual_name(panel, monkeypatch, renamed):
     import conversations
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     entered, release = threading.Event(), threading.Event()
     messages = [{'role': 'user', 'content': 'First subject'}]
     conv_id = conversations.save(None, messages, '<p>First</p>')
@@ -381,7 +381,7 @@ def test_failed_autosave_is_visible_and_manual_save_can_retry(panel, monkeypatch
 
 
 def test_status_distinguishes_answer_checking_from_rendering(panel, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     monkeypatch.setattr(ca, '_router_llm', lambda *a, **kw: pytest.fail('Renderer called an AI'))
     panel._status_stage('Checking the answer…')
     panel._on_chunk('**Visible while checking**\n\n')
@@ -420,7 +420,7 @@ def test_notes_and_revisions_after_the_finished_draft_stay_in_one_message(panel)
 
 def test_theme_switch_mid_stream_preserves_formatting_and_saved_history(panel, monkeypatch, tmp_path):
     import theme
-    from cursiv_v215.chat import keys
+    from cursiv_engine.chat import keys
     monkeypatch.setattr(keys, 'KEYS_FILE', tmp_path / 'keys.json')
     start = theme.CURRENT
     try:
@@ -458,9 +458,9 @@ def test_images_flush_earlier_chunks_and_survive_cached_export(panel, tmp_path):
 
 
 def test_core_announces_the_post_generation_stage_without_a_formatting_call(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import curiosity_engine
-    from cursiv_v215.core import verify
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import curiosity_engine
+    from cursiv_engine.core import verify
     verify.reset_session()
     stages = []
 
@@ -481,7 +481,7 @@ def test_core_announces_the_post_generation_stage_without_a_formatting_call(monk
 
 def test_full_verification_makes_at_most_three_post_answer_calls():
     """Optional full review has no separate ledger-only model round trip."""
-    from cursiv_v215.core import verify
+    from cursiv_engine.core import verify
     verify.reset_session()
     ledger = 'Known: none\nInferred: none\nAssumed: none\nUnknown: none'
     outputs = iter(['The explanation is unclear.', 'Inspect the input.\n\n' + ledger, 'CLEAR'])

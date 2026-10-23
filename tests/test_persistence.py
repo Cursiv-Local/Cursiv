@@ -12,22 +12,22 @@ ROOT = Path(__file__).resolve().parent.parent
 SAVE = r'''
 import sys
 sys.path[:0] = [".", "launcher"]
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
-from cursiv_v215.memory import semantic
+from cursiv_engine.memory import semantic
 print(semantic.memory_command("remember the north transect marker is 40 m past the culvert"))
 '''
 
 READ = r'''
 import json, sys, socket
 sys.path[:0] = [".", "launcher"]
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 blocked = False
 try:
     socket.create_connection(("1.1.1.1", 53), timeout=2)
 except OSError:
     blocked = True
-from cursiv_v215.memory import semantic
+from cursiv_engine.memory import semantic
 facts = semantic.list_facts()
 print(json.dumps({"offline": netgate.is_offline(), "blocked": blocked,
                   "facts": [(f["text"], semantic.origin_of(f), f.get("date", "")) for f in facts]}))
@@ -46,7 +46,7 @@ def _run(code, home, app):
 def test_a_note_and_offline_mode_survive_a_restart(tmp_path):
     import shutil
     app = tmp_path / "app"
-    for part in ("cursiv_v215", "launcher"):
+    for part in ("cursiv_engine", "launcher"):
         shutil.copytree(ROOT / part, app / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
     home = tmp_path / "home"
     home.mkdir()
@@ -70,10 +70,10 @@ sys.path[:0] = [".", "launcher"]
 import portable
 home = Path(sys.argv[1])
 portable.apply_field_defaults(home)
-from cursiv_v215.core import netgate
-from cursiv_v215.chat import keys
-from cursiv_v215.memory import semantic
-from cursiv_v215.core import phases
+from cursiv_engine.core import netgate
+from cursiv_engine.chat import keys
+from cursiv_engine.memory import semantic
+from cursiv_engine.core import phases
 print(json.dumps({"offline": netgate.is_offline(), "breaks": phases._break_notes_on(),
                   "learning": semantic.learning_enabled()}))
 '''
@@ -82,7 +82,7 @@ print(json.dumps({"offline": netgate.is_offline(), "breaks": phases._break_notes
 def test_a_field_copy_starts_offline_quiet_and_not_learning(tmp_path):
     import shutil
     app = tmp_path / "app"
-    for part in ("cursiv_v215", "launcher"):
+    for part in ("cursiv_engine", "launcher"):
         shutil.copytree(ROOT / part, app / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
     home = tmp_path / "home"
     home.mkdir()
@@ -97,7 +97,7 @@ def test_a_field_copy_starts_offline_quiet_and_not_learning(tmp_path):
 
 def test_a_failed_save_leaves_the_old_file_intact(tmp_path, monkeypatch):
     import os
-    from cursiv_v215.core import atomic
+    from cursiv_engine.core import atomic
     f = tmp_path / "memory_facts.jsonl"
     atomic.write_text(f, "old\n")
 
@@ -115,18 +115,18 @@ def test_automatic_fact_survives_restart_and_is_retrieved_without_history(tmp_pa
     import shutil
     app, home = tmp_path / 'app', tmp_path / 'home'
     home.mkdir()
-    for part in ('cursiv_v215', 'launcher'):
+    for part in ('cursiv_engine', 'launcher'):
         shutil.copytree(ROOT / part, app / part, ignore=shutil.ignore_patterns('__pycache__', '.cursiv'))
     save = '''
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
-from cursiv_v215.memory import semantic as sem
+from cursiv_engine.memory import semantic as sem
 sem.set_person('bob')
 sem.embed = lambda _: None
 print(sem.learn_from_exchange("I'm building Cursiv for field research", 'Okay', lambda _: '', person='bob'))
 '''
     read = '''
-from cursiv_v215.memory import semantic as sem
+from cursiv_engine.memory import semantic as sem
 sem.embed = lambda _: None
 sem._strand_items = lambda: []
 print(sem.build_context('Bob building Cursiv field research', person='bob'))

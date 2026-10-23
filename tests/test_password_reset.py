@@ -7,8 +7,8 @@ import pytest
 
 @pytest.fixture
 def env(tmp_path, monkeypatch):
-    from cursiv_v215.guardian import access_gate as ag
-    from cursiv_v215.guardian import security_questions as sq
+    from cursiv_engine.guardian import access_gate as ag
+    from cursiv_engine.guardian import security_questions as sq
     rt = tmp_path / "runtime"
     monkeypatch.setattr(ag, "_RUNTIME", rt)
     for name in ("_HASH_FILE", "_META_FILE", "_FLAG_FILE", "_ACCOUNTS_FILE"):
@@ -51,7 +51,7 @@ def test_an_account_without_questions_can_t_be_reset_with_someone_elses(env):
 
 def test_a_question_file_from_before_belongs_to_the_first_account(env, tmp_path):
     ag, sq = env
-    from cursiv_v215.guardian import security_questions as sqm
+    from cursiv_engine.guardian import security_questions as sqm
     old = {"questions": [0, 1, 2], "answers": json.loads(sqm._SQ_FILE.read_text())["accounts"][sqm._uhash("owner")]["answers"]}
     sqm._SQ_FILE.write_text(json.dumps(old))                                      # the old single-set format
     assert sq.is_setup_complete("owner") and sq.verify_answers(["rex", "boston", "x"], "owner")

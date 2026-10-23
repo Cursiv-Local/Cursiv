@@ -1,7 +1,7 @@
 """Signed export tree inspection rejects substitutions before file contents are read."""
 import json
 import pytest
-from cursiv_v215.core import fieldlog, export_paths
+from cursiv_engine.core import fieldlog, export_paths
 from test_fieldlog import log
 
 

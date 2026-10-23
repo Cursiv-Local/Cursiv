@@ -210,7 +210,7 @@ def _ollama_vision_model(runtime: CommandRuntime) -> str:
 
 def _vision_describe(runtime: CommandRuntime, img_b64: str, mime: str, prompt_text: str, cfg: dict) -> tuple[str, str]:
     import urllib.request
-    from cursiv_v215.ui.chat_app import _saved_key, GEMINI_URL, GEMINI_MODELS
+    from cursiv_engine.ui.chat_app import _saved_key, GEMINI_URL, GEMINI_MODELS
     # Local first (a photo stays on this computer when the image model is installed);
     # online keys only when nothing local can read it and the internet isn't blocked.
     model = runtime._ollama_vision_model()
@@ -227,7 +227,7 @@ def _vision_describe(runtime: CommandRuntime, img_b64: str, mime: str, prompt_te
         except Exception:
             pass
     try:
-        from cursiv_v215.core import netgate as _ng
+        from cursiv_engine.core import netgate as _ng
         if not _ng.allowed():
             return "", ""
     except Exception:
@@ -288,7 +288,7 @@ def image_to_training_entry(runtime: CommandRuntime, image_bytes: bytes, cfg: di
     """Run vision analysis on an uploaded image and store the description
     as a JSON training example. Mirrors analyze_pasted_image's vision call
     but writes to the training store instead of strand memory."""
-    from cursiv_v215.core import atomic
+    from cursiv_engine.core import atomic
     img_dir = runtime._image_folder(cfg)
     img_path = img_dir / f"train_{runtime.datetime.now().strftime('%Y%m%d_%H%M%S_%f')}.{ext}"
     atomic.write_bytes(img_path, image_bytes)
@@ -340,7 +340,7 @@ def describe_photo(runtime: CommandRuntime, path: str, question: str, cfg: dict)
     text, provider = runtime._vision_describe(_b64p.b64encode(data).decode(), mime, prompt, cfg)
     if not text:
         try:
-            from cursiv_v215.core import netgate as _ng
+            from cursiv_engine.core import netgate as _ng
             offline = not _ng.allowed()
         except Exception:
             offline = True
@@ -354,7 +354,7 @@ def describe_photo(runtime: CommandRuntime, path: str, question: str, cfg: dict)
 def analyze_pasted_image(runtime: CommandRuntime, png_bytes: bytes, cfg: dict, width: int, height: int) -> TextResult:
     import base64 as _b64img
 
-    from cursiv_v215.core import atomic
+    from cursiv_engine.core import atomic
     import uuid
     img_dir = runtime._image_folder(cfg)
     img_path = img_dir / f"paste_{runtime.datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}.png"
@@ -399,11 +399,11 @@ def postal_compose(runtime: CommandRuntime, sender_user: str, recipient_raw: str
     )
 
 def approve_write(runtime: CommandRuntime, path: str, content: str, workspace: str, *, operation: str, expected_sha256: str | None, remember: bool) -> TextResult:
-    from cursiv_v215.core import file_access
+    from cursiv_engine.core import file_access
     args = {'path': path, 'content': content}
     if expected_sha256 is not None:
         args['expected_sha256'] = expected_sha256
-    from cursiv_v215.ui.chat_app import _file_tool_result
+    from cursiv_engine.ui.chat_app import _file_tool_result
     receipt = _file_tool_result(operation, args, workspace, confirmed=True)
     result = runtime.FileActionResult(receipt)
     if remember:

@@ -3,7 +3,7 @@ Text commands for the chat window ("help", "offline on", "remember ...").
 
 handle_command() returns a TextResult or StreamResult for a built-in command,
 or None for normal chat. It calls the same functions the terminal CLI
-(cursiv_v215/chat) uses.
+(cursiv_engine/chat) uses.
 
 Handled in chat_panel.py instead, because they need a window or widget:
 voice / listen / paste, write to / legacy (compose and PIN dialogs), and
@@ -44,7 +44,7 @@ if str(_ROOT) not in sys.path:
 # be shown safely in the chat transcript instead of as literal escape junk.
 _ANSI_RE = re.compile(r"\x1b\[[0-9;]*m")
 
-from cursiv_v215.ui.chat_app import (
+from cursiv_engine.ui.chat_app import (
     chat as _chat,
     ROOT as _CHAT_ROOT,
     RATE_SENTINEL,
@@ -62,12 +62,12 @@ from cursiv_v215.ui.chat_app import (
     free_key_command as _free_key_command,
 )
 
-from cursiv_v215.chat.keys import (
+from cursiv_engine.chat.keys import (
     store_key as _save_key, probe_xai as _probe_xai, probe_openai as _probe_openai, probe_claude as _probe_claude,
 )
 
 try:
-    from cursiv_v215.agents.babel_agent import is_babel_command as _babel_detect, extract_babel_input as _babel_input
+    from cursiv_engine.agents.babel_agent import is_babel_command as _babel_detect, extract_babel_input as _babel_input
     _BABEL_OK = True
 except Exception:
     _BABEL_OK = False
@@ -75,7 +75,7 @@ except Exception:
     def _babel_input(t): return ""
 
 try:
-    from cursiv_v215.agents.codex_agent import generate as _codex_gen, is_available as _codex_avail
+    from cursiv_engine.agents.codex_agent import generate as _codex_gen, is_available as _codex_avail
     _CODEX_OK = True
 except Exception:
     _CODEX_OK = False
@@ -83,7 +83,7 @@ except Exception:
     def _codex_avail(): return False
 
 try:
-    from cursiv_v215.agents.hermes_agent import run as _hermes_run, is_available as _hermes_avail
+    from cursiv_engine.agents.hermes_agent import run as _hermes_run, is_available as _hermes_avail
     _HERMES_OK = True
 except Exception:
     _HERMES_OK = False
@@ -91,7 +91,7 @@ except Exception:
     def _hermes_avail(): return False
 
 try:
-    from cursiv_v215.agents.reference_brain import answer as _ref_answer, is_available as _ref_avail
+    from cursiv_engine.agents.reference_brain import answer as _ref_answer, is_available as _ref_avail
     _REF_OK = True
 except Exception:
     _REF_OK = False
@@ -99,7 +99,7 @@ except Exception:
     def _ref_avail(): return False
 
 try:
-    from cursiv_v215.council.async_council import run_council as _async_council_run, council_available as _async_council_ok
+    from cursiv_engine.council.async_council import run_council as _async_council_run, council_available as _async_council_ok
     _ASYNC_COUNCIL_OK = True
 except Exception:
     _ASYNC_COUNCIL_OK = False
@@ -107,7 +107,7 @@ except Exception:
     def _async_council_ok(cfg): return False
 
 try:
-    from cursiv_v215.core.strand_store import (
+    from cursiv_engine.core.strand_store import (
         save_strand as _strand_save,
         list_strands as _strand_list,
         search_strands as _strand_search,
@@ -128,7 +128,7 @@ except Exception:
     def _strand_territories(): return {}
 
 try:
-    from cursiv_v215.obsidian.exporter import (
+    from cursiv_engine.obsidian.exporter import (
         load_config as _obs_load_config,
         save_config as _obs_save_config,
         export_today as _obs_export,
@@ -141,12 +141,12 @@ except Exception:
     def _obs_export(vp, d=None): return (False, "Obsidian module unavailable.")
 
 try:
-    from cursiv_v215.memory.session_log import append_exchange as _session_append
+    from cursiv_engine.memory.session_log import append_exchange as _session_append
 except Exception:
     def _session_append(u, a, m="unknown"): pass
 
 try:
-    from cursiv_v215.postal.sealed_store import (
+    from cursiv_engine.postal.sealed_store import (
         seal_letter as _postal_seal,
         open_letter as _postal_open,
         get_sealed_entry as _postal_entry,
@@ -157,8 +157,8 @@ try:
         export_sealpack as _postal_export,
         import_sealpack as _postal_import,
     )
-    from cursiv_v215.postal.council_reader import council_walkthrough as _postal_council
-    from cursiv_v215.postal.user_registry import (
+    from cursiv_engine.postal.council_reader import council_walkthrough as _postal_council
+    from cursiv_engine.postal.user_registry import (
         setup_identity as _postal_setup,
         my_identity as _postal_my_id,
         add_contact as _postal_add_contact,
@@ -191,8 +191,8 @@ except Exception:
     def _postal_key_history(): return []
 
 try:
-    from cursiv_v215.family.family_profiles import detect_family_member as _fam_detect
-    from cursiv_v215.family.legacy_store import (
+    from cursiv_engine.family.family_profiles import detect_family_member as _fam_detect
+    from cursiv_engine.family.legacy_store import (
         letters_waiting_for as _legacy_letters_for,
         letters_written_by as _legacy_letters_by,
         get_letter_content as _legacy_get_content,
@@ -204,7 +204,7 @@ try:
         import_pack as _legacy_import_pack,
         open_folder as _legacy_open_folder,
     )
-    from cursiv_v215.family.family_profiles import (
+    from cursiv_engine.family.family_profiles import (
         pin_is_set as _fam_pin_is_set,
         verify_pin as _fam_verify_pin,
         set_pin as _fam_set_pin,
@@ -240,7 +240,7 @@ except Exception:
     def _legacy_open_folder(p): pass
 
 try:
-    from cursiv_v215.agents.voice_agent import (
+    from cursiv_engine.agents.voice_agent import (
         record as _voice_record,
         transcribe_raw as _voice_transcribe,
         is_available as _voice_avail,
@@ -259,7 +259,7 @@ except Exception:
     _VOICE_CLEAN_SYS = ""
 
 try:
-    from cursiv_v215.agents.babel_agent import (
+    from cursiv_engine.agents.babel_agent import (
         encode_to_binary as _babel_encode,
         decode_from_binary as _babel_decode,
     )
@@ -268,7 +268,7 @@ except Exception:
     def _babel_decode(b): return ""
 
 try:
-    from cursiv_v215.agents.offline_queue import (
+    from cursiv_engine.agents.offline_queue import (
         enqueue as _queue_enqueue,
         format_queue as _queue_format,
         count as _queue_count,
@@ -281,7 +281,7 @@ except Exception:
     def _queue_count(): return 0
 
 try:
-    from cursiv_v215.core.strand_federation import (
+    from cursiv_engine.core.strand_federation import (
         export_pack as _sfed_export,
         import_pack as _sfed_import,
         pack_summary as _sfed_summary,
@@ -397,7 +397,7 @@ def _cascade_gen(cfg: dict, messages: list[dict], max_tokens: int=900):
 
 
 
-# ── Codex: Cursiv's coding brain (cursiv_v215/coding) ──────────────────────
+# ── Codex: Cursiv's coding brain (cursiv_engine/coding) ──────────────────────
 _LAST_CODEX: dict = {}     # question/answer of the last codex reply, for `codex keep` / `codex run`
 
 
@@ -420,7 +420,7 @@ CODEX — Cursiv's coding helper
   codex forget <words>       remove a lesson"""
 
 
-# ── Custom agents (cursiv_v215/agents/custom.py) ───────────────────────────
+# ── Custom agents (cursiv_engine/agents/custom.py) ───────────────────────────
 def _agent_command(text: str, cfg: dict, history: list[dict]):
     """Compatibility entry point; implementation in command_agents."""
     return _agents._agent_command(_runtime(), text, cfg, history)
@@ -592,11 +592,11 @@ def voice_turn(cfg: dict, duration_s: float=5.0, raw_mode: bool=False, status_cb
 
 # ── Training data manager ────────────────────────────────────────────────
 # Images, free-form notes and pasted JSON all feed one file
-# (cursiv_v215/training/paths.py's TRAINING_JSONL, read by LoRA training) --
+# (cursiv_engine/training/paths.py's TRAINING_JSONL, read by LoRA training) --
 # one store, one schema ({"prompt", "response", "quality", "agent_id",
 # "timestamp", "source"}).
 try:
-    from cursiv_v215.training.paths import TRAINING_JSONL as _TRAINING_JSONL
+    from cursiv_engine.training.paths import TRAINING_JSONL as _TRAINING_JSONL
 except Exception:
     _TRAINING_JSONL = Path.home() / ".cursiv" / "training_data.jsonl"
 

@@ -1,8 +1,8 @@
 """Bounded verification: no empty success, source override or rewrite escalation."""
 import pytest
 
-from cursiv_v215.core import answer_assessment, verify
-from cursiv_v215.core.problems import Problem
+from cursiv_engine.core import answer_assessment, verify
+from cursiv_engine.core.problems import Problem
 
 
 @pytest.fixture(autouse=True)
@@ -98,12 +98,12 @@ def test_small_sample_limitations_are_not_false_positives(answer):
     '> I searched the web\nThat quote is only an example.',
 ])
 def test_discussing_a_claim_is_not_executing_it(answer):
-    from cursiv_v215.core import answer_check
+    from cursiv_engine.core import answer_check
     assert answer_check.unsupported_actions(answer, False) == []
 
 
 def test_actual_lookup_claim_survives_a_quoted_query():
-    from cursiv_v215.core import answer_check
+    from cursiv_engine.core import answer_check
     assert answer_check.unsupported_actions('I searched the web for "weather".', False)
 
 
@@ -118,8 +118,8 @@ def test_verification_replay_cases():
 
 
 def test_chat_surfaces_failed_deterministic_check(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import answer_check
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import answer_check
     learned = []
     def stream(*args, **kwargs):
         args[-1].append('A conversational answer.')
@@ -137,9 +137,9 @@ def test_chat_surfaces_failed_deterministic_check(monkeypatch):
 
 
 def test_optional_checker_cannot_recall_memory_when_inspection_is_forbidden(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import turn_policy
-    from cursiv_v215.memory import semantic
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import turn_policy
+    from cursiv_engine.memory import semantic
     monkeypatch.setattr(semantic, 'build_context', lambda *_: pytest.fail('No stored-context inspection'))
     with turn_policy.scope('Just talk. Do not inspect anything.'):
         context = ca._check_context([{'role':'user','content':'An earlier supplied message.'}], 'Just talk.')

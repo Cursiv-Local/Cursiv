@@ -1,7 +1,7 @@
 """
 Cursiv Login / Setup Dialogs — PyQt6.
-Integrates with cursiv_v215.guardian.access_gate (bcrypt credential store)
-and cursiv_v215.guardian.security_questions (password recovery).
+Integrates with cursiv_engine.guardian.access_gate (bcrypt credential store)
+and cursiv_engine.guardian.security_questions (password recovery).
 """
 
 from __future__ import annotations
@@ -132,7 +132,7 @@ class SetupDialog(_BaseDialog):
             return
 
         try:
-            from cursiv_v215.guardian.access_gate import setup_credentials, add_account, username_exists
+            from cursiv_engine.guardian.access_gate import setup_credentials, add_account, username_exists
             if self._is_additional:
                 if username_exists(username):
                     self._err.setText("That username is already taken.")
@@ -173,7 +173,7 @@ def _clear_saved_keys() -> None:
     """Remove the AI keys from Cursiv's config (part of a full account reset)."""
     import json
     try:
-        from cursiv_v215.chat.keys import KEYS_FILE as path
+        from cursiv_engine.chat.keys import KEYS_FILE as path
         data = json.loads(path.read_text(encoding="utf-8"))
         for field in ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key",
                       "cf_account_id", "cf_api_token"):
@@ -253,7 +253,7 @@ class LoginDialog(_BaseDialog):
         # someone who can already log in may add one.
         username, password = self._user.text().strip(), self._pw.text()
         try:
-            from cursiv_v215.guardian.access_gate import verify_credentials
+            from cursiv_engine.guardian.access_gate import verify_credentials
             approved = bool(username and password and verify_credentials(username, password))
         except Exception:
             approved = False
@@ -297,8 +297,8 @@ class LoginDialog(_BaseDialog):
             if reply != QMessageBox.StandardButton.Yes:
                 return
             try:
-                from cursiv_v215.guardian.access_gate import reset_credentials
-                from cursiv_v215.guardian.security_questions import clear_security_questions
+                from cursiv_engine.guardian.access_gate import reset_credentials
+                from cursiv_engine.guardian.security_questions import clear_security_questions
                 reset_credentials()
                 clear_security_questions()
                 _clear_saved_keys()
@@ -324,7 +324,7 @@ class LoginDialog(_BaseDialog):
         self._status.setText("Verifying…")
 
         try:
-            from cursiv_v215.guardian.access_gate import verify_credentials
+            from cursiv_engine.guardian.access_gate import verify_credentials
             verified = verify_credentials(username, password)
         except Exception as exc:
             self._status.setStyleSheet(f"color: {RED}; font-size: 11px;")

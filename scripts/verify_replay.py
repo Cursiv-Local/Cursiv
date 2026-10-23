@@ -21,7 +21,7 @@ sys.path[:0] = [str(REPO), str(REPO / "bench"), str(REPO / "launcher")]
 
 def drafts(path: str):
     import truth_cases
-    from cursiv_v215.ui.chat_app import _strip_status_lines
+    from cursiv_engine.ui.chat_app import _strip_status_lines
     case = {c["id"]: c for c in truth_cases.CASES}
     for r in json.load(open(path, encoding="utf-8"))["results"]:
         c = case.get(r["id"])
@@ -34,7 +34,7 @@ def drafts(path: str):
 
 
 def checks():
-    from cursiv_v215.core import calc, reference, verify
+    from cursiv_engine.core import calc, reference, verify
 
     def sources(q):
         """What chat() gives the check as sources: the reference card shown and Cursiv's calculation."""

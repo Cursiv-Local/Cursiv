@@ -1,7 +1,7 @@
 """Application-owned phone pointers shared by command and graphical help."""
 from html import escape
 
-from cursiv_v215.core.phone_help import NOTEBOOK_URL, PHOTO_URL, PHONE_CAPTURE, PHONE_LINKS
+from cursiv_engine.core.phone_help import NOTEBOOK_URL, PHOTO_URL, PHONE_CAPTURE, PHONE_LINKS
 
 
 def markdown_links(text: str) -> str:

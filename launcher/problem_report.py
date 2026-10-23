@@ -93,10 +93,10 @@ def collect(context: str = "") -> dict:
     except Exception as exc:
         info.append(f"Ollama check failed: {exc}")
     try:
-        from cursiv_v215.ui import chat_app as ca
+        from cursiv_engine.ui import chat_app as ca
         cfg = {}
         try:
-            from cursiv_v215.chat.keys import KEYS_FILE
+            from cursiv_engine.chat.keys import KEYS_FILE
             cfg = json.loads(KEYS_FILE.read_text(encoding="utf-8"))
         except Exception:
             pass

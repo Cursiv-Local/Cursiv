@@ -94,7 +94,7 @@ class ChatControlsMixin:
         more.setCursor(Qt.CursorShape.PointingHandCursor)
         menu = QMenu(more)
         try:
-            from cursiv_v215.core import profile as _profile
+            from cursiv_engine.core import profile as _profile
             if _profile.personal():
                 menu.addAction("Training data…", lambda: self._open_training_data())
         except Exception:
@@ -207,7 +207,7 @@ class ChatControlsMixin:
 
     def _refresh_status_pill(self) -> None:
         try:
-            from cursiv_v215.chat import status as _st
+            from cursiv_engine.chat import status as _st
             st = _st.network_status()
         except Exception:
             st = {"level": "online", "label": "Status unknown", "details": ["Couldn't read the network settings."]}
@@ -220,7 +220,7 @@ class ChatControlsMixin:
             f"QPushButton:hover {{ border-color: {fg}; }}")
         self._net_status = st
         try:
-            from cursiv_v215.core import demo as _demo
+            from cursiv_engine.core import demo as _demo
             self._demo_pill.setVisible(_demo.active())
         except Exception:
             self._demo_pill.setVisible(False)
@@ -262,10 +262,10 @@ class ChatControlsMixin:
 
         def work():
             try:
-                from cursiv_v215.chat import status as _st
+                from cursiv_engine.chat import status as _st
                 models = _st.local_models()
                 if models is None and _os.environ.get("CURSIV_NO_ENGINE_START") != "1":   # self-test, tests
-                    from cursiv_v215.core import ollama_host, speed
+                    from cursiv_engine.core import ollama_host, speed
                     if ollama_host.installed() and ollama_host.start(speed.ollama_env()):
                         models = _st.local_models()
             except Exception:
@@ -277,7 +277,7 @@ class ChatControlsMixin:
         threading.Thread(target=work, daemon=True).start()
 
     def _on_models(self, models) -> None:
-        from cursiv_v215.chat import status as _st
+        from cursiv_engine.chat import status as _st
         box = self._model_box
         box.clear()
         if not models:
@@ -292,5 +292,5 @@ class ChatControlsMixin:
         box.setEnabled(True)
 
     def _on_model_chosen(self, index: int) -> None:
-        from cursiv_v215.chat import status as _st
+        from cursiv_engine.chat import status as _st
         _st.choose(self._model_box.itemData(index) or "standard")

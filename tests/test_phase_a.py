@@ -1,7 +1,7 @@
 """The three real failures from the U63 benchmark run (bench/FAILURES-U63-pre.md)."""
 import pytest
 
-from cursiv_v215.core import answer_check, calc, clarify
+from cursiv_engine.core import answer_check, calc, clarify
 from test_netgate import _local_model, fresh, outbound  # noqa: F401  (fixtures)
 
 BED = ("I have to wake up at 6:00 AM, I want 8 hours of sleep, and it takes me 30 minutes to fall asleep. "
@@ -35,7 +35,7 @@ def test_answer_without_the_result_is_flagged():
 
 
 def test_chat_gives_the_model_the_result_and_checks_it(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     seen = {}
 
     def fake(messages, **kw):
@@ -87,7 +87,7 @@ def test_earlier_message_supplies_what_it_is():
 def _fake_ollama(monkeypatch, size_mb, blocks, vram):
     import io
     import json
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     monkeypatch.setattr(speed, "_layers", {})
     monkeypatch.setattr(speed, "gpu_vram_mb", lambda: vram)
 
@@ -118,7 +118,7 @@ def test_a_bigger_model_gets_its_share(monkeypatch):
                                       "My daughter is choking", "He's unresponsive and I can't wake him up",
                                       "a snake bit my son's ankle"])
 def test_more_medical_emergencies_are_recognised(question):
-    from cursiv_v215.core import phases
+    from cursiv_engine.core import phases
     assert phases.run(question).emergency_kind == "medical"
 
 
@@ -140,13 +140,13 @@ def test_pasted_text_keeps_its_shape():
 
 
 def test_thousands_separators_in_shown_arithmetic():
-    from cursiv_v215.core import verify
+    from cursiv_engine.core import verify
     assert verify.arithmetic_problems("2,450 × 0.17 = 416.5") == []      # was read as 450 x 0.17 (Phase 1 replay)
     assert verify.arithmetic_problems("2,450 × 0.17 = 41.65")
 
 
 def test_check_notes_stay_out_of_the_conversation():
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     reply = "416.5\n\n*[Answered by Ollama]*\n\n---\n**Checked, with notes** (x):\n- wrong note"
     assert ca._strip_status_lines(reply) == "416.5"
 
@@ -157,8 +157,8 @@ def test_no_warm_drinks_if_unconscious_agrees_with_the_card():
 
 
 def test_break_note_can_be_turned_off(fresh):
-    from cursiv_v215.chat import keys
-    from cursiv_v215.core import phases
+    from cursiv_engine.chat import keys
+    from cursiv_engine.core import phases
     keys.store_key("break_notes", "off")
     assert phases._break_notes_on() is False
     keys.store_key("break_notes", "")
@@ -168,7 +168,7 @@ def test_break_note_can_be_turned_off(fresh):
 # ── Found recording the website's answers (2026-10-18) ─────────────────────
 
 def test_vague_first_message_gets_cursivs_own_question(fresh, monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))
     out = "".join(ca.chat("Is it safe?", [], "", None))
@@ -176,26 +176,26 @@ def test_vague_first_message_gets_cursivs_own_question(fresh, monkeypatch):
 
 
 def test_a_checker_listing_nothing_is_clear():
-    from cursiv_v215.core import verify
+    from cursiv_engine.core import verify
     assert verify.parse_verdict("- Unsupported claims: None") == (True, "")
     assert verify.parse_verdict("Unsupported claim: the CDC figure")[0] is False
 
 
 def test_saying_you_have_no_map_isnt_citing_one():
-    from cursiv_v215.core import verify
+    from cursiv_engine.core import verify
     assert verify.citation_problems("where is it", "", "I don't have a map or location data to show where that is.") == []
 
 
 def test_no_council_hint_on_a_should_question():
-    from cursiv_v215.core import phases
+    from cursiv_engine.core import phases
     assert "council" not in phases.run("What time should I get in bed?").after_reply
 
 
 # ── Battery saver (research roadmap R5) ────────────────────────────────────
 
 def test_battery_saver_settings(fresh, monkeypatch):
-    from cursiv_v215.chat import keys
-    from cursiv_v215.core import speed
+    from cursiv_engine.chat import keys
+    from cursiv_engine.core import speed
     monkeypatch.setattr(speed, "on_battery", lambda: True)
     assert speed.battery_saver() and speed.keep_alive() == "2m" and speed.num_ctx() == 4096   # automatic, unplugged
     keys.store_key("battery_saver", "off")
@@ -206,8 +206,8 @@ def test_battery_saver_settings(fresh, monkeypatch):
 
 
 def test_battery_saver_skips_the_second_model_call(fresh, monkeypatch):
-    from cursiv_v215.chat import keys
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.chat import keys
+    from cursiv_engine.ui import chat_app as ca
     keys.store_key("battery_saver", "on")
     _local_model(monkeypatch)
     calls = []
@@ -222,8 +222,8 @@ def test_battery_saver_skips_the_second_model_call(fresh, monkeypatch):
 
 @pytest.mark.parametrize("offline, expect", [(True, "Offline mode is on."), (False, "Offline mode is off")])
 def test_are_you_offline_is_answered_from_the_real_state(fresh, monkeypatch, offline, expect):
-    from cursiv_v215.core import netgate
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import netgate
+    from cursiv_engine.ui import chat_app as ca
     netgate.set_offline(offline)
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))

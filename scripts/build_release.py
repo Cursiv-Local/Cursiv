@@ -27,7 +27,7 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 ISCC = Path.home() / "AppData" / "Local" / "Programs" / "Inno Setup 6" / "ISCC.exe"
 VERSION_FILES = {
-    "cursiv_v215/core/selfknow.py": r'VERSION\s*=\s*"([^"]+)"',
+    "cursiv_engine/core/selfknow.py": r'VERSION\s*=\s*"([^"]+)"',
     "launcher/cursiv_launcher.py": r'_CURRENT_VERSION\s*=\s*"([^"]+)"',
     "installer/cursiv_setup.iss": r'#define AppVer\s+"([^"]+)"',
 }

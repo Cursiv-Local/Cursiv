@@ -33,7 +33,7 @@ means something specific and can be checked.
 
 - [ ] Keep the signed sheet (scan or photo) outside the repository, with the date.
 - [ ] Entries marked **correct as written**, and whose fingerprint still matches the sheet:
-      set `"reviewed": true` in `cursiv_v215/reference_data/sources.json` (an entry without a
+      set `"reviewed": true` in `cursiv_engine/reference_data/sources.json` (an entry without a
       published source needs one added there first, or stays unreviewed).
 - [ ] Entries marked **needs a change**: rewrite, send the new text back for review, and only
       then mark reviewed. **Remove**: remove it, or hold it back from chat (`NOT_IN_CHAT`).

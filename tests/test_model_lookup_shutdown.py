@@ -4,7 +4,7 @@ from types import SimpleNamespace
 
 def test_deleted_signal_is_ignored_after_model_lookup(monkeypatch):
     import chat_controls
-    from cursiv_v215.chat import status
+    from cursiv_engine.chat import status
     calls = []
     def emit(models):
         calls.append(models)

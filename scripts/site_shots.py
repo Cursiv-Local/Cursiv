@@ -50,9 +50,9 @@ import json, sys
 sys.path[:0] = [".", "launcher"]
 for m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(m, None)
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
-from cursiv_v215.ui import chat_app as ca
+from cursiv_engine.ui import chat_app as ca
 import chat_commands as cc
 ca._learn_later = lambda *a, **k: None
 out = {}
@@ -85,9 +85,9 @@ sys.path[:0] = [".", "launcher"]
 for m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(m, None)
 mode, turns, dest = sys.argv[1], json.loads(sys.argv[2]), sys.argv[3]
-from cursiv_v215.chat import keys
+from cursiv_engine.chat import keys
 keys.store_key("ui_theme", mode)
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
@@ -127,7 +127,7 @@ import sys
 sys.path[:0] = [".", "launcher"]
 for m in ("codex_tool_bridge", "knowledge_brain"):
     sys.modules.setdefault(m, None)
-from cursiv_v215.chat import keys
+from cursiv_engine.chat import keys
 keys.store_key("ui_theme", "light")
 from PyQt6.QtWidgets import QApplication
 from PyQt6.QtCore import QTimer
@@ -142,7 +142,7 @@ if which == "settings":
     w.resize(1000, 680)
 elif which == "notebook":
     # Example entries (the caption on the site says so), recorded through the real field log.
-    from cursiv_v215.core import fieldlog as fl
+    from cursiv_engine.core import fieldlog as fl
     a = fl.add(observer="Dana", site="North transect", lat=44.1234, lon=-71.5678, location_source="typed",
                measurements=[{"name": "water temp", "value": "12.40", "unit": "°C"},
                              {"name": "pH", "value": "7.9", "unit": ""}], note="turbid after rain")
@@ -181,7 +181,7 @@ def windows() -> None:
 
 def _fresh_copy() -> tuple[Path, dict]:
     scratch = Path(tempfile.mkdtemp(prefix="cursiv_shots_"))
-    for part in ("cursiv_v215", "launcher"):
+    for part in ("cursiv_engine", "launcher"):
         shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
     (scratch / "home").mkdir()
     env = {**os.environ, "USERPROFILE": str(scratch / "home"), "HOME": str(scratch / "home"),

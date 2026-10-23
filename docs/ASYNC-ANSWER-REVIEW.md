@@ -189,8 +189,8 @@ state. Physical installed/portable-PC and current Mac checks remain pending.
 
 ## Exact files for this follow-up
 
-- Production: `cursiv_v215/core/verify.py`, `cursiv_v215/chat/review.py`,
-  `cursiv_v215/chat/completion.py`, `cursiv_v215/ui/chat_app.py`,
+- Production: `cursiv_engine/core/verify.py`, `cursiv_engine/chat/review.py`,
+  `cursiv_engine/chat/completion.py`, `cursiv_engine/ui/chat_app.py`,
   `launcher/chat_review.py`, `launcher/chat_panel.py`,
   `launcher/commands_system.py`, `launcher/chat_commands.py`.
 - Checks: `tests/test_background_review.py`, `tests/test_verify.py`,

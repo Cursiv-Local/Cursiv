@@ -40,7 +40,7 @@ class ChatTranscriptMixin:
         ledger: list[str] = []
         try:
             # The same reader the check uses: "✅ Known:" and items on the lines below count too.
-            from cursiv_v215.core import verify
+            from cursiv_engine.core import verify
             text = "\n".join(body)
             found = verify._ledger_span(text)
             if found:

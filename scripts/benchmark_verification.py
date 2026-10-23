@@ -22,7 +22,7 @@ import types
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from cursiv_v215.core import answer_assessment, calc, claims, verify
+from cursiv_engine.core import answer_assessment, calc, claims, verify
 
 LEDGER = '\n\nKnown: none\nInferred: none\nAssumed: none\nUnknown: none'
 
@@ -40,7 +40,7 @@ def current(case):
 
 def baseline_module(ref, path, name):
     content = subprocess.check_output(['git', 'show', f'{ref}:{path}'], cwd=ROOT)
-    module = types.ModuleType('cursiv_v215.core.' + name)
+    module = types.ModuleType('cursiv_engine.core.' + name)
     module.__file__ = str(ROOT / path)
     sys.modules[module.__name__] = module
     exec(compile(content, module.__file__, 'exec'), module.__dict__)
@@ -84,8 +84,8 @@ def main():
     source = ROOT / 'bench/verification_cases.json'
     raw = source.read_bytes()
     cases = json.loads(raw)
-    verifier = baseline_module(args.baseline, 'cursiv_v215/core/verify.py', '_benchmark_prior_verify')
-    checks = baseline_module(args.baseline, 'cursiv_v215/core/answer_check.py', '_benchmark_prior_answers')
+    verifier = baseline_module(args.baseline, 'cursiv_engine/core/verify.py', '_benchmark_prior_verify')
+    checks = baseline_module(args.baseline, 'cursiv_engine/core/answer_check.py', '_benchmark_prior_answers')
     rows = []
     for case in cases:
         start = time.perf_counter()

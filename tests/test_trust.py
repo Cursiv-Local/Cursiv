@@ -141,7 +141,7 @@ def test_data_the_drive_user_made_is_kept_without_the_marker():
 # ── Login ───────────────────────────────────────────────────────────────────
 
 def _temp_login(monkeypatch):
-    from cursiv_v215.guardian import access_gate as ag
+    from cursiv_engine.guardian import access_gate as ag
     rt = _tmp() / "runtime"
     monkeypatch.setattr(ag, "_RUNTIME", rt)
     for name in ("_HASH_FILE", "_META_FILE", "_FLAG_FILE", "_ACCOUNTS_FILE"):
@@ -173,7 +173,7 @@ def test_create_account_needs_an_existing_login(monkeypatch):
 
 def test_login_fails_closed_when_it_cannot_load(monkeypatch):
     import main as launcher_main
-    from cursiv_v215.guardian import access_gate as ag
+    from cursiv_engine.guardian import access_gate as ag
 
     def broken():
         raise ImportError("simulated missing login module")

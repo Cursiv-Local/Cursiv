@@ -26,8 +26,8 @@ in the system browser on user action; notebook storage/import behavior is unchan
 | `launcher/login_style.py`, `login_recovery.py`, `login_dialog.py` | Shared controls, security questions/recovery, login/account setup. Existing class imports are preserved. |
 | `launcher/setup_checks.py`, `setup_dialog.py` | Engine readiness checks and setup view. Platform engine operations remain in `core/ollama_host.py`. |
 | `launcher/usb_ops.py`, `usb_maker.py` | USB planning/copy/verification operations and drive-making view. |
-| `cursiv_v215/ui/chat_app.py` | Stable chat facade, configuration, imports and legacy per-turn records. No Qt dependency. |
-| `cursiv_v215/chat/runtime.py` | Explicit dependency protocol passed to extracted implementations. |
+| `cursiv_engine/ui/chat_app.py` | Stable chat facade, configuration, imports and legacy per-turn records. No Qt dependency. |
+| `cursiv_engine/chat/runtime.py` | Explicit dependency protocol passed to extracted implementations. |
 | `chat/context.py`, `uploads.py` | Prompt/evidence assembly, upload text and tool receipts. |
 | `chat/provenance.py`, `core/grounding.py` | Application-owned source formatting and scoped supplied-memory/execution records; no answer-word attribution. |
 | `core/native_answers.py`, `chat/response_style.py` | Bounded feature/workflow/version/calculation replies before model generation; scoped style guidance and conservative final closer cleanup. Neither prose nor a help answer grants or proves tool execution. |

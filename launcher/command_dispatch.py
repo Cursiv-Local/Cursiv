@@ -32,14 +32,14 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         return None
     cmd = text.lower()
 
-    from cursiv_v215.core import turn_policy
+    from cursiv_engine.core import turn_policy
     if turn_policy.for_text(text) != turn_policy.Policy():
         return None  # enforce limits before even classifying notebook/memory commands
-    from cursiv_v215.core import command_sequence
+    from cursiv_engine.core import command_sequence
     pair = command_sequence.state_reply(text)
     if pair is not None:
         return runtime.TextResult(pair)
-    from cursiv_v215.core import file_requests
+    from cursiv_engine.core import file_requests
     if file_requests.recognizes(text):
         return None  # local source/search intent must precede notebook and memory keywords
 
@@ -63,7 +63,7 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         except (OSError, ValueError) as exc:
             return runtime.TextResult(f'Could not read saved note: {exc}')
 
-    from cursiv_v215.core import file_access as _files
+    from cursiv_engine.core import file_access as _files
     if _files.is_request(text):
         return None                     # application-controlled file route in chat(), not the model
 

@@ -4,7 +4,7 @@ import json
 
 import pytest
 
-from cursiv_v215.core import fieldlog as fl
+from cursiv_engine.core import fieldlog as fl
 
 
 @pytest.fixture
@@ -109,8 +109,8 @@ def test_the_log_survives_a_restart(tmp_path):
     from pathlib import Path
     root = Path(__file__).resolve().parent.parent
     env = {**os.environ, "USERPROFILE": str(tmp_path), "HOME": str(tmp_path), "PYTHONIOENCODING": "utf-8"}
-    write = "import sys; sys.path.insert(0, '.'); from cursiv_v215.core import fieldlog as f; f.add(site='Pond', note='seen')"
-    read = ("import sys, json; sys.path.insert(0, '.'); from cursiv_v215.core import fieldlog as f; "
+    write = "import sys; sys.path.insert(0, '.'); from cursiv_engine.core import fieldlog as f; f.add(site='Pond', note='seen')"
+    read = ("import sys, json; sys.path.insert(0, '.'); from cursiv_engine.core import fieldlog as f; "
             "print(json.dumps([len(f.entries()), f.verify()]))")
     subprocess.run([sys.executable, "-c", write], cwd=root, env=env, check=True)
     out = subprocess.run([sys.executable, "-c", read], cwd=root, env=env, check=True, capture_output=True, text=True)

@@ -2,12 +2,12 @@
 from pathlib import Path
 import pytest
 
-from cursiv_v215.core import file_access as fs, turn_policy
+from cursiv_engine.core import file_access as fs, turn_policy
 from test_background_review import pipeline
 from test_live_test_followup import final_reply
 
 PROMPTS = [
-    'list every .py file under cursiv_v215/core and show the line count for each',
+    'list every .py file under cursiv_engine/core and show the line count for each',
     'search the workspace for the string "turn_policy" and show the files and line numbers',
     'read launcher/chat_commands.py and list every command that touches the field notebook',
     'create a file called tripwire.txt in the workspace root containing the text "probe-20261022"',
@@ -23,7 +23,7 @@ PROMPTS = [
 @pytest.fixture
 def workspace(tmp_path):
     for relative, text in {
-        'cursiv_v215/core/sample.py': 'import turn_policy\n# offline mode\n',
+        'cursiv_engine/core/sample.py': 'import turn_policy\n# offline mode\n',
         'launcher/chat_commands.py': 'def notebook_command():\n    """field notebook import"""\n',
         'tripwire.txt': 'probe-20261022\nsecond write\n',
         '.env': 'turn_policy=DO-NOT-EXPOSE\n',
@@ -38,7 +38,7 @@ def workspace(tmp_path):
 @pytest.mark.parametrize('provider', ['ollama', 'openai'])
 @pytest.mark.parametrize('index', [0, 1, 2, 5, 6, 7, 8, 9])
 def test_exact_read_search_and_denial_routes(pipeline, monkeypatch, workspace, provider, index):
-    from cursiv_v215.core import notebook_tools
+    from cursiv_engine.core import notebook_tools
     def forbidden(*a, **k):
         pytest.fail('No model or notebook fallback for a named workspace file')
     monkeypatch.setattr(pipeline, '_chat_stream', forbidden)
@@ -107,7 +107,7 @@ def test_plain_model_claim_cannot_supply_file_contents(tmp_path):
 
 
 def test_local_search_does_not_become_web_even_online(monkeypatch):
-    from cursiv_v215.chat import web_search
+    from cursiv_engine.chat import web_search
     monkeypatch.setattr(web_search.netgate, 'allowed', lambda: True)
     monkeypatch.setattr(web_search.netgate, 'web_search_auto', lambda: True)
     assert not web_search._needs_search(PROMPTS[1])
@@ -116,14 +116,14 @@ def test_local_search_does_not_become_web_even_online(monkeypatch):
 
 
 def test_memory_compound_does_not_store_commands_as_fact():
-    from cursiv_v215.memory import intents, semantic
+    from cursiv_engine.memory import intents, semantic
     out = intents.command('remember East Fork is clear. now do a file write. now forget East Fork', [], person='dana')
     assert 'Remaining instructions were not run' in out.render()
     assert [f['text'] for f in semantic.list_facts('dana')] == ['East Fork is clear']
 
 
 def test_version_and_explicit_offline_change_both_run(pipeline, monkeypatch):
-    from cursiv_v215.core import netgate, selfknow
+    from cursiv_engine.core import netgate, selfknow
     state = []
     monkeypatch.setattr(netgate, 'set_offline', lambda enabled: state.append(enabled))
     monkeypatch.setattr(netgate, 'is_offline', lambda: bool(state))
@@ -141,7 +141,7 @@ def test_notebook_source_matches_beyond_initial_read_window(tmp_path):
 
 
 def test_local_memory_keyword_search_cannot_become_recall(pipeline, monkeypatch, workspace):
-    from cursiv_v215.memory import intents
+    from cursiv_engine.memory import intents
     monkeypatch.setattr(intents, 'command', lambda *a, **k: pytest.fail('Not a memory action'))
     monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('Not a model search'))
     out = final_reply(pipeline, 'search the repo for "saved memories"', file_access=True, root_path=str(workspace))

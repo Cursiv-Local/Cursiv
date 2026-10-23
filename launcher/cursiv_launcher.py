@@ -42,7 +42,7 @@ if getattr(sys, "frozen", False):
     _HERE = Path(sys.executable).parent
     _ROOT = _HERE
     # PyInstaller's COLLECT layout puts bundled Python source/data (services/,
-    # cursiv_v215/, etc.) under _internal/, not directly beside Cursiv.exe.
+    # cursiv_engine/, etc.) under _internal/, not directly beside Cursiv.exe.
     # Anything launched as "python <relative path>" needs THIS as its cwd,
     # not _ROOT — using _ROOT there silently fails (file/module not found),
     # even though the spawned cmd window still opens with the right title.
@@ -71,7 +71,7 @@ _GITHUB_RELEASES   = "https://github.com/Cursiv-Local/Cursiv/releases"
 def _auto_update_check_on() -> bool:
     """Automatic update check after login: off unless turned on, never offline."""
     try:
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         return netgate.update_check_auto()
     except Exception:
         return False
@@ -79,7 +79,7 @@ def _auto_update_check_on() -> bool:
 
 def _net_allowed() -> bool:
     try:
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         return netgate.allowed()
     except Exception:
         return True
@@ -93,7 +93,7 @@ _MACHINE_ID   = hashlib.sha256(
 
 # ── Ollama (core/ollama_host.py: Windows and macOS) ──────────────────────────
 def _is_ollama_installed() -> bool:
-    from cursiv_v215.core import ollama_host
+    from cursiv_engine.core import ollama_host
     return ollama_host.installed()
 
 
@@ -129,7 +129,7 @@ def _hieroglyph_font(size: int, weight: QFont.Weight = QFont.Weight.Normal) -> Q
     return font
 
 
-# Path.home(), not __file__-relative -- see cursiv_v215/guardian/access_gate.py
+# Path.home(), not __file__-relative -- see cursiv_engine/guardian/access_gate.py
 # for why: this needs to survive reinstalls/upgrades at a fixed install path,
 # same as every other piece of persistent state in this app.
 _GETTING_STARTED_FLAG = Path.home() / ".cursiv" / "runtime" / "getting_started_shown.flag"
@@ -223,7 +223,7 @@ class UpdateChecker:
 
     def _run(self):
         try:
-            from cursiv_v215.core import netgate
+            from cursiv_engine.core import netgate
             from update_security import asset
             if not netgate.allowed():
                 raise netgate.NetworkBlocked(netgate.OFFLINE_MESSAGE)
@@ -428,7 +428,7 @@ class CursivLauncher(QMainWindow):
     def __init__(self, username: str = "Joshua"):
         super().__init__()
         try:   # memory is kept per person: whoever logged in
-            from cursiv_v215.memory import semantic as _sem
+            from cursiv_engine.memory import semantic as _sem
             _sem.set_person(username)
         except Exception:
             pass
@@ -767,7 +767,7 @@ class CursivLauncher(QMainWindow):
         dlg = SecurityQSetupDialog(self, username=self._username)      # the signed-in person's own
         dlg.exec()
         try:
-            from cursiv_v215.guardian.security_questions import is_setup_complete
+            from cursiv_engine.guardian.security_questions import is_setup_complete
             if is_setup_complete(self._username):
                 self._set_status("Security questions saved.")
             else:
@@ -873,7 +873,7 @@ class CursivLauncher(QMainWindow):
         small GPUs) -- only when it'll answer, i.e. no online AI keys are saved."""
         def work():
             try:
-                from cursiv_v215.ui import chat_app as ca
+                from cursiv_engine.ui import chat_app as ca
                 if any(ca._saved_key(f) for f in ("groq_key", "gemini_key", "anthropic_key", "api_key", "openai_key")):
                     return
                 ca.warm_up_local()
@@ -914,7 +914,7 @@ class CursivLauncher(QMainWindow):
     def _open_field_notebook(self, photos=None):
         try:
             from field_notebook import FieldNotebookDialog
-            from cursiv_v215.memory.semantic import current_person
+            from cursiv_engine.memory.semantic import current_person
             dlg = FieldNotebookDialog(self, observer=current_person().title())
             if photos:
                 dlg.add_photos(photos)

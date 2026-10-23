@@ -35,17 +35,17 @@ attempts = []
 def hook(event, args):
     if event in ("socket.connect", "socket.getaddrinfo"):
         host = args[1][0] if event == "socket.connect" and isinstance(args[1], tuple) else (args[0] if args else None)
-        from cursiv_v215.core import netgate
+        from cursiv_engine.core import netgate
         if not netgate.is_local(host):
             attempts.append(f"{event} {host}")
             raise ConnectionRefusedError("demo: no internet")
 sys.addaudithook(hook)
 
-from cursiv_v215.core import netgate
+from cursiv_engine.core import netgate
 netgate.set_offline(True)
 import chat_commands as cc
-from cursiv_v215.ui import chat_app as ca
-from cursiv_v215.memory import semantic as sem
+from cursiv_engine.ui import chat_app as ca
+from cursiv_engine.memory import semantic as sem
 
 cfg = cc._default_cfg()
 
@@ -102,7 +102,7 @@ def main() -> int:
     scratch = Path(tempfile.mkdtemp(prefix="cursiv_offline_"))
     steps, attempts, model = [], [], "?"
     try:
-        for part in ("cursiv_v215", "launcher"):
+        for part in ("cursiv_engine", "launcher"):
             shutil.copytree(REPO / part, scratch / "app" / part, ignore=shutil.ignore_patterns("__pycache__", ".cursiv"))
         (scratch / "home").mkdir()
         env = {**os.environ, "USERPROFILE": str(scratch / "home"), "HOME": str(scratch / "home"),

@@ -8,7 +8,7 @@ Public-key SHA-256 fingerprint:
 
 `f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7`
 
-The only repository key file is public: `cursiv_v215/core/release_public_key.json`.
+The only repository key file is public: `cursiv_engine/core/release_public_key.json`.
 The private seed is protected with Windows DPAPI for the owner's current Windows
 account, at `%LOCALAPPDATA%/CursivReleaseSigning/owner-release-key.dpapi`.
 It is outside GitHub and OneDrive and is not installed with Cursiv. Workspace file

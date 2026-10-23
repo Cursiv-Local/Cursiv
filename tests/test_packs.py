@@ -2,7 +2,7 @@
 Cursiv to ship, found by everyday wording, and not pulled into unrelated questions."""
 import pytest
 
-from cursiv_v215.core import reference as ref
+from cursiv_engine.core import reference as ref
 
 
 def test_every_pack_entry_has_its_sourcing():

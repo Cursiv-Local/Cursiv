@@ -1,7 +1,7 @@
 """
 "Receive from a phone over Wi-Fi": shows the address and code a phone types in its browser,
 and what arrived. The laptop answers on the local network only while this window is open.
-All the receiving is in cursiv_v215/core/phone_receive.py.
+All the receiving is in cursiv_engine/core/phone_receive.py.
 """
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtWidgets import QDialog, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton, QVBoxLayout
 
 import theme
-from cursiv_v215.core import phone_receive
+from cursiv_engine.core import phone_receive
 
 
 class _Signals(QObject):

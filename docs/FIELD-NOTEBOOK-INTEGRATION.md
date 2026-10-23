@@ -9,7 +9,7 @@ the earlier notebook patch and remain its historical evidence.
 
 ## Read-only audit and root cause
 
-The native backend is `cursiv_v215/core/fieldlog.py`. Confirmed callable APIs:
+The native backend is `cursiv_engine/core/fieldlog.py`. Confirmed callable APIs:
 
 - `add(**fields)`: returns an actual observation dict after append, flush and fsync.
 - `entries()` / `current()`: load all records / the current view after corrections.

@@ -18,7 +18,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 
 REPO = Path(__file__).resolve().parent.parent
 NODE = shutil.which("node")
@@ -294,7 +294,7 @@ _attempts: list | None = None
 def _watch(event, args):
     if _attempts is None:
         return
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     if event in ("socket.connect", "socket.sendto"):
         host = args[1][0] if len(args) > 1 and isinstance(args[1], tuple) else None
     elif event in ("socket.getaddrinfo", "socket.gethostbyname"):
@@ -312,7 +312,7 @@ _sys.addaudithook(_watch)
 def test_receive_import_and_export_work_offline_without_reaching_anything(phone, laptop, monkeypatch):
     global _attempts
     import http.client
-    from cursiv_v215.core import netgate, phone_receive
+    from cursiv_engine.core import netgate, phone_receive
     monkeypatch.setattr(netgate, "CONFIG_FILE", laptop / "app" / "config.json")
     netgate.set_offline(True)
     assert not netgate.allowed()

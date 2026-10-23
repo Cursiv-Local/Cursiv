@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from cursiv_v215.core import file_access as fs, turn_policy as tp
+from cursiv_engine.core import file_access as fs, turn_policy as tp
 
 
 @pytest.mark.parametrize('text', [
@@ -41,8 +41,8 @@ def test_file_remember_never_saves_memory_after_a_failed_file_operation(tmp_path
 
 @pytest.fixture
 def pipeline(monkeypatch):
-    from cursiv_v215.ui import chat_app as ca
-    from cursiv_v215.core import netgate, phases, speed, reference, documents
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.core import netgate, phases, speed, reference, documents
     from test_netgate import _local_model
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, '_classify_message', lambda _: 'chat')
@@ -80,7 +80,7 @@ def test_model_cannot_spoof_source_labels_with_case_or_markdown(pipeline, prefix
 
 
 def test_reviewer_does_not_receive_recalled_memory_withheld_from_the_draft(pipeline, monkeypatch):
-    from cursiv_v215.core import speed
+    from cursiv_engine.core import speed
     monkeypatch.setattr(speed, 'battery_saver', lambda: False)
     def inner(**kw):
         pipeline._set_answered('test local model')
@@ -96,7 +96,7 @@ def test_reviewer_does_not_receive_recalled_memory_withheld_from_the_draft(pipel
 
 @pytest.mark.parametrize('error', [PermissionError, ValueError])
 def test_unreadable_dated_recall_is_application_authored(monkeypatch, error):
-    from cursiv_v215.memory import intents, semantic
+    from cursiv_engine.memory import intents, semantic
     def denied():
         raise error('Unreadable store')
     monkeypatch.setattr(semantic, '_read_facts', denied)
@@ -107,8 +107,8 @@ def test_unreadable_dated_recall_is_application_authored(monkeypatch, error):
 
 @pytest.mark.parametrize('provider', ['claude', 'openai', 'xai', 'gemini', 'groq'])
 def test_explicit_crosscheck_has_a_small_output_budget(monkeypatch, provider):
-    from cursiv_v215.core import crosscheck
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.core import crosscheck
+    from cursiv_engine.ui import chat_app as ca
     seen = []
     def call(*args, **kw):
         seen.append(kw.get('max_tokens', args[-1] if len(args) > 2 else None))
@@ -122,7 +122,7 @@ def test_explicit_crosscheck_has_a_small_output_budget(monkeypatch, provider):
 
 @pytest.mark.parametrize('provider', ['claude', 'openai'])
 def test_provider_payload_receives_explicit_review_cap(monkeypatch, provider):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     from test_verified_filesystem import Response
     seen = []
     def request(req, **kw):
@@ -137,7 +137,7 @@ def test_provider_payload_receives_explicit_review_cap(monkeypatch, provider):
 
 @pytest.mark.parametrize('provider', ['claude', 'openai'])
 def test_normal_chat_provider_budgets_remain_unchanged(monkeypatch, provider):
-    from cursiv_v215.ui import chat_app as ca
+    from cursiv_engine.ui import chat_app as ca
     from test_verified_filesystem import Response
     seen = []
     def request(req, **kw):

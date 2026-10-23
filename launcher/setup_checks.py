@@ -29,7 +29,7 @@ def installed_models(runtime: SetupRuntime) -> list[str]:
 
 def _engine_env(runtime: SetupRuntime):
     try:
-        from cursiv_v215.core import speed
+        from cursiv_engine.core import speed
         return speed.ollama_env()          # flash attention + compact cache for this server
     except Exception:
         return None

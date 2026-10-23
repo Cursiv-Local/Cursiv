@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 
-from cursiv_v215.core import devicekey, fieldlog, fieldsync
+from cursiv_engine.core import devicekey, fieldlog, fieldsync
 
 REPO = Path(__file__).resolve().parent.parent
 NODE = shutil.which("node")
@@ -176,7 +176,7 @@ def test_a_zip_without_the_phone_header_is_not_a_phone_file(laptop):
 
 def test_the_phones_zip_sent_over_wifi_imports(laptop):
     import http.client
-    from cursiv_v215.core import phone_receive
+    from cursiv_engine.core import phone_receive
     out, device = _phone(laptop, zip=True)
     r = phone_receive.Receiver(port=0)
     r.start()

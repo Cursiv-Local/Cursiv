@@ -3,7 +3,7 @@ import math
 
 import pytest
 
-from cursiv_v215.core import calc, fieldcalc as fc
+from cursiv_engine.core import calc, fieldcalc as fc
 
 
 @pytest.mark.parametrize("value, src, dst, want", [

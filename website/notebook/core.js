@@ -1,5 +1,5 @@
 // Cursiv phone notebook: the log itself, identical in format to the laptop's field log
-// (cursiv_v215/core/fieldlog.py) so Cursiv imports it through the same checks as a
+// (cursiv_engine/core/fieldlog.py) so Cursiv imports it through the same checks as a
 // laptop's USB share (core/fieldsync.py): append-only entries, each chained to the one
 // before by SHA-256, photos named by their SHA-256, and a signed head (core/devicekey.py).
 //
@@ -11,7 +11,7 @@ export const GENESIS = "genesis";
 export const HEAD_FORMAT = "cursiv-head-1";
 export const BUNDLE_FORMAT = "cursiv-phone-bundle-1";
 export const APP_VERSION = "phone-notebook-1";
-export const SCHEMA = 1;          // the same record schema as cursiv_v215/core/fieldlog.py
+export const SCHEMA = 1;          // the same record schema as cursiv_engine/core/fieldlog.py
 
 // ── canonical JSON: the same bytes as Python's
 //    json.dumps(obj, sort_keys=True, ensure_ascii=False, separators=(",", ":"))

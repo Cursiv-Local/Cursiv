@@ -6,7 +6,7 @@ import re
 import subprocess
 import tempfile
 import urllib.request
-from cursiv_v215.core import release_identity
+from cursiv_engine.core import release_identity
 
 RELEASES = 'https://github.com/Cursiv-Local/Cursiv/releases'
 # Populate only from the owner's independently verified signing certificate.
@@ -67,7 +67,7 @@ def verify_installer(path, *, trusted=None):
 
 
 def _get_manifest(tag):
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     if not netgate.allowed():
         raise netgate.NetworkBlocked(netgate.OFFLINE_MESSAGE)
     req = urllib.request.Request(f'{RELEASES}/download/v{tag}/owner-release.json', headers={'User-Agent': 'Cursiv-Launcher'})
@@ -79,7 +79,7 @@ def _get_manifest(tag):
 
 
 def download(url, tag, size, progress):
-    from cursiv_v215.core import netgate
+    from cursiv_engine.core import netgate
     version(tag)
     permitted = {f'{RELEASES}/download/v{tag}/{name}' for name in
                  (f'Cursiv-Setup-{tag}.exe', 'Cursiv-Setup-latest.exe')}

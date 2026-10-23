@@ -6,7 +6,7 @@ Status: **plan, awaiting approval.** Baseline recorded as tag `ui-baseline-2026-
 
 - **PyQt6** desktop app, packaged with PyInstaller (`launcher/build.spec`) into `Cursiv.exe`.
 - Entry: `launcher/main.py` → single-instance lock → login (`login_dialog.py`, which creates the first account) → `CursivLauncher` (`launcher/cursiv_launcher.py`), a frameless `QMainWindow`.
-- **Talking to the backend:** `chat_panel.py` loads `chat_commands.py` on a background thread. Each message goes first to `chat_commands.handle_command()` (built-in commands such as `help` and `offline on`); otherwise to `cursiv_v215.ui.chat_app.chat()`, which streams text chunks. Results reach the window through Qt signals. Special chunks: `WRITE_SENTINEL` (a file write the person must approve), `REPLACE_SENTINEL` (a checked answer replaces its draft), image paths.
+- **Talking to the backend:** `chat_panel.py` loads `chat_commands.py` on a background thread. Each message goes first to `chat_commands.handle_command()` (built-in commands such as `help` and `offline on`); otherwise to `cursiv_engine.ui.chat_app.chat()`, which streams text chunks. Results reach the window through Qt signals. Special chunks: `WRITE_SENTINEL` (a file write the person must approve), `REPLACE_SENTINEL` (a checked answer replaces its draft), image paths.
 - No web view and no local server; everything is native Qt widgets.
 
 ## 2. Current interface map

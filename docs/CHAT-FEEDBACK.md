@@ -128,15 +128,15 @@ USB removal, current Mac packaging or live-model tone validation.
 
 Production:
 
-- `cursiv_v215/core/feedback.py` (new factual presentation helpers/voice)
-- `cursiv_v215/chat/review.py`, `launcher/chat_review.py`
+- `cursiv_engine/core/feedback.py` (new factual presentation helpers/voice)
+- `cursiv_engine/chat/review.py`, `launcher/chat_review.py`
 - `launcher/chat_feedback.py` (new UI feedback mixin)
 - `launcher/chat_controls.py`, `launcher/chat_panel.py`
-- `cursiv_v215/chat/conversation.py`, `cursiv_v215/codex/system_prompt.md`
-- `cursiv_v215/core/turn_policy.py`
-- `cursiv_v215/memory/intents.py`, `cursiv_v215/memory/recall.py`
-- `cursiv_v215/core/notebook_tools.py`, `launcher/field_notebook.py`
-- `cursiv_v215/core/fieldsync.py`, `cursiv_v215/core/phone_receive.py`,
+- `cursiv_engine/chat/conversation.py`, `cursiv_engine/codex/system_prompt.md`
+- `cursiv_engine/core/turn_policy.py`
+- `cursiv_engine/memory/intents.py`, `cursiv_engine/memory/recall.py`
+- `cursiv_engine/core/notebook_tools.py`, `launcher/field_notebook.py`
+- `cursiv_engine/core/fieldsync.py`, `cursiv_engine/core/phone_receive.py`,
   `launcher/phone_receive_dialog.py`
 
 Checks: new `tests/test_chat_feedback.py`; updated

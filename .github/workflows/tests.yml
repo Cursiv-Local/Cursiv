@@ -39,4 +39,4 @@ jobs:
           python-version: "3.13"
       - run: python -m pip install pip-audit==2.10.1 bandit==1.9.4
       - run: python -m pip_audit -r requirements-release.lock --no-deps --disable-pip
-      - run: python -m bandit -r cursiv_v215 launcher -lll -iii
+      - run: python -m bandit -r cursiv_engine launcher -lll -iii
