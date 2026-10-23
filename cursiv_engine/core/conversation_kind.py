@@ -7,6 +7,8 @@ from .turn_policy import task_text
 
 def reflective(text: str) -> bool:
     return bool(re.search(r'(?i)\b(?:philosoph\w*|conscious\w*|self.aware\w*|point of view|'
+                          r'metaethic\w*|morality|moral (?:truth|realism|anti.realism)|normative|'
+                          r'utilitarianism|deontology|virtue ethics|free[ -]will|aesthetic\w*|'
                           r'honesty|following a rule|explore identity|sense of self|what .{0,25}knowing.{0,15}means|'
                           r'knowledge.{0,35}(?:network|local)|(?:system|computer).{0,100}said to.{0,15}know)\b', text))
 

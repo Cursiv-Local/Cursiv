@@ -35,8 +35,14 @@ def _post_json(runtime: ChatRuntime, url: str, payload: dict, headers: dict, tim
 def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]:
     """Compact persona + newest turns that fit `budget` characters (core/speed.py)."""
     from cursiv_engine.core import speed
-    return speed.slim_messages(runtime._text_messages(messages), budget, runtime._FULL_PERSONA,
-                               speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))
+    from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
+    source = [m for m in runtime._text_messages(messages)
+              if not (m.get('role') == 'system' and m.get('content') == INSTRUCTIONS)]
+    result = speed.slim_messages(source, max(0, budget - len(INSTRUCTIONS)),
+                                 runtime._FULL_PERSONA, speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))
+    result.insert(1 if result and result[0].get('role') == 'system' else 0,
+                  dict(role='system', content=INSTRUCTIONS))
+    return result
 
 def _call_gemini_direct(runtime: ChatRuntime, messages: list[dict], key: str, max_tokens: int) -> Generator[str, None, None]:
     msgs = runtime._slim(messages, runtime.GEMINI_BUDGET)
