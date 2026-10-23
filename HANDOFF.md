@@ -1,9 +1,10 @@
 # Handoff — Cursiv verification overhaul
 
-## Unreleased engine/storage cleanup (2026-10-23)
+## U90 engine/storage cleanup (2026-10-23)
 
-Work is on `codex/engine-storage-cleanup`; no push, installer bump, publication or
-website deployment is part of this task. U89 remains the published baseline.
+Work is on `codex/engine-storage-cleanup`. The owner subsequently authorized
+commit, push, website publication and an installer release as U90. Publication
+results will be recorded after the release checks complete.
 The original personal `test_internals/` file is unchanged and untracked.
 
 - Mechanical rename to `cursiv_engine` is complete across tracked imports, build/CI,

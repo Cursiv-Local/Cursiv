@@ -209,31 +209,29 @@ test('additive schema preserves existing website records and original API/static
   assert.equal(await (await worker.fetch(request('/admin/downloads', { method: 'HEAD' }), env)).text(), '');
 });
 
-async function browserScript({ data = { available: true, total: 1234, status: 'fresh', updated_at: 'date' }, reject = false, privacy = {}, counters = true } = {}) {
-  const calls = [], listeners = {}, counter = { textContent: 'fallback' };
-  const context = { document: { querySelectorAll: () => counters ? [counter] : [], addEventListener: (name, fn) => { listeners[name] = fn; } },
-    navigator: privacy, AbortController, setTimeout, clearTimeout, Intl, Number,
-    fetch: (url, options) => { calls.push({ url, options }); return reject ? Promise.reject(new Error('offline')) : Promise.resolve(response(data)); } };
+async function browserScript({ privacy = {} } = {}) {
+  const calls = [], listeners = {};
+  const context = { document: { addEventListener: (name, fn) => { listeners[name] = fn; } },
+    navigator: privacy,
+    fetch: (url, options) => { calls.push({ url, options }); return Promise.resolve(response({})); } };
   vm.runInNewContext(readFileSync(new URL('../../website/assets/download-stats.js', import.meta.url), 'utf8'), context);
   await new Promise(resolve => setImmediate(resolve));
-  return { calls, listeners, counter };
+  return { calls, listeners };
 }
 
-test('public counter renders real totals or honest unavailable/stale text without storage', async () => {
-  assert.match((await browserScript()).counter.textContent, /1,234 versioned installer/);
-  assert.match((await browserScript({ data: { available: true, total: 0, status: 'unavailable' } })).counter.textContent, /0 versioned.*cached/);
-  for (const options of [{ reject: true }, { data: { available: false, total: null } }, { data: { available: true, total: 'invented' } }]) assert.match((await browserScript(options)).counter.textContent, /temporarily unavailable/);
+test('public download script makes no automatic statistics request', async () => {
+  assert.equal((await browserScript()).calls.length, 0);
 });
 
 test('button recording never cancels navigation, distinguishes real buttons, and respects GPC/DNT', async () => {
-  const browser = await browserScript({ counters: false });
+  const browser = await browserScript();
   const event = (button, type = 'click') => ({ type, button, target: { closest: () => ({ dataset: { downloadButton: 'windows' } }) }, preventDefault() { assert.fail('Downloads must not be blocked'); } });
   browser.listeners.click(event(0)); browser.listeners.auxclick(event(1, 'auxclick')); browser.listeners.click(event(2));
   assert.equal(browser.calls.length, 2);
   assert.deepEqual(JSON.parse(browser.calls[0].options.body), { button: 'windows' });
   assert.equal(browser.calls[0].options.keepalive, true); assert.equal(browser.calls[0].options.credentials, 'omit');
   for (const privacy of [{ doNotTrack: '1' }, { globalPrivacyControl: true }]) {
-    const disabled = await browserScript({ counters: false, privacy }); disabled.listeners.click(event(0)); assert.equal(disabled.calls.length, 0);
+    const disabled = await browserScript({ privacy }); disabled.listeners.click(event(0)); assert.equal(disabled.calls.length, 0);
   }
 });
 
@@ -242,7 +240,7 @@ test('build output retains SEO, canonical installer URLs, privacy disclosure and
   assert(existsSync(path), 'Build first: node cloudflare/publish.mjs --build-only');
   for (const page of ['index.html', 'start.html']) {
     const html = readFileSync(new URL('../dist/' + page, import.meta.url), 'utf8');
-    assert.match(html, /data-download-count/); assert.match(html, /<link rel="canonical" href="https:\/\/cursiv.us\//);
+    assert.doesNotMatch(html, /data-download-count|GitHub download count temporarily unavailable|Versioned (?:assets|installers) only/); assert.match(html, /<link rel="canonical" href="https:\/\/cursiv.us\//);
     assert.match(html, /download-stats.js/);
   }
   const start = readFileSync(new URL('../dist/start.html', import.meta.url), 'utf8');

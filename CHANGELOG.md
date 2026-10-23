@@ -1,6 +1,13 @@
 # Changelog
 
-## Unreleased — engine and local storage maintenance
+## 3.14-U90 — engine and local storage maintenance (2026-10-23)
+
+- Removed the public website download counter, its unavailable message and counting
+  explanation from the homepage and download page. Public pages no longer request
+  GitHub totals; installer links and private statistics remain unchanged.
+
+- Simplified README into a short user guide; moved feature controls, portable/phone
+  setup, release procedures, benchmark context and historical evidence links to TECH.md.
 
 - Renamed the engine package to `cursiv_engine` throughout imports, build/CI,
   tests and documentation. Persistent data folders and record formats are unchanged.
@@ -10,7 +17,7 @@
   resumable state and an OS data lease. Notebook data, workspace/documents, logs
   and explicit exports/training data remain outside coverage.
 - Updated privacy, threat-model and data-location guidance. No owner data was
-  migrated; no installer version was bumped and no release/site was published.
+  migrated. U90 prepares these changes for an owner-authenticated installer release.
 - Consolidated command results/runtime types in one engine API while retaining
   the chat facade's class identities and command order. Moved personal dialogs
   out of the main chat panel; letter/vault commands and shortcuts now respect

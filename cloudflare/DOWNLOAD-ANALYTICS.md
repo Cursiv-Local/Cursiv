@@ -3,6 +3,17 @@
 Prepared October 21, 2026. **Not deployed automatically.** Desktop application
 code, installer, updater and existing user records are outside this task.
 
+## Current public display (October 23, 2026)
+
+The public download counter and counting explanation have been removed from the
+homepage and download page after the deployed endpoint returned unavailable.
+Those pages no longer request `/api/downloads`. Download links, optional anonymous
+button-click recording, the existing backend and authenticated admin page remain.
+This removal is a source change and requires publication to reach the live site;
+it does not resolve the admin/backend availability issue. No production data was
+deleted. The implementation and original audit notes below describe the retained
+backend; earlier public-counter checks are historical.
+
 ## Architecture inspected before implementation
 
 The repository uses Cloudflare **Workers with static assets**, not Pages:
@@ -35,7 +46,7 @@ The owner explicitly selected **exclude duplicate latest copies**:
    if the copy's download count is larger. An alias-only legacy release is counted
    when it has no versioned installer for that platform.
 3. Count each asset ID once. Within a release, exclude duplicate SHA-256/platform
-   copies and duplicate names. Never add excluded assets to the public total.
+   copies and duplicate names. Never add excluded assets to the selected total.
 4. Exclude source zip/tar archives (including GitHub's automatically generated
    archives), checksum files, debug/unuploaded assets and unrelated files.
 5. Include published prereleases in history, marked as such. Ignore drafts.
@@ -45,9 +56,8 @@ The owner explicitly selected **exclude duplicate latest copies**:
 
 This is a deliberately partial **versioned-installer** metric, not all requests
 to every duplicate URL. The existing website/updater “latest” links continue to
-work; requests to those excluded copies do **not** increase the public count when
-the versioned installer exists. That exclusion is visible beside the counter and
-in admin. It avoids inflating the chosen metric without inventing a way to deduce
+work; requests to those excluded copies do **not** increase the selected count when
+the versioned installer exists. That exclusion is visible in admin. It avoids inflating the chosen metric without inventing a way to deduce
 unique people from GitHub's counts.
 
 GitHub counts do not prove completed transfers or installations. Deleted releases
@@ -62,8 +72,8 @@ assets**, **10 counted downloads**, and **105 requests to excluded duplicate
 copies**. The latest stable release was `v3.14-U79`, with **0 counted versioned
 installer downloads**. These low counts follow the owner's exclusion rule; they
 are not zeros substituted for failure. This snapshot is documentation only:
-no number, release tag or date is hardcoded into the website counter. Future
-GitHub refreshes determine the actual displayed values.
+no number, release tag or date was hardcoded into the former website counter.
+GitHub refreshes determine the values available to the retained admin view.
 
 The published homepage was separately fetched successfully (HTTP 200) before
 changes. These checks do not claim the new feature is deployed.
@@ -87,8 +97,8 @@ changes. These checks do not claim the new feature is deployed.
 - Last-known data up to seven days old is shown as **cached**, with its actual last
   successful refresh time. Older/unavailable data returns an unavailable state,
   not a fabricated zero. Missing D1 migration also degrades to unavailable.
-- The small client request has an eight-second timeout and a plain fallback. It
-  never controls an installer link or prevents clicking a download.
+- Public download pages make no statistics request. Installer links work
+  independently of statistics availability; click recording never blocks navigation.
 
 ## Authentication and privacy
 
@@ -153,10 +163,10 @@ Website/deployment:
 - `cloudflare/wrangler.toml` — explicit click enable switch and secret setup note.
 - `cloudflare/publish.mjs` — robots exclusion; preserve the upload allowlist,
   domains, asset configuration and existing sitemap entries.
-- `website/assets/download-stats.js` — public counter and anonymous click events.
+- `website/assets/download-stats.js` — anonymous click events; public counter removed.
 - `website/assets/download-admin.js`, `website/assets/download-admin.css` — private
   view rendering/responsiveness using existing site styles.
-- `website/index.html`, `website/start.html` — small counters; installer links use
+- `website/index.html`, `website/start.html` — counters removed; installer links use
   the current GitHub organization and preserve latest-asset functionality. The
   subsequent homepage copy rewrite uses direct, tagged installer calls to action.
 - `website/privacy/index.html` — accurate feature disclosure and policy date.
@@ -240,9 +250,9 @@ Final results:
    node publish.mjs
    ```
 
-5. Check `/api/downloads` returns a real number or an honest unavailable state;
-   `/` and `/start` show the counter without altering their content/SEO; Windows
-   and Mac buttons still lead to the existing installers. A first cold refresh may
+5. Check `/` and `/start` no longer show a counter or unavailable message and
+   make no request to `/api/downloads`; Windows and Mac buttons still lead to the
+   existing installers. Check backend availability separately through admin. A first cold refresh may
    take longer than a cached request. Do not test download completion by clicking
    repeatedly to inflate the count.
 6. In a private browser, open `/admin/downloads/`. Confirm missing/wrong credentials

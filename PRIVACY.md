@@ -64,8 +64,8 @@ pass, 0 attempts). `scripts/net_audit.py` logs every connection a fresh install 
 - Cursiv's login keeps people at your keyboard out. It is not encryption. Conversation
   and memory encryption is **optional and off by default** in the current source.
   An explicit, app-closed migration uses a separate passphrase; see
-  [encryption scope and recovery](docs/ENCRYPTION-MIGRATION-PLAN.md). U89 installers
-  do not include this unreleased option. Saved AI keys use separate protection
+  [encryption scope and recovery](docs/ENCRYPTION-MIGRATION-PLAN.md). This option is available from U90;
+  older installers do not include it. Saved AI keys use separate protection
   (encrypted for your Windows account, or kept in the macOS Keychain).
   Portable copies deliberately keep usable keys readable; legacy keys or a
   platform-protection failure can also leave plaintext. The

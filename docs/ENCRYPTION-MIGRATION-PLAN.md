@@ -1,7 +1,6 @@
 # Optional conversation and memory encryption
 
-**Status:** implemented in current source, off by default; not included in published
-U89. Development used disposable records. The owner's actual data was not migrated.
+**Status:** included from U90, off by default; not included in U89. Development used disposable records. The owner's actual data was not migrated.
 This replaces the earlier design-only plan, following explicit owner authorization.
 
 ## Enable, unlock and keep a recovery copy

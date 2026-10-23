@@ -84,7 +84,7 @@ inventories that active location too. These paths do not depend on the package n
 
 Nothing in these folders is part of the repository or the installer. On a **Cursiv USB** (`launcher/usb_maker.py`), `launcher/portable.py` points the home folder, the models and Ollama at the drive at startup, so everything stays on the drive.
 
-### Optional conversation and memory encryption (unreleased source)
+### Optional conversation and memory encryption
 
 Off by default. Close Cursiv, then run `python launcher/main.py --encrypt-data`
 from source, or `Cursiv.exe --encrypt-data` after packaging this source. On macOS
@@ -130,43 +130,169 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 ---
 
+## Feature behavior and controls
+
+| Area | Behavior and deeper documentation |
+|---|---|
+| Field notebook | Original measurements are preserved; corrections append a new record with a reason. SHA-256 chains detect changed/reordered records, and signed exports identify the signing device. CSV, JSON, GeoJSON and printable reports are supported. Camera time/GPS are retained when available; the app does not provide live GPS. [Notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), [verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md). |
+| Documents | Imported protocols/SOPs can supply page references. Document-only mode declines uncovered questions, with the documented emergency exception. [Claim evidence](docs/CLAIM-EVIDENCE.md). |
+| Calculations | Code handles units, coordinates/UTM, distance/bearing, dilutions, statistics, rates/durations, bleach doses and the lightning waiting rule. A matching native calculation has an application-owned receipt; this is not medical certification. [Native boundaries](docs/NATIVE-TRUST-BOUNDARIES.md). |
+| Team sharing | Signed notebook chains move by USB/shared folder. Imports retain separate device chains and report conflicts rather than overwriting observations. [Phone notebook and transfer](docs/PHONE-NOTEBOOK.md). |
+| Personal features | Settings → Appearance → Show personal features exposes older letters/vault, council, coding and builder tools. Current source also gates typed letter/vault commands and dialog shortcuts; it retains existing data/backends. [Ownership map](ARCHITECTURE.md). |
+
+### Memory, permissions and conversation history
+
+`remember <fact>` saves an explicit fact. `memory learn on / off` controls automatic
+selection of lasting facts; it does not retrain the model. `memory status` reports
+stored-record/learning state. Dated recall, such as “what do you remember from the
+past two weeks”, reports selected stored facts and IDs. Dates describe when facts
+were saved, not necessarily when events happened. `save this` keeps a saved note.
+
+Turn limits and conversation autosave are separate. “Don't save memories” blocks
+memory formation for that turn; it does not disable the existing conversation-save
+setting. Talk-only turns block tools; read-only turns allow authorized reads while
+blocking writes. A configured workspace or enabled file flag does not establish
+that a particular file operation succeeded. Native receipts establish execution;
+model descriptions do not. [Grounded memory](docs/GROUNDED-CHAT-REPAIR.md),
+[restricted-turn fixes](docs/U82-RESTRICTED-TURN-REPAIR.md),
+[workspace follow-up](docs/LIVE-TRANSCRIPT-GAPS.md).
+
+### Answer review and source labels
+
+| Command | Optional local-model review |
+|---|---|
+| `check off` | Disabled; deterministic code checks remain active. |
+| `check fast` | Default: ordinary turns skip model review; eligible turns can receive a short follow-up review. |
+| `check full` | Bounded review, with a constrained rewrite/recheck when warranted. |
+
+The draft finishes before deferred review. Progress indicates an actual reviewer
+call; a missing/failed check cannot establish verification. Source labels describe
+application-supplied references, documents, calculations, memory context or confirmed
+execution. A memory-context label does not establish that the model used or verified
+that fact. [Review policy](docs/VERIFICATION-POLICY.md),
+[timing/cancellation](docs/ASYNC-ANSWER-REVIEW.md),
+[feedback and receipts](docs/CHAT-FEEDBACK.md),
+[rendering measurements](docs/CHAT-RENDERING-PERFORMANCE.md),
+[source boundaries](docs/TRUST-BOUNDARY-FOLLOWUP.md).
+
+### Phone and portable use
+
+**Phone notebook:** open [cursiv.us/notebook](https://cursiv.us/notebook) online
+once before offline capture. Export the file, then use Field Notebook → Import or
+`field log import <file>` on the laptop. The phone notebook has no AI chat; records
+live in browser storage and can be cleared. Export regularly. Browser checks were
+performed in desktop Chromium; real iPhone/Android testing remains separate.
+[Phone instructions and limits](docs/PHONE-NOTEBOOK.md).
+
+**Phone photo chat:** [cursiv.us/app](https://cursiv.us/app) is a separate online
+photo/text chat page. It uses the website's AI providers and requires internet.
+Device linking can share conversations with the desktop. It is not the offline
+capture notebook. [Website privacy policy](https://cursiv.us/privacy/).
+
+**Windows USB/SSD:** choose Make a Cursiv USB… from the tray menu. It copies the
+app, Ollama and selected installed models. Run Start Cursiv from the drive on
+another Windows PC. A complete kit can be about 30 GB depending on models; the
+existing guidance is a USB 3 drive/SSD of at least 64 GB, formatted as exFAT.
+Fresh kits omit private records/keys/settings. Explicitly including them can copy
+readable API keys for use on other PCs. Optional encrypted conversation/memory
+stores in current source remain encrypted and require their passphrase; the
+remaining private data follows its existing storage rules.
+
+The owner reported basic physical USB operation working on 2026-10-22. Memory
+persistence across PCs and the new encrypted USB option still need physical testing;
+source tests and temporary-drive relocation are not substitutes.
+[Field-kit checklist](docs/FIELD-KIT-TEST.md),
+[focused persistence check](docs/USB-PERSISTENCE-CHECK.md).
+
+**Early Mac build:** download the Apple Silicon DMG and drag Cursiv into
+Applications. Setup can install Ollama and download a model. Apple signing/
+notarization is pending; after verifying the download, macOS may require
+System Settings → Privacy & Security → Open Anyway. Hosted Mac source/package
+checks are recorded per release, separately from real-user and minimum-OS testing.
+The USB edition is Windows-only. [Platform readiness](docs/PLATFORM-READINESS.md).
+
+### Sample-data demo
+
+`demo` loads a labeled sample stream survey and protocol, apart from the user's
+notebook/documents. `demo off` restores the normal records. The demo is a workflow
+example, not evidence that a research team has used Cursiv in the field.
+[Walkthrough](docs/FIELD-DEMO.md), [offline demonstration](OFFLINE-DEMO.md).
+
+---
+
 ## Build the installer
 
-You need PyInstaller (in `requirements.txt`) and [Inno Setup 6](https://jrsoftware.org/isdl.php).
+Use Python 3.13 and a clean virtual environment with the hash-locked
+`requirements-release.lock`. PyInstaller is included; Windows installer creation
+also requires [Inno Setup 6](https://jrsoftware.org/isdl.php).
 
-1. Bump `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`), `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and `cursiv_engine/core/selfknow.py` (`VERSION`) together, using an unused higher suffix such as `3.14-U85`.
-2. Run the regression checks in isolated data, commit reviewed source and tag that exact commit. Use a clean environment containing only `requirements.txt`; retain the exact dependency list.
-3. Run `py -3.13 scripts/build_release.py v3.14-U85`, substituting the new tag for a future release. It builds a temporary tagged checkout, requires the frozen full-window self-test, compiles Inno Setup and stages identical versioned/latest installers plus SHA-256 checksums in `installer/Output/`.
+1. Update the version together in `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`),
+   `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and
+   `cursiv_engine/core/selfknow.py` (`VERSION`). Choose an unused higher version.
+2. Pass isolated regression checks, review the diff, then commit/tag the reviewed
+   source with owner authorization.
+3. Run `scripts/build_release.py` with that exact tag as its only argument. It
+   builds a clean temporary checkout, requires the frozen app self-test, compiles
+   Inno Setup and stages identical versioned/latest installers, checksums and
+   provenance in `installer/Output/`.
 
-Working-tree build scripts remain useful for development, but the release
-builder uses the tag so unrelated or uncommitted files cannot enter an installer.
-See [U85 verification](docs/U85-RELEASE-VERIFICATION.md) for actual source,
-package, hosted CI, model benchmark and public-download evidence.
+Use the helper's sanitized child environment: inherited editor/tool DLL paths can
+shadow Windows/Qt libraries. Working-tree builds are for development. Historical
+tags can predate the package rename; the helper discovers their unique engine
+version file and builds their own specification/source without changing the tag.
+[Build and artifact evidence](docs/U89-RELEASE-VERIFICATION.md).
 
 ## Release an update
 
-The updater reads `https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`.
-It requires a higher version and online checks to be allowed. A source push alone
-does not update installed copies. Prepare the release as a draft:
+A Git push does not update installed copies. The updater reads
+`https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest`, requires a
+higher version and respects offline mode.
 
-```bash
-gh release create v3.14-U85 installer/Output/Cursiv-Setup-3.14-U85.exe installer/Output/Cursiv-Setup-latest.exe installer/Output/SHA256SUMS.txt --title "Cursiv v3.14-U85" --notes-file docs/RELEASE-U85.md --draft --verify-tag --repo Cursiv-Local/Cursiv
-```
+Prepare a draft release with the exact tagged artifacts. Windows needs the
+versioned installer, its identical `Cursiv-Setup-latest.exe` alias,
+`SHA256SUMS.txt` and provenance. The Mac workflow supplies the tagged DMG,
+`Cursiv-mac-latest.dmg`, checksums and provenance. Stable download links are
+filename-exact; keep both versioned and stable names.
 
-Upload the same installer twice: once with its version name and once as `Cursiv-Setup-latest.exe`. The README's download button and the website link to `releases/latest/download/Cursiv-Setup-latest.exe`; asset links are filename-exact, so without the stable name every download button breaks on the next release.
+Follow [owner release authentication](docs/OWNER-RELEASE-SIGNING.md) to create and
+verify the independent owner-signed manifest over the final assets. Keep its
+private key outside GitHub, OneDrive and CI. Do not change public asset bytes after
+signing. Review source CI, frozen checks, independent asset hashes and the draft
+before publication. Owner signatures do not replace Windows-trusted signing or
+Apple notarization.
 
-Copy the builder's versioned checksum file to `SHA256SUMS.txt` before uploading.
-Run the existing tagged Mac workflow to attach its DMG, identical
-`Cursiv-mac-latest.dmg` alias and `SHA256SUMS-mac.txt`. Review CI, frozen checks,
-raw benchmark failures and both artifact hashes before making the draft latest.
-Publishing also triggers a Mac workflow: if the verified Mac assets are already
-attached, stop that redundant run before it rebuilds/overwrites them. Record the
-successful tagged run separately from this intentional cancellation.
+Publication can trigger a redundant Mac build; the existing workflow must not
+overwrite already owner-signed assets. Record successful tagged runs separately
+from intentional duplicate cancellations. [U89 verification](docs/U89-RELEASE-VERIFICATION.md)
+records the actual release procedure and evidence.
 
-Older immutable tags can predate the engine package rename. The release helper
-finds their unique `core/selfknow.py` version source from the tag's tree; it still
-builds the tag's own specification and source. Keep using the helper's sanitized
-build environment, which excludes editor/tool DLL paths that can shadow Qt's ICU.
+## Tests, benchmarks and release history
+
+Software regression counts and model-answer scores measure different things.
+U90 source checks are recorded in the [changelog](CHANGELOG.md);
+published U89 checks belong to its own verification report. Never relabel an older
+model benchmark as a score for a new release. Run the fixed suite from the actual
+new tag, retain its model/configuration and review failures before publishing a score.
+
+The historical U85 model run scored 153/158 (96.8%), below U84's 156/158. Its
+[failure review](bench/FAILURES-U85.md) includes an unsafe allergy answer missed
+by the scorer. Pattern matches do not establish medical safety. No newer full-suite
+model score is established by the software regression counts or the unscored U86
+conversation replay. [Benchmark results](bench/RESULTS.md),
+[claim-to-evidence index](docs/CLAIM-EVIDENCE.md),
+[quality checklist](docs/QUALITY-CHECKLIST.md).
+
+| Historical change | Evidence |
+|---|---|
+| U82: selected memory, dated recall, operational state | [Repair record](docs/GROUNDED-CHAT-REPAIR.md), [verification](docs/U82-RELEASE-VERIFICATION.md) |
+| U84: restricted turns, paths, source ownership, deferred review | [Verification](docs/U84-RELEASE-VERIFICATION.md), [maintenance](docs/MAINTENANCE-HARDENING.md) |
+| U85: quiet feedback, tool/notebook receipts | [Verification](docs/U85-RELEASE-VERIFICATION.md), [feedback details](docs/CHAT-FEEDBACK.md) |
+| U86: native workflow replies, field math, focused conversation | [Release notes](docs/RELEASE-U86.md), [verification](docs/U86-RELEASE-VERIFICATION.md), [live findings](docs/LIVE-TEST-FOLLOWUP.md), [conversation findings](docs/CONVERSATION-FOLLOWUP.md) |
+| U87: phone help links and tester page | [Release notes](docs/RELEASE-U87.md), [verification](docs/U87-RELEASE-VERIFICATION.md) |
+| U89: workspace routing and owner-authenticated updates | [Release notes](docs/RELEASE-U89.md), [verification](docs/U89-RELEASE-VERIFICATION.md), [engineering audit](docs/ENGINEERING-AUDIT-20261023.md) |
+
+U88 was an unpublished candidate; its immutable tag was retained. See
+[HANDOFF.md](HANDOFF.md) for release work and remaining human checks.
 
 ## Publish the website
 
@@ -175,6 +301,21 @@ node cloudflare/publish.mjs
 ```
 
 It copies the allow-listed pages from `website/` into `cloudflare/dist/` and runs `wrangler deploy`. Use `--build-only` to build without deploying.
+
+### Website architecture and analytics
+
+The existing deployment uses Cloudflare Workers with static assets and D1.
+`cloudflare/publish.mjs` builds the allowlisted files into `cloudflare/dist/`;
+`--build-only` never deploys. Analytics setup requires the additive schema and a
+separate administrator secret; do not deploy a partial migration.
+
+The public download counter has been removed. The authenticated statistics page
+retains cached GitHub installer counts, excluding duplicate latest aliases, source
+archives and unrelated files. Optional download-button
+clicks are separate anonymous aggregates, never completed downloads. GPC/Do Not
+Track are respected. `/admin/downloads/` requires authentication. Unavailable
+metadata must not become an invented zero; download links remain independent.
+[Setup, counting rules and checks](cloudflare/DOWNLOAD-ANALYTICS.md).
 
 ---
 

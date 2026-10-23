@@ -27,7 +27,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/site.css?v=u64-2">
-<script defer src="/assets/download-stats.js?v=1"></script>
+<script defer src="/assets/download-stats.js?v=2"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -50,7 +50,7 @@
       <a href="#testing">Testing</a>
       <a href="#faq">Questions</a>
       <a href="https://github.com/Cursiv-Local/Cursiv">GitHub</a>
-      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U89/Cursiv-Setup-3.14-U89.exe">Download</a>
+      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U90/Cursiv-Setup-3.14-U90.exe">Download</a>
     </nav>
   </div>
 </header>
@@ -63,12 +63,10 @@
       <h1>Cursiv: offline AI for your PC.</h1>
       <p class="lede">An AI assistant for fieldwork, research and everyday questions. Runs fully offline on your Windows PC through Ollama after setup.</p>
       <div class="cta-row">
-        <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U89/Cursiv-Setup-3.14-U89.exe">Download the latest release</a>
+        <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U90/Cursiv-Setup-3.14-U90.exe">Download the latest release</a>
         <a class="btn btn-ghost" href="/start">Setup guide</a>
       </div>
       <p class="fine">MIT license · Windows 10/11, 64-bit · Internet needed for initial downloads</p>
-      <p class="fine" data-download-count role="status">Installer download counts are provided by GitHub.</p>
-      <p class="fine">Versioned assets only; duplicate latest copies excluded. Not installs or unique people.</p>
     </div>
     <dl class="facts" aria-label="Cursiv at a glance">
       <div><dt>AI engine</dt><dd class="v" style="margin:0"><a href="https://ollama.com">Ollama</a>, running on your computer</dd></div>
@@ -105,7 +103,7 @@
       <p><a href="/ai-reliability-testing">Results, methods and failures →</a></p>
       <details class="more" id="results">
         <summary>What does the published score cover?</summary>
-        <p style="padding-bottom:14px">U89 passed 1,594 software regression tests on Windows, with one Mac-only skip. See current release checks, the historical local-model benchmark and known failures on the <a href="/ai-reliability-testing#u89">test page</a>. Test scores describe specific checks, not a general accuracy rate.</p>
+        <p style="padding-bottom:14px">U90 pre-release source passed 1,636 software regression tests on Windows, with one Mac-only skip. See current release checks, the historical local-model benchmark and known failures on the <a href="/ai-reliability-testing#u90">test page</a>. Test scores describe specific checks, not a general accuracy rate.</p>
       </details>
     </div>
     <div class="card stack" id="limitations">
@@ -125,7 +123,7 @@
       <details id="privacy"><summary>Does local storage mean encryption?</summary><p>No. Conversations and memories are stored locally but are not encrypted on disk. The local login does not replace disk encryption. Saved API keys use Windows account protection. If you use an online provider or the website phone companion, those services have separate data paths. The <a href="/privacy/">Privacy Policy</a> explains what is stored, what can leave the computer and the website's download analytics.</p></details>
       <details id="architecture"><summary>How are answers checked?</summary><p>Ollama generates a local answer. Cursiv can supply relevant reference material, saved information and results from supported calculations, then check selected claims. These checks are limited and can miss mistakes. Some reference entries still lack published sources, and none has medical-professional review. The <a href="/ai-reliability-testing">testing guide</a> explains the evidence; <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/TECH.md">technical documentation</a> covers the architecture.</p></details>
       <details><summary>Is it free? Which platforms are supported?</summary><p>Cursiv's source code is free under the MIT license. Models have their own licenses; review the terms of the model you choose. Windows is the main platform. An early Apple Silicon Mac build is on the <a href="/start">download page</a>; Linux is not yet supported. Portable USB/SSD operation is Windows-only, and broader field validation is still needed.</p></details>
-      <details><summary>Why does Windows show an unknown publisher?</summary><p>Windows publisher signing is pending; U89 release manifests are owner-signed with a separate pinned key. Cursiv is seeking open-source signing support from the SignPath Foundation. Review the source, release notes and published SHA-256 checksum before deciding to install. The <a href="/start#code-signing">download guide</a> explains signing status and setup. Public source code and a matching checksum identify a build; they do not guarantee it is free of defects.</p></details>
+      <details><summary>Why does Windows show an unknown publisher?</summary><p>Windows publisher signing is pending; Release manifests are owner-signed with a separate pinned key. Cursiv is seeking open-source signing support from the SignPath Foundation. Review the source, release notes and published SHA-256 checksum before deciding to install. The <a href="/start#code-signing">download guide</a> explains signing status and setup. Public source code and a matching checksum identify a build; they do not guarantee it is free of defects.</p></details>
       <details><summary>Can I see the app first?</summary>
         <p>These are dated examples, recorded offline on October 18, 2026 from commit <code>ec0b105</code>, rather than screenshots of the latest release. The <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/website/assets/shots/answers.json">recorded answers</a> provide context. The notebook image uses example entries. Features and broader validation status are described on the <a href="/vision#field">research page</a>.</p>
         <figure class="shot" style="margin:0 0 18px"><a href="/assets/shots/dark.png" target="_blank" rel="noopener"><img src="/assets/shots/dark.png" alt="Dated offline Cursiv chat example in dark mode" width="1475" height="1025" loading="lazy"></a></figure>
@@ -141,7 +139,7 @@
     <h2>Put Cursiv on your PC.</h2>
     <p>Download the latest Windows release. Setup guides you through Ollama and a local model.</p>
     <div class="cta-row">
-      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U89/Cursiv-Setup-3.14-U89.exe">Download the latest release</a>
+      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U90/Cursiv-Setup-3.14-U90.exe">Download the latest release</a>
       <a class="btn btn-ghost" href="/start">Installation help</a>
     </div>
     <p class="fine">Free · MIT license · Initial downloads need internet</p>
