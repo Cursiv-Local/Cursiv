@@ -21,6 +21,7 @@ const PAGES = [
   ["website/board.html", "board.html"],
   ["website/mailbox.html", "mailbox.html"],
   ["website/start.html", "start.html"],
+  ["website/testers.html", "testers.html"],
   ["website/letters.html", "letters.html"],
   ["website/story.html", "story.html"],
   ["website/open-source-offline-ai.html", "open-source-offline-ai.html"],
@@ -33,11 +34,26 @@ const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"],
 
 // The phone notebook (/notebook/) is the only page that may use the GPS and the camera;
 // everywhere else both stay off. Its service worker and files are re-checked on each visit.
+// /testers uses no scripts or external resources. no-transform also prevents
+// Cloudflare's automatic Web Analytics and email-obfuscation injection:
+// https://developers.cloudflare.com/web-analytics/faq/
 const HEADERS = `/*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), geolocation=()
+
+/testers
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
+
+/testers/
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
+
+/testers.html
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
+  Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
 
 /notebook/*
   ! Permissions-Policy
@@ -48,7 +64,7 @@ const HEADERS = `/*
 const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n";
 const SITEMAP_URLS = [
   "/", "/start", "/vision", "/story", "/open-source-offline-ai",
-  "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/",
+  "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/", "/testers",
 ];
 
 rmSync(dist, { recursive: true, force: true });

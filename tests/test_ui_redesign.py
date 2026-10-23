@@ -168,6 +168,11 @@ def test_tools_hides_advanced_and_help_explains(app, settings):
     guide = h.findChildren(QTextBrowser)[0].toPlainText()
     assert "The basics" in guide and "offline on" in guide and "Sources" in guide
     assert "write to <name>" not in guide
+    from phone_help import PHONE_CAPTURE, PHONE_LINKS
+    assert guide.count(PHONE_LINKS) == 1 and guide.count(PHONE_CAPTURE) == 1
+    markup = h.findChildren(QTextBrowser)[0].toHtml()
+    for url in ('https://cursiv.us/notebook', 'https://cursiv.us/app'):
+        assert f'href="{url}"' in markup
     profile.set_personal(True)
     t = nav_windows.ToolsDialog()
     assert t._adv.isHidden()

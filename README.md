@@ -94,6 +94,18 @@ Published installer hashes, CI and package checks:
 [U84 release verification](docs/U84-RELEASE-VERIFICATION.md)
 ([historical U82 record](docs/U82-RELEASE-VERIFICATION.md)).
 
+### Phone pointers and tester feedback (U87)
+
+Type `help` for the phone notebook and separate photo-chat links, or `help field`
+for offline capture and the one-step export/import path. The Field Notebook and
+Help windows also expose clickable links; these instructions come from the app.
+No notebook data or import formats changed.
+
+To report a real task that felt off, slow or unclear, see
+[Help test Cursiv](https://cursiv.us/testers). Email and GitHub are the only
+contact options; there is no signup or form. [U87 release notes](docs/RELEASE-U87.md)
+and [verification](docs/U87-RELEASE-VERIFICATION.md) record the actual checks.
+
 ### Native boundaries and focused conversation (U86)
 
 U86 combines notebook parser/receipt fixes, native workflow and status answers,

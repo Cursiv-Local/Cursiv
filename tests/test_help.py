@@ -11,7 +11,7 @@ def _help(text, monkeypatch, builder=False, personal=False):
 
 def test_help_is_short_and_plain(monkeypatch):
     text = _help("help", monkeypatch)
-    assert len(text.splitlines()) <= 15
+    assert len(text.splitlines()) <= 16
     for word in ("substrate", "funforge", "overseer", "sovereign", "blast", "postal", "tier"):
         assert word not in text.lower()
     assert "help more" in text
@@ -25,6 +25,25 @@ def test_research_help_leads_with_field_work(monkeypatch):
     assert "help field" in topics and "help family" not in topics and "help builder" not in topics
     assert "write to <name>" in _help("help", monkeypatch, personal=True)
     assert "help family" in _help("help more", monkeypatch, personal=True)
+
+
+def test_phone_links_are_native_and_present_once_in_both_short_help_profiles(monkeypatch):
+    line = ('Phone notebook: https://cursiv.us/notebook · Phone photo chat: '
+            'https://cursiv.us/app (separate from the notebook).')
+    for personal in (False, True):
+        text = _help('help', monkeypatch, personal=personal)
+        assert text.splitlines().count(line) == 1
+        assert text.count('https://cursiv.us/notebook') == 1
+        assert text.count('https://cursiv.us/app') == 1
+
+
+def test_field_help_has_exact_phone_capture_and_import_path(monkeypatch):
+    line = ('Phone capture (works offline after first load): https://cursiv.us/notebook '
+            '— export the file, then Field Notebook → Import or field log import <file>.')
+    text = _help('help field', monkeypatch)
+    assert text.count(line) == 1
+    assert 'https://cursiv.us/notebook/' not in text
+    assert 'cursiv.winklers-llc.com/notebook' not in text
 
 
 def test_remember_is_described_as_saving(monkeypatch):

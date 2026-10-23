@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.14-U87 - Phone Help links and tester feedback (2026-10-22)
+
+- Add exact application-owned phone pointers to short Help, field help and the
+  existing notebook explanation; keep graphical links clickable and avoid duplicate
+  phone instructions. Preserve storage/import/chain and command behavior.
+- Add a secondary homepage tester button and `/testers`, with visible email and
+  GitHub issue links, no form/signup and page-specific privacy headers.
+- Bump app, launcher and installer/output names together. Exact checks and hashes:
+  [U87 release verification](docs/U87-RELEASE-VERIFICATION.md).
+
+
 ## v3.14-U86 - Native trust boundaries and focused conversation (2026-10-22)
 
 - Publish U86 as GitHub latest, with verified Windows/Mac packages, checksums

@@ -37,6 +37,11 @@ class FieldNotebookDialog(QDialog):
                        "Corrections append a new entry with a reason; fingerprints detect later changes.")
         intro.setWordWrap(True)
         intro.setStyleSheet(f"color: {theme.MUTED};")
+        from phone_help import capture_html
+        intro.setText(intro.text() + '<br><br>' + capture_html(theme.LINK))
+        intro.setTextFormat(Qt.TextFormat.RichText)
+        intro.setTextInteractionFlags(Qt.TextInteractionFlag.TextBrowserInteraction)
+        intro.setOpenExternalLinks(True)
         outer.addWidget(intro)
 
         # ── New entry ──────────────────────────────────────────────────

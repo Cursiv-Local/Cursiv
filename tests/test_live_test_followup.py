@@ -258,7 +258,7 @@ def test_actual_readonly_notebook_question_uses_backend_not_workspace(pipeline, 
 def test_help_field_has_current_phone_notebook_address():
     import chat_commands
     text = chat_commands.handle_command('help field', {}, []).text
-    assert 'https://cursiv.us/notebook/' in text and 'cursiv.winklers-llc.com/notebook' not in text
+    assert 'https://cursiv.us/notebook' in text and 'cursiv.winklers-llc.com/notebook' not in text
 
 
 @pytest.mark.parametrize('question,expected', [

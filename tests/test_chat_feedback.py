@@ -201,6 +201,22 @@ def test_reopened_chat_restores_confirmed_notebook_context(panel, log, tmp_path,
     assert panel._receipt_line.isHidden()  # a historical record is context, not a fresh execution
 
 
+def test_notebook_phone_pointer_is_clickable_without_touching_records(log, panel):
+    from field_notebook import FieldNotebookDialog
+    from PyQt6.QtWidgets import QLabel
+    from phone_help import capture_html
+    import theme
+    window = FieldNotebookDialog()
+    labels = [label for label in window.findChildren(QLabel)
+              if 'Phone capture (works offline after first load)' in label.text()]
+    assert len(labels) == 1
+    assert capture_html(theme.LINK) in labels[0].text()
+    assert labels[0].openExternalLinks()
+    assert 'field log import &lt;file&gt;.' in labels[0].text()
+    assert log.entries() == []
+    window.deleteLater()
+
+
 def test_notebook_window_verifies_read_back_before_saying_saved(log, panel, monkeypatch):
     from field_notebook import FieldNotebookDialog
     window = FieldNotebookDialog()

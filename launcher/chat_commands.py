@@ -427,6 +427,8 @@ def _agent_command(text: str, cfg: dict, history: list[dict]):
 
 
 # The research profile (core/profile.py, the default): field work first.
+from phone_help import PHONE_CAPTURE, PHONE_LINKS
+
 _FIELD_HELP_TEXT = """\
   check off / fast / full                model review mode; code checks stay on
 Just type a question. These are for field work:
@@ -441,7 +443,7 @@ Just type a question. These are for field work:
   status                                 what's on, and which model answers
   demo                                   try all of it with sample data
 
-help more                                everything else"""
+help more                                everything else""" + '\n' + PHONE_LINKS
 
 _HELP_TEXT = """\
   check off / fast / full   answer review mode; deterministic checks stay on
@@ -457,12 +459,12 @@ Just talk to me. Most things don't need a command.
   offline on / off            keep everything on this computer
   Settings (gear, top right)  AI keys, privacy, updates
 
-help more                     everything else"""
+help more                     everything else""" + '\n' + PHONE_LINKS
 
 # help <topic>. Topics in _BUILDER_TOPICS are listed only for the owner
 # (they still open for anyone who types them).
 _HELP_TOPICS = {
-    "field": ("Field notebook", """\
+    "field": ("Field notebook", f"""\
   log site: <name>; <measurement> <value> <unit>; <lat>, <lon>; note: <text>
                               save an observation, values kept exactly as typed
   log ...; sample: auto       give it a new sample ID (NT-20261018-001)
@@ -474,7 +476,7 @@ _HELP_TOPICS = {
   field log verify <folder>   check an export's signature and that no file was changed
   field log share <folder>    put this laptop's log on a USB drive or shared folder
   field log import <folder>   bring in other laptops' logs (team log, team log export)
-  field log import <file>     a .cursivsync file from the phone notebook (https://cursiv.us/notebook/)
+  {PHONE_CAPTURE}
   Corrections: Field Notebook -> Correct selected. The original always stays.
   demo / demo off             sample data to try it with, kept apart from yours"""),
     "documents": ("Your documents and calculations", """\

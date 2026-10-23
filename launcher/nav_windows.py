@@ -326,13 +326,19 @@ class HelpDialog(_Window):
         ]
         try:
             import chat_commands as cc
-            parts += ["```", cc.help_text("").strip(), "```", ""]
+            from phone_help import PHONE_CAPTURE, PHONE_LINKS, markdown_links
+            short_help = cc.help_text("").replace(PHONE_LINKS, '').strip()
+            parts += ["```", short_help, "```", "", markdown_links(PHONE_LINKS), ""]
             for key, (title, body) in cc._HELP_TOPICS.items():
                 if key in cc._BUILDER_TOPICS and not cc._is_builder():
                     continue
                 if key in cc._PERSONAL_TOPICS and not cc._personal():
                     continue
+                if key == 'field':
+                    body = body.replace(PHONE_CAPTURE, '')
                 parts += [f"**{title}**", "```", body.rstrip(), "```", ""]
+                if key == 'field':
+                    parts += [markdown_links(PHONE_CAPTURE), ""]
         except Exception:
             parts.append("Type `help` in the chat to see them.")
         parts += [
