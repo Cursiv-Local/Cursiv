@@ -146,7 +146,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             break
     _web_ctx = ""
     _search_failed = ""
-    if runtime.netgate.is_offline() and user_text.lower().startswith(("search:", "search ")):
+    if runtime.netgate.is_offline() and (user_text.lower().startswith('search:') or
+            (user_text.lower().startswith('search ') and not _files.is_request(user_text))):
         yield f"*[Web search skipped. {runtime.netgate.OFFLINE_MESSAGE}]*\n\n"
     elif runtime.turn_policy.current().inspect and runtime._needs_search(user_text):
         if runtime._is_online():

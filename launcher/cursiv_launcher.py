@@ -63,7 +63,7 @@ _ICONS = (
 _LOCK_PORT       = 17_860        # local socket port for single-instance lock
 
 # ── Update checker ─────────────────────────────────────────────────────────────
-_CURRENT_VERSION   = "3.14-U87"
+_CURRENT_VERSION   = "3.14-U88"
 _GITHUB_API        = "https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/Cursiv-Local/Cursiv/releases"
 
@@ -223,18 +223,18 @@ class UpdateChecker:
 
     def _run(self):
         try:
+            from cursiv_v215.core import netgate
+            from update_security import asset
+            if not netgate.allowed():
+                raise netgate.NetworkBlocked(netgate.OFFLINE_MESSAGE)
             req = urllib.request.Request(
                 _GITHUB_API,
                 headers={"Accept": "application/vnd.github+json", "User-Agent": "Cursiv-Launcher"},
             )
             with urllib.request.urlopen(req, timeout=8) as resp:
                 data = json.loads(resp.read().decode("utf-8"))
-            tag  = data.get("tag_name", "").lstrip("v")
+            tag, asset = asset(data)
             body = data.get("body", "")
-            exes = [a for a in data.get("assets", []) if a.get("name", "").lower().endswith(".exe")]
-            # Prefer the stable "-latest" name, then any setup exe.
-            exes.sort(key=lambda a: 0 if a["name"].lower() == "cursiv-setup-latest.exe" else 1)
-            asset = exes[0] if exes else None
             self._signals.result.emit({
                 "ok":       True,
                 "tag":      tag,
@@ -258,6 +258,8 @@ def _run_installer_and_quit(installer: str) -> None:
     12-step first-time setup is skipped (its [Run] entry is skipifsilent).
     /UPDATE=1 makes the installer reopen Cursiv when it finishes.
     """
+    from update_security import verify_installer
+    verify_installer(installer)  # repeat identity verification immediately before execution
     subprocess.Popen(
         [installer, "/SILENT", "/SUPPRESSMSGBOXES", "/NORESTART", "/CLOSEAPPLICATIONS", "/UPDATE=1"],
         close_fds=True,
@@ -362,26 +364,8 @@ class UpdateDialog(QDialog):
     def _do_download(self, url: str):
         """Background thread -- talks to the UI only through self._signals."""
         try:
-            dest = Path(tempfile.gettempdir()) / f"Cursiv-Setup-{self._tag}.exe"
-            req = urllib.request.Request(url, headers={"User-Agent": "Cursiv-Launcher"})
-            with urllib.request.urlopen(req, timeout=30) as resp, open(dest, "wb") as out:
-                total = int(resp.headers.get("Content-Length") or self._expected_size or 0)
-                got, last_pct = 0, -1
-                while True:
-                    chunk = resp.read(1 << 20)
-                    if not chunk:
-                        break
-                    out.write(chunk)
-                    got += len(chunk)
-                    pct = int(got * 100 / total) if total else -1
-                    if pct != last_pct:
-                        last_pct = pct
-                        mb = got / (1 << 20)
-                        self._signals.progress.emit(
-                            pct, f"Downloading the update… {mb:.0f} MB" + (f" of {total / (1 << 20):.0f} MB" if total else "")
-                        )
-            if total and got != total:
-                raise IOError(f"download was incomplete ({got} of {total} bytes)")
+            from update_security import download
+            dest = download(url, self._tag, self._expected_size, self._signals.progress.emit)
             self._signals.done.emit(True, str(dest))
         except Exception as exc:
             self._signals.done.emit(False, str(exc))

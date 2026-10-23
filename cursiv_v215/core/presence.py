@@ -97,6 +97,7 @@ def prompt(person: str, workspace: str = '', file_access: bool = False, *, obser
 
 
 _SHORT_STATE = re.compile(
+    r'what is your version and are you offline right now|'
     r"am i offline|are you (?:online|offline|in offline mode)|is file access (?:on|off|enabled)|"
     r"what(?:'s| is) (?:your|the) current workspace|where is (?:my|your|the)(?: current)? workspace|"
     r'can you (?:read or write|read and write|read|write|access)(?: my| workspace)? files(?: right now)?|'
@@ -138,6 +139,9 @@ def state_answer(observed: dict, question: str = '') -> str:
     q = task_text(question).lower().strip().rstrip('.?!').replace('’', "'")
     if short_state_question(question):
         if 'offline' in q or 'online' in q:
+            if 'version' in q:
+                from .selfknow import VERSION
+                return f'Cursiv {VERSION}. ' + network
             return network
         if 'closed' in q:
             return 'Cursiv cannot observe or keep working while closed.'

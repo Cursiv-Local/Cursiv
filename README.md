@@ -296,6 +296,11 @@ expandable practical details and direct latest-installer download buttons.
 
 #### Included Desktop Improvements
 
+U88 includes [remaining live-transcript fixes](docs/LIVE-TRANSCRIPT-GAPS.md),
+native workspace search/write routing and [owner-authenticated release manifests](docs/OWNER-RELEASE-SIGNING.md).
+Owner signatures are independent of GitHub; Windows CA-issued signing remains
+pending. [Engineering validation and remaining risks](docs/ENGINEERING-AUDIT-20261023.md).
+
 U85 carries forward the U81/U82 Saved Notes viewer, incremental chat rendering, native
 Field Notebook chat tools, verified filesystem operations and natural-language
 memory handling. It adds grounded operational state, per-message boundaries,

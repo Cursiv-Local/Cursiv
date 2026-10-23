@@ -268,9 +268,12 @@ class ChatControlsMixin:
                     from cursiv_v215.core import ollama_host, speed
                     if ollama_host.installed() and ollama_host.start(speed.ollama_env()):
                         models = _st.local_models()
-                self._signals.models.emit(models)
             except Exception:
-                self._signals.models.emit(None)
+                models = None
+            try:
+                self._signals.models.emit(models)
+            except RuntimeError:
+                pass  # the window can close while this background lookup finishes
         threading.Thread(target=work, daemon=True).start()
 
     def _on_models(self, models) -> None:

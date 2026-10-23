@@ -584,8 +584,8 @@ def sign_export(folder: Path, paths: dict, rows: list[dict], problems: list[str]
     the chain) and the SHA-256 of every exported file. verify_export() checks it."""
     from cursiv_v215.core import devicekey
     own = entries()
-    files = {f.relative_to(folder).as_posix(): _file_sha256(f) for f in sorted(Path(folder).rglob("*"))
-             if f.is_file() and f.name != SIGNATURE_FILE}
+    from .export_paths import inventory
+    files = {name: _file_sha256(f) for name, f in inventory(folder).items() if name != SIGNATURE_FILE}
     devices = sorted({e.get("device", "") for e in rows})
     env = devicekey.sign({
         "format": "cursiv-export-1",
@@ -606,6 +606,11 @@ def verify_export(folder: Path) -> list[str]:
     """Problems with an export folder's signature and files, or [] when it checks out."""
     from cursiv_v215.core import devicekey
     folder = Path(folder)
+    from .export_paths import inventory, valid_name
+    try:
+        discovered = inventory(folder)
+    except (OSError, ValueError) as exc:
+        return ['Invalid export paths: ' + str(exc)]
     sig = folder / SIGNATURE_FILE
     if not sig.exists():
         return [f"no {SIGNATURE_FILE} in {folder}: this export isn't signed (made before U73?)"]
@@ -622,6 +627,9 @@ def verify_export(folder: Path) -> list[str]:
     problems = []
     root = folder.resolve()
     for name, digest in files.items():
+        if not valid_name(name) or not isinstance(digest, str) or not re.fullmatch(r'[a-f0-9]{64}', digest):
+            problems.append('invalid signature file name or digest (outside the export or malformed)')
+            continue
         f = folder / name
         if not f.resolve().is_relative_to(root):
             problems.append(f"the signature names a file outside the export ({name[:60]})")
@@ -629,9 +637,8 @@ def verify_export(folder: Path) -> list[str]:
             problems.append(f"{name} is missing")
         elif _file_sha256(f) != digest:
             problems.append(f"{name} was changed after the export was signed")
-    for f in sorted(folder.rglob("*")):
-        rel = f.relative_to(folder).as_posix()
-        if f.is_file() and rel != SIGNATURE_FILE and rel not in files:
+    for rel in discovered:
+        if rel != SIGNATURE_FILE and rel not in files:
             problems.append(f"{rel} isn't covered by the signature (added after the export was made)")
     return problems
 

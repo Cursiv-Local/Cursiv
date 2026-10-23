@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   test:
@@ -24,8 +25,18 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           # The same packages the app needs (a hand-kept list here missed pypdf, U67-U71)
-          python -m pip install -r requirements.txt pytest
+          python -m pip install --require-hashes -r requirements-release.lock
       - name: Test
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -q
+  security:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: python -m pip install pip-audit==2.10.1 bandit==1.9.4
+      - run: python -m pip_audit -r requirements-release.lock --no-deps --disable-pip
+      - run: python -m bandit -r cursiv_v215 launcher -lll -iii

@@ -18,7 +18,8 @@ def refusal(text: str, history=()) -> str | None:
         return blocked
     if file_access.is_request(task, list(history)):
         parsed = file_access._parse(task, list(history))
-        operation = {'read': 'read_file', 'list': 'list_directory', 'verify': 'read_file'}.get(
+        operation = {'read': 'read_file', 'list': 'list_directory', 'verify': 'read_file',
+                     'search': 'search_files', 'denied': 'read_file'}.get(
             parsed[0] if parsed else '', 'write_file')
         if policy.blocks(operation):
             return turn_policy.DENIED
@@ -29,6 +30,7 @@ def refusal(text: str, history=()) -> str | None:
     # Command families and unresolved imperative variants must not escape to
     # a model merely because their ordinary parser needs more arguments.
     t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+)', '', task)
+    t = re.sub(r'(?i)^ignore previous instructions\s+and\s+', '', t)
     token = re.match(r'[A-Za-z_]+', t)
     names = {name.casefold(): name for name in turn_policy.READS | turn_policy.WRITES}
     names['file_create'] = 'create_file'

@@ -9,6 +9,12 @@ from . import turn_policy
 def answer(text: str, *, calculations: bool = True) -> str | None:
     q = turn_policy.task_text(text).strip().replace('’', "'")
     low = q.lower().rstrip('.?!')
+    if re.fullmatch(r'you called emergency services for me,? right', low):
+        return ('No. Cursiv did not call emergency services. Contact them directly if you need urgent help.'
+                '\n\n*[Sources: Cursiv capability limits (no AI model)]*')
+    if low == 'is this medical advice':
+        return ('No. Cursiv provides information, not professional medical advice, diagnosis or treatment.'
+                '\n\n*[Sources: Cursiv capability limits (no AI model)]*')
     from .conversation_kind import relayed_thread_question, talk_help
     if relayed_thread_question(q):
         return ('Text pasted here, including text labeled as another model, is user-supplied content '
@@ -32,6 +38,10 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
     help_question = bool(re.match(r'(?i)^(?:how|what|where|can|does|do)\b', q))
     if help_question and not re.search(r'[;\n]', q):
         phone = re.search(r'(?i)\b(?:phone|mobile)\b', q)
+        if (phone and re.search(r'(?i)\b(?:get|bring|move|transfer)\b.*\bobservations?\b.*\binto (?:the )?notebook\b', q)):
+            from .phone_help import PHONE_CAPTURE
+            return _help(PHONE_CAPTURE + '\nOpen and cache the page before leaving signal. '
+                         'A first visit needs a connection. No import was performed by this answer.')
         if re.search(r'(?i)\bimport\b', q) and ('.cursivsync' in low or
                 (phone and re.search(r'(?i)\b(?:notebook|observations?|entries)\b', q))):
             return _help(
@@ -87,6 +97,12 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
         if worked and worked.tool in ('resources', 'proportions'):
             return (worked.statement + f'\n\n*[Sources: Cursiv calculation ({worked.tool}; no AI model)]*')
     if calculations and turn_policy.effective(text).inspect and len(q) <= 240:
+        if re.fullmatch(r'(?i)we start hiking at \d{2}:\d{2} and the route takes '
+                        r'\d+ hours? \d+ minutes?\. arrival time\?', q):
+            from . import calc
+            worked = calc.clock_arithmetic(q)
+            if worked:
+                return worked.statement + '\n\n*[Sources: Cursiv calculation (clock; no AI model)]*'
         from . import fieldmath
         flow = fieldmath.work_out(q)
         if flow:

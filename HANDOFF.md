@@ -1,5 +1,28 @@
 # Handoff — Cursiv verification overhaul
 
+## U88 release preparation (2026-10-23)
+
+The owner authorized commit/push/release and explicitly selected independent
+owner release signatures. U88 includes the previous local follow-up below,
+workspace routing repairs and verified security findings from the supplied audit.
+See [engineering validation](docs/ENGINEERING-AUDIT-20261023.md) and
+[owner signing/recovery](docs/OWNER-RELEASE-SIGNING.md). Keep the private key outside
+GitHub, OneDrive and all build artifacts. Only the public JSON key is tracked.
+Publication evidence will be updated after actual builds and public checks.
+
+## Local follow-up to the U86 transcript (unreleased)
+
+Work is on `codex/live-transcript-gaps`; the application version remains U87.
+[Live-transcript gaps](docs/LIVE-TRANSCRIPT-GAPS.md) records the audit, exact
+production changes and regression evidence. Review the new typed answer-evidence
+receipt and desktop persistence, bounded read authorization and descriptive forget
+ambiguity behavior. Phone wording now lives in `cursiv_v215/core/phone_help.py`;
+the launcher helper reexports it for existing graphical/command help.
+No installer, updater, notebook format, website or production service is changed.
+No commit, push or publication was requested for this follow-up.
+Final isolated Windows regression run: 1,523 passed, 1 skipped in 157.29 seconds.
+No hosted Mac/package validation or live-model quality score is claimed.
+
 ## U87 published and verified
 
 U87 is GitHub latest; tagged app commit `58a6d8d`. Windows passed 1,495 tests

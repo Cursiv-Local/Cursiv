@@ -175,7 +175,7 @@ def embed(texts: list[str]) -> list[list[float]] | None:
     if not texts or not embeddings_available():
         return None
     cache = _load_cache()
-    keys = [hashlib.sha1(t.encode("utf-8")).hexdigest() for t in texts]
+    keys = [hashlib.sha1(t.encode("utf-8"), usedforsecurity=False).hexdigest() for t in texts]
     missing = [(k, t) for k, t in zip(keys, texts) if k not in cache]
     if missing:
         try:

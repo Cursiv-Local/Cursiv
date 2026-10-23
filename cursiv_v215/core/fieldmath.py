@@ -6,12 +6,15 @@ import math
 import re
 
 _N = r'(-?\d+(?:\.\d+)?)'
-_V = r'(liters?|litres?|ml|milliliters?|millilitres?|l)'
+_V = r'(liters?|litres?|ml|milliliters?|millilitres?|l|cubic met(?:er|re)s?|m³|m3)'
 _T = r'(minutes?|mins?|min|hours?|hrs?|seconds?|secs?|s)'
 _RATE = _N + r'\s*' + _V + r'\s*(?:/|per\s+)' + _T
 _VOLUME = _N + r'\s*' + _V
 _TIME = _N + r'\s*' + _T
 _PATTERNS = (
+    ('flow_conversion', r'how many liters per minute is (?:a )?flow of\s+' + _RATE),
+    ('flow_duration', r'if I have\s+' + _VOLUME + r'\s+and use\s+' + _RATE +
+     r',?\s+how long until empty'),
     ('flow_duration', r'(?:how long(?: will it take)?(?: to fill)?|calculate (?:the )?duration(?: to fill)?)\s+'
      + _VOLUME + r'\s+at\s+' + _RATE),
     ('flow_rate', r'(?:what is (?:the )?(?:flow )?rate(?: for)?|calculate (?:the )?(?:flow )?rate(?: for)?)'
@@ -32,7 +35,9 @@ class Result:
 
 
 def _volume(n, unit):
-    return float(n) / (1000 if unit.lower().startswith(('ml', 'milli')) else 1)
+    unit = unit.lower()
+    return float(n) * (1000 if unit.startswith(('cubic', 'm3', 'm³')) else
+                       .001 if unit.startswith(('ml', 'milli')) else 1)
 
 
 def _minutes(n, unit):
@@ -58,7 +63,9 @@ def work_out(question: str) -> Result | None:
         if any(not math.isfinite(n) or n <= 0 for n in numbers):
             return Result('Cursiv did not calculate this: volumes, flow rates and time must be positive finite numbers.',
                           None, tool=tool, inputs=inputs, facts={'invalid': 'nonpositive or nonfinite input'})
-        if tool == 'flow_duration':
+        if tool == 'flow_conversion':
+            value, unit = _volume(args[0], args[1]) / _minutes(1, args[2]), 'L/min'
+        elif tool == 'flow_duration':
             volume = _volume(args[0], args[1])
             rate = _volume(args[2], args[3]) / _minutes(1, args[4])
             value, unit = volume / rate, 'minutes'

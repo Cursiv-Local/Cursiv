@@ -4,8 +4,8 @@ What this is
   Cursiv is an AI assistant that runs on this computer, built for field research:
   a field notebook, calculations done in code, an offline reference, and your
   team's documents. Made by Joshua Winkler. MIT licence.
-  Source code: https://github.com/winklersllc2026-bit/Cursiv
-  Website:     https://cursiv.winklers-llc.com
+  Source code: https://github.com/Cursiv-Local/Cursiv
+  Website:     https://cursiv.us
 
 What the installer does
   - Copies Cursiv into your user folder (no administrator rights needed).
@@ -17,18 +17,26 @@ What the installer does
 
 Why Windows may warn you
   The installer isn't code-signed yet, so Windows SmartScreen may say "Windows
-  protected your PC" or "unknown publisher". Click More info, then Run anyway.
+  protected your PC" or "unknown publisher". Owner release signatures are separate
+  from Windows certificate trust. Verify the download before deciding to run it.
 
-How to check this file is the real one
-  Each release on GitHub lists the SHA-256 checksum of the installer
-  (SHA256SUMS.txt). In PowerShell:
+How to check this download
+  Compare the installer hash with https://cursiv.us/start#verify-download and
+  SHA256SUMS.txt. In PowerShell:
       Get-FileHash .\Cursiv-Setup-<version>.exe -Algorithm SHA256
-  The result must match the line for that file in SHA256SUMS.txt.
+  The result must match. A checksum alone is not proof of the publisher: a
+  compromised release can replace both the file and its checksum.
+  U88 and later include owner-release.json, signed with Cursiv's independent
+  owner key. The updater verifies it using the public key shipped with the app.
+  Signing identity and verification instructions: https://cursiv.us/start#code-signing
+  Owner-key SHA-256 fingerprint:
+  f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7
 
 Privacy, in short
   Your conversations, memories, field notes and documents stay on this computer.
   Nothing leaves it unless you turn on an online feature (web search, a cloud AI
-  key, update checks). Offline mode blocks every connection off this computer.
+  key, update checks). Offline mode blocks Cursiv's external application requests;
+  it is not an operating-system firewall for other programs or every native process.
   Details: PRIVACY.md in the source, or Settings > Privacy & internet in Cursiv.
 
 Uninstall any time from Windows Settings > Apps, or the Start menu entry.

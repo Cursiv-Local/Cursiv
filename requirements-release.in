@@ -1,0 +1,3 @@
+# Release/test environment. Runtime compatibility ranges stay in requirements.txt.
+-r requirements.txt
+pytest==9.1.1

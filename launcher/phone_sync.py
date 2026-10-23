@@ -122,7 +122,7 @@ def sync_once() -> str:
 
         # Computer -> phone: the memory summary (or clear it when sharing is off)
         digest = _digest(person) if st.get("share_memory", True) else ""
-        h = hashlib.sha1(digest.encode("utf-8")).hexdigest()
+        h = hashlib.sha1(digest.encode("utf-8"), usedforsecurity=False).hexdigest()
         if h != st.get("digest_hash"):
             try:
                 pl.api("/api/space/memory", {"digest": digest, "person": person}, token, timeout=20)

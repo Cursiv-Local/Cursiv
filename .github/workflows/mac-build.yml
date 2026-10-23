@@ -38,12 +38,11 @@ jobs:
       - name: Install
         run: |
           python -m pip install --upgrade pip
-          python -m pip install -r requirements.txt
+          python -m pip install --require-hashes -r requirements-release.lock
       - name: Tests
         env:
           QT_QPA_PLATFORM: offscreen
         run: |
-          python -m pip install pytest
           python -m pytest tests -q
       - name: Build Cursiv.app
         run: python -m PyInstaller --noconfirm --clean launcher/build.spec
@@ -67,6 +66,8 @@ jobs:
           cp "$DMG" Cursiv-mac-latest.dmg          # a fixed name for the website's download button
           shasum -a 256 "$DMG" Cursiv-mac-latest.dmg | tee SHA256SUMS-mac.txt
           echo "DMG=$DMG" >> "$GITHUB_ENV"
+      - name: Record build provenance
+        run: python scripts/release_provenance.py provenance-mac.json "$DMG" Cursiv-mac-latest.dmg
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -75,9 +76,15 @@ jobs:
             ${{ env.DMG }}
             SHA256SUMS-mac.txt
             selftest.txt
+            provenance-mac.json
             mac-shots/
       - name: Attach to the release
         if: github.event_name == 'release' || (inputs.upload && startsWith(inputs.ref, 'v'))
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release upload "$REF" "$DMG" Cursiv-mac-latest.dmg SHA256SUMS-mac.txt --clobber
+        run: |
+          if gh release view "$REF" --json assets --jq '.assets[].name' | grep -Fxq 'owner-release.json'; then
+            echo "Owner-signed assets are immutable; automatic replacement skipped."
+            exit 0
+          fi
+          gh release upload "$REF" "$DMG" Cursiv-mac-latest.dmg SHA256SUMS-mac.txt provenance-mac.json

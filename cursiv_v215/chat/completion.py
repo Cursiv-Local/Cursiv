@@ -73,6 +73,11 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     if _denied:
         yield _file_ops.VerifiedText(_denied)
         return
+    from cursiv_v215.core import command_sequence
+    _state_pair = command_sequence.state_reply(_field_text)
+    if _state_pair is not None:
+        yield _file_ops.VerifiedText(_state_pair)
+        return
     from cursiv_v215.core.deterministic_overrides import conflicting_doses
     _provided_conflict = conflicting_doses(_field_text, (), supplied_text=_field_text)
     if _provided_conflict:
@@ -87,6 +92,11 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                 '\n\n*[Sources: User-supplied text conflict check (no AI model)]*')
             return
     from cursiv_v215.core import native_answers
+    from cursiv_v215.core import answer_evidence
+    _source_answer = answer_evidence.reply(_field_text, history)
+    if _source_answer is not None:
+        yield _file_ops.VerifiedText(_source_answer)
+        return
     _native = native_answers.answer(_field_text, calculations=policy.inspect)
     if _native is not None:
         from cursiv_v215.core.conversation_kind import relayed_thread_question
@@ -123,11 +133,12 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from cursiv_v215.memory.semantic import current_person as _notebook_person
     from cursiv_v215.core import presence
     from . import status as _net_status
-    if _net_status.answers_network_question(_field_text) and not presence.short_state_question(_field_text):
+    _workspace_request = _file_ops.is_request(_field_text, history)
+    if not _workspace_request and _net_status.answers_network_question(_field_text) and not presence.short_state_question(_field_text):
         yield _file_ops.VerifiedText(_net_status.network_answer())
         yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
         return
-    if presence.answers_state_question(_field_text):
+    if not _workspace_request and presence.answers_state_question(_field_text):
         observed = presence.snapshot(root_path, file_access,
             person=None if presence.short_state_question(_field_text) else _notebook_person())
         runtime.grounding.set_state(observed)
@@ -135,7 +146,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
         return
     _notebook = (notebook_tools.command(_field_text, history, observer=_notebook_person().title(), scope=notebook_scope)
-                 if policy.inspect else None)
+                 if policy.inspect and not _workspace_request else None)
     if _notebook is not None:
         from cursiv_v215.memory import intents as _native_memory
         _native_memory.clear_pending(_notebook_person(), notebook_scope)
@@ -143,7 +154,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         return
     from cursiv_v215.memory import intents as _memory_intents
     _memory_action = (_memory_intents.command(_field_text, history, person=_notebook_person(), scope=notebook_scope)
-                      if policy.inspect else None)
+                      if policy.inspect and not _workspace_request else None)
     if _memory_action is not None:
         yield _memory_action.render()
         return
@@ -154,6 +165,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             for receipt in _file_reply.receipts:
                 on_action(receipt)
         if _file_reply.pending:
+            yield _file_ops.VerifiedText(_file_reply.text + '\n') if _file_reply.text else ''
             yield runtime.WRITE_SENTINEL + runtime.json.dumps(_file_reply.pending)
         else:
             yield _file_ops.VerifiedText(_file_reply.text)
@@ -189,6 +201,8 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         action_options = {'on_action': on_action} if on_action is not None else {}
         yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply, **action_options)
+        if on_action and (runtime._WORKED or runtime._REF_SHOWN):
+            on_action(answer_evidence.capture(_field_text, runtime._REF_SHOWN, runtime._WORKED))
         if any(isinstance(chunk, _file_ops.VerifiedText)
                and isinstance(chunk.result, _file_ops.FileResult)
                and (not chunk.result.ok or chunk.result.operation not in ('read_file', 'list_directory', 'search_files'))

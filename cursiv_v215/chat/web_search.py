@@ -53,11 +53,14 @@ def _needs_search(text: str) -> bool:
     turned on automatic search ('websearch on'). Never while offline mode is on.
     The trigger words used to fire on their own and send the message to
     DuckDuckGo ("...the farm where we live", "right now"): AUDIT C-009."""
-    if not netgate.allowed():
+    from cursiv_v215.core import file_access
+    if file_access.is_request(text) or not netgate.allowed():
         return False
     lower = text.lower().lstrip()
-    if lower.startswith("search:") or lower.startswith("search "):
+    if lower.startswith("search:"):
         return True
+    if lower.startswith('search '):
+        return bool(_re.search(r'\b(?:web|internet|online|weather|news|county burn ban)\b', lower))
     return netgate.web_search_auto() and any(t in lower for t in _SEARCH_TRIGGERS)
 
 def _ddg_search(query: str, max_results: int = 4) -> str:

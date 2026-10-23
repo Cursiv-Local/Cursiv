@@ -122,6 +122,8 @@ def main() -> int:
     git("worktree", "add", "--detach", str(work), tag)
     try:
         print(f"building {tag} ({git('rev-parse', '--short', tag).strip()}) in {work}", flush=True)
+        from release_provenance import check_lock, record
+        check_lock(work)
         env = build_environment()
         subprocess.run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "launcher/build.spec"],
                        cwd=work, env=env, check=True)
@@ -131,6 +133,7 @@ def main() -> int:
         name = f"Cursiv-Setup-{want}.exe"
         out = REPO / "installer" / "Output"
         sums = stage_installers(work / 'installer/Output' / name, out, want)
+        record(work, [out / name, out / 'Cursiv-Setup-latest.exe'], out / f'provenance-{want}.json')
         print(f"saved {out / name}")
         # Published with the release so anyone can check the download (installer/BEFORE-INSTALL.txt).
         digest = hashlib.sha256((out / name).read_bytes()).hexdigest()

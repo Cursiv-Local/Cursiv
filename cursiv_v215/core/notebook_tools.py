@@ -135,6 +135,9 @@ class _Intent:
 
 def _intent(text: str) -> _Intent | None:
     text = text.strip()
+    from . import file_requests
+    if file_requests.recognizes(text):
+        return None  # explicit workspace source/file intent precedes notebook keywords
     if re.match(r"(?i)^(?:please\s+)?(?:do not|don't|never)\b", text):
         return None
     text = re.sub(r'(?i)^(?:(?:no|actually|instead|i meant)[,:]?\s+)*(?:please\s+)?', '', text)

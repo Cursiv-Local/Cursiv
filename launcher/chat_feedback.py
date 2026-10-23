@@ -108,6 +108,10 @@ class ChatFeedbackMixin:
         """Worker-side adapter. Typed executed results only; never inspect prose."""
         from cursiv_v215.core.file_access import FileResult
         from cursiv_v215.core.tools import ToolOutcome
+        from cursiv_v215.core.answer_evidence import AnswerEvidence
+        if isinstance(result, AnswerEvidence):
+            self._pending_answer_evidence = result.receipt()
+            return
         if isinstance(result, FileResult):
             receipt = result.receipt()
             self._pending_file_receipts.append(receipt)

@@ -153,6 +153,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._pending_history_append: Optional[list[tuple[str, str]]] = None
         self._pending_notebook_receipt: dict | None = None
         self._pending_file_receipts: list[dict] = []
+        self._pending_answer_evidence = None
         self._pending_memory_receipt: dict | None = None
         self._cancel_event: Optional[threading.Event] = None
         self._signals = _ChatSignals()
@@ -510,6 +511,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._reset_rendering()
         self._pending_notebook_receipt = None
         self._pending_file_receipts = []
+        self._pending_answer_evidence = None
         self._pending_memory_receipt = None
         self._streaming = True
         self._cancel_event = threading.Event()
@@ -533,17 +535,18 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         try:
             force_provider, stripped = cc.hey_prefix(text)
             # A provider prefix never transfers notebook execution to the model.
-            from cursiv_v215.core import notebook_tools
+            from cursiv_v215.core import notebook_tools, file_requests
             from cursiv_v215.memory import intents, semantic
             from cursiv_v215.core import turn_policy
             unrestricted = turn_policy.effective(stripped) == turn_policy.Policy()
-            native = unrestricted and (notebook_tools.is_request(stripped, history) or intents.is_request(
+            workspace_request = file_requests.recognizes(stripped)
+            native = unrestricted and not workspace_request and (notebook_tools.is_request(stripped, history) or intents.is_request(
                 stripped, history, person=semantic.current_person(), scope=self._conv_id or ''))
             if native and self._conv_id is None:
                 import uuid
                 self._conv_id = uuid.uuid4().hex[:12]
-            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted else None
-            if result is None and unrestricted:
+            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted and not workspace_request else None
+            if result is None and unrestricted and not workspace_request:
                 result = cc.memory_command(stripped, history, scope=self._conv_id or '')
             if result is None and not force_provider:
                 result = cc.handle_command(text, self._cfg, history)
@@ -809,6 +812,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         if self._pending_file_receipts and self._history:
             self._history[-1]['file_receipts'] = self._pending_file_receipts
             self._pending_file_receipts = []
+        if self._pending_answer_evidence is not None and self._history:
+            self._history[-1]['answer_evidence'] = self._pending_answer_evidence
+            self._pending_answer_evidence = None
         if self._pending_memory_receipt is not None and self._history:
             self._history[-1]['memory_receipt'] = self._pending_memory_receipt
             self._pending_memory_receipt = None

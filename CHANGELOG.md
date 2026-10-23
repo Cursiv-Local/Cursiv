@@ -1,5 +1,41 @@
 # Changelog
 
+## v3.14-U88 — workspace routing and owner release authentication (2026-10-23)
+
+- Add bounded local file/content search, natural creates/appends and source-file
+  precedence over notebook keywords. Preserve authorization and confirmation;
+  compound file tasks explicitly leave later steps unexecuted.
+- Add owner-signed release manifests with a public key pinned in the app. Keep
+  the private signing key Windows-user protected outside GitHub and OneDrive;
+  verify installer bytes before download trust and again before execution.
+- Harden export path inventories against symbolic links, junctions, hard links
+  and unsupported objects. Preserve existing notebook data and chain formats.
+- Lock/hash release dependencies, record build provenance and add CI vulnerability
+  and high-severity static checks. Clarify non-security SHA-1 cache uses without
+  invalidating stored cache keys. Guard model-lookup completion after window close.
+- Windows CA signing and Mac notarization remain unavailable; owner signatures
+  do not remove Windows publisher warnings. Signing-key recovery backup, account
+  protection and physical clean-machine/USB persistence checks remain owner tasks.
+- [Owner signing and recovery](docs/OWNER-RELEASE-SIGNING.md),
+  [engineering audit](docs/ENGINEERING-AUDIT-20261023.md), and
+  [U88 release notes](docs/RELEASE-U88.md) record evidence and limitations.
+
+### Remaining 2026-10-22 live-transcript gaps
+
+- Add native cubic-metre flow conversion, consumption duration and hiking-arrival
+  answers; retain code receipts without a contradictory model draft.
+- Route the no-signal phone-import question to the shared field-help instructions.
+- Match descriptive forget requests conservatively, verify deletion, and show
+  record IDs when multiple memories match.
+- Block the restricted instruction-override wrapper and support an authorized
+  first-N-lines file excerpt on read-only turns.
+- Retain actual calculation/reference evidence with desktop answers for native
+  bleach-source follow-ups; combine native version/offline state and keep emergency
+  action/medical-advice denials short.
+- Exact changes, regression results and limitations:
+  [live-transcript follow-up](docs/LIVE-TRANSCRIPT-GAPS.md). These previously local
+  repairs are included in U88 after the owner's publication authorization.
+
 ## v3.14-U87 - Phone Help links and tester feedback (2026-10-22)
 
 - Publish U87 as latest with publicly verified Windows/Mac installers and

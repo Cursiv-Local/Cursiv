@@ -12,10 +12,10 @@ from pathlib import Path
 import re
 import tempfile
 import threading
-import time
 
 DENY = re.compile(
-    r'(?i)(^|[\\/])(?:\.cursiv|\.git|\.ssh|\.gnupg|\.aws|\.azure|\.kube|\.docker)(?:[\\/]|$)|'
+    r'(?i)(^|[\\/])CursivReleaseSigning(?:[\\/]|$)|'
+    r'(^|[\\/])(?:\.cursiv|\.git|\.ssh|\.gnupg|\.aws|\.azure|\.kube|\.docker)(?:[\\/]|$)|'
     r'(^|[\\/])(?:id_rsa|id_ed25519|[^\\/]*\.(?:pem|key|pfx|p12)|\.env(?:\.[^\\/]*)?|[^\\/]*secrets?[^\\/]*|[^\\/]*password[^\\/]*|[^\\/]*credential[^\\/]*)$|'
     r'Login Data|Cookies|Web Data|Local State|Microsoft[\\/]Credentials|Microsoft[\\/]Protect'
 )
@@ -64,7 +64,9 @@ class FileResult:
         if self.operation == 'list_directory':
             return f'Directory: {self.path}\n' + '\n'.join(self.entries)
         if self.operation == 'search_files':
-            return 'Found:\n' + '\n'.join(self.entries)
+            return ('Found:\n' + '\n'.join(self.entries) if self.entries else
+                    'No matches in readable authorized files scanned.') + (
+                        '\nSearch limit reached; results are partial. Narrow the folder or search.' if self.truncated else '')
         if self.operation == 'create_directory':
             return f'Created and verified directory: {self.path}'
         return f'Saved and verified: {self.path} ({self.byte_count} bytes)\nSHA-256: {self.sha256}'
@@ -150,7 +152,12 @@ def pending(name: str, args: dict, root: Path) -> dict:
     _check_mutation(p)
     if p.exists() and (not p.is_file() or p.stat().st_size > MAX_BYTES):
         raise ValueError('Existing target must be a text file under 2 MB')
-    return dict(operation=name, path=str(p), content=args.get('content', ''), expected_sha256=digest(p),
+    content = args.get('content', '')
+    if name == 'append_file' and args.get('append_line'):
+        _text(p)
+        before = p.read_bytes()
+        content = ('\n' if before and not before.endswith((b'\n', b'\r')) else '') + content + '\n'
+    return dict(operation=name, path=str(p), content=content, expected_sha256=digest(p),
                 remember=bool(args.get('remember', False)))
 
 
@@ -167,8 +174,12 @@ def execute_result(name: str, args: dict, root: Path | None, *, confirmed: bool 
         if name == 'read_file':
             raw = p.read_bytes()
             content = _decode_text(raw)
-            return FileResult(name, str(p), content=content[:12000], byte_count=len(raw),
-                              sha256=hashlib.sha256(raw).hexdigest(), truncated=len(content) > 12000)
+            limit = args.get('max_lines')
+            if limit is not None and (type(limit) is not int or not 1 <= limit <= 200):
+                raise ValueError('Line count must be from 1 to 200')
+            shown = ''.join(content.splitlines(keepends=True)[:limit]) if limit is not None else content
+            return FileResult(name, str(p), content=shown[:12000], byte_count=len(raw),
+                              sha256=hashlib.sha256(raw).hexdigest(), truncated=shown != content or len(shown) > 12000)
         if name == 'list_directory':
             rows = []
             for child in sorted(p.iterdir(), key=lambda x: x.name.lower()):
@@ -181,36 +192,8 @@ def execute_result(name: str, args: dict, root: Path | None, *, confirmed: bool 
                     break
             return FileResult(name, str(p), entries=rows)
         if name == 'search_files':
-            pattern = args.get('pattern', '*')
-            if not isinstance(pattern, str) or '..' in Path(pattern).parts or Path(pattern).is_absolute():
-                raise ValueError('Search pattern must stay inside the workspace')
-            rows = []
-            started = time.monotonic()
-            for current, dirs, files in os.walk(p, followlinks=False):
-                safe_dirs = []
-                for directory in dirs:
-                    try:
-                        resolve(str(Path(current) / directory), root)
-                        safe_dirs.append(directory)
-                    except (OSError, ValueError):
-                        pass
-                dirs[:] = safe_dirs
-                for item in files + dirs:
-                    child = Path(current) / item
-                    relative = child.relative_to(p)
-                    if not (relative.match(pattern) or (pattern.startswith('**/') and relative.match(pattern[3:]))):
-                        continue
-                    try:
-                        rows.append(str(resolve(str(child), root)))
-                    except (OSError, ValueError):
-                        continue
-                    if len(rows) == 80:
-                        break
-                if len(rows) == 80 or time.monotonic() - started > 3:
-                    break
-                if '**' not in pattern:
-                    dirs[:] = []
-            return FileResult(name, str(p), entries=rows)
+            from .workspace_search import search
+            return search(p, args, root)
         # Every mutation route (native, generic and provider) reaches this layer.
         # The provider's additional guard is not an authorization boundary.
         _check_mutation(p)
@@ -239,6 +222,8 @@ def execute_result(name: str, args: dict, root: Path | None, *, confirmed: bool 
         before = p.read_bytes() if existed else b''
         if name == 'append_file':
             _text(p)                       # validate text; preserve every existing byte
+            if args.get('append_line'):
+                content = ('\n' if before and not before.endswith((b'\n', b'\r')) else '') + content + '\n'
             data = before + content.encode('utf-8')
         else:
             data = content.encode('utf-8')
@@ -294,9 +279,16 @@ _REQUEST = re.compile(r'(?i)^(?:please\s+)?file\s+(?:read|list|create|append|rep
 
 
 def is_request(text: str, history: list[dict] | None = None) -> bool:
+    from . import file_requests
     from .turn_policy import task_text
     t = re.sub(r'(?i)^(?:(?:can|could|would) you\s+|now\s+)', '', task_text(text))
-    return bool(_REQUEST.search(t) or _workspace_listing(t) or (_location_request(t) and _previous(history or [])))
+    return bool(file_requests.recognizes(t) or _bounded_read(t) or _REQUEST.search(t) or _workspace_listing(t) or (_location_request(t) and _previous(history or [])))
+
+
+def _bounded_read(text: str):
+    """An explicit filename and line bound; no inferred workspace destination."""
+    return re.fullmatch(r'(?is)(?:summari[sz]e|read|show) the first (\d{1,3}) lines of '
+                        r'(?:the file )?["\x27]?([^"\x27\r\n]+?)["\x27]?[?]?', text.strip())
 
 
 def _workspace_listing(text: str) -> bool:
@@ -313,6 +305,13 @@ def _location_request(text: str) -> bool:
 def _parse(text: str, history: list[dict]) -> tuple[str, str, str] | None:
     from .turn_policy import task_text
     t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+|now\s+)', '', task_text(text))
+    bounded = _bounded_read(t)
+    if bounded:
+        return 'read', bounded[2], ''
+    from .file_requests import parse
+    natural = parse(t)
+    if natural:
+        return natural.operation, natural.path, natural.content
     if _workspace_listing(t):
         return 'list', '.', ''
     m = re.fullmatch(r'(?is)file\s+(read|list|create|append|replace|remember|save conversation)\s+(.+)', t)
@@ -399,21 +398,33 @@ class Reply:
 
 
 def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
+    from . import file_requests, command_sequence
+    first, rest = command_sequence.split(text)
+    if rest:
+        from .turn_policy import scope
+        with scope(text):
+            result = command(first, history, root)
+        if result is not None:
+            result.text += '\n' + command_sequence.REST
+        return result
     if not is_request(text, history):
         return None
     parsed = _parse(text, history)
     if not parsed:
-        return Reply('Choose an exact filename inside your authorized workspace. Commands: file read <path>; '
-                     'file list <folder>; file create|append|replace|remember <path> :: <text>; '
-                     'file save conversation <path>. Set workspace <folder>, then files on first.')
+        return Reply('Supply an exact filename: file create <name> :: <text>; file append <name> :: <text>.')
     op, path, content = parsed
     from .turn_policy import effective, DENIED
     policy = effective(text)
-    action = {'read': 'read_file', 'verify': 'read_file', 'list': 'list_directory'}.get(op, 'write_file')
+    action = {'read': 'read_file', 'verify': 'read_file', 'list': 'list_directory',
+              'search': 'search_files', 'denied': 'read_file'}.get(op, 'write_file')
     if policy.blocks(action):
         return Reply(DENIED)
     if root is None:
         return Reply('File access is off. Choose workspace <folder>, then files on. No file was accessed.')
+    if op == 'denied':
+        return Reply('Protected credential/private-key request denied. No file was read or searched.')
+    if op == 'usage':
+        return Reply('Supply an exact filename: file read <path>; file create <name> :: <text>; file append <name> :: <text>.')
     if op in ('create', 'append', 'replace', 'remember') and not content:
         return Reply('Supply the exact content after " :: ". No file was written.')
     if op == 'save conversation':
@@ -422,8 +433,22 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
             return Reply('No conversation text is available to save.')
     name = {'read': 'read_file', 'verify': 'read_file', 'list': 'list_directory', 'create': 'create_file',
             'append': 'append_file', 'replace': 'write_file', 'remember': 'write_file',
-            'save conversation': 'write_file'}[op]
+            'save conversation': 'write_file', 'search': 'search_files'}[op]
     args = dict(path=path.strip(), content=content, remember=op == 'remember')
+    natural = file_requests.parse(text)
+    if natural:
+        args.update(natural.options)
+        if op == 'search':
+            args['directory'] = path
+        if op == 'read' and natural.task:
+            args['max_lines'] = 200
+    from .turn_policy import task_text
+    bounded = _bounded_read(task_text(text))
+    if bounded:
+        count = int(bounded[1])
+        if not 1 <= count <= 200:
+            return Reply('Choose a line count from 1 to 200. No file was accessed.')
+        args['max_lines'] = count
     try:
         p = resolve(args['path'], root)
         if name in ('write_file', 'append_file') and p.exists():
@@ -432,10 +457,20 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
         if op == 'verify' and receipt.ok and content and receipt.content != content:
             receipt = FileResult(name, receipt.path, ok=False, error='Current file contents do not match the requested contents')
         result = receipt.render()
+        receipts = [receipt]
+        if receipt.ok and op == 'read' and natural and natural.task:
+            result = file_requests.read_note(natural.task, receipt) + '\n\n' + result
+            if re.search(r'(?i)field notebook', natural.task):
+                matches = perform('search_files', dict(directory=str(p.parent), pattern=p.name,
+                                  terms=['notebook', 'field log', 'fieldlog']), root)
+                receipts.append(matches)
+                result += '\n\nNotebook-related source matches across this file (bounded; not a complete runtime command audit):\n' + matches.render()
+        if bounded and receipt.ok:
+            result = f'First {count} lines (verified excerpt, not an AI summary):\n' + result
         if op == 'remember':
             result += ('\nConversational memory: ' + save_memory(content) if receipt.ok else
                        '\nConversational memory: not attempted because the file operation failed.')
-        return Reply(result, receipts=[receipt])
+        return Reply(result, receipts=receipts)
     except (OSError, ValueError) as exc:
         result = f'File operation not confirmed: {type(exc).__name__}: {exc}'
         if op == 'remember':

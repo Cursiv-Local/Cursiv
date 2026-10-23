@@ -35,6 +35,13 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     from cursiv_v215.core import turn_policy
     if turn_policy.for_text(text) != turn_policy.Policy():
         return None  # enforce limits before even classifying notebook/memory commands
+    from cursiv_v215.core import command_sequence
+    pair = command_sequence.state_reply(text)
+    if pair is not None:
+        return runtime.TextResult(pair)
+    from cursiv_v215.core import file_requests
+    if file_requests.recognizes(text):
+        return None  # local source/search intent must precede notebook and memory keywords
 
     # Native notebook intent takes precedence over generic files and memory.
     _notebook = runtime.notebook_command(text, history, cfg=cfg)

@@ -213,12 +213,22 @@ def _context_candidates(history: list[dict], reference: str) -> list[str]:
     return candidates
 
 
-def _targets(query: str, person: str) -> list[dict]:
+def _targets(query: str, person: str, *, forget: bool = False) -> list[dict]:
     from . import semantic
     query = query.strip().lower().rstrip('.!?')
     visible = semantic.list_facts(person)
     by_id = [f for f in visible if f.get('id') == query]
-    return by_id or [f for f in visible if query and query in f['text'].lower()]
+    exact = by_id or [f for f in visible if query and query in f['text'].lower()]
+    if exact or not forget:
+        return exact
+    # Only strip conversational wrappers, then require every meaningful token.
+    # No embeddings, approximate spelling or model-selected deletion targets.
+    label = re.sub(r'^(?:the|my)\s+', '', query)
+    label = re.sub(r'\s+(?:note|memory|record)$', '', label)
+    tokens = set(re.findall(r'\w+', label))
+    if len(tokens) < 2:
+        return []
+    return [f for f in visible if tokens <= set(re.findall(r'\w+', f['text'].lower()))]
 
 
 def execute(action: Action, *, person: str) -> Outcome:
@@ -299,11 +309,14 @@ def execute(action: Action, *, person: str) -> Outcome:
             separator = ' ' if action.form == 'remember' and op == SAVE and not duplicate else '\n'
             return Outcome(op, True, message + separator + 'Memory ID: ' + back['id'] + '; saved and verified.',
                            [back], 'already_saved' if duplicate else 'updated' if op == UPDATE else 'saved')
-        targets = _targets(action.query, person)
+        targets = _targets(action.query, person, forget=True)
         if not targets:
             return Outcome(op, True, "I couldn't find a memory matching that. Nothing was removed.", status='not_found')
         if len(targets) != 1:
-            raise ValueError('choose one actual saved memory to forget')
+            return Outcome(op, False, 'Several saved memories match. Nothing was removed. '
+                           'Use forget <record ID>:\n' + '\n'.join(
+                               '[' + f['id'] + '] ' + f['text'] for f in targets[:10]),
+                           targets[:10], 'clarification')
         gone = sem.forget_selected([targets[0]['id']], person=person)
         remaining = {f['id'] for f in sem.list_facts(person, include_superseded=True)}
         if any(f['id'] in remaining for f in gone):
@@ -324,6 +337,14 @@ def execute(action: Action, *, person: str) -> Outcome:
 
 def command(text: str, history: list[dict], *, person: str, scope: str = '', classifier=None) -> Result | None:
     try:
+        from cursiv_v215.core import command_sequence, turn_policy
+        first, rest = command_sequence.split(text)
+        if rest and len(_parse(text) or []) <= 1:
+            with turn_policy.scope(text):
+                result = _command(first, history, person=person, scope=scope, classifier=classifier)
+            if result is not None:
+                result.clarification = (result.clarification + '\n' + command_sequence.REST).strip()
+            return result
         return _command(text, history, person=person, scope=scope, classifier=classifier)
     except (OSError, ValueError, TypeError, KeyError) as exc:
         return Result([Outcome('', False, f'Memory operation not confirmed: {type(exc).__name__}: {exc}', status='failed')])

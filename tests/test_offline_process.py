@@ -61,6 +61,22 @@ def _remote(conns) -> list[str]:
     return out
 
 
+def _connections(proc):
+    """Windows venv redirectors can run Python in a child; watch that tree too."""
+    processes = [proc]
+    try:
+        processes += proc.children(recursive=True)
+    except (psutil.NoSuchProcess, psutil.AccessDenied):
+        pass
+    rows = []
+    for process in processes:
+        try:
+            rows.extend(process.net_connections(kind='inet'))
+        except (psutil.NoSuchProcess, psutil.AccessDenied):
+            pass
+    return rows
+
+
 @pytest.mark.parametrize("offline", [True, False], ids=["offline mode on", "fresh-install default"])
 def test_the_program_starts_and_works_with_no_connection_off_this_computer(tmp_path, offline):
     app, home = tmp_path / "app", tmp_path / "home"
@@ -79,7 +95,7 @@ def test_the_program_starts_and_works_with_no_connection_off_this_computer(tmp_p
         proc = psutil.Process(p.pid)
         while p.poll() is None:
             try:
-                seen.update(_remote(proc.net_connections(kind="inet")))
+                seen.update(_remote(_connections(proc)))
                 polls += 1
             except (psutil.NoSuchProcess, psutil.AccessDenied):
                 pass
@@ -103,22 +119,35 @@ def test_the_program_starts_and_works_with_no_connection_off_this_computer(tmp_p
 
 
 def test_the_observers_do_see_a_connection_when_there_is_one(tmp_path):
-    """The control: without it, 'nothing seen' could mean the observers are blind. A program that
-    tries 192.0.2.1 (a documentation address that leads nowhere) must show up in both."""
+    """Observe an external attempt and a held OS socket independently.
+
+    A rejected external TCP connection can vanish before an OS poll. Hold a
+    loopback connection for the OS positive control; test remote classification
+    separately. Neither observer can silently pass without seeing its control.
+    """
     (tmp_path / "wrap.py").write_text(WRAPPER.split("root = sys.argv[2]")[0] + (
-        "import socket\n"
+        "import socket, time\n"
         "s = socket.socket(); s.settimeout(1.5)\n"
         "try: s.connect(('192.0.2.1', 9))\n"
-        "except OSError: pass\n"), encoding="utf-8")
+        "except OSError: pass\n"
+        "s.close()\n"
+        "server=socket.socket(); server.bind(('127.0.0.1',0)); server.listen(1)\n"
+        "client=socket.socket(); client.connect(server.getsockname()); accepted,_=server.accept()\n"
+        "open('control-port.txt','w').write(str(server.getsockname()[1]))\n"
+        "time.sleep(1.5)\n"
+        "accepted.close(); client.close(); server.close()\n"), encoding="utf-8")
     attempts = tmp_path / "attempts.jsonl"
     p = subprocess.Popen([sys.executable, "-I", str(tmp_path / "wrap.py"), str(attempts)], cwd=tmp_path)
     seen = set()
     proc = psutil.Process(p.pid)
     while p.poll() is None:
         try:
-            seen.update(_remote(proc.net_connections(kind="inet")))
+            seen.update((c.raddr.ip, c.raddr.port) for c in _connections(proc) if c.raddr)
         except (psutil.NoSuchProcess, psutil.AccessDenied):
             pass
         time.sleep(0.02)
     assert json.loads(attempts.read_text(encoding="utf-8").splitlines()[0]) == ["socket.connect", "192.0.2.1"]
-    assert any(s.startswith("192.0.2.1:9") for s in seen), seen
+    port = int((tmp_path / 'control-port.txt').read_text())
+    assert ('127.0.0.1', port) in seen, seen
+    from types import SimpleNamespace
+    assert _remote([SimpleNamespace(raddr=SimpleNamespace(ip='192.0.2.1', port=9), status='SYN_SENT')]) == ['192.0.2.1:9 SYN_SENT']
