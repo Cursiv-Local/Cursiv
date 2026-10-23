@@ -46,6 +46,7 @@ class FileResult:
     sha256: str = ''
     error: str = ''
     truncated: bool = False
+    matched_files: int = 0
 
     def receipt(self) -> dict:
         data = asdict(self)
@@ -64,11 +65,13 @@ class FileResult:
         if self.operation == 'list_directory':
             return f'Directory: {self.path}\n' + '\n'.join(self.entries)
         if self.operation == 'search_files':
-            return ('Found:\n' + '\n'.join(self.entries) if self.entries else
+            return (f'Found {self.matched_files} matching ' + ('file' if self.matched_files == 1 else 'files') + ':\n' + '\n'.join(self.entries) if self.entries else
                     'No matches in readable authorized files scanned.') + (
                         '\nSearch limit reached; results are partial. Narrow the folder or search.' if self.truncated else '')
         if self.operation == 'create_directory':
             return f'Created and verified directory: {self.path}'
+        if self.operation == 'append_file':
+            return f'Appended to {Path(self.path).name}\nPath (verified): {self.path}'
         return f'Saved and verified: {self.path} ({self.byte_count} bytes)\nSHA-256: {self.sha256}'
 
     def status_line(self) -> str:
@@ -411,7 +414,7 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
         return None
     parsed = _parse(text, history)
     if not parsed:
-        return Reply('Supply an exact filename: file create <name> :: <text>; file append <name> :: <text>.')
+        return Reply('Which file do you mean? For example: Create field-notes.txt with the text: Site A, 14.2 C.')
     op, path, content = parsed
     from .turn_policy import effective, DENIED
     policy = effective(text)
@@ -424,9 +427,12 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
     if op == 'denied':
         return Reply('Protected credential/private-key request denied. No file was read or searched.')
     if op == 'usage':
-        return Reply('Supply an exact filename: file read <path>; file create <name> :: <text>; file append <name> :: <text>.')
-    if op in ('create', 'append', 'replace', 'remember') and not content:
-        return Reply('Supply the exact content after " :: ". No file was written.')
+        natural = file_requests.parse(text)
+        return Reply(natural.error if natural and natural.error else 'Which file do you mean? Give its filename.')
+    natural = file_requests.parse(text)
+    if op in ('create', 'append', 'replace', 'remember') and not content and not (
+            natural and (natural.content_ref or natural.options.get('empty_file'))):
+        return Reply('What text should I write? Include it in the request; no file was changed.')
     if op == 'save conversation':
         content = '\n\n'.join(str(x.get('role', 'message')) + ': ' + str(x.get('content', '')) for x in history)
         if not content:
@@ -435,7 +441,6 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
             'append': 'append_file', 'replace': 'write_file', 'remember': 'write_file',
             'save conversation': 'write_file', 'search': 'search_files'}[op]
     args = dict(path=path.strip(), content=content, remember=op == 'remember')
-    natural = file_requests.parse(text)
     if natural:
         args.update(natural.options)
         if op == 'search':
@@ -450,13 +455,27 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
             return Reply('Choose a line count from 1 to 200. No file was accessed.')
         args['max_lines'] = count
     try:
-        p = resolve(args['path'], root)
+        from . import file_context
+        root = workspace_root(root)
+        p = (file_context.resolve(args['path'], op, history, root) if op in ('read', 'append', 'create', 'replace')
+             else resolve(args['path'], root))
+        args['path'] = str(p)
+        if natural and natural.content_ref:
+            args['content'] = file_context.content(natural.content_ref, history)
+        if name == 'create_file' and p.exists() and natural:
+            name = 'write_file'  # ask before overwriting; keep the backend create operation exclusive
         if name in ('write_file', 'append_file') and p.exists():
-            return Reply(pending=pending(name, args, root))
-        receipt = perform(name, args, root)
+            prepared = pending(name, args, root)
+            if not (natural and natural.options.get('overwrite')):
+                return Reply(pending=prepared)
+            args = prepared
+        approval = {'confirmed': True} if natural and natural.options.get('overwrite') else {}
+        receipt = perform(name, args, root, **approval)
         if op == 'verify' and receipt.ok and content and receipt.content != content:
             receipt = FileResult(name, receipt.path, ok=False, error='Current file contents do not match the requested contents')
         result = receipt.render()
+        if natural and receipt.ok and op in ('create', 'replace'):
+            result = f'{"Updated" if name == "write_file" else "Created"} {p.name}\nPath: {receipt.path}'
         receipts = [receipt]
         if receipt.ok and op == 'read' and natural and natural.task:
             result = file_requests.read_note(natural.task, receipt) + '\n\n' + result
@@ -471,6 +490,8 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
             result += ('\nConversational memory: ' + save_memory(content) if receipt.ok else
                        '\nConversational memory: not attempted because the file operation failed.')
         return Reply(result, receipts=receipts)
+    except file_context.Clarify as exc:
+        return Reply(str(exc))
     except (OSError, ValueError) as exc:
         result = f'File operation not confirmed: {type(exc).__name__}: {exc}'
         if op == 'remember':

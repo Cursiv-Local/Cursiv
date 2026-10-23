@@ -20,6 +20,7 @@ on:
 
 permissions:
   contents: write
+  checks: read
 
 jobs:
   build:
@@ -44,6 +45,14 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: |
           python -m pytest tests -q
+      - name: Require exact-source main release gates
+        if: startsWith(env.REF, 'v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if test -f scripts/prepare_release.py; then
+            python -c "import subprocess,sys;sys.path.insert(0,'scripts');from prepare_release import require_ci;require_ci(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),main_tip=False)"
+          fi
       - name: Build Cursiv.app
         run: python -m PyInstaller --noconfirm --clean launcher/build.spec
       - name: Self-test the built app

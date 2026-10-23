@@ -531,6 +531,9 @@ _HELP_TOPICS = {
   codex <request>             coding help, every step listed (codex help for more)
   files on / off              let me read and write files
   workspace <folder>          the folder I'm allowed to use
+  Create notes.txt with the text: Site A, 14.2 C
+  Add ‘Site B, 13.8 C’ to the notes file; Open the notes file
+  Search my workspace for temperature or sample
   mode                        writes: ask first <-> automatic"""),
     "builder": ("Builder tools", """\
   evolve <idea>               write a new ability (plugin); you approve it first

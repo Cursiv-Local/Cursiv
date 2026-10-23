@@ -14,6 +14,15 @@ release dependencies with `python -m pip install --require-hashes -r requirement
 Run `python launcher/main.py` from the repository root. Ollama is optional for
 unit tests; real local-model use requires its separate installation and a model.
 
+Before committing, run `python scripts/check_workspace_files.py`. This focused
+workspace/language/release gate uses a disposable home and no GUI windows or model
+calls. Then run the full suite below. Both gates must pass; do not push failing work.
+GitHub main protection requires `workspace-files (windows-latest)`,
+`workspace-files (macos-latest)`, both `test (...)` jobs and `security`, all from
+GitHub Actions, with an up-to-date branch and no administrator bypass. Push a
+feature branch and use a PR; the updated workflow must be present in that PR.
+For releases use `scripts/prepare_release.py` after main CI passes; see TECH.
+
 Run `python -m pytest tests -q` in a disposable checkout/profile without personal
 records, production keys or installed-app data. Fixtures redirect storage and
 assert watched user data is unchanged. Qt tests use offscreen rendering and never
