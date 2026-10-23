@@ -140,7 +140,66 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 | Team sharing | Signed notebook chains move by USB/shared folder. Imports retain separate device chains and report conflicts rather than overwriting observations. [Phone notebook and transfer](docs/PHONE-NOTEBOOK.md). |
 | Personal features | Settings → Appearance → Show personal features exposes older letters/vault, council, coding and builder tools. Current source also gates typed letter/vault commands and dialog shortcuts; it retains existing data/backends. [Ownership map](ARCHITECTURE.md). |
 
+### Contested philosophical and value questions (current source)
+
+`core/philosophy_policy.py` holds a shared instruction: acknowledge unresolved
+disagreement first, present the main arguments fairly, distinguish evidence from
+normative premises, and never claim special model access to a philosophical verdict.
+The chat assembles it as a separate application system block for local and cloud
+providers, including tool mode. Prompt compaction reserves space for the complete
+policy instead of losing it with the long persona.
+
+Common foundational questions about moral truth, free will, consciousness,
+ethical theories and beauty receive concise built-in overviews before model
+generation. Their source label identifies application text, not a model or live
+lookup. Short follow-ups use the previous user question for context, never a model's
+verdict as proof. Definitions, historical attributions, factual questions, safety
+instructions and file/memory commands keep their existing routes. Explicit requests
+to argue a position still use the model, with that position labeled as a perspective.
+
+This adds no lookup, model pass or memory write to the built-in reply path. The
+general instruction covers broader contested topics; wording beyond the bounded
+native cases remains dependent on model compliance. Automated tests use fake
+providers and isolated data, not a claim that every live model response is neutral.
+Run `python -m pytest tests/test_philosophy_policy.py -q` in an isolated profile.
+
+Implementation reading, checked 2026-10-23: Stanford Encyclopedia of Philosophy
+entries on [moral realism](https://plato.stanford.edu/entries/moral-realism/),
+[moral anti-realism](https://plato.stanford.edu/entries/moral-anti-realism/),
+[free will](https://plato.stanford.edu/entries/freewill/),
+[consciousness](https://plato.stanford.edu/entries/consciousness/),
+[consequentialism](https://plato.stanford.edu/entries/consequentialism/),
+[deontology](https://plato.stanford.edu/entries/ethics-deontological/),
+[virtue ethics](https://plato.stanford.edu/entries/ethics-virtue/) and
+[beauty](https://plato.stanford.edu/entries/beauty/). These are development references;
+the application does not fetch them while answering. Anti-realism and relativism
+are distinguished rather than treated as interchangeable positions.
+
 ### Memory, permissions and conversation history
+
+#### Workspace files (current source; not yet in the U90 installer)
+
+Choose `workspace <folder>` and enable `files on` once. Natural commands use the
+same verified local tools in local and cloud model modes, without model inference:
+
+- `Create a file called field-notes.txt and write ‘Site A - water clear, 14.2 C’ in it`
+- `Create field-notes.txt in my workspace` creates an empty file.
+- `Add ‘Site B - slightly cloudy, 13.8 C’ to the notes file`
+- `Open the notes file` or `Show me what’s in field-notes`
+- `Search my workspace for temperature or sample` returns local paths and line numbers.
+
+Recent-file context comes from confirmed receipts in this conversation. A bounded
+filename lookup can resolve a unique partial name; ambiguous or incomplete searches
+ask for a filename/subfolder. Paths are revalidated against the current workspace;
+changing workspace does not grant access to old absolute paths. Model save claims
+and model-provided paths never establish context. Measurement references use only
+exact user-authored text; a missing new measurement is requested rather than invented.
+
+Existing-file appends and replacement requests retain the approval flow. Explicit
+`Overwrite notes.txt with the text: ...` authorizes replacement, with a changed-file
+check. All operations retain files-off, protected-path, symlink/junction/hard-link
+and restricted-turn safeguards. No shell execution, web fallback or persistent
+filesystem-context database is added. `help coding` includes natural examples.
 
 `remember <fact>` saves an explicit fact. `memory learn on / off` controls automatic
 selection of lasting facts; it does not retrain the model. `memory status` reports
@@ -229,12 +288,25 @@ also requires [Inno Setup 6](https://jrsoftware.org/isdl.php).
 1. Update the version together in `launcher/cursiv_launcher.py` (`_CURRENT_VERSION`),
    `installer/cursiv_setup.iss` (`AppVer`, `OutputBaseFilename`) and
    `cursiv_engine/core/selfknow.py` (`VERSION`). Choose an unused higher version.
-2. Pass isolated regression checks, review the diff, then commit/tag the reviewed
-   source with owner authorization.
-3. Run `scripts/build_release.py` with that exact tag as its only argument. It
+2. Pass `python scripts/check_workspace_files.py` and the full isolated suite,
+   review the diff, and commit/push the feature branch only with owner authorization.
+   Open a PR and wait for the required workspace, full-suite and security checks
+   before merging to main. Main protection requires these checks even for admins.
+3. From the clean tested main commit, run `python scripts/prepare_release.py <tag>`.
+   It verifies all three version strings, exact-source successful main CI and the
+   local workspace gate **before** creating a new tag. Missing/pending/failed checks
+   stop tag creation. It does not push or publish.
+4. Run `scripts/build_release.py` with that exact tag as its only argument. It
    builds a clean temporary checkout, requires the frozen app self-test, compiles
    Inno Setup and stages identical versioned/latest installers, checksums and
    provenance in `installer/Output/`.
+
+The focused workspace job runs on every PR and main push on Windows and Mac,
+without GUI windows or inference. New Windows builds repeat the tagged workspace
+gate and exact-source CI check; tagged Mac builds require the same main CI.
+Historical immutable tags that predate these helpers keep their rebuild path.
+Use the preparation helper instead of manually creating release tags; the GitHub
+main rule does not prevent an owner from deliberately bypassing local release tools.
 
 Use the helper's sanitized child environment: inherited editor/tool DLL paths can
 shadow Windows/Qt libraries. Working-tree builds are for development. Historical

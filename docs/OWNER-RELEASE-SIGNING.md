@@ -90,11 +90,17 @@ coverage, but a physical-drive recovery drill by the owner remains outstanding.
 
 ## Repository and release controls
 
-The read-only GitHub check returned “Branch not protected” for `main`.
-No account or repository security settings were changed. Configure passkeys/2FA,
-review repository collaborators/tokens, require reviewed changes and passing
-checks, and protect release tags. Owner signing does not prevent malicious
-source commits; the owner must review the exact tagged source before signing.
+The original U89 audit found `main` unprotected. During the U91 follow-up,
+required Actions checks were enabled and independently confirmed: Windows/Mac
+workspace gates, Windows/Mac full suites and security, with strict/up-to-date
+checks and administrator enforcement. Force pushes and branch deletion are
+disabled. Use a PR and passing merged-main checks; the supported release helper
+then validates that exact source before creating the tag.
+
+Account passkeys/2FA, collaborator/token review and release-tag protection remain
+owner controls; this release does not claim to have configured them. Owner
+signing does not prevent malicious source commits; the owner must review the
+exact tagged source before signing.
 Never place the owner private key in a GitHub Action that a repository attacker
 could edit. CI builds Mac artifacts; the owner signs their downloaded final bytes
 locally before publication.
