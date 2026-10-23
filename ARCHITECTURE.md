@@ -1,10 +1,14 @@
 # Cursiv architecture
 
-This describes the U86 source, carrying the U82–U85 architecture forward.
-[U86 verification](docs/U86-RELEASE-VERIFICATION.md) records the combined source,
+This describes the U87 source, carrying the U82–U86 architecture forward.
+[U87 verification](docs/U87-RELEASE-VERIFICATION.md) records the current source,
 tagged packages and actual publication state. The earlier
 [live-test follow-up](docs/LIVE-TEST-FOLLOWUP.md) and
 [conversation follow-up](docs/CONVERSATION-FOLLOWUP.md) explain the repairs.
+
+U87 adds `launcher/phone_help.py` for exact native phone pointers shared by
+short Help, field help and the existing notebook/Help windows. Rich links open
+in the system browser on user action; notebook storage/import behavior is unchanged.
 
 ## Desktop and chat
 

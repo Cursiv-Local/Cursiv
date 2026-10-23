@@ -49,3 +49,12 @@ checks; the U85 full model benchmark remains separately labeled historical data.
 
 README capability/limitation changes should update this mapping, related tests or
 an explicitly uncompleted manual checklist in the same change.
+
+## U87 native phone Help
+
+`test_help.py`, `test_ui_redesign.py` and `test_chat_feedback.py` assert exact
+phone URLs/wording, one occurrence, actual rich-text hrefs and external-link
+support, with unchanged notebook records. The text is shared application code,
+not a model response. No physical phone caching/import claim follows from help
+text checks. [U87 verification](U87-RELEASE-VERIFICATION.md) records packaging
+and actual deployed tester-page privacy/contact checks separately.

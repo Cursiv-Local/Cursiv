@@ -25,7 +25,10 @@ application is not automatically replaced by publishing a release.
 
 The isolated versioned Windows suite passed **1,495 tests with one Mac-only
 skip**. The earlier focused Help/UI run passed 106 tests. Hosted/package and
-public verification outcomes are recorded after execution.
+public verification outcomes are recorded after execution. Hosted source CI
+passed **1,495/1 on Windows** and **1,485/11 on Mac** (passed/skipped).
+Both tagged packages passed their frozen app/notebook self-tests. The static
+website build and all **20 website tests passed**.
 
 [U87 verification](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/U87-RELEASE-VERIFICATION.md)
 records actual source/package tests, artifact hashes and publication checks.
