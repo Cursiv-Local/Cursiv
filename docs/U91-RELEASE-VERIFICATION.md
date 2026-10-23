@@ -49,8 +49,33 @@ behavior. Build-only and whitespace checks passed.
 Prepared the current U91 links, actual Windows hash, signed owner manifest and
 software-test evidence, retaining historical model scores. The wide blue Help
 test Cursiv invitation remains above the navigation and links to `/testers`.
-Publication, final website checks and independent public downloads are recorded
-below after execution; this preparation alone is not a claim of live deployment.
+Completed publication, final website checks and independent public downloads
+are recorded below.
+
+## Completed publication and live verification
+
+U91 was published as GitHub latest at **2026-10-23T19:39:42Z**, with all
+11 intended public assets. Every uploaded size and SHA-256 matched the local
+staging files. Independent unauthenticated downloads of all eight signed
+installer/checksum/provenance assets matched the existing owner key and manifest;
+both platform latest aliases matched their respective versioned installers.
+
+The existing `cursiv-web` Worker deployed successfully as
+`a5b407f1-bd38-44f9-a9a4-ae521bb950a3`. No DNS, secret or D1 schema change was made.
+The deployed website source was committed as `33a66a7` before deployment; later
+commits record publication outcomes, without changing the immutable app tag.
+
+All **45 anonymous production checks passed**. Generated current-release HTML
+matches production after accounting for the pre-existing edge beacon. Checks
+covered the blue tester invitation and exact stylesheet, U91 links and actual
+checksum, public owner proof, canonical/HTTPS/indexability/JSON-LD, the social PNG,
+existing phone routes, robots/sitemap, tester contacts/no-script policy and legacy
+redirect. Both unauthenticated private-statistics endpoints returned 401/no-store.
+The public download counter remains removed.
+
+The publication event triggered a redundant Mac rebuild (`40013158416`); it was
+cancelled after the independently verified tagged build (`40011158453`) and owner
+signing had already completed. Published signed assets were not replaced.
 
 ## Remaining manual limits
 

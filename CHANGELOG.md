@@ -2,6 +2,10 @@
 
 ## 3.14-U91 — workspace files and philosophical uncertainty (2026-10-23)
 
+- Published owner-authenticated Windows/Mac installers as latest and deployed the
+  website. All **45 anonymous production checks passed**, including actual signed
+  downloads, the blue tester link, release evidence, canonical routes and admin denial.
+
 - Final locked Windows source checks: **1,749 passed / 1 skipped**; hosted Mac
   **1,735 / 15 skips**. Both tagged frozen apps and all protected-main gates passed.
   All **21 website checks** passed. Final installer bytes have independent owner proof.
