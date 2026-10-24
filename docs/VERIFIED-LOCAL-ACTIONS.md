@@ -171,7 +171,7 @@ its user records. Baseline selected filesystem/notebook regressions: **82 passed
 
 **Final exact-source full suite: 1,008 passed, 1 skipped, 150.00 s.** The only skip
 requires macOS Keychain on this Windows host. Final log:
-[pytest.log](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-check-2a48gvi8/pytest.log).
+`pytest.log` (local test log, not published).
 Command: Python 3.13 `check_cursiv_memory.py`, selecting all `tests`, using pytest
 `-q -ra --disable-warnings --maxfail=10` in the disposable snapshot. All changed
 Python sources match that snapshot exactly. Syntax and `git diff --check` pass.

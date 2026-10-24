@@ -133,7 +133,7 @@ data, memory and signing keys. Real notebook data is never a test fixture.
 - **Final exact-source full suite: 920 passed, 1 skipped, 140.34 s.**
   The only skip requires macOS Keychain; this run was on Windows. The earlier
   timer failure did not recur in any of these three full post-change runs.
-  Final log: [pytest.log](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-check-dhckjpb1/pytest.log).
+  Final log: `pytest.log` (local test log, not published).
 
 The final full suite used Python 3.13 via `check_cursiv_memory.py` with no test
 selection (all `tests`, pytest `-q -ra --disable-warnings --maxfail=10`). The

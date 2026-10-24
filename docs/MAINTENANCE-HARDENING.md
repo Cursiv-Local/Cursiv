@@ -135,9 +135,9 @@ on Windows, not claimed as passed.
 | Final trust follow-up complete suite | **1,246 passed, 1 skipped; 299.62 s**. Includes expanded local/cloud restrictions and normal provider-budget compatibility; the skip requires a Mac's Keychain. | `%TEMP%/cursiv-maintenance-s8vnolr0/pytest.log` |
 
 Logs/snapshot manifests are under the local task artifact directory:
-`C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/`.
+the local test-run folder (not published).
 The subsequent U82 repair snapshots are under
-`C:/Users/joshu/AppData/Local/Temp/`; the table identifies each exact folder.
+the local test-run folder (not published); the table identifies each exact folder.
 The pre-safety-follow-up application's Python fingerprint was
 `5702f355960e6931e1ca9d042688bf11fc830772a1c2f2d02d2f18697aec8c65`.
 The safety-follow-up tested application/launcher fingerprint was
@@ -335,7 +335,6 @@ candidate, repaired complete-window gate and final release results.
 - [launcher/command_dispatch.py](../launcher/command_dispatch.py)
 - [launcher/command_media.py](../launcher/command_media.py)
 - [cursiv_engine/core/command_api.py](../cursiv_engine/core/command_api.py)
-- [launcher/command_runtime.py](../launcher/command_runtime.py)
 - [launcher/command_support.py](../launcher/command_support.py)
 - [launcher/commands_credentials.py](../launcher/commands_credentials.py)
 - [launcher/commands_extensions.py](../launcher/commands_extensions.py)
