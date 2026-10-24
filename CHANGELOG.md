@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.14-U96 (in progress) — One personality, open system, cleaner memory
+## 3.14-U96 — One personality, open system, self-awareness, USB gate (2026-10-24)
 
 - Cursiv has one personality, the same in every conversation: curious, calm, warm
   without gushing, a light dry humor, honest, on the person's side. The seven
