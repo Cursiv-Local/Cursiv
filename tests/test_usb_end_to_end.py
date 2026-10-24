@@ -225,7 +225,7 @@ def test_a_fresh_kit_without_personal_data_has_none(kit):
 def test_the_usb_gate_runs_on_every_push_pr_commit_and_release():
     workflow = (REPO / ".github" / "workflows" / "tests.yml").read_text(encoding="utf-8")
     assert "python -m pytest tests -m usb" in workflow
-    assert "branches: [main]" not in workflow.split("pull_request:")[0]          # every branch push
+    assert 'branches: ["**"]' in workflow.split("pull_request:")[0]          # every branch push, not tags
     release = (REPO / "scripts" / "build_release.py").read_text(encoding="utf-8")
     assert "portable_report = verify_portable(work, env)" in release
     hook = (REPO / ".githooks" / "pre-commit").read_text(encoding="utf-8")

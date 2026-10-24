@@ -2,6 +2,7 @@ name: tests
 
 on:
   push:            # every push to any branch (the USB gate must pass every time)
+    branches: ["**"]   # not tag pushes: a release tag must not start a second run on its commit
   pull_request:
   workflow_dispatch:
 

@@ -110,7 +110,14 @@ gh api repos/Cursiv-Local/Cursiv/releases/tags/v3.14-U96 -q '.assets[] | "\(.nam
 
 ## 8. Website and evidence (one PR), then deploy
 
-On a branch from main:
+On a branch from main, `scripts/website_release.py` makes the page and doc edits below in
+one checked step (it stops before writing if any expected line is missing):
+
+```bash
+py -3.13 scripts/website_release.py --old U96 --new U97 --old-hash <U96 Windows SHA-256>   --new-hash <U97 Windows SHA-256> --old-windows <U96 count> --windows <U97 count>   --mac <Mac count> --mac-skips <Mac skips> --title "<short title>"   --summary "<Start page sentence>" --section "<test page paragraph>"
+```
+
+What it covers, for reference:
 
 - `cp "$A/owner-release.json" website/assets/cursiv-owner-release-U96.json`
 - Update the previous version to U96 in `README.md`, `TECH.md`, `docs/CLAIM-EVIDENCE.md`,

@@ -1,5 +1,13 @@
 # Handoff — Cursiv verification overhaul
 
+## U96 published (Claude, 2026-10-24)
+
+Tag `v3.14-U96` = `ddc9385` (PRs #13, #14, #15). First release through the USB release
+gate (`verify_portable` passed on the tagged build). The tag push started a second CI run
+on the same commit and the release gate held the build until it passed; the workflow now
+runs on every branch push but not tag pushes. Website updated with the new
+`scripts/website_release.py`. Evidence: [U96-RELEASE-VERIFICATION](docs/U96-RELEASE-VERIFICATION.md).
+
 ## U95 published (Claude, 2026-10-24)
 
 Tag `v3.14-U95` = `7ed4763` (PR #10), built and signed exactly as U94 below

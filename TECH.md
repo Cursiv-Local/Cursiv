@@ -396,7 +396,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U95 source and package checks are recorded in the [verification report](docs/U95-RELEASE-VERIFICATION.md);
+U96 source and package checks are recorded in the [verification report](docs/U96-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -414,6 +414,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 | U93: readable code typography and website polish | [Release notes](docs/RELEASE-U93.md), [verification](docs/U93-RELEASE-VERIFICATION.md) |
 | U94: USB startup fix and drive Check / Update | [Release notes](docs/RELEASE-U94.md), [verification](docs/U94-RELEASE-VERIFICATION.md) |
 | U95: bring USB data back to a computer | [Release notes](docs/RELEASE-U95.md), [verification](docs/U95-RELEASE-VERIFICATION.md) |
+| U96: one personality, self-awareness, USB gate | [Release notes](docs/RELEASE-U96.md), [verification](docs/U96-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |
 | U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
 | U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |

@@ -75,7 +75,7 @@ def test_workspace_gate_is_in_pr_main_and_build_paths():
     triggers = workflow.split('jobs:')[0]
     # Every push (main included, since U96 every branch) and every pull request.
     assert 'pull_request:' in triggers and 'push:' in triggers
-    assert 'branches:' not in triggers or 'branches: [main]' in triggers
+    assert 'branches: ["**"]' in triggers or 'branches: [main]' in triggers
     assert 'workspace-files:' in workflow and 'python scripts/check_workspace_files.py' in workflow
     assert "'tests/test_workspace_release_gate.py'" in (root / 'scripts/check_workspace_files.py').read_text(encoding='utf-8')
     assert 'require_ci' in (root / 'scripts/build_release.py').read_text(encoding='utf-8')
