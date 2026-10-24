@@ -31,6 +31,8 @@ The initial downloads need internet access. Type `offline on` to block Cursiv's 
 
 Windows may show an unrecognized-publisher warning; Windows-trusted signing and Apple notarization are still pending. Read [how to verify a download](docs/OWNER-RELEASE-SIGNING.md) before continuing.
 
+Ask **“What can Cursiv do?”** for a short built-in guide with examples.
+
 To explore without using your own records, type `demo`. Type `demo off` to return to your data, or `help` to see the available commands.
 
 ## Phone and USB options
@@ -51,7 +53,7 @@ AI answers can be confidently wrong. Cursiv's checks catch some mistakes, not al
 
 ## Releases, evidence and development
 
-Latest release: **[U91](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U91)**. See the [release notes](docs/RELEASE-U91.md) and [changelog](CHANGELOG.md).
+Latest release: **[U92](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U92)**. See the [release notes](docs/RELEASE-U92.md) and [changelog](CHANGELOG.md).
 
 - [Tests and evidence](docs/CLAIM-EVIDENCE.md): what has been checked and what remains unverified.
 - [Help test Cursiv](https://cursiv.us/testers): send a clear report of what you tried and what happened.

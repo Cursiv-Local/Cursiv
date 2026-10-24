@@ -1,5 +1,31 @@
 # Handoff — Cursiv verification overhaul
 
+## U92 published and independently verified (2026-10-23)
+
+The owner authorized commit, push, installer build, release and website publication.
+Source PR #4 passed all five protected gates and merged at
+`fa61b2695622c45eeaed1097e4a7ec3bc62b8be0`. Exact-main CI 40040215616
+passed before the helper ran the 63-check workspace gate and created `v3.14-U92`.
+
+- Windows source **1,798 passed / 1 skip**; Mac **1,784 / 15 skips**. Both tagged
+  frozen apps reported **ALL PASSED**. Tagged Mac build 40040910138 passed.
+- The eight final installer/checksum/provenance assets have unchanged independent
+  owner identity and verified public bytes. Latest stable published
+  `2026-10-23T23:52:03Z` with 11 assets. Windows-trusted signing and Apple
+  notarization remain pending.
+- Website tests **21/21** and anonymous production checks **47/47** passed.
+  Deployment: `32d49153-c520-498c-abc2-3635b276a597`. Current download links, hashes,
+  signed proof, README, release notes, changelog and technical evidence are updated.
+- The separate chat's already-published tester image/metadata are preserved;
+  its download link advances to U92. Unfinished 404 changes, personal legal notes,
+  local notes and test files remain excluded in the main checkout.
+- The normal local `installer/Output/` now also contains the verified U92 installer,
+  latest alias, versioned checksums and provenance. No private key was copied.
+
+See [complete verification](docs/U92-RELEASE-VERIFICATION.md). The following
+preparation notes are historical; U92 publication is complete. No new full model
+benchmark, physical encrypted-USB persistence test or recovery drill was run.
+
 ## U92 release preparation and live-transcript repairs (2026-10-23)
 
 The owner subsequently authorized commit, push, installer build and publication.
