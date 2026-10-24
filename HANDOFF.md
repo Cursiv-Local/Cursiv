@@ -1,5 +1,32 @@
 # Handoff — Cursiv verification overhaul
 
+## U93 published and independently verified (2026-10-24)
+
+The owner authorized commit, push, installer build and release. Source PR #6
+passed all five protected checks and merged at `cffcee8478eccc1fdfb9a6714ec0fc705fc96227`.
+Exact-main CI 40060612503 passed before the helper reran the 63-test
+workspace gate and created immutable tag `v3.14-U93`.
+
+- Windows source: **1,805 / 1 skip**; Mac: **1,791 / 15 skips**.
+  Focused typography/rendering: **86 passed**. Both frozen tagged apps reported
+  **ALL PASSED**. Tagged Mac build: 40061149384.
+- All eight installer/checksum/provenance assets have the unchanged independent
+  owner identity and publicly verified hashes/sizes. Latest stable published
+  `2026-10-24T04:19:21Z` with 11 release assets. Windows-trusted signing
+  and Apple notarization remain pending.
+- Website tests: **21/21**; anonymous production checks: **49/49**. Deployment:
+  `98ef90e7-5ebc-4c3a-b564-397ebd637f1a`. Current U93 links, actual hashes, proof, README,
+  changelog, technical evidence and release notes are updated together.
+- The homepage tester link remains below the hero buttons; tester downloads stay
+  below the closing thanks. The published tester artwork and custom 404 survive.
+  Their source/configuration are now recorded in GitHub with this release.
+- The standard local installer output has the final verified U93 Windows files.
+  Personal legal notes, local notes and test_internals are excluded and untouched.
+
+See [U93 verification](docs/U93-RELEASE-VERIFICATION.md). Earlier preparation
+notes below are historical. No new model-accuracy benchmark, physical encrypted
+USB persistence test, clean-machine installation or recovery drill was performed.
+
 ## U93 preparation — code typography and published website polish
 
 The owner authorized commit, push, installer build and release. All three version

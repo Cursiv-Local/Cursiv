@@ -1,7 +1,9 @@
 # Changelog
 
-## 3.14-U93 — Readable chat code and website polish (release preparation)
+## 3.14-U93 — Readable chat code and website polish (2026-10-24)
 
+- Published latest U93 and updated the website. All **21 website tests** and
+  **49 anonymous production checks** passed; signed packages and hashes are public.
 - Display inline commands and code blocks in Consolas on Windows, with platform
   fallbacks, at the same size as normal chat text. Apply the typography during
   streaming, final rendering and reopening older chats. Preserve code text and
@@ -9,7 +11,8 @@
 - Add deterministic coverage for streaming/final typography, old saved HTML,
   unchanged history, point/pixel sizes and idempotent formatting. Locked isolated
   Windows checks: **1,805 passed / 1 platform skip**; focused compatibility **86**;
-  required workspace gate **63**. Hosted/package evidence follows execution.
+  required workspace gate **63**. Hosted Mac: **1,791 / 15 skips**. Both
+  tagged frozen apps passed. [U93 verification](docs/U93-RELEASE-VERIFICATION.md).
 
 ## Website — Tester download placement (2026-10-23)
 
