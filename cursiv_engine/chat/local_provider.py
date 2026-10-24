@@ -62,6 +62,9 @@ def _call_ollama_raw(runtime: ChatRuntime, messages: list[dict], max_tokens: int
         if model is None:
             yield f"\n[No local model available. Run: ollama pull {_speed.chat_model_prefs()[0]}]"
             return
+    from cursiv_engine.core import last_turn
+    if not standard:      # the answer itself, not a helper call (titles, checks, classifiers)
+        last_turn.record_sent("Ollama (local)", model, system_str, 14000 if _speed.small_gpu() else 48000)
     if _speed.gpu_options(model):
         _speed.make_room(model)                 # one model on a small card at a time
     deep = not standard and model == _speed.DEEP_THINK_MODEL and _speed.deep_think_on()

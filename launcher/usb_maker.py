@@ -293,15 +293,16 @@ class _Signals(QObject):
     staged   = pyqtSignal(bool, str)
 
 
-def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool=False) -> None:
+def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool=False,
+             include_keys: bool=False) -> None:
     """Compatibility entry point; implementation in chat.usb_ops."""
-    return _usb_ops.make_usb(_runtime(), root, models, include_private, sig, cancel, field)
+    return _usb_ops.make_usb(_runtime(), root, models, include_private, sig, cancel, field, include_keys)
 
 
 
-def check_usb(root: Path, models: list[dict], include_private: bool) -> tuple[bool, str]:
+def check_usb(root: Path, models: list[dict], include_private: bool, include_keys: bool=False) -> tuple[bool, str]:
     """Compatibility entry point; implementation in chat.usb_ops."""
-    return _usb_ops.check_usb(_runtime(), root, models, include_private)
+    return _usb_ops.check_usb(_runtime(), root, models, include_private, include_keys)
 
 
 
@@ -376,11 +377,15 @@ class UsbMakerDialog(QDialog):
         self._drive_box.currentIndexChanged.connect(self._drive_changed)
         lay.addWidget(self._model_list)
 
-        self._private = QCheckBox("Include my memories, keys and settings (private — only for your own USB)")
-        self._private.setToolTip('Copied API keys are exported in readable form for use on other computers. '
-                                 'Anyone with the drive can read and use those keys.')
+        self._private = QCheckBox("Include my memories, conversations and settings (private — only for your own USB)")
+        self._private.setToolTip("Your AI keys are not included unless you also tick the box below.")
         self._private.toggled.connect(self._update_total)
         lay.addWidget(self._private)
+        self._keys = QCheckBox("Also copy my AI keys (readable on this drive: anyone with the drive can use them)")
+        self._keys.setToolTip("Off by default. Keys are personal; leave this off for any drive you give to someone.")
+        self._keys.setEnabled(False)
+        self._private.toggled.connect(lambda on: (self._keys.setEnabled(on), on or self._keys.setChecked(False)))
+        lay.addWidget(self._keys)
 
         self._field = QCheckBox("Field copy: starts in offline mode, no break reminders, no learned guesses")
         self._field.setToolTip("For research or field use. All three can be changed in Settings on the drive.")
@@ -508,10 +513,11 @@ class UsbMakerDialog(QDialog):
         self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
         self._status.setText("Reading the drive…")
         root, models, private = Path(d["root"]), self._chosen_models(), self._private.isChecked()
+        keys = private and self._keys.isChecked()
 
         def work():
             try:
-                ok, report = check_usb(root, models, private)
+                ok, report = check_usb(root, models, private, keys)
                 self._sig.done.emit(True, report)
             except Exception as exc:
                 self._sig.done.emit(False, f"Couldn't check the drive: {exc}")
@@ -589,19 +595,21 @@ class UsbMakerDialog(QDialog):
         if not self._private.isChecked() and (Path(d["root"]) / PRIVATE_MARKER).exists():
             ok = QMessageBox.question(
                 self, "Private data on this drive",
-                "This drive has a private copy of your memories, keys and settings from an "
-                "earlier time. It may contain readable API keys that anyone with the drive can use. "
+                "This drive has a private copy of your memories and settings from an earlier "
+                "time. It may also contain readable AI keys that anyone with the drive can use. "
                 "Updating preserves that data; this is not a way to reset a drive "
                 "for another person.\n\nContinue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
                 return
         if self._private.isChecked():
+            keys = self._keys.isChecked()
             ok = QMessageBox.question(
                 self, "Private data",
-                "Your memories, keys and conversations will be copied onto the drive. Copied API keys "
-                "are exported in readable form for use on other computers. Anyone with the drive can "
-                "read and use those keys and read the copied personal data.\n\nContinue?",
+                "Your memories, conversations and settings will be copied onto the drive. Anyone with "
+                "the drive can read them. " +
+                ("Your AI keys will be copied too, readable, so anyone with the drive can use them. "
+                 if keys else "Your AI keys will not be copied. ") + "\n\nContinue?",
                 QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
             if ok != QMessageBox.StandardButton.Yes:
                 return
@@ -622,7 +630,8 @@ class UsbMakerDialog(QDialog):
         self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
         threading.Thread(target=make_usb,
                          args=(Path(d["root"]), self._chosen_models(), self._private.isChecked(),
-                               self._sig, self._cancel, self._field.isChecked()),
+                               self._sig, self._cancel, self._field.isChecked(),
+                               self._private.isChecked() and self._keys.isChecked()),
                          daemon=True).start()
 
     def _on_progress(self, pct: int, text: str):

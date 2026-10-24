@@ -8,6 +8,10 @@ from __future__ import annotations
 import re
 
 SOURCE = '\n\n*[Sources: Cursiv built-in feature guidance (no AI model)]*'
+# How memory works -- not a recall request ("do you remember what I said about X?").
+_MEMORY_MECHANICS = re.compile(
+    r"\bhow (?:do|does|will|can) (?:you|cursiv|your memory)\b[^?.]{0,30}\b(?:remember|memory|memories|store|save|learn)\b"
+    r"|\bhow does (?:your|cursiv'?s) memory work\b")
 
 OVERVIEW = (
     "Cursiv is a local-first AI assistant for field notes, documents and practical questions. "
@@ -53,7 +57,8 @@ def answer(text: str) -> str | None:
                          r'capabilities|features|limitations|offline|online|closed|close|code|weights)\b|'
                          r'\b(?:field notebook|field log|sample[ -]ids?|\.cursivsync)\b|'
                          r"\b(?:what (?:can|can't|cannot) you do|who are you|what are you|how do you work|"
-                         r'what makes you unique|do you store anything)\b', q))
+                         r'what makes you unique|do you store anything)\b', q)
+               or bool(_MEMORY_MECHANICS.search(q)))
     if not own:
         return None
     if re.search(r'\bwho\b.*\b(?:created|built|made)\b|\b(?:creator|license|licence|open.source)\b', q) and re.search(r'\bcursiv\b', q):
@@ -80,17 +85,20 @@ def answer(text: str) -> str | None:
                 'the append-only SHA-256 chain with field log check. For a correction, select the entry '
                 'in Field Notebook and choose Correct selected; the original remains. A confirmed save '
                 'includes the actual record ID and fingerprint. This help did not save or inspect entries.')
-    elif re.search(r'\b(?:memory|memories|learn|learning|weights|retrain|store anything)\b', q):
-        body = ('Cursiv supports persistent local memory across restarts. remember <fact> requests a '
+    elif re.search(r'\b(?:memory|memories|learn|learning|weights|retrain|store anything)\b', q) or _MEMORY_MECHANICS.search(q):
+        body = ('Cursiv supports persistent local memory across restarts: saved facts are kept in files '
+                'on this computer and are matched to later questions by meaning. remember <fact> requests a '
                 'verified manual save; recall <words> searches saved facts. Automatic learning, when '
                 'enabled, saves selected facts rather than everything. memory learn off disables it. '
                 'Retrieval may miss a saved fact; remembering a fact does not retrain model weights. '
-                'Conversation history has separate retention settings. This answer did not read or save memory.')
+                'Conversation history has separate retention settings. self stores lists what is saved and '
+                'where; memory cleanup reviews misleading records. This answer did not read or save memory.')
     elif re.search(r'\b(?:usb|ssd|portable)\b', q):
         body = ('Make a Cursiv USB copies the application, local runtime and selected models to a drive. '
                 'Start that copy using Start Cursiv on the drive. Current portable data lives under '
-                'Home/.cursiv on that drive. A personal copy can include memories, settings and readable '
-                'exported API keys; keep it private. A fresh kit excludes those personal records. '
+                'Home/.cursiv on that drive. A personal copy can include memories, conversations and '
+                'settings; AI keys are copied only if you also tick that separate box, and are then readable '
+                'on the drive. Keep a personal copy private. A fresh kit excludes those personal records. '
                 'Verify saved data after restarting and on a second PC before relying on your kit. '
                 'This answer did not inspect your drive.')
     elif re.search(r'\b(?:closed|close|background|working after)\b', q):

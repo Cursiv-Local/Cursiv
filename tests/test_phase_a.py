@@ -224,7 +224,9 @@ def test_battery_saver_skips_the_second_model_call(fresh, monkeypatch):
 def test_are_you_offline_is_answered_from_the_real_state(fresh, monkeypatch, offline, expect):
     from cursiv_engine.core import netgate
     from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.chat import status
     netgate.set_offline(offline)
+    monkeypatch.setattr(status, "_phone_linked", lambda: False)   # not this test machine's real phone link
     _local_model(monkeypatch)
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("the model was asked"))
     out = "".join(ca.chat("Are you completely offline right now? Prove it.", [], "", None))

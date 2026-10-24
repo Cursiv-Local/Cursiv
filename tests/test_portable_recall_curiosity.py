@@ -82,6 +82,7 @@ def test_scan_budget_and_link_protection(records, monkeypatch, tmp_path):
         assert 'PermissionError' in field_recall.command('field log recent')
 
 
+@pytest.mark.usb
 def test_portable_migration_backup_conflict_and_references(tmp_path, monkeypatch):
     import portable
     root = tmp_path / 'drive'
@@ -127,6 +128,7 @@ def test_portable_migration_backup_conflict_and_references(tmp_path, monkeypatch
     assert len(list((destination / 'backups').iterdir())) == 1
 
 
+@pytest.mark.usb
 def test_usb_refresh_preserves_private_and_workspace(tmp_path):
     import usb_maker
     source = tmp_path / 'desktop.txt'
@@ -141,6 +143,7 @@ def test_usb_refresh_preserves_private_and_workspace(tmp_path):
         usb_maker.update_plan(drive, [(source, Path('../host'))])
 
 
+@pytest.mark.usb
 def test_portable_activation_failure_never_returns_nonportable(tmp_path, monkeypatch):
     import portable
     monkeypatch.setattr(portable, 'usb_root', lambda: tmp_path)

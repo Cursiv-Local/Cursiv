@@ -196,7 +196,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     try:
         from cursiv_engine.core import selfknow as _sk
         if not reflective(user_text) and not runtime.turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
-            messages[0]["content"] = _sk.system_prompt(observed=_observed)
+            messages[0]["content"] = _sk.system_prompt(observed=_observed, question=user_text)
             _self_turn = True
     except Exception:
         pass
@@ -265,7 +265,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         try:
             from cursiv_engine.core import tools as _tools
             if runtime.turn_policy.current().inspect and _tools.might_need_tools(user_text):
-                _calls = _tools.plan(user_text, runtime._router_llm)
+                _calls = _tools.plan(user_text, runtime._router_llm, files=bool(file_access and root_path))
                 if _calls:
                     _results = _tools.run(_calls, root=runtime.Path(root_path) if file_access and root_path else None)
                     _tool_ctx = _tools.context_for(_results)
@@ -317,7 +317,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         from cursiv_engine.chat import status as _net_status
         if not runtime._CODING_TURN and _net_status.answers_network_question(user_text):
             runtime._CURSIV_REPLY = True
-            yield _net_status.network_answer()
+            yield _net_status.network_answer(user_text)
             return
         # "Is it safe?" with nothing earlier saying what "it" is: ask, don't guess (core/clarify.py).
         # Not when the calculator already worked it out: "How far is it from 44.1234, -71.5678 to
@@ -455,6 +455,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # ── Smart model routing ─────────────────────────────────────────────
     from .provenance import capture_memory
     capture_memory(runtime, messages)
+    # What this answer's instructions were (memory only), for "self prompt" and
+    # later questions about why Cursiv answered as it did.
+    from cursiv_engine.core import last_turn
+    last_turn.record_assembled(messages)
     key = (api_key or "").strip()
     oai = (openai_key or "").strip()
     ant = (anthropic_key or "").strip()

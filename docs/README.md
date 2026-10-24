@@ -45,7 +45,7 @@ link to them.
 
 ## Releases
 
-Each release has notes (`RELEASE-U<n>.md`) and, from U82, a verification report
+How to make one, step by step: [release runbook](RELEASE-RUNBOOK.md). Each release has notes (`RELEASE-U<n>.md`) and, from U82, a verification report
 (`U<n>-RELEASE-VERIFICATION.md`) with its tests, hashes and owner signature.
 U83 and U88 were candidates rejected before publication; their reports say why.
 

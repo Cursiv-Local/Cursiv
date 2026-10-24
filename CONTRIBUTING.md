@@ -23,6 +23,14 @@ GitHub Actions, with an up-to-date branch and no administrator bypass. Push a
 feature branch and use a PR; the updated workflow must be present in that PR.
 For releases use `scripts/prepare_release.py` after main CI passes; see TECH.
 
+**The USB function must work every time.** `python -m pytest tests -m usb` runs the
+USB gate (about 10 seconds): the whole make-drive → start from the drive → move it →
+bring data back cycle (`tests/test_usb_end_to_end.py`) plus the sync, migration and
+license tests. It runs before every commit once you enable the hook with
+`git config core.hooksPath .githooks`, as its own step in the required `test` job on
+every push and PR, and in `scripts/build_release.py`, which also starts the built
+app from a USB layout and refuses to package it unless portable mode works.
+
 Run `python -m pytest tests -q` in a disposable checkout/profile without personal
 records, production keys or installed-app data. Fixtures redirect storage and
 assert watched user data is unchanged. Qt tests use offscreen rendering and never

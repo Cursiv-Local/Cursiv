@@ -184,7 +184,7 @@ def test_failed_tool_suppresses_model_and_checker(pipeline, monkeypatch, tmp_pat
     from cursiv_engine.core import tools
     ca = pipeline
     monkeypatch.setattr(tools, 'might_need_tools', lambda _: True)
-    monkeypatch.setattr(tools, 'plan', lambda *a: [dict(tool='list_folder', args={})])
+    monkeypatch.setattr(tools, 'plan', lambda *a, **kw: [dict(tool='list_folder', args={})])
     monkeypatch.setattr(tools, 'run', lambda *a, **kw: [tools.ToolOutcome('list_folder', 'PermissionError: denied')])
     monkeypatch.setattr(ca, '_call_ollama', lambda *a, **kw: pytest.fail('No model after denied tool'))
     monkeypatch.setattr(ca, '_router_llm', lambda *a, **kw: pytest.fail('No checking model after denied tool'))

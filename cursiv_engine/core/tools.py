@@ -154,12 +154,16 @@ Use workspace-relative file paths; use "." to list the configured authorized wor
 File tools are confined to the person's explicitly enabled workspace. Use relative paths for files in that workspace; never substitute the home folder or installation directory. No workspace means no file access. Don't guess file names you weren't told -- list or search first. Availability does not establish execution or success."""
 
 
-def plan(text: str, ask: Callable[[list[dict]], str]) -> list[dict]:
+def plan(text: str, ask: Callable[[list[dict]], str], *, files: bool = True) -> list[dict]:
+    """files=False (no enabled workspace): file tools aren't offered, so a question
+    such as "does anything leave my computer?" can't end in a failed folder listing."""
     from .turn_policy import effective, Policy
     policy = effective(text)
     if not policy.inspect:
         return []
     tools = all_tools() if policy == Policy() else dict(BUILTIN)
+    if not files:
+        tools = {n: t for n, t in tools.items() if n not in ('read_file', 'list_folder', 'find_files')}
     desc = "\n".join(f"- {n}: {t['description']}" for n, t in tools.items())
     try:
         raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc)},

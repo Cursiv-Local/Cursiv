@@ -1,8 +1,7 @@
 name: tests
 
 on:
-  push:
-    branches: [main]
+  push:            # every push to any branch (the USB gate must pass every time)
   pull_request:
   workflow_dispatch:
 
@@ -43,6 +42,10 @@ jobs:
           python -m pip install --upgrade pip
           # The same packages the app needs (a hand-kept list here missed pypdf, U67-U71)
           python -m pip install --require-hashes -r requirements-release.lock
+      - name: USB portability (end to end, must pass every time)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: python -m pytest tests -m usb -v
       - name: Test
         env:
           QT_QPA_PLATFORM: offscreen

@@ -22,6 +22,10 @@ for _m in ("codex_tool_bridge", "knowledge_brain"):
 import pytest  # noqa: E402
 
 
+def pytest_configure(config):
+    config.addinivalue_line("markers", "usb: Cursiv USB portability, run as its own CI gate (python -m pytest -m usb)")
+
+
 @pytest.fixture(autouse=True)
 def _memory_isolated(tmp_path, monkeypatch):
     """Background learning must not outlive a test's storage redirections.

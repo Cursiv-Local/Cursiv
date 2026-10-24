@@ -35,6 +35,22 @@ def _checks():
             out.append(str(d))
         return "writable: " + ", ".join(out)
 
+    def portable_storage():
+        """Run from a Cursiv USB, everything must be on that drive (launcher/portable.py)."""
+        if os.environ.get("CURSIV_PORTABLE") != "1":
+            return "installed copy (not running from a Cursiv USB)"
+        from cursiv_engine.core import paths
+        drive = Path(os.environ["CURSIV_USB_ROOT"]).resolve()
+        for name, folder in (("data", paths.APP_DATA), ("home", Path.home())):
+            if not Path(folder).resolve().is_relative_to(drive):
+                raise RuntimeError(f"{name} folder {folder} is not on the drive {drive}")
+        probe = paths.APP_DATA / ".selftest-portable"
+        probe.write_text("ok", encoding="utf-8")
+        if probe.read_text(encoding="utf-8") != "ok":
+            raise RuntimeError("drive write could not be read back")
+        probe.unlink()
+        return f"running from the drive {drive}; data at {paths.APP_DATA}"
+
     def reference():
         from cursiv_engine.core import reference
         n = len(reference.entries())
@@ -100,7 +116,8 @@ def _checks():
         from cursiv_engine.core import release_identity
         return 'Pinned owner key ' + release_identity.public_identity()['key_id']
 
-    return [("imports", imports), ("owner release identity", owner_identity), ("data folders", data_folders), ("offline reference", reference),
+    return [("imports", imports), ("owner release identity", owner_identity), ("data folders", data_folders),
+            ("portable storage", portable_storage), ("offline reference", reference),
             ("calculations", calculations), ("field notebook", field_notebook), ("documents", documents),
             ("window", window), ("AI engine (information only)", engine)]
 

@@ -102,6 +102,38 @@ use (`docs/USB-PERSISTENCE-CHECK.md`) still needs a person. Data made *on the US
 is not copied back to a PC's installed Cursiv yet (one-way: PC -> drive). The 13
 old `portable-*` backup folders on D: were left for the owner to delete.
 
+## U96 part 2: self-awareness, honest privacy, keys opt-in, USB gate (Claude, 2026-10-24) — branch `claude/u96-part2`
+
+- `core/self_source.py` (search/read own code and docs; confined to `TOP`, text
+  suffixes, no tests/licenses/data; labelled), `core/last_turn.py` (memory-only
+  record: assembled in `conversation.py` after `capture_memory`, sent in
+  `_call_ollama_raw` for non-standard calls; council keeps its last call),
+  `core/self_stores.py` (counts + "how it is used", each checked against code:
+  answer ratings are written but never read; session memory is the latest session
+  file regardless of date). `selfknow.system_prompt(question=)` adds labelled
+  evidence. Commands routed in `command_dispatch`: self prompt [full], self stores,
+  self source, self read. `build.spec` bundles launcher code and docs as text.
+- Privacy: live, model-free answer via `chat/status.network_answer(question)`; the
+  `_NET_QUESTION` pattern now covers "leave my computer / is my data private /
+  where does my data go"; the phone link is listed. Persona and SELF_PROMPT state
+  privacy as current facts (in the compact persona too). `feature_answers`
+  `_MEMORY_MECHANICS` answers "how do you remember"; recall requests are untouched.
+- `tools.plan(..., files=False)` without a workspace (a privacy question had ended
+  in a failed `list_folder`; pre-existing bug).
+- Keys: owner decision 2026-10-24 — personal keys never go to others. USB maker has
+  a separate, unticked "Also copy my AI keys" box. Without it `usb_sync.keep_drive_keys`
+  restores exactly the drive's previous keys after config.json is updated, and
+  comparisons ignore key fields (no endless "update"). The owner's own D: was left
+  unchanged by request (it holds 20 readable key copies, incl. 13 failed-launch
+  backups). Verified: no real key in any commit, tag or release source (only
+  `xai-xxxx` / `sk-xxxx` placeholders in old history).
+- USB gate: `-m usb` marker (24 tests incl. `tests/test_usb_end_to_end.py`), its own
+  step in the required `test` job, CI now runs on every branch push, `.githooks/pre-commit`
+  (enable: `git config core.hooksPath .githooks`; set in the owner's clone), and
+  `build_release.verify_portable` + selftest "portable storage" check.
+- `memory cleanup` flags style rules that are captured content (the owner's style
+  file has "### Rule: …" and "1. Identify essential items…") and exact duplicates.
+
 ## U96 part 1: one personality, open system, memory clean-up (Claude, 2026-10-24) — branch `claude/u96-part1`
 
 Owner-approved personality text is the "How to talk" section of

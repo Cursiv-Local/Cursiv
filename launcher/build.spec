@@ -38,6 +38,12 @@ datas = [
     # cursiv_engine package (everything — models, prompts, templates)
     (str(CURSIV), "cursiv_engine"),
 ]
+# Cursiv's own launcher code and documentation as plain text, so it can read how it
+# works (core/self_source.py: "self source", "self read"). Read-only; never imported.
+datas += [(str(f), "launcher") for f in sorted(LAUNCHER.glob("*.py"))]
+datas += [(str(ROOT / "docs"), "docs")]
+datas += [(str(ROOT / name), ".") for name in ("README.md", "TECH.md", "ARCHITECTURE.md", "CHANGELOG.md",
+                                               "MODELS.md", "PRIVACY.md", "OFFLINE-DEMO.md") if (ROOT / name).exists()]
 
 
 # ── Hidden imports that PyInstaller static analysis misses ───────────────────
