@@ -428,6 +428,43 @@ def get_strand(strand_id: str) -> dict[str, Any] | None:
     return None
 
 
+def remove_strands(ids: list[str], archive: Path) -> list[dict[str, Any]]:
+    """Remove the selected saved notes, copying them to `archive` first.
+
+    The archive is written and read back before strands.jsonl is rewritten; both
+    writes go through vault protection when encrypted storage is on. Lines that
+    do not parse are kept exactly as they were. Returns the removed records."""
+    wanted = {str(i) for i in ids}
+    from . import atomic
+    with _save_lock:
+        try:
+            raw = private_store.read_bytes(STRANDS_FILE)
+        except FileNotFoundError:
+            return []
+        kept, removed = [], []
+        for line in raw.decode('utf-8').splitlines(keepends=True):
+            try:
+                record = json.loads(line) if line.strip() else None
+            except ValueError:
+                record = None
+            if isinstance(record, dict) and str(record.get('id')) in wanted:
+                removed.append((record, line if line.endswith('\n') else line + '\n'))
+            else:
+                kept.append(line)
+        if not removed:
+            return []
+        archived = ''.join(line for _record, line in removed).encode('utf-8')
+        atomic.write_bytes(archive, archived)
+        if private_store.read_bytes(archive) != archived:
+            raise OSError('Saved-note archive read-back verification failed; nothing was removed')
+        remaining = ''.join(kept).encode('utf-8')
+        atomic.write_bytes(STRANDS_FILE, remaining)
+        if private_store.read_bytes(STRANDS_FILE) != remaining:
+            raise OSError('Saved-note removal read-back verification failed; the archive holds the removed notes')
+    _mx.invalidate()
+    return [record for record, _line in removed]
+
+
 def list_strands(
     territory: str | None = None,
     min_score: float = 0.0,

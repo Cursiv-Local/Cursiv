@@ -30,7 +30,7 @@ where data lives, and how to run, build and release it.
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |
 | `agents/` | Custom agents (`agent new …`), Babel translation, coding agent, offline queue, reference brain, voice. |
 | `coding/` | The coding brain: playbooks, worked examples, error diagnosis, run-and-fix sandbox, `evolve` plugin writer. |
-| `guardian/` | Login (bcrypt), security questions, owner mode and protected paths. Shared filesystem mutations deny guardian/login/key targets. Login is a front-door lock, not data encryption; installed keys use platform protection where available (see [threat model](docs/THREAT-MODEL.md) for plaintext exceptions). |
+| `guardian/` | Login (bcrypt), security questions and protected paths (no owner mode or unlock codes since U96). Shared filesystem mutations deny guardian/login/key targets. Login is a front-door lock, not data encryption; installed keys use platform protection where available (see [threat model](docs/THREAT-MODEL.md) for plaintext exceptions). |
 | `training/` | LoRA training (`lora_trainer.py`) and merging the adapter into Ollama (`ollama_merge.py`). |
 | `family/`, `postal/` | Sealed letters: per-person letters that open with a name and birth date, and signed letters between people. |
 | `council/cursiv_facts.md`, `codex/system_prompt.md` | What Cursiv knows about itself and its persona. Keep the fact sheet accurate when features change. |
@@ -171,14 +171,27 @@ not proof that the complete document lacks the information. Attached material
 and emergencies retain their existing paths. General questions still use the
 normal model route.
 
-`core/style.py` emits current tone in a separate system block. Compaction reserves
-a bounded share for complete style lines, prioritizing current tone over older
-standing rules. Brief guidance asks for 1–3 sentences/about 60 words for ordinary
-prose; explicit detail/format requests and essential warnings take priority.
-The current normal tone is also explicit after a reset, rather than leaving a
-previous brief command in chat history as the only visible tone instruction.
-There is no hard text cut-off or extra rewrite call; live model compliance still
-requires manual checks. Talk-only turns do not read stored style preferences.
+`core/style.py` emits a person's learned style rules in a separate system block,
+with a note that the current request overrides them. Compaction reserves a bounded
+share for complete style lines. Since U96 there are no selectable tones: Cursiv has
+one personality, defined in `codex/system_prompt.md` ("How to talk") and carried
+into the compact persona. Old `tone` values in style files are ignored. There is no
+hard text cut-off or extra rewrite call; live model compliance still requires
+manual checks. Talk-only turns do not read stored style preferences.
+
+**U96 creative requests.** "Be honest" says thought experiments, hypotheses,
+fiction and creative writing are welcome and labelled. For a creative or
+hypothetical request, `chat/response_style.drop_false_refusal` removes an opening
+claim that Cursiv lacks the capability when the same reply then does the work;
+safety and permission refusals, and refusals with nothing after them, are kept.
+
+**U96 memory clean-up.** `memory cleanup` (`memory/cleanup.py`) lists saved notes
+and memory facts that mislead answers: guardian-era replies, old council answers
+about Cursiv's features, test records and inferred preferences against
+speculative or creative thinking. Plain regular expressions decide, not a model.
+`memory cleanup remove <codes>|all` archives each record to
+`APP_DATA/backups/memory-cleanup-<time>/` (vault-protected names) before a verified
+removal; unreadable saved-note lines are kept. It is routed before memory intents.
 
 Qt streaming and final reply parsing use GitHub Markdown with raw HTML disabled.
 Literal placeholders stay visible; trusted application status chips still use

@@ -102,6 +102,36 @@ use (`docs/USB-PERSISTENCE-CHECK.md`) still needs a person. Data made *on the US
 is not copied back to a PC's installed Cursiv yet (one-way: PC -> drive). The 13
 old `portable-*` backup folders on D: were left for the owner to delete.
 
+## U96 part 1: one personality, open system, memory clean-up (Claude, 2026-10-24) — branch `claude/u96-part1`
+
+Owner-approved personality text is the "How to talk" section of
+`codex/system_prompt.md` (one personality; it is in `speed._CORE_SECTIONS`, so the
+compact persona on small GPUs carries it). Done on this branch, not released:
+- **Creator line:** chat-facing prompts say "made by Cursiv Local, an independent
+  open-source project". Cloud-privacy notices still name the real API host
+  (`cursiv.winklers-llc.com`) because that is where messages go; moving the API to
+  `cursiv.us` would remove the surname there. License/copyright untouched. Note:
+  `Cursiv-LICENSE.txt` says "All rights reserved" while README/installer say MIT —
+  owner decision.
+- **Owner mode removed** (`guardian/owner.py`, `owner setcode`, owner sessions and
+  the owner-only prompt line, whose honesty sentence now applies to everyone).
+  Kept on purpose: `guardian/protected.py`, logins, and the fleet "Manage Access"
+  password re-check (re-authentication before granting remote relay access).
+- **Tones removed** (`style.TONES`, `set_tone`, Settings picker). Learned style rules
+  stay; `tone …` replies with `style.NO_TONES`; old `tone` values are ignored.
+  Response *phases* (constitution/grounding "tone" fields) are untouched.
+- **Hypotheticals rule** added to "Be honest"; **`drop_false_refusal`** in
+  `chat/response_style.py`, applied with `trim_closer` when the draft can be
+  replaced. Tests: `test_false_refusal.py` (incl. the observed transcript and the
+  real `chat()` pipeline), `test_style_personality.py`.
+- **`memory cleanup`** (`memory/cleanup.py`, `strand_store.remove_strands`), routed in
+  `command_dispatch` before memory intents. Dry run on a copy of the owner's data
+  lists 9 items: 3 guardian-era notes (`c9160d06`, `447b4ab6`, `d2b802e9`), 3 old
+  council feature answers, 2 test memories, 1 inferred "over speculative" guess.
+  Nothing was removed from the owner's real data; that is the owner's choice.
+- Correction: the `evolve` command exists (Cursiv Forge); old council answers that
+  mention it are flagged as outdated, not invented.
+
 ## Creative refusal: controlled reproduction (Claude, 2026-10-24) — root cause still unknown
 
 The refusal transcript below is saved on the owner's PC as conversation

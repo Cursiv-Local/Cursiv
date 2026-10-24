@@ -525,6 +525,7 @@ _HELP_TOPICS = {
   grok / claude               ask the last question again with that AI"""),
     "style": ("How I talk", """\
   style                       the rules I learned from your corrections (style add <rule>)
+  memory cleanup              list saved notes/memories that mislead answers; remove the ones you pick
   rate good / bad / 1-5       tell me how the last answer was"""),
     "coding": ("Files and coding", """\
   codex <request>             coding help, every step listed (codex help for more)

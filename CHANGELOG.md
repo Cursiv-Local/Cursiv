@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.14-U96 (in progress) — One personality, open system, cleaner memory
+
+- Cursiv has one personality, the same in every conversation: curious, calm, warm
+  without gushing, a light dry humor, honest, on the person's side. The seven
+  selectable tones are gone; learned style preferences ("keep answers shorter")
+  still apply.
+- Thought experiments, hypotheses, fiction and creative writing are explicitly
+  welcome. A reply that claims it can't do a creative request and then does it
+  anyway now shows only the work.
+- Owner mode is removed: no owner code unlocks anything.
+- `memory cleanup` lists saved notes and memories that mislead answers (old
+  guardian-era replies, outdated answers about Cursiv's features, test records,
+  inferred preferences against speculative thinking). `memory cleanup remove …`
+  removes only what you pick, after copying it to a backup folder.
+- Cursiv says it is made by Cursiv Local, an independent open-source project.
+
 ## 3.14-U95 — Bring USB data back to a computer (2026-10-24)
 
 - "Make a Cursiv USB…" has **Bring drive data here**: conversations, notebook
