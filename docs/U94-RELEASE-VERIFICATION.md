@@ -54,3 +54,24 @@ separate from Windows-trusted Authenticode and Apple notarization; warnings rema
 No new model-accuracy benchmark, second-PC USB persistence test, clean-machine
 installation or owner recovery drill is claimed. Data moves one way (computer to
 drive) in U94. Personal legal notes and local test files remain excluded.
+
+## Publication and production verification completed
+
+- GitHub latest stable U94 published with 11 assets; GitHub's recorded SHA-256 of
+  each installer equals the signed hash. The release-triggered `mac-build` run
+  (40122170647) was cancelled so the signed DMG is never replaced.
+- Evidence PR: https://github.com/Cursiv-Local/Cursiv/pull/9 (all five checks passed).
+- Cloudflare `cursiv-web` deployment: `2efce0cb-29d6-46a6-adf3-45ac10b349cd`.
+- Website build and all **21 website regression checks passed**.
+- Anonymous production checks: **33 of 37 passed**. Both domains serve every page;
+  no U93 download link remains; the live U94 hash, signed manifest and public key
+  equal the repository copies; both installers downloaded from the public links
+  match the signed hashes and verify with the app's owner-proof verifier; GitHub's
+  latest release is U94; custom 404, robots and sitemap rules hold; `/admin/` is not
+  anonymously readable.
+- The 4 failures are "live HTML equals build" for `/`, `/start`, `/vision` and
+  `/ai-reliability-testing`: Cloudflare inserts its Web Analytics beacon
+  (`static.cloudflareinsights.com`) into those pages for browser requests. Only
+  `/testers` sends `no-transform`, which blocks it. This comes from the Cloudflare
+  account setting, predates U94, and is not disclosed in the privacy policy. It is
+  recorded here for the owner's decision; nothing was changed in Cloudflare.
