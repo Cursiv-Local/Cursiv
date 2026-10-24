@@ -14,8 +14,10 @@
   the main button reads **Update USB**.
 - Program updates never copy data into the drive's program folder, and older data
   folders such as `.cursiv.moved-<date>` are never pruned.
-- New `tests/test_usb_sync.py`; isolated Windows source run **1,812 passed / 1
-  platform skip** before the version change.
+- New `tests/test_usb_sync.py`. Locked isolated Windows source **1,812 passed / 1
+  platform skip**; hosted Mac **1,797 / 16 skips**; required workspace gate **63**;
+  website **21**. Published with owner-signed Windows and Mac packages.
+  [U94 verification](docs/U94-RELEASE-VERIFICATION.md).
 
 ## 3.14-U93 — Readable chat code and website polish (2026-10-24)
 
