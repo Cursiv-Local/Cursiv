@@ -1,5 +1,9 @@
 # Public claim to evidence
 
+U93 code typography is covered by `test_code_typography.py` and the existing
+streaming/history/cache regressions. It changes presentation, not model accuracy
+or saved text. Release checks and package evidence are recorded separately.
+
 These links explain what each README claim establishes and where it stops.
 Unit/integration tests use disposable data. The full U85 model run is evidence
 for one fixed suite/model/configuration, not a complete product evaluation. See

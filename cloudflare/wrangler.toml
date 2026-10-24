@@ -13,6 +13,7 @@ routes = [
 directory = "dist"
 binding = "ASSETS"
 html_handling = "auto-trailing-slash"   # /board serves board.html, /vision serves vision.html, ...
+not_found_handling = "404-page"          # show the field-map page with a real 404 status
 run_worker_first = true                  # needed to redirect legacy-host page requests
 
 [vars]

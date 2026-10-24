@@ -132,6 +132,17 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 ## Feature behavior and controls
 
+### Chat code typography (U93 preparation)
+
+`launcher/chat_rendering.py:style_code` gives inline commands and fenced code a
+local monospace font at the transcript's normal size. Windows prefers Consolas;
+Menlo/DejaVu Sans Mono/system monospace are fallbacks. Qt's Markdown importer
+otherwise inserts the system fixed font's own size and ignores code CSS.
+Streaming and final parsing normalize only the inserted range. Reopened HTML is
+normalized once in the view; the export cache is invalidated when necessary and
+user data is not migrated. `tests/test_code_typography.py` covers pixel/point
+sizes, retained text/formats, unchanged history and repeat formatting.
+
 | Area | Behavior and deeper documentation |
 |---|---|
 | Field notebook | Original measurements are preserved; corrections append a new record with a reason. SHA-256 chains detect changed/reordered records, and signed exports identify the signing device. CSV, JSON, GeoJSON and printable reports are supported. Camera time/GPS are retained when available; the app does not provide live GPS. [Notebook integration](docs/FIELD-NOTEBOOK-INTEGRATION.md), [verified local actions](docs/VERIFIED-LOCAL-ACTIONS.md). |

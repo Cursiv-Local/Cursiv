@@ -3,13 +3,65 @@
 Only complete paragraphs outside fenced blocks are candidates for incremental
 formatting. The unfinished tail stays plain text. A final message-only parse
 resolves cross-paragraph constructs (reference links, lists and check details).
-The buffer is pure text; TranscriptCache is used only on the GUI thread.
+The buffer is pure text; typography and TranscriptCache run on the GUI thread.
 """
 from __future__ import annotations
 
 import re
 
 _FENCE = re.compile(r'^ {0,3}(`{3,}|~{3,})(.*)$')
+
+
+def style_code(document, start: int, end: int) -> bool:
+    """Give inserted code a distinct font at the document's normal text size.
+
+    Qt's Markdown importer hardcodes the system fixed font's point size and
+    ignores document CSS for code. Limit formatting to the inserted range;
+    reopening saved HTML also recognizes its serialized monospace families.
+    """
+    from PyQt6.QtGui import QFont, QTextCharFormat, QTextCursor, QTextFormat
+    families = ['Consolas', 'Menlo', 'DejaVu Sans Mono', 'monospace']
+    code_names = {name.casefold() for name in families} | {
+        'courier', 'courier new', 'cascadia code', 'cascadia mono', 'monaco',
+    }
+    base = document.defaultFont()
+    changes = []
+    end = min(end, document.characterCount() - 1)
+    block = document.findBlock(start)
+    while block.isValid() and block.position() < end:
+        iterator = block.begin()
+        while not iterator.atEnd():
+            fragment = iterator.fragment()
+            if fragment.isValid():
+                current = fragment.charFormat()
+                names = current.fontFamilies() or []
+                if current.fontFixedPitch() or any(name.casefold() in code_names for name in names):
+                    styled = QTextCharFormat(current)
+                    styled.setFontFamilies(families)
+                    styled.setFontFixedPitch(True)
+                    styled.setFontStyleHint(QFont.StyleHint.Monospace)
+                    for prop in (QTextFormat.Property.FontPointSize, QTextFormat.Property.FontPixelSize,
+                                 QTextFormat.Property.FontSizeAdjustment):
+                        styled.clearProperty(prop)
+                    if base.pixelSize() > 0:
+                        styled.setProperty(QTextFormat.Property.FontPixelSize, base.pixelSize())
+                    elif base.pointSizeF() > 0:
+                        styled.setFontPointSize(base.pointSizeF())
+                    if styled != current:
+                        changes.append((max(start, fragment.position()),
+                                        min(end, fragment.position() + fragment.length()), styled))
+            iterator += 1
+        block = block.next()
+    if not changes:
+        return False
+    cursor = QTextCursor(document)
+    cursor.beginEditBlock()
+    for first, last, styled in changes:
+        cursor.setPosition(first)
+        cursor.setPosition(last, QTextCursor.MoveMode.KeepAnchor)
+        cursor.setCharFormat(styled)
+    cursor.endEditBlock()
+    return bool(changes)
 
 
 class MarkdownStream:

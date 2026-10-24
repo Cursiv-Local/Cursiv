@@ -33,7 +33,7 @@ from PyQt6.QtWidgets import (
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2  # one palette for every window (theme.py)
 import theme
 import re as _re
-from chat_rendering import MarkdownStream, TranscriptCache
+from chat_rendering import MarkdownStream, TranscriptCache, style_code
 from chat_controls import ChatControlsMixin, _ChatInput
 from chat_transcript import ChatTranscriptMixin
 from chat_review import ChatReviewMixin
@@ -397,8 +397,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             return False
         self._cancel_review()
         self._reset_rendering()
-        self._transcript.setHtml(theme.to_current(data.get("html", "")))
-        self._transcript_cache.reset(theme.to_current(data.get("html", "")))
+        saved_html = theme.to_current(data.get("html", ""))
+        self._transcript.setHtml(saved_html)
+        if style_code(self._transcript.document(), 0, self._transcript.document().characterCount() - 1):
+            self._transcript_cache.reset()  # export the updated font on the next normal save
+        else:
+            self._transcript_cache.reset(saved_html)
         self._empty_shown = False
         self._history = list(data.get("messages", []))
         self._conv_id = conv_id
