@@ -1668,7 +1668,7 @@ these five files: homepage, README, CHANGELOG, HANDOFF and the analytics guide;
 all other existing files, including pending application changes, are unchanged.
 No regression test suite was requested or run for this copy edit. Nothing was
 committed, pushed or deployed automatically. Preview screenshot:
-[homepage-tightened.png](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/homepage-tightened.png).
+`homepage-tightened.png` (local test log, not published).
 
 ## 2026-10-21: Website-only download analytics and documentation inventory
 
@@ -1767,7 +1767,7 @@ at `cursiv-check-_a7kf7b6/pytest.log`.
 
 **Final exact-source full suite: 1,008 passed, 1 skipped, 150.00 s.** The skip
 requires macOS Keychain. Final log:
-[pytest.log](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-check-2a48gvi8/pytest.log).
+`pytest.log` (local test log, not published).
 All follow-up Python sources match this test snapshot byte-for-byte. Syntax and
 `git diff --check` pass. Comparison against the pre-follow-up snapshot finds exactly
 the intended 24 files (repository LF versus Windows CRLF normalized for clean
@@ -2572,7 +2572,7 @@ The verification pass runs in `chat()` **after** `_chat_stream` returns and afte
 
 Verifier calls go through `_router_llm`: the local model when one is ready, no idle wait. The user's free Groq/Gemini key is used only when there is no local model, and a local call that fails does not fall back to the cloud (C-008, 2026-10-17; `_quick_llm` for learning follows the same order). The check runs before `chat_finished()`, so background learning cannot take the local model in the middle of it. Paid keys and Cursiv Cloud are not used for the check.
 
-Since 2026-10-17 (Lane 1, see `AUDIT-2026-10-17.md`), `run_pass` also receives:
+Since 2026-10-17 (Lane 1, see `docs/AUDIT-2026-10-17.md`), `run_pass` also receives:
 - `context`: the last six messages and the memory block recalled for the question (`_check_context`). The checker, the rewrite and the ledger-fill call all see it (C-024).
 - `sources`: text actually looked up this turn (web search, plugin context, local tool results), collected in `chat_app._RETRIEVED`.
 - The draft is the model's text with Cursiv's status lines stripped (no `*[Answered by …]*`), so the footer no longer triggers the pass.

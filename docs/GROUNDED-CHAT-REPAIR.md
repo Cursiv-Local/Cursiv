@@ -178,8 +178,8 @@ failure involved sandbox temp-directory access, not a product regression.
 
 Logs (absolute paths on this computer):
 
-- Baseline: C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-grounding-az0kco92/pytest.log
-- Final: C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/cursiv-grounding-j877mqeg/pytest.log
+- Baseline: the local test-run folder (not published)
+- Final: the local test-run folder (not published)
 
 The isolated runner is check_cursiv_grounding.py in that visualization directory.
 It archives HEAD, overlays intended source changes, redirects user/data/temp

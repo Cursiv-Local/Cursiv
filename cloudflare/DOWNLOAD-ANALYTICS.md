@@ -200,7 +200,7 @@ An initial test-file syntax error was corrected before the passing run.
 Final results:
 
 - **18 tests passed, 0 failed, 0 skipped**, using Node 24.15.0. Test output:
-  [website-analytics-tests.txt](C:/Users/joshu/.codex/visualizations/2026/10/21/01a15c12-fb2b-7d00-9f67-101caecdd403/website-analytics-tests.txt).
+  `website-analytics-tests.txt` (local test log, not published).
 - `publish.mjs --build-only` succeeded; built HTML preserves canonical/SEO data,
   existing routes, SignPath note and installer functionality. No admin HTML is in
   the static upload directory.

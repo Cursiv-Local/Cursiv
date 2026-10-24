@@ -24,6 +24,14 @@ operations. Do not replace it merely because GitHub supplies a different script:
 running an attacker-modified signing script as the owner could expose the key.
 The independent copy verified the final Windows release successfully.
 
+**Where `%LOCALAPPDATA%` actually points.** The key and signer were created from the
+Codex desktop app, which Windows runs as a packaged app with its own redirected
+folder. On the owner's PC they are under
+`%LOCALAPPDATA%\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\CursivReleaseSigning`,
+not `%LOCALAPPDATA%\CursivReleaseSigning`. From any other shell, set `LOCALAPPDATA`
+to that `...\LocalCache\Local` folder for the signing command only; never copy the
+key. U94 was signed this way after the signer's hashes matched its manifest.
+
 ## What is authenticated
 
 `owner-release.json` signs the release version, tagged source commit, artifact
