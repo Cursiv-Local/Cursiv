@@ -1,5 +1,28 @@
 # Handoff — Cursiv verification overhaul
 
+## U93 preparation — code typography and published website polish
+
+The owner authorized commit, push, installer build and release. All three version
+strings and the installer output name are prepared as U93. Pending public website
+changes include the secondary homepage tester link, tester buttons after the
+closing thanks, and the already-live custom 404 page/configuration. Personal legal
+notes, `field-notes.txt` and `test_internals/` are excluded.
+
+Qt imports Markdown code at its system fixed-font size, independently of normal
+chat text; document CSS did not change it. `chat_rendering.style_code` now applies
+Consolas/local fallbacks at the document's normal size. `chat_transcript.py` calls
+it for newly inserted streaming/final ranges, and `chat_panel.py` applies it once
+to reopened HTML while keeping the export cache consistent. A synthetic Windows
+font preview showed normal Segoe UI and code Consolas both at 14px. The offscreen
+preview initially had no font database; loading existing Windows fonts only into
+that preview process resolved the empty-glyph image. No owner chats were opened.
+
+Focused disposable-profile checks passed **86 tests**, including seven new font
+regressions. The locked isolated Windows suite passed **1,805 / 1 platform skip**
+in **228.85 s**; the required workspace gate passed **63 tests**. Hosted gates and
+tagged package results follow; these preparation notes do not claim that U93 is
+already published or OS-trusted signed.
+
 ## U92 published and independently verified (2026-10-23)
 
 The owner authorized commit, push, installer build, release and website publication.

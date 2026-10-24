@@ -16,7 +16,7 @@ from PyQt6.QtWidgets import (
 )
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2
 import theme
-from chat_rendering import MarkdownStream
+from chat_rendering import MarkdownStream, style_code
 
 
 class ChatTranscriptMixin:
@@ -180,7 +180,9 @@ class ChatTranscriptMixin:
         if md:
             if top:
                 cursor.insertBlock()
+            markdown_start = cursor.position()
             cursor.insertMarkdown(md, self._MARKDOWN)
+            style_code(document, markdown_start, cursor.position())
         if details:
             from urllib.parse import quote
             self._plain_block(cursor)
@@ -325,7 +327,9 @@ class ChatTranscriptMixin:
         cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
         cursor.beginEditBlock()
         cursor.removeSelectedText()
+        markdown_start = cursor.position()
         cursor.insertMarkdown(self._keep_line_breaks(ready.strip()), self._MARKDOWN)
+        style_code(self._transcript.document(), markdown_start, cursor.position())
         self._plain_block(cursor)
         self._stream_tail_start = cursor.position()
         cursor.insertText(stream.tail)        # unfinished fences/tables stay literal and intact

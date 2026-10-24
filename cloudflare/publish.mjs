@@ -14,6 +14,7 @@ const dist = join(here, "dist");
 
 // [source (relative to repo root), published name]
 const PAGES = [
+  ["website/404.html", "404.html"],
   ["website/index.html", "index.html"],
   ["website/vision.html", "vision.html"],
   ["website/chat.html", "chat.html"],

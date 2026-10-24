@@ -1,5 +1,50 @@
 # Changelog
 
+## 3.14-U93 — Readable chat code and website polish (release preparation)
+
+- Display inline commands and code blocks in Consolas on Windows, with platform
+  fallbacks, at the same size as normal chat text. Apply the typography during
+  streaming, final rendering and reopening older chats. Preserve code text and
+  Markdown formatting; no additional model call or conversation rebuild is added.
+- Add deterministic coverage for streaming/final typography, old saved HTML,
+  unchanged history, point/pixel sizes and idempotent formatting. Locked isolated
+  Windows checks: **1,805 passed / 1 platform skip**; focused compatibility **86**;
+  required workspace gate **63**. Hosted/package evidence follows execution.
+
+## Website — Tester download placement (2026-10-23)
+
+- Move the testers page's Windows download and setup/Mac buttons below the
+  closing thanks, after the testing and feedback instructions.
+- Published to Cloudflare deployment `e89c6d19-786e-4431-bb9e-34e4e5963202`.
+  All 21 website tests and 6 live checks passed.
+
+## Website — Secondary tester link (2026-10-23)
+
+- Move Help test Cursiv below the homepage hero's download/setup buttons as an
+  18px blue text link with a small arrow, underline and keyboard focus indicator.
+  Remove the full-width banner above navigation and refresh the stylesheet URL.
+- Update the existing homepage layout assertion for the new link position.
+- Published to Cloudflare deployment `5f6cab4f-2da4-4a32-a8ca-175d3d5478be`.
+  All 21 website tests and 7 live checks passed, including the link position,
+  refreshed styling, tester card, existing custom 404 and canonical redirect.
+
+## Website — Off the map (2026-10-23)
+
+- Make the map a fixed full-page background with a dark readability overlay;
+  keep navigation visible above it instead of stacking the illustration below
+  the text on phones. U92 website checks: 21/21 passed.
+- Add an illustrated contour-map 404 page with a one-time mint trail animation,
+  reduced-motion support, and home/download/tester links. Include it in the
+  website build and configure static hosting to return it with HTTP 404.
+- Build and desktop/390px browser preview checks passed. Website tests remain
+  17/21: the four existing U92/U91 release-evidence mismatches are unchanged.
+  Published to the existing Cloudflare Worker with the Cursiv C expedition stamp.
+- A subsequent U92 deployment replaced the initial website deployment. Restored
+  the page and hosting configuration in the U92 release checkout; its 21 website
+  checks passed. Deployed version `52cefbd3-bddf-4672-970c-a33c47a1c94f` and
+  verified the live browser preview, nested missing-path HTTP 404 response, and
+  preserved U92 homepage.
+
 ## 3.14-U92 — feature discovery and live-transcript repairs (2026-10-23)
 
 - Published latest U92 and deployed the website. All **47 anonymous production
