@@ -32,6 +32,10 @@
 - The USB function is tested every time: a full end-to-end USB cycle runs before
   each commit (`.githooks`), on every push and PR, and in the release builder,
   which also starts the built app from a USB layout.
+- Locked isolated Windows source **1,865 passed / 1 platform skip**; hosted Mac
+  **1,850 / 16 skips**; USB gate passed on Windows and Mac; required workspace gate
+  **63**. Published with owner-signed Windows and Mac packages; the Windows package
+  passed a start from a USB layout. [U96 verification](docs/U96-RELEASE-VERIFICATION.md).
 
 ## 3.14-U95 — Bring USB data back to a computer (2026-10-24)
 
