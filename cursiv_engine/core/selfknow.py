@@ -76,7 +76,7 @@ def _safe(fn, default="unknown"):
 def live_report(*, observed=None) -> str:
     from cursiv_engine.ui import chat_app as ca
     from cursiv_engine.core import speed
-    lines = [f"Version: Cursiv {VERSION} (Windows desktop app, PyQt window; phone app at cursiv.winklers-llc.com/app)"]
+    lines = [f"Version: Cursiv {VERSION} (Windows desktop app, PyQt window; phone app at cursiv.us/app)"]
 
     keys = [label for label, f in (("Groq (free)", "groq_key"), ("Gemini (free)", "gemini_key"), ("Claude", "anthropic_key"),
                                    ("xAI Grok", "api_key"), ("OpenAI", "openai_key")) if _safe(lambda f=f: ca._saved_key(f), "")]
@@ -149,7 +149,7 @@ def live_report(*, observed=None) -> str:
     return "\n".join(f"- {l}" for l in lines)
 
 
-SELF_PROMPT = """You are Cursiv, a personal AI created by Joshua Winkler that anyone can install and make their own. The person is asking about \
+SELF_PROMPT = """You are Cursiv, a personal AI made by Cursiv Local, an independent open-source project, that anyone can install and make their own. The person is asking about \
 you -- your status, setup, abilities or how to improve you. Answer ONLY from the facts and the live report below.
 
 Rules:

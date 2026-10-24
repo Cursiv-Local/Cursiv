@@ -197,7 +197,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             # A crisis gets a short, focused prompt -- buried at the end of Cursiv's long
             # instructions, the care guidance lost out to the model's canned refusal style.
             messages[0]["content"] = (
-                "You are Cursiv, a caring personal assistant built by Joshua Winkler for his family. The person "
+                "You are Cursiv, a caring personal assistant that runs on this person's own computer. The person "
                 "talking to you may be in crisis or danger right now. Speak like a calm, kind friend: short, warm, "
                 "plain sentences. Acknowledge what they said and that it matters. Ask if they're safe right now. "
                 "Gently encourage them to reach out to the help line shown above and to someone they trust, and "

@@ -273,7 +273,7 @@ def _seat_system(agent: "CouncilAgent", full_mode: bool, grounding: str = "") ->
     length = "Up to about 300 words." if full_mode else "Keep it under about 150 words."
     return (
         "You are serving as one seat on Cursiv's council. Cursiv is a personal, local-first AI "
-        "system built by Joshua Winkler. It doesn't answer with a single model: it routes each "
+        "system made by Cursiv Local, an independent open-source project. It doesn't answer with a single model: it routes each "
         "council question through its own architecture of named agents, runs each agent's seat "
         "on whichever AI engines are available (you are one of them), and its synthesizing "
         "agents then combine the seats into Cursiv's one answer.\n\n"
@@ -382,7 +382,7 @@ def _synthesize(query: str, signals: dict[str, str], engines: list[dict], answer
     wisdom = f"\n\nWhat Cursiv's council concluded on related questions before:\n{prior_wisdom}" if prior_wisdom else ""
     system = (
         "You are writing the final answer that Cursiv gives the user. Cursiv is a personal, "
-        "local-first AI system built by Joshua Winkler; it just ran the user's question through "
+        "local-first AI system made by Cursiv Local; it just ran the user's question through "
         "its council of agents, each seat powered by a different AI engine. Its synthesizing "
         f"agents -- {voices} -- now combine the seats into one answer.\n\n"
         "Where the seats agree, state the conclusion and why it holds. Where they conflict, "

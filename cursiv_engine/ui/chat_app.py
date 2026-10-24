@@ -277,9 +277,9 @@ FILE_TOOLS = [
         "function": {
             "name": "codex_generate",
             "description": (
-                "Call the Winkler Codex AI to generate production-ready code or Cursiv agent packs. "
+                "Call the Cursiv Codex coding specialist to generate production-ready code or Cursiv agent packs. "
                 "Use this when you need to write code — it produces a structured artifact with "
-                "READY-TO-RUN CODE and JSON FILES in Joshua's exact style. "
+                "READY-TO-RUN CODE and JSON FILES in the project's own style. "
                 "Works offline. Call this before write_file for any non-trivial code."
             ),
             "parameters": {
