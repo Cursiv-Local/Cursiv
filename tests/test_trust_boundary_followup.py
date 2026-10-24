@@ -157,10 +157,17 @@ def test_private_usb_confirmation_explains_readable_api_keys(tmp_path, monkeypat
         seen.append(text)
         return um.QMessageBox.StandardButton.No
     monkeypatch.setattr(um.QMessageBox, 'question', question)
-    dialog = SimpleNamespace(_drive_box=SimpleNamespace(currentData=lambda: dict(root=str(tmp_path))),
-                             _private=SimpleNamespace(isChecked=lambda: True))
-    um.UsbMakerDialog._start(dialog)
-    assert len(seen) == 1 and 'API keys' in seen[0] and 'readable' in seen[0]
+    for keys in (True, False):
+        seen.clear()
+        dialog = SimpleNamespace(_drive_box=SimpleNamespace(currentData=lambda: dict(root=str(tmp_path))),
+                                 _private=SimpleNamespace(isChecked=lambda: True),
+                                 _keys=SimpleNamespace(isChecked=lambda keys=keys: keys))
+        um.UsbMakerDialog._start(dialog)
+        assert len(seen) == 1 and 'AI keys' in seen[0]
+        if keys:
+            assert 'readable' in seen[0] and 'anyone with the drive can use them' in seen[0]
+        else:
+            assert 'will not be copied' in seen[0]
 
 
 def test_phone_pages_distinguish_capture_from_online_ai():

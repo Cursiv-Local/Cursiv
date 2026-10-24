@@ -1,7 +1,11 @@
 """Every Cursiv USB carries the licenses for what's on it."""
 import json
 
+import pytest
+
 import usb_maker as um
+
+pytestmark = pytest.mark.usb
 
 
 def _fake_model(models_dir, name, license_text=None):

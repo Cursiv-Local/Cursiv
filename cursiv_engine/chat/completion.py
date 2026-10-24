@@ -141,7 +141,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from . import status as _net_status
     _workspace_request = _file_ops.is_request(_field_text, history)
     if not _workspace_request and _net_status.answers_network_question(_field_text) and not presence.short_state_question(_field_text):
-        yield _file_ops.VerifiedText(_net_status.network_answer())
+        yield _file_ops.VerifiedText(_net_status.network_answer(_field_text))
         yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
         return
     if not _workspace_request and presence.answers_state_question(_field_text):

@@ -25,7 +25,10 @@ _SELF_RE = re.compile(
     r"|\b(self[- ]?(check|test|diagnos\w*|analy[sz]\w*|report))\b"
     r"|\b(system|status|health) (check|report)\b"
     r"|\bhow are (you|we) (doing|feeling|running)\b"
-    r"|\bwhat (can|can't|cannot) you do\b",
+    r"|\bwhat (can|can't|cannot) you do\b"
+    r"|\bwhy did you (refuse|say|answer|reply|do|decide|think)\b"
+    r"|\bhow do you (work|remember|decide|learn|store|choose)\b"
+    r"|\b(your|cursiv'?s) (own )?(source|code|codebase|prompt|instructions|feedback|stores?|database)\b",
     re.I | re.S)
 
 
@@ -159,6 +162,15 @@ the facts or report, say plainly that you don't know or can't see it.
 lists them.
 - For improvement ideas, base them on what the report actually shows (missing keys, no local model, errors, \
 small GPU, etc.) and be concrete about how to do it in Cursiv (which window or command).
+- When you explain how you work or why you answered something, use only the sections below and say which one \
+it came from: the fact sheet, the live report, "the record of your last answer", "Cursiv's stored data", or a \
+source file and line. If none of them covers it, say plainly that you can't see it. Never present a guess about \
+your prompt, code or settings as fact, and never claim you inspected something that isn't shown below.
+- Privacy: say what is true now. Conversations, memories and files are stored on this computer; something leaves \
+it only through a feature turned on (an online AI key, Cursiv Cloud, web search, the phone link, update checks), \
+and offline mode blocks them. Use the live report to say which are on. Never promise "nothing ever leaves".
+- The person can check for themselves: self prompt (the last answer's real instructions), self stores (what is \
+saved and where), self source <words> and self read <path> (Cursiv's own code), memory cleanup.
 - Be warm, direct and brief.
 
 ## Where things really are (only point people to these -- never invent other menus or settings)
@@ -174,6 +186,7 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
 - Personality and style: one fixed personality (no tones); style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Memory clean-up: memory cleanup (lists misleading saved notes and memories; changes nothing), memory cleanup remove <codes>|all (backs up first).
+- Looking at itself (read-only, app-authored, no AI model): self prompt / self prompt full (the instructions sent for the last answer), self stores (what is saved, where, and how it reaches answers), self source <words>, self read <path> [line] (Cursiv's own code and docs).
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agent council <question>.
 - There is no setting for context length or for choosing the chat model by hand; Cursiv picks models by graphics card. To change models, download a different one in Setup.
 
@@ -182,12 +195,40 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 
 ## Live report (checked just now)
 {report}
-"""
+{evidence}"""
 
 
-def system_prompt(*, observed=None) -> str:
+def evidence(question: str = "") -> str:
+    """Labelled evidence for a question about Cursiv: the previous answer's real
+    instructions, what is stored, and matching lines of Cursiv's own source."""
+    sections = []
+    try:
+        from . import last_turn
+        block = last_turn.evidence_block()
+        if block:
+            sections.append("## The record of your last answer (kept by Cursiv, in memory only)\n" + block)
+    except Exception:
+        pass
+    try:
+        from . import self_stores
+        from cursiv_engine.memory import semantic
+        sections.append("## Cursiv's stored data\n" + self_stores.evidence_block(semantic.current_person()))
+    except Exception:
+        pass
+    if question:
+        try:
+            from . import self_source
+            found = self_source.excerpts(question)
+            if found:
+                sections.append("## From Cursiv's own source code\n" + found)
+        except Exception:
+            pass
+    return ("\n" + "\n\n".join(sections) + "\n") if sections else ""
+
+
+def system_prompt(*, observed=None, question: str = "") -> str:
     try:
         facts = re.sub(r"<!--.*?-->", "", FACTS_FILE.read_text(encoding="utf-8"), flags=re.S).strip()
     except Exception:
         facts = "(fact sheet unavailable)"
-    return SELF_PROMPT.format(facts=facts, report=live_report(observed=observed))
+    return SELF_PROMPT.format(facts=facts, report=live_report(observed=observed), evidence=evidence(question))

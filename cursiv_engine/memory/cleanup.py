@@ -9,7 +9,9 @@ Some records do more harm than good there:
     ("System Guardian: ARMED", "EvoCore", "JWArchitectCore" ...);
   * old council answers about Cursiv's own features, which go stale;
   * test records ("persistence test", test IDs);
-  * inferred guesses about what the person wants from AI (not their words).
+  * inferred guesses about what the person wants from AI (not their words);
+  * style "rules" that are really captured content (a heading, a numbered list
+    item, a long passage) or exact duplicates -- these are added to every answer.
 
 `memory cleanup` only lists them. `memory cleanup remove <codes>` or
 `memory cleanup remove all` removes what the person picked: each record is first
@@ -41,6 +43,14 @@ TEST_RECORD = re.compile(
 AI_PREFERENCE_GUESS = re.compile(
     r"(?i)\b(?:prioriti[sz]\w*|prefer\w*|avoid\w*|dislik\w*|(?:does ?n[o']t|do not) want|over)\b[^.]{0,80}"
     r"\b(?:speculative|abstract|hypothetical|imaginative|creative)\b")
+
+
+STYLE_CONTENT = re.compile(r"^\s*(?:#{1,6}\s|\d+[.)]\s|[-*•]\s|rule\s*:)", re.I)
+
+
+def _style_code(text: str) -> str:
+    import hashlib
+    return "style-" + hashlib.sha256(text.encode("utf-8")).hexdigest()[:8]
 
 
 def _preview(text: str, n: int = 140) -> str:
@@ -76,6 +86,24 @@ def scan(person: str) -> list[dict]:
         found.append({"store": "memory", "id": str(f.get("id")), "reason": reason, "preview": _preview(text)})
     for item in found:
         item["code"] = item["id"]
+    try:
+        from cursiv_engine.core import style
+        seen = set()
+        for rule in style.load(person).get("rules", []):
+            text = str(rule.get("text", ""))
+            key = " ".join(text.lower().split())
+            if STYLE_CONTENT.search(text) or len(text) > 180:
+                reason = "style preference that is really captured content (added to every answer)"
+            elif key in seen:
+                reason = "duplicate style preference"
+            else:
+                seen.add(key)
+                continue
+            seen.add(key)
+            found.append({"store": "style", "id": text, "code": _style_code(text), "reason": reason,
+                          "preview": _preview(text)})
+    except (OSError, ValueError):
+        pass
     return found
 
 
@@ -84,7 +112,7 @@ def describe(items: list[dict]) -> str:
         return "Nothing to clean up: no saved notes or memories match the clean-up rules."
     rows = ["These saved records are put into answers but look misleading. Nothing has been changed.", ""]
     for it in items:
-        kind = "Saved note" if it["store"] == "note" else "Memory"
+        kind = {"note": "Saved note", "memory": "Memory", "style": "Style preference"}[it["store"]]
         rows.append(f"- `{it['code']}` · {kind} · {it['reason']}\n  “{it['preview']}”")
     rows += ["", "Remove some: memory cleanup remove <code> <code> …",
              "Remove all of these: memory cleanup remove all",
@@ -120,10 +148,45 @@ def remove(person: str, codes: list[str] | None) -> str:
         if private_store.read_bytes(archive) != data:
             raise OSError("Memory archive read-back verification failed; no memory was removed")
         removed_facts = semantic.forget_selected(facts, person=person)
-    lines = [f"Removed {len(removed_notes)} saved note(s) and {len(removed_facts)} memory record(s)."]
+    removed_style = _remove_style(person, [it for it in items if it["store"] == "style"])
+    lines = [f"Removed {len(removed_notes)} saved note(s), {len(removed_facts)} memory record(s)"
+             f" and {len(removed_style)} style preference(s)."]
     lines += [f"- {r.get('id')}: {_preview(r.get('query') or r.get('text'), 90)}" for r in removed_notes + removed_facts]
+    lines += [f"- style: {_preview(t, 90)}" for t in removed_style]
     lines.append(f"Copies are in {folder}.")
     return "\n".join(lines)
+
+
+def _remove_style(person: str, items: list[dict]) -> list[str]:
+    """Drop flagged style rules (first occurrence of a duplicate is kept). The removed
+    rules are copied into the style folder's backups first (vault-covered)."""
+    if not items:
+        return []
+    from cursiv_engine.core import atomic, private_store, style
+    with style._lock:
+        data = style.load(person)
+        rules = data.get("rules", [])
+        drop, seen, kept, gone = {it["id"] for it in items}, set(), [], []
+        dup_only = {it["id"] for it in items if it["reason"] == "duplicate style preference"}
+        for rule in rules:
+            text = str(rule.get("text", ""))
+            key = " ".join(text.lower().split())
+            first = key not in seen
+            seen.add(key)
+            if text in drop and not (text in dup_only and first):
+                gone.append(rule)
+            else:
+                kept.append(rule)
+        if not gone:
+            return []
+        archive = style._path(person).parent / "backups" / time.strftime(f"cleanup-%Y%m%d-%H%M%S-{style._path(person).stem}.json")
+        payload = json.dumps(gone, ensure_ascii=False, indent=1).encode("utf-8")
+        atomic.write_bytes(archive, payload)
+        if private_store.read_bytes(archive) != payload:
+            raise OSError("Style archive read-back verification failed; no style preference was removed")
+        data["rules"] = kept
+        style._save(person, data)
+    return [str(r.get("text", "")) for r in gone]
 
 
 def command(text: str, person: str) -> str | None:

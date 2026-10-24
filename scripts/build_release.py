@@ -71,6 +71,32 @@ def verify_frozen(work: Path, env: dict[str, str]) -> Path:
     return report
 
 
+def verify_portable(work: Path, env: dict[str, str]) -> Path:
+    """The built app must run from a Cursiv USB: copy it into a USB layout, start its
+    self-test there, and require portable mode with every write on that drive."""
+    drive = work.parent / 'usb-check'
+    if drive.exists():
+        shutil.rmtree(drive)
+    shutil.copytree(work / 'dist/Cursiv', drive / 'Cursiv')
+    (drive / 'Cursiv' / 'portable.cursiv').write_text('Release check: runs from this drive.\n', encoding='utf-8')
+    report = work.parent / 'portable-selftest.txt'
+    real_home = work.parent / 'usb-check-host-home'
+    real_home.mkdir(exist_ok=True)
+    checked_env = {k: v for k, v in env.items() if not k.startswith('CURSIV_')}
+    checked_env.update(USERPROFILE=str(real_home), HOME=str(real_home), CURSIV_NO_ENGINE_START='1',
+                       QT_QPA_PLATFORM='offscreen')
+    subprocess.run([str(drive / 'Cursiv' / 'Cursiv.exe'), '--selftest', str(report)],
+                   cwd=drive, env=checked_env, check=True, creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+    text = report.read_text(encoding='utf-8') if report.is_file() else ''
+    if not re.search(r'(?m)^ALL PASSED\s*$', text) or 'PASS  portable storage: running from the drive' not in text:
+        raise RuntimeError(f'Packaged application did not run correctly from a USB layout: {report}')
+    if not (drive / 'Home' / '.cursiv' / 'portable-layout-v1.json').is_file():
+        raise RuntimeError('Portable start did not create its data layout on the drive')
+    if any((real_home / '.cursiv').glob('*')):
+        raise RuntimeError('Portable start wrote Cursiv data to the host home folder')
+    return report
+
+
 def stage_installers(source: Path, output: Path, version: str) -> Path:
     """Versioned/stable installer aliases must contain identical verified bytes."""
     output.mkdir(parents=True, exist_ok=True)
@@ -144,6 +170,8 @@ def main() -> int:
         subprocess.run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "launcher/build.spec"],
                        cwd=work, env=env, check=True)
         report = verify_frozen(work, env)
+        portable_report = verify_portable(work, env)
+        print('portable USB check:', portable_report)
         print(f'packaged checks: {report}')
         subprocess.run([str(ISCC), "installer/cursiv_setup.iss"], cwd=work, env=env, check=True)
         name = f"Cursiv-Setup-{want}.exe"

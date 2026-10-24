@@ -55,6 +55,20 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         if _reply is not None:
             return runtime.TextResult(_reply)
 
+    # Looking at itself: answered by Cursiv's own code from real records, never a model.
+    if cmd in ("self prompt", "self prompt full"):
+        from cursiv_engine.core import last_turn
+        return runtime.TextResult(last_turn.summary(full=cmd.endswith("full")))
+    if cmd in ("self stores", "self store", "self data"):
+        from cursiv_engine.core import self_stores
+        from cursiv_engine.memory import semantic as _semantic
+        return runtime.TextResult(self_stores.summary(_semantic.current_person()))
+    if cmd.startswith(("self source", "self read")):
+        from cursiv_engine.core import self_source
+        _reply = self_source.command(text)
+        if _reply is not None:
+            return runtime.TextResult(_reply)
+
     # Native notebook intent takes precedence over generic files and memory.
     _notebook = runtime.notebook_command(text, history, cfg=cfg)
     if _notebook is not None:

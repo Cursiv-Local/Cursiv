@@ -334,7 +334,8 @@ def _download_ollama(runtime: UsbRuntime, dest_dir: Path, progress, cancel: thre
         z.extractall(out_dir)
     return out_dir
 
-def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool) -> None:
+def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool,
+             include_keys: bool = False) -> None:
     try:
         have = {m["name"] for m in runtime.list_models()}
         for tag in runtime.required_names(runtime.list_models()):
@@ -356,7 +357,7 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         plan = runtime.update_plan(root, runtime.build_plan(models, include_private, osrc))
         todo = [(s, d) for s, d in plan if runtime._needs_copy(s, d)]
         data_dir = root / "Home" / ".cursiv"
-        data_items = usb_sync.plan(usb_sync.data_sources(), data_dir) if include_private else []
+        data_items = usb_sync.plan(usb_sync.data_sources(), data_dir, keys=include_keys) if include_private else []
         total = (sum(s.stat().st_size for s, _ in todo)
                  + sum(it["src"].stat().st_size for it in usb_sync.todo(data_items))) or 1
 
@@ -386,7 +387,9 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             # so the drive never starts with two versions of the same store.
             import portable
             portable.migrate_data(root, data_dir)
-            data_items = usb_sync.plan(usb_sync.data_sources(), data_dir)
+            data_items = usb_sync.plan(usb_sync.data_sources(), data_dir, keys=include_keys)
+            config = data_dir / "config.json"
+            previous = config.read_bytes() if config.is_file() else None
             result = usb_sync.apply(data_items, data_dir, sig.progress.emit, cancel)
             counts = usb_sync.summary(data_items)
             data_note = (f" Your data: {counts['add']} new and {counts['update']} updated file(s) copied, "
@@ -396,11 +399,17 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             (root / runtime.PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
             (root / runtime.PRIVATE_MARKER).write_text(
                 "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
-            # Saved keys are encrypted for this Windows account; the USB runs on
-            # other PCs, so its copy holds them readable (the note below says so).
+            # AI keys are personal. They are copied only with the separate opt-in, and
+            # then readable (the USB runs on other PCs, where this account's encryption
+            # can't be undone). Without it the drive keeps exactly the keys it had.
             if any(it["rel"] == runtime.Path("config.json") for it in usb_sync.todo(data_items)):
-                from cursiv_engine.core import keystore
-                keystore.export_readable(data_dir / "config.json")
+                if include_keys:
+                    from cursiv_engine.core import keystore
+                    keystore.export_readable(config)
+                else:
+                    usb_sync.keep_drive_keys(config, previous)
+            data_note += (" Your AI keys were copied and are readable on this drive." if include_keys
+                          else " Your AI keys were not copied.")
 
         runtime.write_licenses(root, models)
 
@@ -428,7 +437,8 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
     except Exception as exc:
         sig.done.emit(False, f"Couldn't finish: {exc}")
 
-def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool) -> tuple[bool, str]:
+def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool,
+              include_keys: bool = False) -> tuple[bool, str]:
     """Read every file the drive should have and say what an update would change.
     Writes nothing. Returns (up_to_date, report)."""
     lines = []
@@ -470,7 +480,7 @@ def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_priva
                      "(the newer copy of each file is kept; replaced files are backed up).")
     data_todo = []
     if include_private:
-        items = usb_sync.plan(usb_sync.data_sources(), data_dir)
+        items = usb_sync.plan(usb_sync.data_sources(), data_dir, keys=include_keys)
         data_todo = usb_sync.todo(items)
         lines.append(usb_sync.describe(items))
         if runtime.os.environ.get("CURSIV_PORTABLE") != "1" and data_dir.is_dir():

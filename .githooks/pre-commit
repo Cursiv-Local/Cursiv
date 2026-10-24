@@ -1,0 +1,18 @@
+#!/bin/sh
+# Cursiv: the USB portability gate runs before every commit (about 10 seconds).
+# Enable once per clone:  git config core.hooksPath .githooks
+# The same tests run on every push and PR (.github/workflows/tests.yml) and in
+# scripts/build_release.py, which also starts the built app from a USB layout.
+if command -v py >/dev/null 2>&1; then
+    PY="py -3.13"
+elif command -v python3 >/dev/null 2>&1; then
+    PY="python3"
+else
+    PY="python"
+fi
+if ! $PY -m pytest tests -m usb -q -p no:cacheprovider; then
+    echo
+    echo "Cursiv USB portability tests failed, so the commit was stopped."
+    echo "Fix them first. (git commit --no-verify skips this check; CI will still run it.)"
+    exit 1
+fi

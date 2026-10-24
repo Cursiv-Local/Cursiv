@@ -15,6 +15,23 @@
   inferred preferences against speculative thinking). `memory cleanup remove …`
   removes only what you pick, after copying it to a backup folder.
 - Cursiv says it is made by Cursiv Local, an independent open-source project.
+- Cursiv can look at itself, read-only: `self source <words>` / `self read <path>`
+  (its own code and docs), `self prompt` (the instructions actually sent for your
+  last answer, kept in memory only) and `self stores` (what is saved, where, and how
+  it reaches answers). Questions about how it works or why it answered something
+  are grounded in these, labelled by source.
+- Privacy questions ("does anything I type leave my computer?", "is my data
+  private?") get an answer from Cursiv's live settings, not the AI model: which
+  keys, Cloud backup, web search, update checks or the phone link can go online.
+  "How do you remember things?" gets the reviewed memory explanation.
+- File tools are offered to the model only when a workspace is enabled.
+- "Make a Cursiv USB" never copies your AI keys unless you tick the separate
+  "Also copy my AI keys" box (off by default). Without it, a drive keeps exactly
+  the keys it already had. `memory cleanup` also flags style preferences that are
+  really captured content.
+- The USB function is tested every time: a full end-to-end USB cycle runs before
+  each commit (`.githooks`), on every push and PR, and in the release builder,
+  which also starts the built app from a USB layout.
 
 ## 3.14-U95 — Bring USB data back to a computer (2026-10-24)
 

@@ -7,6 +7,8 @@ import pytest
 
 import usb_sync
 
+pytestmark = pytest.mark.usb
+
 
 def _write(p: Path, text: str, mtime: float | None = None) -> Path:
     p.parent.mkdir(parents=True, exist_ok=True)

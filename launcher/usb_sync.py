@@ -99,25 +99,52 @@ def _starts_with(longer: Path, shorter: Path) -> bool:
     return True
 
 
-def _same_config(a: Path, b: Path) -> bool:
-    """Two config.json files with the same settings and keys: on a drive keys are
-    stored readable, on a computer encrypted, so the bytes always differ."""
+def _same_config(a: Path, b: Path, keys: bool = True) -> bool:
+    """Two config.json files with the same settings (and, with keys=True, the same AI
+    keys): on a drive keys are stored readable, on a computer encrypted, so the bytes
+    always differ. keys=False compares settings only."""
     try:
         from cursiv_engine.core import keystore
         x, y = (json.loads(p.read_text(encoding="utf-8")) for p in (a, b))
-        return isinstance(x, dict) and keystore.reveal_all(x) == keystore.reveal_all(y)
+        if not isinstance(x, dict) or not isinstance(y, dict):
+            return False
+        if not keys:
+            x, y = ({k: v for k, v in d.items() if k not in keystore.SECRET_FIELDS} for d in (x, y))
+        return keystore.reveal_all(x) == keystore.reveal_all(y)
     except Exception:
         return False
 
 
-def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the drive") -> tuple[str, str]:
-    """`here` names where src lives and `there` where dest lives."""
+def keep_drive_keys(config: Path, previous: bytes | None) -> None:
+    """After this computer's config.json was copied to a drive without permission to
+    copy AI keys: remove this computer's keys and put back exactly the keys the drive
+    already had (none, if it had none). Other settings come from this computer."""
+    from cursiv_engine.core import atomic, keystore
+    data = json.loads(config.read_text(encoding="utf-8"))
+    try:
+        old = json.loads(previous.decode("utf-8")) if previous else {}
+    except ValueError:
+        old = {}
+    for field in keystore.SECRET_FIELDS:
+        data.pop(field, None)
+        if isinstance(old, dict) and field in old:
+            data[field] = old[field]
+    payload = json.dumps(data, indent=2).encode("utf-8")
+    atomic.write_bytes(config, payload, protect=False)
+    if config.read_bytes() != payload:
+        raise OSError("Drive settings read-back verification failed")
+
+
+def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the drive",
+           keys: bool = True) -> tuple[str, str]:
+    """`here` names where src lives and `there` where dest lives. keys=False: AI keys
+    in config.json are not compared (they are not being copied)."""
     if not dest.exists():
         return "add", f"not on {there}"
     s, d = src.stat(), dest.stat()
     if s.st_size == d.st_size and _digest(src) == _digest(dest):
         return "same", ""
-    if src.name == "config.json" and _same_config(src, dest):
+    if src.name == "config.json" and _same_config(src, dest, keys):
         return "same", ""
     if _starts_with(src, dest):
         return "update", f"{here} added to it"
@@ -129,8 +156,9 @@ def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the
     return "keep", f"newer on {there}{both}"
 
 
-def plan(sources: list[Path], dest: Path) -> list[dict]:
-    """Read-only. One entry per file: rel, src, dest, action, reason."""
+def plan(sources: list[Path], dest: Path, *, keys: bool = True) -> list[dict]:
+    """Read-only. One entry per file: rel, src, dest, action, reason. keys=False when
+    AI keys are not being copied: config.json differing only in keys counts as same."""
     if dest.exists() and _linked(dest):
         raise OSError(f"Linked drive data folder refused: {dest}")
     items = []
@@ -141,7 +169,7 @@ def plan(sources: list[Path], dest: Path) -> list[dict]:
                 break
             if p.exists() and _linked(p):
                 raise OSError(f"Linked drive destination refused: {p}")
-        action, reason = decide(src, target)
+        action, reason = decide(src, target, keys=keys)
         items.append({"rel": rel, "src": src, "dest": target, "action": action, "reason": reason})
     return items
 
