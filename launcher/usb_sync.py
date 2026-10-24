@@ -17,6 +17,10 @@ plan() only reads. For every file it decides:
 apply() copies add/update files. A drive file is copied into
 Home\\.cursiv\\backups\\usb-update-<time>\\ and verified before it is replaced, and
 every new file is checked byte for byte against its source.
+
+The other direction (work done on the drive back to this computer) uses the same
+decisions: plan_import(), stage_import() and, at the next start,
+apply_pending_import() -- see the section at the end.
 """
 from __future__ import annotations
 
@@ -31,7 +35,7 @@ from pathlib import Path
 
 MTIME_SLACK = 2.0                      # FAT-family drives store times in 2-second steps
 SKIP_NAMES = {".vault-lease"}          # live process lease, never data
-SKIP_TOP = {"backups"}                 # each side keeps its own recovery copies
+SKIP_TOP = {"backups", "import-pending"}  # each side keeps its own recovery copies and staging
 
 
 def data_sources() -> list[Path]:
@@ -95,19 +99,34 @@ def _starts_with(longer: Path, shorter: Path) -> bool:
     return True
 
 
-def decide(src: Path, dest: Path) -> tuple[str, str]:
+def _same_config(a: Path, b: Path) -> bool:
+    """Two config.json files with the same settings and keys: on a drive keys are
+    stored readable, on a computer encrypted, so the bytes always differ."""
+    try:
+        from cursiv_engine.core import keystore
+        x, y = (json.loads(p.read_text(encoding="utf-8")) for p in (a, b))
+        return isinstance(x, dict) and keystore.reveal_all(x) == keystore.reveal_all(y)
+    except Exception:
+        return False
+
+
+def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the drive") -> tuple[str, str]:
+    """`here` names where src lives and `there` where dest lives."""
     if not dest.exists():
-        return "add", "not on the drive"
+        return "add", f"not on {there}"
     s, d = src.stat(), dest.stat()
     if s.st_size == d.st_size and _digest(src) == _digest(dest):
         return "same", ""
+    if src.name == "config.json" and _same_config(src, dest):
+        return "same", ""
     if _starts_with(src, dest):
-        return "update", "this computer added to it"
+        return "update", f"{here} added to it"
     if _starts_with(dest, src):
-        return "keep", "the drive added to it"
+        return "keep", f"{there} added to it"
+    both = " (both changed; the other copy is saved in backups)" if src.suffix == ".jsonl" else ""
     if s.st_mtime > d.st_mtime + MTIME_SLACK:
-        return "update", "newer on this computer"
-    return "keep", "newer on the drive"
+        return "update", f"newer on {here}{both}"
+    return "keep", f"newer on {there}{both}"
 
 
 def plan(sources: list[Path], dest: Path) -> list[dict]:
@@ -128,7 +147,7 @@ def plan(sources: list[Path], dest: Path) -> list[dict]:
 
 
 def summary(items: list[dict]) -> dict[str, int]:
-    out = {"add": 0, "update": 0, "same": 0, "keep": 0}
+    out = {"add": 0, "update": 0, "same": 0, "keep": 0, "skip": 0}
     for it in items:
         out[it["action"]] += 1
     return out
@@ -156,7 +175,7 @@ def _write_verified(src: Path, dest: Path) -> None:
 
 
 def apply(items: list[dict], dest: Path, progress=None, cancel: threading.Event | None = None,
-          label: str = "usb-update") -> dict:
+          label: str = "usb-update", kept_on: str = "the drive") -> dict:
     """Copy the add/update files. Returns {"copied", "backed_up", "backup"}."""
     work = todo(items)
     backup = dest / "backups" / (label + time.strftime("-%Y%m%d-%H%M%S"))
@@ -179,7 +198,7 @@ def apply(items: list[dict], dest: Path, progress=None, cancel: threading.Event 
         (backup / "REPORT.txt").write_text(
             f"Cursiv data update ({label}) into {dest}\n"
             f"{counts['add']} added, {counts['update']} updated, {counts['same']} already the same, "
-            f"{counts['keep']} kept because the drive's copy is newer.\n"
+            f"{counts['keep']} kept because the copy on {kept_on} is newer.\n"
             "Replaced drive files are saved in this folder under the same names.\n\n"
             + "\n".join(report) + "\n", encoding="utf-8")
         if backed:
@@ -202,3 +221,162 @@ def describe(items: list[dict]) -> str:
         parts.append(f"{c['keep']} newer on the drive (kept)")
     parts.append(f"{c['same']} already up to date")
     return "Your data: " + ", ".join(parts) + "."
+
+
+# ── Drive -> this computer ───────────────────────────────────────────────────
+# Work done on a drive comes back in two steps. stage_import() copies the files
+# that are new or newer on the drive into ~/.cursiv/import-pending (verified, so
+# the drive can be unplugged). The next start of the installed Cursiv calls
+# apply_pending_import() before anything reads its data (main.py): each file is
+# compared again, replaced files are backed up, keys are encrypted for this
+# Windows account. Logins, logs and per-device identity never travel.
+
+PENDING = "import-pending"
+# Stores the installed app keeps in ~/.cursiv; everything else lives in APP_DATA.
+HOME_STORES = {"conversations", "fieldlog", "documents", "style", "projects", "curiosity", "presence",
+               "agents", "family", "plugins", "demo", "space.json", "cursiv_cloud.json"}
+IMPORT_SKIP_TOP = {"runtime", "logs"}   # accounts/passwords and logs stay with each computer
+IMPORT_SKIP_NAMES = {"portable-layout-v1.json", "field_defaults_applied", "crash.log",
+                     "device_key.json", "system.uuid", ".cursiv-private-copy"}
+
+
+def import_targets() -> tuple[Path, Path]:
+    """This computer's (APP_DATA, ~/.cursiv)."""
+    from cursiv_engine.core import paths
+    return paths.APP_DATA.resolve(), (Path.home() / ".cursiv").resolve()
+
+
+def _target(rel: Path, app: Path, home: Path) -> Path:
+    """Where this computer's Cursiv reads `rel`: the folder that has it (the newer
+    one if both do), else the folder that owns that kind of store."""
+    a, h = app / rel, home / rel
+    if a.exists() and h.exists() and a != h:
+        return a if a.stat().st_mtime >= h.stat().st_mtime else h
+    if a.exists():
+        return a
+    if h.exists():
+        return h
+    return (home if rel.parts[0] in HOME_STORES else app) / rel
+
+
+def _check_links(target: Path, root: Path) -> None:
+    for p in (target, *target.parents):
+        if p == root.parent:
+            return
+        if p.exists() and _linked(p):
+            raise OSError(f"Linked data destination refused: {p}")
+
+
+def _vault_on(*roots: Path) -> bool:
+    from cursiv_engine.core import vault
+    return any((r / vault.MARKER).exists() for r in roots)
+
+
+def plan_import(drive_data: Path, app: Path, home: Path) -> list[dict]:
+    """Read-only: what bringing the drive's data to this computer would do."""
+    from cursiv_engine.core import vault
+    encrypted = _vault_on(drive_data, app, home)
+    items = []
+    for rel, src in sorted(collect([drive_data]).items()):
+        if rel.parts[0] in IMPORT_SKIP_TOP or rel.name in IMPORT_SKIP_NAMES:
+            continue
+        target = _target(rel, app, home)
+        if encrypted and (rel.name == vault.MARKER or vault.covered(rel)):
+            items.append({"rel": rel, "src": src, "dest": target, "action": "skip",
+                          "reason": "encrypted storage is on; move encrypted stores by hand"})
+            continue
+        _check_links(target, app if target.is_relative_to(app) else home)
+        action, reason = decide(src, target, "the drive", "this computer")
+        items.append({"rel": rel, "src": src, "dest": target, "action": action, "reason": reason})
+    return items
+
+
+def describe_import(items: list[dict]) -> str:
+    c = summary(items)
+    if not items:
+        return "From the drive: nothing to bring to this computer."
+    parts = []
+    if c["add"]:
+        parts.append(f"{c['add']} new")
+    if c["update"]:
+        parts.append(f"{c['update']} newer on the drive")
+    if c["keep"]:
+        parts.append(f"{c['keep']} newer on this computer (kept)")
+    if c["skip"]:
+        parts.append(f"{c['skip']} encrypted (skipped)")
+    parts.append(f"{c['same']} already the same")
+    return "From the drive to this computer: " + ", ".join(parts) + "."
+
+
+def pending_dir() -> Path:
+    return Path.home() / ".cursiv" / PENDING
+
+
+def stage_import(items: list[dict], progress=None, cancel: threading.Event | None = None) -> Path | None:
+    """Copy the add/update files to this computer's staging folder. Nothing in
+    use is changed until the next start. A newer staging replaces an unapplied one."""
+    work = todo(items)
+    if not work:
+        return None
+    stage = pending_dir()
+    tmp = stage.with_name(PENDING + ".tmp-" + time.strftime("%Y%m%d%H%M%S"))
+    entries = []
+    try:
+        for i, it in enumerate(work):
+            if cancel is not None and cancel.is_set():
+                raise InterruptedError
+            name = f"{i:05d}"
+            _write_verified(it["src"], tmp / "files" / name)
+            entries.append({"file": name, "target": str(it["dest"]), "rel": it["rel"].as_posix(),
+                            "action": it["action"], "reason": it["reason"],
+                            "sha256": _digest(tmp / "files" / name)})
+            if progress:
+                progress(int((i + 1) * 100 / len(work)), f"Copying from the drive: {i + 1} of {len(work)} files")
+        (tmp / "manifest.json").write_text(json.dumps(entries, indent=2), encoding="utf-8")
+        if stage.exists():
+            shutil.rmtree(stage)
+        os.replace(tmp, stage)
+    finally:
+        if tmp.exists():
+            shutil.rmtree(tmp, ignore_errors=True)
+    return stage
+
+
+def apply_pending_import() -> dict | None:
+    """Installed app, at startup before data is read. None when nothing is staged."""
+    stage = pending_dir()
+    manifest = stage / "manifest.json"
+    if not manifest.exists():
+        return None
+    entries = json.loads(manifest.read_text(encoding="utf-8"))
+    app, home = import_targets()
+    stamp = time.strftime("usb-import-%Y%m%d-%H%M%S")
+    report, applied, backed = [], 0, 0
+    for e in entries:
+        staged, target, rel = stage / "files" / e["file"], Path(e["target"]), Path(e["rel"])
+        root = next((r for r in (app, home) if target.resolve().is_relative_to(r)), None)
+        if root is None or not staged.is_file() or _digest(staged) != e["sha256"]:
+            report.append(f"skipped  {e['rel']}  (staged copy missing, damaged or outside Cursiv's data)")
+            continue
+        _check_links(target, root)
+        action, reason = decide(staged, target, "the drive", "this computer")
+        if action not in ("add", "update"):
+            report.append(f"kept     {e['rel']}  ({reason or 'already the same'})")
+            continue
+        if target.exists():
+            _write_verified(target, root / "backups" / stamp / rel)
+            backed += 1
+        _write_verified(staged, target)
+        if target.name == "config.json":
+            from cursiv_engine.core import keystore
+            keystore.migrate(target)          # readable drive keys -> encrypted for this account
+        applied += 1
+        report.append(f"{action:8} {e['rel']}  ({reason})")
+    out = home / "backups" / stamp
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "REPORT.txt").write_text(
+        f"Cursiv data brought from a drive\n{applied} file(s) applied, {backed} replaced file(s) "
+        f"saved under backups/{stamp} in the folder they came from.\n\n" + "\n".join(report) + "\n",
+        encoding="utf-8")
+    shutil.rmtree(stage)
+    return {"applied": applied, "backed_up": backed, "report": out / "REPORT.txt"}

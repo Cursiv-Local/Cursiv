@@ -1,5 +1,29 @@
 # Handoff — Cursiv verification overhaul
 
+## U95: drive -> computer import (Claude, 2026-10-24) — branch `claude/u95-usb-import`
+
+"Bring drive data here" (USB dialog, installed app only) reverses the U94 sync.
+- `usb_sync.plan_import()` (read-only) maps each drive file to the folder the
+  installed app reads it from (`_target`: the folder that has it, the newer one if
+  both do, else `HOME_STORES` -> `~\.cursiv`, otherwise APP_DATA). Never imported:
+  `runtime/` (accounts/passwords), `logs/`, crash log, `device_key.json`,
+  `system.uuid`, portable markers. If any root has `data-vault.json`, vault-covered
+  stores are listed as `skip`, not mixed between vaults.
+- `stage_import()` copies the add/update files, hash-verified, to
+  `~\.cursiv\import-pending\` (atomic rename; replaces an unapplied staging).
+  `main.py` calls `apply_pending_import()` after the data lease and unlock, before
+  any store is read, non-portable only. Each entry is re-decided at that moment
+  (work done after staging is kept), staged hashes are checked, replaced files go
+  to `<folder>\backups\usb-import-<time>\`, `config.json` is re-encrypted with
+  `keystore.migrate`, REPORT.txt is written, staging is removed.
+- `decide()` now names both sides, treats `config.json` with the same revealed
+  settings as `same`, and flags `.jsonl` files that changed on both sides (newer
+  wins, the other copy is in backups -- no line merge; the field-log chain is not
+  merged). `import-pending` is never synced to a drive.
+- Real dry run (read-only) against D: and the installed app: 1 conversation only on
+  the drive (`2dbe2e959c8d.json`, Oct 18) would be added; 174 identical.
+- Not done: an actual import on the owner's PC (needs the owner, then a restart);
+  field logs edited on both sides are not merged line by line.
 ## U94 published (Claude, 2026-10-24)
 
 Tag `v3.14-U94` = `f5b9940` (PR #8). Windows installer built with

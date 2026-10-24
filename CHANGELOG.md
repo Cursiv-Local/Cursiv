@@ -1,5 +1,21 @@
 # Changelog
 
+## 3.14-U95 — Bring USB data back to a computer (2026-10-24)
+
+- "Make a Cursiv USB…" has **Bring drive data here**: conversations, notebook
+  entries, memories and settings that are new or newer on the drive come back into
+  Cursiv on this computer. Anything newer on the computer is kept.
+- The files are copied and checked first, then put in place the next time Cursiv
+  starts, before it reads any data, so nothing in use is overwritten and the drive
+  can be unplugged in between. Each file is compared again at that moment; a file
+  the computer already has is backed up first, and a report lists every decision.
+- Each file goes back to the folder this computer's Cursiv reads it from. Saved
+  keys are encrypted again for this Windows account. Accounts, passwords, logs and
+  device identity are never brought over. With encrypted storage on, encrypted
+  stores are skipped and listed.
+- **Check drive** now reports both directions. A `config.json` with the same
+  settings and keys counts as the same, whether its keys are readable or encrypted.
+
 ## 3.14-U94 — USB startup fix and drive check/update (2026-10-24)
 
 - Fix a Cursiv USB made with "Include my memories" not starting: the first start

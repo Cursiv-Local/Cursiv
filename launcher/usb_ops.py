@@ -473,6 +473,10 @@ def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_priva
         items = usb_sync.plan(usb_sync.data_sources(), data_dir)
         data_todo = usb_sync.todo(items)
         lines.append(usb_sync.describe(items))
+        if runtime.os.environ.get("CURSIV_PORTABLE") != "1" and data_dir.is_dir():
+            back = usb_sync.plan_import(data_dir, *usb_sync.import_targets())
+            lines.append(usb_sync.describe_import(back)
+                         + (" Use \"Bring drive data here\" for those." if usb_sync.todo(back) else ""))
     else:
         lines.append("Your data: not checked (tick \"Include my memories…\" to compare it).")
     up_to_date = (made and not todo and not stale and not missing_models and osrc is not None

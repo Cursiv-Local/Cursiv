@@ -42,6 +42,7 @@ from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QListWidget,
     QListWidgetItem, QMessageBox, QProgressBar, QPushButton, QVBoxLayout,
 )
+import usb_sync
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
 
@@ -122,6 +123,14 @@ UPDATING THIS DRIVE
   "Update USB" copies only what changed. With "Include my memories..." ticked, your
   conversations, field notebook, memories and settings from that computer are
   brought up to date too; anything newer on this drive is kept.
+
+TAKING YOUR WORK BACK TO A COMPUTER
+  On a computer with Cursiv installed, open "Make a Cursiv USB...", pick this
+  drive and click "Bring drive data here". Conversations, notebook entries,
+  memories and settings that are new or newer on the drive are copied, then put
+  in place the next time Cursiv starts. Anything newer on the computer is kept,
+  and every replaced file is backed up first. Accounts and passwords stay as they
+  are on each computer.
 
 More: https://cursiv.winklers-llc.com  ·  Source: https://github.com/winklersllc2026-bit/Cursiv
 """
@@ -280,6 +289,8 @@ def _download_ollama(dest_dir: Path, progress, cancel: threading.Event) -> Path:
 class _Signals(QObject):
     progress = pyqtSignal(int, str)        # percent (-1 = busy), text
     done     = pyqtSignal(bool, str)
+    planned  = pyqtSignal(object, str)     # drive -> computer plan (or None), message
+    staged   = pyqtSignal(bool, str)
 
 
 def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool=False) -> None:
@@ -329,6 +340,8 @@ class UsbMakerDialog(QDialog):
         self._sig = _Signals()
         self._sig.progress.connect(self._on_progress)
         self._sig.done.connect(self._on_done)
+        self._sig.planned.connect(self._on_planned)
+        self._sig.staged.connect(self._on_staged)
         self._cancel = threading.Event()
         self._running = False
 
@@ -393,6 +406,13 @@ class UsbMakerDialog(QDialog):
         self._check.setToolTip("Read the drive and list what an update would change. Nothing is written.")
         self._check.clicked.connect(self._check_drive)
         brow.addWidget(self._check)
+        self._bring = QPushButton("Bring drive data here")
+        self._bring.setObjectName("ghost")
+        self._bring.setToolTip("Copy conversations, notebook entries, memories and settings that are new or "
+                               "newer on the drive into Cursiv on this computer. Anything newer here is kept.")
+        self._bring.clicked.connect(self._bring_data)
+        self._bring.setVisible(False)
+        brow.addWidget(self._bring)
         self._go = QPushButton("Make USB")
         self._go.clicked.connect(self._start)
         brow.addWidget(self._go)
@@ -461,6 +481,7 @@ class UsbMakerDialog(QDialog):
         self._total.setText(txt)
         self._go.setEnabled(bool(d) and not self._running)
         self._check.setEnabled(bool(d) and not self._running)
+        self._bring.setEnabled(bool(d) and not self._running)
 
     def _drive_changed(self, *_):
         """A drive that already has Cursiv is updated, not made again; one that
@@ -469,6 +490,9 @@ class UsbMakerDialog(QDialog):
         root = Path(d["root"]) if d else None
         made = bool(root and (root / "Cursiv" / "portable.cursiv").exists())
         self._go.setText("Update USB" if made else "Make USB")
+        # Only the installed app has a computer side to bring data to.
+        self._bring.setVisible(bool(root and (root / "Home" / ".cursiv").is_dir())
+                               and os.environ.get("CURSIV_PORTABLE") != "1")
         if root and (root / PRIVATE_MARKER).exists():
             self._private.setChecked(True)
 
@@ -492,6 +516,70 @@ class UsbMakerDialog(QDialog):
             except Exception as exc:
                 self._sig.done.emit(False, f"Couldn't check the drive: {exc}")
         threading.Thread(target=work, daemon=True).start()
+
+    def _busy(self, text: str):
+        self._running = True
+        for b in (self._go, self._check, self._bring):
+            b.setEnabled(False)
+        self._bar.setVisible(True)
+        self._bar.setRange(0, 0)
+        self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
+        self._status.setText(text)
+
+    def _bring_data(self):
+        d = self._drive_box.currentData()
+        if not d or self._running:
+            return
+        self._busy("Comparing the drive with this computer…")
+        drive_data = Path(d["root"]) / "Home" / ".cursiv"
+
+        def work():
+            try:
+                items = usb_sync.plan_import(drive_data, *usb_sync.import_targets())
+                self._sig.planned.emit(items, usb_sync.describe_import(items))
+            except Exception as exc:
+                self._sig.planned.emit(None, f"Couldn't compare the drive: {exc}")
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_planned(self, items, message: str):
+        if items is None or not usb_sync.todo(items):
+            self._on_done(items is not None, message if items is None else message + " Nothing to bring.")
+            return
+        ok = QMessageBox.question(
+            self, "Bring drive data to this computer",
+            f"{message}\n\nThese files are copied to this computer now and put in place the next time "
+            "Cursiv starts, before it reads anything. Each file this computer already has is backed up "
+            "first. Accounts and passwords are not changed. Saved keys are encrypted for this Windows "
+            "account.\n\nContinue?",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if ok != QMessageBox.StandardButton.Yes:
+            self._on_done(True, "Nothing was copied.")
+            return
+        self._cancel.clear()
+        self._stop.setVisible(True)
+
+        def work():
+            try:
+                usb_sync.stage_import(items, self._sig.progress.emit, self._cancel)
+                self._sig.staged.emit(True, f"Copied {len(usb_sync.todo(items))} file(s) from the drive. "
+                                            "They go into place the next time Cursiv starts.")
+            except InterruptedError:
+                self._sig.staged.emit(False, "Stopped. Nothing on this computer was changed.")
+            except Exception as exc:
+                self._sig.staged.emit(False, f"Couldn't copy from the drive: {exc}. Nothing on this computer was changed.")
+        threading.Thread(target=work, daemon=True).start()
+
+    def _on_staged(self, ok: bool, message: str):
+        self._on_done(ok, message)
+        if not ok:
+            return
+        again = QMessageBox.question(
+            self, "Finish bringing your data in",
+            message + "\n\nClose Cursiv now? Open it again to finish; you can unplug the drive first.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if again == QMessageBox.StandardButton.Yes:
+            from PyQt6.QtWidgets import QApplication
+            QApplication.quit()
 
     # ── run ──────────────────────────────────────────────────────────────
     def _start(self):

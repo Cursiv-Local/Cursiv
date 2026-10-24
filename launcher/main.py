@@ -168,6 +168,24 @@ def main():
         QMessageBox.critical(None, 'Cursiv data unavailable', str(exc))
         sys.exit(1)
 
+    # Data brought from a Cursiv USB ("Bring drive data to this computer") is
+    # applied here: the lease is held and no store has been read yet.
+    if os.environ.get('CURSIV_PORTABLE') != '1':
+        try:
+            import usb_sync
+            done = usb_sync.apply_pending_import()
+            if done:
+                QMessageBox.information(
+                    None, 'Cursiv: data from your USB',
+                    f"Brought {done['applied']} file(s) from your USB into Cursiv on this computer. "
+                    f"Anything newer here was kept, and {done['backed_up']} replaced file(s) were "
+                    f"backed up first.\n\nDetails: {done['report']}")
+        except Exception as exc:
+            QMessageBox.warning(None, 'Cursiv: data from your USB',
+                                f"The data copied from your USB wasn't fully applied. Files already brought in "
+                                f"stay (each replaced one was backed up); the rest is tried again at the next "
+                                f"start.\n\n{exc}")
+
     # ── Single-instance enforcement ───────────────────────────────────────
     try:
         from cursiv_launcher import _acquire_instance_lock
