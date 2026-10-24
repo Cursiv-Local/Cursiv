@@ -38,7 +38,7 @@ Signing ran with `LOCALAPPDATA` pointed there; the key was not copied. Signer ha
 matched `trusted-tool-manifest.json` and commit `e9828f6` first. Evidence:
 [U94-RELEASE-VERIFICATION](docs/U94-RELEASE-VERIFICATION.md).
 
-## USB startup fix and drive check/update (Claude, 2026-10-24) — uncommitted
+## USB startup fix and drive check/update (Claude, 2026-10-24) — released in U94
 
 **Symptom (owner):** `Start Cursiv.bat` on the USB opened nothing. Reproduced on a
 copy of the real drive (D:, exFAT, made 2026-10-24 02:39 with private data):
