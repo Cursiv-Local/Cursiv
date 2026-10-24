@@ -80,7 +80,6 @@ class ChatRuntime(Protocol):
     _WORKED: Any
     _big_gpu: Any
     _build_live_status: Any
-    _build_owner_reveal: Any
     _build_strand_context: Any
     _call_claude_direct: Any
     _call_claude_with_tools: Any
@@ -119,7 +118,6 @@ class ChatRuntime(Protocol):
     _hermes_available: Any
     _hermes_run: Any
     _is_online: Any
-    _is_owner_session: Any
     _learn_later: Any
     _load_session_ctx: Any
     _local_llm: Any
@@ -134,7 +132,6 @@ class ChatRuntime(Protocol):
     _ollama_pulled_models: Any
     _ollama_running: Any
     _ollama_tags: Any
-    _owner_active: Any
     _pending_file: Any
     _post_json: Any
     _pull_ollama_model: Any
@@ -155,7 +152,6 @@ class ChatRuntime(Protocol):
     _save_cloud_settings: Any
     _saved_key: Any
     _set_answered: Any
-    _set_owner_code: Any
     _slim: Any
     _store_key: Any
     _strand_count: Any
@@ -163,8 +159,6 @@ class ChatRuntime(Protocol):
     _strip_status_lines: Any
     _text_messages: Any
     _time_boxed: Any
-    _unlock_owner: Any
-    _verify_owner_code: Any
     _web_search: Any
     _without_model: Any
     base64: Any

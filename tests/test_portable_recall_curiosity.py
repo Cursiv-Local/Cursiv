@@ -165,7 +165,7 @@ def test_corrupt_style_never_resets_preferences(monkeypatch):
     p = style._path('dana')
     p.write_text('{bad')
     with pytest.raises(ValueError):
-        style.set_tone('dana', 'brief')
+        style.add_rule('dana', 'Keep answers short', 'manual')
     assert p.read_text() == '{bad'
     style.add_rule('other', 'Keep explanations brief', 'manual')
     assert 'accuracy, permissions and safety' in style.prompt_addendum('other')

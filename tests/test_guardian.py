@@ -19,13 +19,15 @@ def test_a_probing_question_gets_a_normal_answer(fresh, monkeypatch):
     assert "☠" not in out and "Access Denied" not in out
 
 
-def test_owner_code(tmp_path, monkeypatch):
-    from cursiv_engine.guardian import owner
-    monkeypatch.setattr(owner, "_OWNER_CODE_FILE", tmp_path / "owner.hash")
-    assert owner.verify_owner_code("open sesame") is False
-    owner.set_owner_code("open sesame")
-    assert "open sesame" not in (tmp_path / "owner.hash").read_text()
-    assert owner.verify_owner_code("open sesame") and not owner.verify_owner_code("open")
+def test_no_owner_code_unlocks_anything(monkeypatch):
+    """Cursiv is open: there is no owner code, owner session or owner-only prompt."""
+    import importlib.util
+    from cursiv_engine.ui import chat_app as ca
+    assert importlib.util.find_spec("cursiv_engine.guardian.owner") is None
+    assert not hasattr(ca, "_verify_owner_code") and not hasattr(ca, "_owner_active")
+    _local_model(monkeypatch, reply="Here is the answer.")
+    out = "".join(ca.chat("owner setcode open sesame", [], "", None))
+    assert "Owner code saved" not in out and "Owner mode" not in out
 
 
 def test_ai_may_not_write_keys_or_logins():

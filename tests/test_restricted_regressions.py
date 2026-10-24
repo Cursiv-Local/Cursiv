@@ -49,7 +49,7 @@ def test_restrictions_precede_every_retrieval_and_retention(pipeline, monkeypatc
         (documents, ['library']), (presence, ['memory_state', 'settings']),
         (plugins, ['message_context']), (style, ['prompt_addendum']),
         (ca, ['_learn_later', '_build_strand_context', 'load_vault_context', '_load_session_ctx',
-              '_call_openai_with_tools', '_verify_owner_code', '_strand_count', '_ref_available', '_codex_available']),
+              '_call_openai_with_tools', '_strand_count', '_ref_available', '_codex_available']),
     ]:
         for name in names:
             monkeypatch.setattr(module, name, denied)

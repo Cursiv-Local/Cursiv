@@ -76,7 +76,7 @@ def _safe(fn, default="unknown"):
 def live_report(*, observed=None) -> str:
     from cursiv_engine.ui import chat_app as ca
     from cursiv_engine.core import speed
-    lines = [f"Version: Cursiv {VERSION} (Windows desktop app, PyQt window; phone app at cursiv.winklers-llc.com/app)"]
+    lines = [f"Version: Cursiv {VERSION} (Windows desktop app, PyQt window; phone app at cursiv.us/app)"]
 
     keys = [label for label, f in (("Groq (free)", "groq_key"), ("Gemini (free)", "gemini_key"), ("Claude", "anthropic_key"),
                                    ("xAI Grok", "api_key"), ("OpenAI", "openai_key")) if _safe(lambda f=f: ca._saved_key(f), "")]
@@ -120,7 +120,7 @@ def live_report(*, observed=None) -> str:
         lines.append(f"Projects tracked: {', '.join(_projects.load(person)) or 'none'}")
         from cursiv_engine.core import style as _style
         _st = _style.load(person)
-        lines.append(f"Tone: {_st.get('tone', 'normal')}; style rules learned from corrections: {len(_st.get('rules', []))}")
+        lines.append(f"Personality: one fixed personality (no tones); style rules learned from corrections: {len(_st.get('rules', []))}")
         from cursiv_engine.agents import custom as _custom
         lines.append("Custom agents: " + (", ".join("@" + a["name"] for a in _custom.all_agents()) or "none"))
     except Exception:
@@ -149,7 +149,7 @@ def live_report(*, observed=None) -> str:
     return "\n".join(f"- {l}" for l in lines)
 
 
-SELF_PROMPT = """You are Cursiv, a personal AI created by Joshua Winkler that anyone can install and make their own. The person is asking about \
+SELF_PROMPT = """You are Cursiv, a personal AI made by Cursiv Local, an independent open-source project, that anyone can install and make their own. The person is asking about \
 you -- your status, setup, abilities or how to improve you. Answer ONLY from the facts and the live report below.
 
 Rules:
@@ -172,7 +172,8 @@ small GPU, etc.) and be concrete about how to do it in Cursiv (which window or c
 - Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.
 - Native notebook recording, retrieval and integrity verification use the Field Notebook backend, not field_log.txt. Explicit memory save/recall/list/correct/forget and automatic-learning controls use the memory backend; manual saves remain available with automatic learning off. These explicit local actions need no cloud model. Only application-verified results and actual paths/record IDs establish success; model prose never does.
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
-- Tone and style: tone blunt/warm/brief/playful/legacy/teacher/normal; style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
+- Personality and style: one fixed personality (no tones); style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
+- Memory clean-up: memory cleanup (lists misleading saved notes and memories; changes nothing), memory cleanup remove <codes>|all (backs up first).
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agent council <question>.
 - There is no setting for context length or for choosing the chat model by hand; Cursiv picks models by graphics card. To change models, download a different one in Setup.
 

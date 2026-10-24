@@ -102,6 +102,85 @@ use (`docs/USB-PERSISTENCE-CHECK.md`) still needs a person. Data made *on the US
 is not copied back to a PC's installed Cursiv yet (one-way: PC -> drive). The 13
 old `portable-*` backup folders on D: were left for the owner to delete.
 
+## U96 part 1: one personality, open system, memory clean-up (Claude, 2026-10-24) — branch `claude/u96-part1`
+
+Owner-approved personality text is the "How to talk" section of
+`codex/system_prompt.md` (one personality; it is in `speed._CORE_SECTIONS`, so the
+compact persona on small GPUs carries it). Done on this branch, not released:
+- **Creator line:** chat-facing prompts say "made by Cursiv Local, an independent
+  open-source project". Cloud-privacy notices still name the real API host
+  (`cursiv.winklers-llc.com`) because that is where messages go; moving the API to
+  `cursiv.us` would remove the surname there. License/copyright untouched. Note:
+  `Cursiv-LICENSE.txt` says "All rights reserved" while README/installer say MIT —
+  owner decision.
+- **Owner mode removed** (`guardian/owner.py`, `owner setcode`, owner sessions and
+  the owner-only prompt line, whose honesty sentence now applies to everyone).
+  Kept on purpose: `guardian/protected.py`, logins, and the fleet "Manage Access"
+  password re-check (re-authentication before granting remote relay access).
+- **Tones removed** (`style.TONES`, `set_tone`, Settings picker). Learned style rules
+  stay; `tone …` replies with `style.NO_TONES`; old `tone` values are ignored.
+  Response *phases* (constitution/grounding "tone" fields) are untouched.
+- **Hypotheticals rule** added to "Be honest"; **`drop_false_refusal`** in
+  `chat/response_style.py`, applied with `trim_closer` when the draft can be
+  replaced. Tests: `test_false_refusal.py` (incl. the observed transcript and the
+  real `chat()` pipeline), `test_style_personality.py`.
+- **`memory cleanup`** (`memory/cleanup.py`, `strand_store.remove_strands`), routed in
+  `command_dispatch` before memory intents. Dry run on a copy of the owner's data
+  lists 9 items: 3 guardian-era notes (`c9160d06`, `447b4ab6`, `d2b802e9`), 3 old
+  council feature answers, 2 test memories, 1 inferred "over speculative" guess.
+  Nothing was removed from the owner's real data; that is the owner's choice.
+- Correction: the `evolve` command exists (Cursiv Forge); old council answers that
+  mention it are flagged as outdated, not invented.
+
+## Creative refusal: controlled reproduction (Claude, 2026-10-24) — root cause still unknown
+
+The refusal transcript below is saved on the owner's PC as conversation
+`7f70c0352786` (person `jw`, 2026-10-24 ~01:04). It was a **fresh, two-message
+conversation**: one local `qwen3:4b-instruct` pass, no answer-check rewrite (footer:
+"saved memory context supplied … Wording by the AI model"). History was not a factor.
+
+Same exact prompt, `qwen3:4b-instruct`, current source, run against a copy of the
+owner's real data (never the live stores). **0 refusals in 48 attempts:**
+
+| Setup | Refused |
+|---|---|
+| Model alone, no system prompt | 0/4 |
+| `codex/system_prompt.md` only | 0/4 |
+| System prompt + "hypotheticals are welcome" line | 0/4 |
+| System prompt after two earlier refusals in the history | 0/4 (+0/4 fresh) |
+| Exact captured full chat messages (4 system blocks, 14,017 chars) | 0/4 |
+| Same, minus status / philosophy policy / style block / memory+session (one at a time) | 0/16 |
+| **Real `chat_app.chat()` pipeline** (`_slim` to 14k on the 4 GB GPU, compact persona, `/api/generate`, num_ctx 8192) | 0/4 |
+| Real pipeline with battery saver forced (num_ctx 4096) | 0/4 |
+
+Ruled out as the sole cause: base system prompt, conversation history, the
+status/philosophy/style blocks, memory retrieval for this prompt (person `jw`), saved
+conversations (not a source of "related earlier conversations"), battery-saver context.
+Not reproducible now: the installed U93-era build last night, sampling, and memory/style
+state at that moment. Most likely a low-probability sampling outcome in a prompt heavy
+with prohibitions. The 6 "never invent / never claim / only claim" rules have no
+positive counterpart saying hypotheticals and fiction are fine.
+
+Context hygiene found during the probe (affects answers generally):
+- Retrieved for this prompt: test memories ("brass compass … persistence test", "the
+  workspace root is dangerous…") and old council answers recommending a nonexistent
+  `evolve` feature. They are irrelevant, and the second teaches invented features.
+- `strands.jsonl` (fallback context) still holds 3 Aug-13 guardian-era replies:
+  "System Guardian: ARMED … CONSTITUTIONAL ✓", "EvoCore … constitutional guardrails".
+  These are a plausible source of invented self-explanations.
+- Learned memory `b4f4de245d` [inferred, 2026-10-21]: "Jw prioritizes … over
+  speculative or abstract AI capabilities." Not retrieved for this prompt, but it is
+  exactly the kind of inference that could prime a refusal.
+- Owner mode (`guardian/owner.py`, "owner setcode") still exists; the owner wants no
+  unlock codes. `guardian/protected.py` (AI file tool can't overwrite keys/logins) is
+  a real safety rule and should stay. Logins are accounts, not feature unlocks.
+
+Recommended (not done): add a positive hypotheticals/fiction rule to the persona and
+compact persona; a deterministic, zero-extra-call check that drops a leading "I
+can't …" sentence when the same reply then completes the task; a regression test
+with the exact prompt and a fake model; a reviewed clean-up of the polluted stores
+(show and confirm, never silent deletion); remove owner mode.
+
 ## Planned for Claude: creative reasoning, evidence discipline and self-correction — NOT STARTED (2026-10-24)
 
 **For Claude's planned October 25, 2026 session (America/New_York).**

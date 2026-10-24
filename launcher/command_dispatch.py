@@ -46,6 +46,15 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     if profile.personal_command(text) and not runtime._personal():
         return runtime.TextResult(profile.PERSONAL_NOTE)
 
+    # Clean-up is exact and precedes memory intents, so "memory cleanup remove all"
+    # can never be read as a request to forget every memory.
+    from cursiv_engine.memory import cleanup as _cleanup
+    if cmd.startswith(("memory cleanup", "memory clean up", "clean up memory", "cleanup memory")):
+        from cursiv_engine.memory import semantic as _semantic
+        _reply = _cleanup.command(text, _semantic.current_person())
+        if _reply is not None:
+            return runtime.TextResult(_reply)
+
     # Native notebook intent takes precedence over generic files and memory.
     _notebook = runtime.notebook_command(text, history, cfg=cfg)
     if _notebook is not None:

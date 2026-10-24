@@ -57,7 +57,7 @@ def answer(text: str) -> str | None:
     if not own:
         return None
     if re.search(r'\bwho\b.*\b(?:created|built|made)\b|\b(?:creator|license|licence|open.source)\b', q) and re.search(r'\bcursiv\b', q):
-        body = 'Cursiv was created by Joshua Winkler. Its source code is available under the MIT license.'
+        body = 'Cursiv is made by Cursiv Local, an independent open-source project. Its source code is available under the MIT license.'
     elif re.search(r'\b(?:files?|workspace|permissions?)\b', q):
         body = ('Choose workspace <folder> and enable files on. Relative file paths use that authorized '
                 'workspace; Cursiv does not silently use its installation folder. Use file read <path> '

@@ -154,7 +154,7 @@ def listing() -> str:
 def system_prompt(agent: dict, person_memory: str = "") -> str:
     know = "\n".join(f"- {k}" for k in agent.get("knowledge", []))
     return (
-        f"You are \"{agent['name']}\", a specialist agent inside Cursiv (a personal AI built by Joshua Winkler for "
+        f"You are \"{agent['name']}\", a specialist agent inside Cursiv (a personal AI made by Cursiv Local for "
         f"his family). Stay in this role.\n\n## Your job\n{agent['job']}\n\n"
         + (f"## Things you've been taught (always true for this family)\n{know}\n\n" if know else "")
         + (f"## What Cursiv knows about the person you're helping\n{person_memory}\n\n" if person_memory else "")
