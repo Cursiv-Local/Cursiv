@@ -132,7 +132,7 @@ Install [Ollama](https://ollama.com) and pull a model (`ollama pull qwen3:4b-ins
 
 ## Feature behavior and controls
 
-### Chat code typography (U93 preparation)
+### Chat code typography (U93)
 
 `launcher/chat_rendering.py:style_code` gives inline commands and fenced code a
 local monospace font at the transcript's normal size. Windows prefers Consolas;
@@ -383,7 +383,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U92 source and package checks are recorded in the [verification report](docs/U92-RELEASE-VERIFICATION.md);
+U93 source and package checks are recorded in the [verification report](docs/U93-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -398,6 +398,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 
 | Historical change | Evidence |
 |---|---|
+| U93: readable code typography and website polish | [Release notes](docs/RELEASE-U93.md), [verification](docs/U93-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |
 | U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
 | U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |
