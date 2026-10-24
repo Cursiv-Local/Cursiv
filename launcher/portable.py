@@ -20,8 +20,6 @@ from __future__ import annotations
 
 import os
 import sys
-import hashlib
-import json
 import uuid
 from pathlib import Path
 
@@ -94,7 +92,15 @@ def activate() -> bool:
 
 
 def migrate_data(root: Path, data: Path) -> None:
-    """Snapshot legacy stores before copying missing files. Never choose a conflict."""
+    """Once per drive: bring data that older USB makers left in the program folder
+    (Cursiv\\_internal\\.cursiv, Cursiv\\.cursiv) into Home\\.cursiv.
+
+    Same rules as updating a drive (usb_sync): missing files are added, and when
+    both sides have a file the newer one wins (a log that only grew counts as
+    newer). A Home file is copied to backups\\portable-migration-<time>\\ and
+    verified before it is replaced; REPORT.txt there lists every decision. The
+    old folders are left as they were. Earlier versions stopped startup on any
+    difference, and every launch then failed on a drive made with private data."""
     marker = data / 'portable-layout-v1.json'
     if marker.exists():
         return
@@ -104,57 +110,14 @@ def migrate_data(root: Path, data: Path) -> None:
             if p.is_symlink() or p.is_junction():
                 raise OSError(f'Linked portable data requires manual review: {p}')
     sources = [root / 'Cursiv' / '_internal' / '.cursiv', root / 'Cursiv' / '.cursiv']
-    files = []
     for source in sources:
         for parent in (source, source.parent, source.parent.parent):
             if parent.is_symlink() or parent.is_junction():
                 raise OSError(f'Linked legacy data requires manual review: {parent}')
-        if not source.exists():
-            continue
-        if source.is_symlink() or source.is_junction():
-            raise OSError(f'Legacy portable data is a link: {source}')
-        for folder, dirs, names in os.walk(source, followlinks=False):
-            for name in dirs + names:
-                p = Path(folder) / name
-                if p.is_symlink() or p.is_junction():
-                    raise OSError(f'Linked legacy data requires manual review: {p}')
-            for name in names:
-                p = Path(folder) / name
-                files.append((p, p.relative_to(source), source.parent.name))
-    if files:
-        backup = data / 'backups' / ('portable-' + uuid.uuid4().hex)
-        manifest = {}
-        # Include the destination so both sides of every conflict are recoverable.
-        snapshots = [(p, Path('Home') / p.relative_to(data)) for p in data.rglob('*')
-                     if p.is_file() and 'backups' not in p.relative_to(data).parts]
-        snapshots += [(p, Path(label) / rel) for p, rel, label in files]
-        for source, rel in snapshots:
-            if source.is_symlink() or source.is_junction():
-                raise OSError('Linked data requires manual review')
-            content = source.read_bytes()
-            target = backup / rel
-            target.parent.mkdir(parents=True, exist_ok=True)
-            with target.open('xb') as stream:
-                stream.write(content); stream.flush(); os.fsync(stream.fileno())
-            if target.read_bytes() != content:
-                raise OSError('Portable migration backup verification failed')
-            manifest[rel.as_posix()] = hashlib.sha256(content).hexdigest()
-        (backup / 'SHA256.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
-        planned = {}
-        for source, rel, _ in files:
-            content = source.read_bytes()
-            target = data / rel
-            if (target.exists() and target.read_bytes() != content) or (rel in planned and planned[rel] != content):
-                raise OSError(f'Portable data conflict at {rel}. Backups: {backup}. Resolve before restarting.')
-            planned[rel] = content
-        for rel, content in planned.items():
-            target = data / rel
-            if not target.exists():
-                target.parent.mkdir(parents=True, exist_ok=True)
-                with target.open('xb') as stream:
-                    stream.write(content); stream.flush(); os.fsync(stream.fileno())
-                if target.read_bytes() != content:
-                    raise OSError(f'Portable migration verification failed: {rel}')
+    sources = [s for s in sources if s.is_dir()]
+    if sources:
+        import usb_sync
+        usb_sync.apply(usb_sync.plan(sources, data), data, label='portable-migration')
     marker.write_text('{"version":1}', encoding='utf-8')
 
 
