@@ -1,5 +1,19 @@
 # Handoff — Cursiv verification overhaul
 
+## U94 published (Claude, 2026-10-24)
+
+Tag `v3.14-U94` = `f5b9940` (PR #8). Windows installer built with
+`build_release.py` in the hash-locked environment
+`%TEMP%\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8` (system Python fails
+the lock check). Mac DMG from `mac-build` run 40121155490 (dispatched, upload off).
+Signed with the reviewed signer copy; **note:** the owner key and signer live in
+Codex's virtualized folder
+`%LOCALAPPDATA%\Packages\OpenAI.Codex_2p2nqsd0c76g0\LocalCache\Local\CursivReleaseSigning`,
+not `%LOCALAPPDATA%\CursivReleaseSigning` as `docs/OWNER-RELEASE-SIGNING.md` says.
+Signing ran with `LOCALAPPDATA` pointed there; the key was not copied. Signer hashes
+matched `trusted-tool-manifest.json` and commit `e9828f6` first. Evidence:
+[U94-RELEASE-VERIFICATION](docs/U94-RELEASE-VERIFICATION.md).
+
 ## USB startup fix and drive check/update (Claude, 2026-10-24) — uncommitted
 
 **Symptom (owner):** `Start Cursiv.bat` on the USB opened nothing. Reproduced on a
