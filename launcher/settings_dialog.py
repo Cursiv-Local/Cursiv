@@ -325,17 +325,15 @@ class SettingsDialog(QDialog):
         from cursiv_engine.memory import semantic
         person = semantic.current_person()
         v = self._card(lay)
-        t = QLabel("Tone"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
-        self._tone = QComboBox()
-        names = {"normal": "Normal", "warm": "Warm", "brief": "Brief", "blunt": "Blunt", "teacher": "Teacher",
-                 "playful": "Playful", "legacy": "Family and legacy"}
-        current = (style.load(person) or {}).get("tone", "normal") or "normal"
-        for key in style.TONES:
-            self._tone.addItem(names.get(key, key.title()), key)
-        self._tone.setCurrentIndex(max(0, self._tone.findData(current)))
-        self._tone.activated.connect(lambda i: style.set_tone(person, self._tone.itemData(i)))
-        v.addWidget(self._tone)
-        v.addWidget(self._explain("How Cursiv talks to you. Brief keeps answers short; Teacher explains step by step."))
+        t = QLabel("How Cursiv talks"); t.setStyleSheet("font-size: 14px; font-weight: 600;"); v.addWidget(t)
+        try:
+            count = len((style.load(person) or {}).get("rules", []))
+        except (OSError, ValueError):
+            count = 0
+        v.addWidget(self._explain(
+            "Cursiv has one personality: curious, calm, warm and honest, the same in every conversation. "
+            "To change how it talks to you, just say so in chat (\"keep answers shorter\", \"less formal\") "
+            f"or type style add <rule>. Your preferences so far: {count}. Type style to see them."))
         from cursiv_engine.core import presence
         self._switch(lay, 'Adapt communication preferences',
                      'Learn presentation preferences from explicit corrections. Accuracy and permissions take precedence.',

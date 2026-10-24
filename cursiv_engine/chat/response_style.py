@@ -80,3 +80,48 @@ def trim_closer(question: str, answer: str) -> str:
             paragraphs.pop()
     cleaned = '\n\n'.join(paragraphs)
     return cleaned if cleaned and cleaned != original else answer
+
+
+# A creative or hypothetical request that the reply first claims Cursiv can't do,
+# then does anyway ("No, I can't invent an experiment … But here's one:"). The
+# claimed incapability is false, so it is dropped and the work is kept. Only a
+# capability claim is removed, never a safety or permission refusal.
+_CREATIVE_ASK = re.compile(r"(?i)\b(?:imagine|hypothetic\w*|thought experiment|invent\w*|fiction\w*|story|poem|"
+                           r"creative\w*|speculat\w*|what if|brainstorm\w*|make up)\b")
+_REFUSAL_START = re.compile(
+    r"(?i)^\W*(?:no[,.]?\s+)?(?:(?:i(?:'|’)?m\s+)?sorry[,.]?\s+)?(?:but\s+)?i(?:'|’)?m?\s*"
+    r"(?:can(?:'|’)?t|cannot|can not|am not able to|not able to|am unable to|unable to|won(?:'|’)?t be able to)\b")
+_INCAPABILITY = re.compile(
+    r"(?i)beyond (?:what(?:'|’)?s|what is) possible|beyond my|in this system|not designed|operational constraint\w*|"
+    r"capabilit\w*|(?:creative|speculative|original|unverified)[\w\s,]{0,40}(?:reasoning|ideas|content)")
+_SENTENCE = re.compile(r"[^.!?\n]*[.!?]+")
+_SAFETY = re.compile(r"(?i)\b(?:harm\w*|danger\w*|illegal|unsafe|weapon\w*|violen\w*|abuse|self-harm|suicid\w*|"
+                     r"privacy|permission|not allowed|against)\b")
+_LEAD_CONJUNCTION = re.compile(r"(?i)^(?:but|however|that said|still|instead)[,:]?\s+")
+
+
+def drop_false_refusal(question: str, answer: str) -> str:
+    """Remove an opening "I can't do creative work" claim when the reply then does the creative work."""
+    if not _CREATIVE_ASK.search(question or ''):
+        return answer
+    text = answer.lstrip()
+    if not _REFUSAL_START.match(text):
+        return answer
+    # The refusal and its capability reason may take one or two sentences.
+    end, claim = 0, ''
+    for _ in range(2):
+        s = _SENTENCE.match(text, end)
+        if not s:
+            break
+        claim, end = claim + s.group(0), s.end()
+        while end < len(text) and text[end] in ' \t':
+            end += 1
+        if _INCAPABILITY.search(claim) or (end < len(text) and text[end] == '\n'):
+            break
+    if not _INCAPABILITY.search(claim) or _SAFETY.search(claim):
+        return answer
+    rest = text[end:].lstrip(' \t\n—–-')
+    if len(rest) < 300:
+        return answer               # little or nothing followed: the refusal is the answer
+    rest = _LEAD_CONJUNCTION.sub('', rest, count=1)
+    return rest[:1].upper() + rest[1:]

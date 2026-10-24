@@ -4,17 +4,13 @@ Functions receive the explicit ChatRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: _owner_active, _cursiv_encode, _cursiv_decode, _existing_file, _pending_file, _file_tool_result, execute_tool, _build_owner_reveal, _compact_system_for_tools, _build_strand_context, _build_live_status, load_system_prompt, load_vault_context, _memory_used, _ref_evidence, sources_line, _without_model, _evidence, _compact_notes, _replacement_reply, _check_context.
+Entry points: _cursiv_encode, _cursiv_decode, _existing_file, _pending_file, _file_tool_result, execute_tool, _compact_system_for_tools, _build_strand_context, _build_live_status, load_system_prompt, load_vault_context, _memory_used, _ref_evidence, sources_line, _without_model, _evidence, _compact_notes, _replacement_reply, _check_context.
 """
 from __future__ import annotations
 
 from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
-
-def _owner_active(runtime: ChatRuntime) -> bool:
-    """True if owner is verified in any session (Gradio or CLI)."""
-    return runtime._is_owner_session(runtime._GRADIO_SESSION_ID)
 
 def _cursiv_encode(runtime: ChatRuntime, text: str) -> str:
     """Encode text to Cursiv binary (space-separated 8-bit bytes)."""
@@ -110,11 +106,7 @@ def execute_tool(runtime: ChatRuntime, name: str, args: dict, root: Path, *, con
 
     return f"Unknown tool: {name}"
 
-def _build_owner_reveal(runtime: ChatRuntime) -> str:
-    return ("Owner mode is on for this session: builder tools are listed in help "
-            "(help builder), and file tools treat you as the owner.")
-
-def _compact_system_for_tools(runtime: ChatRuntime, is_owner: bool) -> str:
+def _compact_system_for_tools(runtime: ChatRuntime) -> str:
     """
     Minimal system prompt used in tool-use loops to stay under rate limits.
     The full 47KB codex is skipped — Claude reads files with tools instead.
@@ -125,13 +117,9 @@ def _compact_system_for_tools(runtime: ChatRuntime, is_owner: bool) -> str:
         "Always call submit_plan before writing files. "
         "Read files before editing them. Write complete, working code — no stubs. "
         "Human approval is required before any system change is applied. "
-        "Be direct, honest, and technically precise."
+        "Be direct, honest, and technically precise. "
+        "Answer questions about how Cursiv works fully and honestly."
     )
-    if is_owner:
-        base += (
-            "\n\nOwner mode: the owner of this copy is verified. "
-            "Answer questions about how Cursiv works fully and honestly."
-        )
     return base
 
 def _build_strand_context(runtime: ChatRuntime, query: str, top_k: int) -> str:

@@ -106,7 +106,7 @@ def test_memory_comparison_does_not_capture_other_requests(question):
     ('ollama', '_call_ollama'), ('openai', '_call_openai_direct'),
     ('grok', '_call_xai_stream'), ('claude', '_call_claude_direct'),
 ])
-def test_brief_style_is_current_and_survives_compaction(pipeline, monkeypatch, provider, method):
+def test_style_rule_is_current_and_survives_compaction(pipeline, monkeypatch, provider, method):
     from cursiv_engine.memory import semantic
     from cursiv_engine.core import netgate
     seen = []
@@ -114,7 +114,7 @@ def test_brief_style_is_current_and_survives_compaction(pipeline, monkeypatch, p
     monkeypatch.setattr(pipeline, '_build_strand_context', lambda *a, **k: '')
     monkeypatch.setattr(pipeline, method, lambda messages, *a, **k: seen.extend(messages) or iter(['A short answer.']))
     person = semantic.current_person()
-    style.set_tone(person, 'brief')
+    style.add_rule(person, 'Answer in about 60 words, with no examples.', 'manual')
     options = dict(force_provider=provider, openai_key='fake-key', anthropic_key='fake-key')
     # The helper supplies an empty xAI key; use the public chat call for that provider.
     def ask():
@@ -122,22 +122,22 @@ def test_brief_style_is_current_and_survives_compaction(pipeline, monkeypatch, p
                                     [], 'fake-key', None, **options))
     ask()
     blocks = [m for m in seen if m.get('role') == 'system' and m.get('content', '').startswith('## Current answer style')]
-    assert len(blocks) == 1 and '60 words' in blocks[0]['content'] and 'No examples' in blocks[0]['content']
+    assert len(blocks) == 1 and '60 words' in blocks[0]['content'] and 'overrides these preferences' in blocks[0]['content']
     slim = pipeline._slim(seen, 4000)
     assert sum(m == blocks[0] for m in slim) == 1
     assert sum(m == blocks[0] for m in pipeline._slim(slim, 4000)) == 1
     seen.clear()
-    style.set_tone(person, 'normal')
+    style.clear(person)
     ask()
-    assert any('Current tone: normal.' in m.get('content', '') for m in seen)
-    assert not any('60 words' in m.get('content', '') for m in seen)
+    assert not any(m.get('content', '').startswith('## Current answer style') for m in seen)
+    assert not any('Current tone' in m.get('content', '') for m in seen)
 
 
 def test_long_style_rules_cannot_exhaust_compact_budget(pipeline):
     from cursiv_engine.memory import semantic
     person = semantic.current_person()
-    style.set_tone(person, 'brief')
-    for i in range(15):
+    style.add_rule(person, 'Answer in about 60 words.', 'manual')
+    for i in range(14):
         style.add_rule(person, f'Presentation rule {i}: ' + 'plain words ' * 15)
     block = style.prompt_addendum(person, 'Explain observation versus inference.')
     messages = [dict(role='system', content='Persona ' * 2000),
@@ -164,7 +164,10 @@ def test_document_miss_does_not_block_attached_material(library, pipeline, tmp_p
     'Give all the steps and warnings for this task.', 'Write a 200-word explanation.',
 ])
 def test_explicit_detail_overrides_brief_preference(question):
-    assert not style.brief_guidance(question)
+    from cursiv_engine.memory import semantic
+    person = semantic.current_person()
+    style.add_rule(person, 'Keep answers short', 'manual')
+    assert 'The current request overrides these preferences.' in style.prompt_addendum(person, question)
 
 
 def test_talk_only_does_not_read_style_preferences(pipeline, monkeypatch):

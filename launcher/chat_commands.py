@@ -524,8 +524,7 @@ _HELP_TOPICS = {
   anthropic <key>             add a Claude key
   grok / claude               ask the last question again with that AI"""),
     "style": ("How I talk", """\
-  tone <warm|brief|blunt|teacher|playful|normal>   how I talk to you
-  style                       your tone and the rules I learned from your corrections
+  style                       the rules I learned from your corrections (style add <rule>)
   rate good / bad / 1-5       tell me how the last answer was"""),
     "coding": ("Files and coding", """\
   codex <request>             coding help, every step listed (codex help for more)

@@ -12,13 +12,13 @@ from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
 
-def _call_claude_with_tools(runtime: ChatRuntime, messages: list[dict], anthropic_key: str, root: Path, confirm_writes: bool, max_tokens: int, max_loops: int, is_owner: bool, on_action) -> Generator[str, None, None]:
+def _call_claude_with_tools(runtime: ChatRuntime, messages: list[dict], anthropic_key: str, root: Path, confirm_writes: bool, max_tokens: int, max_loops: int, on_action) -> Generator[str, None, None]:
     """
     Agentic file-access loop using Claude's native tool-calling API.
     Uses a compact system prompt (~200 tokens) instead of the full 12k-token
     codex to stay under the 30k input-tokens/min rate limit.
     """
-    system_str = runtime._compact_system_for_tools(is_owner=is_owner) + runtime.turn_policy.current().note()
+    system_str = runtime._compact_system_for_tools() + runtime.turn_policy.current().note()
     # The first block is the replaceable persona. Retain application-owned
     # current-state/source blocks when this provider switches to its tool prompt.
     system_str += '\n'.join(m['content'] for m in messages[1:] if m.get('role') == 'system')

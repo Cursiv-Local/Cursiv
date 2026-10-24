@@ -87,11 +87,6 @@ from cursiv_engine.chat.optional import (  # noqa: E402,F401  (moved; chat_app r
 # Session ID — stable per process, rotates on every server restart
 _GRADIO_SESSION_ID = f"gradio_{os.getpid()}"
 
-def _owner_active() -> bool:
-    """Compatibility entry point; implementation in chat.context."""
-    return _context._owner_active(_runtime())
-
-
 from cursiv_engine.chat.web_search import (  # noqa: E402,F401  (moved; chat_app re-exports)
     _wcache_get,
     _wcache_store,
@@ -104,25 +99,6 @@ from cursiv_engine.chat.web_search import (  # noqa: E402,F401  (moved; chat_app
     _brave_search,
     _web_search,
 )
-# ── Owner mode (guardian/owner.py): an owner code set at runtime, stored hashed ──
-try:
-    from cursiv_engine.guardian.owner import unlock_owner_session as _unlock_owner
-    from cursiv_engine.guardian.owner import is_owner_session     as _is_owner_session
-    from cursiv_engine.guardian.owner import verify_owner_code    as _verify_owner_code
-    from cursiv_engine.guardian.owner import set_owner_code       as _set_owner_code
-    from cursiv_engine.guardian.owner import owner_code_is_set    as _owner_code_is_set
-except Exception:
-    def _verify_owner_code(text: str) -> bool:
-        return False
-    def _unlock_owner(sid: str):
-        pass
-    def _is_owner_session(sid: str) -> bool:
-        return False
-    def _set_owner_code(code: str) -> None:
-        raise RuntimeError("Owner code storage unavailable.")
-    def _owner_code_is_set() -> bool:
-        return False
-
 # ── Paths ──────────────────────────────────────────────────────────────────
 ROOT               = Path(__file__).parent.parent.parent
 SYSTEM_PROMPT_FILE = ROOT / "cursiv_engine" / "codex" / "system_prompt.md"
@@ -410,17 +386,9 @@ def execute_tool(name: str, args: dict, root: Path, *, confirmed: bool=False) ->
     return _context.execute_tool(_runtime(), name, args, root, confirmed=confirmed)
 
 
-# ── Owner reveal ──────────────────────────────────────────────────────────
-
-def _build_owner_reveal() -> str:
+def _compact_system_for_tools() -> str:
     """Compatibility entry point; implementation in chat.context."""
-    return _context._build_owner_reveal(_runtime())
-
-
-
-def _compact_system_for_tools(is_owner: bool=False) -> str:
-    """Compatibility entry point; implementation in chat.context."""
-    return _context._compact_system_for_tools(_runtime(), is_owner)
+    return _context._compact_system_for_tools(_runtime())
 
 
 
@@ -824,9 +792,9 @@ def _generate_with_claude(filepath: str, anthropic_key: str, context_messages: l
 
 
 
-def _call_claude_with_tools(messages: list[dict], anthropic_key: str, root: Path, confirm_writes: bool=False, max_tokens: int=4000, max_loops: int=20, is_owner: bool=False, on_action=None) -> Generator[str, None, None]:
+def _call_claude_with_tools(messages: list[dict], anthropic_key: str, root: Path, confirm_writes: bool=False, max_tokens: int=4000, max_loops: int=20, on_action=None) -> Generator[str, None, None]:
     """Compatibility entry point; implementation in chat.provider_tools."""
-    return _provider_tools._call_claude_with_tools(_runtime(), messages, anthropic_key, root, confirm_writes, max_tokens, max_loops, is_owner, on_action)
+    return _provider_tools._call_claude_with_tools(_runtime(), messages, anthropic_key, root, confirm_writes, max_tokens, max_loops, on_action)
 
 
 

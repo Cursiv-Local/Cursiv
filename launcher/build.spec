@@ -63,7 +63,6 @@ hiddenimports = [
     "cursiv_engine.guardian",
     "cursiv_engine.guardian.access_gate",
     "cursiv_engine.guardian.security_questions",
-    "cursiv_engine.guardian.owner",
     "cursiv_engine.guardian.protected",
     "cursiv_engine.guardian.identity_core",
     "bcrypt",

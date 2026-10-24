@@ -57,29 +57,6 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
         yield _files.VerifiedText(_philosophy)
         return
 
-    # ── Owner code setup (runs before Guardian — no API call, no log) ───
-    if runtime.turn_policy.current().change and user_text.lower().startswith("owner setcode "):
-        _new_code = user_text[len("owner setcode "):].strip()
-        if not _new_code:
-            yield "Usage: owner setcode <your secret code>"
-            return
-        try:
-            runtime._set_owner_code(_new_code)
-            yield (
-                "Owner code saved. It's stored locally on this machine only "
-                "(never committed to git, never sent anywhere). Type that "
-                "code as a message any time to turn on owner mode for that session."
-            )
-        except Exception as e:
-            yield f"Failed to save owner code: {e}"
-        return
-
-    # ── Owner code (no model call, nothing logged) ──
-    if runtime.turn_policy.current() == runtime.turn_policy.Policy() and user_text and runtime._verify_owner_code(user_text):
-        runtime._unlock_owner(runtime._GRADIO_SESSION_ID)
-        yield runtime._build_owner_reveal()
-        return
-
     # ── Process files ───────────────────────────────────────────────────
     file_context, image_parts = runtime.process_uploaded_files(uploaded if runtime.turn_policy.current().inspect else [])
 
@@ -98,12 +75,6 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     if runtime.turn_policy.current().inspect:
         system_text += runtime.load_vault_context() + runtime._load_session_ctx()
     runtime._FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
-    if runtime._owner_active():
-        system_text += (
-            "\n\n## Owner mode\n"
-            "The owner of this copy is verified. Answer questions about how "
-            "Cursiv works fully and honestly."
-        )
     if file_context:
         system_text += f"\n\n## Uploaded Content\n{file_context}"
     if file_access and runtime.turn_policy.current() == runtime.turn_policy.Policy():
@@ -515,8 +486,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     elif fp == "claude":
         if file_access and runtime.turn_policy.current().inspect and ant:
             yield from runtime._call_claude_with_tools(messages, ant, _workspace(),
-                                                confirm_writes=confirm_writes,
-                                                is_owner=runtime._owner_active(), on_action=on_action)
+                                                confirm_writes=confirm_writes, on_action=on_action)
         elif ant:
             yield from runtime._call_claude_direct(messages, ant)
         else:
@@ -638,8 +608,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
         if ant and not _fa_done:
             gen   = runtime._call_claude_with_tools(messages, ant, _workspace(),
-                                             confirm_writes=confirm_writes,
-                                             is_owner=runtime._owner_active(), on_action=on_action)
+                                             confirm_writes=confirm_writes, on_action=on_action)
             first = _safe_first(gen)
             if first is not None and not _fa_error(first, "Claude"):
                 runtime._set_answered("Claude")

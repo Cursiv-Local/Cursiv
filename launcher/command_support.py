@@ -111,13 +111,7 @@ def _personal(runtime: CommandRuntime) -> bool:
         return False
 
 def _is_builder(runtime: CommandRuntime) -> bool:
-    """The owner: a verified owner session, or this is one of Joshua's machines."""
-    try:
-        from cursiv_engine.ui.chat_app import _owner_active
-        if _owner_active():
-            return True
-    except Exception:
-        pass
+    """Builder tools are for anyone who has set up an account on this copy; no code unlocks them."""
     try:
         from cursiv_engine.guardian.access_gate import is_setup_complete
         return bool(is_setup_complete())
