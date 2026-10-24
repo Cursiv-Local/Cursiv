@@ -37,6 +37,10 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
                     r"(?:which|what) version (?:of cursiv )?are you(?: running)?|(?:cursiv |show )?version)", low):
         from .selfknow import VERSION
         return f'Cursiv {VERSION}.\n\n*[Sources: Cursiv application state (no AI model)]*'
+    from . import clock
+    today = clock.answer(q)          # "what day is it?" -- the computer's clock, not the model
+    if today is not None:
+        return today
     # Help questions describe a workflow; they never execute an import or inspect
     # whether any particular device, cached page or sample actually exists.
     help_question = bool(re.match(r'(?i)^(?:how|what|where|can|does|do)\b', q))

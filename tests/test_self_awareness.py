@@ -141,3 +141,29 @@ def test_how_memory_works_is_answered_from_reviewed_facts_but_recall_is_not():
     answer = feature_answers.answer("How do you remember things about me?")
     assert "persistent local memory across restarts" in answer and "files on this computer" in answer
     assert feature_answers.answer("Do you remember what I said about soil?") is None
+
+
+@pytest.mark.parametrize("question", ["what day is it?", "What is the date today?", "what time is it",
+                                      "Is it Saturday?", "Do you know what day it is?", "what year is it?"])
+def test_date_and_time_come_from_the_computer_clock_not_a_model(question, monkeypatch):
+    from datetime import datetime
+    from cursiv_engine.core import clock
+    from cursiv_engine.ui import chat_app as ca
+    monkeypatch.setattr(clock, "now", lambda: datetime(2026, 10, 24, 19, 5))
+    monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: pytest.fail("a date question must not reach a model"))
+    out = "".join(ca.chat(question, [], "", None))
+    assert "computer's clock" in out and ("2026" in out or "7:05 PM" in out or "Saturday" in out)
+
+
+@pytest.mark.parametrize("question", ["what time is it in Tokyo?", "what day is 25 December 2026?",
+                                      "What time is it best to plant tomatoes?", "what year did WW2 end?"])
+def test_other_date_questions_are_not_taken_over(question):
+    from cursiv_engine.core import clock
+    assert clock.answer(question) is None
+
+
+def test_the_prompt_says_what_day_it_is(monkeypatch):
+    from datetime import datetime
+    from cursiv_engine.core import clock
+    monkeypatch.setattr(clock, "now", lambda: datetime(2026, 10, 24, 19, 5))
+    assert clock.today_line().startswith("Today is Saturday, 24 October 2026; the time is 7:05 PM")
