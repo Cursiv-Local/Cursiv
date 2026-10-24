@@ -14,6 +14,7 @@ if TYPE_CHECKING:
     from usb_maker import _Signals
 
 from usb_ops_runtime import UsbRuntime
+import usb_sync
 
 def program_dir(runtime: UsbRuntime) -> Path | None:
     """The built Cursiv folder to copy (the running app, or dist\\Cursiv in a dev checkout)."""
@@ -187,8 +188,8 @@ def _program_files(runtime: UsbRuntime, src: Path, include_private: bool) -> lis
         top = rel.parts[0]
         if top in skip_top or ".bak" in top:   # installer leftovers, old-version backups
             continue
-        if ".cursiv" in rel.parts and not include_private:
-            continue                           # memories, keys, training data
+        if any(part.startswith(".cursiv") for part in rel.parts):
+            continue  # personal data goes to Home\.cursiv (usb_sync), never into the program folder
         pairs.append((f, runtime.Path("Cursiv") / rel))
     return pairs
 
@@ -208,12 +209,6 @@ def build_plan(runtime: UsbRuntime, models: list[dict], include_private: bool, o
             if f not in seen:
                 seen.add(f)
                 pairs.append((f, runtime.Path("Models") / f.relative_to(mbase)))
-    if include_private:
-        home_data = runtime.Path.home() / ".cursiv"
-        if home_data.is_dir():
-            for f in home_data.rglob("*"):
-                if f.is_file() and f.name != '.vault-lease':
-                    pairs.append((f, runtime.Path("Home") / ".cursiv" / f.relative_to(home_data)))
     return pairs
 
 def _needs_copy(runtime: UsbRuntime, src: Path, dest: Path) -> bool:
@@ -227,7 +222,8 @@ def _needs_copy(runtime: UsbRuntime, src: Path, dest: Path) -> bool:
     return s.st_size != d.st_size or abs(s.st_mtime - d.st_mtime) > runtime.MTIME_SLACK
 
 def _is_personal(runtime: UsbRuntime, rel: Path) -> bool:
-    return ".cursiv" in rel.parts or rel.name == "portable.cursiv"
+    # .cursiv and older copies of it such as .cursiv.moved-<date> are data, never pruned
+    return any(part.startswith(".cursiv") for part in rel.parts) or rel.name == "portable.cursiv"
 
 def stale_files(runtime: UsbRuntime, root: Path, plan: list[tuple[Path, Path]]) -> list[Path]:
     """Files in the drive's program folders that the current build doesn't have
@@ -354,12 +350,15 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             tmp_zip_dir = runtime.Path(runtime.tempfile.mkdtemp(prefix="cursiv_ollama_"))
             osrc = runtime._download_ollama(tmp_zip_dir, sig.progress.emit, cancel)
 
-        # Updating binaries never resets existing personal data, even if private
-        # copying is unchecked. A fresh private copy only fills missing files.
+        # Program files only; personal data is compared and updated separately
+        # below (usb_sync), so drive data that is newer is never overwritten.
         wiped = False
         plan = runtime.update_plan(root, runtime.build_plan(models, include_private, osrc))
         todo = [(s, d) for s, d in plan if runtime._needs_copy(s, d)]
-        total = sum(s.stat().st_size for s, _ in todo) or 1
+        data_dir = root / "Home" / ".cursiv"
+        data_items = usb_sync.plan(usb_sync.data_sources(), data_dir) if include_private else []
+        total = (sum(s.stat().st_size for s, _ in todo)
+                 + sum(it["src"].stat().st_size for it in usb_sync.todo(data_items))) or 1
 
         _, fs = runtime._volume_info(str(root))
         if fs.upper() == "FAT32" and any(s.stat().st_size > runtime.FAT32_MAX for s, _ in todo):
@@ -373,10 +372,6 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         runtime.copy_files(todo, sig.progress.emit, cancel)
         for f in runtime.stale_files(root, plan):
             f.unlink(missing_ok=True)
-        if include_private:
-            (root / runtime.PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
-            (root / runtime.PRIVATE_MARKER).write_text(
-                "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
 
         sig.progress.emit(-1, "Checking the drive matches…")
         problems = runtime.verify_usb(plan)
@@ -384,13 +379,28 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             raise RuntimeError(f"{len(problems)} file(s) didn't copy correctly (first: {problems[0]}). "
                                "Click Make USB again to fix them.")
 
+        data_note = ""
         if include_private:
+            data_dir.mkdir(parents=True, exist_ok=True)
+            # Data an older USB maker left in the program folder joins Home first,
+            # so the drive never starts with two versions of the same store.
+            import portable
+            portable.migrate_data(root, data_dir)
+            data_items = usb_sync.plan(usb_sync.data_sources(), data_dir)
+            result = usb_sync.apply(data_items, data_dir, sig.progress.emit, cancel)
+            counts = usb_sync.summary(data_items)
+            data_note = (f" Your data: {counts['add']} new and {counts['update']} updated file(s) copied, "
+                         f"{counts['keep']} newer on the drive kept.")
+            if result["backup"]:
+                data_note += f" Replaced drive files were saved in {result['backup']}."
+            (root / runtime.PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
+            (root / runtime.PRIVATE_MARKER).write_text(
+                "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
             # Saved keys are encrypted for this Windows account; the USB runs on
             # other PCs, so its copy holds them readable (the note below says so).
-            from cursiv_engine.core import keystore
-            for _src, cfg_file in plan:
-                if cfg_file.name == 'config.json' and cfg_file.parent.name == '.cursiv':
-                    keystore.export_readable(cfg_file)
+            if any(it["rel"] == runtime.Path("config.json") for it in usb_sync.todo(data_items)):
+                from cursiv_engine.core import keystore
+                keystore.export_readable(data_dir / "config.json")
 
         runtime.write_licenses(root, models)
 
@@ -408,7 +418,7 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         runtime.tidy_root(root)
         if tmp_zip_dir:
             runtime.shutil.rmtree(tmp_zip_dir, ignore_errors=True)
-        note = ' Existing drive data was preserved. Private data on this drive is not encrypted by Cursiv.'
+        note = data_note + ' Private data on this drive is not encrypted by Cursiv.'
         if wiped:
             note += " The private data from the earlier copy was removed from the drive."
         sig.done.emit(True, f"Done. Plug the drive into any Windows PC and double-click "
@@ -417,6 +427,59 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         sig.done.emit(False, "Stopped. Click Make USB again to pick up where it left off.")
     except Exception as exc:
         sig.done.emit(False, f"Couldn't finish: {exc}")
+
+def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool) -> tuple[bool, str]:
+    """Read every file the drive should have and say what an update would change.
+    Writes nothing. Returns (up_to_date, report)."""
+    lines = []
+    made = (root / "Cursiv" / "portable.cursiv").exists()
+    lines.append("Cursiv is on this drive." if made else "This drive doesn't have Cursiv yet.")
+    have = {m["name"] for m in runtime.list_models()}
+    missing_models = [t for t in runtime.required_names(runtime.list_models()) if t not in have]
+    osrc = runtime.ollama_dir()
+    plan = runtime.update_plan(root, runtime.build_plan(models, False, osrc))
+    todo = [(s, d) for s, d in plan if runtime._needs_copy(s, d)]
+    groups: dict[str, list[int]] = {}
+    for s, d in todo:
+        g = groups.setdefault(d.relative_to(root.resolve()).parts[0], [0, 0])
+        g[0] += 1
+        g[1] += s.stat().st_size
+    names = {"Cursiv": "Program", "Ollama": "AI engine", "Models": "AI models"}
+    for top in ("Cursiv", "Ollama", "Models"):
+        if top in groups:
+            n, size = groups[top]
+            lines.append(f"{names[top]}: {n} file(s) to copy ({size / runtime.GB:.2f} GB).")
+        else:
+            lines.append(f"{names[top]}: up to date.")
+    stale = runtime.stale_files(root, plan)
+    if stale:
+        lines.append(f"{len(stale)} old program file(s) the current version no longer uses would be removed.")
+    if missing_models:
+        lines.append("Needs downloading first: " + ", ".join(missing_models) + ".")
+    if osrc is None:
+        lines.append("The Ollama engine isn't on this computer; it would be downloaded.")
+    bat = root / "Start Cursiv.bat"
+    bat_ok = bat.exists() and bat.read_bytes() == runtime.START_BAT.encode("ascii")
+    if not bat_ok:
+        lines.append("Start Cursiv.bat is missing or out of date.")
+    data_dir = root / "Home" / ".cursiv"
+    legacy = [p for p in (root / "Cursiv" / "_internal" / ".cursiv", root / "Cursiv" / ".cursiv") if p.is_dir()]
+    pending_migration = bool(legacy) and not (data_dir / "portable-layout-v1.json").exists()
+    if pending_migration:
+        lines.append("Older data in the program folder will be moved into Home\\.cursiv "
+                     "(the newer copy of each file is kept; replaced files are backed up).")
+    data_todo = []
+    if include_private:
+        items = usb_sync.plan(usb_sync.data_sources(), data_dir)
+        data_todo = usb_sync.todo(items)
+        lines.append(usb_sync.describe(items))
+    else:
+        lines.append("Your data: not checked (tick \"Include my memories…\" to compare it).")
+    up_to_date = (made and not todo and not stale and not missing_models and osrc is not None
+                  and bat_ok and not pending_migration and not data_todo)
+    lines.append("Nothing to update." if up_to_date else "Click Update USB to bring the drive up to date.")
+    return up_to_date, "\n".join(lines)
+
 
 def update_plan(runtime: UsbRuntime, root: Path, pairs: list[tuple[Path, Path]]) -> list[tuple[Path, Path]]:
     """Never overwrite a private file during a program refresh."""

@@ -1,5 +1,22 @@
 # Changelog
 
+## 3.14-U94 — USB startup fix and drive check/update (2026-10-24)
+
+- Fix a Cursiv USB made with "Include my memories" not starting: the first start
+  found two versions of the same data files and stopped on every launch. Now the
+  newer copy of each file is kept, the replaced one is saved in
+  `Home\.cursiv\backups\`, and startup continues. Nothing is deleted.
+- Personal data on a drive is compared file by file: new files are added, files
+  newer on the computer are updated, and anything newer on the drive is kept. A
+  log that only grew counts as newer. Each copy is checked byte for byte.
+- "Make a Cursiv USB…" has a **Check drive** button that reads the drive and lists
+  what is out of date without writing anything. For a drive that already has Cursiv
+  the main button reads **Update USB**.
+- Program updates never copy data into the drive's program folder, and older data
+  folders such as `.cursiv.moved-<date>` are never pruned.
+- New `tests/test_usb_sync.py`; isolated Windows source run **1,812 passed / 1
+  platform skip** before the version change.
+
 ## 3.14-U93 — Readable chat code and website polish (2026-10-24)
 
 - Published latest U93 and updated the website. All **21 website tests** and

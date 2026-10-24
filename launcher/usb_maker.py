@@ -7,8 +7,11 @@ Private data (memories, keys, conversations, training data) is left OFF by
 default, so a USB can be handed to someone else as a fresh Cursiv of their
 own. Ticking "Include my memories, keys and settings" copies them too.
 
-Re-running on the same drive only copies what changed (same size = skip),
-so updating a USB after a Cursiv update is quick.
+Re-running on the same drive only copies what changed, so updating a USB after
+a Cursiv update is quick. "Check drive" reads the drive and reports what an update
+would change without writing anything. Personal data is compared file by file
+(usb_sync): newer drive data is kept, and a drive file is backed up before it is
+replaced.
 """
 from __future__ import annotations
 
@@ -86,8 +89,9 @@ WHAT'S ON THIS DRIVE
                            notebook, documents, settings (Home\\.cursiv)
   Workspace\\               authorized research and project files
 
-  Updates preserve existing personal data. Legacy data conflicts stop startup
-  after verified backups; they are never silently merged. Keep a separate backup.
+  Updating the drive never overwrites newer data on it: for each file the newer
+  copy is kept, and a drive file is backed up (Home\\.cursiv\\backups) before it is
+  replaced. Keep a separate backup.
   Cursiv does not encrypt this drive. Anyone with access may read its files and
   copied credentials. Use drive encryption when appropriate. A lost or damaged
   drive is not recoverable without a separate backup. Close Cursiv before ejecting.
@@ -113,8 +117,11 @@ IF SOMETHING ISN'T RIGHT
   - Settings > Help & diagnostics has a problem report.
 
 UPDATING THIS DRIVE
-  Update Cursiv on your computer, then use "Make a Cursiv USB..." again on the same
-  drive. Only changed files are copied.
+  Update Cursiv on your computer, then open "Make a Cursiv USB..." and pick this
+  drive. "Check drive" shows what is out of date without changing anything;
+  "Update USB" copies only what changed. With "Include my memories..." ticked, your
+  conversations, field notebook, memories and settings from that computer are
+  brought up to date too; anything newer on this drive is kept.
 
 More: https://cursiv.winklers-llc.com  ·  Source: https://github.com/winklersllc2026-bit/Cursiv
 """
@@ -281,6 +288,12 @@ def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signal
 
 
 
+def check_usb(root: Path, models: list[dict], include_private: bool) -> tuple[bool, str]:
+    """Compatibility entry point; implementation in chat.usb_ops."""
+    return _usb_ops.check_usb(_runtime(), root, models, include_private)
+
+
+
 def update_plan(root: Path, pairs: list[tuple[Path, Path]]) -> list[tuple[Path, Path]]:
     """Compatibility entry point; implementation in chat.usb_ops."""
     return _usb_ops.update_plan(_runtime(), root, pairs)
@@ -347,6 +360,7 @@ class UsbMakerDialog(QDialog):
         self._model_list = QListWidget()
         self._model_list.setMinimumHeight(150)
         self._model_list.itemChanged.connect(self._update_total)
+        self._drive_box.currentIndexChanged.connect(self._drive_changed)
         lay.addWidget(self._model_list)
 
         self._private = QCheckBox("Include my memories, keys and settings (private — only for your own USB)")
@@ -374,6 +388,11 @@ class UsbMakerDialog(QDialog):
 
         brow = QHBoxLayout()
         brow.addStretch(1)
+        self._check = QPushButton("Check drive")
+        self._check.setObjectName("ghost")
+        self._check.setToolTip("Read the drive and list what an update would change. Nothing is written.")
+        self._check.clicked.connect(self._check_drive)
+        brow.addWidget(self._check)
         self._go = QPushButton("Make USB")
         self._go.clicked.connect(self._start)
         brow.addWidget(self._go)
@@ -441,6 +460,38 @@ class UsbMakerDialog(QDialog):
                 txt += "  This drive is FAT32 and can't hold the larger models — reformat it as exFAT first."
         self._total.setText(txt)
         self._go.setEnabled(bool(d) and not self._running)
+        self._check.setEnabled(bool(d) and not self._running)
+
+    def _drive_changed(self, *_):
+        """A drive that already has Cursiv is updated, not made again; one that
+        holds a private copy keeps getting your data unless you untick it."""
+        d = self._drive_box.currentData()
+        root = Path(d["root"]) if d else None
+        made = bool(root and (root / "Cursiv" / "portable.cursiv").exists())
+        self._go.setText("Update USB" if made else "Make USB")
+        if root and (root / PRIVATE_MARKER).exists():
+            self._private.setChecked(True)
+
+    def _check_drive(self):
+        d = self._drive_box.currentData()
+        if not d or self._running:
+            return
+        self._running = True
+        self._go.setEnabled(False)
+        self._check.setEnabled(False)
+        self._bar.setVisible(True)
+        self._bar.setRange(0, 0)
+        self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
+        self._status.setText("Reading the drive…")
+        root, models, private = Path(d["root"]), self._chosen_models(), self._private.isChecked()
+
+        def work():
+            try:
+                ok, report = check_usb(root, models, private)
+                self._sig.done.emit(True, report)
+            except Exception as exc:
+                self._sig.done.emit(False, f"Couldn't check the drive: {exc}")
+        threading.Thread(target=work, daemon=True).start()
 
     # ── run ──────────────────────────────────────────────────────────────
     def _start(self):
@@ -477,6 +528,7 @@ class UsbMakerDialog(QDialog):
         self._running = True
         self._cancel.clear()
         self._go.setEnabled(False)
+        self._check.setEnabled(False)
         self._stop.setVisible(True)
         self._bar.setVisible(True)
         self._status.setStyleSheet(f"color: {SILV2}; font-size: 12px;")

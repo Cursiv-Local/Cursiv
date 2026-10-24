@@ -92,7 +92,7 @@ def test_portable_migration_backup_conflict_and_references(tmp_path, monkeypatch
     data.mkdir(parents=True)
     portable.migrate_data(root, data)
     assert (data / 'memory_facts.jsonl').read_text() == 'legacy'
-    assert list((data / 'backups').rglob('SHA256.json'))
+    assert (data / 'portable-layout-v1.json').exists()
     monkeypatch.setenv('CURSIV_PORTABLE', '1')
     monkeypatch.setenv('CURSIV_USB_ROOT', str(root))
     folder = root / 'Workspace' / 'research'
@@ -107,14 +107,24 @@ def test_portable_migration_backup_conflict_and_references(tmp_path, monkeypatch
     conflict = tmp_path / 'conflict'
     old = conflict / 'Cursiv' / '.cursiv'
     old.mkdir(parents=True)
-    (old / 'config.json').write_text('one')
+    (old / 'config.json').write_text('newer legacy')
+    (old / 'memory.json').write_text('older legacy')
     destination = conflict / 'Home' / '.cursiv'
     destination.mkdir(parents=True)
-    (destination / 'config.json').write_text('two')
-    with pytest.raises(OSError, match='conflict'):
-        portable.migrate_data(conflict, destination)
-    assert (destination / 'config.json').read_text() == 'two'
-    assert not (destination / 'portable-layout-v1.json').exists()
+    (destination / 'config.json').write_text('older home')
+    (destination / 'memory.json').write_text('newer home')
+    os.utime(destination / 'config.json', (1_000_000, 1_000_000))
+    os.utime(old / 'memory.json', (1_000_000, 1_000_000))
+    # A difference no longer stops startup: the newer copy wins, the replaced one is kept.
+    portable.migrate_data(conflict, destination)
+    assert (destination / 'config.json').read_text() == 'newer legacy'
+    assert (destination / 'memory.json').read_text() == 'newer home'
+    assert (old / 'config.json').read_text() == 'newer legacy'
+    saved = list((destination / 'backups').glob('portable-migration-*/config.json'))
+    assert saved and saved[0].read_text() == 'older home'
+    assert (destination / 'portable-layout-v1.json').exists()
+    portable.migrate_data(conflict, destination)   # runs once
+    assert len(list((destination / 'backups').iterdir())) == 1
 
 
 def test_usb_refresh_preserves_private_and_workspace(tmp_path):

@@ -85,6 +85,7 @@ hiddenimports = [
     "postal_compose_dialog",
     "training_data_dialog",
     "portable",
+    "usb_sync",                      # imported inside portable.migrate_data
     "usb_maker",
     # PyQt6
     "PyQt6",
