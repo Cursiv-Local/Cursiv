@@ -15,6 +15,11 @@
   stores are skipped and listed.
 - **Check drive** now reports both directions. A `config.json` with the same
   settings and keys counts as the same, whether its keys are readable or encrypted.
+- The website sends `no-transform` on every page, so Cloudflare no longer inserts
+  its Web Analytics script.
+- Locked isolated Windows source **1,819 passed / 1 platform skip**; hosted Mac
+  **1,804 / 16 skips**; required workspace gate **63**; website **22**. Published with
+  owner-signed Windows and Mac packages. [U95 verification](docs/U95-RELEASE-VERIFICATION.md).
 
 ## 3.14-U94 — USB startup fix and drive check/update (2026-10-24)
 

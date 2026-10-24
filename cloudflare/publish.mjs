@@ -35,31 +35,31 @@ const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"],
 
 // The phone notebook (/notebook/) is the only page that may use the GPS and the camera;
 // everywhere else both stay off. Its service worker and files are re-checked on each visit.
-// /testers uses no scripts or external resources. no-transform also prevents
-// Cloudflare's automatic Web Analytics and email-obfuscation injection:
+// /testers uses no scripts or external resources. Every page sends no-transform, which
+// stops Cloudflare from inserting its automatic Web Analytics beacon or email
+// obfuscation into the HTML, so visitors get exactly the files published here:
 // https://developers.cloudflare.com/web-analytics/faq/
 const HEADERS = `/*
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), geolocation=()
+  Cache-Control: public, max-age=0, must-revalidate, no-transform
 
 /testers
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
   Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
 
 /testers/
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
   Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
 
 /testers.html
-  Cache-Control: public, max-age=0, must-revalidate, no-transform
   Content-Security-Policy: default-src 'none'; style-src 'self' 'unsafe-inline'; img-src 'self'; font-src 'self'; script-src 'none'; connect-src 'none'; form-action 'none'; base-uri 'self'; frame-ancestors 'none'
 
 /notebook/*
   ! Permissions-Policy
   Permissions-Policy: camera=(self), geolocation=(self)
-  Cache-Control: no-cache
+  ! Cache-Control
+  Cache-Control: no-cache, no-transform
 `;
 
 const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n";

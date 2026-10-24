@@ -252,3 +252,16 @@ test('build output retains SEO, canonical installer URLs, privacy disclosure and
   assert(!existsSync(new URL('../dist/admin', import.meta.url)));
   assert(!readFileSync(new URL('../dist/sitemap.xml', import.meta.url), 'utf8').includes('/admin'));
 });
+
+test('every page sends no-transform so Cloudflare cannot insert analytics or rewrite HTML', () => {
+  const path = new URL('../dist/_headers', import.meta.url);
+  assert(existsSync(path), 'Build first: node cloudflare/publish.mjs --build-only');
+  const rules = readFileSync(path, 'utf8').split(/\n(?=\S)/);
+  const all = rules.find(r => r.startsWith('/*\n'));
+  assert.match(all, /^  Cache-Control: public, max-age=0, must-revalidate, no-transform$/m);
+  for (const rule of rules) {
+    const lines = rule.split('\n').filter(l => /^\s+Cache-Control:/.test(l));
+    for (const line of lines) assert.match(line, /no-transform/, rule.split('\n')[0]);
+    if (lines.length && !rule.startsWith('/*\n')) assert.match(rule, /^\s+! Cache-Control$/m, rule.split('\n')[0]);
+  }
+});

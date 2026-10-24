@@ -1,5 +1,13 @@
 # Handoff — Cursiv verification overhaul
 
+## U95 published (Claude, 2026-10-24)
+
+Tag `v3.14-U95` = `7ed4763` (PR #10), built and signed exactly as U94 below
+(locked environment, `mac-build` run 40124370698, signer copy in Codex's packaged-app
+folder). Release-triggered Mac run 40126413262 cancelled. The website also gained
+`no-transform` on every page (Cloudflare had been inserting its Web Analytics beacon).
+Evidence: [U95-RELEASE-VERIFICATION](docs/U95-RELEASE-VERIFICATION.md).
+
 ## U95: drive -> computer import (Claude, 2026-10-24) — branch `claude/u95-usb-import`
 
 "Bring drive data here" (USB dialog, installed app only) reverses the U94 sync.
