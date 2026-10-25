@@ -12,6 +12,12 @@
   cover the question instead of guessing.
 - Numbers and units in a profile's answer that aren't in your records get a note under it.
 - Editing or teaching a starter makes your own copy; `agents ask` uses at most three of your own agents.
+- Field formulas are worked out by code: conductivity corrected to 25 °C (APHA 2510 B), discharge (with the
+  0.85 surface-float coefficient), percent oxygen saturation, µS/cm and mS/cm, molar solutions. On a benchmark
+  of 14 field calculations the local model went from 9 right to 14 (0 of 4 trick questions calculated).
+- Code that Codex test-runs now runs under the same guard as plugins: no network, programs or files outside its
+  own folder, even when the code tries to hide it. A refused run is never sent back to be "fixed".
+- The test suite also runs on Linux in CI.
 
 ## 3.14-U100 — Records you can trust, memory you can see (2026-10-25)
 

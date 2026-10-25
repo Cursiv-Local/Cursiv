@@ -33,6 +33,16 @@ Profiles are markdown files in `agents/starters/`; `agents/profile_context.py` f
 Report writer invented a unit, methods and a model name before the code check and rules were added. No First
 aid profile (medical stays with the reviewed reference). Owner rule: no self-editing agents.
 
+## U101 hardening (Claude, 2026-10-25, unreleased, branch `claude/u101-hardening` on top of profiles)
+- Codex run-and-fix: `coding/runner.py` runs `python -I <copy of core/plugin_runner.py> --script main.py`; the
+  audit hook blocks what the word check misses (getattr(builtins, ...), importlib). Refusals -> "SANDBOX:".
+- CI: `test-linux` job (Ubuntu): first run 2,017 passed / 30 skipped. Not a required check yet.
+- `core/fieldsci.py` + `scripts/fieldcalc_bench.py` (bench/fieldcalc/cases.py written before the code; two
+  hand-worked expected values were wrong and were recomputed): qwen3:4b 9/14 -> 14/14, 0 trap claims. The U100
+  saturation answer had been answering "percent saturation" questions; it now steps aside.
+- CONTRIBUTING: the rule behind the code; docs/GOOD-FIRST-ISSUES.md drafts five issues (not posted).
+- Owner validated the encrypted USB round trip across clean PCs (2026-10-25).
+
 ## U100 published (Claude, 2026-10-25)
 Tag `v3.14-U100` = `7c297d5` (PR #24). First three-digit U number: the updater compares
 versions as numbers (`launcher/cursiv_launcher.py` `_version_key`), so U100 > U99.

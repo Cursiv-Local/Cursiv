@@ -50,3 +50,35 @@ def test_a_correct_median_is_not_withdrawn():
     assert calc.check("The median is 7.", w) == ""
     assert calc.check("The median is 9.", w) != ""
     assert calc.work_out("Calculate the mean of 18.6, 19.1, 18.9, 18.4, and 19.0.").statement == "The mean is 18.8."
+
+
+# ── Field formulas worked out by code (U101, scripts/fieldcalc_bench.py: 9/14 -> 14/14) ──
+
+def test_field_formulas_match_their_published_methods():
+    cases = {
+        "Conductivity is 412 uS/cm at 18 C. What is the specific conductance at 25 C?": 475.59,   # APHA 2510 B
+        "The stream is 3.2 m wide, 0.4 m deep and the float moved 0.6 m/s. What is the discharge?": 0.6528,  # x 0.85
+        "Channel 1.5 m wide, average depth 0.25 m, current meter velocity 0.8 m/s. Discharge?": 0.3,
+        "Measured DO is 7.8 mg/L at 18.6 C. What is the percent saturation?": 83.41,              # Benson & Krause
+        "Convert 450 uS/cm to mS/cm": 0.45,
+        "How many grams of NaCl for 500 mL of 0.1 M solution?": 2.922,
+    }
+    for q, expected in cases.items():
+        w = calc.work_out(q)
+        assert w is not None and abs(w.value - expected) < 0.01, (q, w and w.statement)
+    assert "0.85" in calc.work_out("The stream is 3.2 m wide, 0.4 m deep and the float moved 0.6 m/s. "
+                                   "What is the discharge?").statement
+
+
+def test_questions_about_a_number_are_not_calculated():
+    for q in ("Is 412 uS/cm conductivity normal for a trout stream?",
+              "Why would a float give a higher velocity than a current meter?",
+              "What does percent saturation of dissolved oxygen tell me?",
+              "The probe shows 300 uS/cm"):
+        assert calc.work_out(q) is None, q
+
+
+def test_percent_saturation_is_not_answered_as_the_saturation_limit():
+    # The U100 "oxygen saturation at X °C" answer took "7.8 mg/L ... percent saturation?" and gave 9.35 mg/L.
+    assert science_check.saturation_answer("Measured DO is 7.8 mg/L at 18.6 C. What is the percent saturation?") is None
+    assert "9.35" in science_check.saturation_answer("What is the oxygen saturation at 18.6 °C?")
