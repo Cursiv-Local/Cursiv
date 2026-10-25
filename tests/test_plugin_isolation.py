@@ -129,3 +129,19 @@ def test_forge_tests_new_plugins_in_the_runner():
     assert list(res["commands"]) == ["roll"]
     ok, err, _ = forge.sandbox_test(SNEAKY)          # gets past a regex check; the audit hook stops it
     assert not ok and "plugins may not" in err
+
+
+def test_blocked_modules_already_loaded_by_the_app_are_still_refused(tmp_path):
+    """The installed app has socket loaded before the runner starts (U98 release check)."""
+    import json
+    import subprocess
+    import sys
+    plugin = tmp_path / 'p.py'
+    plugin.write_text('def register(cursiv):\n    import socket\n', encoding='utf-8')
+    script = ('import socket, subprocess, json, sys\n'
+              f'sys.path.insert(0, {str(plugins.Path(plugins.__file__).parent)!r})\n'
+              'import plugin_runner\n'
+              f'print(json.dumps(plugin_runner.run({{"path": {str(plugin)!r}, "data_dir": {str(tmp_path / "d")!r}}})))\n')
+    out = subprocess.run([sys.executable, '-I', '-c', script], capture_output=True, text=True, timeout=60)
+    reply = json.loads(out.stdout.strip().splitlines()[-1])
+    assert not reply['ok'] and 'plugins may not import socket' in reply['error'], (reply, out.stderr[-500:])
