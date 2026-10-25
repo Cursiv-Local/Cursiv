@@ -33,6 +33,19 @@ _BLOCKED_MODULES = {"ctypes", "_ctypes", "socket", "_socket", "ssl", "_ssl", "su
                     "smtplib", "webbrowser", "asyncio"}
 
 
+_UNLOAD_ROOTS = {m.split(".")[0] for m in _BLOCKED_MODULES} | {"http", "urllib"}
+
+
+def _unload_blocked() -> None:
+    """The installed app (Cursiv.exe --plugin-runner) has already imported socket and
+    friends by the time the runner starts. An already-loaded module never raises the
+    "import" audit event, so drop them: a plugin then has to import them afresh, which
+    the hook refuses. (Using a socket is refused anyway by the socket.* events.)"""
+    for name in list(sys.modules):
+        if name.split(".")[0] in _UNLOAD_ROOTS:
+            sys.modules.pop(name, None)
+
+
 def _sandbox(allowed_dirs: list[str]) -> None:
     roots = [os.path.normcase(os.path.realpath(d)) for d in allowed_dirs if d]
 
@@ -93,6 +106,7 @@ def run(request: dict) -> dict:
         code = open(path, encoding="utf-8").read()
         library = [os.path.dirname(os.__file__), sys.prefix, sys.base_prefix,
                    getattr(sys, "_MEIPASS", ""), os.path.dirname(sys.executable)]
+        _unload_blocked()
         _sandbox([data, os.path.dirname(path)] + library)
         module = {"__name__": "cursiv_plugin", "__file__": path}
         exec(compile(code, path, "exec"), module)
