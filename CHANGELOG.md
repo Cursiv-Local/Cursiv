@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.14-U100 — Memory you can see and steer (unreleased)
+## 3.14-U100 — Records you can trust, memory you can see (2026-10-25)
 
 - Session notes: each conversation keeps a short note (goal, what was done from Cursiv's own records,
   decided, open, next) and picks up where you left off ("Picking up: …").
