@@ -47,3 +47,6 @@ reports/
 
 # Plaintext family letters (sealed copy lives in cursiv_engine/family/sealed_letters.json)
 private/
+
+# Local release staging (signed installers); never commit
+release-u*/

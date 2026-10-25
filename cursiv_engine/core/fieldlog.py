@@ -115,13 +115,25 @@ def store_photo(path) -> str:
     size_mb = src.stat().st_size / 2**20
     if size_mb > PHOTO_MAX_MB:
         raise ValueError(f"{src.name} is {size_mb:.0f} MB; photos over {PHOTO_MAX_MB} MB aren't stored")
-    digest = hashlib.sha256(src.read_bytes()).hexdigest()
+    data = src.read_bytes()
+    digest = hashlib.sha256(data).hexdigest()
     rel = f"photos/{digest}{'.jpg' if ext == '.jpeg' else ext}"
     dest = log_dir() / rel
     if not dest.exists():
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(src, dest)
+        from cursiv_engine.core import atomic
+        atomic.write_bytes(dest, data)          # encrypted when the notebook is (U98)
     return rel
+
+
+def photo_bytes(rel: str) -> bytes:
+    """A stored photo's bytes, decrypted if the notebook is encrypted."""
+    from cursiv_engine.core import private_store
+    return private_store.read_bytes(photo_path(rel))
+
+
+def _photo_sha256(path: Path) -> str:
+    from cursiv_engine.core import private_store
+    return hashlib.sha256(private_store.read_bytes(path)).hexdigest()
 
 
 def _is_stored(p: str) -> bool:
@@ -137,8 +149,9 @@ def _fingerprint(entry: dict) -> str:
 def _read() -> tuple[list[dict], list[str]]:
     """Entries in file order, and lines that couldn't be read (e.g. a write cut off by power loss)."""
     entries, bad = [], []
+    from cursiv_engine.core import private_store
     try:
-        lines = log_file().read_text(encoding="utf-8").splitlines()
+        lines = private_store.read_text(log_file()).splitlines()     # encrypted on a computer (U98)
     except FileNotFoundError:
         return [], []
     for n, line in enumerate(lines, 1):
@@ -261,6 +274,18 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         # write was cut off, this entry starts on a new line instead of being glued
         # onto the broken one (which would make both unreadable).
         line = json.dumps(entry, ensure_ascii=False, separators=(",", ":"), allow_nan=False) + "\n"
+        from cursiv_engine.core import private_store, vault
+        if vault.owner(log_file()) is not None:
+            # Encrypted (U98): the whole log is rewritten atomically, fsynced and read back,
+            # so a power cut leaves the old log or the new one, never part of an entry.
+            try:
+                text = private_store.read_text(log_file())
+            except FileNotFoundError:
+                text = ""
+            if text and not text.endswith("\n"):
+                line = "\n" + line
+            private_store.write_text(log_file(), text + line)
+            return entry
         if not _ends_with_newline(log_file()):
             line = "\n" + line
         with log_file().open("a", encoding="utf-8") as f:
@@ -409,7 +434,7 @@ def photo_problems(rows: list[dict] | None = None) -> list[str]:
             f = photo_path(rel)
             if not f.is_file():
                 out.append(f"{where}: photo {rel} is missing")
-            elif _file_sha256(f) != Path(rel).stem:
+            elif _photo_sha256(f) != Path(rel).stem:
                 out.append(f"{where}: photo {rel} doesn't match its fingerprint (changed or damaged after it was stored)")
     return out
 
@@ -560,10 +585,11 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
             src = photo_path(rel)
             # only a photo that still matches its fingerprint is copied, so the signature never
             # vouches for a changed one (photo_problems() lists it in the export's integrity)
-            if _is_stored(rel) and src.is_file() and not (folder / rel).exists() \
-                    and _file_sha256(src) == Path(rel).stem:
-                (folder / rel).parent.mkdir(parents=True, exist_ok=True)
-                shutil.copyfile(src, folder / rel)
+            if _is_stored(rel) and src.is_file() and not (folder / rel).exists():
+                data = photo_bytes(rel)          # an export is readable by design
+                if hashlib.sha256(data).hexdigest() == Path(rel).stem:
+                    (folder / rel).parent.mkdir(parents=True, exist_ok=True)
+                    (folder / rel).write_bytes(data)
     if (folder / "photos").is_dir():
         paths["photos"] = folder / "photos"
     paths["signature"] = sign_export(folder, paths, every, problems)

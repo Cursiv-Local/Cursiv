@@ -9,6 +9,15 @@ import os
 import sys
 from pathlib import Path
 
+# ── Cursiv.exe --plugin-runner: one plugin call in its own process (U98) ──────
+# Before anything else: no data folders, no Qt, no Cursiv modules. The runner is
+# standard library only and reads its request from stdin (core/plugin_runner.py).
+if "--plugin-runner" in sys.argv[1:2] and os.environ.get("CURSIV_PLUGIN_SANDBOX") == "1":
+    if getattr(sys, "frozen", False):
+        sys.path.insert(0, os.path.join(getattr(sys, "_MEIPASS", os.path.dirname(sys.executable))))
+    from cursiv_engine.core import plugin_runner as _plugin_runner
+    sys.exit(_plugin_runner.main())
+
 # ── Ensure repo root is on sys.path so cursiv_engine imports work ─────────────
 if getattr(sys, "frozen", False):
     _ROOT = Path(sys.executable).parent

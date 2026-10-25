@@ -8,7 +8,8 @@ person approves.
   2. Safety check: no running programs, no network, no deleting/moving files,
      no dynamic code, files only inside the plugin's own data folder.
   3. Sandbox test: register() + each command + the plugin's self_test() run in
-     a separate Python process, in an empty temp folder, with a time limit.
+     the plugin runner (core/plugin_runner.py): its own process, an empty temp
+     folder, a time limit, network/programs/native code/outside files refused.
   4. On failure it shows the model the error and asks for a fix (2 rounds).
   5. The person reads the code + summary, then `evolve approve` installs it
      (fingerprinted; changes later require re-approval) or `evolve discard`.
@@ -102,55 +103,32 @@ def plugin_meta(code: str) -> dict | None:
     return None
 
 
-_HARNESS = r'''
-import json, sys, traceback, importlib.util, pathlib
-out = {"ok": False, "commands": [], "tools": [], "hooks": 0, "error": ""}
-class API:
-    def __init__(s): s.cmds, s.tools, s.hooks = {}, {}, []
-    def add_command(s, w, fn, help=""): s.cmds[w] = (fn, help)
-    def add_tool(s, n, fn, d): s.tools[n] = (fn, d)
-    def on_message(s, fn): s.hooks.append(fn)
-    def data_dir(s):
-        p = pathlib.Path("plugin_data"); p.mkdir(exist_ok=True); return p
-    def remember(s, f): pass
-    def person(s): return "tester"
-try:
-    spec = importlib.util.spec_from_file_location("p", "plugin.py")
-    m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
-    api = API(); m.register(api)
-    out["commands"] = list(api.cmds); out["tools"] = list(api.tools); out["hooks"] = len(api.hooks)
-    for w, (fn, h) in api.cmds.items():
-        r = fn("")
-        if not isinstance(r, str): raise TypeError(f"command {w!r} returned {type(r).__name__}, not text")
-    for fn in api.hooks:
-        fn("hello, how are you?")
-    m.self_test()
-    out["ok"] = True
-except Exception:
-    out["error"] = traceback.format_exc()[-1500:]
-print("@@RESULT@@" + json.dumps(out))
-'''
-
-
 def sandbox_test(code: str, timeout: int = 25) -> tuple[bool, str, dict]:
-    exe = runner._python()
-    if not exe:
-        return False, "No Python found on this computer to test with (install it from python.org).", {}
+    """Register the new plugin and run its commands, hooks and self_test() in the
+    plugin runner (U98): its own process, an empty temporary folder, a time limit,
+    and the audit hook that refuses network, other programs, native code and files
+    outside that folder. No Python needs to be installed: Cursiv runs it itself."""
+    from cursiv_engine.core import plugins
     with tempfile.TemporaryDirectory(prefix="cursiv_forge_") as tmp:
-        Path(tmp, "plugin.py").write_text(code, encoding="utf-8")
-        Path(tmp, "harness.py").write_text(_HARNESS, encoding="utf-8")
-        env = {k: v for k, v in os.environ.items() if not re.search(r"KEY|TOKEN|SECRET|PASS", k, re.I)}
-        env["PYTHONIOENCODING"] = "utf-8"
+        path = Path(tmp, "plugin.py")
+        path.write_text(code, encoding="utf-8")
+        env = {k: v for k, v in os.environ.items()
+               if k.upper() in ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH", "LANG")}
+        env.update(PYTHONIOENCODING="utf-8", CURSIV_PLUGIN_SANDBOX="1")
+        request = {"path": str(path), "data_dir": str(Path(tmp, "plugin_data")), "action": "selftest",
+                   "person": "tester"}
         try:
-            p = subprocess.run([exe, "harness.py"], cwd=tmp, capture_output=True, text=True, timeout=timeout,
-                               env=env, stdin=subprocess.DEVNULL, creationflags=0x08000000 if os.name == "nt" else 0)
+            p = subprocess.run(plugins.runner_command(), input=json.dumps(request), capture_output=True,
+                               text=True, encoding="utf-8", timeout=timeout, env=env,
+                               creationflags=0x08000000 if os.name == "nt" else 0)
         except subprocess.TimeoutExpired:
             return False, f"The test took longer than {timeout} seconds (an endless loop?).", {}
-        m = re.search(r"@@RESULT@@(.*)", p.stdout or "")
-        if not m:
+        marker = "@@CURSIV-PLUGIN@@"
+        if marker not in (p.stdout or ""):
             return False, ((p.stderr or p.stdout or "no output")[-1500:]).replace(tmp, "."), {}
-        res = json.loads(m.group(1))
-        return res["ok"], res.get("error", "").replace(tmp, "."), res
+        res = json.loads(p.stdout.split(marker, 1)[1])
+        err = (res.get("trace") or res.get("error") or "").replace(tmp, ".")
+        return bool(res.get("ok")), err, res
 
 
 def evolve(idea: str, generate: Callable[[list[dict]], Generator[str, None, None]],

@@ -4,24 +4,13 @@ Functions receive the explicit ChatRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: _cursiv_encode, _cursiv_decode, _existing_file, _pending_file, _file_tool_result, execute_tool, _compact_system_for_tools, _build_strand_context, _build_live_status, load_system_prompt, load_vault_context, _memory_used, _ref_evidence, sources_line, _without_model, _evidence, _compact_notes, _replacement_reply, _check_context.
+Entry points: _existing_file, _pending_file, _file_tool_result, execute_tool, _compact_system_for_tools, _build_strand_context, _build_live_status, load_system_prompt, load_vault_context, _ref_evidence, sources_line, _without_model, _evidence, _compact_notes, _replacement_reply, _check_context.
 """
 from __future__ import annotations
 
 from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
-
-def _cursiv_encode(runtime: ChatRuntime, text: str) -> str:
-    """Encode text to Cursiv binary (space-separated 8-bit bytes)."""
-    return ' '.join(f'{ord(c):08b}' for c in text if ord(c) < 256)
-
-def _cursiv_decode(runtime: ChatRuntime, binary: str) -> str:
-    """Decode Cursiv binary back to text."""
-    try:
-        return ''.join(chr(int(b, 2)) for b in binary.strip().split() if len(b) == 8)
-    except Exception:
-        return '[decode error]'
 
 def _existing_file(runtime: ChatRuntime, args: dict, root: Path) -> bool:
     from cursiv_engine.core import file_access
@@ -256,20 +245,6 @@ def load_vault_context(runtime: ChatRuntime) -> str:
         return "\n".join(lines)
     except Exception:
         return ""
-
-def _memory_used(runtime: ChatRuntime, answer: str, question: str) -> bool:
-    """Did the answer use a saved memory it was given? Three of a memory's distinctive words (or one
-    code or number) in the answer's own words that the question didn't already have. Being offered a
-    memory isn't using it, and a word the person just typed isn't evidence of memory: "your saved
-    memories" was named under a water-supply answer that used none (2026-10 tests, first U76 Cross-check)."""
-    words = {w.lower() for w in runtime._MEMORY_WORDS.findall(runtime._strip_status_lines(answer or ""))}
-    asked = {w.lower() for w in runtime._MEMORY_WORDS.findall(question or "")}
-    for text in runtime._MEMORY_TEXTS:
-        mine = {w.lower() for w in runtime._MEMORY_WORDS.findall(text)} - runtime._COMMON_WORDS - asked
-        shared = mine & words
-        if len(shared) >= 3 or any(any(c.isdigit() for c in w) for w in shared):
-            return True
-    return False
 
 def _ref_evidence(runtime: ChatRuntime) -> dict:
     """id -> reference.evidence() for the entries given this turn."""

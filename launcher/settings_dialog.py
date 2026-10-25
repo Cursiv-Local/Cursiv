@@ -418,8 +418,8 @@ class SettingsDialog(QDialog):
             'Conversation and memory encryption: ' + ('on (always). Your passphrase unlocks it at startup.' if encrypted else
             'not used on this Cursiv USB drive (a drive stays readable; use BitLocker To Go if it could be lost). '
             'On a computer it is always on.') +
-            ' Notebook data, workspace files, exports/training data and logs '
-            'remain outside this protection. See TECH.md for scope and recovery.'))
+            ' It covers the field notebook too (entries, photos, team logs). Reports, exports and shares you '
+            'make, workspace files, training data and logs remain outside it. See TECH.md for scope and recovery.'))
         self._action(lay, "What Cursiv remembers",
                      "See every saved memory, where it came from and when, and remove any of them.",
                      self._open_memory)

@@ -66,7 +66,8 @@ simultaneous migrations/desktops, but does not sandbox arbitrary external writer
 
 ## Outside coverage
 
-Notebook observations/photos/exports, imported documents, workspace files, explicit
+Since U98 the field notebook's observations, photos and imported team logs are covered;
+notebook reports, exports and team shares stay readable. Imported documents, workspace files, explicit
 training saves and trained adapters, explicit exported packs/Obsidian notes, logs,
 login/settings, plugin/agent definitions, older external copies and cloud copies
 remain under their existing rules. Saving a response to training or exporting it

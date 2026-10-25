@@ -1,4 +1,4 @@
-"""Opt-in, portable data encryption. No password or derived key is persisted.
+"""Portable data encryption (always on for a computer since U97). No password or derived key is persisted.
 
 The envelope retains the existing JSON/JSONL bytes. A path binding prevents
 swapping two records within a vault; roots can move with a portable drive.
@@ -20,10 +20,26 @@ MAGIC = b'CURSIV-VAULT-1\n'
 MAX_BYTES = 64 * 1024 * 1024
 LOCK = threading.RLock()
 _keys: dict[Path, Fernet] = {}
-FOLDERS = frozenset(('conversations', 'sessions', 'projects', 'style', 'curiosity', 'presence'))
+FOLDERS = frozenset(('conversations', 'sessions', 'projects', 'style', 'curiosity', 'presence',
+                     'agents'))   # custom agents and what they were taught (U98)
 NAMES = frozenset(('memory.json', 'embeddings_cache.json', 'strands.jsonl', 'territories.json',
                    'coding_profile.json', 'coding_lessons.jsonl', 'council_memory.json',
                    'rated_exchanges.jsonl'))
+
+
+def notebook_covered(rest: tuple) -> bool:
+    """Inside fieldlog/ (U98): the observation log, its photos and other devices' logs.
+    Reports, exports and the public team keys and manifests are made to be handed to
+    someone, so they stay readable. A phone upload in received/ can exceed the 64 MB
+    envelope limit; once imported it is deleted when encryption is on (phone_receive)."""
+    if not rest:
+        return False
+    if len(rest) == 1:
+        return rest[0].lstrip('.').startswith('observations.jsonl')
+    if rest[0] == 'photos':
+        return True
+    # team/<device>.jsonl, its conflict copies and their temporary files
+    return rest[0] == 'team' and len(rest) == 2 and '.jsonl' in rest[1]
 
 
 class VaultError(OSError):
@@ -55,6 +71,8 @@ def covered(relative: Path) -> bool:
         return False
     if relative.parts[0] in FOLDERS:
         return True
+    if relative.parts[0] == 'fieldlog':
+        return notebook_covered(relative.parts[1:])
     if len(relative.parts) > 1 and relative.parts[0] not in ('backups', 'archives'):
         return False  # a similarly named attachment/document is not a memory store
     name = relative.name.lstrip('.')  # include leftovers from older interrupted atomic writes

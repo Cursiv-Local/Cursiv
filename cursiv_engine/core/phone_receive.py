@@ -57,6 +57,11 @@ def _private(ip: str) -> bool:
     return a.is_private or a.is_loopback
 
 
+def _vault_on() -> bool:
+    from cursiv_engine.core import vault
+    return vault.owner(fieldlog.log_file()) is not None
+
+
 def received_dir() -> Path:
     return fieldlog.log_dir() / "received"
 
@@ -143,8 +148,14 @@ class Receiver:
                 result = fieldsync.import_phone_bundle(dest)
                 text = fieldsync.report_text(result)
                 self.imported += sum(result['added'].values())
+                if _vault_on():
+                    # Its entries and photos are now in the encrypted notebook; a readable
+                    # copy of the upload would undo that.
+                    dest.unlink(missing_ok=True)
             except (OSError, ValueError) as exc:
                 text = f"NOT IMPORTED: {exc}"
+                if _vault_on():
+                    text += f"\nThe upload is kept, unencrypted, so you can try again: {dest}"
         self.received += 1
         self.last_activity = time.monotonic()
         self.report(f"Received {safe} ({got / 1e6:.1f} MB):\n{text}")

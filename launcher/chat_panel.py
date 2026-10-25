@@ -351,16 +351,22 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                     f'<p><a href="cursiv://prompt/What%20can%20Cursiv%20do%3F" '
                     f'style="color:{theme.ACCENT};">New here? What can Cursiv do?</a></p>')
         else:
-            body = "".join(
-                f'<p style="margin:6px 0;"><a href="cursiv://prompt/{quote(text)}" '
-                f'style="color:{theme.TEXT}; text-decoration:none;">→&nbsp;&nbsp;{self._escape(label)}</a></p>'
-                for label, text in ((e, e) if isinstance(e, str) else e for e in self._examples()))
+            import chat_badges
+            prompt = lambda text: f"cursiv://prompt/{quote(text)}"
+            extra = [(e, e) if isinstance(e, str) else e for e in self._examples()]
+            covered = ("log site", "offline on")       # already a starter card
+            extra = [(label, text) for label, text in extra          # not a second "log site: …"
+                     if not text.lower().startswith(covered)][:3]
+            body = chat_badges.starters(prompt) + "".join(
+                f'<p style="margin:4px 0 4px 8px;"><a href="{prompt(text)}" '
+                f'style="color:{theme.MUTED}; text-decoration:none; font-size:13px;">→&nbsp;&nbsp;{self._escape(label)}</a></p>'
+                for label, text in extra)
         self._transcript.setHtml(theme.live(
-            f'<div style="margin-top:40px;">'
+            f'<div style="margin-top:36px;">'
             f'<p style="font-size:22px; font-weight:600; color:{theme.TEXT};">What can I help with?</p>'
-            f'<p style="color:{theme.MUTED}; margin:6px 0 18px 0;">Cursiv answers with an AI model on this computer. '
-            f'It can be wrong, so check anything that matters. Choose an example to edit before '
-            f'sending, or type <b>help</b> for commands.</p>'
+            f'<p style="color:{theme.MUTED}; margin:6px 0 14px 0;">Cursiv runs on this computer. Calculations, '
+            f'notebook entries and saved memories are done by Cursiv itself; other answers come from an AI model '
+            f'and can be wrong, so check anything that matters. Pick a card to edit it before sending.</p>'
             f'{body}</div>'))
         self._empty_shown = True
 
@@ -385,6 +391,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 win = self.window()
                 if hasattr(win, "_open_setup"):
                     win._open_setup()
+            elif url.host() == "report":
+                win = self.window()
+                if hasattr(win, "_send_problem_report"):
+                    win._send_problem_report(getattr(self, "_last_problem", ""))
             return
         from PyQt6.QtGui import QDesktopServices
         QDesktopServices.openUrl(url)
@@ -809,8 +819,14 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         if getattr(self, "_reply_is_chat", False):
             try:
                 self._render_reply()
+                self._maybe_show_tour()
             except Exception:
                 pass                     # the plain streamed text stays
+        else:
+            try:
+                self._render_receipt()   # a notebook save, offline on, … as a card
+            except Exception:
+                pass
         self._end_ai_reply()
         self._refresh_status_pill()      # "offline on", a new key, ... change it
         for role, content in (getattr(self, "_pending_history_append", None) or []):
@@ -862,9 +878,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._cancel_review()
         self._flush_reply_chunks(format_blocks=False)
         self._chunk_timer.stop()
-        self._append_html_block(
-            f'<span style="color:#ff6666;">[Error: {self._escape(message)}]</span></p>'
-        )
+        import chat_badges
+        self._force_new_block()
+        self._append_html_block(chat_badges.problem(message))
+        self._last_problem = message
         # _pending_history_append is only ever set right before a clean
         # done.emit() (see _run_turn/_deliver_result), so an error here
         # means it's still None -- a failed generation never produced a
@@ -956,6 +973,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
         from cursiv_engine.core import profile
         if profile.letters_command(text):
+            self._append_user(text)          # show what was typed; the note alone looked like a repeat
             self._append_system(profile.REMOVED_NOTE)
             return True
 

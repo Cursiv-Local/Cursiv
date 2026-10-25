@@ -89,7 +89,8 @@ def test_a_photo_that_cant_be_stored_leaves_no_entry_pointing_at_it(team, tmp_pa
     with laptop("A"):
         fieldlog.add(note="before")
         with monkeypatch.context() as m:
-            m.setattr(fieldlog.shutil, "copyfile", _full)
+            from cursiv_engine.core import atomic
+            m.setattr(atomic, "write_bytes", _full)       # photos are stored through atomic (U98)
             with pytest.raises(OSError):
                 fieldlog.add(note="with photo", photos=[photo])
         assert [e["note"] for e in fieldlog.entries()] == ["before"]

@@ -15,10 +15,13 @@ from cursiv_engine.core import vault, vault_migration
 
 SCOPE = (
     'Cursiv encrypts your saved conversations, memories, saved notes, session history, project and style '
-    'notes, curiosity records and their local backups on this computer. Nothing changes in how you use them.\n\n'
+    'notes, curiosity records, your custom agents, your field notebook (entries, photos and team logs) and '
+    'their local backups '
+    'on this computer. Nothing changes in how you use them.\n\n'
     'Choose a passphrase of at least 16 characters. Cursiv asks for it each time it opens. If you lose it, '
     'that data cannot be recovered (your Cursiv login cannot reset it), so write it down somewhere safe.\n\n'
-    'Not covered: field notebook entries and photos, workspace files, exports, logs, and copies on a Cursiv '
+    'Not covered: field reports, exports and team shares you make (they are for handing out), workspace '
+    'files, app logs, and copies on a Cursiv '
     'USB drive (a drive stays readable; use BitLocker To Go if it could be lost). Deleted files from before '
     'encryption can remain recoverable on disk or in OneDrive history.'
 )
@@ -57,6 +60,21 @@ def _migrate(password: str) -> bool:
                              f'{exc}\n\nNothing was lost: every file is kept and recovery copies were made. '
                              'Open Cursiv again and enter the same passphrase to finish.')
         return False
+
+
+def _adopt() -> None:
+    """Encrypt stores a newer release covers (U98: the field notebook) in an existing vault."""
+    try:
+        count = vault_migration.adopt_new_stores()
+    except Exception as exc:
+        QMessageBox.warning(None, 'Field notebook not encrypted yet',
+                            f'{exc}\n\nNothing in your notebook was lost or changed, but it stays closed until '
+                            'this works. Cursiv tries again at the next start.')
+        return
+    if count:
+        QMessageBox.information(None, 'Field notebook encrypted',
+                                f'Your field notebook ({count} file(s): entries and photos) is now encrypted '
+                                'with the same passphrase. Recovery copies were made first.')
 
 
 def _unfinished() -> bool:
@@ -100,6 +118,7 @@ def startup(*, configure=False) -> bool:
             vault.unlock(password)
             if not _portable() and not all((r / vault.MARKER).exists() for r in vault.roots() if r.exists()):
                 return _migrate(password)                       # a data folder added since: encrypt it too
+            _adopt()                                            # the field notebook, from U98
             return True
         except vault.VaultError as exc:
             QMessageBox.warning(None, 'Data stays locked', str(exc))

@@ -116,7 +116,20 @@ def _checks():
         from cursiv_engine.core import release_identity
         return 'Pinned owner key ' + release_identity.public_identity()['key_id']
 
-    return [("imports", imports), ("owner release identity", owner_identity), ("data folders", data_folders),
+    def plugin_isolation():
+        # U98: plugins run in their own process (Cursiv.exe --plugin-runner) and may not use the network.
+        from cursiv_engine.coding import forge
+        ok, err, res = forge.sandbox_test('def hi(_):\n    return "hi"\n'
+                                          'def register(cursiv):\n    cursiv.add_command("hi", hi, "hi")\n')
+        if not ok or list(res.get("commands") or []) != ["hi"]:
+            raise RuntimeError(f"a plugin didn't run in its own process: {err[-300:]}")
+        ok, err, _ = forge.sandbox_test('def register(cursiv):\n    import socket\n')
+        if ok or "plugins may not" not in err:
+            raise RuntimeError("a plugin could import socket")
+        return "a plugin ran in its own process; network access was refused"
+
+    return [("imports", imports), ("owner release identity", owner_identity), ("plugin isolation", plugin_isolation),
+            ("data folders", data_folders),
             ("portable storage", portable_storage), ("offline reference", reference),
             ("calculations", calculations), ("field notebook", field_notebook), ("documents", documents),
             ("window", window), ("AI engine (information only)", engine)]

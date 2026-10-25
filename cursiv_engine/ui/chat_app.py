@@ -138,16 +138,6 @@ RATE_SENTINEL  = "<<<RATE_LIMIT_EXHAUSTED>>>"
 # (a draft the check revised). Only the desktop chat window asks for it.
 REPLACE_SENTINEL = "<<<REPLACE_REPLY>>>"
 
-def _cursiv_encode(text: str) -> str:
-    """Compatibility entry point; implementation in chat.context."""
-    return _context._cursiv_encode(_runtime(), text)
-
-
-def _cursiv_decode(binary: str) -> str:
-    """Compatibility entry point; implementation in chat.context."""
-    return _context._cursiv_decode(_runtime(), binary)
-
-
 # ── Real-time web search (worldwide, zero API key required) ───────────────
 import urllib.parse as _urlparse
 import re as _re
@@ -669,12 +659,6 @@ _MEMORY_CTX = ""                       # the memory block as put into the prompt
 _MEMORY_WORDS = _re.compile(r"[A-Za-z0-9][\w.-]{3,}")
 
 
-def _memory_used(answer: str, question: str='') -> bool:
-    """Compatibility entry point; implementation in chat.context."""
-    return _context._memory_used(_runtime(), answer, question)
-
-
-
 _COMMON_WORDS = {"about", "after", "also", "been", "from", "have", "into", "just", "like", "more", "much", "only",
                  "over", "some", "that", "their", "them", "then", "there", "they", "this", "time", "very", "what",
                  "when", "with", "would", "your", "user", "likes", "prefers", "wants", "family", "people"}
@@ -771,18 +755,6 @@ def _call_ollama_code_council(messages: list[dict], max_tokens: int=2000) -> Gen
 def _call_xai_stream(messages: list[dict], api_key: str, has_images: bool=False, max_tokens: int=RESPONSE_MAX_TOKENS) -> Generator[str, None, None]:
     """Compatibility entry point; implementation in chat.cloud_providers."""
     return _cloud_providers._call_xai_stream(_runtime(), messages, api_key, has_images, max_tokens)
-
-
-
-def _call_xai_non_stream(messages: list[dict], api_key: str, has_images: bool) -> str:
-    """Compatibility entry point; implementation in chat.cloud_providers."""
-    return _cloud_providers._call_xai_non_stream(_runtime(), messages, api_key, has_images)
-
-
-
-def _generate_with_openai(filepath: str, openai_key: str, context_messages: list[dict], grok_draft: str='') -> str:
-    """Compatibility entry point; implementation in chat.cloud_providers."""
-    return _cloud_providers._generate_with_openai(_runtime(), filepath, openai_key, context_messages, grok_draft)
 
 
 

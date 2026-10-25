@@ -4,7 +4,7 @@ Functions receive the explicit ChatRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: _text_messages, _post_json, _slim, _call_gemini_direct, check_free_key, _call_groq_direct, _cloud_settings, _save_cloud_settings, cloud_enabled, set_cloud_enabled, _call_cursiv_cloud, free_key_command, _local_llm, _free_key_llm, _quick_llm, _memory_llm, _local_model_ready, _call_xai_stream, _call_xai_non_stream, _generate_with_openai, _generate_with_claude, _call_claude_direct, _call_openai_direct.
+Entry points: _text_messages, _post_json, _slim, _call_gemini_direct, check_free_key, _call_groq_direct, _cloud_settings, _save_cloud_settings, cloud_enabled, set_cloud_enabled, _call_cursiv_cloud, free_key_command, _local_llm, _free_key_llm, _quick_llm, _memory_llm, _local_model_ready, _call_xai_stream, _generate_with_claude, _call_claude_direct, _call_openai_direct.
 """
 from __future__ import annotations
 
@@ -354,70 +354,6 @@ def _call_xai_stream(runtime: ChatRuntime, messages: list[dict], api_key: str, h
             yield runtime.RATE_SENTINEL
     except Exception:
         yield runtime.RATE_SENTINEL
-
-def _call_xai_non_stream(runtime: ChatRuntime, messages: list[dict], api_key: str, has_images: bool) -> str:
-    """Non-streaming fallback for xAI."""
-    result = []
-    for chunk in runtime._call_xai_stream(messages, api_key, has_images):
-        result.append(chunk)
-    return "".join(result)
-
-def _generate_with_openai(runtime: ChatRuntime, filepath: str, openai_key: str, context_messages: list[dict], grok_draft: str) -> str:
-    """
-    Use OpenAI gpt-4.1 to generate or rewrite a file with full conversation context.
-    Passes the last 6 conversation turns so OpenAI understands the goal.
-    Falls back to grok_draft if the call fails.
-    """
-    ext  = runtime.Path(filepath).suffix.lower() if filepath else ""
-    lang = {".py": "Python", ".js": "JavaScript", ".ts": "TypeScript",
-            ".html": "HTML", ".css": "CSS", ".sh": "Bash", ".bat": "Batch"}.get(ext, "code")
-
-    # Build context from the last 6 conversation turns (skip system message)
-    ctx_turns = [m for m in context_messages if m.get("role") in ("user", "assistant")][-6:]
-    ctx_text  = "\n".join(
-        f"[{m['role'].upper()}]: {m['content'][:800]}"
-        for m in ctx_turns
-        if isinstance(m.get("content"), str)
-    )
-
-    system_msg = (
-        f"You are an expert {lang} engineer. "
-        "Write complete, production-ready code — no stubs, no TODOs, no placeholder comments. "
-        "Return ONLY the raw file content, nothing else. No markdown fences, no explanation."
-    )
-    user_msg = (
-        f"Conversation context:\n{ctx_text}\n\n"
-        f"File to generate: {filepath}\n\n"
-    )
-    if grok_draft:
-        user_msg += (
-            f"Grok's draft (improve and complete this):\n"
-            f"{grok_draft[:8000]}\n\n"
-        )
-    user_msg += (
-        "Write the complete, final file content. "
-        "Every function must be fully implemented. No ellipsis, no '# TODO'."
-    )
-
-    try:
-        payload = runtime.json.dumps({
-            "model":      runtime.OPENAI_CODE_MODEL,
-            "messages":   [
-                {"role": "system", "content": system_msg},
-                {"role": "user",   "content": user_msg},
-            ],
-            "max_tokens": 8000,
-        }).encode()
-        req = runtime.urllib.request.Request(
-            runtime.OPENAI_URL, data=payload,
-            headers={"Content-Type":  "application/json",
-                     "Authorization": f"Bearer {openai_key}"},
-        )
-        with runtime.urllib.request.urlopen(req, timeout=120) as resp:
-            data = runtime.json.loads(resp.read().decode())
-            return data["choices"][0]["message"]["content"].strip()
-    except Exception:
-        return ""
 
 def _generate_with_claude(runtime: ChatRuntime, filepath: str, anthropic_key: str, context_messages: list[dict], grok_draft: str) -> str:
     """

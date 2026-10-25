@@ -14,6 +14,10 @@ Safety:
   * Plugins are only installed with the person's approval (`evolve approve` or
     copying a file in themselves). The approved file's fingerprint (sha256) is
     recorded; if the file changes afterwards it is NOT loaded until re-approved.
+  * Since U98 a plugin never runs inside Cursiv: every registration, command, tool
+    and hook call runs in its own short-lived process (core/plugin_runner.py) with a
+    cleaned environment, a time limit, and an audit hook that refuses network,
+    other programs, native code and files outside the plugin's data folder.
   * Every plugin is loaded inside try/except: a broken plugin is switched off
     with its error shown in `plugins`, never crashing Cursiv.
   * Each command / tool / hook call is guarded the same way.
@@ -141,13 +145,16 @@ def _load_file(path: Path, st: dict) -> None:
         _status[name] = {"loaded": False, "error": "switched off"}
         return
     try:
-        spec = importlib.util.spec_from_file_location(f"cursiv_plugin_{name}", path)
-        mod = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(mod)
-        if not callable(getattr(mod, "register", None)):
-            raise RuntimeError("the plugin has no register(cursiv) function")
-        mod.register(PluginAPI(name))
-        meta = getattr(mod, "PLUGIN", {}) or {}
+        # Never imported into Cursiv (U98): registration runs in the plugin's own process.
+        reply = _call(path, "register")
+        api = PluginAPI(name)
+        for word, help_text in reply["commands"].items():
+            api.add_command(word, _proxy(path, "command", word), help_text)
+        for tool, description in reply["tools"].items():
+            api.add_tool(tool, _proxy(path, "tool", tool), description)
+        if reply["hooks"]:
+            api.on_message(_proxy(path, "hook", ""))
+        meta = reply.get("meta") or {}
         _status[name] = {"loaded": True, "error": "", "description": meta.get("description", ""),
                          "commands": [w for w, c in _commands.items() if c["plugin"] == name],
                          "tools": [t for t, c in _tools.items() if c["plugin"] == name]}
@@ -155,6 +162,53 @@ def _load_file(path: Path, st: dict) -> None:
         _unload(name)
         _status[name] = {"loaded": False, "error": f"{type(e).__name__}: {e}"[:300]}
         log("load-failed", name, traceback.format_exc()[-800:])
+
+
+# ── the plugin's own process (core/plugin_runner.py) ────────────────────────
+
+TIMEOUT = 20          # seconds for one call; a hook on every message gets less
+HOOK_TIMEOUT = 6
+
+
+def runner_command() -> list[str]:
+    import sys
+    if getattr(sys, "frozen", False):
+        return [sys.executable, "--plugin-runner"]          # launcher/main.py dispatches it
+    return [sys.executable, "-I", str(Path(__file__).with_name("plugin_runner.py"))]
+
+
+def _call(path: Path, action: str, item: str = "", arg=None, timeout: int = TIMEOUT) -> dict:
+    """One plugin call in a fresh process with a cleaned environment. Raises on failure."""
+    import os
+    import subprocess
+    from cursiv_engine.memory import semantic
+    name = path.stem
+    keep = ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH", "LANG", "PYTHONIOENCODING")
+    env = {k: v for k, v in os.environ.items() if k.upper() in keep}
+    env["PYTHONIOENCODING"] = "utf-8"
+    env["CURSIV_PLUGIN_SANDBOX"] = "1"
+    request = {"path": str(path), "data_dir": str(DIR / "_data" / name), "action": action, "name": item,
+               "arg": arg if arg is not None else "", "person": semantic.current_person()}
+    p = subprocess.run(runner_command(), input=json.dumps(request), capture_output=True, text=True,
+                       encoding="utf-8", timeout=timeout, env=env, stdin=None,
+                       creationflags=0x08000000 if os.name == "nt" else 0)
+    marker = "@@CURSIV-PLUGIN@@"
+    if marker not in (p.stdout or ""):
+        raise RuntimeError(((p.stderr or p.stdout or "no reply from the plugin process")[-300:]).strip())
+    reply = json.loads(p.stdout.split(marker, 1)[1])
+    for fact in reply.get("remember") or []:
+        PluginAPI(name).remember(fact)
+    if not reply.get("ok"):
+        log(f"{action}-error", name, reply.get("trace", "") or reply.get("error", ""))
+        raise RuntimeError(reply.get("error") or "the plugin failed")
+    return reply
+
+
+def _proxy(path: Path, action: str, item: str):
+    def call(*args, **kwargs):
+        arg = kwargs if kwargs else (args[0] if args else "")
+        return _call(path, action, item, arg, HOOK_TIMEOUT if action == "hook" else TIMEOUT)["result"]
+    return call
 
 
 def load_all(force: bool = False) -> None:

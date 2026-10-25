@@ -32,7 +32,7 @@ def test_similarly_named_user_files_are_never_encryption_targets(folder):
     assert not vault.covered(Path(folder) / 'memory_facts.jsonl')
 
 
-def test_migration_exact_bytes_backups_and_notebook_unchanged(encrypted):
+def test_migration_exact_bytes_backups_and_notebook_encrypted(encrypted):
     values = {'memory_facts.jsonl': b'{"text":"unique secret marker"}\ninvalid-line\n',
               'backups/autonomous-memory-v1/memory_facts.jsonl': b'older secret marker\n',
               'conversations/one.json': '{"html":"private ünicode"}'.encode('utf-8'),
@@ -41,6 +41,9 @@ def test_migration_exact_bytes_backups_and_notebook_unchanged(encrypted):
         path = encrypted / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes(value)
     notebook = encrypted / 'fieldlog/observations.jsonl'
     notebook.parent.mkdir(); notebook.write_bytes(b'notebook-original-chain')
+    report = encrypted / 'fieldlog/reports/field-report.html'
+    report.parent.mkdir(); report.write_bytes(b'<p>made to hand out</p>')
+    values['fieldlog/observations.jsonl'] = b'notebook-original-chain'     # encrypted since U98
     counts = vault_migration.migrate(PASSWORD, [encrypted])
     assert counts[str(encrypted)] == len(values)
     for name, value in values.items():
@@ -48,7 +51,7 @@ def test_migration_exact_bytes_backups_and_notebook_unchanged(encrypted):
         assert path.read_bytes().startswith(vault.MAGIC)
         assert value not in path.read_bytes()
         assert private_store.read_bytes(path) == value
-    assert notebook.read_bytes() == b'notebook-original-chain'
+    assert report.read_bytes() == b'<p>made to hand out</p>'          # reports stay readable
     for path in (encrypted / '.vault-recovery').iterdir():
         assert b'secret marker' not in path.read_bytes()
     # Independently decrypt the authenticated snapshot and each recovery file.

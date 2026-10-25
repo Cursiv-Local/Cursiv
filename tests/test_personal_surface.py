@@ -17,11 +17,12 @@ def test_removed_letter_commands_say_so(text):
 def test_gui_letter_shortcuts_say_so():
     from types import SimpleNamespace
     from chat_panel import ChatPanel
-    notes = []
-    fake = SimpleNamespace(_append_system=notes.append)
+    notes, typed = [], []
+    fake = SimpleNamespace(_append_system=notes.append, _append_user=typed.append)
     assert ChatPanel._try_dialog_command(fake, 'write to Example') is True
     assert ChatPanel._try_dialog_command(fake, 'legacy') is True
     assert notes == [profile.REMOVED_NOTE] * 2
+    assert typed == ['write to Example', 'legacy']      # each note sits under what was typed (U98)
 
 
 def test_family_code_and_names_are_not_shipped():

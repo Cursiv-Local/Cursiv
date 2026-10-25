@@ -123,6 +123,8 @@ RICH = ('## Notes\n\n**bold** and *italic*, with [a link](https://cursiv.us/).\n
 
 
 def test_stream_and_single_final_parse_have_identical_formatting(panel):
+    import chat_badges
+    chat_badges.seen_once("tour_shown")      # the one-time tour card is tested on its own
     for i in range(0, len(RICH), 7):
         panel._on_chunk(RICH[i:i + 7])
         panel._flush_reply_chunks()
