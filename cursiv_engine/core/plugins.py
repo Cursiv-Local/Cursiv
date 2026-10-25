@@ -174,7 +174,8 @@ def runner_command() -> list[str]:
     import sys
     if getattr(sys, "frozen", False):
         return [sys.executable, "--plugin-runner"]          # launcher/main.py dispatches it
-    return [sys.executable, "-I", str(Path(__file__).with_name("plugin_runner.py"))]
+    from . import confined                                  # a venv's python.exe is a launcher (U102)
+    return [confined.real_python(sys.executable), "-I", str(Path(__file__).with_name("plugin_runner.py"))]
 
 
 def _call(path: Path, action: str, item: str = "", arg=None, timeout: int = TIMEOUT) -> dict:
@@ -189,9 +190,8 @@ def _call(path: Path, action: str, item: str = "", arg=None, timeout: int = TIME
     env["CURSIV_PLUGIN_SANDBOX"] = "1"
     request = {"path": str(path), "data_dir": str(DIR / "_data" / name), "action": action, "name": item,
                "arg": arg if arg is not None else "", "person": semantic.current_person()}
-    p = subprocess.run(runner_command(), input=json.dumps(request), capture_output=True, text=True,
-                       encoding="utf-8", timeout=timeout, env=env, stdin=None,
-                       creationflags=0x08000000 if os.name == "nt" else 0)
+    from . import confined                  # OS-enforced limits as well as the audit hook (U102)
+    p = confined.run(runner_command(), input=json.dumps(request), timeout=timeout, env=env)
     marker = "@@CURSIV-PLUGIN@@"
     if marker not in (p.stdout or ""):
         raise RuntimeError(((p.stderr or p.stdout or "no reply from the plugin process")[-300:]).strip())

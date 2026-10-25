@@ -5,6 +5,8 @@ environment, a time limit and an audit hook that refuses network, other
 programs, native code and files outside the plugin's own data folder.
 """
 import os
+import sys
+from pathlib import Path
 
 import pytest
 
@@ -159,14 +161,14 @@ def test_codex_test_runs_refuse_what_the_word_check_misses(tmp_path, monkeypatch
     # The word check only blocks "os.system", "socket", "__import__(", absolute paths written plainly;
     # these get past it.
     from cursiv_engine.coding import runner
-    outside = tmp_path / "private.txt"           # a file outside the run's own folder
-    outside.write_text("secret", encoding="utf-8")
-    monkeypatch.setenv("CURSIV_TEST_FILE", str(outside))
+    outside = str(tmp_path / "private.txt")      # a file outside the run's own folder
+    Path(outside).write_text("secret", encoding="utf-8")
+    hidden_path = f"chr({ord(outside[0])}) + {outside[1:]!r}"     # no drive-letter literal for the word check
     load = "import builtins\nload = getattr(builtins, '__imp' + 'ort__')\n"
     for code in (load + "m = load('o' + 's')\nm.system('echo hacked')",
                  load + "s = load('sock' + 'et')",
                  "import importlib\nimportlib.import_module('subpro' + 'cess')",
-                 "import os\nprint(open(os.environ['CURSIV_TEST_FILE']).read())"):
+                 f"print(open({hidden_path}).read())"):
         assert runner.check(code)[0], code              # the word check lets it through ...
         ok, out = runner.run(code)
         assert not ok and out.startswith("SANDBOX: "), (code, out)   # ... the guard doesn't
@@ -177,3 +179,44 @@ def test_a_refused_test_run_is_never_sent_back_to_the_model_to_fix():
     answer = "```python\nimport builtins\nm = getattr(builtins, '__imp' + 'ort__')('o' + 's')\nm.system('echo hacked')\n```"
     out = "".join(runner.run_and_fix(answer, lambda code, err: (_ for _ in ()).throw(AssertionError("asked to fix"))))
     assert "Test run stopped" in out and "don't allow" in out
+
+
+# ── OS-enforced limits (U102, core/confined.py) ─────────────────────────────
+
+def test_secrets_in_the_environment_never_reach_a_code_run(monkeypatch):
+    # Was: everything except names containing KEY/TOKEN/SECRET/PASS, so a key named otherwise got through.
+    from cursiv_engine.coding import runner
+    monkeypatch.setenv("MY_PROVIDER_CREDENTIAL", "sk-live-should-not-leak")
+    ok, out = runner.run("import os\nprint(sorted(os.environ))")
+    assert ok and "MY_PROVIDER_CREDENTIAL" not in out and "sk-live" not in out
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows Job Objects")
+def test_the_job_object_stops_what_the_audit_hook_cannot(tmp_path):
+    # No audit hook here at all (plain python -c): the operating system alone must stop these.
+    from cursiv_engine.core import confined
+    py = confined.real_python(sys.executable)
+    run = lambda code, **kw: confined.run([py, "-I", "-c", code], timeout=20, **kw)
+    assert run("print('fine')").stdout.strip() == "fine"
+    spawn = run("import subprocess; subprocess.run(['cmd', '/c', 'echo escaped'])")
+    assert spawn.returncode != 0 and "1816" in spawn.stderr                 # not enough quota: no child processes
+    assert "escaped" not in run("import os; os.system('echo escaped')").stdout
+    assert run("x = bytearray(2_000_000_000)", memory_mb=256).limit == "memory"
+    assert run("while True: pass", cpu_seconds=2).limit == "time"
+    clip = run("import ctypes; u = ctypes.windll.user32; u.OpenClipboard(0); print(bool(u.GetClipboardData(13)))")
+    assert clip.stdout.strip() == "False"                                   # clipboard contents not readable
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows Job Objects")
+def test_if_the_limits_cannot_be_applied_nothing_runs(monkeypatch, tmp_path):
+    from cursiv_engine.core import confined
+    marker = tmp_path / "ran.txt"
+    def broken(*_):
+        raise confined.ConfinementError("simulated")
+    monkeypatch.setattr(confined, "_windows_job", broken)
+    with pytest.raises(confined.ConfinementError):
+        confined.run([sys.executable, "-c", f"open({str(marker)!r}, 'w').write('x')"])
+    assert not marker.exists()
+    from cursiv_engine.coding import runner
+    ok, out = runner.run("print('hi')\nprint('there')")
+    assert not ok and out.startswith("SANDBOX: the safety limits couldn't be applied")
