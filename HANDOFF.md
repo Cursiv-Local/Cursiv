@@ -33,6 +33,15 @@ Profiles are markdown files in `agents/starters/`; `agents/profile_context.py` f
 Report writer invented a unit, methods and a model name before the code check and rules were added. No First
 aid profile (medical stays with the reviewed reference). Owner rule: no self-editing agents.
 
+## U101 data safety (Claude, 2026-10-25, branch `claude/u101-data-safety` on top of hardening)
+From the codebase review: login files atomic + accounts backup + `AccountsUnreadable` (tests/test_login_files.py);
+`fieldlog/received/` and `fieldlog/.import-*` are now vault-covered, oversized uploads go to `received-large/`,
+and `vault_migration.set_aside_large_uploads` moves (never deletes) old oversized readable uploads so they can't
+stop an unlock (tests in test_notebook_encryption.py); strand/session loaders report damaged lines in `status`
+(tests/test_damaged_lines.py). Writers already kept damaged lines; nothing was being lost, only unreported.
+Still open from the review: tests for problem_report/login_recovery/chat_actions, one notebook read path,
+overconfidence benchmark, dead modules (sigil, quality_scorer, offline_queue), silent-except lint.
+
 ## U101 hardening (Claude, 2026-10-25, unreleased, branch `claude/u101-hardening` on top of profiles)
 - Codex run-and-fix: `coding/runner.py` runs `python -I <copy of core/plugin_runner.py> --script main.py`; the
   audit hook blocks what the word check misses (getattr(builtins, ...), importlib). Refusals -> "SANDBOX:".

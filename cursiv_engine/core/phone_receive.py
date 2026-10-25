@@ -66,6 +66,20 @@ def received_dir() -> Path:
     return fieldlog.log_dir() / "received"
 
 
+def large_dir() -> Path:
+    """Uploads over the encryption envelope limit (vault.MAX_BYTES): readable, and Cursiv says so."""
+    return fieldlog.log_dir() / "received-large"
+
+
+def readable_leftovers() -> list[Path]:
+    """Readable uploads on an encrypted computer: ones too big to encrypt (including older ones moved
+    here at unlock by vault_migration.set_aside_large_uploads). Listed so the person knows; never
+    deleted by Cursiv."""
+    if not _vault_on() or not large_dir().is_dir():
+        return []
+    return sorted(p for p in large_dir().iterdir() if p.is_file())
+
+
 class Receiver:
     """Start with .start(); report(text) is called (from a background thread) for each event."""
 
@@ -92,6 +106,14 @@ class Receiver:
         self._server.daemon_threads = True
         threading.Thread(target=self._server.serve_forever, daemon=True).start()
         threading.Thread(target=self._watch_idle, daemon=True).start()
+        try:
+            left = readable_leftovers()
+        except OSError:
+            left = []
+        if left:
+            self.report(f"{len(left)} earlier phone upload(s) on this computer are NOT encrypted (too big, or from "
+                        f"before Cursiv encrypted uploads). Delete them once their entries are in your notebook: "
+                        f"{large_dir()}")
         return self.port
 
     @property
@@ -129,18 +151,34 @@ class Receiver:
         """Save the upload into the field log's received folder, then import it. Returns the report."""
         self.last_activity = time.monotonic()
         safe = re.sub(r"[^A-Za-z0-9._-]", "_", Path(name).name)[:80] or "phone.cursivsync"
-        folder = received_dir()
+        from cursiv_engine.core import atomic, vault
+        # U101: on an encrypted computer an upload that fits the encryption envelope is kept encrypted;
+        # only a bigger one is written readable, to its own folder, and the report says so.
+        encrypt = _vault_on() and length <= vault.MAX_BYTES - 4096
+        folder = received_dir() if (encrypt or not _vault_on()) else large_dir()
         folder.mkdir(parents=True, exist_ok=True)
         dest = folder / f"{datetime.now().strftime('%Y%m%d-%H%M%S')}-{safe}"
         with self._lock:
             got = 0
-            with dest.open("wb") as out:
+            if encrypt:
+                buffer = bytearray()
                 while got < length:
                     chunk = read(min(1 << 20, length - got))
                     if not chunk:
                         break
-                    out.write(chunk)
+                    buffer += chunk
                     got += len(chunk)
+                if got == length:
+                    atomic.write_bytes(dest, bytes(buffer))
+                del buffer
+            else:
+                with dest.open("wb") as out:
+                    while got < length:
+                        chunk = read(min(1 << 20, length - got))
+                        if not chunk:
+                            break
+                        out.write(chunk)
+                        got += len(chunk)
             if got != length:
                 dest.unlink(missing_ok=True)
                 raise ValueError("the file didn't arrive whole (the connection dropped): send it again")
@@ -155,7 +193,8 @@ class Receiver:
             except (OSError, ValueError) as exc:
                 text = f"NOT IMPORTED: {exc}"
                 if _vault_on():
-                    text += f"\nThe upload is kept, unencrypted, so you can try again: {dest}"
+                    text += (f"\nThe upload is kept, encrypted, so you can try again: {dest}" if encrypt else
+                             f"\nThe upload is kept, unencrypted (too big to encrypt), so you can try again: {dest}")
         self.received += 1
         self.last_activity = time.monotonic()
         self.report(f"Received {safe} ({got / 1e6:.1f} MB):\n{text}")

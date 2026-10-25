@@ -72,6 +72,12 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             lines.append(f"Field notebook: {n} entr{'y' if n == 1 else 'ies'}, "
                          + ("intact" if not bad else f"{len(bad)} problem(s): type field log check"))
             lines.append(f"Documents:     {len(_documents.library())} imported")
+            # U101 review: stores that skipped damaged lines used to say nothing about it.
+            from cursiv_engine.core import strand_store as _strands
+            from cursiv_engine.memory import session_log as _sessions
+            _strands._load_all()
+            for problem in _strands.problems() + _sessions.problems():
+                lines.append(f"Problem:       {problem}")
             if _demo.active():
                 lines.insert(0, "FIELD DEMO ON: the notebook and documents hold sample data (demo off to end it)")
         except Exception:

@@ -209,7 +209,8 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
         problems.append("its manifest is missing")
     else:
         try:
-            m = json.loads(man.read_text(encoding="utf-8"))
+            from cursiv_engine.core import private_store      # a staged copy is encrypted (U101)
+            m = json.loads(private_store.read_text(man))
         except (OSError, ValueError):
             m = None
         if not isinstance(m, dict):
@@ -240,8 +241,9 @@ def _import_photos(src: Path, rows: list[dict]) -> int:
             if dest.exists():
                 continue
             f = src / rel
-            if not f.exists() or f.stat().st_size > fieldlog.PHOTO_MAX_MB * 2**20 \
-                    or hashlib.sha256(f.read_bytes()).hexdigest() != Path(rel).stem:
+            from cursiv_engine.core import private_store
+            if not f.exists() or f.stat().st_size > fieldlog.PHOTO_MAX_MB * 2**20 + 65536 \
+                    or hashlib.sha256(private_store.read_bytes(f)).hexdigest() != Path(rel).stem:
                 missing.add(rel)
                 continue
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -361,13 +363,33 @@ _ZIP_LIMIT = 4 << 30                       # the whole file, unpacked (a zip's s
 _LOG_LIMIT = 200 << 20                     # bundle.json, the log and its manifest, each
 
 
-def _unzip_phone_bundle(path: Path, into: Path) -> None:
+def _staging() -> Path:
+    """Where an import is unpacked (U101): inside the notebook folder, so on an encrypted computer every
+    staged piece is encrypted (vault.notebook_covered '.import-*'), never the system's temp folder.
+    Leftovers from an interrupted import are staging copies Cursiv made, so they're removed first."""
+    import uuid
+    root = fieldlog.log_dir()
+    root.mkdir(parents=True, exist_ok=True)
+    for old in root.glob(".import-*"):
+        shutil.rmtree(old, ignore_errors=True)
+    folder = root / f".import-{uuid.uuid4().hex[:12]}"
+    folder.mkdir()
+    return folder
+
+
+def _stage(dest: Path, data: bytes) -> None:
+    from cursiv_engine.core import atomic
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    atomic.write_bytes(dest, data)          # encrypted when the notebook is
+
+
+def _unzip_phone_bundle(path: Path, into: Path, source=None) -> None:
     """Unpack a format-2 send file into `into`, letting through only the names a phone writes:
     bundle.json, cursiv-field-share/<phone>.jsonl, <phone>.manifest.json and photos/<sha256>.<ext>.
     Anything else (another folder, an absolute path, "..", a second log) refuses the whole file."""
     import zipfile
     try:
-        z = zipfile.ZipFile(path)
+        z = zipfile.ZipFile(source if source is not None else path)
     except (OSError, zipfile.BadZipFile) as exc:
         raise ValueError(f"{path.name} isn't a phone notebook file ({exc})") from exc
     with z:
@@ -394,16 +416,15 @@ def _unzip_phone_bundle(path: Path, into: Path) -> None:
             limit = photo_max if fieldlog._is_stored(rel) else _LOG_LIMIT
             if name == "bundle.json":
                 continue
-            dest = into / name
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            got = 0
-            with z.open(info) as src, dest.open("wb") as out:
+            got, piece = 0, bytearray()
+            with z.open(info) as src:
                 while chunk := src.read(1 << 20):
                     got += len(chunk)
                     total += len(chunk)
                     if got > limit + (1 << 20) or total > _ZIP_LIMIT:
                         raise ValueError(f"{path.name} is too big to be a phone's send file ({name[:80]})")
-                    out.write(chunk)
+                    piece += chunk
+            _stage(into / name, bytes(piece))
         if f"{SHARE_DIR}/{device}.jsonl" not in names:
             raise ValueError(f"{path.name} has no log in it")
 
@@ -411,39 +432,46 @@ def _unzip_phone_bundle(path: Path, into: Path) -> None:
 def import_phone_bundle(path: Path) -> dict:
     """Import a .cursivsync file from the phone notebook: format 2 (a zip, what the phone makes now)
     or format 1 (one JSON file with photos inside, from earlier versions). Same report as import_folder()."""
-    import base64
-    import tempfile
+    import io
+    from cursiv_engine.core import private_store, vault
     path = Path(path)
     try:
-        with path.open("rb") as f:
+        # An encrypted upload (phone_receive, U101) is opened in memory; a readable one from disk.
+        data = private_store.read_bytes(path) if vault.owner(path) else None
+        with (io.BytesIO(data) if data is not None else path.open("rb")) as f:
             is_zip = f.read(2) == b"PK"
     except OSError as exc:
         raise ValueError(f"can't read {path.name} ({exc})") from exc
-    if is_zip:
-        with tempfile.TemporaryDirectory() as tmp:
-            _unzip_phone_bundle(path, Path(tmp))
-            return import_folder(Path(tmp))
+    staging = _staging()
     try:
-        bundle = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, ValueError) as exc:
-        raise ValueError(f"{path.name} isn't a phone notebook file ({exc})") from exc
+        if is_zip:
+            _unzip_phone_bundle(path, staging, io.BytesIO(data) if data is not None else None)
+            return import_folder(staging)
+        try:
+            bundle = json.loads(data.decode("utf-8") if data is not None else path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            raise ValueError(f"{path.name} isn't a phone notebook file ({exc})") from exc
+        return _import_format1(path, bundle, staging)
+    finally:
+        shutil.rmtree(staging, ignore_errors=True)
+
+
+def _import_format1(path: Path, bundle, staging: Path) -> dict:
+    """A format-1 send file (one JSON with photos inside), staged piece by piece like a zip."""
+    import base64
     if not isinstance(bundle, dict) or bundle.get("format") != PHONE_FORMAT:
         raise ValueError(f"{path.name} isn't a phone notebook file")
     device = str(bundle.get("device", ""))
     if not _PHONE_DEVICE.match(device):
         raise ValueError("the file doesn't name a phone (its device label is wrong)")
-    with tempfile.TemporaryDirectory() as tmp:
-        out = Path(tmp) / SHARE_DIR
-        out.mkdir()
-        with (out / f"{device}.jsonl").open("w", encoding="utf-8") as f:
-            for e in bundle.get("entries") or []:
-                f.write(json.dumps(e, ensure_ascii=False, separators=(",", ":")) + "\n")
-        (out / f"{device}.manifest.json").write_text(json.dumps(bundle.get("manifest") or {}), encoding="utf-8")
-        for rel, data in (bundle.get("photos") or {}).items():
-            if fieldlog._is_stored(rel):
-                (out / rel).parent.mkdir(parents=True, exist_ok=True)
-                (out / rel).write_bytes(base64.b64decode(data))
-        return import_folder(Path(tmp))
+    out = staging / SHARE_DIR
+    _stage(out / f"{device}.jsonl", "".join(json.dumps(e, ensure_ascii=False, separators=(",", ":")) + "\n"
+                                            for e in bundle.get("entries") or []).encode("utf-8"))
+    _stage(out / f"{device}.manifest.json", json.dumps(bundle.get("manifest") or {}).encode("utf-8"))
+    for rel, data in (bundle.get("photos") or {}).items():
+        if fieldlog._is_stored(rel):
+            _stage(out / rel, base64.b64decode(data))
+    return import_folder(staging)
 
 
 def _team_files() -> list[Path]:
