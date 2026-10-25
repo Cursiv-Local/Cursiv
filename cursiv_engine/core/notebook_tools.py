@@ -20,7 +20,7 @@ VERIFY = 'notebook_verify_chain'
 TOOLS = frozenset((CREATE, READ, VERIFY))
 _lock = threading.RLock()
 _FIELDS = {'observer', 'site', 'lat', 'lon', 'location_source', 'location_accuracy_m',
-           'location_fix_utc', 'measurements', 'note', 'sample_id'}
+           'location_fix_utc', 'measurements', 'note', 'sample_id', 'project'}
 _TARGET = r'(?:field\s+(?:notebook(?:\s+section)?|log)|notebook\s+section)'
 _REF = re.compile(r'(?i)^(?:it|this|that|this observation|that observation|the observation|the above|those details)$')
 
@@ -33,6 +33,7 @@ class Result:
     error: str = ''
     problems: list[str] = field(default_factory=list)
     count: int = 0
+    scope: dict = field(default_factory=dict)      # verify: {code: [records that mention it]}
 
     @property
     def ok(self) -> bool:
@@ -49,9 +50,22 @@ class Result:
             from .feedback import logged_receipt
             return logged_receipt(self.records[0], duplicate=self.status == 'already_recorded')
         if self.status == 'verified':
-            return f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified).'
+            lines = [f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified).']
+            # A scoped check says which records it found; none found is never "verified" (U100 audit).
+            for code, rows in self.scope.items():
+                if rows:
+                    lines.append(f'Records for {code}: {len(rows)}, all inside that verified chain:')
+                    lines += ['[' + row['id'] + '] ' + fieldlog.summary(row) for row in rows]
+                else:
+                    lines.append(f'No records mention {code}, so nothing was checked for it.')
+            return '\n'.join(lines)
         if not self.records:
-            return 'No matching Field Notebook entries.'
+            lines = ['No matching Field Notebook entries.']
+            for code, rows in self.scope.items():          # read: records that only mention the sample
+                if rows:
+                    lines.append(f'No record has sample ID {code}, but {len(rows)} mention it in their text:')
+                    lines += ['[' + row['id'] + '] ' + fieldlog.summary(row) for row in rows]
+            return '\n'.join(lines)
         return ('Field Notebook: ' + str(self.count) + ' matching record(s).\n' +
                 ('\n'.join('[' + row['id'] + '] ' + fieldlog.summary(row) for row in self.records)
                  if self.records else 'No matching entries were found.'))
@@ -81,12 +95,13 @@ def execute(tool: str, args: dict, *, observer: str = '') -> Result:
                 result = field_recall.query(**args)
                 if result['warnings']:
                     return Result(tool, 'failed', error='Some notebook records could not be validated.', problems=result['warnings'])
-                return Result(tool, 'read', records=result['records'], count=result['total'])
+                return Result(tool, 'read', records=result['records'], count=result['total'],
+                              scope={result['sample']: result['mentions']} if result.get('mentions') else {})
             fields = args.get('fields')
             if not isinstance(fields, dict) or fields.keys() - _FIELDS:
                 raise ValueError('unsupported observation fields; photos and record corrections use the notebook window')
             fields = dict(fields)
-            for key in ('observer', 'site', 'note', 'sample_id', 'location_source', 'location_fix_utc'):
+            for key in ('observer', 'site', 'note', 'sample_id', 'project', 'location_source', 'location_fix_utc'):
                 if key in fields and not isinstance(fields[key], str):
                     raise ValueError(key + ' must be text')
             if not isinstance(fields.get('measurements', []), list) or any(
@@ -105,6 +120,8 @@ def execute(tool: str, args: dict, *, observer: str = '') -> Result:
             # Compare with the requested fields as well as the backend's receipt:
             # a consistent return value cannot excuse writing different details.
             expected = {k: fields.get(k, '').strip() for k in ('observer', 'site', 'note', 'sample_id')}
+            if fields.get('project', '').strip():
+                expected['project'] = fields['project'].strip()
             expected.update(lat=fieldlog._coord(fields.get('lat'), -90, 90),
                             lon=fieldlog._coord(fields.get('lon'), -180, 180),
                             measurements=fieldlog._clean_measurements(fields.get('measurements')))
@@ -143,11 +160,18 @@ def _intent(text: str) -> _Intent | None:
     text = re.sub(r'(?i)^(?:(?:no|actually|instead|i meant)[,:]?\s+)*(?:please\s+)?', '', text)
     text = re.sub(r'(?i)^(?:(?:can|could|would) you\s+|i (?:want|need) you to\s+)(?:please\s+)?', '', text)
     # Existing exports/imports/reports retain their separate, explicit commands.
-    if re.match(r'(?i)^field\s*(?:log|notebook)\s+(?:export|import|share|report|verify\s+\S)', text):
+    if re.match(r'(?i)^field\s*(?:log|notebook)\s+(?:export|import|share|report|correct|verify\s+\S)', text):
         return None
     if re.fullmatch(r'(?i)(?:field\s*log check|check field log)', text) or re.search(
-            rf'(?i)^(?:verify|check|validate)\b.*\b{_TARGET}\b', text):
-        return _Intent('verify')
+            rf'(?i)^(?:verify|check|validate)\b.*\b{_TARGET}\b', text) or re.search(
+            r'(?i)^(?:verify|check|validate|confirm)\b.*\b(?:integrity|(?:field\s+)?observations?|field records?|'
+            r'notebook (?:entries|records))\b', text):
+        return _Intent('verify', text)
+    # "Show the full correction history for W-001": every entry for that sample, corrections included.
+    m = re.search(r'(?i)^(?:show|list|what is|what\'s)\b.*\b(?:correction\s+)?history\b.*?\b(?:for|of)\s+(?:sample\s+)?'
+                  r'(' + fieldlog.ID.pattern + r')\b', text)
+    if m:
+        return _Intent('read', 'sample ' + m[1])
     if re.fullmatch(rf'(?i)(?:show |read |list |see )?(?:the |my )?{_TARGET}[.?]?', text) or re.search(
             rf'(?i)^(?:show|read|list|retrieve|find|search|what did i record|what is in|what\x27s in)\b.*\b{_TARGET}\b', text):
         return _Intent('read', text)
@@ -162,6 +186,8 @@ def _intent(text: str) -> _Intent | None:
         # An explicit destination suffix is not part of the observation itself.
         payload = re.sub(rf'(?i)\s+(?:to|in|into) (?:the |my )?{_TARGET}[.!]?$', '', payload)
         payload = re.sub(rf'(?i)^(?:to|in|into) (?:the |my )?{_TARGET}\s*[:,-]?\s*', '', payload)
+        if payload and not _explicit(payload):
+            return _Intent('card', payload)   # plain words: a confirm card shows how Cursiv read it first (U100 audit)
         return _Intent('create', payload)
     m = re.match(rf'(?is)^(?:add|record|save|put|log|write|move|remember)\s*(.*?)\s+(?:to|in|into)\s+(?:the |my )?{_TARGET}\b(.*)$', text)
     if m:
@@ -176,6 +202,13 @@ def _intent(text: str) -> _Intent | None:
     if text.lower().startswith('log ') and not re.fullmatch(r'(?i)log (?:in|out|off|on|into|me (?:in|out))\b[^;\d]*', text):
         return _Intent('create', text[4:].strip())
     return None
+
+
+def _explicit(payload: str) -> bool:
+    """Written the notebook's own way ("site: …; temp 14.2 C"), so it can be saved as typed.
+    Plain sentences go to a confirm card instead (W-001 was saved as "ORION = -742")."""
+    return bool(';' in payload or re.search(
+        r'(?i)(?:^|[;,]\s*)(?:site|sample(?: id)?|project|note|observation)\s*:', payload))
 
 
 def _detail(text: str) -> str:
@@ -237,6 +270,10 @@ def _request(text: str, history: list[dict]) -> _Intent | None:
         if re.search(r'(?i)\b(?:poem|story|song|haiku|limerick|essay|joke|riddle|rhyme|verse|lyrics|tale|sonnet)s?\b|'
                      rf'\babout (?:a|an|the|my|this) {_TARGET}\b', text):
             return None
+        # A plain-words record gets a confirm card from core/notebook_proposals.py instead.
+        if re.match(r'(?i)^(?:please\s+)?(?:record|log|save|add)\s+(?:(?:a|an|this|that|the|my|new)\s+)?'
+                    r'field observation\b\s*[:,-]?\s*\S', text):
+            return _Intent('card', text)
         if (_positive_target(text)
                 and re.search(r'(?i)\b(?:record|add|save|write|put|move|remember)\b', text)):
             return _Intent('clarification')
@@ -270,6 +307,8 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
     operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)
     if effective(text).blocks(operation):
         return Result(operation, 'failed', error=blocked_message(text, history) or DENIED)
+    if intent.kind == 'card':
+        return None          # allowed: the chat shows a confirm card (core/notebook_proposals.py)
     if intent.kind == 'clarification':
         return Result(CREATE, 'clarification', error='State the observation and native notebook destination explicitly. '
                       'No notebook operation was executed; model text, filesystem paths and memory claims cannot confirm a save.')
@@ -277,7 +316,13 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
         return Result(CREATE, 'failed', error='Chat cannot edit or delete existing notebook entries. '
                       'Use Field Notebook → Correct selected to append a correction with a reason; the original stays intact.')
     if intent.kind == 'verify':
-        return execute(VERIFY, {}, observer=observer)
+        result = execute(VERIFY, {}, observer=observer)
+        codes = list(dict.fromkeys(m.group(0) for m in fieldlog.ID.finditer(intent.payload or '')))
+        if result.ok and codes:
+            from . import field_recall
+            for code in codes[:5]:
+                result.scope[code] = field_recall.query(words=code, limit=50)['records']
+        return result
     if intent.kind == 'read' and not intent.reference:
         entry = re.search(r'(?i)\bentry\s+([0-9a-f]{12}|#?\d+)\b', intent.payload)
         sample = re.search(r'(?i)\bsample\s+([\w.-]+)', intent.payload)

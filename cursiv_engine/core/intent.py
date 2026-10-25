@@ -134,6 +134,9 @@ class Proposal:
     def card_lines(self) -> list[str]:
         if self.action.name == "notebook.log":
             return [p.strip() for p in self.slots.get("details", "").split(";") if p.strip()]
+        if self.action.name == "notebook.correct":           # core/notebook_proposals.py
+            return [f"Record: {self.slots.get('record', '')}", self.slots.get("change", ""),
+                    "The original stays; this adds a correction linked to it."]
         if self.action.name in ("file.create", "file.append"):
             return [f"File: {self.slots.get('path', '')}", f"Text: {self.slots.get('text', '')}"]
         return [v for v in (str(x) for x in self.slots.values()) if v]
@@ -292,7 +295,8 @@ def build(action_name: str, slots: dict, said: str) -> Proposal | None:
     if action is None:
         return None
     if action.name == "notebook.log":
-        slots = {"details": _log_details(slots)}
+        from . import notebook_proposals          # a code isn't a site unless the person said so
+        slots = {"details": notebook_proposals.fix_details(_log_details(slots), said)}
     clean = {k: re.sub(r"\s+", " ", str(slots.get(k, ""))).strip().strip('"').strip() for k in action.slots}
     problems = check(action, clean, said)
     if action.name == "workspace.set" and not problems:

@@ -171,14 +171,23 @@ class ChatActionsMixin:
         """U99: plain words that might be an action -> one canonical command, from the
         LOCAL model only (never an online one), checked by core/intent.py."""
         try:
-            from cursiv_engine.core import intent
+            from cursiv_engine.core import intent, notebook_proposals
+            # Notebook corrections never need the model: Cursiv finds the record and checks the old value.
+            fixed = notebook_proposals.correction(text)
+            if fixed is not None:
+                return fixed
             if not intent.might_be_action(text):
                 return None
+            parsed = notebook_proposals.record(text)
+            if notebook_proposals.understood(parsed):
+                return parsed                      # Cursiv's parser read all of it; no model rewording
             from cursiv_engine.ui import chat_app as _ca
-            if not _ca._local_model_ready():
-                return None
-            self._signals.stage.emit("Working out what you asked for…")
-            workspace = self._cfg.get("workspace", "") if self._cfg.get("file_access") else ""
-            return intent.propose(text, lambda messages: _ca._local_llm(messages, 220), workspace)
+            proposal = None
+            if _ca._local_model_ready():
+                self._signals.stage.emit("Working out what you asked for…")
+                workspace = self._cfg.get("workspace", "") if self._cfg.get("file_access") else ""
+                proposal = intent.propose(text, lambda messages: _ca._local_llm(messages, 220), workspace)
+            # No model, or it found no action: a plain-words record still gets a card from the parser.
+            return proposal or parsed
         except Exception:
             return None

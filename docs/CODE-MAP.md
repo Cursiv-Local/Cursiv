@@ -79,6 +79,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/fieldlog.py` — the field notebook: entries, hash chain, photos, exports, reports, signatures.
 - `core/notebook_tools.py` — notebook commands from chat.
 - `core/field_recall.py` — searching the notebook and its averages.
+- `core/notebook_proposals.py` — confirm cards built by Cursiv's parser: plain-words records, codes kept out of `site`, append-only corrections ("Correct W-001 temperature from 18.6 to 18.9").
 - `core/fieldsync.py` — team sharing and phone imports, without internet.
 - `core/phone_receive.py` — receiving a phone file over local Wi-Fi.
 - `core/devicekey.py` — this installation's signing key for exports.
@@ -214,7 +215,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 
 ## Elsewhere
 - `tests/` — the suite (`-m usb` is the USB gate run before every commit).
-- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories).
+- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder).
 - `bench/` — truth benchmark and the U99 phrasing set.
 - `website/`, `cloudflare/` — cursiv.us and its deploy.
 - `installer/` — the Windows installer script.

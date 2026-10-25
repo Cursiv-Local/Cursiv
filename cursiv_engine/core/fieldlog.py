@@ -199,7 +199,7 @@ def _coord(value, low: float, high: float):
 def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
         location_accuracy_m=None, location_fix_utc: str = "",
         measurements=None, note: str = "", photos=None, corrects: str = "", reason: str = "",
-        app_version: str = "", sample_id: str = "", request_id: str = "") -> dict:
+        app_version: str = "", sample_id: str = "", request_id: str = "", project: str = "") -> dict:
     """Append one entry and return it. Coordinates are decimal degrees (WGS84)."""
     if corrects and not reason.strip():
         raise ValueError("a correction needs a reason")
@@ -212,6 +212,9 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
     sample_id = (sample_id or "").strip()
     if sample_id and not _SAMPLE_OK.fullmatch(sample_id):
         raise ValueError("a sample ID can use letters, numbers, '-', '_' and '.' (up to 40)")
+    project = (project or "").strip()
+    if project and not _SAMPLE_OK.fullmatch(project):
+        raise ValueError("a project ID can use letters, numbers, '-', '_' and '.' (up to 40)")
     if not (meas or note.strip() or photos or sample_id):
         raise ValueError("an entry needs at least a measurement, a note or a photo")
     stored, infos = [], []
@@ -256,6 +259,10 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
         }
         if infos:
             entry["photo_info"] = infos
+        if project:
+            # Optional (U100), like chat_request_id: only entries with a project carry the key,
+            # so every older entry keeps its exact bytes and fingerprint.
+            entry["project"] = project
         if request_id:
             # Optional metadata, included in the existing fingerprint. Old records
             # keep their schema and bytes; retries never edit the append-only log.
@@ -263,7 +270,8 @@ def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_sour
             previous = next((e for e in existing if e.get("chat_request_id") == request_id), None)
             if previous is not None:
                 fields = ("observer", "site", "lat", "lon", "location_source", "location_accuracy_m",
-                          "location_fix_utc", "measurements", "note", "photos", "sample_id", "corrects", "reason")
+                          "location_fix_utc", "measurements", "note", "photos", "sample_id", "corrects", "reason",
+                          "project")
                 if any(previous.get(k) != entry.get(k) for k in fields):
                     raise ValueError("notebook request was already used with different observation details")
                 return previous
@@ -313,10 +321,11 @@ def correct(entry_id: str, reason: str, **fields) -> dict:
     if old is None:
         raise ValueError(f"no entry {entry_id} to correct")
     base = {k: old.get(k) for k in ("observer", "site", "lat", "lon", "location_source", "measurements",
-                                    "note", "photos", "sample_id", "location_accuracy_m", "location_fix_utc")}
+                                    "note", "photos", "sample_id", "location_accuracy_m", "location_fix_utc", "project")}
     base["location_fix_utc"] = base.get("location_fix_utc") or ""
     base["photos"] = base.get("photos") or []
     base["sample_id"] = base.get("sample_id") or ""
+    base["project"] = base.get("project") or ""
     base.update(fields)
     return add(**base, corrects=entry_id, reason=reason)
 
@@ -376,7 +385,7 @@ def record_problems(e) -> list[str]:
     for k in ("id", "recorded_utc", "recorded_local", "observer", "site", "note", "reason", "device", "prev", "hash"):
         if not isinstance(e.get(k), str):
             p.append(f"{k} is missing or not text")
-    for k in ("location_source", "app_version", "sample_id", "location_fix_utc"):
+    for k in ("location_source", "app_version", "sample_id", "location_fix_utc", "project"):
         if k in e and not isinstance(e[k], str):
             p.append(f"{k} is not text")
     if not (isinstance(e.get("seq"), int) and not isinstance(e.get("seq"), bool) and e["seq"] >= 1):
@@ -418,6 +427,9 @@ def record_problems(e) -> list[str]:
     sid = e.get("sample_id", "")
     if isinstance(sid, str) and sid and not _SAMPLE_OK.fullmatch(sid):
         p.append(f"sample ID {sid[:40]!r} isn't valid")
+    proj = e.get("project", "")
+    if isinstance(proj, str) and proj and not _SAMPLE_OK.fullmatch(proj):
+        p.append(f"project ID {proj[:40]!r} isn't valid")
     return p
 
 
@@ -489,7 +501,7 @@ def labels_html(rows: list[dict]) -> str:
 
 CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "sample_id", "site", "lat", "lon",
               "location_source", "measurement", "value", "unit", "note", "photos", "corrects", "reason",
-              "fingerprint", "device", "location_accuracy_m")
+              "fingerprint", "device", "location_accuracy_m", "project")
 
 
 def _is_export(folder: Path) -> bool:
@@ -551,7 +563,7 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
                       e["location_source"]]
             acc = e.get("location_accuracy_m")
             tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"],
-                    e.get("device", ""), "" if acc is None else acc]
+                    e.get("device", ""), "" if acc is None else acc, e.get("project", "")]
             for m in e["measurements"] or [{"name": "", "value": "", "unit": ""}]:
                 w.writerow(common + [m["name"], m["value"], m["unit"]] + tail)
 
@@ -803,9 +815,22 @@ def report_html(rows: list[dict], title: str = "Field report", all_entries: list
 
 # ── Typed entries: "log ..." ───────────────────────────────────────────────
 
-_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|observation|observations|lat|lon|latitude|longitude|sample|sample id)\s*[:=]\s*(.*)$")
+_FIELD = re.compile(r"(?i)^\s*(site|observer|note|notes|observation|observations|lat|lon|latitude|longitude|sample|sample id|project)\s*[:=]\s*(.*)$")
 _PAIR = re.compile(r"^\s*(-?\d{1,2}\.\d+)\s*,\s*(-?\d{1,3}\.\d+)\s*$")
-_MEASURE = re.compile(r"^\s*([A-Za-z][\w ./()%-]*?)\s*[:=]?\s*(-?\d+(?:\.\d+)?)\s*([^\d\s][^;]*)?\s*$")
+# A minus sign only counts when it's separated from the name ("temp -1.5 C", "temp: -1.5"),
+# so an identifier like ORION-742 or W-001 is never read as ORION = -742 (U100 audit).
+_MEASURE = re.compile(r"^\s*([A-Za-z][\w ./()%-]*?)(?:\s*[:=]\s*|\s+|(?=\d))(-?\d+(?:\.\d+)?)\s*([^\d\s][^;]*)?\s*$")
+# Project, sample and site codes: letters then digits, e.g. ORION-742, W-001, NC_12, Q1.
+ID = re.compile(r"(?:[A-Za-z]{1,12}[-_]\d{1,6}|[A-Z]{1,6}\d{2,6})(?:[-_.]?[A-Za-z0-9]{1,8}){0,3}")
+_LABELLED = re.compile(r"(?i)^\s*(sample|project)\s+(?:id\s+)?(" + ID.pattern + r")\s*$")
+_SITE_WORDS = re.compile(r"^\s*(?i:site)\s+([A-Z][\w'.-]*(?:\s+[A-Z][\w'.-]*){0,5})\s*$")
+_BARE_TEMP = re.compile(r"^\s*(-?\d+(?:\.\d+)?)\s*(°\s?[CF])\s*$")
+_TIME = re.compile(r"\b\d{1,2}:\d{2}(?::\d{2})?\b")
+
+
+def _unit_ok(unit: str) -> bool:
+    """A unit is short text ("mg/L", "°C", "NTU"), not the rest of a sentence."""
+    return len(unit) <= 12 and not re.search(r"[,;]|\s\w+\s", unit)
 
 
 def _parts(text: str):
@@ -823,7 +848,10 @@ def _parts(text: str):
                 remaining = line[index + 1:]
                 candidate = remaining.split(',', 1)[0].strip()
                 coordinate = re.match(r'^\s*-?\d{1,2}\.\d+\s*,\s*-?\d{1,3}\.\d+\s*(?=,|$)', remaining)
-                if _FIELD.fullmatch(candidate) or _MEASURE.fullmatch(candidate) or coordinate:
+                bare = candidate.rstrip('.')
+                if (_FIELD.fullmatch(candidate) or _MEASURE.fullmatch(candidate) or coordinate
+                        or _LABELLED.fullmatch(bare) or _SITE_WORDS.fullmatch(bare) or _BARE_TEMP.fullmatch(bare)
+                        or ID.fullmatch(bare) or _TIME.search(bare)):
                     yield line[start:index]
                     start = index + 1
         yield line[start:]
@@ -833,11 +861,29 @@ def parse(text: str) -> dict:
     """'site: North transect; water temp 12.4 C; pH 7.2; 44.1234, -71.5678; note: turbid'
     -> fields for add(). Parts use ';', newlines or explicit comma-delimited fields. Anything that isn't a
     field, a coordinate pair or 'name number unit' goes into the note, word for word."""
-    out = {"site": "", "observer": "", "lat": None, "lon": None, "measurements": [], "note": "", "sample_id": ""}
+    out = {"site": "", "observer": "", "lat": None, "lon": None, "measurements": [], "note": "", "sample_id": "",
+           "project": ""}
     notes = []
     for part in _parts(text or ''):
         part = part.strip()
         if not part:
+            continue
+        core = part.rstrip(".")
+        m = _LABELLED.match(core)                       # "sample W-001", "project ORION-742"
+        if m:
+            out["sample_id" if m.group(1).lower() == "sample" else "project"] = m.group(2)
+            continue
+        m = _SITE_WORDS.match(core)                     # "site Willow Basin"
+        if m:
+            out["site"] = m.group(1)
+            continue
+        m = _BARE_TEMP.match(core)                      # "18.6°C" on its own is a temperature
+        if m:
+            out["measurements"].append({"name": "temperature", "value": m.group(1),
+                                        "unit": m.group(2).replace(" ", "")})
+            continue
+        if (ID.fullmatch(core) or _TIME.search(core)) and not _FIELD.match(core):   # kept as written, never guessed
+            notes.append(core)
             continue
         m = _FIELD.match(part)
         if m:
@@ -859,7 +905,7 @@ def parse(text: str) -> dict:
             out["lat"], out["lon"] = float(m.group(1)), float(m.group(2))
             continue
         m = _MEASURE.match(part)
-        if m:
+        if m and _unit_ok((m.group(3) or "").strip()):
             out["measurements"].append({"name": m.group(1).strip(), "value": m.group(2),
                                         "unit": (m.group(3) or "").strip()})
             continue
@@ -870,6 +916,8 @@ def parse(text: str) -> dict:
 
 def summary(e: dict) -> str:
     bits = [f"#{e['seq']}", e["recorded_local"].replace("T", " ")]
+    if e.get("project"):
+        bits.append(f"project {e['project']}")
     if e.get("sample_id"):
         bits.append(f"sample {e['sample_id']}")
     if e["site"]:
@@ -914,6 +962,34 @@ def command(text: str, observer: str = "") -> str | None:
         if not rows:
             return "The field log is empty. Add an entry with: log site: …; water temp 12.4 C; note: …"
         return "Field log (latest 15):\n" + "\n".join(summary(e) for e in rows[-15:])
+    # "field log correct <record> <measurement> <value> [unit] :: <reason>" (the correction card's
+    # command, core/notebook_proposals.py): appends a correction; the original entry stays.
+    m = re.match(r"(?is)^field ?log correct\s+([0-9a-f]{12})\s+(.+?)\s*::\s*(.+)$", t)
+    if m:
+        entry_id, change, reason = m.group(1), m.group(2).strip(), m.group(3).strip()
+        new = _MEASURE.match(change)
+        old = next((e for e in current() if e["id"] == entry_id), None)
+        if old is None:
+            return f"Not corrected: there's no current entry {entry_id} (it may already have been corrected)."
+        if not new:
+            return "Not corrected: give the measurement and its new value, e.g. temperature 18.9 °C."
+        name, value, unit = new.group(1).strip(), new.group(2), (new.group(3) or "").strip()
+        measurements = [dict(x) for x in old.get("measurements") or []]
+        hit = [x for x in measurements if x["name"].casefold() == name.casefold()]
+        if len(hit) != 1:
+            return f"Not corrected: entry {entry_id} has no single {name!r} reading."
+        hit[0].update(value=value, unit=unit or hit[0].get("unit", ""))
+        hit[0].pop("number", None)
+        try:
+            e = correct(entry_id, reason, measurements=[{k: x[k] for k in ("name", "value", "unit")} for x in measurements])
+            actual = next((row for row in entries() if row.get("id") == e.get("id")), None)
+            if actual != e or verify():
+                return "Not confirmed: the correction's read-back or chain check failed. Inspect the notebook before retrying."
+        except (OSError, ValueError) as exc:
+            return f"Not corrected: {exc}."
+        from .feedback import logged_receipt
+        return (logged_receipt(e) + f"\nCorrects {entry_id} ({name}: {next(x['value'] for x in old['measurements'] if x['name'].casefold() == name.casefold())}"
+                f" → {value}); the original entry is unchanged. Reason: {reason}")
     m = re.match(r"(?i)^field ?log sample\s+(\S+)$", t)
     if m:
         hist = sample_history(m.group(1))
