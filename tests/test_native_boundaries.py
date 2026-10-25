@@ -45,12 +45,15 @@ def test_blocked_actions_stop_before_any_backend_model_or_formation(pipeline, mo
     monkeypatch.setattr(pipeline, '_chat_stream', forbidden('model'))
     marker = tmp_path / 'unchanged.txt'
     marker.write_text('original')
-    before = {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+    # Files by content, folders by name: reading a folder's bytes is "Permission denied" on Windows,
+    # which failed this test whenever the setup had made a memory/ folder here first.
+    snapshot = lambda: {p.name: (p.read_bytes() if p.is_file() else 'folder') for p in tmp_path.iterdir()}
+    before = snapshot()
     out = final_reply(pipeline, question, force_provider=provider, root_path=str(tmp_path), file_access=True)
     assert not calls
     assert 'No action was executed' in out
     assert 'model knowledge' not in out and len(out) < 550
-    assert before == {p.name: p.read_bytes() for p in tmp_path.iterdir()}
+    assert before == snapshot()
 
 
 @pytest.mark.parametrize('question,expected', [
