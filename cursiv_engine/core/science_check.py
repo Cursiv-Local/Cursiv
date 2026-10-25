@@ -62,6 +62,8 @@ def saturation_answer(question: str) -> str | None:
     q = question or ""
     if not (_DO.search(q) and re.search(r"(?i)saturat|solubil|how much oxygen can", q)):
         return None
+    if re.search(r"(?i)\bpercent\b|%", q) and re.search(r"\d\s*mg\s*/\s*L", q, re.I):
+        return None          # "7.8 mg/L ... what percent saturation?" is core/fieldsci.py do_percent (U101)
     m = re.search(r"(-?\d+(?:\.\d+)?)\s*°?\s*C\b", q)
     if not m:
         return None

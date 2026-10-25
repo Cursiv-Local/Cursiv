@@ -145,3 +145,35 @@ def test_blocked_modules_already_loaded_by_the_app_are_still_refused(tmp_path):
     out = subprocess.run([sys.executable, '-I', '-c', script], capture_output=True, text=True, timeout=60)
     reply = json.loads(out.stdout.strip().splitlines()[-1])
     assert not reply['ok'] and 'plugins may not import socket' in reply['error'], (reply, out.stderr[-500:])
+
+
+# ── Codex test runs use the same guard (U101) ────────────────────────────────
+
+def test_codex_test_runs_still_work_for_ordinary_code():
+    from cursiv_engine.coding import runner
+    ok, out = runner.run("import math\nopen('out.txt', 'w').write('fine')\nprint(open('out.txt').read(), round(math.pi, 2))")
+    assert ok and "fine 3.14" in out
+
+
+def test_codex_test_runs_refuse_what_the_word_check_misses(tmp_path, monkeypatch):
+    # The word check only blocks "os.system", "socket", "__import__(", absolute paths written plainly;
+    # these get past it.
+    from cursiv_engine.coding import runner
+    outside = tmp_path / "private.txt"           # a file outside the run's own folder
+    outside.write_text("secret", encoding="utf-8")
+    monkeypatch.setenv("CURSIV_TEST_FILE", str(outside))
+    load = "import builtins\nload = getattr(builtins, '__imp' + 'ort__')\n"
+    for code in (load + "m = load('o' + 's')\nm.system('echo hacked')",
+                 load + "s = load('sock' + 'et')",
+                 "import importlib\nimportlib.import_module('subpro' + 'cess')",
+                 "import os\nprint(open(os.environ['CURSIV_TEST_FILE']).read())"):
+        assert runner.check(code)[0], code              # the word check lets it through ...
+        ok, out = runner.run(code)
+        assert not ok and out.startswith("SANDBOX: "), (code, out)   # ... the guard doesn't
+
+
+def test_a_refused_test_run_is_never_sent_back_to_the_model_to_fix():
+    from cursiv_engine.coding import runner
+    answer = "```python\nimport builtins\nm = getattr(builtins, '__imp' + 'ort__')('o' + 's')\nm.system('echo hacked')\n```"
+    out = "".join(runner.run_and_fix(answer, lambda code, err: (_ for _ in ()).throw(AssertionError("asked to fix"))))
+    assert "Test run stopped" in out and "don't allow" in out

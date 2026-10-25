@@ -95,8 +95,25 @@ def append_exchange(user_msg: str, ai_msg: str, model: str = "unknown") -> None:
     _append_memory_run(user_msg, ai_msg, model)
 
 
+_PROBLEMS: dict[str, dict] = {}       # file name -> {"damaged": n, "unreadable": "..."}
+
+
+def problems() -> list[str]:
+    """What the last loads couldn't use (U101 review: skipped without a word, and an unreadable day
+    looked like a day with nothing in it). Damaged lines stay in the file; appends never rewrite it."""
+    out = []
+    for name, p in sorted(_PROBLEMS.items()):
+        if p.get("unreadable"):
+            out.append(f"Session history {name} couldn't be read ({p['unreadable']}).")
+        elif p.get("damaged"):
+            out.append(f"Session history {name}: {p['damaged']} damaged line(s) not used; kept in the file.")
+    return out
+
+
 def _load_file(path: Path) -> list[dict]:
     entries: list[dict] = []
+    damaged = 0
+    _PROBLEMS.pop(path.name, None)
     try:
         with private_store.lines(path) as f:
             for line in f:
@@ -104,12 +121,16 @@ def _load_file(path: Path) -> list[dict]:
                 if line:
                     try:
                         entries.append(json.loads(line))
-                    except Exception:
-                        pass
+                    except ValueError:
+                        damaged += 1
     except vault.VaultError:
         raise
-    except Exception:
-        pass
+    except (OSError, UnicodeError) as exc:
+        _PROBLEMS[path.name] = {"unreadable": f"{type(exc).__name__}: {exc}"[:160]}
+        _failed("session_log_read_failed", exc)
+        return []
+    if damaged:
+        _PROBLEMS[path.name] = {"damaged": damaged}
     return entries
 
 

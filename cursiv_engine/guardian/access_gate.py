@@ -63,18 +63,52 @@ def _check_bcrypt() -> None:
         )
 
 
+class AccountsUnreadable(OSError):
+    """accounts.json and its backup are both damaged. Never treated as "no accounts": that would
+    let the app offer Create Account over an existing setup."""
+
+
+def _write(path: Path, data: bytes) -> None:
+    """Atomic (old file or new, never half of one) and plain: these are read before the vault is
+    unlocked, so they can't be encrypted with it (U101 review: a power cut mid-write could lose them)."""
+    from cursiv_engine.core import atomic
+    atomic.write_bytes(path, data, protect=False)
+
+
+def _backup() -> Path:
+    return _ACCOUNTS_FILE.with_name(_ACCOUNTS_FILE.name + ".bak")
+
+
+def _parse(path: Path) -> dict:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict) or not all(isinstance(v, dict) and "pw_hash" in v for v in value.values()):
+        raise ValueError("not an accounts file")
+    return value
+
+
 def _load_accounts() -> dict:
     if not _ACCOUNTS_FILE.exists():
         return {}
     try:
-        return json.loads(_ACCOUNTS_FILE.read_text(encoding="utf-8"))
-    except Exception:
-        return {}
+        return _parse(_ACCOUNTS_FILE)
+    except (OSError, ValueError) as first:
+        # Damaged: use the last good copy, and put it back so the next save starts from it.
+        try:
+            accounts = _parse(_backup())
+        except (OSError, ValueError):
+            raise AccountsUnreadable(f"The accounts file is damaged ({first}) and its backup can't be read. "
+                                     f"Nothing was changed. Files: {_ACCOUNTS_FILE}") from first
+        _write(_ACCOUNTS_FILE, json.dumps(accounts, indent=2).encode("utf-8"))
+        return accounts
 
 
 def _save_accounts(accounts: dict) -> None:
+    """The file, then the same contents as its backup: if the file is ever damaged, the backup has
+    every account (a crash between the two leaves the backup one save behind, never empty)."""
     _ensure()
-    _ACCOUNTS_FILE.write_text(json.dumps(accounts, indent=2), encoding="utf-8")
+    data = json.dumps(accounts, indent=2).encode("utf-8")
+    _write(_ACCOUNTS_FILE, data)
+    _write(_backup(), data)
 
 
 # ── Public API ─────────────────────────────────────────────────────────────────
@@ -92,9 +126,9 @@ def setup_credentials(username: str, password: str) -> None:
     hashed = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt(rounds=12))
     username_hash = hashlib.sha256(username.encode("utf-8")).hexdigest()
 
-    _HASH_FILE.write_bytes(hashed)
-    _META_FILE.write_text(username_hash, encoding="utf-8")
-    _FLAG_FILE.write_text(username_hash, encoding="utf-8")
+    _write(_HASH_FILE, hashed)
+    _write(_META_FILE, username_hash.encode("utf-8"))
+    _write(_FLAG_FILE, username_hash.encode("utf-8"))
 
 
 def add_account(username: str, password: str) -> bool:
@@ -156,8 +190,14 @@ def verify_credentials(username: str, password: str) -> bool:
 
 
 def is_setup_complete() -> bool:
-    """True if any credentials (primary or additional) have been configured."""
-    return _FLAG_FILE.exists() or bool(_load_accounts())
+    """True if any credentials (primary or additional) have been configured. A damaged accounts file
+    still counts: offering Create Account then would replace someone's existing setup."""
+    if _FLAG_FILE.exists():
+        return True
+    try:
+        return bool(_load_accounts())
+    except AccountsUnreadable:
+        return True
 
 
 def username_exists(username: str) -> bool:
@@ -185,7 +225,7 @@ def reset_password(new_password: str, username: str | None = None) -> None:
     if username is None or is_primary(username):
         if username is None and not _primary_hash():
             raise ValueError("There's no account to reset.")
-        _HASH_FILE.write_bytes(hashed)
+        _write(_HASH_FILE, hashed)
         return
     accounts = _load_accounts()
     key = _uhash(username)
@@ -197,7 +237,7 @@ def reset_password(new_password: str, username: str | None = None) -> None:
 
 def reset_credentials() -> None:
     """Delete all stored credential files, returning the app to first-run state."""
-    for f in (_HASH_FILE, _META_FILE, _FLAG_FILE, _ACCOUNTS_FILE):
+    for f in (_HASH_FILE, _META_FILE, _FLAG_FILE, _ACCOUNTS_FILE, _backup()):   # the backup too: no old accounts back
         try:
             f.unlink(missing_ok=True)
         except Exception:
@@ -261,9 +301,9 @@ def remove_account(username: str) -> bool:
     heir = min((h for h in accounts if h != target),
                key=lambda h: accounts[h].get("created", ""))
     _ensure()
-    _HASH_FILE.write_bytes(base64.b64decode(accounts[heir]["pw_hash"]))
-    _META_FILE.write_text(heir, encoding="utf-8")
-    _FLAG_FILE.write_text(heir, encoding="utf-8")
+    _write(_HASH_FILE, base64.b64decode(accounts[heir]["pw_hash"]))
+    _write(_META_FILE, heir.encode("utf-8"))
+    _write(_FLAG_FILE, heir.encode("utf-8"))
     accounts.pop(heir, None)
     accounts.pop(target, None)
     _save_accounts(accounts)

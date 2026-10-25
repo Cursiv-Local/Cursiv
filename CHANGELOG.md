@@ -12,6 +12,20 @@
   cover the question instead of guessing.
 - Numbers and units in a profile's answer that aren't in your records get a note under it.
 - Editing or teaching a starter makes your own copy; `agents ask` uses at most three of your own agents.
+- Field formulas are worked out by code: conductivity corrected to 25 °C (APHA 2510 B), discharge (with the
+  0.85 surface-float coefficient), percent oxygen saturation, µS/cm and mS/cm, molar solutions. On a benchmark
+  of 14 field calculations the local model went from 9 right to 14 (0 of 4 trick questions calculated).
+- Code that Codex test-runs now runs under the same guard as plugins: no network, programs or files outside its
+  own folder, even when the code tries to hide it. A refused run is never sent back to be "fixed".
+- The test suite also runs on Linux in CI.
+- Login files are written so a power cut can't half-write them, the accounts list keeps a backup, and a
+  damaged one is restored from it or reported. It's never read as "no accounts" (which would offer Create
+  Account over an existing setup).
+- Phone uploads are kept encrypted on an encrypted computer; one too big to encrypt goes to its own folder
+  and Cursiv says so each time you receive. Imports are unpacked encrypted inside the notebook folder, never
+  in the system's temp folder.
+- Damaged lines in saved notes or session history are kept and now reported in `status`, instead of being
+  skipped without a word.
 
 ## 3.14-U100 — Records you can trust, memory you can see (2026-10-25)
 

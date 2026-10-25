@@ -32,10 +32,15 @@ NAMES = frozenset(('memory.json', 'embeddings_cache.json', 'strands.jsonl', 'ter
 def notebook_covered(rest: tuple) -> bool:
     """Inside fieldlog/ (U98): the observation log, its photos and other devices' logs.
     Reports, exports and the public team keys and manifests are made to be handed to
-    someone, so they stay readable. A phone upload in received/ can exceed the 64 MB
-    envelope limit; once imported it is deleted when encryption is on (phone_receive)."""
+    someone, so they stay readable. A phone upload in received/ is encrypted (U101); one over
+    the 64 MB envelope limit goes to received-large/, readable, and Cursiv says so. Imports are
+    unpacked into .import-<id>/ here, encrypted, never into the system's temp folder."""
     if not rest:
         return False
+    if rest[0].startswith('.import-'):
+        return True
+    if rest[0] == 'received':
+        return len(rest) == 2
     if len(rest) == 1:
         return rest[0].lstrip('.').startswith('observations.jsonl')
     if rest[0] == 'photos':
