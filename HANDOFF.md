@@ -26,6 +26,13 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
   (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
 - Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
 
+## U101 starter profiles (Claude, 2026-10-25, unreleased, branch `claude/u101-profiles`)
+Profiles are markdown files in `agents/starters/`; `agents/profile_context.py` fetches what `reads:` allows
+(never a tool call); `answer_note` flags numbers/units not in the records. Live on qwen3:4b: @checker found all
+4 planted problems; @protocol gave both holding times with pages 3/3 after the "every condition" rule; the
+Report writer invented a unit, methods and a model name before the code check and rules were added. No First
+aid profile (medical stays with the reviewed reference). Owner rule: no self-editing agents.
+
 ## U100 published (Claude, 2026-10-25)
 Tag `v3.14-U100` = `7c297d5` (PR #24). First three-digit U number: the updater compares
 versions as numbers (`launcher/cursiv_launcher.py` `_version_key`), so U100 > U99.

@@ -1,5 +1,18 @@
 # Changelog
 
+## 3.14-U101 — Starter profiles (unreleased)
+
+- Five profiles come with Cursiv, ready to use: @field (Field assistant), @checker (Data checker), @report
+  (Report writer), @protocol (Protocol helper), @writer (Writing helper). Each is a markdown file
+  (`cursiv_engine/agents/starters/`); its `reads:` line says what Cursiv's code shows it (your notebook,
+  your documents, a calculation), read only. No profile can save, change or delete anything.
+- The Data checker's findings (duplicate sample IDs, missing units, values that aren't numbers, entries with
+  no site or sample) are worked out by code; the model only explains them.
+- The Protocol helper answers only from your imported documents, with pages, and says so when they don't
+  cover the question instead of guessing.
+- Numbers and units in a profile's answer that aren't in your records get a note under it.
+- Editing or teaching a starter makes your own copy; `agents ask` uses at most three of your own agents.
+
 ## 3.14-U100 — Records you can trust, memory you can see (2026-10-25)
 
 - Session notes: each conversation keeps a short note (goal, what was done from Cursiv's own records,

@@ -185,7 +185,7 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
 
         def stream():
             views = []
-            for a in agents[:6]:
+            for a in agents[:3]:              # each one is a model pass; three is the limit
                 yield f"\n**@{a['name']}**\n"
                 gen, _u = runtime._cascade_stream(custom.messages_for(a, question + "\n\n(Answer in under 150 words, "
                                           "from your specialty.)", [], mem), cfg, max_tokens=500)
@@ -202,20 +202,39 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
                      {"role": "user", "content": f"Question: {question}\n\n" + "\n\n".join(views)}]
             gen, _u = runtime._cascade_stream(synth, cfg, max_tokens=700)
             yield from gen
-        return runtime.StreamResult(f"Your agents — {len(agents[:6])} answering", stream(), None)
+        return runtime.StreamResult(f"Your agents — {len(agents[:3])} answering", stream(), None)
 
     m = _re.match(r"(?is)^(?:@|agent\s+(?:ask\s+)?@?)([\w-]+)[\s,:]+(.+)$", t)
     if m:
         a = custom.load(m.group(1))
         if not a:
-            names = ", ".join("@" + x["name"] for x in custom.all_agents()) or "none yet"
+            names = ", ".join("@" + x["name"] for x in custom.everyone()) or "none yet"
             return runtime.TextResult(f"There's no agent called {custom.clean_name(m.group(1))}. Your agents: {names}.\n"
                               f"Make one: agent new {custom.clean_name(m.group(1)) or 'name'}: <what it should do>")
         q = m.group(2).strip()
         if custom.asks_about_permissions(q):
             # What an agent may touch is decided by Cursiv's code, so Cursiv answers it, not the agent.
             return runtime.TextResult(custom.permissions_answer(a))
-        gen, _u = runtime._cascade_stream(custom.messages_for(a, q, history, _memory(q)), cfg, max_tokens=3000)
+        # U101: what a profile may read is fetched by Cursiv's code, read only (agents/profile_context.py).
+        from cursiv_engine.agents import profile_context
+        try:
+            supplied, own_reply = profile_context.context(a, q)
+        except Exception as exc:
+            return runtime.TextResult(f"@{a['name']} couldn't be given its records ({type(exc).__name__}: {exc}). "
+                                      "Nothing was answered from them.")
+        if own_reply:
+            return runtime.TextResult(own_reply)
+        raw, _u = runtime._cascade_stream(custom.messages_for(a, q, history, _memory(q), supplied), cfg, max_tokens=3000)
+
+        def gen():
+            parts = []
+            for chunk in raw:
+                parts.append(chunk)
+                yield chunk
+            note = profile_context.answer_note("".join(parts), supplied, a)
+            if note:
+                yield "\n\n" + note
+        gen = gen()
         custom.note_use(a)
         return runtime.StreamResult(f"@{a['name']}", gen, None)
     if t.startswith("@"):

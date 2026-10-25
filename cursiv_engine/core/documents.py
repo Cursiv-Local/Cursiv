@@ -172,16 +172,26 @@ def _passages() -> list[Passage]:
 _passages.cache = None
 
 
-def search(question: str, limit: int = 3, min_cover: float = 0.4) -> list[Passage]:
+def _stem(word: str) -> str:
+    """'holding' ~ 'hold', 'samples' ~ 'sample', 'calibrated' ~ 'calibrat'. Only for stem=True searches."""
+    for end in ("ing", "ed", "es", "s"):
+        if len(word) > len(end) + 3 and word.endswith(end):
+            return word[: -len(end)]
+    return word
+
+
+def search(question: str, limit: int = 3, min_cover: float = 0.4, *, stem: bool = False) -> list[Passage]:
     """The best passages for the question (BM25 order), or [] when nothing matches well.
     A passage counts only if it has at least two of the question's words and at least
     min_cover of them; BM25 scores on their own are too small to compare with a
-    library of one or two documents."""
-    q = set(_words(question))
+    library of one or two documents. stem=True (starter profiles, U101) lets word endings
+    differ: "how long can I hold a nitrate sample" matched no "holding time for nitrate samples"."""
+    words = (lambda t: [_stem(w) for w in _words(t)]) if stem else _words
+    q = set(words(question))
     passages = _passages()
     if not q or not passages:
         return []
-    docs = [_words(p.text) for p in passages]
+    docs = [words(p.text) for p in passages]
     avg = sum(len(d) for d in docs) / len(docs) or 1
     df = {w: sum(1 for d in docs if w in d) for w in q}
     n = len(docs)
