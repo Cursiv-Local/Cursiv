@@ -69,7 +69,7 @@ def test_command_domain_order_preserves_intentional_chat_fallback(monkeypatch):
     import command_dispatch as dispatch
     from cursiv_engine.core.command_api import UNHANDLED
     called = []
-    for name in ('system', 'research', 'credentials', 'extensions', 'notes', 'services', 'postal', 'images'):
+    for name in ('system', 'research', 'credentials', 'extensions', 'notes', 'services', 'images'):
         module = getattr(dispatch, '_' + name)
         monkeypatch.setattr(module, 'handle', lambda *a, name=name: called.append(name) or
                             (None if name == 'research' else UNHANDLED))

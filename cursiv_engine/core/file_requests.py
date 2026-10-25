@@ -36,7 +36,13 @@ def _write(text):
     short = re.fullmatch(r'(?is)append to\s+(.+)', text)
     if short and (reference(short[1]) or re.search(r'[\\/]|\.[a-z0-9]{1,8}$', _unquote(short[1]), re.I)):
         return Request('append', _unquote(short[1]), options=dict(append_line=True), content_ref='the new measurement')
-    m = re.fullmatch(r'(?is)(?:append|add)\s+(?:the line\s+)?(.+?)\s+to\s+(.+)', text)
+    # "Add a second line to notes.txt saying Site B, 13.8 C"
+    m = re.fullmatch(r'(?is)(?:append|add|write)\s+(?:(?:a|an|another|one more)\s+)?(?:(?:second|third|new|next|last|final)\s+)?'
+                     r'line\s+(?:to|at the end of|onto)\s+(.+?)\s+(?:saying|that says|which says|reading|with(?: the text)?)\s*:?\s+(.+)', text)
+    if m:
+        m = (None, m[2], m[1])
+    else:
+        m = re.fullmatch(r'(?is)(?:append|add)\s+(?:the line\s+)?(.+?)\s+to\s+(.+)', text)
     if m:
         payload, target = m[1].strip(), m[2].strip().rstrip('?')
         if not (reference(target) or re.search(r'[\\/]|\.[a-z0-9]{1,8}$', _unquote(target), re.I)):
@@ -82,6 +88,13 @@ def parse(text):
     # An indirect request for credentials is denied, never resolved by searching.
     if re.match(r'(?i)^read\b', t) and re.search(r'(?i)\b(?:private key|device key|password|credentials?)\b', t):
         return Request('denied')
+    # Cursiv never deletes files; say so instead of letting the model pretend it did.
+    m = re.fullmatch(r'(?is)(?:delete|remove|erase|trash)\s+(?:the\s+)?(?:file\s+)?(.+?)[.!?]?', t)
+    if m:
+        target = _unquote(m[1].strip())
+        target = re.sub(r'(?i)\s+(?:from|in) (?:the |my )?(?:authorized )?workspace$', '', target)
+        if re.search(r'[\\/]|\.[a-z0-9]{1,8}$', target, re.I) or re.fullmatch(r'(?i)(?:that|this|the) file', target):
+            return Request('delete', target)
     write = _write(t)
     if write:
         return write

@@ -99,6 +99,19 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
     duration = re.fullmatch(r'(?is)(?:for )?how long\b[^;\n?!]{1,210}\blast\b[^;\n?!]*[?!.]?', q)
     comparison = re.fullmatch(r'(?i)is \d+ (?:out of|of) \d+ (?:better|higher|lower|worse) than '
                               r'\d+ (?:out of|of) \d+[?!.]?', q)
+    # A plain conversion or speed × time question is answered by the calculator
+    # itself; the model added "verified" and "from your field log" claims to these.
+    from .fieldcalc import _NUM, _U
+    conversion = re.fullmatch(rf"(?i)(?:please\s+)?(?:(?:convert|what(?:'s| is))\s+)?{_NUM}\s*{_U}\s+(?:to|in|into)\s+{_U}"
+                              rf"(?:\s+(?:exactly|without rounding))?|(?:please\s+)?how many\s+{_U}\s+(?:are\s+)?(?:in|is)\s+{_NUM}\s*{_U}",
+                              q.rstrip('?.! '))
+    travel = re.fullmatch(r"(?i)(?:if\s+)?(?:i|we|you)\s+(?:walk|hike|drive|cycle|bike|run|ride|paddle|travel|go)\s+"
+                          r"[^;\n]{1,100}\bhow far\b[^;\n]{0,40}[?.!]?", q)
+    if calculations and turn_policy.effective(text).inspect and (conversion or travel):
+        from . import fieldcalc
+        worked = fieldcalc.work_out(q)
+        if worked and worked.tool in ('units', 'travel') and not worked.lead:
+            return worked.statement + f'\n\n*[Sources: Cursiv calculation ({worked.tool}; no AI model)]*'
     if calculations and turn_policy.effective(text).inspect and len(q) <= 240 and (duration or comparison):
         from . import calc
         worked = calc.work_out(q)

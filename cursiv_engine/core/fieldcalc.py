@@ -33,7 +33,9 @@ def _fmt(v: float, places: int = 4) -> str:
 # factor to the base unit of each kind
 _UNITS = {
     "length": {"m": 1, "meter": 1, "meters": 1, "metre": 1, "metres": 1, "km": 1000, "kilometer": 1000,
-               "kilometers": 1000, "cm": 0.01, "centimeters": 0.01, "mm": 0.001, "millimeters": 0.001,
+               "kilometers": 1000, "kilometre": 1000, "kilometres": 1000, "cm": 0.01, "centimeters": 0.01,
+               "centimetre": 0.01, "centimetres": 0.01, "mm": 0.001, "millimeters": 0.001,
+               "millimetre": 0.001, "millimetres": 0.001,
                "ft": 0.3048, "foot": 0.3048, "feet": 0.3048, "in": 0.0254, "inch": 0.0254, "inches": 0.0254,
                "mi": 1609.344, "mile": 1609.344, "miles": 1609.344, "yd": 0.9144, "yard": 0.9144, "yards": 0.9144,
                "nmi": 1852, "nautical mile": 1852, "nautical miles": 1852},
@@ -452,11 +454,38 @@ def lightning_wait(question: str) -> Result | None:
                        "Any new thunder restarts it.")
 
 
+# ── Speed × time ───────────────────────────────────────────────────────────
+# "If I walk 4.5 km/h for 2 hours 20 minutes, how far do I go?"
+_SPEED_UNITS = {"km/h": "km", "kph": "km", "kmh": "km", "mph": "miles", "m/s": "m"}
+_TRAVEL = re.compile(r"(?i)\b(?:at\s+)?(\d+(?:\.\d+)?)\s*(km/h|kph|kmh|mph|m/s)\s+for\s+"
+                     r"(?:(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)\b)?\s*(?:and\s+)?"
+                     r"(?:(\d+(?:\.\d+)?)\s*(?:minutes?|mins?)\b)?\s*(?:and\s+)?"
+                     r"(?:(\d+(?:\.\d+)?)\s*(?:seconds?|secs?|s)\b)?")
+
+
+def travel(question: str) -> Result | None:
+    q = question or ""
+    if not re.search(r"(?i)\bhow far\b|\bwhat distance\b|\bhow (?:many|much) (?:km|kilomet\w+|miles|meters|metres)\b", q):
+        return None
+    m = _TRAVEL.search(q)
+    if not m or not any(m.group(i) for i in (3, 4, 5)):
+        return None
+    speed, unit = float(m.group(1)), m.group(2).lower()
+    hours = (float(m.group(3) or 0) + float(m.group(4) or 0) / 60 + float(m.group(5) or 0) / 3600)
+    if unit == "m/s":
+        hours *= 3600
+    out, label = speed * hours, _SPEED_UNITS[unit]
+    timing = " ".join(f"{_fmt(float(m.group(i)))} {name}" for i, name in ((3, "h"), (4, "min"), (5, "s")) if m.group(i))
+    span = (f"{_fmt(hours, 4)} s" if unit == "m/s" else f"{_fmt(hours, 4)} h")
+    return Result(f"{_fmt(speed)} {unit} for {timing} ({span}) covers {_fmt(out, 3)} {label}. "
+                  "Assumes a steady speed with no stops.", out, max(abs(out) * 0.0005, 0.001))
+
+
 def work_out(question: str) -> Result | None:
     from cursiv_engine.core import datecalc       # dates, weekdays, spaced points, two proportions
     # An explicit conversion in a compound request must not be shadowed by an
     # unrelated calculator that happens to notice the same quantity (e.g. liters for a dose).
-    for fn in (lightning_wait, units, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
+    for fn in (lightning_wait, travel, units, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
                datecalc.weekday, datecalc.dates, datecalc.spacing):
         try:
             r = fn(question)

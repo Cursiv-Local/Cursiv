@@ -147,13 +147,33 @@ def transition(person: str, ident: str, status: str, evidence: list[dict] | None
         state_store.save(path(person), data)
 
 
+def _quote(e: dict) -> str:
+    """A field record is saved as its JSON snapshot; show it as one notebook line."""
+    try:
+        row = json.loads(e['quote'])
+        if isinstance(row, dict) and 'measurements' in row:
+            from .fieldlog import summary
+            return summary(row)
+    except (ValueError, TypeError, KeyError):
+        pass
+    return str(e['quote'])
+
+
+def _listed(items) -> str:
+    return '; '.join(str(x) for x in items) if items else 'none'
+
+
 def render(records: list[dict]) -> str:
     if not records:
         return 'No matching curiosity entries. No journal contents were invented.'
-    return 'Evidence below is a saved snapshot; use curiosity review <CUR-id> to check current availability.\n\n' + '\n\n'.join(f"[{r['id']}] {r['status']} · priority {r['score']} (selection score, not probability)\n"
-        f"{r['question']}\nWhy: {r['why']}\nNext: {r['investigation']}\n"
-        + '\n'.join(f"Evidence [{e['source']}:{e['id']}] ({e['classification']}): {e['quote']}" for e in r['evidence'])
-        + '\nHypotheses (unverified): ' + json.dumps(r['hypotheses'])
-        + '\nMissing/unknown: ' + json.dumps(r['missing_variables'])
-        + '\nHistory: ' + json.dumps(r['history'], ensure_ascii=False)
-        for r in records[:50])
+    def one(r):
+        last = r['history'][-1] if r['history'] else {}
+        return (f"[{r['id']}] {r['status']} · priority {r['score']} (selection score, not probability)\n"
+                f"{r['question']}\nWhy: {r['why']}\nNext: {r['investigation']}\n"
+                + ''.join(f"- Evidence [{e['source']}:{e['id']}] ({e['classification']}): {_quote(e)}\n" for e in r['evidence'])
+                + 'Hypotheses (unverified): ' + _listed(r['hypotheses'])
+                + '\nMissing/unknown: ' + _listed(r['missing_variables'])
+                + (f"\nLast update: {str(last.get('at', ''))[:16].replace('T', ' ')} · {last.get('note') or last.get('status', '')}"
+                   f" ({len(r['history'])} in history)" if last else ''))
+    return ('Evidence below is a saved snapshot; use curiosity review <CUR-id> to check current availability.\n\n'
+            + '\n\n'.join(one(r) for r in records[:50]))

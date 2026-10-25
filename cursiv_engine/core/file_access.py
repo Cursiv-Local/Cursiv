@@ -374,6 +374,14 @@ def unverified_claim(text: str) -> bool:
     text = re.sub(r'(?ms)^\s*~~~[^\n]*\n.*?^\s*~~~\s*$', '', text)
     text = re.sub(r'(?m)^\s*(?:[-+•]\s+|\d+[.)]\s+)', '', text)
     text = re.sub(r'(?<=[.!?])\s+(?=(?:I|we|Cursiv|the file|your file)\b)', '\n', text)
+    text = re.sub(r'[✅✔☑]️?\s*', '', text)          # "✅ File deleted."
+    if re.search(r'(?im)^\s*[*_`]*(?:(?:the|your)\s+)?(?:file|folder|[\w.-]+\.[a-z0-9]{1,8})\s+'
+                 r'(?:(?:has been|have been|was|were|is now|successfully)\s+)*'
+                 r'(?:deleted|removed|updated|created|saved|written|appended|overwritten)\b|'
+                 r'\b(?:updated|saved|written|appended|deleted|created)\s+and\s+verified\b|'
+                 r'^\s*[*_`]*now executing\s*:|\bis no longer (?:present|in the (?:directory|folder|workspace))\b|'
+                 r'^\s*[*_`]*SHA-?256\s*:\s*`?[0-9a-f]{16,}', text):
+        return True
     return bool(re.search(r'(?im)^\s*[*_`]*(?:→\s*)?(?:file_create|create_file|write_file|append_file|read_file)\s*[:(]|'
         r'^\s*[*_`]*(?:got it\s*[,—–:-]\s*)?I(?:[\x27’]ll| will)\s+remember\b|'
         r'^\s*[*_`]*(?:I|we|Cursiv|the file|your file|it)\s+(?:(?:have|has|just|successfully|now|been|was|is|already)\s+)*'
@@ -389,7 +397,8 @@ def unverified_claim(text: str) -> bool:
 def model_prose(text: str) -> str:
     if unverified_claim(text):
         return VerifiedText('Action not confirmed: the model described a save or file operation without a matching verified execution result. '
-                            'No successful action is confirmed by that description.')
+                            'No successful action is confirmed by that description, and nothing was changed by this answer. '
+                            'To add a line to a file, say: Add a line to notes.txt saying <text>.')
     return text
 
 
@@ -429,6 +438,17 @@ def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
     if op == 'usage':
         natural = file_requests.parse(text)
         return Reply(natural.error if natural and natural.error else 'Which file do you mean? Give its filename.')
+    if op == 'delete':
+        from . import file_context
+        try:
+            target = file_context.resolve(path, 'read', history, workspace_root(root))
+        except file_context.Clarify as exc:
+            return Reply(str(exc))
+        except (OSError, ValueError) as exc:
+            return Reply(f'Cursiv does not delete files. Nothing was deleted ({type(exc).__name__}: {exc}).')
+        state = 'It is still there' if target.exists() else 'There is no file by that name in the workspace'
+        return Reply(f'Cursiv does not delete files, so {target.name} was not deleted. {state}: {target}\n'
+                     'To delete it, use File Explorer (or Finder) yourself.')
     natural = file_requests.parse(text)
     if op in ('create', 'append', 'replace', 'remember') and not content and not (
             natural and (natural.content_ref or natural.options.get('empty_file'))):

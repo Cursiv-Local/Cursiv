@@ -106,6 +106,8 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
 
     # "help" / "help more" / "help family" -- but "help me write a letter" is chat.
     _topic = cmd[5:].strip() if cmd.startswith("help ") else None
+    if _topic in ("family", "letters"):
+        return runtime.TextResult(profile.REMOVED_NOTE)
     if cmd in ("help", "help?", "commands") or (_topic and (_topic in runtime._HELP_TOPICS or _topic in ("more", "all", "topics"))):
         return runtime.TextResult(runtime.help_text(_topic or ""))
 

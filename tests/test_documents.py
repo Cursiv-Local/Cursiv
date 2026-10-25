@@ -131,7 +131,7 @@ def test_with_the_ai_engine_down_cursiv_gives_what_it_has(library, tmp_path, fre
     assert "isn't answering" in out and "WS-3 protocol.pdf p. 2" in out and "24 hours" in out
     assert "Written by Cursiv, no AI model" in out and "Answered by" not in out
     out = "".join(ca.chat("Convert 12 C to F", [], "", None))
-    assert "53.6 F" in out and "worked out by Cursiv's code" in out
+    assert "53.6 F" in out and "no AI model" in out            # plain conversions need no model (U97)
     out = "".join(ca.chat("What is a riffle in a stream?", [], "", None))
     assert "no answer without the model" in out and "Sources: Cursiv itself (no AI model)" in out
 

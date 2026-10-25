@@ -125,3 +125,22 @@ def drop_false_refusal(question: str, answer: str) -> str:
         return answer               # little or nothing followed: the refusal is the answer
     rest = _LEAD_CONJUNCTION.sub('', rest, count=1)
     return rest[:1].upper() + rest[1:]
+
+
+# The model certifying its own answer ("✅ Verified: Yes", "No model, file or
+# external source was used"). It cannot know either: Cursiv's source line says
+# what really answered, so these lines are dropped. Labels the person asked
+# for ("Fact:" / "Speculation:") are not touched.
+_SELF_CERT_LINE = re.compile(
+    r"(?im)^[ \t>*_-]*(?:[\u2705\u274c\u2714\u2611]\ufe0f?\s*)?[*_]*"
+    r"(?:verified|not speculative|fact[- ]checked|accuracy check)[*_]*\s*:[^\n]*\n?")
+_SELF_CERT_SENTENCE = re.compile(
+    r"(?i)(?:\(\s*)?[^.!?\n(]*\b(?:no (?:ai )?model(?: output)?|no (?:need for a )?(?:file|model)(?: or model)? lookup|"
+    r"no external source or model)\b[^.!?\n]*\b(?:was|were|is|needed|used|required|involved|generated)\b[^.!?\n]*[.!?]\s*\)?")
+
+
+def drop_self_certification(answer: str) -> str:
+    cleaned = _SELF_CERT_LINE.sub('', answer)
+    cleaned = _SELF_CERT_SENTENCE.sub('', cleaned)
+    cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip()
+    return cleaned if cleaned and cleaned != answer.strip() else answer
