@@ -247,12 +247,6 @@ class ToolsDialog(_Window):
         self.entry("Field demo", "Try everything with sample data, kept apart from your own records (demo off to end).",
                    "Start", self._send("demo"))
         self.section("EVERYDAY")
-        if personal:
-            self.entry("Write a family letter", "A private letter that opens only with the code you set for that person.",
-                       "Write", self._window("_open_postal_compose", ""))
-            self.entry("Read letters", "Letters waiting for you, and ones you've sent.", "Show", self._send("letters"))
-            self.entry("Legacy Vault", "Keep family stories and messages for later, behind a PIN.", "Open",
-                       self._window("_open_legacy_vault"))
         self.entry("Translate", "Type your text, then the language: translate good morning into Spanish.",
                    "Start", self._prefill("translate  into Spanish"))
         if personal:
@@ -268,8 +262,6 @@ class ToolsDialog(_Window):
         self.section("CODING AND BIG QUESTIONS")
         self.entry("Coding help", "Step-by-step help with code; uses local coding models if installed.",
                    "Start", self._prefill("codex "))
-        self.entry("Ask the council", "Several AI views on a hard question, combined into one answer. Slower.",
-                   "Start", self._prefill("council "))
         self.entry("Your agents", "Specialists you create (agent new name: job) and talk to with @name.",
                    "Show", self._send("agents"))
 

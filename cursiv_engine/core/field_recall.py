@@ -146,8 +146,73 @@ def render(result: dict, *, summarize: bool = False) -> str:
     return '\n'.join(lines)
 
 
+# "What was the average water temperature in my TEST-U96 samples?" The model got
+# this right once but labelled it as coming from an imported document; the
+# notebook can answer it exactly, with the records it used.
+_STAT = re.compile(r"(?i)^(?:what(?:'s| is| was| were)\s+)?(?:the\s+)?"
+                   r"(average|mean|median|minimum|maximum|min|max|highest|lowest|range)\s+(?:of\s+)?(?:the\s+|my\s+)?"
+                   r"(.+?)\s+(?:in|of|across|for|from|at)\s+(?:all\s+)?(?:my\s+|the\s+)?(.*?)\s*"
+                   r"(?:samples?|records?|entries|observations|readings|field\s*log|notebook)\b[^?]*[?.!]?$")
+
+
+def _words(text: str) -> list[str]:
+    return [w for w in re.findall(r'[a-z0-9]+', text.casefold().replace('temperature', 'temp'))]
+
+
+def stats_command(text: str) -> str | None:
+    m = _STAT.match(text.strip())
+    if not m:
+        return None
+    kind, measure, scope = m[1].lower(), _words(m[2]), m[3].strip().casefold()
+    if not measure:
+        return None
+    rows, offset = [], 0
+    while True:
+        page = query(limit=50, offset=offset)
+        rows += page['records']
+        if not page['more']:
+            break
+        offset += 50
+    superseded = {r['corrects'] for r in rows if r.get('corrects')}
+    used = []
+    for r in rows:
+        if r['id'] in superseded:
+            continue
+        if scope and scope not in ('my', 'all') and scope not in (r.get('sample_id', '') + ' ' + r.get('site', '')).casefold():
+            continue
+        for item in r.get('measurements') or []:
+            if isinstance(item.get('number'), (int, float)) and all(w in _words(item.get('name', '')) for w in measure):
+                used.append((r, item))
+                break
+    label = m[2].strip()
+    where = f' in {m[3].strip()} records' if scope else ''
+    if not used:
+        return (f'No recorded {label} values{where} were found in the field notebook, so nothing was calculated.'
+                '\n\n*[Sources: your field notebook (no AI model)]*')
+    units = {str(item.get('unit') or '').strip() for _, item in used}
+    if len(units) > 1:
+        return (f'The {label} records{where} use different units ({", ".join(sorted(units))}), so Cursiv did not combine them.'
+                '\n\n*[Sources: your field notebook (no AI model)]*')
+    unit = (' ' + units.pop()) if units and next(iter(units), '') else ''
+    values = [float(item['number']) for _, item in used]
+    import statistics
+    result = {'average': statistics.fmean(values), 'mean': statistics.fmean(values), 'median': statistics.median(values),
+              'minimum': min(values), 'min': min(values), 'lowest': min(values),
+              'maximum': max(values), 'max': max(values), 'highest': max(values),
+              'range': max(values) - min(values)}[kind]
+    name = {'mean': 'average', 'min': 'minimum', 'lowest': 'minimum', 'max': 'maximum', 'highest': 'maximum'}.get(kind, kind)
+    shown = f'{result:.2f}'.rstrip('0').rstrip('.')
+    lines = [f'The {name} {label}{where} is {shown}{unit}, from {len(values)} record(s):']
+    lines += [f'- [{r["id"]}] {r.get("sample_id") or r.get("site") or "#" + str(r["seq"])}: {item["number"]:g}{unit}'
+              for r, item in used]
+    return '\n'.join(lines) + '\n\n*[Sources: your field notebook, calculated by Cursiv (no AI model)]*'
+
+
 def command(text: str) -> str | None:
     try:
+        stat = stats_command(text)
+        if stat is not None:
+            return stat
         result = request(text)
         return render(result, summarize=bool(re.search(r'(?i)summari[sz]', text))) if result is not None else None
     except (OSError, ValueError, TypeError, KeyError) as exc:

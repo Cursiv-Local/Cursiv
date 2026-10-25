@@ -284,7 +284,7 @@ def _num_ctx(runtime: ChatRuntime) -> int:
 
 def _call_ollama_code_council(runtime: ChatRuntime, messages: list[dict], max_tokens: int) -> Generator[str, None, None]:
     """
-    Dual-model offline Code Council:
+    Dual-model offline coding help:
       Phase 1 — qwen2.5-coder:14b writes the primary solution (streamed live)
       Phase 2 — deepseek-coder-v2:16b reviews and improves it (streamed live)
     Falls back to llama3.1 if neither coding model is pulled.

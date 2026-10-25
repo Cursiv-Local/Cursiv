@@ -69,7 +69,7 @@ class ChatTranscriptMixin:
         esc = self._escape(inner)
         if inner.startswith("Answered by "):
             engine = inner[len("Answered by "):]
-            local = engine.startswith(("Ollama", "Code Council", "Cursiv local"))
+            local = engine.startswith(("Ollama", "Local coding models", "Cursiv local"))
             col = theme.GREEN if local else theme.AMBER
             label = ("Local · " + self._escape(engine.split("·", 1)[-1].strip())) if local else ("Online · " + self._escape(engine))
             return f'<p style="margin:6px 0 0 0; font-size:12px; color:{col};">● {label}</p>'

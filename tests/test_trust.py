@@ -180,6 +180,17 @@ def test_login_fails_closed_when_it_cannot_load(monkeypatch):
 
     monkeypatch.setattr(ag, "is_setup_complete", broken)
     monkeypatch.setattr(launcher_main, "_error_box", lambda *a, **k: None)
+    # main() takes Cursiv's exclusive data lease on the real home folder; a running
+    # Cursiv on this machine would hold it and this test would wait forever.
+    from cursiv_engine.core import data_lease
+    import encryption_dialog
+
+    class _Lease:
+        def __enter__(self): return self
+        def __exit__(self, *a): return False
+        def hold_until_exit(self): pass
+    monkeypatch.setattr(data_lease, "DataLease", _Lease)
+    monkeypatch.setattr(encryption_dialog, "startup", lambda **k: True)
     import cursiv_launcher
     monkeypatch.setattr(cursiv_launcher, "_acquire_instance_lock", lambda: True)
     monkeypatch.setattr(cursiv_launcher, "CursivLauncher",

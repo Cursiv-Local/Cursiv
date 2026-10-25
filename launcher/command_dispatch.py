@@ -19,7 +19,6 @@ import commands_credentials as _credentials
 import commands_extensions as _extensions
 import commands_notes as _notes
 import commands_services as _services
-import commands_postal as _postal
 import commands_images as _images
 
 def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[dict]) -> Optional[TextResult | StreamResult]:
@@ -43,8 +42,8 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     if file_requests.recognizes(text):
         return None  # local source/search intent must precede notebook and memory keywords
     from cursiv_engine.core import profile
-    if profile.personal_command(text) and not runtime._personal():
-        return runtime.TextResult(profile.PERSONAL_NOTE)
+    if profile.letters_command(text):
+        return runtime.TextResult(profile.REMOVED_NOTE)
 
     # Clean-up is exact and precedes memory intents, so "memory cleanup remove all"
     # can never be read as a request to forget every memory.
@@ -107,6 +106,8 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
 
     # "help" / "help more" / "help family" -- but "help me write a letter" is chat.
     _topic = cmd[5:].strip() if cmd.startswith("help ") else None
+    if _topic in ("family", "letters"):
+        return runtime.TextResult(profile.REMOVED_NOTE)
     if cmd in ("help", "help?", "commands") or (_topic and (_topic in runtime._HELP_TOPICS or _topic in ("more", "all", "topics"))):
         return runtime.TextResult(runtime.help_text(_topic or ""))
 
@@ -124,7 +125,6 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         _extensions.handle,
         _notes.handle,
         _services.handle,
-        _postal.handle,
         _images.handle,
     ):
         result = handler(runtime, text, cmd, cfg, history)

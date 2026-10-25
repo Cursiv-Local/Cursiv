@@ -92,7 +92,6 @@ class ChatRuntime(Protocol):
     _call_ollama_raw: Any
     _call_openai_direct: Any
     _call_openai_with_tools: Any
-    _call_provider_council: Any
     _call_xai_stream: Any
     _call_xai_with_tools: Any
     _chat_inner: Any

@@ -23,8 +23,8 @@ def test_research_help_leads_with_field_work(monkeypatch):
     assert "letter" not in text and "family" not in text.lower()
     topics = _help("help more", monkeypatch, builder=True)
     assert "help field" in topics and "help family" not in topics and "help builder" not in topics
-    assert "write to <name>" in _help("help", monkeypatch, personal=True)
-    assert "help family" in _help("help more", monkeypatch, personal=True)
+    assert "write to <name>" not in _help("help", monkeypatch, personal=True)    # letters removed (U97)
+    assert "help family" not in _help("help more", monkeypatch, personal=True)
 
 
 def test_phone_links_are_native_and_present_once_in_both_short_help_profiles(monkeypatch):
@@ -59,8 +59,9 @@ def test_builder_topic_listed_only_for_the_owner(monkeypatch):
 
 def test_help_me_is_still_chat(monkeypatch):
     assert _help("help me write a letter to my sister", monkeypatch) is None
-    assert 'Show personal features' in _help("help family", monkeypatch)
-    assert _help("help family", monkeypatch, personal=True).startswith("FAMILY")
+    from cursiv_engine.core.profile import REMOVED_NOTE
+    assert _help("help family", monkeypatch) == REMOVED_NOTE              # family letters were removed (U97)
+    assert _help("help family", monkeypatch, personal=True) == REMOVED_NOTE
 
 
 def test_tier_1_is_offline_mode(tmp_path, monkeypatch):

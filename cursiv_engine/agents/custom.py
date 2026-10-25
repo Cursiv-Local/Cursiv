@@ -4,7 +4,7 @@ Custom agents: specialists anyone in the family can create in plain words.
   agent new chef: plans healthy family meals on a budget, asks about allergies
   @chef what should we make tonight?
   agent teach chef Brandon is allergic to peanuts
-  agent council should we start a garden this spring?
+  agents ask should we start a garden this spring?
 
 Each agent = a name, its job (instructions), and things it has been taught.
 Saved per person in ~/.cursiv/agents/<person>/<name>.json -- plain files.
@@ -148,7 +148,7 @@ def listing() -> str:
                 "  agent new tutor: explains math to a 10-year-old with simple examples\n"
                 "Then talk to it with @chef or @tutor.")
     rows = "\n".join(f"- **@{a['name']}** — {a['job'][:90]}{'…' if len(a['job']) > 90 else ''}" for a in agents)
-    return f"Your agents:\n{rows}\n\nTalk: @name <message> · Ask all of them: agent council <question>\nManage: agent show/edit/teach/delete <name>"
+    return f"Your agents:\n{rows}\n\nTalk: @name <message> · Ask all of them: agents ask <question>\nManage: agent show/edit/teach/delete <name>"
 
 
 def system_prompt(agent: dict, person_memory: str = "") -> str:

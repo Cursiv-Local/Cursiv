@@ -93,7 +93,7 @@ def inventory(person: str) -> list[dict]:
         n = 0
     except Exception:
         n = None
-    add("Council conclusions", APP_DATA / "council_memory.json", n, "used only by council answers")
+    add("Old council conclusions", APP_DATA / "council_memory.json", n, "no longer used (the council was removed)")
     return rows
 
 

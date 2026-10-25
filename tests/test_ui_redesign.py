@@ -176,7 +176,7 @@ def test_tools_hides_advanced_and_help_explains(app, settings):
     profile.set_personal(True)
     t = nav_windows.ToolsDialog()
     assert t._adv.isHidden()
-    assert "Write a family letter" in _labels(t) and "Coding help" in _labels(t)
+    assert "Write a family letter" not in _labels(t) and "Coding help" in _labels(t)   # letters removed (U97)
 
 
 def test_sidebar_navigation_and_prefill(panel):

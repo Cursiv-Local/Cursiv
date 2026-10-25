@@ -84,13 +84,17 @@ inventories that active location too. These paths do not depend on the package n
 
 Nothing in these folders is part of the repository or the installer. On a **Cursiv USB** (`launcher/usb_maker.py`), `launcher/portable.py` points the home folder, the models and Ollama at the drive at startup, so everything stays on the drive.
 
-### Optional conversation and memory encryption
+### Conversation and memory encryption (always on)
 
-Off by default. Close Cursiv, then run `python launcher/main.py --encrypt-data`
-from source, or `Cursiv.exe --encrypt-data` after packaging this source. On macOS
-run the bundle's `Contents/MacOS/Cursiv --encrypt-data` executable. The startup
-dialog lists coverage and asks for a separate passphrase twice. Normal startup
-requires that passphrase before loading private stores or launching background work.
+Always on for a computer since U97 (`launcher/encryption_dialog.py`). The first start
+lists coverage, asks for a separate passphrase twice and encrypts the existing data
+(resumable: an interrupted start finishes at the next one with the same passphrase;
+`--encrypt-data` still works and does the same). Every start after requires that
+passphrase before loading private stores or launching background work. A Cursiv USB
+drive (portable mode) stays readable by the owner's choice; `launcher/usb_sync.py`
+decrypts covered stores on the way to a drive and encrypts them again when they come
+back (staged imports in `import-pending` stay encrypted). The vault marker and
+`.vault-recovery/` never travel.
 There is no chat command that accepts the passphrase. Login recovery cannot recover it.
 
 `core/vault.py` uses the already required `cryptography` library: Fernet authenticated

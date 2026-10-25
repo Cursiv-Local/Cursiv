@@ -107,7 +107,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     if _native is not None:
         from cursiv_engine.core.conversation_kind import relayed_thread_question
         _requested_provider = (force_provider or '').lower().strip()
-        if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai', 'council') and runtime.netgate.is_offline():
+        if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai') and runtime.netgate.is_offline():
             yield _file_ops.VerifiedText(f'*[{_requested_provider.title()} skipped. Offline mode is on. '
                 'This application answer used no external provider or local model.]*\n\n')
         yield _file_ops.VerifiedText(_native)
@@ -231,7 +231,8 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + final
             return
         from . import response_style
-        polished = (response_style.drop_false_refusal(_field_text, response_style.trim_closer(_field_text, draft))
+        polished = (response_style.drop_self_certification(
+                        response_style.drop_false_refusal(_field_text, response_style.trim_closer(_field_text, draft)))
                     if replace_draft else draft)
         if polished != draft:
             notes = [m.group(0).strip() for m in runtime._STATUS_LINE_RE.finditer(''.join(reply))]

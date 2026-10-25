@@ -34,7 +34,10 @@ import time
 from pathlib import Path
 
 MTIME_SLACK = 2.0                      # FAT-family drives store times in 2-second steps
-SKIP_NAMES = {".vault-lease"}          # live process lease, never data
+# The live process lease, and each computer's own encryption configuration: a
+# computer's data is always encrypted (U97), a drive's stays readable, so stores
+# are decrypted on the way to a drive and encrypted again on the way back.
+SKIP_NAMES = {".vault-lease", "data-vault.json"}
 SKIP_TOP = {"backups", "import-pending"}  # each side keeps its own recovery copies and staging
 
 
@@ -64,7 +67,7 @@ def collect(sources: list[Path]) -> dict[Path, Path]:
             raise OSError(f"Linked data folder refused: {base}")
         for folder, dirs, names in os.walk(base, followlinks=False):
             here = Path(folder)
-            dirs[:] = [d for d in dirs if not _linked(here / d)
+            dirs[:] = [d for d in dirs if not _linked(here / d) and not d.startswith(".vault-")
                        and not (here == base and d in SKIP_TOP)]
             for name in names:
                 f = here / name
@@ -135,12 +138,49 @@ def keep_drive_keys(config: Path, previous: bytes | None) -> None:
         raise OSError("Drive settings read-back verification failed")
 
 
+def _sealed(p: Path) -> bool:
+    """An encrypted store (vault.MAGIC header)."""
+    from cursiv_engine.core import vault
+    try:
+        with open(p, "rb") as fh:
+            return fh.read(len(vault.MAGIC)) == vault.MAGIC
+    except OSError:
+        return False
+
+
+def _plain(p: Path) -> bytes:
+    """A store's readable bytes. Raises VaultError when it is encrypted by a vault
+    this process has not unlocked (for example a drive encrypted by an older release)."""
+    from cursiv_engine.core import vault
+    data = p.read_bytes()
+    return vault.reveal(p, data) if data.startswith(vault.MAGIC) else data
+
+
+def _decide_data(a: bytes, a_time: float, dest: Path, here: str, there: str, suffix: str) -> tuple[str, str]:
+    """decide() on readable bytes, for stores that are encrypted on one side."""
+    if not dest.exists():
+        return "add", f"not on {there}"
+    b = _plain(dest)
+    if a == b:
+        return "same", ""
+    if len(a) > len(b) > 0 and a.startswith(b):
+        return "update", f"{here} added to it"
+    if len(b) > len(a) > 0 and b.startswith(a):
+        return "keep", f"{there} added to it"
+    both = " (both changed; the other copy is saved in backups)" if suffix == ".jsonl" else ""
+    if a_time > dest.stat().st_mtime + MTIME_SLACK:
+        return "update", f"newer on {here}{both}"
+    return "keep", f"newer on {there}{both}"
+
+
 def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the drive",
            keys: bool = True) -> tuple[str, str]:
     """`here` names where src lives and `there` where dest lives. keys=False: AI keys
     in config.json are not compared (they are not being copied)."""
     if not dest.exists():
         return "add", f"not on {there}"
+    if _sealed(src) or _sealed(dest):
+        return _decide_data(_plain(src), src.stat().st_mtime, dest, here, there, src.suffix)
     s, d = src.stat(), dest.stat()
     if s.st_size == d.st_size and _digest(src) == _digest(dest):
         return "same", ""
@@ -159,6 +199,7 @@ def decide(src: Path, dest: Path, here: str = "this computer", there: str = "the
 def plan(sources: list[Path], dest: Path, *, keys: bool = True) -> list[dict]:
     """Read-only. One entry per file: rel, src, dest, action, reason. keys=False when
     AI keys are not being copied: config.json differing only in keys counts as same."""
+    from cursiv_engine.core import vault
     if dest.exists() and _linked(dest):
         raise OSError(f"Linked drive data folder refused: {dest}")
     items = []
@@ -169,7 +210,10 @@ def plan(sources: list[Path], dest: Path, *, keys: bool = True) -> list[dict]:
                 break
             if p.exists() and _linked(p):
                 raise OSError(f"Linked drive destination refused: {p}")
-        action, reason = decide(src, target, keys=keys)
+        try:
+            action, reason = decide(src, target, keys=keys)
+        except vault.VaultError as exc:
+            action, reason = "skip", f"encrypted and not readable here ({exc}); move it by hand"
         items.append({"rel": rel, "src": src, "dest": target, "action": action, "reason": reason})
     return items
 
@@ -185,16 +229,22 @@ def todo(items: list[dict]) -> list[dict]:
     return [it for it in items if it["action"] in ("add", "update")]
 
 
-def _write_verified(src: Path, dest: Path) -> None:
+def _write_verified(src: Path, dest: Path, data: bytes | None = None) -> None:
+    """Copy src to dest, or write `data` (src's readable bytes) with src's times."""
     dest.parent.mkdir(parents=True, exist_ok=True)
     fd, tmp = tempfile.mkstemp(prefix="." + dest.name, suffix=".part", dir=dest.parent)
     part = Path(tmp)
     try:
-        with os.fdopen(fd, "wb") as fo, open(src, "rb") as fi:
-            shutil.copyfileobj(fi, fo, 8 << 20)
+        with os.fdopen(fd, "wb") as fo:
+            if data is None:
+                with open(src, "rb") as fi:
+                    shutil.copyfileobj(fi, fo, 8 << 20)
+            else:
+                fo.write(data)
             fo.flush()
             os.fsync(fo.fileno())
-        if _digest(part) != _digest(src):
+        expected = _digest(src) if data is None else hashlib.sha256(data).hexdigest()
+        if _digest(part) != expected:
             raise OSError(f"Copy verification failed: {dest}")
         os.replace(part, dest)
         shutil.copystat(src, dest, follow_symlinks=False)
@@ -216,7 +266,8 @@ def apply(items: list[dict], dest: Path, progress=None, cancel: threading.Event 
             saved = backup / it["rel"]
             _write_verified(target, saved)
             backed += 1
-        _write_verified(it["src"], target)
+        # A drive stays readable: an encrypted store from this computer is written decrypted.
+        _write_verified(it["src"], target, _plain(it["src"]) if _sealed(it["src"]) else None)
         report.append(f"{it['action']:6}  {it['rel'].as_posix()}  ({it['reason']})")
         if progress:
             progress(int(i * 100 / len(work)), f"Updating your data on the drive: {i} of {len(work)} files")
@@ -303,18 +354,21 @@ def _vault_on(*roots: Path) -> bool:
 def plan_import(drive_data: Path, app: Path, home: Path) -> list[dict]:
     """Read-only: what bringing the drive's data to this computer would do."""
     from cursiv_engine.core import vault
-    encrypted = _vault_on(drive_data, app, home)
+    drive_locked = _vault_on(drive_data)      # a drive encrypted by an older release
     items = []
     for rel, src in sorted(collect([drive_data]).items()):
         if rel.parts[0] in IMPORT_SKIP_TOP or rel.name in IMPORT_SKIP_NAMES:
             continue
         target = _target(rel, app, home)
-        if encrypted and (rel.name == vault.MARKER or vault.covered(rel)):
+        if drive_locked and vault.covered(rel):
             items.append({"rel": rel, "src": src, "dest": target, "action": "skip",
-                          "reason": "encrypted storage is on; move encrypted stores by hand"})
+                          "reason": "encrypted on the drive; open the drive's Cursiv to read it"})
             continue
         _check_links(target, app if target.is_relative_to(app) else home)
-        action, reason = decide(src, target, "the drive", "this computer")
+        try:
+            action, reason = decide(src, target, "the drive", "this computer")
+        except vault.VaultError as exc:
+            action, reason = "skip", f"encrypted and not readable here ({exc})"
         items.append({"rel": rel, "src": src, "dest": target, "action": action, "reason": reason})
     return items
 
@@ -340,9 +394,22 @@ def pending_dir() -> Path:
     return Path.home() / ".cursiv" / PENDING
 
 
+def _stage_rel(name: str) -> Path:
+    return Path(PENDING) / "files" / name
+
+
+def _stage_cipher():
+    """The unlocked vault key of the folder holding import-pending (~/.cursiv), or None
+    when it has no vault."""
+    from cursiv_engine.core import vault
+    home = pending_dir().parent.absolute()
+    return vault._cipher(home) if (home / vault.MARKER).exists() else None
+
+
 def stage_import(items: list[dict], progress=None, cancel: threading.Event | None = None) -> Path | None:
     """Copy the add/update files to this computer's staging folder. Nothing in
     use is changed until the next start. A newer staging replaces an unapplied one."""
+    from cursiv_engine.core import vault
     work = todo(items)
     if not work:
         return None
@@ -354,9 +421,12 @@ def stage_import(items: list[dict], progress=None, cancel: threading.Event | Non
             if cancel is not None and cancel.is_set():
                 raise InterruptedError
             name = f"{i:05d}"
-            _write_verified(it["src"], tmp / "files" / name)
+            # Conversations and memories waiting here are encrypted like the stores they join.
+            cipher = _stage_cipher() if vault.covered(it["rel"]) else None
+            sealed = vault.pack(cipher, _stage_rel(name), it["src"].read_bytes()) if cipher else None
+            _write_verified(it["src"], tmp / "files" / name, sealed)
             entries.append({"file": name, "target": str(it["dest"]), "rel": it["rel"].as_posix(),
-                            "action": it["action"], "reason": it["reason"],
+                            "action": it["action"], "reason": it["reason"], "sealed": bool(cipher),
                             "sha256": _digest(tmp / "files" / name)})
             if progress:
                 progress(int((i + 1) * 100 / len(work)), f"Copying from the drive: {i + 1} of {len(work)} files")
@@ -387,14 +457,30 @@ def apply_pending_import() -> dict | None:
             report.append(f"skipped  {e['rel']}  (staged copy missing, damaged or outside Cursiv's data)")
             continue
         _check_links(target, root)
-        action, reason = decide(staged, target, "the drive", "this computer")
+        from cursiv_engine.core import atomic, vault
+        data = staged.read_bytes()
+        if e.get("sealed"):
+            data = vault.unpack(_stage_cipher(), _stage_rel(e["file"]), data)
+        into_vault = vault.owner(target) is not None
+        if e.get("sealed") or into_vault:
+            action, reason = _decide_data(data, staged.stat().st_mtime, target, "the drive",
+                                          "this computer", target.suffix)
+        else:
+            action, reason = decide(staged, target, "the drive", "this computer")
         if action not in ("add", "update"):
             report.append(f"kept     {e['rel']}  ({reason or 'already the same'})")
             continue
         if target.exists():
-            _write_verified(target, root / "backups" / stamp / rel)
+            _write_verified(target, root / "backups" / stamp / rel)   # stays encrypted if it was
             backed += 1
-        _write_verified(staged, target)
+        if into_vault:
+            atomic.write_bytes(target, data)                          # encrypted for this computer
+            if _plain(target) != data:
+                raise OSError(f"Encrypted import read-back verification failed: {target}")
+            mtime = staged.stat().st_mtime
+            os.utime(target, (mtime, mtime))
+        else:
+            _write_verified(staged, target, data if e.get("sealed") else None)
         if target.name == "config.json":
             from cursiv_engine.core import keystore
             keystore.migrate(target)          # readable drive keys -> encrypted for this account

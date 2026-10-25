@@ -191,7 +191,7 @@ def test_a_contradicting_model_answer_is_flagged_in_the_chat(fresh, outbound, mo
 def test_wrong_unit_conversion_is_replaced_with_the_calculated_result(fresh, outbound, monkeypatch):
     from cursiv_engine.ui import chat_app as ca
     _local_model(monkeypatch, reply="3 liters is 0.789 gallons.")
-    chunks = list(ca.chat("Convert 3 liters to gallons exactly", [], "", None, replace_draft=True))
+    chunks = list(ca.chat("Convert 3 liters to gallons exactly for my water report", [], "", None, replace_draft=True))
     replacements = [chunk for chunk in chunks if chunk.startswith(ca.REPLACE_SENTINEL)]
     assert len(replacements) == 1
     shown = replacements[0][len(ca.REPLACE_SENTINEL):]

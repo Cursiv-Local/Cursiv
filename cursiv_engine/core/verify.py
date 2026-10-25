@@ -1,7 +1,7 @@
 """
 Verification after a draft exists.
 
-The eight phases and the council only add prompt text. This module is the
+The eight phases only add prompt text. This module is the
 check that runs once the draft is in hand: concrete problems, one rewrite,
 and a ledger of what was known, inferred, assumed, or unknown.
 

@@ -199,7 +199,8 @@ def _build_live_status(runtime: ChatRuntime) -> str:
         sc = runtime._strand_count()
         items.append(f"Saved notes: {sc}")
 
-    lines = ["\n\n---", f"## Available right now (Cursiv {version})",
+    from cursiv_engine.core import clock
+    lines = ["\n\n---", f"## Available right now (Cursiv {version})", clock.today_line(),
              "For your reference only: don't mention these unless the person asks what you can do.", ""]
     lines += [f"- {t}" for t in items]
     return "\n".join(lines)

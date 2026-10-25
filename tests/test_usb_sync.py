@@ -212,14 +212,48 @@ def test_config_with_same_keys_is_the_same_and_imported_keys_are_reencrypted(com
     assert json.loads((app / "config.json").read_text())["groq_key"] == "enc:new"
 
 
-def test_encrypted_storage_is_skipped_not_mixed(computer):
+def test_a_drive_encrypted_by_an_older_release_is_skipped_not_mixed(computer):
     from cursiv_engine.core import vault
     app, home, drive = computer
     _write(drive / vault.MARKER, "{}")
     _write(drive / "conversations" / "c.json", "ciphertext")
     _write(drive / "fieldlog" / "observations.jsonl", "1\n")
     got = {it["rel"].as_posix(): it["action"] for it in usb_sync.plan_import(drive, app, home)}
-    assert got == {vault.MARKER: "skip", "conversations/c.json": "skip", "fieldlog/observations.jsonl": "add"}
+    assert got == {"conversations/c.json": "skip", "fieldlog/observations.jsonl": "add"}   # marker never travels
+
+
+PASSWORD = "synthetic-usb-test-passphrase"
+
+
+def test_encrypted_computer_to_readable_drive_and_back(computer):
+    """U97: a computer is always encrypted, a drive stays readable, and data still moves."""
+    from cursiv_engine.core import vault, vault_migration
+    app, home, drive = computer
+    _write(home / "conversations" / "c.json", '{"text": "computer conversation"}')
+    _write(app / "memory_facts.jsonl", "fact one\n")
+    vault_migration.migrate(PASSWORD, [app, home])
+    try:
+        assert (home / "conversations" / "c.json").read_bytes().startswith(vault.MAGIC)
+        # Computer -> drive: written readable, vault files stay behind.
+        usb_sync.apply(usb_sync.plan([app, home], drive), drive)
+        assert (drive / "conversations" / "c.json").read_text(encoding="utf-8") == '{"text": "computer conversation"}'
+        assert (drive / "memory_facts.jsonl").read_text(encoding="utf-8") == "fact one\n"
+        assert not (drive / vault.MARKER).exists() and not (drive / ".vault-recovery").exists()
+        assert all(it["action"] == "same" for it in usb_sync.plan([app, home], drive))
+        # Work on the drive, then bring it back: staged encrypted, applied encrypted.
+        later = (drive / "memory_facts.jsonl").stat().st_mtime + 60
+        _write(drive / "memory_facts.jsonl", "fact one\nfact two from the drive\n", later)
+        _write(drive / "conversations" / "d.json", '{"text": "drive conversation"}')
+        stage = usb_sync.stage_import(usb_sync.plan_import(drive, app, home))
+        for staged in (stage / "files").iterdir():
+            assert staged.read_bytes().startswith(vault.MAGIC)
+        done = usb_sync.apply_pending_import()
+        assert done["applied"] == 2, done
+        for path, source in ((app / "memory_facts.jsonl", drive / "memory_facts.jsonl"),
+                             (home / "conversations" / "d.json", drive / "conversations" / "d.json")):
+            assert path.read_bytes().startswith(vault.MAGIC) and usb_sync._plain(path) == source.read_bytes()
+    finally:
+        vault.lock()
 
 
 def test_staging_is_not_carried_to_a_drive(sides):

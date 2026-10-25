@@ -68,7 +68,6 @@ class CommandRuntime(Protocol):
     StreamResult: Any
     TextResult: Any
     _ANSI_RE: Any
-    _ASYNC_COUNCIL_OK: Any
     _BABEL_DEFAULT_SET: Any
     _BABEL_MANY: Any
     _BABEL_OK: Any
@@ -87,7 +86,6 @@ class CommandRuntime(Protocol):
     _PACK_EXT: Any
     _PERSONAL_TOPICS: Any
     _PHOTO_CMD: Any
-    _POSTAL_OK: Any
     _QUEUE_OK: Any
     _REF_OK: Any
     _RETIRED: Any
@@ -98,7 +96,6 @@ class CommandRuntime(Protocol):
     _VOICE_CLEAN_SYS: Any
     _VOICE_OK: Any
     _agent_command: Any
-    _async_council_run: Any
     _babel_decode: Any
     _babel_encode: Any
     _babel_input: Any
@@ -108,7 +105,6 @@ class CommandRuntime(Protocol):
     _call_ollama: Any
     _call_ollama_code_council: Any
     _call_openai_direct: Any
-    _call_provider_council: Any
     _call_xai_stream: Any
     _cascade_gen: Any
     _cascade_stream: Any
@@ -122,31 +118,12 @@ class CommandRuntime(Protocol):
     _image_folder: Any
     _image_request_prompt: Any
     _is_builder: Any
-    _legacy_import_pack: Any
     _looks_like_text_to_json_request: Any
     _notes_view_request: Any
     _obs_export: Any
     _obs_save_config: Any
     _ollama_vision_model: Any
     _personal: Any
-    _postal_add_contact: Any
-    _postal_all: Any
-    _postal_contacts: Any
-    _postal_council: Any
-    _postal_entry: Any
-    _postal_export: Any
-    _postal_for: Any
-    _postal_from: Any
-    _postal_import: Any
-    _postal_key_history: Any
-    _postal_my_id: Any
-    _postal_open: Any
-    _postal_resolve: Any
-    _postal_rm_contact: Any
-    _postal_rotate: Any
-    _postal_seal: Any
-    _postal_setup: Any
-    _postal_sig_status: Any
     _probe_claude: Any
     _probe_openai: Any
     _probe_xai: Any

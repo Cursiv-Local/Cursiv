@@ -132,5 +132,7 @@ def test_every_answer_says_what_it_was_given(fresh, monkeypatch):
     monkeypatch.setattr(ca, "_call_ollama", lambda *a, **k: iter(["Press hard on the wound and call 911."]))
     out = "".join(ca.chat("my coworker cut his arm and it's bleeding badly", [], "", None))
     assert "Sources: Cursiv Offline Reference (" in out and "model knowledge" not in out
-    out = "".join(ca.chat("Convert 12.4 C to F", [], "", None))
+    out = "".join(ca.chat("Convert 12.4 C to F", [], "", None))    # plain conversions: no model (U97)
+    assert "54.32 F" in out and "no AI model" in out
+    out = "".join(ca.chat("Convert 12.4 C to F and tell me if that is cold for a stream", [], "", None))
     assert "worked out by Cursiv's code" in out

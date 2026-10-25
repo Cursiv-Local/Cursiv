@@ -73,7 +73,6 @@ hiddenimports = [
     "cursiv_engine.guardian.identity_core",
     "bcrypt",
     "cursiv_engine.memory",
-    "cursiv_engine.council",
     "cursiv_engine.obsidian",
     # launcher
     "cursiv_launcher",
@@ -86,8 +85,6 @@ hiddenimports = [
     "phone_receive_dialog",
     "selftest",
     "chat_commands",
-    "legacy_vault_dialog",
-    "postal_compose_dialog",
     "training_data_dialog",
     "portable",
     "usb_sync",                      # imported inside portable.migrate_data

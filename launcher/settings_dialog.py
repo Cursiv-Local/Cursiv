@@ -370,7 +370,7 @@ class SettingsDialog(QDialog):
     def _page_appearance(self, lay):
         from cursiv_engine.core import profile as _profile
         self._switch(lay, "Show personal features",
-                     "Family letters, the legacy vault, the phone app, coding help, the council and builder tools. "
+                     "The phone app, coding help, agents and builder tools. "
                      "Off keeps Cursiv focused on field work and disables letter/vault commands. "
                      "Tools and help change right away; the title bar the next time Cursiv opens.",
                      _profile.personal(), _profile.set_personal)
@@ -415,10 +415,10 @@ class SettingsDialog(QDialog):
         from cursiv_engine.core import vault
         encrypted = any((p / vault.MARKER).exists() for p in vault.roots())
         lay.addWidget(self._explain(
-            'Conversation and memory encryption: ' + ('enabled. Unlock is required at startup.' if encrypted else
-            'off (optional). Close Cursiv, then run Cursiv.exe --encrypt-data to enable it. '
-            'From source: python launcher/main.py --encrypt-data.') +
-            ' This uses a separate passphrase. Notebook data, workspace files, exports/training data and logs '
+            'Conversation and memory encryption: ' + ('on (always). Your passphrase unlocks it at startup.' if encrypted else
+            'not used on this Cursiv USB drive (a drive stays readable; use BitLocker To Go if it could be lost). '
+            'On a computer it is always on.') +
+            ' Notebook data, workspace files, exports/training data and logs '
             'remain outside this protection. See TECH.md for scope and recovery.'))
         self._action(lay, "What Cursiv remembers",
                      "See every saved memory, where it came from and when, and remove any of them.",

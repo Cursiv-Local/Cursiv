@@ -17,13 +17,9 @@ JOURNAL = Path('.vault-recovery/manifest.enc')
 def require_closed() -> None:
     """Older releases predate the OS lease; refuse migration while they run too."""
     import psutil
-    own_launchers = set()
-    for parent in psutil.Process().parents():
-        try:
-            if '--encrypt-data' in parent.cmdline():
-                own_launchers.add(parent.pid)  # venv/PyInstaller launcher for this configuration process
-        except (psutil.NoSuchProcess, psutil.AccessDenied):
-            continue
+    # Migration now runs at a normal start (U97), so this process's own launchers
+    # (a venv python.exe redirector, a PyInstaller bootloader) are never "another Cursiv".
+    own_launchers = {parent.pid for parent in psutil.Process().parents()}
     for process in psutil.process_iter(['pid', 'name', 'cmdline']):
         try:
             info = process.info

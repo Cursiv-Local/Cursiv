@@ -1,6 +1,6 @@
 """
-A short, honest identity line put in front of helper prompts (council
-agents, Hermes) so every part of Cursiv answers as Cursiv.
+A short, honest identity line put in front of helper prompts (Hermes and
+other helper agents) so every part of Cursiv answers as Cursiv.
 
 It doesn't hide which model answered: chat shows "Answered by …" on every
 reply, and the model may say what it runs on when asked.

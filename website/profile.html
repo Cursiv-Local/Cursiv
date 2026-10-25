@@ -208,7 +208,7 @@ main { max-width: 720px; margin: 0 auto; padding: 32px 24px 64px; }
     </div>
     <div class="field">
       <label>MODEL</label>
-      <input type="text" id="f-model" placeholder="llama3.2">
+      <input type="text" id="f-model" placeholder="qwen3:4b-instruct">
       <div class="field-note">Any model you have pulled via <code style="color:var(--lgold)">ollama pull &lt;name&gt;</code></div>
     </div>
     <div class="field">
@@ -251,7 +251,7 @@ const BOARD_U  = 'cursiv_username';
 // ── Utils ─────────────────────────────────────────────────
 function getMem()   { return JSON.parse(localStorage.getItem(MEM_KEY)  || '[]'); }
 function saveMem(m) { localStorage.setItem(MEM_KEY, JSON.stringify(m)); renderMem(); }
-function getSett()  { return { ollamaUrl: 'http://localhost:11434', model: 'llama3.2', contextLength: 8192, ...JSON.parse(localStorage.getItem(SETT_KEY) || '{}') }; }
+function getSett()  { return { ollamaUrl: 'http://localhost:11434', model: 'qwen3:4b-instruct', contextLength: 8192, ...JSON.parse(localStorage.getItem(SETT_KEY) || '{}') }; }
 function saveSett(s){ localStorage.setItem(SETT_KEY, JSON.stringify(s)); }
 
 function toast(msg) {
@@ -362,7 +362,7 @@ function loadSettings() {
 function saveSettings() {
   const s = getSett();
   s.ollamaUrl      = document.getElementById('f-url').value.trim()   || 'http://localhost:11434';
-  s.model          = document.getElementById('f-model').value.trim() || 'llama3.2';
+  s.model          = document.getElementById('f-model').value.trim() || 'qwen3:4b-instruct';
   s.contextLength  = parseInt(document.getElementById('f-ctx').value) || 8192;
   saveSett(s); toast('Settings saved.');
 }

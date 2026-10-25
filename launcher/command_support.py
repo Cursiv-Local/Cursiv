@@ -85,8 +85,6 @@ def _default_cfg(runtime: CommandRuntime) -> dict:
         "obsidian_path":    "",
         "offline_mode":     runtime._gate().is_offline(),
         "last_user_msg":    "",
-        "_last_council_synthesis": "",
-        "_last_council_query":     "",
     }
 
 def _auto_territory(runtime: CommandRuntime, q: str) -> str:
@@ -95,7 +93,7 @@ def _auto_territory(runtime: CommandRuntime, q: str) -> str:
         return "coding"
     if any(w in ql for w in ["health", "recovery", "feel", "mental", "grounding", "medication", "episode"]):
         return "recovery"
-    if any(w in ql for w in ["design", "system", "architecture", "cursiv", "agent", "strand", "council", "guardian"]):
+    if any(w in ql for w in ["design", "system", "architecture", "cursiv", "agent", "strand"]):
         return "architecture"
     if any(w in ql for w in ["music", "creative", "story", "forge", "art", "write", "poem", "song"]):
         return "creative"
@@ -121,9 +119,9 @@ def _is_builder(runtime: CommandRuntime) -> bool:
 def help_text(runtime: CommandRuntime, topic: str) -> str:
     """`help` -> the short list; `help more` -> topics; `help <topic>` -> one topic."""
     topic = topic.strip().lower()
-    if topic == 'family' and not runtime._personal():
-        from cursiv_engine.core.profile import PERSONAL_NOTE
-        return PERSONAL_NOTE
+    if topic == 'family':
+        from cursiv_engine.core.profile import REMOVED_NOTE
+        return REMOVED_NOTE
     if not topic:
         return runtime._HELP_TEXT if runtime._personal() else runtime._FIELD_HELP_TEXT
     if topic in runtime._HELP_TOPICS:
@@ -146,7 +144,7 @@ def hey_prefix(runtime: CommandRuntime, raw: str) -> tuple[str, str]:
     Returns (force_provider, stripped_text)."""
     lower = raw.lower()
     for prefix, fp in (
-        ("hey council ", "council"), ("hey grok ", "grok"), ("hey claude ", "claude"),
+        ("hey grok ", "grok"), ("hey claude ", "claude"),
         ("hey chat ", "openai"), ("hey openai ", "openai"), ("hey gpt ", "openai"),
         ("hey ollama ", "ollama"),
         ("grok ", "grok"), ("claude ", "claude"),

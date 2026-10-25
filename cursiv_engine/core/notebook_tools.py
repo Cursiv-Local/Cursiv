@@ -233,6 +233,10 @@ def _request(text: str, history: list[dict]) -> _Intent | None:
         # change the destination selected by the person.
         if re.match(r'(?i)^(?:file\s+|remember\s+|save (?:this )?(?:record|memory)\s*:)', text.strip()):
             return None
+        # "Write a poem about a field notebook left in the rain" is writing, not a save.
+        if re.search(r'(?i)\b(?:poem|story|song|haiku|limerick|essay|joke|riddle|rhyme|verse|lyrics|tale|sonnet)s?\b|'
+                     rf'\babout (?:a|an|the|my|this) {_TARGET}\b', text):
+            return None
         if (_positive_target(text)
                 and re.search(r'(?i)\b(?:record|add|save|write|put|move|remember)\b', text)):
             return _Intent('clarification')

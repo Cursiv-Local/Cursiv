@@ -777,7 +777,7 @@ async function route(env, request, url) {
 
   if (p === "/health") return { status: "ok", service: "cursiv-board" };
 
-  if (p === "/api/posts" && m === "GET") return feed(env);
+  if (p === "/api/posts" && m === "GET") throw new HttpError(410, "The public board and the mailbox were removed from Cursiv; existing records are kept and are no longer served");
   if (p === "/api/demo/chat" && m === "POST") return [200, await demoChat(env, request)];
   if (p === "/api/cursiv/chat" && m === "POST") return cursivCloudChat(env, request);
   if (p === "/api/report" && m === "POST") return [201, await problemReport(env, request)];
@@ -794,15 +794,12 @@ async function route(env, request, url) {
     const u = await requireAuth(env, request);
     return { id: u.id, username: u.username };
   }
-  if (p === "/api/blast" && m === "POST") return [201, await blast(env, request)];
+  if (p === "/api/blast" && m === "POST") throw new HttpError(410, "The public board and the mailbox were removed from Cursiv; existing records are kept and are no longer served");
   if ((match = p.match(/^\/api\/post\/([^/]+)$/)) && m === "DELETE") return deletePost(env, request, decodeURIComponent(match[1]));
 
-  if (p === "/api/legacy/letters") throw new HttpError(404, "Letters vault unavailable — letters open in the desktop app");
+  if (p === "/api/legacy/letters") throw new HttpError(410, "Family letters were removed from Cursiv");
 
-  if (p === "/api/mailbox/send" && m === "POST") return [201, await mailboxSend(env, request)];
-  if (p === "/api/mailbox/inbox" && m === "GET") return mailboxList(env, request, "inbox");
-  if (p === "/api/mailbox/sent" && m === "GET") return mailboxList(env, request, "sent");
-  if ((match = p.match(/^\/api\/mailbox\/([^/]+)\/read$/)) && m === "POST") return mailboxMarkRead(env, request, decodeURIComponent(match[1]));
+  if (p.startsWith("/api/mailbox/")) throw new HttpError(410, "The public board and the mailbox were removed from Cursiv; existing records are kept and are no longer served");
 
   if (p === "/remote/heartbeat" && m === "POST") return heartbeat(env, request);
   if (p === "/remote/fleet" && m === "GET") return fleet(env, request, url);

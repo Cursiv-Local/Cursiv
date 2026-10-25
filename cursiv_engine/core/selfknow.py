@@ -15,7 +15,7 @@ import time
 from pathlib import Path
 
 VERSION = "3.14-U96"
-FACTS_FILE = Path(__file__).parent.parent / "council" / "cursiv_facts.md"
+FACTS_FILE = Path(__file__).with_name("cursiv_facts.md")
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
 _SELF_RE = re.compile(
@@ -179,7 +179,7 @@ saved and where), self source <words> and self read <path> (Cursiv's own code), 
 - Setup window (tray menu → Setup…, or opens when something is missing): install/start/Restart Ollama, download the chat model (qwen3 4B Instruct, the one Cursiv tested), download a coding model (qwen2.5-coder 3B/7B/14B), Cursiv Cloud + free key test.
 - "What I remember" window (Settings or tray): search, add, forget memories; learning on/off.
 - Tray menu: What I remember…, Phone…, Setup…, Send problem report…, Quit.
-- Chat commands: remember <fact>, forget <words>, what do you remember, memory learn on/off, free keys, cloud on/off/status, council <question>, codex <request> (codex help, codex keep, codex project <folder>, codex lessons, codex learn <lesson>), phases, help.
+- Chat commands: remember <fact>, forget <words>, what do you remember, memory learn on/off, free keys, cloud on/off/status, codex <request> (codex help, codex keep, codex project <folder>, codex lessons, codex learn <lesson>), phases, help.
 - Cursiv Forge: evolve <idea> (writes a plugin, safety-checks it, tests it in a sandbox; installs only after evolve approve), plugins, plugin show/off/on/remove/approve <name>. Plugins live in .cursiv/plugins.
 - Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.
 - Native notebook recording, retrieval and integrity verification use the Field Notebook backend, not field_log.txt. Explicit memory save/recall/list/correct/forget and automatic-learning controls use the memory backend; manual saves remain available with automatic learning off. These explicit local actions need no cloud model. Only application-verified results and actual paths/record IDs establish success; model prose never does.
@@ -187,7 +187,7 @@ saved and where), self source <words> and self read <path> (Cursiv's own code), 
 - Personality and style: one fixed personality (no tones); style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Memory clean-up: memory cleanup (lists misleading saved notes and memories; changes nothing), memory cleanup remove <codes>|all (backs up first).
 - Looking at itself (read-only, app-authored, no AI model): self prompt / self prompt full (the instructions sent for the last answer), self stores (what is saved, where, and how it reaches answers), self source <words>, self read <path> [line] (Cursiv's own code and docs).
-- Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agent council <question>.
+- Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agents ask <question>.
 - There is no setting for context length or for choosing the chat model by hand; Cursiv picks models by graphics card. To change models, download a different one in Setup.
 
 ## What Cursiv really is (fact sheet)

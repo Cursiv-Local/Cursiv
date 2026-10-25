@@ -52,7 +52,7 @@ def self_test():
 Rules (a safety check enforces them -- code that breaks them is rejected):
 - No subprocess/os.system/eval/exec/ctypes/winreg, no network (socket, urllib, requests, http), no installs.
 - Never delete, move or rename files. Only write files inside cursiv.data_dir().
-- Command words: one lowercase word that isn't a built-in Cursiv command (help, codex, council, remember, agent,
+- Command words: one lowercase word that isn't a built-in Cursiv command (help, codex, remember, agent,
   tone, style, plugin(s), evolve, projects, search, memory...).
 - Every function returns a helpful string, handles bad input with a friendly message, never raises.
 - Keep it small and focused on the one idea.

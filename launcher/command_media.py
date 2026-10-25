@@ -4,7 +4,7 @@ Functions receive the explicit CommandRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: _looks_like_text_to_json_request, list_training_entries, add_training_entry_json, delete_training_entry, _run_llm_once, text_to_training_entry, _cloudflare_image, _image_request_prompt, _ollama_vision_model, _vision_describe, image_to_training_entry, describe_photo, analyze_pasted_image, postal_compose, approve_write.
+Entry points: _looks_like_text_to_json_request, list_training_entries, add_training_entry_json, delete_training_entry, _run_llm_once, text_to_training_entry, _cloudflare_image, _image_request_prompt, _ollama_vision_model, _vision_describe, image_to_training_entry, describe_photo, analyze_pasted_image, approve_write.
 """
 from __future__ import annotations
 
@@ -375,28 +375,6 @@ def analyze_pasted_image(runtime: CommandRuntime, png_bytes: bytes, cfg: dict, w
     if vision_result:
         return runtime.TextResult(f"{header}Vision analysis (via {vision_provider}):\n\n{vision_result}", image_path=str(img_path))
     return runtime.TextResult(f"{header}Image saved, no analysis. {runtime._NO_VISION_HELP}", image_path=str(img_path))
-
-def postal_compose(runtime: CommandRuntime, sender_user: str, recipient_raw: str, hint: str, content: str) -> TextResult:
-    if not runtime._POSTAL_OK:
-        return runtime.TextResult("Postal module unavailable.")
-    if not content.strip():
-        return runtime.TextResult("Nothing written — letter not sent.")
-    resolved = runtime._postal_resolve(recipient_raw)
-    recipient_key = resolved[1] if resolved else recipient_raw.lower().replace(" ", "")
-    recipient_disp = resolved[0] if resolved else recipient_raw.title()
-    my_id = runtime._postal_my_id()
-    sender_key = my_id.get("name", sender_user).lower() if my_id else sender_user
-    sender_disp = my_id.get("name", sender_user).title() if my_id else sender_user.title()
-    lid = runtime._postal_seal(
-        sender_key=sender_key, sender_display=sender_disp,
-        recipient_key=recipient_key, recipient_display=recipient_disp,
-        content=content, hint=hint,
-    )
-    return runtime.TextResult(
-        f"Sealed\nid: {lid}\nfor: {recipient_disp}\n"
-        f"signed: {'yes — Ed25519' if my_id else 'no — run postal setup first'}\n"
-        f"readable: on this machine only"
-    )
 
 def approve_write(runtime: CommandRuntime, path: str, content: str, workspace: str, *, operation: str, expected_sha256: str | None, remember: bool) -> TextResult:
     from cursiv_engine.core import file_access

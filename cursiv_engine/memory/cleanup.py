@@ -43,6 +43,8 @@ TEST_RECORD = re.compile(
 AI_PREFERENCE_GUESS = re.compile(
     r"(?i)\b(?:prioriti[sz]\w*|prefer\w*|avoid\w*|dislik\w*|(?:does ?n[o']t|do not) want|over)\b[^.]{0,80}"
     r"\b(?:speculative|abstract|hypothetical|imaginative|creative)\b")
+# "... Cursiv, a local AI assistant built by <a person>": a guess, and it names someone.
+MADE_BY = re.compile(r"(?i)\bcursiv\b[^.]{0,80}\b(?:built|made|created|developed|written)\s+by\b")
 
 
 STYLE_CONTENT = re.compile(r"^\s*(?:#{1,6}\s|\d+[.)]\s|[-*•]\s|rule\s*:)", re.I)
@@ -81,6 +83,8 @@ def scan(person: str) -> list[dict]:
             reason = "test record"
         elif semantic.origin_of(f) == "inferred" and AI_PREFERENCE_GUESS.search(text):
             reason = "inferred guess about what you want from AI (not something you said)"
+        elif semantic.origin_of(f) == "inferred" and MADE_BY.search(text):
+            reason = "inferred claim about who made Cursiv (not something you said)"
         else:
             continue
         found.append({"store": "memory", "id": str(f.get("id")), "reason": reason, "preview": _preview(text)})

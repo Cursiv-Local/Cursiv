@@ -214,7 +214,7 @@ header {
 <div id="setup-banner">
   <div class="sb-title">⬡ Ollama not reachable — one-time setup needed:</div>
   <div class="sb-step"><span class="sb-n">1.</span><span class="sb-body">Install Ollama if you haven't: <a class="sb-link" href="https://ollama.com" target="_blank">ollama.com</a></span></div>
-  <div class="sb-step"><span class="sb-n">2.</span><span class="sb-body">Pull a model: <span class="sb-code">ollama pull llama3.2</span></span></div>
+  <div class="sb-step"><span class="sb-n">2.</span><span class="sb-body">Pull a model: <span class="sb-code">ollama pull qwen3:4b-instruct</span></span></div>
   <div class="sb-step"><span class="sb-n">3.</span><span class="sb-body">Allow this site to connect — start Ollama with:<br>
     <span class="sb-code">OLLAMA_ORIGINS=https://cursiv.us ollama serve</span><br>
     <span style="color:var(--dim);font-size:10px">Windows: set the OLLAMA_ORIGINS environment variable in System Properties, then restart Ollama from the tray.</span>
@@ -242,7 +242,7 @@ const SETT_KEY = 'cursiv_settings_v1';
 
 // ── Settings ──────────────────────────────────────────────
 function getSett() {
-  return { ollamaUrl: 'http://localhost:11434', model: 'llama3.2', contextLength: 8192,
+  return { ollamaUrl: 'http://localhost:11434', model: 'qwen3:4b-instruct', contextLength: 8192,
            ...JSON.parse(localStorage.getItem(SETT_KEY) || '{}') };
 }
 function saveSett(s) { localStorage.setItem(SETT_KEY, JSON.stringify(s)); }
@@ -364,7 +364,7 @@ async function connect() {
     const sel = document.getElementById('model-sel');
     sel.innerHTML = '';
     if (models.length === 0) {
-      addMsg('system', 'Ollama connected but no models installed. Run: ollama pull llama3.2');
+      addMsg('system', 'Ollama connected but no models installed. Run: ollama pull qwen3:4b-instruct');
     } else {
       models.forEach(m => {
         const o = document.createElement('option');
