@@ -1,5 +1,12 @@
 # Handoff — Cursiv verification overhaul
 
+## U97 published (Claude, 2026-10-25)
+
+Tag `v3.14-U97` = `c7554a7` (PRs #17, #18). Trust fixes from the U96 live run, encryption
+always on for a computer (a Cursiv USB drive stays readable; `usb_sync` decrypts and
+re-encrypts), and the family letters, legacy vault, board, mailbox and council removed.
+Evidence: [U97-RELEASE-VERIFICATION](docs/U97-RELEASE-VERIFICATION.md).
+
 ## U96 published (Claude, 2026-10-24)
 
 Tag `v3.14-U96` = `ddc9385` (PRs #13, #14, #15). First release through the USB release

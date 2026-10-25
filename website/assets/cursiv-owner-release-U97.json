@@ -1,0 +1,43 @@
+{
+  "key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "signed": {
+    "format": "cursiv-owner-release-1",
+    "version": "3.14-U97",
+    "source_commit": "c7554a72457e6ec7a6df0556e6f2457168664767",
+    "assets": {
+      "Cursiv-Setup-3.14-U97.exe": {
+        "size": 56127766,
+        "sha256": "b3ecc0f59df4220574ce20551f649f7c2a3e268bc51bf1ec0d7fdef63b708c4a"
+      },
+      "Cursiv-Setup-latest.exe": {
+        "size": 56127766,
+        "sha256": "b3ecc0f59df4220574ce20551f649f7c2a3e268bc51bf1ec0d7fdef63b708c4a"
+      },
+      "SHA256SUMS.txt": {
+        "size": 184,
+        "sha256": "fc2a73394dc54a8b1892ad9551f8f9799ed604cfdf73dd4be08b024f51594f9d"
+      },
+      "provenance-3.14-U97.json": {
+        "size": 1797,
+        "sha256": "08a837efd5cf59a12a0342911aa5255543be95f7f11254a4e68c9dc3a1315511"
+      },
+      "Cursiv-3.14-U97-mac-arm64.dmg": {
+        "size": 68846815,
+        "sha256": "3433290d0fb8c2588263e11847fcffd2cbc90b92ace7857e615963abefab59c7"
+      },
+      "Cursiv-mac-latest.dmg": {
+        "size": 68846815,
+        "sha256": "3433290d0fb8c2588263e11847fcffd2cbc90b92ace7857e615963abefab59c7"
+      },
+      "SHA256SUMS-mac.txt": {
+        "size": 184,
+        "sha256": "06ac59133d58d3acfe871d24c2e8cc6e1c1f6a34735291caaaca30f03f55d7cf"
+      },
+      "provenance-mac.json": {
+        "size": 1757,
+        "sha256": "85c75063d60e9bf7febd77a8d5acd70a27f4acb3bd44866ddb61eed462955e1a"
+      }
+    }
+  },
+  "signature": "Ng6k4lXj913Yet7GFRG+PqgVsRUTjG178pU+WMT2kCiWsZnFS8jj/j0AUOEcdFGpz5uzSNN+8ORqsT8fOWLPCw=="
+}
