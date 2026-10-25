@@ -32,10 +32,13 @@ def _photo(tmp_path):
 
 def test_covered_paths():
     for rel in ('fieldlog/observations.jsonl', 'fieldlog/photos/' + 'a' * 64 + '.jpg', 'fieldlog/team/phone-1.jsonl',
-                'fieldlog/team/laptop.conflict-20261025.jsonl'):
+                'fieldlog/team/laptop.conflict-20261025.jsonl',
+                'fieldlog/received/up.cursivsync',                     # U101: phone uploads are encrypted
+                'fieldlog/.import-ab12cd34ef56/cursiv-field-share/phone-1.jsonl'):   # and so is unpacking
         assert vault.covered(Path(rel)), rel
     for rel in ('fieldlog/reports/field-report.html', 'fieldlog/exports/x/observations.json',
-                'fieldlog/team/laptop.key.json', 'fieldlog/team/revoked.json', 'fieldlog/received/up.cursivsync',
+                'fieldlog/team/laptop.key.json', 'fieldlog/team/revoked.json',
+                'fieldlog/received-large/up.cursivsync',               # over 64 MB: readable, and listed
                 'fieldlog/memory.json'):
         assert not vault.covered(Path(rel)), rel
 
@@ -93,3 +96,71 @@ def test_existing_vault_adopts_a_readable_notebook(notebook, tmp_path):
     assert private_store.read_bytes(photo) == PNG
     assert any(p.name.startswith('adopt-') for p in (notebook / '.vault-recovery').iterdir())
     assert vault_migration.adopt_new_stores([notebook]) == 0          # once only
+
+
+# ── U101 review: no readable copies of phone uploads or imports on an encrypted computer ──
+
+def _vault_notebook(notebook):
+    vault_migration.migrate(PASSWORD, [notebook])
+    return notebook / 'fieldlog'
+
+
+def test_a_phone_upload_is_kept_encrypted(notebook, monkeypatch):
+    import io
+    from cursiv_engine.core import phone_receive
+    log = _vault_notebook(notebook)
+    def refuse(path):                     # the import fails, so the upload is kept for another try
+        raise ValueError('not a phone file')
+    monkeypatch.setattr(fieldsync, 'import_phone_bundle', refuse)
+    body = b'PK synthetic upload with a private site name'
+    r = phone_receive.Receiver(report=lambda *_: None, port=0)
+    text = r.receive('send.cursivsync', io.BytesIO(body).read, len(body))
+    kept = list((log / 'received').iterdir())
+    assert len(kept) == 1 and kept[0].read_bytes().startswith(vault.MAGIC)       # was: the bytes as sent
+    assert private_store.read_bytes(kept[0]) == body and b'private site' not in kept[0].read_bytes()
+    assert 'kept, encrypted' in text
+
+
+def test_an_upload_too_big_to_encrypt_is_set_apart_and_listed(notebook, monkeypatch):
+    import io
+    from cursiv_engine.core import phone_receive
+    log = _vault_notebook(notebook)
+    monkeypatch.setattr(vault, 'MAX_BYTES', 8192)
+    monkeypatch.setattr(fieldsync, 'import_phone_bundle', lambda path: (_ for _ in ()).throw(ValueError('x')))
+    body = b'PK' + b'x' * 9000
+    r = phone_receive.Receiver(report=lambda *_: None, port=0)
+    text = r.receive('big.cursivsync', io.BytesIO(body).read, len(body))
+    assert 'unencrypted (too big to encrypt)' in text
+    assert [p.parent.name for p in phone_receive.readable_leftovers()] == ['received-large']
+    assert not (log / 'received').exists() or not list((log / 'received').iterdir())
+
+
+def test_unpacking_an_import_writes_only_encrypted_staging_and_cleans_it_up(notebook, monkeypatch):
+    log = _vault_notebook(notebook)
+    staged = {}
+
+    def inspect(folder):
+        staged['folder'] = folder
+        staged['raw'] = {p.name: p.read_bytes() for p in folder.rglob('*') if p.is_file()}
+        return {'added': {}, 'unchanged': [], 'conflicts': [], 'rejected': [], 'own': False}
+    monkeypatch.setattr(fieldsync, 'import_folder', inspect)
+    bundle = {'format': fieldsync.PHONE_FORMAT, 'device': 'phone-abcdefabcdef',
+              'entries': [{'note': 'private site note'}], 'manifest': {'entries': 1}}
+    src = notebook / 'send.cursivsync'
+    src.write_text(json.dumps(bundle), encoding='utf-8')
+    fieldsync.import_phone_bundle(src)
+    assert staged['folder'].parent == log and staged['folder'].name.startswith('.import-')   # not the system temp
+    assert staged['raw'] and all(raw.startswith(vault.MAGIC) for raw in staged['raw'].values())
+    assert not staged['folder'].exists()
+
+
+def test_an_old_oversized_upload_never_blocks_unlocking(notebook, monkeypatch):
+    log = _vault_notebook(notebook)
+    monkeypatch.setattr(vault, 'MAX_BYTES', 8192)
+    (log / 'received').mkdir(exist_ok=True)
+    (log / 'received' / 'old-big.cursivsync').write_bytes(b'PK' + b'y' * 9000)   # readable, from before U101
+    (log / 'received' / 'old-small.cursivsync').write_bytes(b'PK small')
+    vault_migration.adopt_new_stores([notebook])                                 # was: VaultError, no unlock
+    assert (log / 'received-large' / 'old-big.cursivsync').read_bytes().startswith(b'PKyy')
+    small = log / 'received' / 'old-small.cursivsync'
+    assert small.read_bytes().startswith(vault.MAGIC) and private_store.read_bytes(small) == b'PK small'

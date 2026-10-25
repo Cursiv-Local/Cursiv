@@ -69,9 +69,32 @@ def adopt_new_stores(directories=None) -> int:
     return done
 
 
+def set_aside_large_uploads(root: Path) -> int:
+    """fieldlog/received/ is encrypted since U101. A readable phone upload already there that is over
+    the 64 MB envelope can't be, and would stop the unlock (inventory refuses it), so it is MOVED,
+    never deleted, to fieldlog/received-large/, where Cursiv lists readable uploads. Smaller ones stay
+    and are encrypted like any other new store. Returns how many were moved."""
+    folder = Path(root) / "fieldlog" / "received"
+    moved = 0
+    if not folder.is_dir():
+        return 0
+    for path in folder.iterdir():
+        if not path.is_file() or path.stat().st_size <= vault.MAX_BYTES - 4096:
+            continue
+        with path.open("rb") as stream:
+            if stream.read(len(vault.MAGIC)) == vault.MAGIC:
+                continue
+        target = folder.parent / "received-large"
+        target.mkdir(exist_ok=True)
+        path.replace(target / path.name)
+        moved += 1
+    return moved
+
+
 def inventory(root: Path) -> list[Path]:
     if not root.exists():
         return []
+    set_aside_large_uploads(root)
     result = []
     for directory, dirs, files in os.walk(vault.checked(root), followlinks=False):
         for name in dirs:
