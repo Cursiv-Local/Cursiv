@@ -69,6 +69,38 @@ def adopt_new_stores(directories=None) -> int:
     return done
 
 
+def recovery_copies(root: Path) -> list[dict]:
+    """The encrypted copies migration made of each store just before encrypting it (U102: they were
+    kept but there was no way to get one back). [{"path", "sha256", "backup"}]. Needs the vault unlocked."""
+    root = Path(root).absolute()
+    journal = root / JOURNAL
+    if not journal.exists():
+        return []
+    cipher = vault._cipher(root)
+    return json.loads(vault.unpack(cipher, JOURNAL, journal.read_bytes()))
+
+
+def write_recovery_copy(root: Path, relative: str, dest: Path) -> Path:
+    """Decrypt the pre-encryption copy of one store into a NEW file at dest (refused if dest exists), after
+    checking it against its recorded SHA-256. The live store is never touched; putting the copy back is the
+    person's decision. Returns dest."""
+    root = Path(root).absolute()
+    record = next((r for r in recovery_copies(root) if r["path"] == relative), None)
+    if record is None:
+        raise vault.VaultError(f"There's no recovery copy of {relative}")
+    backup = Path(record["backup"])
+    if backup.parent != Path(".vault-recovery") or not backup.name.endswith(".enc"):
+        raise vault.VaultError("Invalid recovery file reference")
+    original = vault.unpack(vault._cipher(root), backup, vault.checked(root / backup).read_bytes())
+    if hashlib.sha256(original).hexdigest() != record["sha256"]:
+        raise vault.VaultError("Recovery copy checksum mismatch; nothing was written")
+    dest = Path(dest)
+    if dest.exists():
+        raise FileExistsError(f"{dest} already exists; choose a new file name")
+    atomic.write_bytes(dest, original, protect=False)
+    return dest
+
+
 def set_aside_large_uploads(root: Path) -> int:
     """fieldlog/received/ is encrypted since U101. A readable phone upload already there that is over
     the 64 MB envelope can't be, and would stop the unlock (inventory refuses it), so it is MOVED,
