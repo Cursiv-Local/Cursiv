@@ -3,7 +3,7 @@ Point the website and release docs from one published release to the next.
 
     py -3.13 scripts/website_release.py --old U95 --new U96 \
         --old-hash <previous Windows SHA-256> --new-hash <new Windows SHA-256> \
-        --windows 1865 --old-windows 1819 --mac 1850 --mac-skips 16 \
+        --windows 1865 --windows-skips 1 --old-windows 1819 --mac 1850 --mac-skips 16 \
         --summary "One sentence for the Start page." --section "<p>…</p> text for the test page"
 
 Edits only the lines a release changes (download links, Mac link, hash and its id,
@@ -16,6 +16,8 @@ Run `node cloudflare/publish.mjs --build-only` and the website tests afterwards.
 from __future__ import annotations
 
 import argparse
+import re
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,7 +28,12 @@ def main() -> int:
     for name in ("old", "new", "old-hash", "new-hash", "windows", "old-windows", "mac", "mac-skips", "summary",
                  "section", "title"):
         a.add_argument("--" + name, required=name != "title")
+    today = date.today()
+    a.add_argument("--windows-skips", type=int, default=1)
+    a.add_argument("--date", default=f"{today:%B} {today.day}, {today.year}")
     x = a.parse_args()
+    # The live-model checks skip unless a model is running, so the skip count changes between releases.
+    win_skips = "1 platform test skipped" if x.windows_skips == 1 else f"{x.windows_skips} skipped"
     old, new = x.old, x.new
     lo, ln = old.lower(), new.lower()
     fmt = lambda n: f"{int(n):,}"
@@ -64,8 +71,7 @@ def main() -> int:
              f'<meta name="description" content="Cursiv {new} software regressions', 1),
             (f'<section id="{lo}">',
              f'<section id="{ln}"><div class="wrap"><h2>{new} software and release checks</h2><p>Updated '
-             f'October 24, 2026. The full isolated Windows source suite passed <b>{fmt(x.windows)} passed; 1 platform '
-             f'test skipped</b>. Hosted Mac source checks passed <b>{fmt(x.mac)} tests; {x.mac_skips} platform skips</b>. '
+             f'{x.date}. The full isolated Windows source suite passed <b>{fmt(x.windows)} passed; {win_skips}</b>. Hosted Mac source checks passed <b>{fmt(x.mac)} tests; {x.mac_skips} platform skips</b>. '
              f'Both tagged packages passed their frozen self-tests, and the Windows package also passed a start from a '
              f'USB layout. {x.section} <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/{new}-RELEASE-'
              f'VERIFICATION.md">Source, package and owner-signature evidence</a>.</p><p>These are software checks, not a '
@@ -73,7 +79,6 @@ def main() -> int:
              f'unchanged. Windows CA signing and Mac notarization remain separate checks.</p></div></section>\n'
              f'<section id="{lo}">', 1)],
     }
-    import re
     # Matched after the anchor links above were already moved to the new release.
     current = re.compile(r'<p class="fine">Current release: ' + old + r'\. [^<]*<a href="/ai-reliability-testing#' + ln + '">')
     staged = {}
@@ -91,6 +96,12 @@ def main() -> int:
                 raise SystemExit(f"TECH.md: no release-table row for {old}. Nothing written.")
             text = (text[:row.end()] + f"\n| {new}: {x.title} | [Release notes](docs/RELEASE-{new}.md), "
                     f"[verification](docs/{new}-RELEASE-VERIFICATION.md) |" + text[row.end():])
+        if rel == "website/index.html":
+            skips = "with one Mac-only skip" if x.windows_skips == 1 else f"{x.windows_skips} skipped"
+            text, n = re.subn(rf"({new} source passed [\d,]+ software regression tests on Windows), [^.]*\.",
+                              rf"\1, {skips}.", text)
+            if n != 1:
+                raise SystemExit("website/index.html: Windows skip sentence not found once. Nothing written.")
         if rel == "website/start.html":
             text, n = current.subn(f'<p class="fine">Current release: {new}. {x.summary} '
                                    f'<a href="/ai-reliability-testing#{ln}">', text)
