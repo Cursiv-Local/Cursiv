@@ -38,7 +38,6 @@ from chat_controls import ChatControlsMixin, _ChatInput
 from chat_transcript import ChatTranscriptMixin
 from chat_review import ChatReviewMixin
 from chat_feedback import ChatFeedbackMixin
-from personal_features import PersonalFeaturesMixin
 
 
 _HERE = Path(__file__).parent
@@ -135,7 +134,7 @@ class _ChatSignals(QObject):
 
 
 
-class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, PersonalFeaturesMixin, QWidget):
+class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, QWidget):
     conversation_changed = pyqtSignal()     # saved / opened / new / renamed -> sidebar refresh
     """
     Self-contained chat view: transcript + input box, wired to the real
@@ -956,35 +955,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         cmd = text.strip().lower()
 
         from cursiv_engine.core import profile
-        if profile.personal_command(text) and not profile.personal():
-            self._append_system(profile.PERSONAL_NOTE)
+        if profile.letters_command(text):
+            self._append_system(profile.REMOVED_NOTE)
             return True
-
-        if cmd == "write to" or cmd.startswith("write to "):
-            self._open_postal_compose(text[9:].strip())
-            return True
-
-        if cmd == "legacy" or cmd.startswith("legacy "):
-            # "legacy import <path>" is a plain text command (handled by
-            # chat_commands); bare "legacy"/"legacy <anything else>" opens
-            # the vault dialog, matching the terminal's natural-language
-            # gate but with real structured login fields instead.
-            if cmd.startswith("legacy import "):
-                return False
-            self._open_legacy_vault()
-            return True
-
-        if cmd.startswith("babel i am ") or cmd.startswith("babel: i am "):
-            # Family letter activation ("babel I am [Name] born [Date][, PIN]")
-            # existed in the terminal CLI but was never ported to the GUI --
-            # it fell through to plain "translate this to English" instead,
-            # which is what a name+DOB *mismatch* is supposed to do (the CLI
-            # deliberately doesn't reveal whether a guess was close), so only
-            # intercept here once detect_family_member finds a real match.
-            # A non-match returns False and falls through to chat_commands'
-            # normal babel handler, unchanged -- same as a genuine guess.
-            if self._try_family_activation(text):
-                return True
 
         if cmd in ("voice", "listen") or cmd.startswith("voice ") or cmd.startswith("listen "):
             # Typed as a command (matching the terminal CLI exactly) --

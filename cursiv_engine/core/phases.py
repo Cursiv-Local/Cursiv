@@ -4,7 +4,7 @@ Cursiv's 8 phases as running code -- one pass per message, before the model is c
   Energy        notice stress, exhaustion or rush -> shorter, gentler reply
   Emergency     notice a crisis -> care first, real help lines shown up front
   Grounding     the person's relevant memories (memory/semantic.py)
-  Route         what kind of answer: direct, code, or a decision worth the council
+  Route         what kind of answer: direct, code, or a decision
   Structure     the shape of the answer: steps, direct yes/no, comparison, explanation
   Connectivity  online? local model ready? (recorded for routing and the trace)
   Future State  when the person is working toward something: end with one next step
@@ -21,7 +21,7 @@ import time
 from dataclasses import dataclass, field
 
 # ── Session state (one Cursiv session = this process) ───────────────────────
-_session = {"start": time.time(), "messages": 0, "break_suggested": False, "council_hinted": False}
+_session = {"start": time.time(), "messages": 0, "break_suggested": False}
 _last_trace: list[tuple[str, str]] = []
 
 

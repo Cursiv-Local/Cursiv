@@ -175,7 +175,7 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
         except Exception:
             return ""
 
-    m = _re.match(r"(?is)^agent\s+council\s+(.+)$", t)
+    m = _re.match(r"(?is)^(?:agents\s+ask|agent\s+council)\s+(.+)$", t)
     if m:
         question = m.group(1).strip()
         agents = custom.all_agents()
@@ -202,7 +202,7 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
                      {"role": "user", "content": f"Question: {question}\n\n" + "\n\n".join(views)}]
             gen, _u = runtime._cascade_stream(synth, cfg, max_tokens=700)
             yield from gen
-        return runtime.StreamResult(f"Agent council — {len(agents[:6])} agents", stream(), None)
+        return runtime.StreamResult(f"Your agents — {len(agents[:6])} answering", stream(), None)
 
     m = _re.match(r"(?is)^(?:@|agent\s+(?:ask\s+)?@?)([\w-]+)[\s,:]+(.+)$", t)
     if m:

@@ -75,7 +75,7 @@ print(json.dumps({"model": model}), flush=True)
 for c in cases:
     sem.FACTS_FILE.unlink(missing_ok=True)
     verify.reset_session()
-    phases._session.update(start=time.time(), messages=0, break_suggested=False, council_hinted=False)
+    phases._session.update(start=time.time(), messages=0, break_suggested=False)
     phases._conn_cache.update(t=0.0, online=None)
     for fact, origin in c.get("memory", []):
         sem.add_fact(fact, source="manual" if origin == "user_said" else "learned", origin=origin)

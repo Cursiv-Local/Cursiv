@@ -852,9 +852,6 @@ def _call_openai_direct(messages: list[dict], openai_key: str, max_tokens: int |
 
 
 
-def _call_provider_council(question: str, xai_key: str, openai_key: str, anthropic_key: str, system_context: str='') -> Generator[str, None, None]:
-    """Compatibility entry point; implementation in chat.routing."""
-    return _routing._call_provider_council(_runtime(), question, xai_key, openai_key, anthropic_key, system_context)
 
 
 

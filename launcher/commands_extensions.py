@@ -97,93 +97,10 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
             return runtime.TextResult("Usage: ref <question>")
         return runtime.TextResult(runtime._ref_answer(query))
 
-    # ── Council ──────────────────────────────────────────────────────────
-    if (cmd == "council" or cmd.startswith("council ")
-            or cmd == "/full" or cmd.startswith("/full ")
-            or cmd == "/deliberate" or cmd.startswith("/deliberate ")):
-        force_full = cmd.startswith(("/full", "/deliberate"))
-        for prefix in ("council ", "/full ", "/deliberate "):
-            if cmd.startswith(prefix):
-                question = text[len(prefix):].strip()
-                break
-        else:
-            question = ""
-        if not question:
-            return runtime.TextResult("Usage: council <question>  ·  /full <question> for complete deliberation")
-        if runtime._ASYNC_COUNCIL_OK:
-            # Bridges run_council()'s blocking/asyncio interior to a live
-            # generator via a background thread + queue -- the exact
-            # pattern cursiv_engine.ui.chat_app.py's Gradio surface already
-            # uses (_call_provider_council), so the GUI streams each
-            # provider's response as it actually arrives (write_fn fires
-            # for the session banner, each provider's own streamed text,
-            # quality scores, and the synthesis, in that real order)
-            # instead of going silent for the whole deliberation and only
-            # ever showing a synthesis at the end. write_fn=None (the
-            # default) falls back to raw sys.stdout.write() inside
-            # run_council() -- fine for the terminal CLI, but sys.stdout
-            # is None in the packaged GUI build (console=False), which is
-            # why this needs an explicit write_fn at all, not just a nicer
-            # UI: without one, this crashed outright the moment
-            # run_council tried to print anything.
-            _result_holder: dict = {}
-
-            def _run():
-                import queue as _queue_mod
-                q: "_queue_mod.Queue[str | None]" = _queue_mod.Queue()
-
-                def _worker():
-                    try:
-                        r = runtime._async_council_run(
-                            question, cfg, force_full=True if force_full else None,
-                            write_fn=q.put,
-                        )
-                        _result_holder["result"] = r
-                    except Exception as exc:
-                        q.put(f"\n[Council error: {exc}]\n")
-                    finally:
-                        q.put(None)   # sentinel -- always fires
-
-                import threading as _threading_mod
-                _threading_mod.Thread(target=_worker, daemon=True).start()
-
-                while True:
-                    chunk = q.get()
-                    if chunk is None:
-                        break
-                    # CLI-only ANSI color codes would otherwise show up as
-                    # literal garbage (e.g. "\x1b[31m") in the transcript.
-                    yield runtime._ANSI_RE.sub("", chunk)
-
-                result = _result_holder.get("result")
-                if result is not None:
-                    cfg["_last_council_synthesis"] = result.synthesis
-                    cfg["_last_council_query"] = question
-
-            def _finish(full: str):
-                # Strand/session log gets the clean synthesis specifically
-                # (when available), not the full multi-provider transcript
-                # the chat panel just streamed -- same as before this was
-                # switched to live streaming, just no longer assuming the
-                # generator's only output was ever the synthesis alone.
-                result = _result_holder.get("result")
-                saved = result.synthesis if result is not None else full
-                runtime._session_append(question, saved, "async_council")
-                if runtime._STRAND_OK and saved and len(saved) > 100:
-                    runtime._strand_save(question, saved, tags=["council", "async"], score=0.80,
-                                 territory_tag="worldmodel", source="async_council", model="council_synthesis")
-
-            return runtime.StreamResult(f"Council deliberating — {question[:60]}", _run(), _finish)
-        if not (cfg.get("api_key") or cfg.get("openai_key") or cfg.get("anthropic_key")):
-            return runtime.TextResult("Council requires at least one API key.")
-        def _finish2(full: str):
-            cfg["_last_council_synthesis"] = full
-            runtime._session_append(question, full, "group_discovery")
-        return runtime.StreamResult(
-            f"Group discovery — {question[:60]}",
-            runtime._call_provider_council(question, cfg.get("api_key", ""), cfg.get("openai_key", ""), cfg.get("anthropic_key", "")),
-            _finish2,
-        )
+    # ── Council (removed in U97) ──
+    if (cmd == "council" or cmd.startswith("council ") or cmd in ("/full", "/deliberate")
+            or cmd.startswith(("/full ", "/deliberate "))):
+        return runtime.TextResult('The council was removed from Cursiv. Ask your question normally, or ask your own agents together with: agents ask <question>')
 
     # ── Strand memory ────────────────────────────────────────────────────
     return UNHANDLED

@@ -231,25 +231,6 @@ def main():
         )
         sys.exit(1)
 
-    # ── Family member welcome ─────────────────────────────────────────────
-    # If the username matches a family member's first name, point them at
-    # the babel activation before the main launcher opens. The letter itself
-    # is sealed (cursiv_engine/family/sealed_letters.json) and only opens with
-    # their name + birth date -- a username alone must never reveal it.
-    try:
-        _FAMILY_FIRST = ("keiarra", "kain", "allan", "elijah", "eli", "naylie", "adaline", "tina")
-        _lname = username.lower().strip()
-        from cursiv_engine.core import profile
-        if not profile.personal():
-            _lname = ''  # no name-triggered personal welcome in the research profile
-        for _fn in _FAMILY_FIRST:
-            if _lname == _fn or _lname.startswith(_fn + " ") or _lname.startswith(_fn + "_"):
-                from login_dialog import FamilyWelcomeDialog
-                FamilyWelcomeDialog(_fn.title()).exec()
-                break
-    except Exception:
-        pass
-
     # ── Main launcher window ──────────────────────────────────────────────
     try:
         from cursiv_launcher import CursivLauncher

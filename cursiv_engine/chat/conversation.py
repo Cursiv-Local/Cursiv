@@ -467,7 +467,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     if not runtime.netgate.allowed():
         # Offline mode: saved keys stay saved but aren't used; the local model answers.
         key = oai = ant = ""
-        if fp in ("grok", "claude", "openai", "council"):
+        if fp in ("grok", "claude", "openai"):
             yield f"*[{fp.title()} skipped. {runtime.netgate.OFFLINE_MESSAGE} Answering with the local model.]*\n\n"
             fp = "ollama"
 
@@ -515,14 +515,6 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         yield from runtime._call_ollama(text_msgs)
         return
 
-    elif fp == "council":
-        raw = user_text.strip()
-        _sys_ctx = "\n\n".join(
-            m["content"] for m in messages
-            if m.get("role") == "system" and isinstance(m.get("content"), str)
-        )
-        yield from runtime._call_provider_council(raw, key, oai, ant, system_context=_sys_ctx)
-        return
 
     _text_msgs_all = [
         {"role": m["role"],

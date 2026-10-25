@@ -675,7 +675,7 @@ class CursivLauncher(QMainWindow):
         self._codex_dl_btn.setFixedHeight(28)
         self._codex_dl_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._codex_dl_btn.setToolTip(
-            "Download the offline Code Council models (qwen2.5-coder:14b + deepseek-coder-v2:16b)"
+            "Download the offline coding models (qwen2.5-coder:14b + deepseek-coder-v2:16b)"
         )
         self._codex_dl_btn.setStyleSheet(_codex_style)
         self._codex_dl_btn.clicked.connect(self._download_codex_models)
@@ -937,12 +937,6 @@ class CursivLauncher(QMainWindow):
             self._set_status(f"Help failed to open: {e}")
 
     # Tools buttons reach the chat panel's dialogs through the main window.
-    def _open_postal_compose(self, hint: str = ""):
-        self._chat_panel._open_postal_compose(hint)
-
-    def _open_legacy_vault(self):
-        self._chat_panel._open_legacy_vault()
-
     def _open_training_data(self):
         self._chat_panel._open_training_data()
 

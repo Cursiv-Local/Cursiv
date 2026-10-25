@@ -3,19 +3,22 @@ Which features Cursiv shows: the research profile (the default) or everything.
 
 The research profile keeps the window focused on field work: the field notebook,
 documents, calculations, the offline reference and privacy. Personal features
-(family letters, the legacy vault, the phone app, coding help, the council,
-agents and builder tools) are hidden from Tools, help and the title bar.
-Nothing is removed. Letter/vault commands also require Settings → Appearance →
-"Show personal features"; they no longer bypass the hidden UI.
+(the phone app, coding help, agents and builder tools) are hidden from Tools, help
+and the title bar until Settings → Appearance → "Show personal features".
+
+Family letters, the legacy vault and personal letters were removed from the public
+app in U97. Their old commands get REMOVED_NOTE; letters and data already saved on a
+computer are left where they are.
 """
 from __future__ import annotations
 
 PROFILE_KEY = "profile"          # "personal" shows everything; anything else is the research profile
-PERSONAL_NOTE = 'Personal letters and the legacy vault are hidden. Enable Settings → Appearance → Show personal features to use them.'
+REMOVED_NOTE = ('Family letters, the legacy vault and personal letters were removed from Cursiv. '
+                'Letters and data already saved on this computer were not deleted.')
 
 
-def personal_command(text: str) -> bool:
-    """Only established letter/vault commands, not ordinary discussion or file intent."""
+def letters_command(text: str) -> bool:
+    """The removed letter/vault commands, not ordinary discussion or file intent."""
     cmd = text.strip().lower()
     return (cmd in ('letters', 'letters for me', 'letters from me', 'legacy', 'write to') or
             cmd.startswith(('open letter ', 'letter ', 'council letter ', 'seal export ', 'seal import ',

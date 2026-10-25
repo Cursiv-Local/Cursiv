@@ -6,7 +6,7 @@ or None for normal chat. It calls the same functions the terminal CLI
 (cursiv_engine/chat) uses.
 
 Handled in chat_panel.py instead, because they need a window or widget:
-voice / listen / paste, write to / legacy (compose and PIN dialogs), and
+voice / listen / paste, and
 clear (the transcript widget).
 """
 from __future__ import annotations
@@ -56,7 +56,6 @@ from cursiv_engine.ui.chat_app import (
     _call_xai_stream,
     _call_claude_direct,
     _call_openai_direct,
-    _call_provider_council,
     _web_search,
     cascade_stream as _cascade_stream,
     free_key_command as _free_key_command,
@@ -98,13 +97,6 @@ except Exception:
     def _ref_answer(q): return ""
     def _ref_avail(): return False
 
-try:
-    from cursiv_engine.council.async_council import run_council as _async_council_run, council_available as _async_council_ok
-    _ASYNC_COUNCIL_OK = True
-except Exception:
-    _ASYNC_COUNCIL_OK = False
-    def _async_council_run(q, cfg, **kw): return None
-    def _async_council_ok(cfg): return False
 
 try:
     from cursiv_engine.core.strand_store import (
@@ -145,99 +137,6 @@ try:
 except Exception:
     def _session_append(u, a, m="unknown"): pass
 
-try:
-    from cursiv_engine.postal.sealed_store import (
-        seal_letter as _postal_seal,
-        open_letter as _postal_open,
-        get_sealed_entry as _postal_entry,
-        get_sig_status as _postal_sig_status,
-        letters_for as _postal_for,
-        letters_from as _postal_from,
-        all_letters as _postal_all,
-        export_sealpack as _postal_export,
-        import_sealpack as _postal_import,
-    )
-    from cursiv_engine.postal.council_reader import council_walkthrough as _postal_council
-    from cursiv_engine.postal.user_registry import (
-        setup_identity as _postal_setup,
-        my_identity as _postal_my_id,
-        add_contact as _postal_add_contact,
-        remove_contact as _postal_rm_contact,
-        list_contacts as _postal_contacts,
-        resolve_recipient as _postal_resolve,
-        rotate_identity as _postal_rotate,
-        key_rotation_history as _postal_key_history,
-    )
-    _POSTAL_OK = True
-except Exception:
-    _POSTAL_OK = False
-    def _postal_seal(**kw): return ""
-    def _postal_open(i): return None
-    def _postal_entry(i): return None
-    def _postal_sig_status(i): return "unknown"
-    def _postal_for(k): return []
-    def _postal_from(k): return []
-    def _postal_all(): return []
-    def _postal_export(i): return None
-    def _postal_import(f, p): return None
-    def _postal_council(i, u, c, **kw): return "[Postal module unavailable]"
-    def _postal_setup(n): return {}
-    def _postal_my_id(): return None
-    def _postal_add_contact(n, k): return {}
-    def _postal_rm_contact(n): return False
-    def _postal_contacts(): return []
-    def _postal_resolve(n): return None
-    def _postal_rotate(reason="", **kw): return {}
-    def _postal_key_history(): return []
-
-try:
-    from cursiv_engine.family.family_profiles import detect_family_member as _fam_detect
-    from cursiv_engine.family.legacy_store import (
-        letters_waiting_for as _legacy_letters_for,
-        letters_written_by as _legacy_letters_by,
-        get_letter_content as _legacy_get_content,
-        save_letter as _legacy_save,
-        rewrite_letter as _legacy_rewrite,
-        delete_letter as _legacy_delete,
-        name_to_key as _legacy_name_to_key,
-        export_pack as _legacy_export_pack,
-        import_pack as _legacy_import_pack,
-        open_folder as _legacy_open_folder,
-    )
-    from cursiv_engine.family.family_profiles import (
-        pin_is_set as _fam_pin_is_set,
-        verify_pin as _fam_verify_pin,
-        set_pin as _fam_set_pin,
-        is_valid_pin as _fam_pin_valid,
-        get_letter as _fam_get_letter,
-        build_system_prompt as _fam_build_prompt,
-        get_jw_header as _fam_header,
-        parse_iam_command as _fam_parse_iam,
-        PIN_CHARS as _FAM_PIN_CHARS,
-    )
-    _LEGACY_OK = True
-except Exception:
-    _LEGACY_OK = False
-    def _fam_detect(n, d): return None
-    def _fam_pin_is_set(k): return False
-    def _fam_verify_pin(k, p): return False
-    def _fam_set_pin(k, p): pass
-    def _fam_pin_valid(p): return False
-    def _fam_get_letter(k): return ""
-    def _fam_build_prompt(p): return ""
-    def _fam_header(): return ""
-    def _fam_parse_iam(t): return None
-    _FAM_PIN_CHARS = "! @ # $ % ^ & * ~ - + = ? /"
-    def _legacy_letters_for(k): return []
-    def _legacy_letters_by(k): return []
-    def _legacy_get_content(i): return None
-    def _legacy_save(**kw): return ""
-    def _legacy_rewrite(i, c): return False
-    def _legacy_delete(i): return False
-    def _legacy_name_to_key(n): return n.lower().split()[0] if n.split() else ""
-    def _legacy_export_pack(k, d): return (Path("."), 0)
-    def _legacy_import_pack(f): return (0, [])
-    def _legacy_open_folder(p): pass
 
 try:
     from cursiv_engine.agents.voice_agent import (
@@ -453,7 +352,6 @@ Just talk to me. Most things don't need a command.
   what do you remember        see what I know (forget <words> to remove)
   translate <text> into <lang>   Spanish, French, Korean, ...
   search: <question>          look it up online, only when you ask
-  write to <name>             a private sealed letter for family
   mic button / voice          talk instead of typing
   paste                       look at a picture from the clipboard
   offline on / off            keep everything on this computer
@@ -496,12 +394,6 @@ _HELP_TOPICS = {
   save this                   save the last answer as a note
   notes / notes search <words>   your saved notes
   clear                       clear this conversation from the screen"""),
-    "family": ("Family", """\
-  write to <name>             write a sealed letter (opens a window)
-  letters                     letters waiting for you, and ones you sent
-  open letter <id>            read one letter
-  legacy                      open the family Legacy Vault
-  legacy import <file>        add a .legacypack file to the vault"""),
     "translate": ("Translate and voice", """\
   translate <text> into <lang>   e.g. into English, or into Spanish and French
   voice / voice <seconds>     record, turn speech into text, then send
@@ -543,9 +435,7 @@ _HELP_TOPICS = {
   plugins                     plugin show / on / off / remove <name>
   projects                    running summaries of projects (project show / forget <name>)
   agents                      agent new <name>: <job>, then @name <message>
-  agent council <question>    ask all your agents, then combine their views
-  council <question>          ask every AI at once and combine the answers
-  /full <question>            council without the summary step
+  agents ask <question>       ask all your agents, then combine their views
   postal setup <name> / my key / add user <n> <k> / contacts / rotate
   note export / note import <file>
   ref <question>              answer from the local reference data
@@ -553,7 +443,7 @@ _HELP_TOPICS = {
   obsidian on / off / path / export / status"""),
 }
 _BUILDER_TOPICS = {"builder"}
-_PERSONAL_TOPICS = {"family", "coding", "builder"}     # listed only with personal features shown
+_PERSONAL_TOPICS = {"coding", "builder"}     # listed only with personal features shown
 
 
 def _personal() -> bool:
@@ -744,16 +634,6 @@ def describe_photo(path: str, question: str, cfg: dict) -> TextResult:
 def analyze_pasted_image(png_bytes: bytes, cfg: dict, width: int, height: int) -> TextResult:
     """Compatibility entry point; implementation in command_media."""
     return _media.analyze_pasted_image(_runtime(), png_bytes, cfg, width, height)
-
-
-
-# ── Postal compose — caller (chat_panel.py) collects recipient/hint/body
-# via a dialog; the actual sealing call is identical to the terminal CLI's
-# "write to" flow. ──────────────────────────────────────────────────────
-
-def postal_compose(sender_user: str, recipient_raw: str, hint: str, content: str) -> TextResult:
-    """Compatibility entry point; implementation in command_media."""
-    return _media.postal_compose(_runtime(), sender_user, recipient_raw, hint, content)
 
 
 

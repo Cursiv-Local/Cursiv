@@ -4,7 +4,7 @@ Functions receive the explicit ChatRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: cascade_stream, _classify_message, _call_provider_council, _is_online, _cloud_configured, _connectivity_probe, _local_stream, _fallback_chain, _router_llm, warm_up_local.
+Entry points: cascade_stream, _classify_message, _is_online, _cloud_configured, _connectivity_probe, _local_stream, _fallback_chain, _router_llm, warm_up_local.
 """
 from __future__ import annotations
 
@@ -118,50 +118,10 @@ def _classify_message(runtime: ChatRuntime, text: str) -> str:
     # Generic verbs (write/build/create/test/...) need 2+ hits before this
     # counts as code -- a single "create" or "build" is common in completely
     # non-code requests ("create a farming schedule", "build my confidence")
-    # and shouldn't alone route someone into the Code Council pipeline.
+    # and shouldn't alone route someone into the local coding models.
     if code_hits >= 2:
         return "code"
     return "general"
-
-def _call_provider_council(runtime: ChatRuntime, question: str, xai_key: str, openai_key: str, anthropic_key: str, system_context: str) -> Generator[str, None, None]:
-    """
-    Entry into the Provider Council (council/async_council.py)
-    (cursiv_engine.council.async_council.run_council) -- bridges its
-    blocking/asyncio interior to Gradio's synchronous streaming generator
-    via a background thread + queue, so both UI surfaces run one shared
-    council implementation instead of each maintaining a separate one.
-
-    Replaces the old, independently-written "Group Discovery" 3-cycle
-    loop that used to live here -- same idea (multi-provider consensus),
-    now the one real implementation instead of a second copy of it.
-    """
-    from cursiv_engine.council.async_council import run_council
-
-    full_question = f"{system_context}\n\n{question}" if system_context else question
-
-    cfg = {
-        "api_key":       xai_key or "",
-        "openai_key":    openai_key or "",
-        "anthropic_key": anthropic_key or "",
-    }
-
-    q = runtime._queue_mod.Queue()
-
-    def _worker() -> None:
-        try:
-            run_council(full_question, cfg, force_full=True, write_fn=q.put)
-        except Exception as exc:
-            q.put(f"\n[Council error: {exc}]\n")
-        finally:
-            q.put(None)  # sentinel -- always fires
-
-    runtime.threading.Thread(target=_worker, daemon=True).start()
-
-    while True:
-        chunk = q.get()
-        if chunk is None:
-            break
-        yield chunk
 
 def _is_online(runtime: ChatRuntime) -> bool:
     """TCP connect to 8.8.8.8:53 — tests internet without a DNS lookup.
@@ -208,7 +168,7 @@ def _local_stream(runtime: ChatRuntime, text_msgs: list[dict], user_text: str) -
     except Exception:
         pass
     if _is_code:
-        return "Code Council", runtime._call_ollama_code_council(text_msgs)
+        return "Local coding models", runtime._call_ollama_code_council(text_msgs)
     return "Ollama", runtime._call_ollama(text_msgs)
 
 def _fallback_chain(runtime: ChatRuntime, text_msgs: list[dict], user_text: str, tried: list[str], local_tried: bool) -> Generator[str, None, None]:
@@ -250,13 +210,13 @@ def _fallback_chain(runtime: ChatRuntime, text_msgs: list[dict], user_text: str,
             yield "*[The local model didn't answer. Try again in a moment, or add a free key in Settings.]*"
         return
     _label, ollama_gen = runtime._local_stream(text_msgs, user_text)
-    _is_code = _label == "Code Council"
+    _is_code = _label == "Local coding models"
     first_ol   = next(ollama_gen, None)
     if first_ol is not None:
         if not first_ol.lstrip().startswith("[Ollama"):
             runtime._set_answered(runtime._ollama_label(_label))
         if tried:
-            _label = "Code Council" if _is_code else "Ollama"
+            _label = "Local coding models" if _is_code else "Ollama"
             yield f"*[{' → '.join(tried)} unavailable — {_label}]*\n\n"
         yield first_ol
         yield from ollama_gen

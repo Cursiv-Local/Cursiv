@@ -107,7 +107,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     if _native is not None:
         from cursiv_engine.core.conversation_kind import relayed_thread_question
         _requested_provider = (force_provider or '').lower().strip()
-        if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai', 'council') and runtime.netgate.is_offline():
+        if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai') and runtime.netgate.is_offline():
             yield _file_ops.VerifiedText(f'*[{_requested_provider.title()} skipped. Offline mode is on. '
                 'This application answer used no external provider or local model.]*\n\n')
         yield _file_ops.VerifiedText(_native)

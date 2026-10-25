@@ -1,8 +1,8 @@
 """
 Cursiv semantic memory -- memory that finds by meaning and learns.
 
-  * Facts: short lasting things about a person ("Keiarra compares KJV and NIV",
-    "Joshua prefers direct answers"), saved per person in .cursiv/memory_facts.jsonl.
+  * Facts: short lasting things about a person ("Dana compares two Bible translations",
+    "Alex prefers direct answers"), saved per person in .cursiv/memory_facts.jsonl.
     Person "family" = shared by everyone.
   * Recall: facts and saved strands are matched to the question by meaning, using
     a small local embedding model through Ollama (nomic-embed-text). Without it,

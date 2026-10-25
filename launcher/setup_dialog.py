@@ -47,7 +47,7 @@ from cursiv_engine.core import ollama_host   # where Ollama lives on Windows and
 OLLAMA_INSTALLER_URL = ollama_host.INSTALLER_URL
 OLLAMA_API = ollama_host.API
 
-# Coding models for Cursiv's offline code council: (label, tag)
+# Coding models for Cursiv's offline coding help: (label, tag)
 CODE_MODELS = [
     ("qwen2.5-coder 3B — fast on 4–6 GB graphics cards (1.9 GB)", "qwen2.5-coder:3b"),
     ("qwen2.5-coder 7B — for 8 GB+ graphics cards (4.7 GB)", "qwen2.5-coder:7b"),

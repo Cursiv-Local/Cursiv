@@ -370,7 +370,7 @@ class SettingsDialog(QDialog):
     def _page_appearance(self, lay):
         from cursiv_engine.core import profile as _profile
         self._switch(lay, "Show personal features",
-                     "Family letters, the legacy vault, the phone app, coding help, the council and builder tools. "
+                     "The phone app, coding help, agents and builder tools. "
                      "Off keeps Cursiv focused on field work and disables letter/vault commands. "
                      "Tools and help change right away; the title bar the next time Cursiv opens.",
                      _profile.personal(), _profile.set_personal)

@@ -26,7 +26,6 @@ The engine has no Qt dependency; launcher owns widget lifecycles and entry point
 | `launcher/chat_feedback.py`, `core/feedback.py` | GUI-thread state/receipt presentation and short factual formatters; model prose cannot create execution receipts. |
 | `launcher/chat_review.py`, `chat/review.py` | Snapshot eligible review evidence; finish the draft before a local worker runs; apply labeled follow-ups in Qt with generation/cancellation guards. |
 | `launcher/chat_controls.py`, `chat_transcript.py`, `chat_rendering.py` | Controls, transcript operations, incremental Markdown and message cache. Qt widgets stay on the GUI thread. |
-| `launcher/personal_features.py` | Opt-in letter/vault dialogs separated from the research chat lifecycle; existing backend checks are retained. |
 | `launcher/chat_commands.py` | Compatibility facade and desktop command entry point; re-exports the engine result classes. |
 | `cursiv_engine/core/command_api.py` | Shared result types, command runtime protocol and `UNHANDLED` sentinel. Consolidates the former separate launcher type modules without changing result identity. |
 | `launcher/command_dispatch.py`, `commands_*.py` | Ordered command domains. `UNHANDLED` continues dispatch; intentional `None` defers to guarded chat. |

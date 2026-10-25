@@ -140,7 +140,7 @@ class TrainingDataDialog(QDialog):
 
         self._refresh()
 
-    # ── Styling helpers (match legacy_vault_dialog.py) ──────────────────────
+    # ── Styling helpers ──────────────────────
 
     def _note_label(self, text: str) -> QLabel:
         lbl = QLabel(text)
