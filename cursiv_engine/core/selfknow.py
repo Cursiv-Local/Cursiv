@@ -21,7 +21,8 @@ RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 _SELF_RE = re.compile(
     r"\b(your|you'?re|yourself|cursiv'?s?)\b.{0,40}\b(system|internals?|status|health|version|setup|"
     r"architecture|code|agents?|council|memory|models?|keys?|working|diagnos\w*|analy[sz]\w*|"
-    r"improv\w*|weak\w*|problems?|errors?|capabilit\w*|limits?|speed|slow)\b"
+    r"improv\w*|weak\w*|problems?|errors?|capabilit\w*|limits?|speed|slow|updates?|updater|online|offline|"
+    r"internet|dependenc\w*|privacy|private|encrypt\w*|features?|supports?|claims?|evidence|verif\w*)\b"
     r"|\b(self[- ]?(check|test|diagnos\w*|analy[sz]\w*|report))\b"
     r"|\b(system|status|health) (check|report)\b"
     r"|\bhow are (you|we) (doing|feeling|running)\b"
@@ -84,7 +85,8 @@ def live_report(*, observed=None) -> str:
     keys = [label for label, f in (("Groq (free)", "groq_key"), ("Gemini (free)", "gemini_key"), ("Claude", "anthropic_key"),
                                    ("xAI Grok", "api_key"), ("OpenAI", "openai_key")) if _safe(lambda f=f: ca._saved_key(f), "")]
     lines.append("AI keys saved: " + (", ".join(keys) if keys else "none") +
-                 " (order tried: paid keys, then Groq, then Gemini, then local Ollama / Cursiv Cloud)")
+                 " (order tried: the local model first whenever it is ready; then paid keys, Groq and Gemini; "
+                 "Cursiv Cloud only when no local model is ready and it's turned on)")
     lines.append(f"Cursiv Cloud backup: {'on' if _safe(ca.cloud_enabled, False) else 'off'} (used only when no local model is ready)")
 
     vram = _safe(speed.gpu_vram_mb, 0)
@@ -186,7 +188,7 @@ saved and where), self source <words> and self read <path> (Cursiv's own code), 
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
 - Personality and style: one fixed personality (no tones); style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Memory clean-up: memory cleanup (lists misleading saved notes and memories; changes nothing), memory cleanup remove <codes>|all (backs up first).
-- Looking at itself (read-only, app-authored, no AI model): self prompt / self prompt full (the instructions sent for the last answer), self stores (what is saved, where, and how it reaches answers), self source <words>, self read <path> [line] (Cursiv's own code and docs).
+- Looking at itself (read-only, app-authored, no AI model): self prompt / self prompt full (the instructions sent for the last answer), self stores (what is saved, where, and how it reaches answers), self map [words] (which module does a job, from its code map), self source <words>, self read <path> [line] (Cursiv's own code and docs).
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agents ask <question>.
 - There is no setting for context length or for choosing the chat model by hand; Cursiv picks models by graphics card. To change models, download a different one in Setup.
 
@@ -227,8 +229,19 @@ def evidence(question: str = "") -> str:
 
 
 def system_prompt(*, observed=None, question: str = "") -> str:
+    from . import capabilities, evidence_log
     try:
         facts = re.sub(r"<!--.*?-->", "", FACTS_FILE.read_text(encoding="utf-8"), flags=re.S).strip()
     except Exception:
         facts = "(fact sheet unavailable)"
-    return SELF_PROMPT.format(facts=facts, report=live_report(observed=observed), evidence=evidence(question))
+    # The capability records are the one inventory (core/capabilities.py); the fact sheet adds context.
+    facts = "### Capabilities (Cursiv's records)\n" + capabilities.facts_block() + "\n\n### More context\n" + facts
+    report = live_report(observed=observed)
+    try:
+        report += "\n" + capabilities.live_block()
+    except Exception:
+        report += "\n- Some live settings couldn't be read (unknown)."
+    evidence_log.record(evidence_log.SOURCE_SUPPLIED, "fact sheet, capability records and live report",
+                        operation="supplied to the model for a question about Cursiv",
+                        scope="what the model was given, not something it inspected")
+    return SELF_PROMPT.format(facts=facts, report=report, evidence=evidence(question))

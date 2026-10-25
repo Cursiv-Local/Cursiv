@@ -73,7 +73,13 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     # ── Build system prompt ─────────────────────────────────────────────
     system_text = runtime.load_system_prompt()
     if runtime.turn_policy.current().inspect:
-        system_text += runtime.load_vault_context() + runtime._load_session_ctx()
+        system_text += runtime.load_vault_context()
+        # Session memory (the last exchanges of the latest session, even from another
+        # conversation) is continuity, not material. For writing and creative requests it
+        # made a small model reuse earlier posts word for word (U99), so it's left out.
+        from . import response_style as _rs
+        if not (_rs.DRAFT.search(user_text or '') or _rs._CREATIVE_ASK.search(user_text or '')):
+            system_text += runtime._load_session_ctx()
     runtime._FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if file_context:
         system_text += f"\n\n## Uploaded Content\n{file_context}"

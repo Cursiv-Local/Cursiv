@@ -96,6 +96,9 @@ def for_text(text: str) -> Policy:
         if re.search(r'(?i)\b(?:I|you|we|they|he|she|it)\s*$', body[:match.start()]):
             continue
         clause = re.split(r'(?i)\b(?:but|however|instead|then)\b', match[1], maxsplit=1)[0]
+        if match[0].lower().startswith('without'):
+            # "Without asking me any questions, write the post": the clause ends at the comma (U99).
+            clause = clause.split(',', 1)[0]
         if re.search(r'(?i)\b(?:use|call|invoke)\s+(?:(?:any|the)\s+)?(?:tools?|plugins?|functions?)\b', clause):
             inspect = False
         if re.search(r'(?i)\b(?:inspect|read|browse|scan|search|list|access|look|check|open|analy[sz]e)\b', clause):

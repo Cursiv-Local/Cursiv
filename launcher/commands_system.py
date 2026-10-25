@@ -145,14 +145,20 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
         new_ws = text[9:].strip()
         if not new_ws:
             return runtime.TextResult(f"Workspace: {cfg.get('workspace', '')}")
+        # "workspace <folder> and files on": what a confirmed "work in my … folder" runs (U99).
+        files_on = bool(runtime.re.search(r"(?i)\s+and\s+files\s+on$", new_ws))
+        new_ws = runtime.re.sub(r"(?i)\s+and\s+files\s+on$", "", new_ws).strip()
         from cursiv_engine.core.tools import _resolve
         from cursiv_engine.core import workspace
         from cursiv_engine.memory.semantic import current_person
         try:
-            ws_path = workspace.save(current_person(), str(_resolve(new_ws)), cfg.get('file_access', False))
+            ws_path = workspace.save(current_person(), str(_resolve(new_ws)), files_on or cfg.get('file_access', False))
         except (OSError, ValueError, TypeError) as exc:
             return runtime.TextResult(f'Workspace selection not confirmed: {exc}')
         cfg["workspace"] = ws_path
+        if files_on:
+            cfg["file_access"] = True
+            return runtime.TextResult(f"Workspace → {ws_path}\nFile access → ON")
         return runtime.TextResult(f"Workspace → {ws_path}")
 
     # ── Free AI keys (Gemini / Groq) and Cursiv Cloud ─────────────────────

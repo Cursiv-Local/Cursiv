@@ -41,6 +41,12 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
     today = clock.answer(q)          # "what day is it?" -- the computer's clock, not the model
     if today is not None:
         return today
+    from . import capabilities      # "does Cursiv have an updater / online AI / …?" -- its own records
+    known = capabilities.answer(q)
+    if known is not None:
+        from . import evidence_log
+        evidence_log.record(evidence_log.CAPABILITY, "capability records", operation=f"answer to {q[:80]!r}")
+        return known
     # Help questions describe a workflow; they never execute an import or inspect
     # whether any particular device, cached page or sample actually exists.
     help_question = bool(re.match(r'(?i)^(?:how|what|where|can|does|do)\b', q))
