@@ -214,7 +214,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 
 ## Elsewhere
 - `tests/` — the suite (`-m usb` is the USB gate run before every commit).
-- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`).
+- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories).
 - `bench/` — truth benchmark and the U99 phrasing set.
 - `website/`, `cloudflare/` — cursiv.us and its deploy.
 - `installer/` — the Windows installer script.

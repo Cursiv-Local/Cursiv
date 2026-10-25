@@ -846,8 +846,10 @@ def learn_from_exchange(user_text: str, reply: str, ask: Callable[[list[dict]], 
         except Exception as exc:
             formation.record('extraction_failed', exc)
             return []
+        suggest = suggest_inferred()       # U100: guesses are only offered, so paraphrases may pass
         proposed = [dict(text=it, category='inferred_fact', evidence='inferred', quote=user_text[:3000])
-                    for it in items[:5] if isinstance(it, str) and formation.supported(it, user_text, person)]
+                    for it in items[:5]
+                    if isinstance(it, str) and formation.supported(it, user_text, person, suggest=suggest)]
     event_id = event_id or uuid.uuid4().hex
     # U100: the model's guesses are suggested for the person to confirm, never saved silently.
     guesses = [c for c in proposed if c.get('evidence') == 'inferred']
@@ -856,7 +858,7 @@ def learn_from_exchange(user_text: str, reply: str, ask: Callable[[list[dict]], 
             from . import suggestions
             allowed = [c['text'] for c in guesses if formation.permitted(c['text'])]
             if allowed:
-                suggestions.add(person, allowed, quote=user_text)
+                suggestions.add(person, allowed[:1], quote=user_text)   # one card per message, not near-duplicates
                 formation.record('suggested')
         proposed = [c for c in proposed if c.get('evidence') != 'inferred']
     saved = []

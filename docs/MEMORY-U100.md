@@ -42,3 +42,28 @@ up) is the natural next step if wanted.
 - Existing inferred memories aren't migrated or removed; `memory cleanup` still lists the
   misleading ones for the person to remove.
 - Grouping `core/` into sub-folders (planned for U100 "if there's room") was not started.
+
+## Suggested memories, measured (2026-10-25)
+
+The live check found the "Remember this?" card almost never appeared: the filter for model
+guesses was still the strict one built when guesses were saved automatically, so ordinary
+paraphrases ("conducts water sampling") and any "prefers …" you didn't word that way were
+dropped. Guesses that will only be *offered* now pass when they share two distinctive words
+with what you said (or pass the old rule); passing moods, one-off events, other people's
+details, and health, money and secret details never become a card. One card per message.
+
+`scripts/suggest_bench.py` runs the real learner in a throwaway home and program-data
+folder (qwen3:4b-instruct):
+
+| Set | Filter | Lasting facts offered | False cards | Sensitive offered or saved |
+|---|---|---|---|---|
+| Development (30, `bench/memory/suggest_cases.py`) | before | 14% | 0 | 0 |
+| Development | U100 | 71% | 0 | 0 |
+| Held-out (20, `suggest_heldout.py`), first and only clean run | U100 | 90% | 2 | 0 |
+| Held-out, after two rules prompted by that run | U100 | 70–80% | 0 | 0 |
+| Held-out | before | 20% | 0 | 0 |
+
+The held-out run found two false cards (a sister's visit, a coffee spill); the "other people"
+and "one-off event" rules were added after it, so the held-out set is no longer clean for those
+rules. Runs vary by one or two cases between tries. Direct statements are now saved in the
+third person ("their thesis", not "my thesis") and "I want you to always …" reads correctly.
