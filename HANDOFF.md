@@ -26,12 +26,17 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
   (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
 - Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
 
-## U101 starter profiles (Claude, 2026-10-25, unreleased, branch `claude/u101-profiles`)
+## U101 starter profiles (Claude, 2026-10-25, released in U101)
 Profiles are markdown files in `agents/starters/`; `agents/profile_context.py` fetches what `reads:` allows
 (never a tool call); `answer_note` flags numbers/units not in the records. Live on qwen3:4b: @checker found all
 4 planted problems; @protocol gave both holding times with pages 3/3 after the "every condition" rule; the
 Report writer invented a unit, methods and a model name before the code check and rules were added. No First
 aid profile (medical stays with the reviewed reference). Owner rule: no self-editing agents.
+
+## U101 published (Claude, 2026-10-25)
+Tag `v3.14-U101` = `df74806` (PRs #28, #29, #30). Evidence: [U101-RELEASE-VERIFICATION](docs/U101-RELEASE-VERIFICATION.md).
+Next from the review: tests for problem_report / login_recovery / chat_actions, one notebook read path,
+overconfidence benchmark, dead modules, silent-except lint; profile form window; Settings reorganisation.
 
 ## U101 data safety (Claude, 2026-10-25, branch `claude/u101-data-safety` on top of hardening)
 From the codebase review: login files atomic + accounts backup + `AccountsUnreadable` (tests/test_login_files.py);
@@ -42,7 +47,7 @@ stop an unlock (tests in test_notebook_encryption.py); strand/session loaders re
 Still open from the review: tests for problem_report/login_recovery/chat_actions, one notebook read path,
 overconfidence benchmark, dead modules (sigil, quality_scorer, offline_queue), silent-except lint.
 
-## U101 hardening (Claude, 2026-10-25, unreleased, branch `claude/u101-hardening` on top of profiles)
+## U101 hardening (Claude, 2026-10-25, released in U101)
 - Codex run-and-fix: `coding/runner.py` runs `python -I <copy of core/plugin_runner.py> --script main.py`; the
   audit hook blocks what the word check misses (getattr(builtins, ...), importlib). Refusals -> "SANDBOX:".
 - CI: `test-linux` job (Ubuntu): first run 2,017 passed / 30 skipped. Not a required check yet.
