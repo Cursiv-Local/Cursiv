@@ -147,7 +147,23 @@ def run(request: dict) -> dict:
     return out
 
 
+def run_script(script: str) -> int:
+    """Codex's test runs (coding/runner.py, U101): run one script under the same audit hook as a
+    plugin, with files limited to the script's own temp folder and Python's library. Started as
+    `python -I <copy of this file> --script main.py`, so it needs nothing from Cursiv."""
+    import runpy
+    folder = os.path.dirname(os.path.abspath(script))
+    library = [os.path.dirname(os.__file__), sys.prefix, sys.base_prefix, getattr(sys, "_MEIPASS", ""),
+               os.path.dirname(sys.executable)]
+    _unload_blocked()
+    _sandbox([folder] + library)
+    runpy.run_path(script, run_name="__main__")
+    return 0
+
+
 def main() -> int:
+    if sys.argv[1:2] == ["--script"] and len(sys.argv) > 2:
+        return run_script(sys.argv[2])
     request = json.loads(sys.stdin.read() or "{}")
     reply = run(request)
     sys.stdout.write("@@CURSIV-PLUGIN@@" + json.dumps(reply)[:200_000])

@@ -172,7 +172,13 @@ def test_create_account_needs_an_existing_login(monkeypatch):
 
 
 def test_login_fails_closed_when_it_cannot_load(monkeypatch):
-    import main as launcher_main
+    # Loaded by path: after other tests "import main" could find another checkout's main.py on sys.path.
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("main", Path(__file__).resolve().parent.parent / "launcher" / "main.py")
+    launcher_main = importlib.util.module_from_spec(spec)
+    monkeypatch.setitem(__import__("sys").modules, "main", launcher_main)
+    spec.loader.exec_module(launcher_main)
     from cursiv_engine.guardian import access_gate as ag
 
     def broken():

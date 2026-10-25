@@ -375,6 +375,13 @@ def live_block() -> str:
 
 def agent_permissions(agent: dict) -> str:
     """What a custom agent may use. Enforced by application code: today agents get no tools."""
+    reads = [r for r in (agent.get("reads") or []) if r in ("notebook", "documents", "calculations")]
+    if reads:
+        # U101 starter profiles: Cursiv's code shows them these, read only (agents/profile_context.py).
+        shown = {"notebook": "your field notebook's records (read only)", "documents": "matching passages from your "
+                 "imported documents (read only)", "calculations": "calculations worked out by Cursiv's code"}
+        return ("Cursiv shows this profile " + ", ".join(shown[r] for r in reads) + ". It cannot save, change, correct "
+                "or delete anything, read other files, search the web, or use any other tool.")
     tools = [t for t in (agent.get("tools") or []) if t in BY_KEY]
     if not tools:
         return ("This agent can only talk. It cannot read, create, change or delete files, use the field notebook, "

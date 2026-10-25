@@ -18,6 +18,7 @@ import sys
 import tempfile
 from typing import Callable, Generator
 
+_GUARD = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "core", "plugin_runner.py")
 _BLOCK_RE = re.compile(r"```(?:python|py)[ \t]*\n(.*?)```", re.S | re.I)
 
 _DANGER = [
@@ -77,16 +78,24 @@ def run(code: str, timeout: int = 20) -> tuple[bool, str]:
         path = os.path.join(tmp, "main.py")
         with open(path, "w", encoding="utf-8") as f:
             f.write(code)
+        # U101: the word check above is easy to get round (__import__("o" + "s")), so the script also
+        # runs under the plugin sandbox's audit hook: no network, programs, native code or registry,
+        # and files only in this temp folder and Python's library (core/plugin_runner.py, stdlib only).
+        guard = os.path.join(tmp, "_cursiv_guard.py")
+        shutil.copyfile(_GUARD, guard)
         env = {k: v for k, v in os.environ.items() if not re.search(r"KEY|TOKEN|SECRET|PASS", k, re.I)}
         env["PYTHONIOENCODING"] = "utf-8"
         flags = 0x08000000 if os.name == "nt" else 0          # CREATE_NO_WINDOW
         try:
-            p = subprocess.run([exe, path], cwd=tmp, capture_output=True, text=True, timeout=timeout,
+            p = subprocess.run([exe, "-I", guard, "--script", path], cwd=tmp, capture_output=True, text=True, timeout=timeout,
                                env=env, creationflags=flags, stdin=subprocess.DEVNULL)
         except subprocess.TimeoutExpired:
             return False, f"TIMEOUT after {timeout}s"
         out = (p.stdout or "")[-3000:]
         err = (p.stderr or "")[-3000:].replace(tmp, ".")
+        refused = re.search(r"PermissionError: plugins may (?:not |only )(.+)", err)
+        if p.returncode != 0 and refused:
+            return False, "SANDBOX: " + refused.group(1).strip()
         return p.returncode == 0, (out + ("\n" + err if err else "")).strip()
 
 
@@ -110,6 +119,11 @@ def run_and_fix(answer: str, regenerate: Callable[[str, str], Generator[str, Non
         success, output = run(code)
         if output == "NO_PYTHON":
             yield "\n\n---\n*Test run skipped: no Python found on this computer (install it from python.org).*"
+            return
+        if output.startswith("SANDBOX: "):
+            # Never "fixed" by the model: that would only teach it to get round the guard.
+            yield (f"\n\n---\n*Test run stopped: the code tried something test runs don't allow "
+                   f"({output[9:]}). Read it before running it yourself.*")
             return
         if success:
             shown = output[-800:] if output else "(no output)"

@@ -533,8 +533,9 @@ def work_out(question: str) -> Result | None:
     from cursiv_engine.core import datecalc       # dates, weekdays, spaced points, two proportions
     # An explicit conversion in a compound request must not be shadowed by an
     # unrelated calculator that happens to notice the same quantity (e.g. liters for a dose).
-    for fn in (lightning_wait, travel, units, bleach_dose, distance, coordinates, dilution, datecalc.proportions, stats,
-               datecalc.weekday, datecalc.dates, datecalc.spacing):
+    from cursiv_engine.core import fieldsci        # field formulas the model got wrong (U101)
+    for fn in (lightning_wait, travel, *fieldsci.ALL, units, bleach_dose, distance, coordinates, dilution,
+               datecalc.proportions, stats, datecalc.weekday, datecalc.dates, datecalc.spacing):
         try:
             r = fn(question)
         except (ValueError, ZeroDivisionError, statistics.StatisticsError):

@@ -88,7 +88,23 @@ def _decay(timestamp: float, half_life_days: float = 30.0) -> float:
     return math.exp(-math.log(2) * hours / half_life_h)
 
 
+_PROBLEMS: dict[str, Any] = {"damaged": 0, "unreadable": ""}
+
+
+def problems() -> list[str]:
+    """What the last load couldn't use (U101 review: these were skipped without a word, and an
+    unreadable file looked the same as having no saved notes). The lines stay in the file as they
+    are -- saving appends and removing copies unparsed lines across -- so nothing is lost."""
+    out = []
+    if _PROBLEMS["unreadable"]:
+        out.append(f"Saved notes couldn't be read ({_PROBLEMS['unreadable']}); none are shown until that's fixed.")
+    if _PROBLEMS["damaged"]:
+        out.append(f"{_PROBLEMS['damaged']} saved-note line(s) are damaged and not used; they're kept in {STRANDS_FILE.name}.")
+    return out
+
+
 def _load_all() -> list[dict[str, Any]]:
+    _PROBLEMS.update(damaged=0, unreadable="")
     if not STRANDS_FILE.exists():
         return []
     strands: list[dict] = []
@@ -99,12 +115,13 @@ def _load_all() -> list[dict[str, Any]]:
                 if line:
                     try:
                         strands.append(json.loads(line))
-                    except Exception:
-                        pass
+                    except ValueError:
+                        _PROBLEMS["damaged"] += 1
     except vault.VaultError:
         raise
-    except Exception:
-        pass
+    except (OSError, UnicodeError) as exc:
+        _PROBLEMS["unreadable"] = f"{type(exc).__name__}: {exc}"[:160]
+        strands = []
     return strands
 
 
