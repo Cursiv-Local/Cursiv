@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.14-U99 — Conversational actions, operational self-knowledge (unreleased)
+## 3.14-U99 — Conversational actions, operational self-knowledge (2026-10-25)
 
 - Say it normally: "Add a note that North Creek was 14.2 C and cloudy", "work in my Field Data folder",
   "go offline". The local model turns it into one of Cursiv's own commands, Cursiv checks every value
