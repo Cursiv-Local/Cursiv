@@ -2927,3 +2927,28 @@ Roadmap: `docs/RESEARCH-ROADMAP.md`.
 - Not verified by a person: the first-open Gatekeeper flow, Ollama install on a real Mac, Keychain prompts, the
   frameless window's feel on macOS, voice input.
 
+
+## U97 (2026-10-24): removals, trust fixes from the U96 live run, encryption always on
+
+- Removed: family letters, legacy vault, personal letters, postal/board/mailbox and the
+  council (copies kept in the git-ignored `private/`). `core/profile.REMOVED_NOTE`
+  answers the old commands; `council`, `/full`, `/deliberate` point to `agents ask`.
+  The phases module lost its council branch only. Plain MIT license.
+- "What day is it?" is answered from the computer's clock (`core/clock.py`), and the
+  date is in the live status block.
+- Faked file actions: "Add a line to notes.txt saying …" is a real append that asks
+  first; "Delete notes.txt" gets Cursiv's own answer (it never deletes files).
+  `file_access.unverified_claim` also catches "File deleted", "Updated and verified",
+  "Now executing:" and model-printed SHA-256 lines. Tests: `tests/test_file_claims.py`.
+- Plain unit conversions and speed × time questions are answered by the calculator
+  (`native_answers`, `fieldcalc.travel`); compound questions still go to the model with
+  the worked result. Field-log averages/min/max come from the notebook
+  (`field_recall.stats_command`). `response_style.drop_self_certification` removes the
+  model's own "✅ Verified: …" / "No model was used" lines (part of the polish step in
+  `chat/completion.py`; "Fact:" / "Speculation:" labels the person asked for stay).
+- Encryption is always on for a computer (`launcher/encryption_dialog.py`): the first
+  start asks for a passphrase and migrates; an unfinished migration resumes at the next
+  start. A Cursiv USB drive (portable mode) stays readable by the owner's choice.
+  `usb_sync` decrypts covered stores going to a drive and re-encrypts them coming back;
+  staged imports stay encrypted; the vault marker and `.vault-recovery/` never travel.
+  `vault_migration.require_closed` exempts this process's own launchers.

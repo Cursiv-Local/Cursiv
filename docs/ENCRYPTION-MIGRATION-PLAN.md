@@ -1,6 +1,6 @@
-# Optional conversation and memory encryption
+# Conversation and memory encryption
 
-**Status:** included from U90, off by default; not included in U89. Development used disposable records. The owner's actual data was not migrated.
+**Status:** always on for computers since U97 (first start sets it up; a Cursiv USB drive stays readable). Included from U90 as an opt-in; not included in U89. Development used disposable records. The owner's actual data was not migrated.
 This replaces the earlier design-only plan, following explicit owner authorization.
 
 ## Enable, unlock and keep a recovery copy

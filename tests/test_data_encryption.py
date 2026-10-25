@@ -256,13 +256,65 @@ def test_startup_cancel_and_unlock_use_native_password_dialog(encrypted, monkeyp
     assert state_store.load(encrypted / 'projects/missing.json', {}) == {}
 
 
-def test_startup_mismatched_confirmation_never_migrates(encrypted, monkeypatch):
+@pytest.fixture
+def dialogs(encrypted, monkeypatch):
+    """Headless startup: every message box is recorded, never shown."""
     import encryption_dialog
+    shown = []
+    for name in ('information', 'warning', 'critical'):
+        monkeypatch.setattr(encryption_dialog.QMessageBox, name, lambda *a, name=name: shown.append((name, a[1])))
     monkeypatch.setattr(vault, 'roots', lambda: [encrypted])
-    monkeypatch.setattr(encryption_dialog.QMessageBox, 'question',
-                        lambda *a: encryption_dialog.QMessageBox.StandardButton.Yes)
-    monkeypatch.setattr(encryption_dialog.QMessageBox, 'warning', lambda *a: None)
-    replies = iter([(PASSWORD, True), ('different confirmation', True)])
-    monkeypatch.setattr(encryption_dialog.QInputDialog, 'getText', lambda *a: next(replies))
-    assert encryption_dialog.startup(configure=True) is False
+    monkeypatch.delenv('CURSIV_PORTABLE', raising=False)
+    monkeypatch.setattr(vault_migration, 'require_closed', lambda: None)
+    return encryption_dialog, shown
+
+
+def _replies(monkeypatch, module, *answers):
+    answers = iter(answers)
+    monkeypatch.setattr(module.QInputDialog, 'getText', lambda *a: next(answers))
+
+
+def test_startup_mismatched_confirmation_never_migrates(encrypted, dialogs, monkeypatch):
+    dialog, shown = dialogs
+    _replies(monkeypatch, dialog, (PASSWORD, True), ('different confirmation', True), ('', False))
+    assert dialog.startup() is False
     assert not (encrypted / vault.MARKER).exists()
+    assert ('warning', 'Passphrases did not match') in shown
+
+
+def test_first_start_on_a_computer_always_encrypts(encrypted, dialogs, monkeypatch):
+    """U97: no opt-in. The first start encrypts what is there and opens unlocked."""
+    dialog, shown = dialogs
+    (encrypted / 'memory_facts.jsonl').write_bytes(b'{"text":"existing memory"}\n')
+    _replies(monkeypatch, dialog, ('too short', True), (PASSWORD, True), (PASSWORD, True))
+    assert dialog.startup() is True
+    assert ('warning', 'Passphrase too short') in shown
+    assert vault.metadata(encrypted)['state'] == 'ready'
+    assert (encrypted / 'memory_facts.jsonl').read_bytes().startswith(vault.MAGIC)
+    assert private_store.read_text(encrypted / 'memory_facts.jsonl') == '{"text":"existing memory"}\n'
+
+
+def test_cancelling_first_setup_quits_and_changes_nothing(encrypted, dialogs, monkeypatch):
+    dialog, _ = dialogs
+    (encrypted / 'memory_facts.jsonl').write_bytes(b'plain\n')
+    _replies(monkeypatch, dialog, ('', False))
+    assert dialog.startup() is False
+    assert (encrypted / 'memory_facts.jsonl').read_bytes() == b'plain\n' and not (encrypted / vault.MARKER).exists()
+
+
+def test_a_usb_drive_stays_readable(encrypted, dialogs, monkeypatch):
+    dialog, shown = dialogs
+    monkeypatch.setenv('CURSIV_PORTABLE', '1')
+    monkeypatch.setattr(dialog.QInputDialog, 'getText', lambda *a: pytest.fail('a drive was asked for a passphrase'))
+    assert dialog.startup() is True and not (encrypted / vault.MARKER).exists() and shown == []
+
+
+def test_an_interrupted_first_encryption_finishes_at_the_next_start(encrypted, dialogs, monkeypatch):
+    dialog, _ = dialogs
+    (encrypted / 'memory_facts.jsonl').write_bytes(b'resume me\n')
+    meta, _cipher = vault.new_metadata(PASSWORD)
+    (encrypted / vault.MARKER).write_text(json.dumps(meta))          # state 'migrating', nothing encrypted yet
+    _replies(monkeypatch, dialog, ('wrong passphrase here', True), (PASSWORD, True))
+    assert dialog.startup() is True
+    assert vault.metadata(encrypted)['state'] == 'ready'
+    assert private_store.read_text(encrypted / 'memory_facts.jsonl') == 'resume me\n'
