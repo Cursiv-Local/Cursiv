@@ -7,6 +7,18 @@ Read these three files first:
 3. [cursiv_engine/ui/chat_app.py](cursiv_engine/ui/chat_app.py): compatible chat
    facade; follow its calls into `chat/conversation.py` and `chat/completion.py`.
 
+Looking for a specific thing? [docs/CODE-MAP.md](docs/CODE-MAP.md) lists every module in one
+line, grouped by job, and a test keeps it complete. A first task to pick up:
+[docs/GOOD-FIRST-ISSUES.md](docs/GOOD-FIRST-ISSUES.md).
+
+## The one rule behind the code
+
+Cursiv is for people who need to trust what it says. So anything that must be right (a saved record,
+a calculation, a lookup, what Cursiv can do) is done by code and checked, and the AI model only words
+it. If a change makes the model do more and the code check less, it's the wrong change. New behaviour
+lands only with a test that would have caught the old failure, and model-facing changes with a
+measured before/after (see `scripts/*_bench.py`).
+
 ## Run and check
 
 Use a dedicated checkout and a Python 3.13 virtual environment. Install the exact

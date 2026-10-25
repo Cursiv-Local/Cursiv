@@ -14,6 +14,11 @@ link to them.
   [phone notebook](PHONE-NOTEBOOK.md), [field network](FIELD-NETWORK.md)
 - [Hardware](HARDWARE.md)
 
+## Contributing
+
+- [CONTRIBUTING](../CONTRIBUTING.md): setup, the gates, boundaries to keep
+- [Code map](CODE-MAP.md): every module in one line; [good first issues](GOOD-FIRST-ISSUES.md)
+
 ## Design and plans
 
 - [Architecture plan](ARCHITECTURE-PLAN.md) (see also [ARCHITECTURE](../ARCHITECTURE.md)
