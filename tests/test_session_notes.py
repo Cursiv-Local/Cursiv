@@ -34,7 +34,10 @@ def test_a_note_is_written_kept_and_picked_up():
     note = sn.update("conv1", "North Creek survey", HISTORY, lambda m: MODEL, force=True)
     assert "Goal: water samples at North Creek before the freeze" in note
     assert "- Logged to the field notebook: Sample NC-1 (record 334001fca158)" in note
-    assert "- rainfall data for last week" in note and "Next: log site 2 on Friday" in note
+    assert "Next: log site 2 on Friday" in note
+    # Never said in the conversation, so never written into the note (U100 review of the live model):
+    assert "rainfall" not in note and "cattle fence" not in note
+    assert "Decided:" not in note         # "mornings" was the assistant's suggestion, not a decision
     assert "summarised by the AI model" in note
     assert sn.load("conv1") == note
     assert sn.picking_up(note) == "Picking up: water samples at North Creek before the freeze — next: log site 2 on Friday"

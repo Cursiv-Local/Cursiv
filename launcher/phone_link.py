@@ -1,5 +1,5 @@
 """
-Phone ↔ computer link: the desktop side of the phone app (cursiv.winklers-llc.com/app).
+Phone ↔ computer link: the desktop side of the phone app (cursiv.us/app).
 
 The phone and computer share one conversation ("space") on the owner's
 Cloudflare site. Linking: the phone's Link button shows a 6-digit code; enter
@@ -25,7 +25,7 @@ from PyQt6.QtWidgets import (
 )
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
-API = "https://cursiv.winklers-llc.com"
+API = "https://cursiv.us"
 SPACE_FILE = Path.home() / ".cursiv" / "space.json"
 
 
@@ -151,7 +151,7 @@ class PhoneDialog(QDialog):
         self._send_btn.clicked.connect(self._send)
         send_row.addWidget(self._send_btn)
         lay.addLayout(send_row)
-        self._share = QCheckBox("Let the phone app use my memories (a short summary is kept on cursiv.winklers-llc.com)")
+        self._share = QCheckBox("Let the phone app use my memories (a short summary is kept on cursiv.us)")
         self._share.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
         try:
             import phone_sync
@@ -191,7 +191,7 @@ class PhoneDialog(QDialog):
             self._status.setText("Linked with the phone app. New messages from the phone appear here automatically.")
             self._poll()
         else:
-            self._status.setText("On the phone, open Cursiv (cursiv.winklers-llc.com/app), tap Link at the top, "
+            self._status.setText("On the phone, open Cursiv (cursiv.us/app), tap Link at the top, "
                                  "and type the 6-digit code here. The phone and this computer will then share one conversation.")
 
     def _run(self, action: str, fn):

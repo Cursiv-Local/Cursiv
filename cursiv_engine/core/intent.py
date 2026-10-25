@@ -165,8 +165,11 @@ _FILLER = {"the", "that", "this", "and", "for", "with", "you", "your", "they", "
            "prefers", "likes", "has", "have", "are", "was", "were", "who", "his", "her", "its", "my", "i'm", "is"}
 
 
-def check(action: Action, slots: dict, said: str) -> list[str]:
-    """Problems with a proposal. Empty means it may be shown (or, if read-only, run)."""
+def check(action: Action, slots: dict, said: str, original: str | None = None) -> list[str]:
+    """Problems with a proposal. Empty means it may be shown (or, if read-only, run).
+    `said` may include the meanings of the person's own hints (core/guidance.py) for checking values;
+    whether they asked for the action at all is judged on `original`, their actual words."""
+    original = said if original is None else original
     problems = []
     said_n = _norm(said)
     said_numbers = _numbers(said)
@@ -190,7 +193,7 @@ def check(action: Action, slots: dict, said: str) -> list[str]:
             problems.append("only files inside your workspace")
     if action.name == "memory.forget" and not re.search(
             r"(?i)^(?:please\s+|ok,?\s+|you can\s+|can you\s+)?(?:forget|delete|remove|erase|drop)\b|"
-            r"\bforget (?:what|that|about|the|my|everything i)\b|\b(?:delete|remove) (?:the|that|my) memory\b", said):
+            r"\bforget (?:what|that|about|the|my|everything i)\b|\b(?:delete|remove) (?:the|that|my) memory\b", original):
         problems.append("that doesn't sound like a request to forget a memory")
     if action.name in ("file.create", "file.append"):
         text = _norm(slots.get("text", "")).rstrip(".!")
@@ -290,7 +293,7 @@ def _log_details(slots: dict) -> str:
     return "; ".join(p for p in parts if p)
 
 
-def build(action_name: str, slots: dict, said: str) -> Proposal | None:
+def build(action_name: str, slots: dict, said: str, original: str | None = None) -> Proposal | None:
     action = ACTIONS.get(action_name)
     if action is None:
         return None
@@ -298,7 +301,7 @@ def build(action_name: str, slots: dict, said: str) -> Proposal | None:
         from . import notebook_proposals          # a code isn't a site unless the person said so
         slots = {"details": notebook_proposals.fix_details(_log_details(slots), said)}
     clean = {k: re.sub(r"\s+", " ", str(slots.get(k, ""))).strip().strip('"').strip() for k in action.slots}
-    problems = check(action, clean, said)
+    problems = check(action, clean, said, original)
     if action.name == "workspace.set" and not problems:
         matches = find_folder(clean["folder"])
         if len(matches) == 1:
@@ -335,4 +338,4 @@ def propose(text: str, ask: Callable[[list[dict]], str], workspace: str = "") ->
         said = guidance.expand(text)               # "the creek" -> also "North Creek", from how-i-talk.md
     except Exception:
         said = text
-    return build(str(data.get("action")), slots, said)
+    return build(str(data.get("action")), slots, said, text)

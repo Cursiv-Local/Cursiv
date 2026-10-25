@@ -217,7 +217,7 @@ class SetupDialog(QDialog):
         # Step 5 — cloud + free keys
         self._s3 = self._card(lay, "5  ·  While you wait (optional)")
         self._s3_intro = ("Downloading a model can take a while. Until it's done, Cursiv can answer through "
-                          "Cursiv Cloud (free, sent to cursiv.winklers-llc.com) or your own free AI key.")
+                          "Cursiv Cloud (free, sent to cursiv.us) or your own free AI key.")
         self._s3["detail"].setText(self._s3_intro)
         self._cloud_box = QCheckBox("Use Cursiv Cloud when no local model is ready")
         self._cloud_box.toggled.connect(self._toggle_cloud)

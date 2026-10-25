@@ -10,7 +10,8 @@ Two kinds of line, labelled apart:
   * Done -- only from Cursiv's own results in the conversation (a notebook save with its
     record ID, a saved memory, a file written). Never from the model.
   * Goal / Decided / Open / Next -- a summary written by the local model from what was
-    said, marked as such; the person can read and edit the note.
+    said, marked as such, and only lines that are mostly the person's own words (Decided only when
+    they decided something). `session note` shows it; `session note clear` starts it over.
 """
 from __future__ import annotations
 
@@ -67,12 +68,36 @@ def _summary(history: list[dict], ask: Callable[[list[dict]], str]) -> dict:
                    {"role": "user", "content": "\n".join(turns)[:7000]}]) or ""
     except Exception:
         return {}
+    said = " ".join(str(m.get("content", "")) for m in history or [] if m.get("role") == "user").lower()
     out = {}
     for key in ("Goal", "Decided", "Open", "Next"):
         m = re.search(rf"(?im)^\s*{key}\s*:\s*(.+)$", raw)
-        if m and m.group(1).strip().lower() not in ("not stated", "none", "n/a", ""):
-            out[key] = m.group(1).strip()[:300]
+        if not m:
+            continue
+        # U100 review: the live model wrote "Decided: record temperature at 14.2 °C for Tuesday sampling"
+        # (nobody decided that) and "Open: No further questions or tasks stated". A line is kept only
+        # when it isn't a "nothing" line and most of its words come from what the person said;
+        # Decided also needs the person to have decided something.
+        items = [i.strip() for i in m.group(1).split(";") if i.strip() and not _NOTHING.search(i)]
+        items = [i for i in items if _from_person(i, said, 0.5 if key == "Decided" else 0.34)]
+        if key == "Decided" and not _DECIDING.search(said):
+            items = []
+        if items:
+            out[key] = "; ".join(items)[:300]
     return out
+
+
+_NOTHING = re.compile(r"(?i)^\s*(?:not stated|none|n/?a|nothing|no (?:further |other |open )?(?:questions?|tasks?|"
+                      r"decisions?|next steps?)\b.*|unknown)\s*\.?\s*$")
+_DECIDING = re.compile(r"(?i)\b(?:decid\w*|agreed?|let'?s|we'?ll|i'?ll|go with|going with|the plan is|chose|choose|settled on)\b")
+
+
+def _from_person(item: str, said: str, share: float) -> bool:
+    """Enough of the line's words (by stem: "Tuesday's" ~ "Tuesday") are the person's own."""
+    stems = {w[:5] for w in re.findall(r"[a-z0-9]{3,}", said)}
+    words = [w for w in re.findall(r"[a-z0-9]{3,}", item.lower())
+             if w not in ("the", "and", "for", "with", "that", "this", "from", "into", "their", "person", "user")]
+    return bool(words) and sum(w[:5] in stems for w in words) / len(words) >= share
 
 
 def render(title: str, done: list[str], summary: dict) -> str:
