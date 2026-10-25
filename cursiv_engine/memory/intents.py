@@ -106,6 +106,11 @@ def _parse(text: str) -> list[Action] | None:
     m = re.fullmatch(r'(?is)(?:actually[, ]+)?(my\s+.+?)\s*,?\s+not\s+(.+?)[.!]?$', t)
     if m:
         return [Action(UPDATE, content=m[1].strip().rstrip(','), query=m[2].strip().rstrip('.!'))]
+    # "Correction: ORION-742's primary site is Willow Basin, not Cedar Basin." (U100 audit: this went
+    # to the model, which said nothing changed and then answered as if it had.)
+    m = re.fullmatch(r'(?is)(?:correction|actually|update|fix)\s*[:,\-–]\s*(.+?)\s*,?\s+(?:not|instead of)\s+(.+?)[.!]?$', t)
+    if m and len(m[1].split()) >= 3:
+        return [Action(UPDATE, content=_clean(m[1].strip().rstrip(',')), query=m[2].strip().rstrip('.!'))]
     m = re.fullmatch(r'(?is)(?:update|correct|change)\s+(?:the |my )?(?:saved )?memory\s+(.+?)\s+(?:to|with|:)\s*(.+)', t)
     if m:
         return [Action(UPDATE, content=_clean(m[2]), query=m[1].strip())]

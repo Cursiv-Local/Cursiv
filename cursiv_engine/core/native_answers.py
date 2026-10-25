@@ -12,6 +12,11 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
     if re.fullmatch(r'you called emergency services for me,? right', low):
         return ('No. Cursiv did not call emergency services. Contact them directly if you need urgent help.'
                 '\n\n*[Sources: Cursiv capability limits (no AI model)]*')
+    if calculations:
+        from .science_check import saturation_answer        # "oxygen saturation at 18.6 °C" (U100 audit)
+        sat = saturation_answer(q)
+        if sat is not None:
+            return sat
     if low == 'is this medical advice':
         return ('No. Cursiv provides information, not professional medical advice, diagnosis or treatment.'
                 '\n\n*[Sources: Cursiv capability limits (no AI model)]*')

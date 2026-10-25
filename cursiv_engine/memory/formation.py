@@ -17,9 +17,23 @@ from typing import Callable
 _PRIVATE = re.compile(
     r"(?i)\b(passwords?|passphrases?|passwd|api[ _-]?keys?|access[ _-]?tokens?|auth[ _-]?tokens?|"
     r"private[ _-]?keys?|secrets?|credentials?|pins?|social security|ssn|credit cards?|"
-    r"diagnos\w*|medication|sexual\w*|religio\w*|political affiliation)\b|"
+    r"diagnos\w*|medication|sexual\w*|religio\w*|political affiliation|"
+    # U100: health and money details are never offered as memories (the suggestion benchmark
+    # turned "I take 20 mg of fluoxetine" into a card).
+    r"medications?|meds|prescri\w*|dosage|doses?|antidepressants?|therapist|psychiatr\w*|"
+    r"depression|bipolar|schizophreni\w*|ptsd|anxiety disorder|pregnan\w*|hiv|"
+    r"bank account|account numbers?|routing numbers?|debts?|owe|loans?|salary|income)\b|"
+    r"\b\d+(?:\.\d+)?\s?(?:mg|mcg|µg|ml)\b|\b(?:\d{4}[ -]?){3}\d{1,4}\b|"
     r"-----BEGIN .*PRIVATE KEY|\b(?:sk-|ghp_|github_pat_)[A-Za-z0-9_-]{8,}"
 )
+# A passing state is not a lasting fact ("currently tired and annoyed"), and memory is about the
+# person, not their relatives or neighbours. The last two lines were added after the held-out
+# run of scripts/suggest_bench.py (a sister's visit, a coffee spill each became a card).
+_PASSING = re.compile(r"(?i)\b(currently|right now|at the moment|today|tonight|this morning|"
+                      r"tired|annoyed|angry|upset|sad|stressed|exhausted|frustrated|bored|in a (?:bad|good) mood|"
+                      r"just|spill\w*|next week|this week|last night|yesterday|tomorrow|"
+                      r"(?:has|have) an? (?:sister|brother|mother|father|mom|dad|son|daughter|wife|husband|partner|"
+                      r"friend|neighbou?r|coworker|colleague|boss|cousin|aunt|uncle))\b")
 _NO_RETAIN = re.compile(
     r"(?i)\b(?:do not|don't|dont|never|not to)\s+(?:ever\s+)?(?:remember|retain|save|store|learn|record)\b|"
     r"\b(?:off the record|not for memory|without (?:saving|remembering)|forget this)\b"
@@ -42,6 +56,17 @@ def enabled_for(text: str) -> bool:
     return semantic.learning_enabled() and permitted(text)
 
 
+_PRONOUNS = {"i": "they", "i'm": "they're", "i’m": "they're", "me": "them", "my": "their", "mine": "theirs",
+             "myself": "themselves", "our": "their", "ours": "theirs", "we": "they", "us": "them"}
+
+
+def third_person(text: str) -> str:
+    """'my thesis' -> 'their thesis': a saved fact is about the person, not in their voice
+    ("Tester is working on my thesis" was saved before U100)."""
+    return re.sub(r"(?i)\b(i'm|i’m|myself|mine|my|me|ours|our|we|us|i)\b",
+                  lambda m: _PRONOUNS[m.group(1).lower()], text)
+
+
 def candidates(text: str, person: str) -> list[dict]:
     """High precision direct statements; no model or network needed for common cases."""
     if not permitted(text):
@@ -56,7 +81,7 @@ def candidates(text: str, person: str) -> list[dict]:
         body = re.sub(r"(?i)^(?:actually|correction|from now on)[,:\s]+", '', quote)
         patterns = [
             (r"(?i)^I\s+(?:now\s+)?prefer\s+(.+)$", 'preference', 'prefers', 'preference'),
-            (r"(?i)^I\s+(?:always want|need you to|want you to always)\s+(.+)$", 'convention', 'wants', None),
+            (r"(?i)^I\s+(always want|need you to|want you to always)\s+(.+)$", 'convention', None, None),
             (r"(?i)^I(?: am|'m|’m)\s+(?:currently\s+)?(building|developing|working on|researching)\s+(.+)$", 'project', None, None),
             (r"(?i)^We\s+(decided|agreed)\s+(.+)$", 'decision', None, None),
             (r"(?i)^The previous approach failed because\s+(.+)$", 'correction', 'reported the previous approach failed because', None),
@@ -67,11 +92,15 @@ def candidates(text: str, person: str) -> list[dict]:
             if not m:
                 continue
             if category == 'project':
-                value = f'{name} is {m[1].lower()} {m[2]}'
+                value = f'{name} is {m[1].lower()} {third_person(m[2])}'
+            elif category == 'convention':
+                lead = {'always want': 'always wants', 'need you to': 'needs Cursiv to',
+                        'want you to always': 'wants Cursiv to always'}[re.sub(r'\s+', ' ', m[1].lower())]
+                value = f'{name} {lead} {third_person(m[2])}'
             elif category == 'decision':
-                value = f'{name} said their team {m[1].lower()} {m[2]}'
+                value = f'{name} said their team {m[1].lower()} {third_person(m[2])}'
             else:
-                value = f'{name} {verb} {m[1]}'
+                value = f'{name} {verb} {third_person(m[1])}'
             if category == 'preference':
                 slot = next((topic for topic, words in (
                     ('language', r'\b(rust|python|javascript|typescript|java|c\+\+|golang)\b'),
@@ -85,8 +114,12 @@ def candidates(text: str, person: str) -> list[dict]:
     return out[:5]
 
 
-def supported(candidate: str, user_text: str, person: str) -> bool:
-    """Model suggestions stay inferred and must share specific evidence with the user."""
+def supported(candidate: str, user_text: str, person: str, *, suggest: bool = False) -> bool:
+    """Model suggestions stay inferred and must share specific evidence with the user.
+
+    suggest=True (U100): the guess will only be offered as "Remember this?", so a paraphrase
+    ("conducts water sampling", "prefers short answers") is allowed, but it still needs two
+    distinctive words from what the person said and the same safety checks."""
     from . import semantic
     name = person.title() if person != 'family' else 'the user'
     if not permitted(candidate) or not permitted(user_text) or not semantic.learnable(candidate, name):
@@ -95,13 +128,18 @@ def supported(candidate: str, user_text: str, person: str) -> bool:
         return False
     if not re.search(r"(?i)\b(I|my|we|our)\b", user_text):
         return False
-    if re.search(r'(?i)\bprefer\w*\b', candidate) and not re.search(r'(?i)\bprefer\w*\b', user_text):
-        return False
     words = semantic._content_words(candidate) - semantic._content_words(name)
     evidence = semantic._content_words(user_text)
-    # At least one distinctive user-supplied word plus a lasting user predicate.
     anchors = (words & evidence) - {'user', 'family', 'person', 'project', 'prefer', 'prefers'}
-    return bool(anchors and re.search(r'(?i)\b(prefer\w*|keeps|learning|building|working|practic\w*|goal|wants|uses|decided|agreed)\b', candidate))
+    if suggest and _PASSING.search(candidate):
+        return False
+    lasting = bool(anchors and re.search(r'(?i)\b(prefer\w*|keeps|learning|building|working|practic\w*|goal|wants|uses|decided|agreed)\b', candidate))
+    if suggest:
+        return lasting or len(anchors) >= 2           # everything the strict rule allows, plus paraphrases
+    if re.search(r'(?i)\bprefer\w*\b', candidate) and not re.search(r'(?i)\bprefer\w*\b', user_text):
+        return False
+    # At least one distinctive user-supplied word plus a lasting user predicate.
+    return lasting
 
 
 _counts: Counter = Counter()

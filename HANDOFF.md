@@ -4,6 +4,13 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U100 (on `claude/u100`, built on U99): memory you can see and steer
+
+- Session notes, suggested memories, the readable memory folder and guidance files:
+  [docs/MEMORY-U100.md](docs/MEMORY-U100.md). The memory store stays the source of truth; the markdown
+  folder is a readable copy (a decision for the owner to review). Inferred guesses go to
+  `memory/suggestions.py`; don't route them back into `add_fact` without a confirmation.
+
 ## U99 (on `claude/u99`, one squashed commit): conversational actions and operational self-knowledge
 
 - `core/capabilities.py` is THE inventory of what Cursiv supports; add a feature there (with its code and
@@ -18,6 +25,15 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
   against the person's words and confirms changes. Publish the held-out score
   (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
 - Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
+
+## U100 audit of the owner's U99 test run (Claude, 2026-10-25, unreleased, branch `claude/u100`)
+Root causes found and fixed with tests (`tests/test_notebook_audit.py`, `test_conversation_audit.py`,
+`test_science_audit.py`): the fieldlog parser read codes as negative measurements; SESSION MEMORY carried
+other conversations into ongoing ones; the stats tool always checked answers against the mean; the units tool
+ignored requested decimal places. `scripts/replay_notebook.py` and `scripts/suggest_bench.py` run on the real
+code in throwaway folders (APP_DATA too: HOME alone leaks into the checkout's `.cursiv`). Prompt-only items
+(overconfidence, experiment design) are NOT shown fixed: live, the thermometer answer still says "normal".
+Document questions measured at ~8 s here, search ~60 ms; no speed change made.
 
 ## U99 published (Claude, 2026-10-25)
 Tag `v3.14-U99` = `3345d8b` (PRs #23, #25). Conversational actions (confirm cards) and

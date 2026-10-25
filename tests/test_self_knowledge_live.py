@@ -131,3 +131,25 @@ def test_live_i_old_session_posts_are_not_copied_into_a_new_conversation(monkeyp
     overlap = _overlap(old, _body(text))
     _record("I session memory", text, overlap_with_old_session_post=round(overlap, 3))
     assert overlap < 0.2
+
+
+def test_live_u100_session_note_and_suggestions(tmp_path, monkeypatch):
+    """U100 with the real model: a session note summary, and the learner suggesting instead of saving."""
+    from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.memory import semantic, session_notes, suggestions
+    monkeypatch.setattr(session_notes, "DIR", tmp_path / "notes")
+    history = [
+        {"role": "user", "content": "I'm planning water sampling at North Creek before the November freeze."},
+        {"role": "assistant", "content": "Mornings give the most consistent temperatures."},
+        {"role": "user", "content": "OK, we'll sample mornings only. I still need last week's rainfall data."},
+        {"role": "assistant", "content": "Logged. Sample NC-1. Record 334001fca158 · fingerprint 788e · read-back matched."},
+    ]
+    note = session_notes.update("live1", "North Creek", history, lambda m: ca._local_llm(m, 260), force=True)
+    person = semantic.current_person()
+    before = len(semantic.list_facts(person))
+    semantic.learn_from_exchange("I've been working on a soil survey of the east plots every weekend this month",
+                                 "Sounds like steady progress.", lambda m: ca._local_llm(m, 200), person)
+    _record("U100", note, saved_silently=len(semantic.list_facts(person)) - before,
+            suggested=[r["text"] for r in suggestions.pending(person)])
+    assert "record 334001fca158" in note and re.search(r"(?i)Goal: .*(?:sampl|creek|water)", note)
+    assert len(semantic.list_facts(person)) == before                 # nothing inferred was saved silently

@@ -106,8 +106,9 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     # U99: what was read or checked for THIS answer starts empty; the model can't add to it.
     from cursiv_engine.core import claim_evidence, evidence_log
     evidence_log.begin_turn()
-    _claim_check = claim_evidence.answer(_field_text, history)
-    if _claim_check is not None:          # "have you inspected your source?" / "you said … — check it"
+    from cursiv_engine.core import conversation_recall
+    _claim_check = claim_evidence.answer(_field_text, history) or conversation_recall.answer(_field_text, history)
+    if _claim_check is not None:          # "have you inspected your source?" / "what did I ask three messages ago?"
         yield _file_ops.VerifiedText(_claim_check)
         return
     _native = native_answers.answer(_field_text, calculations=policy.inspect)
@@ -271,7 +272,10 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         if _unbacked:
             reply.append('\n\n' + _unbacked)
             yield '\n\n' + _unbacked
-        for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text)):
+        from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
+        for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text),
+                      _science.do_note(draft), _science.simulated_note(_field_text, draft),
+                      _science.coordinate_note(draft)):
             if _note:
                 reply.append('\n\n' + _note)
                 yield '\n\n' + _note

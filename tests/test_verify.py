@@ -157,8 +157,10 @@ def test_learned_facts_stay_inferred_even_after_a_clean_check(memory):
         person="bob",
         origin="verified",
     )
-    assert saved == ["Bob is learning piano"]
-    assert memory.list_facts("bob")[0]["origin"] == "inferred"
+    # U100: a guess is suggested, not saved; a confirmed one is saved by the person's own save.
+    from cursiv_engine.memory import suggestions
+    assert saved == [] and memory.list_facts("bob") == []
+    assert [r["text"] for r in suggestions.pending("bob")] == ["Bob is learning piano"]
 
 
 def test_learner_skips_cursivs_own_words(memory):
@@ -169,7 +171,9 @@ def test_learner_skips_cursivs_own_words(memory):
                        '"Bob did not explicitly tell you his soil type", "Bob keeps raised garden beds"]',
         person="bob",
     )
-    assert saved == ["Bob keeps raised garden beds"]
+    from cursiv_engine.memory import suggestions
+    assert saved == []                                     # U100: guesses are suggestions
+    assert [r["text"] for r in suggestions.pending("bob")] == ["Bob keeps raised garden beds"]
 
 
 def test_conflicting_memories_are_both_shown(memory):

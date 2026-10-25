@@ -69,8 +69,14 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
                 break
             ids |= related
         rows = [r for r in rows if r['id'] in ids or str(r['seq']) == entry.lstrip('#')]
+    mentions = []
     if sample:
+        everything = rows
         rows = [r for r in rows if r.get('sample_id', '').casefold() == sample.casefold()]
+        if not rows:
+            # No record has that sample ID; say which ones only mention it (U100 audit: W-003 was in a note).
+            mentions = [r for r in everything if sample.casefold() in ' '.join(
+                str(r.get(k, '')) for k in ('site', 'project', 'note', 'measurements')).casefold()][-10:]
     if start:
         rows = [r for r in rows if r['recorded_local'][:10] >= start]
     if end:
@@ -78,13 +84,13 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
     if words:
         terms = re.findall(r'[\w.-]+', words.casefold())
         rows = [r for r in rows if all(term in ' '.join(str(r.get(k, '')) for k in
-                ('site', 'sample_id', 'note', 'measurements', 'reason')).casefold() for term in terms)]
+                ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold() for term in terms)]
     if corrections:
         rows = [r for r in rows if r.get('corrects')]
     total = len(rows)
     selected = list(reversed(rows))[offset:offset + limit]
     return dict(records=selected, total=total, offset=offset, more=offset + limit < total,
-                warnings=warnings[:20], source='field log')
+                warnings=warnings[:20], source='field log', mentions=list(reversed(mentions)), sample=sample)
 
 
 def is_request(text: str) -> bool:
@@ -141,6 +147,9 @@ def render(result: dict, *, summarize: bool = False) -> str:
     lines += ['Warning: ' + w for w in result['warnings']]
     if not result['records']:
         lines.append('No matching entries were found in the readable, integrity-checked records.')
+        if result.get('mentions'):
+            lines.append(f"No record has sample ID {result['sample']}, but {len(result['mentions'])} mention it in their text:")
+            lines += ['[' + row['id'] + '] ' + fieldlog.summary(row) for row in result['mentions']]
     if summarize and result['records']:
         lines.append('Extractive summary of recorded observations; no causal interpretation was generated.')
     for row in result['records']:

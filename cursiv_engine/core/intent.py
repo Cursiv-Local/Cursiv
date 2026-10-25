@@ -134,6 +134,9 @@ class Proposal:
     def card_lines(self) -> list[str]:
         if self.action.name == "notebook.log":
             return [p.strip() for p in self.slots.get("details", "").split(";") if p.strip()]
+        if self.action.name == "notebook.correct":           # core/notebook_proposals.py
+            return [f"Record: {self.slots.get('record', '')}", self.slots.get("change", ""),
+                    "The original stays; this adds a correction linked to it."]
         if self.action.name in ("file.create", "file.append"):
             return [f"File: {self.slots.get('path', '')}", f"Text: {self.slots.get('text', '')}"]
         return [v for v in (str(x) for x in self.slots.values()) if v]
@@ -162,8 +165,11 @@ _FILLER = {"the", "that", "this", "and", "for", "with", "you", "your", "they", "
            "prefers", "likes", "has", "have", "are", "was", "were", "who", "his", "her", "its", "my", "i'm", "is"}
 
 
-def check(action: Action, slots: dict, said: str) -> list[str]:
-    """Problems with a proposal. Empty means it may be shown (or, if read-only, run)."""
+def check(action: Action, slots: dict, said: str, original: str | None = None) -> list[str]:
+    """Problems with a proposal. Empty means it may be shown (or, if read-only, run).
+    `said` may include the meanings of the person's own hints (core/guidance.py) for checking values;
+    whether they asked for the action at all is judged on `original`, their actual words."""
+    original = said if original is None else original
     problems = []
     said_n = _norm(said)
     said_numbers = _numbers(said)
@@ -187,7 +193,7 @@ def check(action: Action, slots: dict, said: str) -> list[str]:
             problems.append("only files inside your workspace")
     if action.name == "memory.forget" and not re.search(
             r"(?i)^(?:please\s+|ok,?\s+|you can\s+|can you\s+)?(?:forget|delete|remove|erase|drop)\b|"
-            r"\bforget (?:what|that|about|the|my|everything i)\b|\b(?:delete|remove) (?:the|that|my) memory\b", said):
+            r"\bforget (?:what|that|about|the|my|everything i)\b|\b(?:delete|remove) (?:the|that|my) memory\b", original):
         problems.append("that doesn't sound like a request to forget a memory")
     if action.name in ("file.create", "file.append"):
         text = _norm(slots.get("text", "")).rstrip(".!")
@@ -287,14 +293,15 @@ def _log_details(slots: dict) -> str:
     return "; ".join(p for p in parts if p)
 
 
-def build(action_name: str, slots: dict, said: str) -> Proposal | None:
+def build(action_name: str, slots: dict, said: str, original: str | None = None) -> Proposal | None:
     action = ACTIONS.get(action_name)
     if action is None:
         return None
     if action.name == "notebook.log":
-        slots = {"details": _log_details(slots)}
+        from . import notebook_proposals          # a code isn't a site unless the person said so
+        slots = {"details": notebook_proposals.fix_details(_log_details(slots), said)}
     clean = {k: re.sub(r"\s+", " ", str(slots.get(k, ""))).strip().strip('"').strip() for k in action.slots}
-    problems = check(action, clean, said)
+    problems = check(action, clean, said, original)
     if action.name == "workspace.set" and not problems:
         matches = find_folder(clean["folder"])
         if len(matches) == 1:
@@ -307,13 +314,18 @@ def build(action_name: str, slots: dict, said: str) -> Proposal | None:
     return Proposal(action, clean, command, problems)
 
 
-def propose(text: str, ask: Callable[[list[dict]], str]) -> Proposal | None:
+def propose(text: str, ask: Callable[[list[dict]], str], workspace: str = "") -> Proposal | None:
     """Ask the model for one action; None when it isn't one (or the model is unsure).
     A proposal with problems is returned so the card can say why it wasn't offered."""
     if not might_be_action(text):
         return None
     try:
-        raw = ask([{"role": "system", "content": PROMPT}, {"role": "user", "content": text[:1500]}]) or ""
+        from . import guidance                     # U100: the person's own words and folder map
+        extra = guidance.prompt_block(workspace)
+    except Exception:
+        extra = ""
+    try:
+        raw = ask([{"role": "system", "content": PROMPT + extra}, {"role": "user", "content": text[:1500]}]) or ""
         m = re.search(r"\{.*\}", raw, re.S)
         data = json.loads(m.group(0)) if m else {}
     except Exception:
@@ -321,4 +333,9 @@ def propose(text: str, ask: Callable[[list[dict]], str]) -> Proposal | None:
     if not isinstance(data, dict) or str(data.get("action", "none")).lower() in ("", "none", "null"):
         return None
     slots = data.get("slots") if isinstance(data.get("slots"), dict) else {}
-    return build(str(data.get("action")), slots, text)
+    try:
+        from . import guidance
+        said = guidance.expand(text)               # "the creek" -> also "North Creek", from how-i-talk.md
+    except Exception:
+        said = text
+    return build(str(data.get("action")), slots, said, text)

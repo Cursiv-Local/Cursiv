@@ -219,7 +219,7 @@ def _call_cursiv_cloud(runtime: ChatRuntime, messages: list[dict], max_tokens: i
             settings["notice_shown"] = True
             runtime._save_cloud_settings(settings)
             yield ("*[No local model was ready, so this answer came from Cursiv Cloud (free, sent to "
-                   "cursiv.winklers-llc.com). Type 'cloud off' to keep everything on this computer.]*\n\n")
+                   "cursiv.us). Type 'cloud off' to keep everything on this computer.]*\n\n")
         yield text
     except runtime.urllib.error.HTTPError as e:
         try:
@@ -264,7 +264,7 @@ def free_key_command(runtime: ChatRuntime, text: str) -> str | None:
         on = runtime.cloud_enabled()
         return (f"Cursiv Cloud is {'ON' if on else 'OFF'}. "
                 + ("It answers only when no local model is ready (Ollama not installed or no model yet), "
-                   "through cursiv.winklers-llc.com. Type 'cloud off' to keep everything on this computer."
+                   "through cursiv.us. Type 'cloud off' to keep everything on this computer."
                    if on else "Everything stays on this computer. Type 'cloud on' to allow it as a backup."))
     if cmd in ("cloud on", "cloud off"):
         runtime.set_cloud_enabled(cmd == "cloud on")

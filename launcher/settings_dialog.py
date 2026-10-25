@@ -215,7 +215,7 @@ class SettingsDialog(QDialog):
                 set_cloud_enabled(on)
                 self._refresh_status()
             self._switch(lay, "Cursiv Cloud backup",
-                         "Only when no local model is ready, your message goes to cursiv.winklers-llc.com for an answer. "
+                         "Only when no local model is ready, your message goes to cursiv.us for an answer. "
                          "Off keeps everything on this computer.",
                          cloud_enabled(), cloud)
         except Exception:

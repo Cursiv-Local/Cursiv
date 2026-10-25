@@ -55,6 +55,23 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
             return runtime.TextResult(_reply)
 
     # Looking at itself: answered by Cursiv's own code from real records, never a model.
+    if cmd.rstrip(".?!") in ("session note", "show the session note", "show session note", "session note clear",
+                             "clear the session note"):
+        from cursiv_engine.memory import session_notes   # U100: the note this conversation picks up from
+        conv = session_notes._active.get("conv") or ""
+        if "clear" in cmd:
+            if conv:
+                session_notes.path(conv).unlink(missing_ok=True)
+            session_notes._active["note"] = ""
+            return runtime.TextResult("This conversation's session note was cleared; a new one starts from here.")
+        note = session_notes._active.get("note") or (session_notes.load(conv) if conv else "")
+        return runtime.TextResult(note.strip() + "\n\n(session note clear starts it over.)" if note.strip() else
+                                  "This conversation has no session note yet. One is written as you talk.")
+    if cmd.startswith("when i say "):            # U100: "when I say the creek I mean North Creek"
+        from cursiv_engine.core import guidance
+        _hint = guidance.command(text)
+        if _hint is not None:
+            return runtime.TextResult(_hint)
     if cmd in ("self prompt", "self prompt full"):
         from cursiv_engine.core import last_turn
         return runtime.TextResult(last_turn.summary(full=cmd.endswith("full")))

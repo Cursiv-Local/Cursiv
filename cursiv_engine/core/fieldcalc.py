@@ -133,10 +133,31 @@ def units(question: str) -> Result | None:
                          f"{_UNITS[_kind(dst)][dst.lower()]} = {out:.12g} {dst} "
                          "(decimal approximation shown to 12 significant digits).")
     else:
+        places = _places(question)
+        if places is not None:
+            # U100 audit: "to six decimal places" got 0.7925, called "exactly".
+            statement = (f"{raw} {src} is {out:,.{places}f} {dst_label} (rounded to {places} decimal "
+                         f"place{'s' if places != 1 else ''}; not exact).")
+            return Result(statement, out, 0.5 * 10 ** -places, tool="units",
+                          facts={"destination_unit": dst.lower(), "destination_label": dst_label, "places": places})
         statement = f"{raw} {src} is approximately {_fmt(out)} {dst_label}."
     # _fmt publishes four decimal places; do not encode the old 0.5% acceptance band.
     return Result(statement, out, 0.00005, tool="units",
                   facts={"destination_unit": dst.lower(), "destination_label": dst_label})
+
+
+_PLACES_WORDS = {"one": 1, "two": 2, "three": 3, "four": 4, "five": 5, "six": 6, "seven": 7, "eight": 8,
+                 "nine": 9, "ten": 10}
+
+
+def _places(question: str) -> int | None:
+    """'to six decimal places', '3 dp', '4 d.p.' -> the number of places (up to 12), else None."""
+    m = re.search(r"(?i)\b(\d{1,2}|one|two|three|four|five|six|seven|eight|nine|ten)\s*"
+                  r"(?:decimal(?:\s+places?|\s+digits?)?|d\.?\s?p\.?)(?![a-z])", question or "")
+    if not m:
+        return None
+    n = int(m.group(1)) if m.group(1).isdigit() else _PLACES_WORDS[m.group(1).lower()]
+    return min(n, 12)
 
 
 # ── Coordinates ────────────────────────────────────────────────────────────
@@ -361,7 +382,34 @@ def stats(question: str) -> Result | None:
     if want_pop:
         parts.append(f"population standard deviation (n) = {_fmt(statistics.pstdev(xs))}{u}")
     note = " With fewer than 5 values these are rough: one unusual value moves them a lot." if n < 5 else ""
+    # U100 audit: the checked number was always the mean, so a correct median of 7 (mean 8.4) was
+    # "withdrawn". When one statistic is asked for, it is the checked number and it leads the answer.
+    asked = _asked_statistic(q)
+    if asked:
+        value = {"median": statistics.median(xs), "total": sum(xs), "range": max(xs) - min(xs),
+                 "sd": statistics.stdev(xs), "mean": mean}[asked]
+        if asked == "sd" and want_pop and not re.search(r"(?i)\bsample (?:standard deviation|sd|std)", q):
+            value = statistics.pstdev(xs)
+        label = {"median": "median", "total": "total", "range": "range", "mean": "mean",
+                 "sd": "population standard deviation (n)" if value == statistics.pstdev(xs) and want_pop
+                 else "sample standard deviation (n - 1)"}[asked]
+        lead = f"The {label} is {_fmt(value)}{u}"
+        if asked == "median":
+            lead += " (values in order: " + ", ".join(_fmt(x) for x in sorted(xs)) + ")"
+        return Result(lead + ".", value, max(abs(value) * 0.0005, 0.001),
+                      facts={"asked": asked, "all": ", ".join(parts) + "."})
     return Result(", ".join(parts) + "." + note, mean, max(abs(mean) * 0.0005, 0.001))
+
+
+def _asked_statistic(q: str) -> str:
+    """The single statistic asked for ("Calculate the median of …"), or "" for several or a summary."""
+    if re.search(r"(?i)\b(summary statistics|statistics|stats|confidence interval)\b", q):
+        return ""
+    found = {name for name, pattern in (
+        ("median", r"\bmedian\b"), ("mean", r"\b(?:mean|average)\b"), ("range", r"\brange\b"),
+        ("total", r"\b(?:total|sum)\b"), ("sd", r"\b(?:standard deviation|std dev|sd)\b"))
+        if re.search("(?i)" + pattern, q)}
+    return found.pop() if len(found) == 1 else ""
 
 
 # ── Bleach for drinking water, from the reference card's own table ─────────

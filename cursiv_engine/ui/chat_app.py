@@ -499,7 +499,7 @@ GROQ_MODELS  = (GROQ_MODEL, "openai/gpt-oss-120b", "openai/gpt-oss-20b")
 # smaller prompts are also simply faster everywhere.
 GROQ_BUDGET   = 18000
 GEMINI_BUDGET = 60000
-CURSIV_CLOUD_URL = os.environ.get("CURSIV_CLOUD_URL", "https://cursiv.winklers-llc.com/api/cursiv/chat")
+CURSIV_CLOUD_URL = os.environ.get("CURSIV_CLOUD_URL", "https://cursiv.us/api/cursiv/chat")
 
 FREE_KEY_HELP = """\
 FREE AI KEYS -- no credit card, about 2 minutes each. Add one or both.

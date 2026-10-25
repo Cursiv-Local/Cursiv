@@ -74,12 +74,25 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     system_text = runtime.load_system_prompt()
     if runtime.turn_policy.current().inspect:
         system_text += runtime.load_vault_context()
+        try:
+            from cursiv_engine.memory import session_notes as _notes   # U100: where this conversation left off
+            system_text += _notes.prompt_block()
+        except Exception:
+            pass
         # Session memory (the last exchanges of the latest session, even from another
         # conversation) is continuity, not material. For writing and creative requests it
         # made a small model reuse earlier posts word for word (U99), so it's left out.
+        # U100 audit: it also came from OTHER conversations, written as "You: …", and the model
+        # answered "what did I ask three messages ago?" from it with an invented checklist request
+        # and invented ORION-742 readings. So it's only given to a conversation that has no
+        # history of its own yet, and labelled as another conversation's.
         from . import response_style as _rs
-        if not (_rs.DRAFT.search(user_text or '') or _rs._CREATIVE_ASK.search(user_text or '')):
-            system_text += runtime._load_session_ctx()
+        if not history and not (_rs.DRAFT.search(user_text or '') or _rs._CREATIVE_ASK.search(user_text or '')):
+            _ctx = runtime._load_session_ctx()
+            if _ctx:
+                system_text += ("\n\n(The block below is from an EARLIER, DIFFERENT conversation. It is background "
+                                "only: never describe it as something said in this conversation, and never treat "
+                                "its numbers, sites or projects as recorded data.)" + _ctx)
     runtime._FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if file_context:
         system_text += f"\n\n## Uploaded Content\n{file_context}"

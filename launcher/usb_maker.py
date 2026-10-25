@@ -132,7 +132,7 @@ TAKING YOUR WORK BACK TO A COMPUTER
   and every replaced file is backed up first. Accounts and passwords stay as they
   are on each computer.
 
-More: https://cursiv.winklers-llc.com  ·  Source: https://github.com/winklersllc2026-bit/Cursiv
+More: https://cursiv.us  ·  Source: https://github.com/Cursiv-Local/Cursiv
 """
 
 

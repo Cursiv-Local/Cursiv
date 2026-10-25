@@ -77,6 +77,12 @@ Tests exercise learner work explicitly; ordinary chat tests never start jobs.
         monkeypatch.setattr(chat_badges, 'moments_file', lambda: folder / 'ui_moments.json')
     except ImportError:
         pass
+    from cursiv_engine.core import guidance
+    monkeypatch.setattr(guidance, 'DIR', folder / 'guidance')
+    from cursiv_engine.memory import session_notes
+    monkeypatch.setattr(session_notes, 'DIR', folder / 'session_notes')
+    monkeypatch.setitem(session_notes._active, 'conv', '')
+    monkeypatch.setitem(session_notes._active, 'note', '')
     real_submit = formation.submit
     monkeypatch.setattr(formation, 'submit', lambda work, event_id: False)
     # No diagnostic file handler opens in a unit test unless explicitly tested.

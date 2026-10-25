@@ -208,7 +208,14 @@ def load_system_prompt(runtime: ChatRuntime) -> str:
     return base + runtime._build_live_status()
 
 def load_vault_context(runtime: ChatRuntime) -> str:
-    """Inject PiForge phase agent knowledge from vault into every conversation."""
+    """Retired (U100 audit): this put the old PiForge agent registry (agent_registry.json, last
+    written May 2026) into every conversation as "PHASE INTELLIGENCE" -- unrelated text the
+    model could mistake for the person's projects. The file is left where it is; nothing reads
+    it into chat any more. Kept as a function so older callers and tests still work."""
+    return ""
+
+
+def _legacy_vault_context(runtime: ChatRuntime) -> str:
     registry_path = runtime.APP_DATA / "agent_registry.json"
     vault_dir     = runtime.APP_DATA / "vault"
     if not registry_path.exists():

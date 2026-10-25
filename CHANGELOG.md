@@ -1,5 +1,30 @@
 # Changelog
 
+## 3.14-U100 — Records you can trust, memory you can see (2026-10-25)
+
+- Session notes: each conversation keeps a short note (goal, what was done from Cursiv's own records,
+  decided, open, next) and picks up where you left off ("Picking up: …").
+- Suggested memories: what Cursiv guesses about you is asked about ("Remember this?" Save / No), never
+  saved silently. What you say outright is still saved.
+- `memory folder`: your memory as readable .md files with a MEMORY.md index (on a USB drive, the
+  drive's folder; on a computer, a readable copy where you choose).
+- "when I say the creek I mean North Creek" teaches Cursiv your words; `workspace map` drafts a
+  CURSIV.md folder map. Both help plain-words actions; neither grants new abilities.
+- From the owner's U99 test run (each with a regression test):
+  - Field notebook: plain-words records get a confirm card from Cursiv's own parser (W-001 had been saved as
+    "ORION = -742"); codes stay out of `site` unless you call them a site; "verify … ORION-742 …" runs the
+    real chain check and lists what it found; "Correct W-001 temperature from 18.6 to 18.9" appends a linked
+    correction (the original stays) and the history shows both. Optional `project` field.
+  - "What did I ask three messages ago?" is answered from this conversation; another conversation's
+    exchanges no longer reach an ongoing one; the old PiForge registry is no longer put into chat.
+  - "Correction: X, not Y." updates the saved memory, keeping the old value as history.
+  - Numbers: a correct median is no longer withdrawn (it was checked against the mean); "to six decimal
+    places" is honoured and never called exact; oxygen saturation uses the Benson & Krause / APHA equation
+    (the model had invented one); invented experiment numbers and impossible coordinates get a note.
+- Suggested memories now actually appear (held-out: 20% -> 90% on the first run, 0 sensitive), with health,
+  money and secrets never offered. Session notes keep only lines in your own words; `session note` shows it.
+- The app uses https://cursiv.us.
+
 ## 3.14-U99 — Conversational actions, operational self-knowledge (2026-10-25)
 
 - Say it normally: "Add a note that North Creek was 14.2 C and cloudy", "work in my Field Data folder",

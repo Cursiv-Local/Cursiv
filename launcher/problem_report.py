@@ -25,7 +25,7 @@ from PyQt6.QtWidgets import (
 )
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN  # one palette for every window (theme.py)
 
-REPORT_URL = os.environ.get("CURSIV_REPORT_URL", "https://cursiv.winklers-llc.com/api/report")
+REPORT_URL = os.environ.get("CURSIV_REPORT_URL", "https://cursiv.us/api/report")
 HOME_DATA = Path.home() / ".cursiv"
 
 
