@@ -295,6 +295,8 @@ def _bounded_read(text: str):
 
 
 def _workspace_listing(text: str) -> bool:
+    if re.fullmatch(r'(?i)\s*(?:file\s+list|list\s+(?:the\s+|my\s+)?files)\s*[.?]?\s*', text):
+        return True                       # a bare "file list" lists the workspace (U98)
     return bool(re.fullmatch(r"(?is)(?:look at|list|show(?: me)?)(?:\s+the)?\s+"
                              r"(?:files in (?:the )?)?(?:current |authorized )?workspace"
                              r"(?:\s+and (?:tell|show|give)\b.*)?[.?]?", text))

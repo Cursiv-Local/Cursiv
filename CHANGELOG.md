@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.14-U98 — Plugins isolated, notebook encrypted, clearer chat (2026-10-25)
+
+- Plugins never run inside Cursiv any more. Every plugin call, and every Forge test
+  of a new plugin, runs in its own short-lived process with no secrets in its
+  environment, a time limit, and a guard that refuses network access, starting other
+  programs, native code and files outside the plugin's own folder. The installed app
+  runs plugins itself (`Cursiv.exe --plugin-runner`); no separate Python is needed.
+- The field notebook is encrypted with your conversations and memories: entries,
+  photos and imported team logs. Reports, exports and shares stay readable. A computer
+  already on U97 encrypts its notebook at the next unlock, after making recovery copies.
+- A clearer chat: four starter cards in a new chat; answers worked out by Cursiv carry
+  a green "Worked out by Cursiv · no AI model" badge; notebook, memory and file saves
+  and offline on/off show as receipt cards; a one-time tour after the first AI answer;
+  errors say what happened and what to do next, with Open Setup or Send a problem report.
+- Custom agents (`agent new …`, `@name`) are encrypted too, and their built-in
+  instructions no longer talk about "his family".
+- Fixes from the U97 test run: a bare `file list` lists the workspace; a removed
+  letters command shows what you typed above its note.
+- Failed session-log writes are recorded instead of silently dropped.
+- Docs: README and the privacy page describe always-on encryption; HANDOFF.md keeps the
+  current rules, with history moved to docs/HANDOFF-HISTORY.md.
+- Moving data computer → USB → another computer was tested on real hardware with U97.
+
 ## 3.14-U97 — Trust fixes, encryption always on, removals (2026-10-25)
 
 - Cursiv no longer pretends to change files. "Add a line to notes.txt saying …"

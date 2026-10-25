@@ -38,6 +38,37 @@ def require_closed() -> None:
             raise vault.VaultError('Could not establish whether Cursiv data is in use; migration refused') from exc
 
 
+def adopt_new_stores(directories=None) -> int:
+    """After unlock: stores a later release began encrypting (the field notebook, U98) are
+    still readable in an existing vault. Each gets an encrypted recovery copy, verified,
+    then is encrypted in place and read back. Run at startup with the lease held."""
+    import time
+    done = 0
+    for root in (directories if directories is not None else vault.roots()):
+        root = Path(root).absolute()
+        if not (root / vault.MARKER).exists() or vault.metadata(root)['state'] != 'ready':
+            continue
+        cipher = vault._cipher(root)
+        stamp = time.strftime('%Y%m%d-%H%M%S')
+        for index, path in enumerate(inventory(root)):
+            raw = path.read_bytes()
+            if raw.startswith(vault.MAGIC):
+                continue
+            relative = path.relative_to(root)
+            backup = Path('.vault-recovery') / f'adopt-{stamp}-{index:06d}.enc'
+            atomic.write_bytes(root / backup, vault.pack(cipher, backup, relative.as_posix().encode('utf-8')
+                                                         + b'\0' + raw), protect=False)
+            if vault.unpack(cipher, backup, (root / backup).read_bytes()).split(b'\0', 1)[1] != raw:
+                raise vault.VaultError('Encrypted recovery copy verification failed; nothing was changed')
+            if path.read_bytes() != raw:
+                raise vault.VaultError('A store changed while it was being encrypted; existing data preserved')
+            atomic.write_bytes(path, vault.pack(cipher, relative, raw), protect=False)
+            if vault.unpack(cipher, relative, path.read_bytes()) != raw:
+                raise vault.VaultError('Encryption read-back verification failed; the recovery copy is kept')
+            done += 1
+    return done
+
+
 def inventory(root: Path) -> list[Path]:
     if not root.exists():
         return []

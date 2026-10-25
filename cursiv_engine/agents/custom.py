@@ -1,5 +1,5 @@
 """
-Custom agents: specialists anyone in the family can create in plain words.
+Custom agents: specialists anyone using Cursiv can create in plain words.
 
   agent new chef: plans healthy family meals on a budget, asks about allergies
   @chef what should we make tonight?
@@ -7,7 +7,8 @@ Custom agents: specialists anyone in the family can create in plain words.
   agents ask should we start a garden this spring?
 
 Each agent = a name, its job (instructions), and things it has been taught.
-Saved per person in ~/.cursiv/agents/<person>/<name>.json -- plain files.
+Saved per person in ~/.cursiv/agents/<person>/<name>.json, encrypted with the vault on a
+computer (U98; a Cursiv USB drive keeps them readable).
 """
 from __future__ import annotations
 
@@ -17,7 +18,7 @@ import time
 import threading
 from functools import wraps
 from pathlib import Path
-from cursiv_engine.core import atomic
+from cursiv_engine.core import atomic, private_store, vault
 
 DIR = Path.home() / ".cursiv" / "agents"
 _NAME_RE = re.compile(r"^[a-z][a-z0-9_-]{1,23}$")
@@ -50,7 +51,7 @@ def clean_name(name: str) -> str:
 
 def load(name: str) -> dict | None:
     try:
-        value = json.loads((_dir() / f"{clean_name(name)}.json").read_text(encoding="utf-8"))
+        value = json.loads(private_store.read_text(_dir() / f"{clean_name(name)}.json"))
     except FileNotFoundError:
         return None
     if not isinstance(value, dict) or value.get('name') != clean_name(name) or not isinstance(value.get('job'), str) \
@@ -76,7 +77,9 @@ def all_agents() -> list[dict]:
     out = []
     for f in sorted(d.glob("*.json")) if d.exists() else []:
         try:
-            out.append(json.loads(f.read_text(encoding="utf-8")))
+            out.append(json.loads(private_store.read_text(f)))
+        except vault.VaultError:
+            raise                     # locked is not "no agents"
         except Exception:
             pass
     return out
@@ -154,12 +157,12 @@ def listing() -> str:
 def system_prompt(agent: dict, person_memory: str = "") -> str:
     know = "\n".join(f"- {k}" for k in agent.get("knowledge", []))
     return (
-        f"You are \"{agent['name']}\", a specialist agent inside Cursiv (a personal AI made by Cursiv Local for "
-        f"his family). Stay in this role.\n\n## Your job\n{agent['job']}\n\n"
-        + (f"## Things you've been taught (always true for this family)\n{know}\n\n" if know else "")
+        f"You are \"{agent['name']}\", a specialist agent inside Cursiv (a personal AI made by Cursiv Local, "
+        f"an independent open-source project). Stay in this role.\n\n## Your job\n{agent['job']}\n\n"
+        + (f"## Things you've been taught (always true for the person you help)\n{know}\n\n" if know else "")
         + (f"## What Cursiv knows about the person you're helping\n{person_memory}\n\n" if person_memory else "")
         + "Be practical and specific. If your job doesn't cover the question, say so briefly and answer as best you can. "
-          "Never invent facts about the family."
+          "Never invent facts about the person or the people they mention."
     )
 
 

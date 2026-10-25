@@ -19,6 +19,11 @@ import theme
 from chat_rendering import MarkdownStream, style_code
 
 
+def _seen_once(flag: str) -> bool:
+    import chat_badges
+    return chat_badges.seen_once(flag)
+
+
 class ChatTranscriptMixin:
     # Replies are Markdown, not trusted HTML. Literal <file>/<folder> otherwise
     # become open HTML elements and can swallow the rest of an instruction.
@@ -65,23 +70,45 @@ class ChatTranscriptMixin:
         return main, "\n".join(details)
 
     def _chip_html(self, inner: str) -> str:
-        """One of Cursiv's own status lines, as a small line under (or above) the answer."""
-        esc = self._escape(inner)
-        if inner.startswith("Answered by "):
-            engine = inner[len("Answered by "):]
-            local = engine.startswith(("Ollama", "Local coding models", "Cursiv local"))
-            col = theme.GREEN if local else theme.AMBER
-            label = ("Local · " + self._escape(engine.split("·", 1)[-1].strip())) if local else ("Online · " + self._escape(engine))
-            return f'<p style="margin:6px 0 0 0; font-size:12px; color:{col};">● {label}</p>'
-        if inner.startswith("Cursiv's check:"):
-            return f'<p style="margin:8px 0 0 0; font-size:13px; color:{theme.AMBER};">⚠ {esc}</p>'
-        if inner.startswith("From Cursiv's offline reference"):
-            urgent = "[medical/" in inner or "[survival/" in inner
-            style = (f"font-size:13px; color:{theme.TEXT};" if urgent else f"font-size:12px; color:{theme.MUTED};")
-            return (f'<table width="100%" cellpadding="10" cellspacing="0" style="margin:2px 0 10px 0;'
-                    f' background-color:{theme.SURFACE2}; border:1px solid {theme.BORDER};"><tr><td>'
-                    f'<span style="{style}">{esc}</span></td></tr></table>')
-        return f'<p style="margin:4px 0; font-size:12px; color:{theme.MUTED};">{esc}</p>'
+        """One of Cursiv's own status lines, as a quiet badge under (or above) the answer."""
+        import chat_badges
+        return chat_badges.badge(inner)
+
+    def _maybe_show_tour(self) -> bool:
+        """Once, after the first answer from an AI model: four things to try next.
+        Not before, so a new person sees the AI work first."""
+        import chat_badges
+        from urllib.parse import quote
+        if "*[Answered by " not in (self._reply_text or "") or _seen_once("tour_shown"):
+            return False
+        cursor = QTextCursor(self._transcript.document())
+        cursor.movePosition(QTextCursor.MoveOperation.End)
+        self._plain_block(cursor)
+        cursor.insertHtml(theme.live(chat_badges.tour(lambda t: f"cursiv://prompt/{quote(t)}")))
+        self._plain_block(cursor)
+        return True
+
+    def _render_receipt(self) -> bool:
+        """A command result that reads better as a card (a notebook save, offline on, …):
+        swap its plain text for the card. The words are the command's own."""
+        import chat_badges
+        text = (self._reply_text or "").strip()
+        start = getattr(self, "_reply_start", None)
+        if start is None or not text or chat_badges.receipt_kind(text) is None:
+            return False
+        first_offline = False
+        if text.startswith("Offline mode ON"):
+            first_offline = not _seen_once("offline_celebrated")
+        html = chat_badges.receipt(text, first_offline=first_offline)
+        cursor = QTextCursor(self._transcript.document())
+        cursor.beginEditBlock()
+        cursor.setPosition(start)
+        cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+        cursor.removeSelectedText()
+        cursor.insertHtml(theme.live(html))
+        self._plain_block(cursor)
+        cursor.endEditBlock()
+        return True
 
     @staticmethod
     def _keep_line_breaks(md: str) -> str:

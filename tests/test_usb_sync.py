@@ -216,7 +216,8 @@ def test_a_drive_encrypted_by_an_older_release_is_skipped_not_mixed(computer):
     from cursiv_engine.core import vault
     app, home, drive = computer
     _write(drive / vault.MARKER, "{}")
-    _write(drive / "conversations" / "c.json", "ciphertext")
+    (drive / "conversations").mkdir(parents=True)
+    (drive / "conversations" / "c.json").write_bytes(vault.MAGIC + b"ciphertext")
     _write(drive / "fieldlog" / "observations.jsonl", "1\n")
     got = {it["rel"].as_posix(): it["action"] for it in usb_sync.plan_import(drive, app, home)}
     assert got == {"conversations/c.json": "skip", "fieldlog/observations.jsonl": "add"}   # marker never travels

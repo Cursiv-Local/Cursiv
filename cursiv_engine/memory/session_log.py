@@ -17,6 +17,16 @@ from datetime import datetime, date
 from pathlib import Path
 from cursiv_engine.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
+
+def _failed(stage: str, exc: BaseException) -> None:
+    """The session log is best-effort, but a failed write is recorded in logs/memory.log
+    (U98) instead of vanishing: a locked or damaged store must not look like a quiet day."""
+    try:
+        from cursiv_engine.memory import formation
+        formation.record(stage, exc)
+    except Exception:
+        pass
+
 ROOT         = Path(__file__).parent.parent.parent
 CURSIV_DIR   = APP_DATA
 SESSIONS_DIR = CURSIV_DIR / "sessions"
@@ -49,8 +59,8 @@ def _append_memory_run(user_msg: str, ai_msg: str, model: str, quality: float = 
             json.dumps(mem, indent=2, ensure_ascii=False),
             encoding="utf-8",
         )
-    except Exception:
-        pass
+    except Exception as exc:
+        _failed("session_memory_write_failed", exc)
 
 
 def get_last_exchange() -> dict | None:
@@ -80,8 +90,8 @@ def append_exchange(user_msg: str, ai_msg: str, model: str = "unknown") -> None:
     }
     try:
         private_store.append_text(_today_file(), json.dumps(entry, ensure_ascii=False) + "\n")
-    except Exception:
-        pass
+    except Exception as exc:
+        _failed("session_log_write_failed", exc)
     _append_memory_run(user_msg, ai_msg, model)
 
 

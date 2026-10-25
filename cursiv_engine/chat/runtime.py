@@ -123,7 +123,6 @@ class ChatRuntime(Protocol):
     _local_model_ready: Any
     _local_stream: Any
     _memory_llm: Any
-    _memory_used: Any
     _models_on_disk: Any
     _needs_search: Any
     _num_ctx: Any

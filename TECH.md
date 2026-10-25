@@ -25,7 +25,7 @@ where data lives, and how to run, build and release it.
 |---|---|
 | `ui/chat_app.py` | Compatible chat entry points, configuration and legacy turn records; passes explicit runtime services to implementation modules. No Qt interface. |
 | `chat/` | Context/uploads, phase orchestration, routing, local/cloud/provider-tool adapters, streaming/completion, saved keys and web search. See [ARCHITECTURE.md](ARCHITECTURE.md) for exact module boundaries. |
-| `core/` | Phases (`phases.py`), speed tuning for small GPUs and free keys (`speed.py`), self-knowledge (`selfknow.py`), read-only computer tools (`tools.py`), plugins / Cursiv Forge (`plugins.py`), talking style (`style.py`), strand memory archive (`strand_store.py`), constitution. |
+| `core/` | Phases (`phases.py`), speed tuning for small GPUs and free keys (`speed.py`), self-knowledge (`selfknow.py`), read-only computer tools (`tools.py`), plugins / Cursiv Forge (`plugins.py`; since U98 every plugin call runs in its own process via `plugin_runner.py`, `Cursiv.exe --plugin-runner` when installed), talking style (`style.py`), strand memory archive (`strand_store.py`), constitution. |
 | `memory/` | Semantic memory (find by meaning with `nomic-embed-text`, keyword fallback), project memory, session logs. |
 | `council/` | The advising council behind `council <question>`: seats answer in parallel, synthesizers combine them. |
 | `agents/` | Custom agents (`agent new …`), Babel translation, coding agent, offline queue, reference brain, voice. |
@@ -95,6 +95,11 @@ drive (portable mode) stays readable by the owner's choice; `launcher/usb_sync.p
 decrypts covered stores on the way to a drive and encrypts them again when they come
 back (staged imports in `import-pending` stay encrypted). The vault marker and
 `.vault-recovery/` never travel.
+Since U98 the field notebook is covered too: the observation log, its photos and
+imported team logs (reports, exports, team shares and public team keys stay readable;
+a phone upload is deleted once imported). A computer already encrypted by U97 gets
+its notebook encrypted at the next unlock (`vault_migration.adopt_new_stores`), with
+verified recovery copies first.
 There is no chat command that accepts the passphrase. Login recovery cannot recover it.
 
 `core/vault.py` uses the already required `cryptography` library: Fernet authenticated
@@ -316,9 +321,10 @@ readable API keys for use on other PCs. Optional encrypted conversation/memory
 stores in current source remain encrypted and require their passphrase; the
 remaining private data follows its existing storage rules.
 
-The owner reported basic physical USB operation working on 2026-10-22. Memory
-persistence across PCs and the new encrypted USB option still need physical testing;
-source tests and temporary-drive relocation are not substitutes.
+The owner reported basic physical USB operation working on 2026-10-22, and on
+2026-10-25 (U97, encryption always on) reported moving data computer → USB → another
+computer working. A clean-machine first start and a passphrase-recovery drill are
+still not claimed; source tests and temporary-drive relocation are not substitutes.
 [Field-kit checklist](docs/FIELD-KIT-TEST.md),
 [focused persistence check](docs/USB-PERSISTENCE-CHECK.md).
 

@@ -155,7 +155,8 @@ def test_restrictions_and_routine_sources_collapse_into_details(panel):
 def test_calculation_and_reference_evidence_stay_visible(panel):
     panel._on_chunk('2.5 days.\n\n*[Sources: Cursiv calculation (resources; no AI model)]*')
     panel._on_done()
-    assert 'Cursiv calculation' in panel._transcript.toPlainText()
+    text = panel._transcript.toPlainText()                      # U98 badge wording
+    assert 'Worked out by Cursiv · resources' in text and 'no AI model' in text
 
 
 def test_pure_status_answers_only_requested_scope(pipeline, tmp_path):

@@ -254,12 +254,6 @@ def _default_cfg() -> dict:
 
 
 
-def _auto_territory(q: str) -> str:
-    """Compatibility entry point; implementation in command_support."""
-    return _support._auto_territory(_runtime(), q)
-
-
-
 _LANG_NAMES = {
     "mandarin": "Mandarin Chinese", "chinese": "Mandarin Chinese", "korean": "Korean",
     "russian": "Russian", "spanish": "Spanish", "french": "French", "german": "German",

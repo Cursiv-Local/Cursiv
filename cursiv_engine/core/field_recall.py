@@ -26,8 +26,12 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
     if start and end and start > end:
         raise ValueError('Start date is after end date')
     rows, warnings, size, previous, sequence = [], [], 0, fieldlog.GENESIS, 0
+    import io
+    from . import private_store
     try:
-        stream = path.open('rb')
+        if path.stat().st_size > MAX_BYTES * 2:
+            raise ValueError('Field log exceeds safe scan budget; use an authorized smaller export for review')
+        stream = io.BytesIO(private_store.read_bytes(path))       # encrypted on a computer (U98)
     except FileNotFoundError:
         return dict(records=[], total=0, offset=offset, more=False, warnings=[], source='field log')
     with stream:

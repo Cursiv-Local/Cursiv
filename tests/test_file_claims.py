@@ -112,3 +112,18 @@ def test_inferred_creator_memory_is_flagged_for_cleanup():
     from cursiv_engine.memory.cleanup import MADE_BY
     assert MADE_BY.search('Jw is the user who installed and uses Cursiv, a local AI assistant built by Someone Else.')
     assert not MADE_BY.search('Jw built a bird feeder.')
+
+
+def test_bare_file_list_lists_the_workspace(tmp_path):
+    (tmp_path / 'notes.txt').write_text('x', encoding='utf-8')
+    for text in ('file list', 'list files'):
+        reply = fs.command(text, [], tmp_path)
+        assert reply is not None and 'notes.txt' in reply.text, (text, reply and reply.text)
+
+
+def test_a_removed_letters_command_shows_what_was_typed():
+    import re
+    from pathlib import Path
+    src = Path(__file__).resolve().parent.parent.joinpath('launcher', 'chat_panel.py').read_text(encoding='utf-8')
+    block = re.search(r'if profile\.letters_command\(text\):\n(.*?)return True', src, re.S).group(1)
+    assert block.index('_append_user(text)') < block.index('_append_system(profile.REMOVED_NOTE)')

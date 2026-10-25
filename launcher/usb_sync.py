@@ -360,7 +360,7 @@ def plan_import(drive_data: Path, app: Path, home: Path) -> list[dict]:
         if rel.parts[0] in IMPORT_SKIP_TOP or rel.name in IMPORT_SKIP_NAMES:
             continue
         target = _target(rel, app, home)
-        if drive_locked and vault.covered(rel):
+        if drive_locked and vault.covered(rel) and _sealed(src):
             items.append({"rel": rel, "src": src, "dest": target, "action": "skip",
                           "reason": "encrypted on the drive; open the drive's Cursiv to read it"})
             continue

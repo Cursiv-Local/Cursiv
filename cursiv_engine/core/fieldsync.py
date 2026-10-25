@@ -42,8 +42,9 @@ def team_dir() -> Path:
 
 def _read_lines(path: Path) -> list[dict]:
     """Every entry in a log file; ValueError if any line isn't one (cut off, or not an entry)."""
+    from cursiv_engine.core import private_store
     out = []
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in private_store.read_text(path).splitlines():     # a team log is encrypted (U98)
         if line.strip():
             e = json.loads(line)
             if not isinstance(e, dict):
@@ -53,13 +54,11 @@ def _read_lines(path: Path) -> list[dict]:
 
 
 def _copy_atomic(src: Path, dest: Path) -> None:
-    """Copy so a power cut or a pulled drive leaves either the old file or the new one, never half."""
-    import os
-    tmp = dest.with_name(dest.name + ".tmp")
-    shutil.copyfile(src, tmp)
-    with tmp.open("rb+") as f:
-        os.fsync(f.fileno())
-    os.replace(tmp, dest)
+    """Copy so a power cut or a pulled drive leaves either the old file or the new one, never half.
+    Since U98 the notebook is encrypted: a copy out of it (a share) is written readable, a copy
+    into it (an import, a photo) is encrypted, both by the vault's own read and write."""
+    from cursiv_engine.core import atomic, private_store
+    atomic.write_bytes(dest, private_store.read_bytes(src))
 
 
 def chain_problems(rows: list[dict]) -> list[str]:

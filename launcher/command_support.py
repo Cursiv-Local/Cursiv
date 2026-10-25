@@ -4,7 +4,7 @@ Functions receive the explicit CommandRuntime services from the compatibility
 facade. They never import that facade, widgets, or install replacement globals.
 Runtime owns call overrides, configuration and per-turn execution records.
 Provider calls retain their existing offline gate and authorization checks.
-Entry points: _image_folder, memory_command, notebook_command, _notes_view_request, _gate, _default_cfg, _auto_territory, _personal, _is_builder, help_text, hey_prefix, voice_turn.
+Entry points: _image_folder, memory_command, notebook_command, _notes_view_request, _gate, _default_cfg, _personal, _is_builder, help_text, hey_prefix, voice_turn.
 """
 from __future__ import annotations
 
@@ -86,20 +86,6 @@ def _default_cfg(runtime: CommandRuntime) -> dict:
         "offline_mode":     runtime._gate().is_offline(),
         "last_user_msg":    "",
     }
-
-def _auto_territory(runtime: CommandRuntime, q: str) -> str:
-    ql = q.lower()
-    if any(w in ql for w in ["code", "function", "python", "debug", "build", "error", "syntax", "class", "codex"]):
-        return "coding"
-    if any(w in ql for w in ["health", "recovery", "feel", "mental", "grounding", "medication", "episode"]):
-        return "recovery"
-    if any(w in ql for w in ["design", "system", "architecture", "cursiv", "agent", "strand"]):
-        return "architecture"
-    if any(w in ql for w in ["music", "creative", "story", "forge", "art", "write", "poem", "song"]):
-        return "creative"
-    if any(w in ql for w in ["research", "history", "world", "science", "civilization"]):
-        return "worldmodel"
-    return "general"
 
 def _personal(runtime: CommandRuntime) -> bool:
     try:

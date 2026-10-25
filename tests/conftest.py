@@ -57,6 +57,26 @@ Tests exercise learner work explicitly; ordinary chat tests never start jobs.
     monkeypatch.setattr(workspace, 'config_file', lambda: folder / 'workspace_access.json')
     monkeypatch.setattr(curiosity, 'path', lambda person: folder / 'curiosity' / (person + '.json'))
     monkeypatch.setattr(presence, 'path', lambda person: folder / 'presence' / (person + '.json'))
+    # The field notebook too: since U98 it is encrypted, so a test that reads the real
+    # one on a computer with a vault fails "locked" (and must never read it anyway).
+    from cursiv_engine.core import demo, fieldlog
+    real_log_dir = fieldlog.log_dir
+    monkeypatch.setattr(fieldlog, 'log_dir',
+                        lambda: real_log_dir() if demo.active() else folder / 'fieldlog')   # demo keeps its own
+    try:
+        # Saved conversations: never the real folder. On a computer with an encrypted
+        # vault (U97+) reading it fails ("locked"), and a failed save would be reported
+        # by every later test's wait_for_save().
+        import conversations
+        monkeypatch.setattr(conversations, 'DIR', folder / 'conversations')
+        monkeypatch.setattr(conversations, '_failures', {})
+    except ImportError:
+        pass
+    try:
+        import chat_badges              # one-time UI moments (first offline, the tour) stay in the test
+        monkeypatch.setattr(chat_badges, 'moments_file', lambda: folder / 'ui_moments.json')
+    except ImportError:
+        pass
     real_submit = formation.submit
     monkeypatch.setattr(formation, 'submit', lambda work, event_id: False)
     # No diagnostic file handler opens in a unit test unless explicitly tested.

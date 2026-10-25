@@ -682,7 +682,9 @@ def _strand_items() -> list[tuple[str, str]]:
             text = f"{s.get('query', '')[:200]} — {s.get('synthesis', '')[:500]}"
             out.append(("conversation", text))
         return out
-    except Exception:
+    except Exception as exc:
+        from . import formation
+        formation.record('saved_notes_read_failed', exc)    # recall goes on without them, but it's on record
         return []
 
 

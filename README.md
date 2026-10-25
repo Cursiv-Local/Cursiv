@@ -47,7 +47,7 @@ See [phone and portable setup](TECH.md#phone-and-portable-use) for instructions 
 
 Local chat runs on your computer. Optional online services can receive the content sent to them when used or enabled. [Privacy details](PRIVACY.md).
 
-Saved conversations and memories are readable files by default; login is not encryption. Optional passphrase encryption is available from **U90**, off by default. [Coverage and setup](TECH.md#optional-conversation-and-memory-encryption).
+On a computer, conversations, memories and (from U98) the field notebook are always encrypted with a passphrase you choose at first start; a lost passphrase can't be recovered. A Cursiv USB drive stays readable by design (use drive encryption if it could be lost). The login only keeps people at your keyboard out; the passphrase is the real protection. [Coverage and recovery](TECH.md#conversation-and-memory-encryption-always-on).
 
 AI answers can be confidently wrong. Cursiv's checks catch some mistakes, not all of them. Verify important results. Cursiv is not certified for medical or safety-critical use, and its first-aid reference has not been professionally reviewed.
 
