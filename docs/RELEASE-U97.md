@@ -24,3 +24,9 @@ passed, and the Windows package also passed a start from a USB layout.
 The existing independent owner identity authenticates the final package bytes; this is
 separate from Windows-trusted Authenticode and Apple notarization. No new model-accuracy
 score is claimed.
+
+## Installer SHA-256
+
+Windows: `b3ecc0f59df4220574ce20551f649f7c2a3e268bc51bf1ec0d7fdef63b708c4a`
+
+Mac (Apple Silicon): `3433290d0fb8c2588263e11847fcffd2cbc90b92ace7857e615963abefab59c7`
