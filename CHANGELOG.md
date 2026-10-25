@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.14-U100 — Memory you can see and steer (unreleased)
+
+- Session notes: each conversation keeps a short note (goal, what was done from Cursiv's own records,
+  decided, open, next) and picks up where you left off ("Picking up: …").
+- Suggested memories: what Cursiv guesses about you is asked about ("Remember this?" Save / No), never
+  saved silently. What you say outright is still saved.
+- `memory folder`: your memory as readable .md files with a MEMORY.md index (on a USB drive, the
+  drive's folder; on a computer, a readable copy where you choose).
+- "when I say the creek I mean North Creek" teaches Cursiv your words; `workspace map` drafts a
+  CURSIV.md folder map. Both help plain-words actions; neither grants new abilities.
+
 ## 3.14-U99 — Conversational actions, operational self-knowledge (2026-10-25)
 
 - Say it normally: "Add a note that North Creek was 14.2 C and cloudy", "work in my Field Data folder",

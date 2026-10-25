@@ -1,0 +1,156 @@
+"""
+Session notes (U100): Cursiv's own CLAUDE.md for each conversation.
+
+A short markdown note per conversation -- goal, what was done, what was decided,
+what's open, the next step -- kept up to date as you talk, and put first in the
+instructions when the conversation is picked up again, so Cursiv knows where you
+left off. Stored in ~/.cursiv/session_notes/<conversation>.md (encrypted on a computer).
+
+Two kinds of line, labelled apart:
+  * Done -- only from Cursiv's own results in the conversation (a notebook save with its
+    record ID, a saved memory, a file written). Never from the model.
+  * Goal / Decided / Open / Next -- a summary written by the local model from what was
+    said, marked as such; the person can read and edit the note.
+"""
+from __future__ import annotations
+
+import re
+import time
+from pathlib import Path
+from typing import Callable
+
+DIR = Path.home() / ".cursiv" / "session_notes"
+EVERY = 3                      # model summary refreshed every N exchanges
+_active: dict = {"conv": "", "note": ""}
+
+# Application-written result lines (native commands), never model prose.
+_DONE = (
+    (re.compile(r"^Logged\.\s*(.+?)\s*Record ([0-9a-f]{6,})", re.M), lambda m: f"Logged to the field notebook: {m[1].rstrip('.')} (record {m[2]})"),
+    (re.compile(r"^Saved to memory: (.+?)(?: Memory ID: ([0-9a-f]+))?;?\s*(?:saved and verified\.)?$", re.M),
+     lambda m: f"Saved to memory: {m[1].strip()}"),
+    (re.compile(r"^Saved and verified: (\S.+?) \(\d+ bytes\)", re.M), lambda m: f"Wrote the file {m[1]}"),
+    (re.compile(r"^Appended to (\S+)", re.M), lambda m: f"Added a line to {m[1]}"),
+    (re.compile(r"^Forgotten:\s*\n- (.+)$", re.M), lambda m: f"Forgot the memory: {m[1].strip()}"),
+    (re.compile(r"^Workspace → (.+)$", re.M), lambda m: f"Workspace set to {m[1].strip()}"),
+)
+
+SUMMARY_PROMPT = """You keep a short note so a conversation can be picked up later. From the conversation
+below, write exactly these four lines, using only what was said (write "not stated" if it wasn't):
+Goal: <what the person is working on, one line>
+Decided: <decisions made, separated by "; ">
+Open: <questions or tasks still open, separated by "; ">
+Next: <the next step, one line>
+No other text."""
+
+
+def path(conv_id: str) -> Path:
+    safe = re.sub(r"[^A-Za-z0-9_-]", "_", conv_id or "")[:64]
+    return DIR / f"{safe}.md"
+
+
+def done_lines(history: list[dict]) -> list[str]:
+    out = []
+    for m in history or []:
+        if m.get("role") != "assistant" or not isinstance(m.get("content"), str):
+            continue
+        for pattern, fmt in _DONE:
+            for match in pattern.finditer(m["content"]):
+                out.append(fmt(match))
+    return list(dict.fromkeys(out))[-12:]
+
+
+def _summary(history: list[dict], ask: Callable[[list[dict]], str]) -> dict:
+    turns = [f"{m['role']}: {str(m.get('content', ''))[:600]}" for m in (history or [])[-16:]
+             if m.get("role") in ("user", "assistant")]
+    try:
+        raw = ask([{"role": "system", "content": SUMMARY_PROMPT},
+                   {"role": "user", "content": "\n".join(turns)[:7000]}]) or ""
+    except Exception:
+        return {}
+    out = {}
+    for key in ("Goal", "Decided", "Open", "Next"):
+        m = re.search(rf"(?im)^\s*{key}\s*:\s*(.+)$", raw)
+        if m and m.group(1).strip().lower() not in ("not stated", "none", "n/a", ""):
+            out[key] = m.group(1).strip()[:300]
+    return out
+
+
+def render(title: str, done: list[str], summary: dict) -> str:
+    rows = [f"# {title or 'Conversation'}", f"Updated: {time.strftime('%Y-%m-%d %H:%M')}", ""]
+    if summary.get("Goal"):
+        rows += [f"Goal: {summary['Goal']}", ""]
+    if done:
+        rows += ["Done (from Cursiv's own records):"] + [f"- {d}" for d in done] + [""]
+    for key in ("Decided", "Open"):
+        if summary.get(key):
+            rows += [f"{key}:"] + [f"- {p.strip()}" for p in summary[key].split(";") if p.strip()] + [""]
+    if summary.get("Next"):
+        rows += [f"Next: {summary['Next']}", ""]
+    if summary:
+        rows.append("(Goal, Decided, Open and Next were summarised by the AI model from the conversation.)")
+    return "\n".join(rows).rstrip() + "\n"
+
+
+def load(conv_id: str) -> str:
+    if not conv_id:
+        return ""
+    from cursiv_engine.core import private_store
+    try:
+        return private_store.read_text(path(conv_id))
+    except FileNotFoundError:
+        return ""
+
+
+def save(conv_id: str, text: str) -> None:
+    from cursiv_engine.core import atomic
+    atomic.write_bytes(path(conv_id), text.encode("utf-8"))
+
+
+def update(conv_id: str, title: str, history: list[dict], ask: Callable[[list[dict]], str] | None = None,
+           *, force: bool = False) -> str:
+    """Rebuild the note. The model summary is refreshed every EVERY exchanges (or when forced);
+    otherwise the previous summary lines are kept and only Done is recomputed."""
+    if not conv_id or not history:
+        return ""
+    exchanges = sum(m.get("role") == "user" for m in history)
+    previous = load(conv_id)
+    summary = {k: v for k, v in (
+        (k, (re.search(rf"(?m)^{k}: (.+)$", previous) or [None, None])[1]) for k in ("Goal", "Next")) if v}
+    for key in ("Decided", "Open"):
+        block = re.search(rf"(?ms)^{key}:\n((?:- .+\n?)+)", previous)
+        if block:
+            summary[key] = "; ".join(ln[2:].strip() for ln in block.group(1).splitlines() if ln.startswith("- "))
+    if ask is not None and (force or exchanges % EVERY == 0 or not summary):
+        fresh = _summary(history, ask)
+        if fresh:
+            summary = fresh
+    note = render(title, done_lines(history), summary)
+    save(conv_id, note)
+    return note
+
+
+def picking_up(note: str) -> str:
+    """One line for the top of a reopened conversation."""
+    title = (re.search(r"(?m)^# (.+)$", note) or [None, ""])[1]
+    nxt = (re.search(r"(?m)^Next: (.+)$", note) or [None, ""])[1]
+    goal = (re.search(r"(?m)^Goal: (.+)$", note) or [None, ""])[1]
+    bits = [b for b in (goal or title, f"next: {nxt}" if nxt else "") if b]
+    return "Picking up: " + " — ".join(bits) if bits else ""
+
+
+# ── the conversation the window is in (one chat window per process) ──────────
+
+def set_active(conv_id: str) -> str:
+    note = load(conv_id) if conv_id else ""
+    _active.update(conv=conv_id or "", note=note)
+    return note
+
+
+def prompt_block() -> str:
+    """Put first in the instructions when a conversation with a note is picked up."""
+    note = _active.get("note") or ""
+    if not note.strip():
+        return ""
+    return ("\n\n## Where this conversation left off (Cursiv's session note)\n" + note.strip()[:2500] +
+            "\nUse it to continue. Lines under \"Done\" are Cursiv's records; the rest is a summary and may be "
+            "incomplete.\n")

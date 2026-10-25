@@ -71,6 +71,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/conversation_kind.py` — conversation preferences ("just talk").
 - `core/intent.py` — U99 conversational actions: plain words → one native command, checked, confirmed.
 - `core/local_intent.py` — memory-only intent classifier used by `memory/intents.py`.
+- `core/guidance.py` — U100: "how I talk" hints (how-i-talk.md) and the workspace folder map (CURSIV.md) for the action step; they grant no powers.
 - `core/phases.py` — the per-message phases before the model is called.
 - `core/tools.py` — read-only computer tools and the tool planner.
 
@@ -99,8 +100,11 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `memory/formation.py` — automatic-memory policy and its failure log.
 - `memory/recall.py` — date-scoped recall.
 - `memory/projects.py` — running project summaries.
-- `memory/session_log.py` — the session log ("session memory").
+- `memory/session_log.py` — the session log ("session memory"; left out of writing requests since U99).
+- `memory/session_notes.py` — U100: each conversation's note (goal, done from records, decided, open, next), used when it's picked up.
 - `memory/cleanup.py` — `memory cleanup`.
+- `memory/suggestions.py` — U100: the model's guesses wait as "Remember this?" suggestions; only confirmed ones are saved.
+- `memory/markdown.py` — U100: memory as readable .md files with a MEMORY.md index ("show my memory folder").
 - `core/strand_store.py`, `core/strand.py`, `core/strand_federation.py` — saved notes ("save this") and their packs.
 - `core/style.py` — how each person wants answers.
 - `core/presence.py` — stable identity and observed operating context.
@@ -170,7 +174,8 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `shell_dialogs.py`, `nav_windows.py` — dialogs, frame, Memory & Knowledge / Tools / Help.
 
 ### Chat window
-- `chat_panel.py` — turns, signals, conversations, the U99 confirm card.
+- `chat_panel.py` — turns, signals, conversations.
+- `chat_actions.py` — U99/U100 in the window: the action confirm card, suggested memories, session notes, memory folder, workspace map.
 - `chat_transcript.py` — rendering, badges, receipts, the one-time tour.
 - `chat_badges.py` — badge, receipt, starter, problem and intent-card HTML.
 - `chat_rendering.py` — streaming Markdown and the export cache.

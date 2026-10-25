@@ -74,6 +74,11 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     system_text = runtime.load_system_prompt()
     if runtime.turn_policy.current().inspect:
         system_text += runtime.load_vault_context()
+        try:
+            from cursiv_engine.memory import session_notes as _notes   # U100: where this conversation left off
+            system_text += _notes.prompt_block()
+        except Exception:
+            pass
         # Session memory (the last exchanges of the latest session, even from another
         # conversation) is continuity, not material. For writing and creative requests it
         # made a small model reuse earlier posts word for word (U99), so it's left out.

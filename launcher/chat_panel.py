@@ -38,6 +38,7 @@ from chat_controls import ChatControlsMixin, _ChatInput
 from chat_transcript import ChatTranscriptMixin
 from chat_review import ChatReviewMixin
 from chat_feedback import ChatFeedbackMixin
+from chat_actions import ChatActionsMixin
 
 
 _HERE = Path(__file__).parent
@@ -134,7 +135,7 @@ class _ChatSignals(QObject):
 
 
 
-class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, QWidget):
+class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, ChatActionsMixin, QWidget):
     conversation_changed = pyqtSignal()     # saved / opened / new / renamed -> sidebar refresh
     """
     Self-contained chat view: transcript + input box, wired to the real
@@ -252,6 +253,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._dirty = True
         if self._conv_id or autosave_enabled():    # new chats save themselves; saved ones stay current
             self.save_conversation(background=True)
+        self._update_session_note()
+        QTimer.singleShot(8000, self._show_suggestions)     # learning finishes in the background
 
     def _on_saved(self, conv_id: str, error: str, revision: int) -> None:
         if conv_id == self._conv_id and revision == self._save_revision:
@@ -315,6 +318,11 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._conv_id = None
         self._dirty = False
         self._save_error = False
+        try:
+            from cursiv_engine.memory import session_notes
+            session_notes.set_active("")             # a new chat starts without an old note
+        except Exception:
+            pass
         self._show_empty_state()
         self._reset_feedback()
         self.conversation_changed.emit()
@@ -394,6 +402,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             elif url.host() == "intent":
                 what, _, key = url.path().lstrip("/").partition("/")
                 self._answer_intent(what, key)
+            elif url.host() == "suggest":
+                what, _, key = url.path().lstrip("/").partition("/")
+                self._answer_suggestion(what, key)
             elif url.host() == "report":
                 win = self.window()
                 if hasattr(win, "_send_problem_report"):
@@ -401,50 +412,6 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             return
         from PyQt6.QtGui import QDesktopServices
         QDesktopServices.openUrl(url)
-
-    # ── U99: conversational actions waiting for a yes ───────────────────────
-
-    def _show_intent_card(self, proposal) -> None:
-        import uuid
-        import chat_badges
-        key = uuid.uuid4().hex[:10]
-        self._intents = getattr(self, "_intents", {})
-        self._intents[key] = proposal
-        start = getattr(self, "_reply_start", None)
-        cursor = QTextCursor(self._transcript.document())
-        cursor.beginEditBlock()
-        if start is not None:
-            cursor.setPosition(start)
-            cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
-            cursor.removeSelectedText()
-        else:
-            cursor.movePosition(QTextCursor.MoveOperation.End)
-        cursor.insertHtml(theme.live(chat_badges.intent_card(proposal, key)))
-        self._plain_block(cursor)
-        cursor.endEditBlock()
-
-    def _answer_intent(self, what: str, key: str) -> None:
-        """Save runs exactly the command on the card, through Cursiv's own code (with
-        its receipt); Edit puts it in the message box; Cancel changes nothing."""
-        proposal = getattr(self, "_intents", {}).get(key)
-        if proposal is None:
-            self._append_system("That card was already answered.")
-            return
-        if what == "edit":
-            self.prefill(proposal.command)
-            return
-        if self._streaming:
-            return
-        self._intents.pop(key, None)
-        if what == "cancel":
-            self._append_system("Cancelled. Nothing was changed.")
-            return
-        if what != "save" or not proposal.ok:
-            return
-        self._begin_turn(proposal.command)
-        history_snapshot = list(self._history)
-        threading.Thread(target=self._run_turn, args=(proposal.command, history_snapshot, False),
-                         daemon=True).start()
 
     def open_conversation(self, conv_id: str) -> bool:
         import conversations
@@ -465,6 +432,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._dirty = False
         self._save_error = False
         self._reset_feedback()
+        self._show_picking_up(conv_id)
         self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
         self.conversation_changed.emit()
         return True
@@ -596,21 +564,6 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             self._cancel_event.set()
         self._stop_btn.setEnabled(False)
         self._status.setText("Stopping…")
-
-    def _propose_action(self, text: str):
-        """U99: plain words that might be an action -> one canonical command, from the
-        LOCAL model only (never an online one), checked by core/intent.py."""
-        try:
-            from cursiv_engine.core import intent
-            if not intent.might_be_action(text):
-                return None
-            from cursiv_engine.ui import chat_app as _ca
-            if not _ca._local_model_ready():
-                return None
-            self._signals.stage.emit("Working out what you asked for…")
-            return intent.propose(text, lambda messages: _ca._local_llm(messages, 220))
-        except Exception:
-            return None
 
     def _run_turn(self, text: str, history: list[dict], propose: bool = True) -> None:
         try:
@@ -1065,6 +1018,16 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
         if cmd == "paste":
             self._paste_from_clipboard()
+            return True
+
+        if cmd in ("workspace map", "make a workspace map", "draft cursiv.md"):
+            self._append_user(text)
+            self._draft_workspace_map()
+            return True
+
+        if cmd in ("memory folder", "show my memory folder", "show memory folder", "memory files"):
+            self._append_user(text)
+            self._show_memory_folder()
             return True
 
         return False

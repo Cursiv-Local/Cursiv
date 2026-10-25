@@ -21,7 +21,9 @@ MAX_BYTES = 64 * 1024 * 1024
 LOCK = threading.RLock()
 _keys: dict[Path, Fernet] = {}
 FOLDERS = frozenset(('conversations', 'sessions', 'projects', 'style', 'curiosity', 'presence',
-                     'agents'))   # custom agents and what they were taught (U98)
+                     'agents',            # custom agents and what they were taught (U98)
+                     'session_notes',     # each conversation's note (U100)
+                     'guidance'))         # how-i-talk.md (U100)
 NAMES = frozenset(('memory.json', 'embeddings_cache.json', 'strands.jsonl', 'territories.json',
                    'coding_profile.json', 'coding_lessons.jsonl', 'council_memory.json',
                    'rated_exchanges.jsonl'))

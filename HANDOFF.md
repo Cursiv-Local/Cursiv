@@ -4,6 +4,13 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U100 (on `claude/u100`, built on U99): memory you can see and steer
+
+- Session notes, suggested memories, the readable memory folder and guidance files:
+  [docs/MEMORY-U100.md](docs/MEMORY-U100.md). The memory store stays the source of truth; the markdown
+  folder is a readable copy (a decision for the owner to review). Inferred guesses go to
+  `memory/suggestions.py`; don't route them back into `add_fact` without a confirmation.
+
 ## U99 (on `claude/u99`, one squashed commit): conversational actions and operational self-knowledge
 
 - `core/capabilities.py` is THE inventory of what Cursiv supports; add a feature there (with its code and

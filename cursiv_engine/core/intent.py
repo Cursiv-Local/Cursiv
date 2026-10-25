@@ -307,13 +307,18 @@ def build(action_name: str, slots: dict, said: str) -> Proposal | None:
     return Proposal(action, clean, command, problems)
 
 
-def propose(text: str, ask: Callable[[list[dict]], str]) -> Proposal | None:
+def propose(text: str, ask: Callable[[list[dict]], str], workspace: str = "") -> Proposal | None:
     """Ask the model for one action; None when it isn't one (or the model is unsure).
     A proposal with problems is returned so the card can say why it wasn't offered."""
     if not might_be_action(text):
         return None
     try:
-        raw = ask([{"role": "system", "content": PROMPT}, {"role": "user", "content": text[:1500]}]) or ""
+        from . import guidance                     # U100: the person's own words and folder map
+        extra = guidance.prompt_block(workspace)
+    except Exception:
+        extra = ""
+    try:
+        raw = ask([{"role": "system", "content": PROMPT + extra}, {"role": "user", "content": text[:1500]}]) or ""
         m = re.search(r"\{.*\}", raw, re.S)
         data = json.loads(m.group(0)) if m else {}
     except Exception:
@@ -321,4 +326,9 @@ def propose(text: str, ask: Callable[[list[dict]], str]) -> Proposal | None:
     if not isinstance(data, dict) or str(data.get("action", "none")).lower() in ("", "none", "null"):
         return None
     slots = data.get("slots") if isinstance(data.get("slots"), dict) else {}
-    return build(str(data.get("action")), slots, text)
+    try:
+        from . import guidance
+        said = guidance.expand(text)               # "the creek" -> also "North Creek", from how-i-talk.md
+    except Exception:
+        said = text
+    return build(str(data.get("action")), slots, said)

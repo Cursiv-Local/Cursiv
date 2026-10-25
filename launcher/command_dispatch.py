@@ -55,6 +55,11 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
             return runtime.TextResult(_reply)
 
     # Looking at itself: answered by Cursiv's own code from real records, never a model.
+    if cmd.startswith("when i say "):            # U100: "when I say the creek I mean North Creek"
+        from cursiv_engine.core import guidance
+        _hint = guidance.command(text)
+        if _hint is not None:
+            return runtime.TextResult(_hint)
     if cmd in ("self prompt", "self prompt full"):
         from cursiv_engine.core import last_turn
         return runtime.TextResult(last_turn.summary(full=cmd.endswith("full")))

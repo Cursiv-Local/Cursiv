@@ -254,3 +254,17 @@ def intent_card(proposal, key: str) -> str:
     return _card("Nothing was saved", [f"It looked like: {wanted}. But {why}.",
                                        "Edit it and send it yourself if it's right."],
                  theme.AMBER, extra=command + f'<br><br>{link("edit", "Edit", theme.ACCENT)}')
+
+
+# ── Suggested memories (U100, memory/suggestions.py) ──────────────────────────
+
+def suggestion_card(rows: list[dict]) -> str:
+    """Guesses Cursiv made about the person, offered for a yes; nothing is saved yet."""
+    items = "".join(
+        f'<br><span style="color:{theme.TEXT};">{esc(r["text"])}</span>&nbsp;&nbsp;'
+        f'<a href="cursiv://suggest/save/{r["id"]}" style="color:{theme.ACCENT}; text-decoration:none; '
+        f'font-weight:600;">Save</a>&nbsp;&nbsp;'
+        f'<a href="cursiv://suggest/no/{r["id"]}" style="color:{theme.MUTED}; text-decoration:none;">No</a>'
+        for r in rows[:3])
+    return _card("Remember this?", ["Cursiv guessed this from what you said. Nothing is saved unless you say so."],
+                 theme.ACCENT, extra=items)
