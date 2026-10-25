@@ -103,6 +103,13 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     if _source_answer is not None:
         yield _file_ops.VerifiedText(_source_answer)
         return
+    # U99: what was read or checked for THIS answer starts empty; the model can't add to it.
+    from cursiv_engine.core import claim_evidence, evidence_log
+    evidence_log.begin_turn()
+    _claim_check = claim_evidence.answer(_field_text, history)
+    if _claim_check is not None:          # "have you inspected your source?" / "you said … — check it"
+        yield _file_ops.VerifiedText(_claim_check)
+        return
     _native = native_answers.answer(_field_text, calculations=policy.inspect)
     if _native is not None:
         from cursiv_engine.core.conversation_kind import relayed_thread_question
@@ -231,6 +238,18 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + final
             return
         from . import response_style
+        if replace_draft and response_style.refused_writing(_field_text, draft):
+            # A writing request ("write an X post I'll copy") answered with "I don't post":
+            # drafting isn't posting. One retry with the writing instruction first.
+            try:
+                _retry = runtime._local_llm(response_style.writing_retry_messages(_field_text), 700).strip()
+            except Exception:
+                _retry = ""
+            if _retry and not response_style.refused_writing(_field_text, _retry):
+                _notes = [m.group(0).strip() for m in runtime._STATUS_LINE_RE.finditer(''.join(reply))]
+                draft = _retry
+                reply[:] = ['\n\n'.join([_retry, *_notes])]
+                yield _replace_prefix + reply[0]
         polished = (response_style.drop_self_certification(
                         response_style.drop_false_refusal(_field_text, response_style.trim_closer(_field_text, draft)))
                     if replace_draft else draft)
@@ -246,6 +265,16 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield (_replace_prefix if replace_draft else '\n\n') + _capability_problem
             skip = deterministic_correction = True
             draft = _capability_problem
+        # U99: "I checked the source", "verified by the live report", "the tests prove", "no correction
+        # is needed" -- only with a record of that check for this answer. Otherwise say so under it.
+        _unbacked = claim_evidence.correction(draft)
+        if _unbacked:
+            reply.append('\n\n' + _unbacked)
+            yield '\n\n' + _unbacked
+        for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text)):
+            if _note:
+                reply.append('\n\n' + _note)
+                yield '\n\n' + _note
         _source_problem = runtime.grounding.quote_problem(_field_text, draft)
         if _source_problem:
             reply[:] = [_source_problem]

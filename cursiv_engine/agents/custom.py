@@ -154,13 +154,34 @@ def listing() -> str:
     return f"Your agents:\n{rows}\n\nTalk: @name <message> · Ask all of them: agents ask <question>\nManage: agent show/edit/teach/delete <name>"
 
 
+_PERMISSION_Q = re.compile(r"(?i)\b(?:can|could|may|are you able to|do you have (?:access|permission))\b.{0,60}"
+                           r"\b(?:read|open|see|access|modify|change|edit|delete|write|files?|folders?|computer|"
+                           r"notebook|internet|web|tools?|run)\b|\bwhat (?:can you|are you allowed to) (?:access|do|use)\b")
+
+
+def asks_about_permissions(text: str) -> bool:
+    return bool(_PERMISSION_Q.search(text or ""))
+
+
+def permissions_answer(agent: dict) -> str:
+    from cursiv_engine.core import capabilities
+    return (f"@{agent['name']}: {capabilities.agent_permissions(agent)}\n\n"
+            "That's set by Cursiv's code, not by this agent's instructions. Cursiv itself can do more (for example "
+            "read and write text files in a workspace you chose and turned file access on for), but an agent gets "
+            "only what's listed here, and nothing outside your chosen workspace in any case."
+            "\n\n*[Sources: Cursiv capability records (no AI model)]*")
+
+
 def system_prompt(agent: dict, person_memory: str = "") -> str:
+    from cursiv_engine.core import capabilities
     know = "\n".join(f"- {k}" for k in agent.get("knowledge", []))
     return (
         f"You are \"{agent['name']}\", a specialist agent inside Cursiv (a personal AI made by Cursiv Local, "
         f"an independent open-source project). Stay in this role.\n\n## Your job\n{agent['job']}\n\n"
         + (f"## Things you've been taught (always true for the person you help)\n{know}\n\n" if know else "")
         + (f"## What Cursiv knows about the person you're helping\n{person_memory}\n\n" if person_memory else "")
+        + "## What you can use\n" + capabilities.agent_permissions(agent) + " Never claim to have read, saved, "
+          "searched or changed anything.\n\n"
         + "Be practical and specific. If your job doesn't cover the question, say so briefly and answer as best you can. "
           "Never invent facts about the person or the people they mention."
     )

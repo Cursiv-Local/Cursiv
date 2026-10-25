@@ -234,3 +234,23 @@ def seen_once(flag: str) -> bool:
     except Exception:
         return True                     # can't remember it: never show it again and again
     return False
+
+
+# ── A conversational action waiting for a yes (U99, core/intent.py) ───────────
+
+def intent_card(proposal, key: str) -> str:
+    """Save / Edit / Cancel for something Cursiv worked out from plain words. Nothing has
+    run yet; Save runs the exact command shown, through Cursiv's own code."""
+    link = lambda what, label, colour: (f'<a href="cursiv://intent/{what}/{key}" '
+                                        f'style="color:{colour}; text-decoration:none; font-weight:600;">{label}</a>')
+    command = (f'<br><span style="color:{theme.FAINT}; font-size:11px;">Runs: {esc(proposal.command)}</span>')
+    if proposal.ok:
+        actions = (f'<br><br>{link("save", "Save" if proposal.action.name.startswith(("notebook", "memory.save", "file.c")) else "Yes", theme.ACCENT)}'
+                   f'&nbsp;&nbsp;&nbsp;{link("edit", "Edit", theme.MUTED)}&nbsp;&nbsp;&nbsp;{link("cancel", "Cancel", theme.MUTED)}')
+        return _card(esc(proposal.action.title), proposal.card_lines(), theme.ACCENT, extra=command + actions)
+    why = "; ".join(dict.fromkeys(proposal.problems))
+    wanted = proposal.action.title.rstrip("?")
+    wanted = wanted[0].lower() + wanted[1:]
+    return _card("Nothing was saved", [f"It looked like: {wanted}. But {why}.",
+                                       "Edit it and send it yourself if it's right."],
+                 theme.AMBER, extra=command + f'<br><br>{link("edit", "Edit", theme.ACCENT)}')

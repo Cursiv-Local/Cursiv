@@ -34,7 +34,66 @@ def guidance(question: str) -> str:
                      'closed. Stopping execution does not erase saved records on disk. Cursiv can '
                      'retrieve selected stored facts across sessions without retraining model weights; '
                      'that is distinct from subjective recollection or a continuously active mind.')
+    notes += writing_guidance(question)
     return '\n' + '\n'.join(notes) + '\n' if notes else ''
+
+
+# ── Writing requests (U99): drafting is not doing ─────────────────────────────
+DRAFT = re.compile(r"(?i)\b(?:write|draft|compose|create|make|give me|come up with|craft|generate)\b.{0,80}?"
+                   r"\b(?:posts?|tweets?|threads?|captions?|e-?mails?|messages?|texts?|letters?|announcements?|"
+                   r"press releases?|ads?|adverts?|blurbs?|bios?|pitch(?:es)?|speech(?:es)?|slogans?|taglines?|"
+                   r"newsletters?|updates?|reviews?|replies)\b")
+ABOUT_CURSIV = re.compile(r"(?i)\bcursiv\b|\b(?:about|of) (?:you|yourself)\b|\beverything you know about yourself\b|"
+                          r"\byour (?:features|capabilities|abilities|app)\b")
+FICTION = re.compile(r"(?i)\b(?:fiction|fictional|made[- ]up|imaginary|imagined|pretend|invented|hypothetical)\b")
+FRESH = re.compile(r"(?i)\b(?:new|different|another|fresh|completely|other)\b")
+
+
+_POSTING_REFUSAL = re.compile(
+    r"(?i)\bi (?:do not|don'?t|can'?t|cannot|won'?t)\s+(?:post|publish|tweet|share|send|access|use|have)\b|"
+    r"\b(?:no|without) (?:social media|internet|online|outside access|account)\b|\bi run locally\b|"
+    r"\bi'?m (?:just )?a local\b|\bdon'?t have a social media\b")
+
+
+def refused_writing(question: str, answer: str) -> bool:
+    """A writing request answered only with "I don't post / I run locally": nothing to keep."""
+    if not DRAFT.search(question or ''):
+        return False
+    text = (answer or '').strip()
+    return bool(text) and len(text) < 500 and bool(_POSTING_REFUSAL.search(text)) and not re.search(r"\n\s*\n.{80,}", text)
+
+
+def writing_retry_messages(question: str) -> list[dict]:
+    """One more try with the writing instruction stated first and nothing else to misread."""
+    return [{"role": "system", "content": "You are Cursiv, a writing assistant on this person's computer. "
+             + " ".join(writing_guidance(question)) + " Reply with only the requested text."},
+            {"role": "user", "content": question}]
+
+
+def writing_guidance(question: str) -> list[str]:
+    q = question or ''
+    if not DRAFT.search(q):
+        return []
+    notes = ['This is a writing request: write the text itself, ready to copy. The person will post or send it '
+             'themselves; nothing is posted or sent and no internet or account is needed. Do not refuse, and do not '
+             'explain that you cannot post or that you run locally.']
+    if ABOUT_CURSIV.search(q):
+        try:
+            from cursiv_engine.core import capabilities
+            facts = capabilities.facts_block(short=True)
+        except Exception:
+            facts = ''
+        notes.append('It is about Cursiv. Describe only what these capability records say; do not add features, '
+                     'speeds or guarantees. No absolute privacy or security promises ("no risk", "nothing ever '
+                     'leaves", "no cloud", "no tracking"): say data is stored on this computer and goes online only '
+                     'through features the person turns on.' + ('\nCursiv capability records:\n' + facts if facts else ''))
+        if FICTION.search(q):
+            notes.append('It is fiction: invented programs, teams or resources are fine, but present them as part of '
+                         'the story, never as real Cursiv features, documents or support channels.')
+    if FRESH.search(q):
+        notes.append('Write something new: do not reuse sentences, images or slogans from earlier answers in this '
+                     'conversation.')
+    return notes
 
 
 _OFFER = re.compile(r"(?is)^(?:let me know if\b|would you like\b|want to\b|how['’]s that feel\b|"
@@ -87,7 +146,8 @@ def trim_closer(question: str, answer: str) -> str:
 # claimed incapability is false, so it is dropped and the work is kept. Only a
 # capability claim is removed, never a safety or permission refusal.
 _CREATIVE_ASK = re.compile(r"(?i)\b(?:imagine|hypothetic\w*|thought experiment|invent\w*|fiction\w*|story|poem|"
-                           r"creative\w*|speculat\w*|what if|brainstorm\w*|make up)\b")
+                           r"creative\w*|speculat\w*|what if|brainstorm\w*|make up|"
+                           r"post|tweet|caption|e-?mail|announcement|press release|draft|slogan|bio)\b")
 _REFUSAL_START = re.compile(
     r"(?i)^\W*(?:no[,.]?\s+)?(?:(?:i(?:'|’)?m\s+)?sorry[,.]?\s+)?(?:but\s+)?i(?:'|’)?m?\s*"
     r"(?:can(?:'|’)?t|cannot|can not|am not able to|not able to|am unable to|unable to|won(?:'|’)?t be able to)\b")

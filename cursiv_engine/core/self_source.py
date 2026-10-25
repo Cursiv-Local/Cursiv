@@ -7,6 +7,7 @@ app ships them as plain files in its `_internal` folder (launcher/build.spec). O
 kinds below, inside that folder, can be read -- never user data, keys or any other
 folder. Every excerpt carries a label naming the file and lines it came from.
 
+    self map [words]        where a job is done, from docs/CODE-MAP.md
     self source <words>     search the code and docs
     self read <path>        read a file (or self read <path> <first line>)
 """
@@ -71,7 +72,7 @@ def _words(query: str) -> list[str]:
     return [w for w in re.findall(r"[a-z_][a-z0-9_]{2,}", (query or "").lower()) if w not in stop][:8]
 
 
-def search(query: str, limit: int = 8) -> list[dict]:
+def search(query: str, limit: int = 8, *, kind: str = "") -> list[dict]:
     """Best-matching lines: {path, line, text, score}. Reads only allowed files, bounded."""
     words = _words(query)
     if not words:
@@ -101,6 +102,10 @@ def search(query: str, limit: int = 8) -> list[dict]:
         out.append(h)
         if len(out) >= limit:
             break
+    from . import evidence_log
+    for h in out:
+        evidence_log.record(kind or evidence_log.SOURCE_SEARCH, "Cursiv's own source", path=h["path"], lines=str(h["line"]),
+                            operation=f"search for {query!r}", scope="matching lines only, not whole files")
     return out
 
 
@@ -116,13 +121,22 @@ def read(rel: str, first: int = 1, count: int = MAX_LINES) -> tuple[str, str]:
     chunk = lines[first - 1: first - 1 + max(1, min(count, MAX_LINES))]
     last = first + len(chunk) - 1
     body = "\n".join(f"{first + i:5}  {line}" for i, line in enumerate(chunk))
+    from . import evidence_log
+    evidence_log.record(evidence_log.SOURCE_READ, "Cursiv's own source", path=rel, lines=f"{first}-{max(first, last)}",
+                        operation="read", scope="these lines only")
     return label(rel, first, max(first, last)), body
 
 
 def excerpts(query: str, budget: int = 1800) -> str:
-    """Short labelled source excerpts for a question about Cursiv, within `budget` characters."""
+    """Short labelled source excerpts for a question about Cursiv, within `budget` characters.
+    The code map's matching lines come first: they say which module does the job."""
     rows, used = [], 0
-    for h in search(query, limit=6):
+    for line in map_lines(query)[:3]:
+        row = f"- {MAP} (code map): {line}"
+        rows.append(row)
+        used += len(row) + 1
+    from . import evidence_log
+    for h in search(query, limit=6, kind=evidence_log.SOURCE_SUPPLIED):
         row = f"- {h['path']}:{h['line']}: {h['text']}"
         if used + len(row) > budget:
             break
@@ -134,9 +148,38 @@ def excerpts(query: str, budget: int = 1800) -> str:
             "They show what the code says, not that a feature ran:\n" + "\n".join(rows))
 
 
+MAP = "docs/CODE-MAP.md"
+
+
+def map_lines(query: str = "") -> list[str]:
+    """Lines of the code map (every module, one line each, by job) that match the words;
+    with no words, the section headings. The map is kept complete by tests/test_code_map.py."""
+    try:
+        text = (root() / MAP).read_text(encoding="utf-8")
+    except OSError:
+        return []
+    if not query.strip():
+        return [ln.lstrip("# ").strip() for ln in text.splitlines() if ln.startswith(("## ", "### "))]
+    words = _words(query)
+    rows = [ln.strip("- ").strip() for ln in text.splitlines() if ln.startswith("- ")]
+    scored = sorted(((sum(w in r.lower() for w in words), r) for r in rows), key=lambda x: -x[0])
+    return [r for s, r in scored if s][:8]
+
+
 def command(text: str) -> str | None:
     t = " ".join((text or "").split())
     low = t.lower()
+    if low == "self map" or low.startswith("self map "):
+        q = t[len("self map"):].strip()
+        found = map_lines(q)
+        if not found:
+            return f"Nothing on Cursiv's code map matches “{q}”. Try: self source {q}" if q else \
+                "Cursiv's code map isn't available in this copy."
+        if not q:
+            return ("Cursiv's code map (docs/CODE-MAP.md), by job:\n" + "\n".join(f"- {r}" for r in found) +
+                    "\n\nFind where something lives: self map <words>")
+        return (f"Where “{q}” lives in Cursiv ({version()}), from its code map:\n" +
+                "\n".join(f"- {r}" for r in found) + "\n\nRead one: self read <path>")
     if low.startswith("self source"):
         q = t[len("self source"):].strip()
         if not q:

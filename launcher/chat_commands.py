@@ -414,6 +414,7 @@ _HELP_TOPICS = {
   memory cleanup              list saved notes/memories that mislead answers; remove the ones you pick
   self prompt                 the instructions Cursiv sent for your last answer (self prompt full)
   self stores                 what Cursiv has saved, where, and how it reaches answers
+  self map <words>            where something lives in Cursiv (its code map)
   self source <words>         search Cursiv's own code and docs (self read <path> [line])
   rate good / bad / 1-5       tell me how the last answer was"""),
     "coding": ("Files and coding", """\

@@ -212,6 +212,9 @@ def _agent_command(runtime: CommandRuntime, text: str, cfg: dict, history: list[
             return runtime.TextResult(f"There's no agent called {custom.clean_name(m.group(1))}. Your agents: {names}.\n"
                               f"Make one: agent new {custom.clean_name(m.group(1)) or 'name'}: <what it should do>")
         q = m.group(2).strip()
+        if custom.asks_about_permissions(q):
+            # What an agent may touch is decided by Cursiv's code, so Cursiv answers it, not the agent.
+            return runtime.TextResult(custom.permissions_answer(a))
         gen, _u = runtime._cascade_stream(custom.messages_for(a, q, history, _memory(q)), cfg, max_tokens=3000)
         custom.note_use(a)
         return runtime.StreamResult(f"@{a['name']}", gen, None)

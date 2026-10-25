@@ -391,6 +391,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 win = self.window()
                 if hasattr(win, "_open_setup"):
                     win._open_setup()
+            elif url.host() == "intent":
+                what, _, key = url.path().lstrip("/").partition("/")
+                self._answer_intent(what, key)
             elif url.host() == "report":
                 win = self.window()
                 if hasattr(win, "_send_problem_report"):
@@ -398,6 +401,50 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             return
         from PyQt6.QtGui import QDesktopServices
         QDesktopServices.openUrl(url)
+
+    # ── U99: conversational actions waiting for a yes ───────────────────────
+
+    def _show_intent_card(self, proposal) -> None:
+        import uuid
+        import chat_badges
+        key = uuid.uuid4().hex[:10]
+        self._intents = getattr(self, "_intents", {})
+        self._intents[key] = proposal
+        start = getattr(self, "_reply_start", None)
+        cursor = QTextCursor(self._transcript.document())
+        cursor.beginEditBlock()
+        if start is not None:
+            cursor.setPosition(start)
+            cursor.movePosition(QTextCursor.MoveOperation.End, QTextCursor.MoveMode.KeepAnchor)
+            cursor.removeSelectedText()
+        else:
+            cursor.movePosition(QTextCursor.MoveOperation.End)
+        cursor.insertHtml(theme.live(chat_badges.intent_card(proposal, key)))
+        self._plain_block(cursor)
+        cursor.endEditBlock()
+
+    def _answer_intent(self, what: str, key: str) -> None:
+        """Save runs exactly the command on the card, through Cursiv's own code (with
+        its receipt); Edit puts it in the message box; Cancel changes nothing."""
+        proposal = getattr(self, "_intents", {}).get(key)
+        if proposal is None:
+            self._append_system("That card was already answered.")
+            return
+        if what == "edit":
+            self.prefill(proposal.command)
+            return
+        if self._streaming:
+            return
+        self._intents.pop(key, None)
+        if what == "cancel":
+            self._append_system("Cancelled. Nothing was changed.")
+            return
+        if what != "save" or not proposal.ok:
+            return
+        self._begin_turn(proposal.command)
+        history_snapshot = list(self._history)
+        threading.Thread(target=self._run_turn, args=(proposal.command, history_snapshot, False),
+                         daemon=True).start()
 
     def open_conversation(self, conv_id: str) -> bool:
         import conversations
@@ -550,7 +597,22 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._stop_btn.setEnabled(False)
         self._status.setText("Stopping…")
 
-    def _run_turn(self, text: str, history: list[dict]) -> None:
+    def _propose_action(self, text: str):
+        """U99: plain words that might be an action -> one canonical command, from the
+        LOCAL model only (never an online one), checked by core/intent.py."""
+        try:
+            from cursiv_engine.core import intent
+            if not intent.might_be_action(text):
+                return None
+            from cursiv_engine.ui import chat_app as _ca
+            if not _ca._local_model_ready():
+                return None
+            self._signals.stage.emit("Working out what you asked for…")
+            return intent.propose(text, lambda messages: _ca._local_llm(messages, 220))
+        except Exception:
+            return None
+
+    def _run_turn(self, text: str, history: list[dict], propose: bool = True) -> None:
         try:
             force_provider, stripped = cc.hey_prefix(text)
             # A provider prefix never transfers notebook execution to the model.
@@ -573,6 +635,20 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             if result is not None:
                 self._deliver_result(result, history, text)
                 return
+
+            # U99: said in plain words? The local model may turn it into one of
+            # Cursiv's own commands. Read-only ones run now; anything that changes
+            # something waits on a confirm card. The model never runs anything.
+            if propose and not force_provider and unrestricted and not workspace_request:
+                proposal = self._propose_action(stripped)
+                if proposal is not None:
+                    if proposal.ok and not proposal.needs_confirm:
+                        self._signals.chunk.emit(f"*[Understood as: {proposal.command}]*\n\n")
+                        return self._run_turn(proposal.command, history, propose=False)
+                    self._pending_intent = proposal
+                    self._pending_history_append = None
+                    self._signals.done.emit()
+                    return
 
             # No built-in command matched (or a "hey <provider>" prefix
             # forced routing) -- fall through to the default streaming chat,
@@ -816,7 +892,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def _on_done(self) -> None:
         self._flush_reply_chunks(format_blocks=False)
-        if getattr(self, "_reply_is_chat", False):
+        if getattr(self, "_pending_intent", None) is not None:
+            self._show_intent_card(self._pending_intent)
+            self._pending_intent = None
+        elif getattr(self, "_reply_is_chat", False):
             try:
                 self._render_reply()
                 self._maybe_show_tour()

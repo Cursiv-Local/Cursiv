@@ -4,6 +4,21 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U99 (on `claude/u99`, one squashed commit): conversational actions and operational self-knowledge
+
+- `core/capabilities.py` is THE inventory of what Cursiv supports; add a feature there (with its code and
+  tests) and every reader follows. A failed live read is "unknown", never "off". Disabled != missing.
+- `core/evidence_log.py` records what Cursiv itself read or checked; `core/claim_evidence.py` flags
+  verification claims without a record and answers "have you inspected…" / "you said… check it".
+  Never let the model write evidence records; keep "supplied to the model" separate from "inspected".
+- Writing is not doing: persona rules, `response_style.writing_guidance`, the refusal retry, and the
+  `turn_policy` "without …," fix. Session memory is left out of writing/creative requests (it caused the
+  repetition, measured). Report: [docs/SELF-KNOWLEDGE-U99.md](docs/SELF-KNOWLEDGE-U99.md).
+- `core/intent.py` (conversational actions): the model only proposes one native command; Cursiv checks it
+  against the person's words and confirms changes. Publish the held-out score
+  (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
+- Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
+
 ## U98 published (Claude, 2026-10-25)
 
 Tag `v3.14-U98` = `1bc1593` (PRs #20, #21). Plugins isolated in their own process, field

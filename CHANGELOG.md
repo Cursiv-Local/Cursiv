@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.14-U99 — Conversational actions, operational self-knowledge (unreleased)
+
+- Say it normally: "Add a note that North Creek was 14.2 C and cloudy", "work in my Field Data folder",
+  "go offline". The local model turns it into one of Cursiv's own commands, Cursiv checks every value
+  against what you wrote, and anything that changes something waits on a Save / Edit / Cancel card.
+- Cursiv knows what it is: one capability inventory answers "does Cursiv have an updater / online AI /
+  dependencies…?" from its records and live settings, and an inactive feature is never called missing.
+- Claims of verification need a record: "I checked the source", "verified", "no correction needed" get a
+  note when Cursiv has no record of that check; "you said X — check it" is answered from the records and
+  says plainly when an earlier answer was wrong.
+- Writing is not doing: posts, emails and announcements are written, not refused; writing about Cursiv
+  sticks to what it does; absolute privacy promises get the true statement under them; fiction is labelled.
+- New requests get new writing: session memory no longer feeds earlier posts into writing requests.
+- `self map` and a complete code map (docs/CODE-MAP.md).
+
 ## 3.14-U98 — Plugins isolated, notebook encrypted, clearer chat (2026-10-25)
 
 - Plugins never run inside Cursiv any more. Every plugin call, and every Forge test

@@ -62,7 +62,7 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         from cursiv_engine.core import self_stores
         from cursiv_engine.memory import semantic as _semantic
         return runtime.TextResult(self_stores.summary(_semantic.current_person()))
-    if cmd.startswith(("self source", "self read")):
+    if cmd.startswith(("self source", "self read", "self map")):
         from cursiv_engine.core import self_source
         _reply = self_source.command(text)
         if _reply is not None:
