@@ -276,6 +276,15 @@ def check(answer: str, w: Worked) -> str:
         if clash:
             return ("*(Cursiv's check: the answer contradicts what Cursiv's code worked out: " + "; ".join(clash)
                     + f". Worked out exactly: {w.statement})*")
+    places = w.facts.get("places")
+    if places is not None and w.value is not None:
+        # "to six decimal places" (U100 audit: the answer gave 0.7925 and called it exact)
+        close = [n for n in re.findall(r"-?\d+\.\d+|-?\d+", text) if abs(float(n) - w.value) <= _rounding_tolerance(n) + 1e-12]
+        if close and not any(_decimals(n) == places for n in close):
+            return (f"*(Cursiv's check: you asked for {places} decimal places; the answer gives {close[0]}. "
+                    f"Worked out: {w.statement})*")
+        if re.search(r"(?i)\bexact(?:ly)?\b", text) and not re.search(r"(?i)\bnot exact\b", text):
+            return f"*(Cursiv's check: that figure is rounded, not exact. Worked out: {w.statement})*"
     if w.value is not None:
         # rounding is fine ("about 54.3" for 54.32); a different number isn't
         wanted = [w.value] + list(w.facts.get("also", []))

@@ -42,8 +42,9 @@ def calculation(worked, mismatch: str) -> str | None:
     if not mismatch or not worked:
         return None  # unit conversions retain the existing narrow in-place correction
     lead = worked.lead + '\n\n' if worked.lead else ''
-    return (lead + "The model calculation contradicts what Cursiv's code worked out and is withdrawn.\n\n" + worked.statement +
-            f'\n\n*[Sources: Cursiv calculation ({worked.tool}; no AI model)]*')
+    # U100 audit: lead with the answer; one short line says why the model's draft isn't shown.
+    return (lead + worked.statement + "\n\n(The AI model's draft gave a different number and was withdrawn; "
+            f"this is Cursiv's own calculation.)\n\n*[Sources: Cursiv calculation ({worked.tool}; no AI model)]*")
 
 
 def execution(issues, evidence=None) -> str | None:

@@ -129,7 +129,8 @@ def test_sample_and_population_standard_deviation():
         assert part in w.statement, w.statement
     assert "population" not in w.statement
     p = calc.work_out("What is the population standard deviation of 12.4, 9.8, 15.1, 10.7?")
-    assert "population standard deviation (n) = 2.0187" in p.statement and "sample" not in p.statement
+    # U100: one statistic asked for -> that one, as the checked number
+    assert p.statement == "The population standard deviation (n) is 2.0187." and abs(p.value - 2.0187) < 0.0001
 
 
 def test_a_calculator_that_fails_is_nothing_ran(monkeypatch):
@@ -185,7 +186,7 @@ def test_a_contradicting_model_answer_is_flagged_in_the_chat(fresh, outbound, mo
     _local_model(monkeypatch, reply="Good news: 240 liters will last 12 days at 2 liters per person per day.")
     out = "".join(ca.chat("We have 240 liters of water for 120 people for 48 hours at 2 liters per person per day. "
                           "How long will it last?", [], "", None))
-    assert "contradicts what Cursiv's code worked out" in out and "lasts 1 day" in out
+    assert "gave a different number and was withdrawn" in out and "lasts 1 day" in out
 
 
 def test_wrong_unit_conversion_is_replaced_with_the_calculated_result(fresh, outbound, monkeypatch):
