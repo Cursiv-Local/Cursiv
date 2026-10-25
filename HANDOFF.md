@@ -26,7 +26,12 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
   (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
 - Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
 
-## U100 audit of the owner's U99 test run (Claude, 2026-10-25, unreleased, branch `claude/u100`)
+## U100 published (Claude, 2026-10-25)
+Tag `v3.14-U100` = `7c297d5` (PR #24). First three-digit U number: the updater compares
+versions as numbers (`launcher/cursiv_launcher.py` `_version_key`), so U100 > U99.
+Evidence: [U100-RELEASE-VERIFICATION](docs/U100-RELEASE-VERIFICATION.md).
+
+## U100 audit of the owner's U99 test run (Claude, 2026-10-25, released in U100)
 Root causes found and fixed with tests (`tests/test_notebook_audit.py`, `test_conversation_audit.py`,
 `test_science_audit.py`): the fieldlog parser read codes as negative measurements; SESSION MEMORY carried
 other conversations into ongoing ones; the stats tool always checked answers against the mean; the units tool
