@@ -1,5 +1,30 @@
 # Changelog
 
+## 3.14-U97 — Trust fixes, encryption always on, removals (2026-10-25)
+
+- Cursiv no longer pretends to change files. "Add a line to notes.txt saying …"
+  is a real append that asks first; "Delete notes.txt" gets Cursiv's own answer
+  (it never deletes files). A model reply that claims a file was saved, updated
+  or deleted without a real result is replaced with "Action not confirmed".
+- Plain unit conversions ("3 miles in kilometres") and speed × time questions are
+  answered by Cursiv's calculator, with no AI model. Field-log averages, minimums
+  and maximums come from the notebook and list the records used.
+- The model's own "✅ Verified: Yes" and "No model was used" lines are removed;
+  the source line says what really answered.
+- "What day is it?" is answered from this computer's clock.
+- Conversations and memories are always encrypted on a computer. The first start
+  asks for a passphrase (at least 16 characters) and encrypts what is already
+  there; an interrupted first encryption finishes at the next start. A Cursiv USB
+  drive stays readable; moving data to and from a drive decrypts and re-encrypts
+  it, so USB transfer keeps working.
+- Removed: family letters, the legacy vault, personal letters, the public board,
+  the mailbox and the council. Data already saved on a computer is not deleted.
+- Plain MIT license.
+- Smaller fixes: a poem about a field notebook is no longer a notebook save;
+  `curiosity` shows notebook lines instead of raw JSON; `memory cleanup` flags
+  inferred "Cursiv was built by …" memories; old pages no longer default to
+  llama 3.2.
+
 ## 3.14-U96 — One personality, open system, self-awareness, USB gate (2026-10-24)
 
 - Cursiv has one personality, the same in every conversation: curious, calm, warm
