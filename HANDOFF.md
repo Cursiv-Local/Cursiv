@@ -19,6 +19,12 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
   (`scripts/intent_bench.py --set heldout`): [docs/CONVERSATIONAL-ACTIONS-U99.md](docs/CONVERSATIONAL-ACTIONS-U99.md).
 - Live-model checks: `CURSIV_LIVE=1 pytest tests/test_self_knowledge_live.py` (12/12 on qwen3:4b-instruct).
 
+## U99 published (Claude, 2026-10-25)
+Tag `v3.14-U99` = `3345d8b` (PRs #23, #25). Conversational actions (confirm cards) and
+operational self-knowledge (capability registry, evidence records, writing not refused).
+`scripts/website_release.py` now takes `--windows-skips` and `--date` (U99 skips 13 on
+Windows: 12 live-model, 1 Keychain). Evidence: [U99-RELEASE-VERIFICATION](docs/U99-RELEASE-VERIFICATION.md).
+
 ## U98 published (Claude, 2026-10-25)
 
 Tag `v3.14-U98` = `1bc1593` (PRs #20, #21). Plugins isolated in their own process, field
