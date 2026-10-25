@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.14-U101 — Starter profiles (unreleased)
+## 3.14-U101 — Starter profiles, field formulas, safer storage (2026-10-25)
 
 - Five profiles come with Cursiv, ready to use: @field (Field assistant), @checker (Data checker), @report
   (Report writer), @protocol (Protocol helper), @writer (Writing helper). Each is a markdown file
