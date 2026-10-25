@@ -406,7 +406,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U97 source and package checks are recorded in the [verification report](docs/U97-RELEASE-VERIFICATION.md);
+U98 source and package checks are recorded in the [verification report](docs/U98-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -426,6 +426,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 | U95: bring USB data back to a computer | [Release notes](docs/RELEASE-U95.md), [verification](docs/U95-RELEASE-VERIFICATION.md) |
 | U96: one personality, self-awareness, USB gate | [Release notes](docs/RELEASE-U96.md), [verification](docs/U96-RELEASE-VERIFICATION.md) |
 | U97: Trust fixes, encryption always on | [Release notes](docs/RELEASE-U97.md), [verification](docs/U97-RELEASE-VERIFICATION.md) |
+| U98: Plugins isolated, notebook encrypted, clearer chat | [Release notes](docs/RELEASE-U98.md), [verification](docs/U98-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |
 | U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
 | U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |

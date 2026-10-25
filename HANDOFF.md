@@ -4,6 +4,13 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U98 published (Claude, 2026-10-25)
+
+Tag `v3.14-U98` = `1bc1593` (PRs #20, #21). Plugins isolated in their own process, field
+notebook and custom agents encrypted, chat look part 1. The first (unpublished) tag was
+moved after its own packaged self-test caught an already-loaded `socket` in the runner.
+Evidence: [U98-RELEASE-VERIFICATION](docs/U98-RELEASE-VERIFICATION.md).
+
 ## U97 published (Claude, 2026-10-25)
 
 Tag `v3.14-U97` = `c7554a7` (PRs #17, #18). Trust fixes from the U96 live run, encryption
