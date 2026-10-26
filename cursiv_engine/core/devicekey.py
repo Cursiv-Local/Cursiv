@@ -12,6 +12,12 @@ The private key never leaves this computer on purpose: it is stored protected
 to work on any PC). If the key can't be read back (another Windows user, a copied
 file), a new key is made and the old public key is kept in the file's history, so a
 reader can see the key changed and when.
+
+A key can also be protected with a passphrase (U105, for drives, where it is otherwise readable by
+anyone holding the drive): protect(passphrase) re-stores the same key encrypted (scrypt + Fernet, as the
+vault does), so its id and every pin of it stay the same. While it's locked nothing is signed: load()
+raises KeyLocked instead of making a new key, which would give the drive a new identity that main
+computers refuse. unlock(passphrase) opens it for this run of Cursiv.
 """
 from __future__ import annotations
 
@@ -26,7 +32,17 @@ from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey, Ed25519PublicKey
 
 HEAD_FORMAT = "cursiv-head-1"
+PASSPHRASE_PREFIX = "pp1:"           # "pp1:" + base64(salt) + ":" + Fernet token of the raw key, base64
+MIN_PASSPHRASE = 10
 _cache: dict = {}
+
+
+class KeyLocked(ValueError):
+    """The signing key is passphrase-protected and hasn't been unlocked in this run of Cursiv."""
+
+    def __init__(self):
+        super().__init__("the signing key is protected by a passphrase and is locked; unlock it to sign "
+                         "(Field Notebook: Signing key…)")
 
 
 def key_file() -> Path:
@@ -70,6 +86,8 @@ def load() -> tuple[Ed25519PrivateKey, dict]:
     except (OSError, ValueError):
         data = None
     priv = None
+    if data and str(data.get("private_key", "")).startswith(PASSPHRASE_PREFIX):
+        raise KeyLocked()                                   # never replaced while locked
     if data:
         try:
             raw = base64.b64decode(keystore.reveal(data.get("private_key", "")))
@@ -88,6 +106,66 @@ def load() -> tuple[Ed25519PrivateKey, dict]:
         priv, data = _new(history)
     _cache.update(path=path, priv=priv, data=data)
     return priv, data
+
+
+def _read() -> dict | None:
+    try:
+        return json.loads(key_file().read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+
+def protected() -> bool:
+    """Is this installation's key stored under a passphrase?"""
+    return str((_read() or {}).get("private_key", "")).startswith(PASSPHRASE_PREFIX)
+
+
+def unlocked() -> bool:
+    return _cache.get("path") == key_file() and "priv" in _cache
+
+
+def protect(passphrase: str) -> dict:
+    """Store this installation's key under a passphrase (the same key: its id and pins don't change).
+    The key must be readable or unlocked now. Returns the key's public data."""
+    from cursiv_engine.core import atomic, vault
+    import os
+    if len(passphrase or "") < MIN_PASSPHRASE:
+        raise ValueError(f"use a passphrase of at least {MIN_PASSPHRASE} characters")
+    priv, data = load()
+    raw = priv.private_bytes(serialization.Encoding.Raw, serialization.PrivateFormat.Raw,
+                             serialization.NoEncryption())
+    salt = os.urandom(16)
+    token = vault.derive(passphrase, salt).encrypt(raw).decode("ascii")
+    data = dict(data, private_key=PASSPHRASE_PREFIX + _b64(salt) + ":" + token, protected_utc=_now())
+    atomic.write_text(key_file(), json.dumps(data, indent=2))
+    if unlock(passphrase)[1]["key_id"] != data["key_id"]:       # read back: the stored key opens
+        raise OSError("the protected key didn't read back the same; nothing else was changed")
+    return {k: data[k] for k in ("public_key", "key_id")}
+
+
+def unlock(passphrase: str) -> tuple[Ed25519PrivateKey, dict]:
+    """Open a passphrase-protected key for this run of Cursiv. ValueError if the passphrase is wrong."""
+    from cryptography.fernet import InvalidToken
+    from cursiv_engine.core import vault
+    data = _read()
+    stored = str((data or {}).get("private_key", ""))
+    if not stored.startswith(PASSPHRASE_PREFIX):
+        return load()
+    try:
+        salt_b64, token = stored[len(PASSPHRASE_PREFIX):].split(":", 1)
+        raw = vault.derive(passphrase or "", base64.b64decode(salt_b64)).decrypt(token.encode("ascii"))
+        priv = Ed25519PrivateKey.from_private_bytes(raw)
+    except (InvalidToken, ValueError, TypeError):
+        raise ValueError("that passphrase doesn't open the signing key") from None
+    mine = _b64(priv.public_key().public_bytes(serialization.Encoding.Raw, serialization.PublicFormat.Raw))
+    if mine != data.get("public_key"):
+        raise ValueError("the stored key doesn't match its public key; it wasn't used")
+    _cache.update(path=key_file(), priv=priv, data=data)
+    return priv, data
+
+
+def lock() -> None:
+    _cache.clear()
 
 
 def public_key() -> str:

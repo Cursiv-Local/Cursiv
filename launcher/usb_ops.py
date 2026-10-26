@@ -415,7 +415,9 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             notebook = data_dir / "fieldlog"
             if workspace_name:
                 me = fieldlog.name_new_notebook(notebook, workspace_name)
-                data_note += f" Its field notebook is {me['name']}'s."
+                data_note += (f" Its field notebook is {me['name']}'s. Its signing key will be readable by anyone "
+                              "holding the drive: on the drive, open the Field Notebook and choose Signing key… "
+                              "to protect it with a passphrase.")
             if team_ids:
                 sig.progress.emit(-1, "Copying the chosen team notebooks…")
                 copied = fieldsync.copy_notebooks_to(notebook, list(team_ids))

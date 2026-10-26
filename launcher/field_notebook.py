@@ -148,11 +148,17 @@ class FieldNotebookDialog(QDialog):
         self._name_btn.clicked.connect(self._name)
         self._show_name()
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
-        for b in (fix, check, exp, rep, share, imp, self._name_btn):
+        key = QPushButton("Signing key…"); key.setStyleSheet(theme.ghost_button()); key.clicked.connect(self._signing_key)
+        key.setToolTip("Protect this notebook's signing key with a passphrase, or unlock it (U105).")
+        for b in (fix, check, exp, rep, share, imp, self._name_btn, key):
             foot.addWidget(b)
         foot.addStretch(1); foot.addWidget(close)
         outer.addLayout(foot)
         self.refresh()
+        from cursiv_engine.core import devicekey
+        if devicekey.protected() and not devicekey.unlocked():
+            self._status.setText("The signing key is locked: entries save as usual, but shares and exports can't "
+                                 "be signed until you unlock it (Signing key…).")
 
     # ── form ───────────────────────────────────────────────────────────
     def _add_row(self):
@@ -386,6 +392,56 @@ class FieldNotebookDialog(QDialog):
         QMessageBox.information(self, "Shared", f"This laptop's field log is in:\n{out}\n\n"
                                 "On each other laptop: Import from team… and pick the same drive. "
                                 "Only the field log is shared; memories and documents stay on this computer.")
+
+    def _signing_key(self):
+        """Protect the key that signs this notebook's shares and exports with a passphrase (U105), or unlock
+        it. On a drive the key is otherwise readable by anyone holding the drive."""
+        from cursiv_engine.core import devicekey
+        if devicekey.protected() and not devicekey.unlocked():
+            phrase, ok = QInputDialog.getText(self, "Unlock the signing key", "Signing-key passphrase:",
+                                              QLineEdit.EchoMode.Password)
+            if not ok:
+                return
+            try:
+                devicekey.unlock(phrase)
+            except ValueError as exc:
+                QMessageBox.warning(self, "Still locked", str(exc))
+                return
+            self._status.setText("Signing key unlocked for this session. Shares and exports are signed again.")
+            return
+        if devicekey.protected():
+            QMessageBox.information(self, "Signing key", "The signing key is protected by a passphrase and is "
+                                    "unlocked for this session.")
+            return
+        ok = QMessageBox.question(
+            self, "Protect the signing key",
+            "This notebook's shares and exports are signed with a key stored in its data folder. On a Cursiv "
+            "drive anyone holding the drive can read that key and sign in this notebook's name.
+
+"
+            "Protect it with a passphrase? The key stays the same, so computers that already know it keep "
+            "accepting its shares. You'll enter the passphrase once each time Cursiv starts, before sharing or "
+            "exporting. Without it nothing can be signed, so keep it safe.",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No)
+        if ok != QMessageBox.StandardButton.Yes:
+            return
+        first, ok = QInputDialog.getText(self, "Signing-key passphrase",
+                                         f"New passphrase (at least {devicekey.MIN_PASSPHRASE} characters):",
+                                         QLineEdit.EchoMode.Password)
+        if not ok:
+            return
+        again, ok = QInputDialog.getText(self, "Signing-key passphrase", "Type it again:", QLineEdit.EchoMode.Password)
+        if not ok:
+            return
+        if first != again:
+            QMessageBox.warning(self, "Not protected", "The two passphrases don't match. Nothing was changed.")
+            return
+        try:
+            info = devicekey.protect(first)
+        except (ValueError, OSError) as exc:
+            QMessageBox.warning(self, "Not protected", str(exc))
+            return
+        self._status.setText(f"Signing key {info['key_id']} is now protected by a passphrase.")
 
     def _show_name(self):
         from cursiv_engine.core import fieldlog
