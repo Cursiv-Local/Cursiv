@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark light">
+<title>Cursiv Field Station</title>
+<link rel="stylesheet" href="/static/app.css">
+<script src="/static/app.js" defer></script>
+</head>
+<body>
+<div id="sim" class="sim" hidden></div>
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true">C</span><span>Cursiv <b>Field Station</b></span></div>
+  <div class="top-right"><span id="offline" class="pill ok" hidden>Offline · local only</span><button id="signout" class="ghost" hidden>Sign out</button></div>
+</header>
+
+<main id="app">
+  <section id="v-loading" class="view"><p class="muted">Connecting to the Field Station…</p></section>
+
+  <section id="v-setup" class="view narrow" hidden>
+    <h1>Set up this Field Station</h1>
+    <p class="muted">Create the administrator account and the encryption passphrase. The setup code is shown on the station's own screen or service log.</p>
+    <form id="f-setup" class="stack" autocomplete="off">
+      <label>Setup code <input id="s-code" inputmode="numeric" required></label>
+      <label>Station name <input id="s-name" value="Field station" maxlength="60" required></label>
+      <label>Administrator name <input id="s-user" autocomplete="username" required></label>
+      <label>Sign-in password (8+ characters) <input id="s-pass" type="password" autocomplete="new-password" minlength="8" required></label>
+      <label>Encryption passphrase (12+ characters, different) <input id="s-phrase" type="password" autocomplete="new-password" minlength="12" required></label>
+      <p class="fine">The passphrase unlocks the notebook after every restart. Keep it somewhere safe: without it the notebook can't be opened.</p>
+      <button class="gold" type="submit">Set up</button>
+      <p id="s-msg" class="msg" role="status"></p>
+    </form>
+  </section>
+
+  <section id="v-signin" class="view narrow" hidden>
+    <h1>Sign in</h1>
+    <form id="f-signin" class="stack">
+      <label>Name <input id="i-user" autocomplete="username" required></label>
+      <label>Password <input id="i-pass" type="password" autocomplete="current-password" required></label>
+      <button class="gold" type="submit">Sign in</button>
+      <p id="i-msg" class="msg" role="status"></p>
+    </form>
+    <p class="fine transport"></p>
+  </section>
+
+  <section id="v-unlock" class="view narrow" hidden>
+    <h1>Unlock the notebook</h1>
+    <p class="muted">The station restarted, so its notebook is encrypted until someone enters the encryption passphrase. Health readings work meanwhile.</p>
+    <form id="f-unlock" class="stack">
+      <label>Encryption passphrase <input id="u-phrase" type="password" autocomplete="off" required></label>
+      <button class="gold" type="submit">Unlock</button>
+      <p id="u-msg" class="msg" role="status"></p>
+    </form>
+    <p><a href="#health">See station health</a></p>
+  </section>
+
+  <section id="v-dashboard" class="view" hidden>
+    <h1>Dashboard</h1>
+    <div class="grid" id="d-cards"></div>
+    <p><a class="button gold" href="#notebook">New observation</a></p>
+  </section>
+
+  <section id="v-notebook" class="view" hidden>
+    <h1>Field notebook</h1>
+    <form id="f-entry" class="card stack">
+      <h2 id="e-title">New observation</h2>
+      <input id="e-correct" type="hidden">
+      <div class="row2">
+        <label>Site <input id="e-site" placeholder="e.g. Willow Creek WC-1"></label>
+        <label>Sample ID <input id="e-sample" placeholder="optional"></label>
+      </div>
+      <div class="row2">
+        <label>Project <input id="e-project" placeholder="optional, e.g. FALL-2026"></label>
+        <label>Observer <input id="e-observer"></label>
+      </div>
+      <fieldset class="stack"><legend>Measurements <span class="fine">kept exactly as typed</span></legend>
+        <div id="e-meas" class="stack"></div>
+        <button type="button" id="e-addm" class="ghost">+ Another measurement</button>
+      </fieldset>
+      <label>Note <textarea id="e-note" rows="3" placeholder="conditions, what you saw"></textarea></label>
+      <label id="e-reason-wrap" hidden>Reason for the correction <input id="e-reason"></label>
+      <div class="actions"><button class="gold" type="submit" id="e-save">Save entry</button><button type="button" class="ghost" id="e-cancel" hidden>Cancel correction</button></div>
+      <p id="e-msg" class="msg" role="status"></p>
+    </form>
+    <div class="toolbar">
+      <input id="n-q" type="search" placeholder="Search entries" aria-label="Search entries">
+      <button id="n-verify" class="ghost">Check integrity</button>
+      <button id="n-export" class="ghost">Export</button>
+    </div>
+    <p id="n-msg" class="msg" role="status"></p>
+    <ol id="n-list" class="entries" reversed></ol>
+  </section>
+
+  <section id="v-health" class="view" hidden>
+    <h1>Field Station health</h1>
+    <p class="fine">Each value says where it comes from: <span class="src real">real</span> read from the hardware, <span class="src derived">derived</span> worked out from real readings, <span class="src simulated">simulated</span> test scenario, <span class="src unavailable">unavailable</span> not reported by this hardware. Old readings are marked <span class="src stale">stale</span>.</p>
+    <div class="grid" id="h-sections"></div>
+  </section>
+
+  <section id="v-workspaces" class="view" hidden>
+    <h1>Workspaces</h1>
+    <h2>Notebooks on this station</h2>
+    <ul id="w-books" class="list"></ul>
+    <h2>Drives</h2>
+    <ul id="w-drives" class="list"></ul>
+    <p class="fine">Read-only for now: importing from a USB workspace, exporting to one and safe eject come in a later update.</p>
+  </section>
+
+  <section id="v-settings" class="view" hidden>
+    <h1>Settings</h1>
+    <div class="card stack">
+      <h2>Connection</h2>
+      <p class="transport"></p>
+    </div>
+    <div class="card stack">
+      <h2>Shut down</h2>
+      <p class="muted">Stops new entries, lets any entry being saved finish, locks the notebook, then shuts the station down if it's set up to. Wait for the station's light to stop before unplugging the battery.</p>
+      <div class="actions"><button id="x-ask" class="danger">Shut down…</button><button id="x-yes" class="danger" hidden>Yes, shut down now</button><button id="x-no" class="ghost" hidden>Cancel</button></div>
+      <p id="x-msg" class="msg" role="status"></p>
+    </div>
+    <div class="card stack">
+      <h2>About</h2>
+      <p id="about" class="muted"></p>
+      <p class="fine">Network, model, backup and account settings come in later updates.</p>
+    </div>
+  </section>
+</main>
+
+<nav class="tabs" id="tabs" hidden aria-label="Sections">
+  <a href="#dashboard">Dashboard</a><a href="#notebook">Notebook</a><a href="#health">Health</a><a href="#workspaces">Workspaces</a><a href="#settings">Settings</a>
+</nav>
+</body>
+</html>
