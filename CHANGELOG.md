@@ -1,6 +1,6 @@
 # Changelog
 
-## 3.14-U103 — Overconfidence check, silent-error lint, phone and USB safety (unreleased)
+## 3.14-U103 — Overconfidence check, silent-error lint, phone and USB safety (2026-10-25)
 
 - When you ask about one reading, a look or one sample and the answer settles it anyway ("No, your meter
   isn't broken", "Yes, you can drink it without treating it"), Cursiv adds a line saying what the answer rests
