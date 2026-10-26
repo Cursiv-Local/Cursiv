@@ -53,8 +53,8 @@ _UNITS = {
     "area": {"m2": 1, "square meters": 1, "ha": 10000, "hectare": 10000, "hectares": 10000, "km2": 1e6,
              "square kilometers": 1e6, "acre": 4046.8564224, "acres": 4046.8564224, "ft2": 0.09290304,
              "square feet": 0.09290304, "mi2": 2589988.110336, "square miles": 2589988.110336},
-    "speed": {"m/s": 1, "km/h": 1 / 3.6, "kph": 1 / 3.6, "mph": 0.44704, "knot": 0.514444, "knots": 0.514444,
-              "kn": 0.514444},
+    "speed": {"m/s": 1, "km/h": 1 / 3.6, "kph": 1 / 3.6, "mph": 0.44704, "knot": 1852 / 3600, "knots": 1852 / 3600,
+              "kn": 1852 / 3600},                 # knots exact (NIST SP 811); were rounded to 0.514444 (U102)
     "pressure": {"pa": 1, "kpa": 1000, "hpa": 100, "mbar": 100, "bar": 1e5, "psi": 6894.757293168,
                  "inhg": 3386.389, "mmhg": 133.322387415, "atm": 101325},
 }
@@ -105,6 +105,13 @@ def units(question: str) -> Result | None:
     out = convert(value, src, dst)
     if out is None:
         return None
+    if _kind(src) == "temperature" and _to_c(value, _TEMP[src.lower()]) < -273.15 - 1e-9:
+        # U102 benchmark: "-300 C to K" gave -26.85 K. Nothing is colder than absolute zero.
+        return Result(f"Cursiv didn't convert this: {raw} {src} is below absolute zero (-273.15 °C, 0 K, -459.67 °F), "
+                      "so it can't be a real temperature. Check the reading.", float("nan"), 0.0, tool="units")
+    if _kind(src) in ("length", "mass", "volume", "area") and value < 0:
+        return Result(f"Cursiv didn't convert this: a {_kind(src)} can't be negative ({raw} {src}).",
+                      float("nan"), 0.0, tool="units")
     dst_label = dst
     if dst.lower() in ("gallon", "gallons", "gal"):
         dst_label = "US liquid gallons" if abs(_UNITS["volume"][dst.lower()] - 3.785411784) < 1e-12 else dst
@@ -313,8 +320,14 @@ def dilution(question: str) -> Result | None:
         c1, c2 = c1 * scale[u1], c2 * scale[u2]
     elif u1 != u2:
         return None
-    if c1 <= 0 or c2 > c1:
-        return None
+    before = lambda g: question[max(0, m.start(g) - 1):m.start(g)] == "-"
+    if before(1) or before(3) or before(5) or c1 <= 0 or v2 <= 0:
+        # U102 benchmark: "-100 mL" was read as 100 mL and answered.
+        return Result("Cursiv didn't calculate this: a concentration or volume can't be zero or negative.",
+                      float("nan"), 0.0)
+    if c2 > c1:
+        return Result(f"Cursiv didn't calculate this: diluting can't make a solution stronger than its stock "
+                      f"({_fmt(c2)} is more than {_fmt(c1)}). You'd need a stronger stock.", float("nan"), 0.0)
     v2_ml = v2 * _VOL[vu]
     v1_ml = c2 * v2_ml / c1
     return Result(f"C1V1 = C2V2: use {_fmt(v1_ml)} mL of the stock and make it up to {_fmt(v2_ml)} mL "

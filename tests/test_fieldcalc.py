@@ -117,7 +117,9 @@ def test_dilution():
     assert r.value == pytest.approx(50)
     r = fc.dilution("I have a 10 mM stock solution, how much for 250 mL of 50 uM?")
     assert r.value == pytest.approx(1.25)
-    assert fc.dilution("dilute a 1 M stock to make 100 mL of 2 M") is None          # can't concentrate
+    # can't concentrate: refused by Cursiv with the reason (U102), not left for the model to answer
+    refused = fc.dilution("dilute a 1 M stock to make 100 mL of 2 M")
+    assert refused.value != refused.value and "can't make a solution stronger" in refused.statement
 
 
 def test_summary_statistics():
