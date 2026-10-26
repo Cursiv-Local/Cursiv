@@ -61,6 +61,7 @@ U83 and U88 were candidates rejected before publication; their reports say why.
 
 | Release | Notes | Verification |
 |---|---|---|
+| U102 | [RELEASE-U102](RELEASE-U102.md) | [U102](U102-RELEASE-VERIFICATION.md) |
 | U101 | [RELEASE-U101](RELEASE-U101.md) | [U101](U101-RELEASE-VERIFICATION.md) |
 | U100 | [RELEASE-U100](RELEASE-U100.md) | [U100](U100-RELEASE-VERIFICATION.md) |
 | U99 | [RELEASE-U99](RELEASE-U99.md) | [U99](U99-RELEASE-VERIFICATION.md) |
