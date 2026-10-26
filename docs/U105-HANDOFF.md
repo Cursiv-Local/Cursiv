@@ -6,7 +6,7 @@ runs out of usage. Owner: Joshua Winkler. Repo: https://github.com/Cursiv-Local/
 **`claude/u105`** (from `main` at `b5d457d`, after the U104 release). For the separate Raspberry Pi work see
 `docs/FIELD-STATION-HANDOFF.md`.
 
-Last updated: 2026-10-26, all 4 items done; release prep next.
+Last updated: 2026-10-26, released; evidence PR and website publish are the last steps.
 
 ## What U105 is
 
@@ -97,6 +97,11 @@ commit/push/release only when the owner asks (he asked for U105 work; ask before
 
 ## Progress log (newest first)
 
+- 2026-10-26: **RELEASED** v3.14-U105 (tag `501d94e`, PR #43):
+  https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U105 . Windows SHA-256 `29c8643d...942bed08`,
+  Mac `26d2106b...7bc30666`; tag suite 2,200 passed / 15 skipped; frozen apps ALL PASSED. Evidence PR
+  `claude/u105-release-evidence` (docs/U105-RELEASE-VERIFICATION.md, website from U104 to U105). U105 is done
+  once that PR is merged and `node cloudflare/publish.mjs` has run.
 - 2026-10-26: PR #43 CI all green (Windows, Mac, Linux, station-arm64, workspace gates, security). Waiting
   for the owner to say "release" before merging; then follow the release runbook above from step 3
   (merge, main CI, tag, builds, sign, publish, evidence PR, website).
