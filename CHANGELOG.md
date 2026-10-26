@@ -1,5 +1,26 @@
 # Changelog
 
+## 3.14-U103 — Overconfidence check, silent-error lint, phone and USB safety (unreleased)
+
+- When you ask about one reading, a look or one sample and the answer settles it anyway ("No, your meter
+  isn't broken", "Yes, you can drink it without treating it"), Cursiv adds a line saying what the answer rests
+  on and how to confirm it. Measured on the local model: 6 of 6 such answers on the set it was tuned on, 1 of 1
+  on a held-out set, with 2 false notes there that are now fixed (bench/overconfidence/RESULTS.md).
+- The dissolved-oxygen check no longer mistakes your own reading for a saturation figure.
+- Storage code may no longer ignore an error without saying why (a test enforces it). It found three:
+  a damaged territories file was overwritten (now moved aside), Start over could leave a locked login file
+  behind while looking successful, and a removed account's security answers could stay if the write failed.
+  Security answers are now saved atomically.
+- Guessing security answers is slowed down: after 5 wrong tries, a wait that doubles up to an hour, kept
+  across restarts.
+- Phone link: a memory containing a key, token or password is never put in the summary stored on cursiv.us;
+  a failed upload is reported instead of called "shared"; only real images from the phone are shown.
+- USB: removed an unused function that could erase a drive's personal data.
+- Chat lookups and notebook reads word results the same way.
+- New app icon (the Cursiv logo); the website uses it too.
+- Removed unused code (an old response scorer and a retired loader). Tests added for the problem report, the
+  confirm card and the phone sync, which had none.
+
 ## 3.14-U102 — Reliability: OS-enforced isolation, verified calculations, recovery (2026-10-25)
 
 An engineering reliability release: no new features, the existing ones made harder to break.

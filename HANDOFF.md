@@ -41,6 +41,18 @@ support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELE
 Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
 sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
 
+## U103 work (Claude, 2026-10-25, branch `claude/u103`, not released)
+Finishes the review list. `science_check.overconfidence_note` (wired in chat/completion.py beside the other
+science notes) judges the verdict lines only (first sentence, lines starting Yes/No/So); measured with
+`scripts/overconfidence_bench.py`, results and hand labels in bench/overconfidence/RESULTS.md. Re-run
+`--heldout` after changing the rule and report numbers as measured. `do_note` now ignores readings.
+tests/test_silent_errors.py: pass/continue-only handlers in core storage, guardian and memory need
+`# best-effort: <why>`. Phone sync drops secret-bearing memories (problem_report.has_secret). Kept on purpose:
+sigil.py (saved files use its encodings) and agents/offline_queue.py (live chat tool). usb_ops.wipe_private_copy
+removed (unused since U83). Icons: launcher/resources/gen_icons.py builds from icons/cursiv-logo-source.png.
+Website (already published): new logo everywhere, social preview 20261025, notebook screenshot full width,
+notebook service-worker cache v4.
+
 ## U101 published (Claude, 2026-10-25)
 Tag `v3.14-U101` = `df74806` (PRs #28, #29, #30). Evidence: [U101-RELEASE-VERIFICATION](docs/U101-RELEASE-VERIFICATION.md).
 Next from the review: tests for problem_report / login_recovery / chat_actions, one notebook read path,

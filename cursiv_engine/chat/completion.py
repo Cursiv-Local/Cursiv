@@ -275,7 +275,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
         for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text),
                       _science.do_note(draft), _science.simulated_note(_field_text, draft),
-                      _science.coordinate_note(draft)):
+                      _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft)):
             if _note:
                 reply.append('\n\n' + _note)
                 yield '\n\n' + _note

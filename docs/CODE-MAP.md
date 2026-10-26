@@ -82,7 +82,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/conversation_recall.py` — "what did I ask three messages ago?" answered from this conversation's stored messages (no model).
 - `core/confined.py` — runs plugins and code under OS limits: a Windows Job Object (no child processes, memory/CPU caps, no clipboard), resource limits elsewhere.
 - `core/fieldsci.py` — field formulas worked out by code: conductivity to 25 °C (APHA 2510 B), velocity-area discharge with the 0.85 float coefficient, percent DO saturation, µS/cm↔mS/cm, molar solutions.
-- `core/science_check.py` — notes under a draft: oxygen saturation against the standard equation, invented example numbers, impossible coordinates.
+- `core/science_check.py` — notes under a draft: oxygen saturation against the standard equation, invented example numbers, impossible coordinates, a settled verdict from one reading (overconfidence).
 - `agents/profile_context.py` — what a starter profile may read (notebook, documents, a calculation), fetched by code, read only; the Data checker's findings; the check under a profile's answer.
 - `core/notebook_proposals.py` — confirm cards built by Cursiv's parser: plain-words records, codes kept out of `site`, append-only corrections ("Correct W-001 temperature from 18.6 to 18.9").
 - `core/fieldsync.py` — team sharing and phone imports, without internet.
@@ -220,7 +220,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 
 ## Elsewhere
 - `tests/` — the suite (`-m usb` is the USB gate run before every commit).
-- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories, `scripts/fieldcalc_bench.py` for field calculations end to end, `scripts/calc_bench.py` the 237-case calculation benchmark), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder).
+- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories, `scripts/fieldcalc_bench.py` for field calculations end to end, `scripts/calc_bench.py` the 237-case calculation benchmark, `scripts/overconfidence_bench.py` for overconfident answers on the live model), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder).
 - `bench/` — truth benchmark and the U99 phrasing set.
 - `website/`, `cloudflare/` — cursiv.us and its deploy.
 - `installer/` — the Windows installer script.
