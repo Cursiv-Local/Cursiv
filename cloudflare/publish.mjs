@@ -29,6 +29,7 @@ const PAGES = [
   ["website/field-research.html", "field-research.html"],
   ["website/offline-research.html", "offline-research.html"],
   ["website/portable-workspace.html", "portable-workspace.html"],
+  ["website/team-drives.html", "team-drives.html"],
   ["website/app.webmanifest", "app.webmanifest"],
 ];
 const FOLDERS = [["website/assets", "assets"], ["website/notebook", "notebook"], ["website/privacy", "privacy"]];  // notebook and privacy policy directory routes
@@ -64,7 +65,7 @@ const HEADERS = `/*
 
 const ROBOTS = "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n";
 const SITEMAP_URLS = [
-  "/", "/field-research", "/offline-research", "/portable-workspace", "/start", "/vision", "/story", "/open-source-offline-ai",
+  "/", "/field-research", "/team-drives", "/offline-research", "/portable-workspace", "/start", "/vision", "/story", "/open-source-offline-ai",
   "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/", "/testers",
 ];
 
