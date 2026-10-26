@@ -314,10 +314,11 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
     return rows, problems, None
 
 
-def _import_photos(src: Path, rows: list[dict]) -> int:
+def _import_photos(src: Path, rows: list[dict], *, copy: bool = True) -> int:
     """Copy the photos these entries name into the photo store, each checked against its
     SHA-256 name. Returns how many photos (each counted once) are missing or don't match
-    (the entries still import; fieldlog.photo_problems() names them)."""
+    (the entries still import; fieldlog.photo_problems() names them). copy=False only counts (U105:
+    strict import checks every photo before anything is copied)."""
     import hashlib
     missing: set[str] = set()
     for e in rows:
@@ -333,8 +334,9 @@ def _import_photos(src: Path, rows: list[dict]) -> int:
                     or hashlib.sha256(private_store.read_bytes(f)).hexdigest() != Path(rel).stem:
                 missing.add(rel)
                 continue
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            _copy_atomic(f, dest)
+            if copy:
+                dest.parent.mkdir(parents=True, exist_ok=True)
+                _copy_atomic(f, dest)
     return len(missing)
 
 
@@ -360,9 +362,13 @@ def _copy_import(src: Path, dest: Path, expected: list[dict]) -> None:
         raise OSError('import read-back verification failed; a copy may exist, but the import is not confirmed')
 
 
-def import_folder(folder: Path) -> dict:
+def import_folder(folder: Path, *, strict: bool = False) -> dict:
     """Import every shared log in folder (or folder/cursiv-field-share). Returns a report:
-    {"added": {device: new entries}, "unchanged": [...], "conflicts": [...], "rejected": [...], "own": bool}."""
+    {"added": {device: new entries}, "unchanged": [...], "conflicts": [...], "rejected": [...], "own": bool}.
+
+    strict (U105, outside review): a log with any photo missing, too large or not matching its fingerprint is
+    refused whole, before anything from it is copied, so an import is a complete dataset or nothing. The
+    default keeps the entries and names the missing photos, which is what recovering a damaged drive needs."""
     folder = Path(folder)
     src = folder / SHARE_DIR if (folder / SHARE_DIR).is_dir() else folder
     logs = sorted(src.glob("*.jsonl"))
@@ -384,6 +390,13 @@ def import_folder(folder: Path) -> dict:
         if problems:
             report["rejected"].append(f"{device}: " + "; ".join(problems))
             continue
+        if strict:
+            gone = _import_photos(src, rows, copy=False)
+            if gone:
+                report["rejected"].append(f"{device}: {gone} photo(s) missing, over {fieldlog.PHOTO_MAX_MB} MB or not "
+                                          "matching their fingerprint. Strict import refused this notebook's entries; "
+                                          "nothing from it was imported (import without strict to keep the entries)")
+                continue
         missing = _import_photos(src, rows)
         if missing:
             report["photos_missing"][device] = missing
@@ -714,9 +727,10 @@ def command(text: str, observer: str = "") -> str | None:
             return f"Not named: {exc}."
         return (f"This notebook is now named {me['name']}. Its entries keep their id ({me['id'][:6]}), so work "
                 "already shared or imported stays theirs; the new name shows on the next import.")
-    m = re.match(r"(?i)^field ?log (share|import)\s+(.+)$", t)
+    m = re.match(r"(?i)^field ?log (share|import)\s+(--strict\s+)?(.+)$", t)
     if m:
-        folder = Path(m.group(2).strip().strip('"'))
+        folder = Path(m.group(3).strip().strip('"'))
+        strict = bool(m.group(2))
         try:
             if m.group(1).lower() == "import" and folder.suffix.lower() == ".cursivsync":
                 return report_text(import_phone_bundle(folder))
@@ -724,7 +738,7 @@ def command(text: str, observer: str = "") -> str | None:
                 out = share(folder, observer)
                 return (f"Shared this laptop's field log to {out}. On the other laptops: "
                         f"field log import {folder}. Only the field log is shared; memories and documents stay here.")
-            return report_text(import_folder(folder))
+            return report_text(import_folder(folder, strict=strict))
         except (OSError, ValueError) as exc:
             return f"Not done: {exc}."
     low = t.lower()

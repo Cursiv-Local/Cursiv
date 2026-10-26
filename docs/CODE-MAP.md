@@ -133,6 +133,8 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/paths.py` — where program data lives.
 - `core/keystore.py` — AI keys encrypted for the Windows account.
 
+- `core/safe_zip.py` — unpacking downloaded zips (Vosk model, Ollama) with no path tricks or links, size and file limits, all or nothing.
+
 ### Network, engine and speed
 - `core/netgate.py` — offline mode: one switch for every outside connection.
 - `core/ollama_host.py` — finding and starting Ollama.

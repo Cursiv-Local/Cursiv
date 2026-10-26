@@ -315,8 +315,9 @@ def _download_ollama(runtime: UsbRuntime, dest_dir: Path, progress, cancel: thre
         zpath.unlink(missing_ok=True)
         raise RuntimeError("The Ollama download didn't match its published checksum, so it wasn't used. Try again.")
     out_dir = dest_dir / "ollama"
-    with runtime.zipfile.ZipFile(zpath) as z:
-        z.extractall(out_dir)
+    # U105: unpacked with limits and nothing outside out_dir (core/safe_zip.py), all or nothing
+    from cursiv_engine.core import safe_zip
+    safe_zip.extract(zpath, out_dir, max_files=20_000, max_bytes=12 << 30, max_file_bytes=4 << 30)
     return out_dir
 
 def _own_notebook(items: list[dict]) -> list[dict]:
@@ -415,7 +416,9 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             notebook = data_dir / "fieldlog"
             if workspace_name:
                 me = fieldlog.name_new_notebook(notebook, workspace_name)
-                data_note += f" Its field notebook is {me['name']}'s."
+                data_note += (f" Its field notebook is {me['name']}'s. Its signing key will be readable by anyone "
+                              "holding the drive: on the drive, open the Field Notebook and choose Signing key… "
+                              "to protect it with a passphrase.")
             if team_ids:
                 sig.progress.emit(-1, "Copying the chosen team notebooks…")
                 copied = fieldsync.copy_notebooks_to(notebook, list(team_ids))
