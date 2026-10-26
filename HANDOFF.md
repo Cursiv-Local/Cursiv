@@ -41,7 +41,12 @@ support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELE
 Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
 sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
 
-## U103 team drives (Claude, 2026-10-25, branch `claude/u103-team-drives`)
+## U103 published (Claude, 2026-10-26)
+Tag `v3.14-U103` = `5c821ca` (PRs #35, #36). Evidence: [U103-RELEASE-VERIFICATION](docs/U103-RELEASE-VERIFICATION.md).
+Next (owner asked): a demo with real screenshots, leading with three named SSDs brought back into one main
+computer and a new drive sent out with chosen notebooks. Open: physical multi-drive test by the owner.
+
+## U103 team drives (Claude, 2026-10-25, PR #36)
 Notebook identity: `fieldlog/notebook.json` {id, name}; `_device()` returns the notebook id (an existing
 notebook keeps its first entry's label; nothing is written until it's named). Shares carry the name;
 imports keep `team/<id>.identity.json` (written only when it changes, so re-import is byte-identical).
