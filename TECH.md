@@ -406,7 +406,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U103 source and package checks are recorded in the [verification report](docs/U103-RELEASE-VERIFICATION.md);
+U104 source and package checks are recorded in the [verification report](docs/U104-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -432,6 +432,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 | U101: starter profiles, field formulas, safer storage | [Release notes](docs/RELEASE-U101.md), [verification](docs/U101-RELEASE-VERIFICATION.md) |
 | U102: reliability: OS-enforced isolation, verified calculations, recovery | [Release notes](docs/RELEASE-U102.md), [verification](docs/U102-RELEASE-VERIFICATION.md) |
 | U103: team field drives, overconfidence check, silent-error lint | [Release notes](docs/RELEASE-U103.md), [verification](docs/U103-RELEASE-VERIFICATION.md) |
+| U104: Field Station preview, team-drive fixes | [Release notes](docs/RELEASE-U104.md), [verification](docs/U104-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |
 | U91: natural workspace requests and philosophical uncertainty policy | [Release notes](docs/RELEASE-U91.md), [verification](docs/U91-RELEASE-VERIFICATION.md) |
 | U90: permanent engine package and optional private storage | [Release notes](docs/RELEASE-U90.md), [verification](docs/U90-RELEASE-VERIFICATION.md) |

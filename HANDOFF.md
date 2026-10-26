@@ -41,6 +41,14 @@ support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELE
 Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
 sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
 
+## U104 published (Claude, 2026-10-26)
+Tag `v3.14-U104` = `47c4ceb` (PRs #38, #40, #41). Field Station preview (`cursiv_engine/station/`, plan and
+status in docs/FIELD-STATION-PLAN.md, handoff for other assistants in docs/FIELD-STATION-HANDOFF.md) and
+team-drive demo fixes. Evidence: [U104-RELEASE-VERIFICATION](docs/U104-RELEASE-VERIFICATION.md). Website:
+/field-station and /team-drives. Next (U105): the outside-review items (drive-key passphrase, strict
+photo-complete import, Vosk checksum + safe unzip limits, release-doc consistency test); Field Station phases
+6-9 when a Pi 5 arrives.
+
 ## U103 published (Claude, 2026-10-26)
 Tag `v3.14-U103` = `5c821ca` (PRs #35, #36). Evidence: [U103-RELEASE-VERIFICATION](docs/U103-RELEASE-VERIFICATION.md).
 Next (owner asked): a demo with real screenshots, leading with three named SSDs brought back into one main
