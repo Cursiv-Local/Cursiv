@@ -87,6 +87,8 @@ section:first-of-type { border-top: 0; }
 .cards.two { grid-template-columns: repeat(2, 1fr); }
 @media (max-width: 920px) { .grid2 { grid-template-columns: 1fr; gap: 32px; } .cards { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 600px) { .cards, .cards.two { grid-template-columns: 1fr; } }
+.shot-wide { margin: 32px 0 0; }
+.shot-wide img { width: 100%; height: auto; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; }
 .card h3 { margin-bottom: 8px; }
 .card p, .card li { color: var(--muted); font-size: 15px; }
