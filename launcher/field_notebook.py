@@ -416,9 +416,7 @@ class FieldNotebookDialog(QDialog):
         ok = QMessageBox.question(
             self, "Protect the signing key",
             "This notebook's shares and exports are signed with a key stored in its data folder. On a Cursiv "
-            "drive anyone holding the drive can read that key and sign in this notebook's name.
-
-"
+            "drive anyone holding the drive can read that key and sign in this notebook's name.\n\n"
             "Protect it with a passphrase? The key stays the same, so computers that already know it keep "
             "accepting its shares. You'll enter the passphrase once each time Cursiv starts, before sharing or "
             "exporting. Without it nothing can be signed, so keep it safe.",
