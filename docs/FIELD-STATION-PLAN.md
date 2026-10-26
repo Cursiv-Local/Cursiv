@@ -1,7 +1,8 @@
 # Cursiv Field Station: audit and implementation plan
 
-Status: **plan only.** Nothing below is built unless marked. Written 2026-10-26 from an audit of the
-repository at `main` (U103 + PR #39). Every statement about current code was checked against it.
+Status: **phases 2–5 built as a preview (2026-10-26); nothing validated on a Raspberry Pi yet.** See
+section 8. Audit written 2026-10-26 against `main` (U103 + PR #39). Every statement about current code was
+checked against it. Handoff for another assistant: `docs/FIELD-STATION-HANDOFF.md`.
 
 The Field Station is a Raspberry Pi 5 running Cursiv's existing engine headless, serving a browser
 interface over its own Wi-Fi. Phones, tablets and laptops are the screens; the Pi, its SSD and the
@@ -100,3 +101,55 @@ in simulation unless it's a development install. Tests run all five scenarios.
 No battery percentage without a device that reports it; no temperature without a sensor reading; nothing
 marked validated until it runs on a Pi 5 and the acceptance results are recorded; no multi-station sync
 until built and tested; no claim that HTTP on the local network is encrypted.
+
+## 8. Status (2026-10-26, branch `claude/field-station`)
+
+| Deliverable | Status |
+|---|---|
+| Repository audit and plan | done (this document) |
+| Shared core | **implemented and tested**: the station uses `cursiv_engine` unchanged; it imports with Qt blocked (`tests/test_station_storage.py`) |
+| ARM64 compatibility | **implemented, awaiting validation**: CI job `station-arm64` on GitHub's ARM64 Linux; not yet run on a Pi |
+| Local API (`station/server.py`) | **implemented and tested** on loopback: 15 tests incl. CSRF, Origin, Host, locked data, 20 concurrent writes, safe shutdown, storage failing mid-write |
+| Sign-in, sessions, setup, unlock (`station/sessions.py`) | **implemented and tested**: 7 tests with real accounts and real encryption |
+| Browser interface (`station/web/`) | **implemented and tested** in a desktop browser at 1280 and 375 px; **awaiting validation** on iOS Safari, Android Chrome, Firefox, tablets |
+| Telemetry (`station/telemetry.py`) | **implemented and tested** with faked /sys folders (25 tests); **awaiting hardware validation** of the Pi 5 thermal zone, `vcgencmd` and any UPS battery |
+| Battery providers | Linux `power_supply`, unavailable (plain power bank), simulated: **implemented and tested**; real UPS boards **awaiting hardware** |
+| Simulation (`station/simulation.py`) | **implemented and tested**: scenarios A-F, labelled SIMULATED everywhere |
+| Drive discovery (`station/storage.py`) | **implemented and tested** (read-only, by UUID); mounting, import/export, eject: **planned** (phase 9) |
+| Install script, systemd service | **planned** (phase 6) |
+| Wi-Fi access point, cursiv.local | **planned** (phase 7) |
+| Local AI on the Pi | **planned** (phase 8): the dashboard shows whether Ollama is running; no Pi benchmark yet |
+| Research chat in the browser | **planned**: not in this preview |
+| Hardware acceptance test plan | **planned** (`docs/FIELD-STATION-ACCEPTANCE.md`) |
+| Multi-station sync | **unsupported** in the first version |
+
+### Running it on a development PC
+
+`python scripts/station_dev.py --port 8090 --simulate A` (data in `.station-dev/`, git-ignored). Never run
+`python -m cursiv_engine.station` on a PC with real Cursiv data: it holds the data lease and first-run setup
+encrypts `~/.cursiv`.
+
+## 9. Local API (preview)
+
+All responses are JSON. Every request must come from loopback or a private network and name the station in
+`Host`. After sign-in, the `cursiv_station` cookie (HttpOnly, SameSite=Strict) identifies the session; every
+POST except setup and login also needs `X-CSRF-Token` (from `/api/session` or the login response) and, if the
+browser sends `Origin`, it must be this station. 401 = sign in first; 403 = refused; 423 = notebook locked
+(enter the passphrase); 429 = too many wrong tries (`Retry-After`); 503 = shutting down or storage unavailable.
+
+| Method and path | Needs | Does |
+|---|---|---|
+| GET/HEAD `/healthz` | nothing | `{"ok", "state"}`, no data (for systemd and monitors) |
+| GET `/api/session` | nothing | signed in?, user, CSRF token, needs setup?, encryption state, simulated scenario, version |
+| POST `/api/setup` | setup code | `{code, username, password, passphrase, station_name}`: only while no account exists |
+| POST `/api/login` / `/api/logout` | — / session | sign in with a Cursiv account / end the session |
+| POST `/api/unlock` | session | `{passphrase}`: unlocks the encrypted notebook after a restart |
+| GET `/api/health` | session | the telemetry snapshot (works while locked) |
+| GET `/api/status` | session | encryption, local AI engine, offline state, notebook summary |
+| GET `/api/notebook?q=&limit=` | unlocked | entries, newest first, with whose notebook each came from |
+| POST `/api/notebook` | unlocked | a new entry (`site, sample_id, project, observer, note, measurements[], lat, lon`) |
+| POST `/api/notebook/correct` | unlocked | `{entry_id, reason, ...fields}`: a new entry that corrects one; the original stays |
+| GET `/api/notebook/verify` | unlocked | integrity check, and what a pass does and doesn't show |
+| POST `/api/export` | unlocked | team export (CSV, JSON, GeoJSON, report) on the station |
+| GET `/api/workspaces` | unlocked | notebooks on the station and drives it can see |
+| POST `/api/shutdown` | session | `{confirm: true}`: stop writes, finish running ones, lock, then the OS command if configured |

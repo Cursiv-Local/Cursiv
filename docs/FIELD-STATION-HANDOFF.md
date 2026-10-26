@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 6 of 7 done (drive discovery tests + ARM64 CI).
+Last updated: 2026-10-26, step 7 of 7: full suite passed, PR opened (see log).
 
 ## What this work is
 
@@ -65,13 +65,18 @@ these choices (2026-10-26):
 | 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | done: `tests/test_station_server.py` 13 passed (live loopback server) |
 | 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | done: walked through live (setup, restart -> locked -> unlock, record, correct, verify, health at phone width); 15 server tests |
 | 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | done: `tests/test_station_storage.py` 5 passed; CI job `station-arm64` added (first run on the PR) |
-| 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | next |
+| 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | done: full suite 2,175 passed, 14 skipped; PR opened, not merged |
 
 Phases 6–9 (install script + systemd, Wi-Fi access point, local AI benchmark on ARM, SSD/USB mounting) come
 later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 step 7: full suite 2,175 passed / 14 skipped (the usual live-model + Keychain skips). Committed and pushed `claude/field-station`; PR opened for the owner (not merged, not released). Earlier note: `docs/CODE-MAP.md` has a "Field Station preview" section (code-map test
+  passes); `docs/FIELD-STATION-PLAN.md` gained section 8 (status of every deliverable, labelled) and section 9
+  (API reference); CHANGELOG has "3.14-U104 — in progress". Full suite running. Not yet committed. Then: commit,
+  push `claude/field-station`, open a PR (do NOT merge or release without the owner), watch the new
+  `station-arm64` CI job.
 - 2026-10-26 step 6: `tests/test_station_storage.py` (lsblk JSON parsed to UUID-identified mounted drives, swap
   and unmounted skipped; workspace recognition writes nothing; psutil fallback marked not stable; the station
   imports with `sys.modules['PyQt6'] = None`). `requirements-station.txt` (engine deps only, versions from

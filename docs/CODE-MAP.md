@@ -166,6 +166,15 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `obsidian/exporter.py` — Obsidian vault export.
 - `training/lora_trainer.py`, `training/ollama_merge.py`, `training/paths.py` — optional local fine-tuning.
 
+## Field Station preview (`station/`, a Raspberry Pi 5 served to browsers; docs/FIELD-STATION-PLAN.md)
+- `station/__main__.py` — `python -m cursiv_engine.station`: starts the server, holds the data lease, offline on, prints the setup code. On a development PC use `scripts/station_dev.py` instead.
+- `station/server.py` — the local web server and API: loopback/private clients only, Host and Origin checks, CSRF, notebook, health, workspaces, safe shutdown.
+- `station/sessions.py` — sign-in with Cursiv accounts, sessions, rate limits, first-run setup with a console code, encryption unlock.
+- `station/telemetry.py` — hardware readings, each labelled real / derived / simulated / unavailable / stale: CPU temperature, throttling, CPU, memory, storage, battery providers.
+- `station/simulation.py` — named hardware scenarios A-F for development; never mixed into real readings.
+- `station/storage.py` — read-only drive discovery by filesystem UUID; recognises Cursiv workspaces.
+- `station/web/` — the browser interface (index.html, app.css, app.js).
+
 ## Desktop (`launcher/`)
 
 ### Start-up and window
