@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 3 of 7 done (sessions, setup, unlock).
+Last updated: 2026-10-26, step 4 of 7 done (server + API).
 
 ## What this work is
 
@@ -62,8 +62,8 @@ these choices (2026-10-26):
 | 1 | Check the engine functions the station calls (vault, accounts, notebook) | done |
 | 2 | `station/telemetry.py` (temperature via discovered thermal zone, `vcgencmd get_throttled` parsing, CPU/RAM via psutil, disk, board model, battery providers: Linux `power_supply`, unavailable, simulated) + `station/simulation.py` (scenarios A–E from the spec, plus F undervoltage) | done: `tests/test_station_telemetry.py` 25 passed |
 | 3 | `station/sessions.py`: sign-in with existing accounts, session cookie (HttpOnly, SameSite=Strict, idle + absolute expiry), CSRF token, login rate limit, encryption unlock | done: `tests/test_station_sessions.py` 7 passed |
-| 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | next |
-| 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | planned |
+| 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | done: `tests/test_station_server.py` 13 passed (live loopback server) |
+| 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | next |
 | 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | planned |
 | 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | planned |
 
@@ -72,6 +72,18 @@ later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 step 4: `station/server.py` (`Station` state + `make_handler`; `local_client()` = the inbound rule:
+  loopback or RFC1918/ULA only; Host must be a station name; Origin must match; CSRF header `X-CSRF-Token` on
+  every POST after sign-in; security headers + CSP; cookie `cursiv_station` HttpOnly SameSite=Strict (no
+  Secure: plain HTTP, by the owner's choice). API: GET /healthz, /api/session, /api/health, /api/status,
+  /api/notebook[?q=&limit=], /api/notebook/verify, /api/workspaces; POST /api/setup, /api/login, /api/logout,
+  /api/unlock, /api/notebook, /api/notebook/correct, /api/export, /api/shutdown {confirm:true}. Locked data
+  -> 423. Shutdown: running -> draining -> stopped, OS command only if `--shutdown-command` given.)
+  `station/storage.py` (read-only drive discovery: lsblk UUIDs on Linux, psutil elsewhere marked not stable;
+  recognises Cursiv workspaces). `station/__main__.py` (`python -m cursiv_engine.station --simulate A`, holds
+  DataLease, offline on, prints the first-run setup code). Tests 13 passed. Committed. Next: step 5, the
+  browser UI in `cursiv_engine/station/web/` (index.html, app.css, app.js; served at / and /static/<name>;
+  CSP forbids inline scripts and styles, so keep JS and CSS in files).
 - 2026-10-26 step 3: `station/sessions.py`: `Sessions` (token + per-session CSRF, idle 30 min, absolute 12 h),
   `Limiter` (5 free tries, then 30 s doubling to 15 min, per client address and per account), `Gate`
   (`sign_in` via `access_gate.verify_credentials`; `first_setup` needs the 8-digit setup code printed on the
