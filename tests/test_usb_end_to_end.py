@@ -232,3 +232,34 @@ def test_the_usb_gate_runs_on_every_push_pr_commit_and_release():
     assert "-m usb" in hook
     selftest = (REPO / "launcher" / "selftest.py").read_text(encoding="utf-8")
     assert '("portable storage", portable_storage)' in selftest
+
+
+def test_a_drive_made_for_one_scientist_starts_their_own_notebook_with_chosen_work(kit, monkeypatch):
+    """U103: Make USB with a name and chosen notebooks (the real make_usb). The drive gets its own notebook
+    and signing key in that name; the computer's notebook isn't copied onto it; only the chosen work is."""
+    import usb_maker
+    from cursiv_engine.core import fieldlog, fieldsync
+    pc_notebook = kit["tmp"] / "pc-notebook"
+    monkeypatch.setattr(fieldlog, "log_dir", lambda: pc_notebook)
+    fieldlog.set_name("Base station")
+    fieldlog.add(observer="lead", note="season start", sample_id="BS-0001")
+    fieldlog.add(observer="lead", note="calibrated meters")
+    _write(kit["home"] / "device_key.json", '{"the computer": "key"}')
+    sig = _Sig()
+    usb_maker.make_usb(kit["drive"], kit["models"], True, sig, threading.Event(), True, False,
+                       "Ana Ruiz", [fieldlog.identity()["id"]])
+    ok, message = sig.result
+    assert ok, message
+    assert "Ana Ruiz's" in message and "Base station" in message
+    notebook = kit["drive"] / "Home" / ".cursiv" / "fieldlog"
+    me = json.loads((notebook / "notebook.json").read_text(encoding="utf-8"))
+    assert me["name"] == "Ana Ruiz" and me["id"] != fieldlog.identity()["id"]
+    assert not (notebook / "observations.jsonl").exists()                 # her own notebook starts empty
+    assert not (kit["drive"] / "Home" / ".cursiv" / "device_key.json").exists()   # and gets its own key
+    copied = fieldsync._read_lines(notebook / "team" / f"{fieldlog.identity()['id']}.jsonl")
+    assert [e["hash"] for e in copied] == [e["hash"] for e in fieldlog.entries()]
+    # Made again: still the same person's notebook (same id), nothing duplicated
+    usb_maker.make_usb(kit["drive"], kit["models"], True, sig, threading.Event(), True, False,
+                       "Ana Ruiz", [fieldlog.identity()["id"]])
+    assert sig.result[0], sig.result[1]
+    assert json.loads((notebook / "notebook.json").read_text(encoding="utf-8"))["id"] == me["id"]

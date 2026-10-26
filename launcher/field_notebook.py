@@ -143,8 +143,12 @@ class FieldNotebookDialog(QDialog):
         imp_menu.addSeparator()
         imp_menu.addAction("Revoke a lost or retired device's key…", self._revoke)
         imp.setMenu(imp_menu)
+        self._name_btn = QPushButton(""); self._name_btn.setStyleSheet(theme.ghost_button())
+        self._name_btn.setToolTip("Whose notebook this is. Shared and imported work is kept in this name (U103).")
+        self._name_btn.clicked.connect(self._name)
+        self._show_name()
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
-        for b in (fix, check, exp, rep, share, imp):
+        for b in (fix, check, exp, rep, share, imp, self._name_btn):
             foot.addWidget(b)
         foot.addStretch(1); foot.addWidget(close)
         outer.addLayout(foot)
@@ -253,7 +257,8 @@ class FieldNotebookDialog(QDialog):
         except (OSError, ValueError):
             pass  # an optional suggestion cannot turn a verified save into failure
         sample = f" · sample {e['sample_id']}" if e.get('sample_id') else ''
-        self._status.setText(f"Saved #{e['seq']}{sample} · fingerprint {e['hash'][:12]} · chain intact")
+        self._status.setText(f"Saved #{e['seq']}{sample} · fingerprint {e['hash'][:12]} · chain intact"
+                             + (f" · {fieldlog.share_problem}" if fieldlog.share_problem else ""))
         self._status.setToolTip(f"Record ID: {e['id']}\nSHA-256: {e['hash']}")
         self._status.setStyleSheet(f"color: {theme.GREEN};")
         self._clear_form()
@@ -283,6 +288,16 @@ class FieldNotebookDialog(QDialog):
         self._photo_lbl.setText(f"{len(self._photos)} photo(s) kept from the original" if self._photos else "")
 
     # ── list, checks, export ───────────────────────────────────────────
+    def done(self, result):
+        """Closing the notebook on a drive brings its team copy up to date (U103)."""
+        try:
+            from cursiv_engine.core import fieldsync
+            fieldsync.auto_share()
+            fieldlog.share_problem = ""
+        except (OSError, ValueError) as exc:
+            fieldlog.share_problem = f"the team copy on the drive wasn't updated ({exc})"
+        super().done(result)
+
     def refresh(self):
         rows = fieldlog.current()
         self._table.setRowCount(len(rows))
@@ -371,6 +386,35 @@ class FieldNotebookDialog(QDialog):
         QMessageBox.information(self, "Shared", f"This laptop's field log is in:\n{out}\n\n"
                                 "On each other laptop: Import from team… and pick the same drive. "
                                 "Only the field log is shared; memories and documents stay on this computer.")
+
+    def _show_name(self):
+        from cursiv_engine.core import fieldlog
+        try:
+            name = fieldlog.identity().get("name", "")
+        except fieldlog.IdentityDamaged:
+            name = ""
+        self._name_btn.setText(f"Notebook: {name}…" if name else "Name this notebook…")
+
+    def _name(self):
+        """The person who records in this notebook. Their shared work arrives on the team's main computer in
+        this name, with its photos (U103). Renaming keeps the notebook's id, so earlier work stays theirs."""
+        from cursiv_engine.core import fieldlog
+        try:
+            current = fieldlog.identity().get("name", "")
+        except fieldlog.IdentityDamaged as exc:
+            QMessageBox.warning(self, "Notebook name", str(exc))
+            return
+        name, ok = QInputDialog.getText(self, "Name this notebook",
+                                        "Who records in this notebook? (their name, as the team should see it)",
+                                        text=current)
+        if not ok:
+            return
+        try:
+            fieldlog.set_name(name)
+        except ValueError as exc:
+            QMessageBox.warning(self, "Not named", str(exc))
+            return
+        self._show_name()
 
     def _revoke(self):
         """The team lead marks a lost, stolen or retired phone or laptop: its new files are refused."""

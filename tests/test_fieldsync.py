@@ -7,6 +7,8 @@ import pytest
 
 from cursiv_engine.core import fieldlog, fieldsync
 
+pytestmark = pytest.mark.usb      # team sync is part of the mandatory USB gate (U103)
+
 
 @pytest.fixture
 def team(tmp_path, monkeypatch):
@@ -86,7 +88,7 @@ def test_different_history_keeps_both_and_chooses_neither(team, tmp_path):
     with laptop("A"):
         r = fieldsync.import_folder(usb)
         assert r["conflicts"] and "neither was chosen" in r["conflicts"][0]
-        kept = sorted(p.name for p in fieldsync.team_dir().iterdir())
+        kept = sorted(p.name for p in fieldsync.team_dir().glob("*.jsonl"))
         assert kept[0].startswith("laptopB.conflict-") and kept[1] == "laptopB.jsonl"
         assert len(fieldsync.team_entries()) == 3                # the earlier copy is still the team view
 
@@ -99,7 +101,7 @@ def test_the_same_sample_id_on_two_laptops_is_reported(team):
             fieldsync.share(usb)
     with laptop("A"):
         text = fieldsync.report_text(fieldsync.import_folder(usb))
-        assert "CHECK sample NT-20261018-001 was recorded on 2 laptops" in text
+        assert "CHECK sample NT-20261018-001 was recorded on 2 notebooks" in text
 
 
 def test_only_the_field_log_is_shared(team, tmp_path):

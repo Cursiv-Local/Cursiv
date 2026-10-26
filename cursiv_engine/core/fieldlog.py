@@ -47,9 +47,141 @@ def log_file() -> Path:
     return log_dir() / "observations.jsonl"
 
 
-def _device() -> str:
-    """A short, stable label for this computer (a hash, not its name)."""
+def _host_label() -> str:
+    """The label entries carried before U103: a hash of the computer's name."""
     return hashlib.sha256(socket.gethostname().encode("utf-8", "replace")).hexdigest()[:12]
+
+
+# ── Whose notebook this is (U103) ──────────────────────────────────────────
+# Entries used to be labelled with the computer they were typed on, so a field drive used on two
+# laptops, or on the team's main computer, couldn't be imported as one scientist's work. Now each
+# notebook has its own identity (notebook.json beside the log): an id that every entry carries and
+# a name (the scientist, "Ana Ruiz"). It travels with the notebook, so a drive keeps it on any PC.
+# A notebook that already has entries keeps the label they carry, so old records still check out.
+
+IDENTITY_FILE = "notebook.json"
+NAME_MAX = 60
+
+
+class IdentityDamaged(ValueError):
+    """notebook.json can't be read. Never replaced silently: a new id would split one person's work."""
+
+
+def identity_file() -> Path:
+    return log_dir() / IDENTITY_FILE
+
+
+def read_identity(folder: Path | None = None) -> dict:
+    """The identity in a notebook folder (this one by default) without creating it: {} if it has none
+    yet. A notebook without one is labelled by its first entry (what identity() would keep)."""
+    from cursiv_engine.core import private_store
+    folder = Path(folder) if folder is not None else log_dir()
+    try:
+        data = json.loads(private_store.read_text(folder / IDENTITY_FILE))
+    except FileNotFoundError:
+        data = None
+    except (OSError, ValueError) as exc:
+        raise IdentityDamaged(f"{folder / IDENTITY_FILE} can't be read ({type(exc).__name__})") from None
+    if data is not None:
+        if not (isinstance(data, dict) and re.fullmatch(r"[A-Za-z0-9_-]{1,40}", str(data.get("id", "")))):
+            raise IdentityDamaged(f"{folder / IDENTITY_FILE} isn't a notebook identity")
+        return data
+    first = _first_entry(folder / "observations.jsonl")
+    return {"id": first["device"], "name": "", "derived": True} if first and first.get("device") else {}
+
+
+def _first_entry(path: Path) -> dict | None:
+    from cursiv_engine.core import private_store
+    try:
+        text = private_store.read_text(path)
+    except FileNotFoundError:
+        return None
+    line = next((ln for ln in text.splitlines() if ln.strip()), "")
+    try:
+        row = json.loads(line) if line else None
+    except ValueError:
+        return None
+    return row if isinstance(row, dict) else None
+
+
+_fresh_id: dict[Path, str] = {}
+
+
+def identity() -> dict:
+    """{"id", "name"} for this notebook. Nothing is written until it's named (set_name): a notebook with
+    entries is labelled by its first entry, and a new, empty one gets an id that its first entry keeps."""
+    found = read_identity()
+    if found:
+        return found
+    return {"id": _fresh_id.setdefault(log_dir(), uuid.uuid4().hex[:12]), "name": ""}
+
+
+def _write_identity(data: dict, folder: Path | None = None, *, protect: bool = True) -> None:
+    from cursiv_engine.core import atomic
+    folder = Path(folder) if folder is not None else log_dir()
+    folder.mkdir(parents=True, exist_ok=True)
+    atomic.write_bytes(folder / IDENTITY_FILE, json.dumps(data, indent=2, ensure_ascii=False).encode("utf-8"),
+                       protect=protect)
+
+
+def clean_name(name: str) -> str:
+    name = re.sub(r"[\x00-\x1f\x7f]+", " ", str(name or "")).strip()
+    name = re.sub(r"\s+", " ", name)
+    if not name:
+        raise ValueError("give the notebook a name (the person who uses it)")
+    if len(name) > NAME_MAX:
+        raise ValueError(f"a notebook name can be at most {NAME_MAX} characters")
+    return name
+
+
+def set_name(name: str) -> dict:
+    """Name this notebook (the scientist who records in it). The id never changes, so entries already
+    recorded and copies already imported elsewhere stay this person's; the new name shows on the next import."""
+    data = dict(identity())
+    data["name"] = clean_name(name)
+    _write_identity(data)
+    return data
+
+
+def name_new_notebook(folder: Path, name: str, *, protect: bool = False) -> dict:
+    """Give the notebook in `folder` (a field drive's) its identity and name. An existing identity keeps
+    its id (only the name changes); a notebook with entries but no identity keeps its entries' label."""
+    found = read_identity(folder)
+    data = {"id": found.get("id") or uuid.uuid4().hex[:12], "name": clean_name(name),
+            "created_utc": found.get("created_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    _write_identity(data, folder, protect=protect)
+    return data
+
+
+def notebook_names() -> dict[str, str]:
+    """{notebook id: name} for this notebook and every team notebook imported here."""
+    names = {}
+    for f in sorted((log_dir() / "team").glob("*.identity.json")) if (log_dir() / "team").is_dir() else []:
+        try:
+            from cursiv_engine.core import private_store
+            d = json.loads(private_store.read_text(f))
+            if isinstance(d, dict) and d.get("id") and d.get("name"):
+                names[d["id"]] = d["name"]
+        except (OSError, ValueError):  # best-effort: a damaged name file shows the id instead
+            continue
+    try:
+        me = read_identity()
+    except IdentityDamaged:  # best-effort: shown by id; field log check reports the damage
+        me = {}
+    if me.get("id") and me.get("name"):
+        names[me["id"]] = me["name"]
+    return names
+
+
+def who(device: str, names: dict[str, str] | None = None) -> str:
+    """How a notebook is shown: its name and short id ("Ana Ruiz (3f2a9c)"), or the id alone."""
+    name = (names if names is not None else notebook_names()).get(device, "")
+    return f"{name} ({device[:6]})" if name else device
+
+
+def _device() -> str:
+    """The id every entry in this notebook carries (identity()). Kept under this name for callers."""
+    return identity()["id"]
 
 
 # ── Photos: stored once, named by their SHA-256 ───────────────────────────
@@ -196,7 +328,32 @@ def _coord(value, low: float, high: float):
     return round(v, 7)
 
 
-def add(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
+def add(**fields) -> dict:
+    """Append one entry and return it (the arguments are _append's). On a Cursiv drive the share at the
+    drive's top is brought up to date too (fieldsync.auto_share, U103, at most every SHARE_EVERY_S), so the
+    team's main computer can import this person's work by picking the drive. The entry is saved even if
+    that share can't be."""
+    entry = _append(**fields)
+    global share_problem, _last_share
+    if time.monotonic() - _last_share >= SHARE_EVERY_S:
+        try:
+            from cursiv_engine.core import fieldsync
+            if fieldsync.auto_share() is not None:
+                _last_share = time.monotonic()
+            share_problem = ""
+        except (OSError, ValueError) as exc:
+            share_problem = f"the entry is saved, but the team copy on the drive wasn't updated ({exc})"
+    return entry
+
+
+# On a drive the share is rewritten whole and re-checked, so it's brought up to date at most every 30 s
+# while recording, and always when Cursiv starts or quits and when the notebook window closes (U103).
+SHARE_EVERY_S = 30
+_last_share = -SHARE_EVERY_S
+share_problem = ""          # set when the last automatic share on a drive failed (shown in the notebook)
+
+
+def _append(*, observer: str = "", site: str = "", lat=None, lon=None, location_source: str = "",
         location_accuracy_m=None, location_fix_utc: str = "",
         measurements=None, note: str = "", photos=None, corrects: str = "", reason: str = "",
         app_version: str = "", sample_id: str = "", request_id: str = "", project: str = "") -> dict:
@@ -506,7 +663,7 @@ def labels_html(rows: list[dict]) -> str:
 
 CSV_FIELDS = ("entry_id", "seq", "recorded_utc", "recorded_local", "observer", "sample_id", "site", "lat", "lon",
               "location_source", "measurement", "value", "unit", "note", "photos", "corrects", "reason",
-              "fingerprint", "device", "location_accuracy_m", "project")
+              "fingerprint", "device", "location_accuracy_m", "project", "notebook_name")
 
 
 def _is_export(folder: Path) -> bool:
@@ -557,6 +714,7 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
     every = entries() if everything is None else everything
     problems = verify() + photo_problems(every)
 
+    names = notebook_names()          # whose notebook each entry (and its photos) came from (U103)
     csv_path = folder / "observations.csv"
     with csv_path.open("w", encoding="utf-8", newline="") as f:
         w = csv.writer(f)
@@ -568,7 +726,8 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
                       e["location_source"]]
             acc = e.get("location_accuracy_m")
             tail = [e["note"], ";".join(e["photos"]), e["corrects"] or "", e["reason"], e["hash"],
-                    e.get("device", ""), "" if acc is None else acc, e.get("project", "")]
+                    e.get("device", ""), "" if acc is None else acc, e.get("project", ""),
+                    names.get(e.get("device", ""), "")]
             for m in e["measurements"] or [{"name": "", "value": "", "unit": ""}]:
                 w.writerow(common + [m["name"], m["value"], m["unit"]] + tail)
 
@@ -576,6 +735,8 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
     json_path.write_text(json.dumps({
         "exported_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "integrity": "intact" if not problems else problems,
+        "notebooks": {d: names[d] for d in sorted({e.get("device", "") for e in (entries() if everything is None
+                                                                                  else everything)}) if d in names},
         "entries": entries() if everything is None else everything,
     }, indent=2, ensure_ascii=False), encoding="utf-8")
 
@@ -584,6 +745,7 @@ def _export_into(folder: Path, include_corrected: bool = False, *,
                  "properties": {**{k: e[k] for k in ("id", "seq", "recorded_utc", "observer", "site",
                                                      "measurements", "note", "hash")},
                                 "sample_id": e.get("sample_id", ""),
+                                "notebook_name": names.get(e.get("device", ""), ""),
                                 "location_accuracy_m": e.get("location_accuracy_m")}}
                 for e in rows if e["lat"] is not None]
     geo_path.write_text(json.dumps({"type": "FeatureCollection", "features": features}, indent=2,

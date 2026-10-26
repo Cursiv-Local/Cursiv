@@ -1,5 +1,5 @@
 ; ============================================================
-; Cursiv v3.14-U103 — Overconfidence check, silent-error lint, phone and USB safety
+; Cursiv v3.14-U103 — Team field drives, overconfidence check, silent-error lint
 ; Produces: installer\Output\Cursiv-Setup-3.14-U103.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat

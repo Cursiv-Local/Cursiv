@@ -76,6 +76,16 @@ def chain_problems(rows: list[dict]) -> list[str]:
     return problems
 
 
+def _photo_ok(path: Path) -> bool:
+    """A photo already in a share that matches its SHA-256 name. A damaged one is copied again (U103:
+    it used to be skipped because the file existed, so a share could never repair it)."""
+    import hashlib
+    try:
+        return hashlib.sha256(path.read_bytes()).hexdigest() == path.stem
+    except OSError:
+        return False
+
+
 def share(folder: Path, observer: str = "") -> Path:
     """Copy this laptop's field log and a manifest into <folder>/cursiv-field-share/."""
     rows = fieldlog.entries()
@@ -95,14 +105,88 @@ def share(folder: Path, observer: str = "") -> Path:
     for e in rows:                                   # photos travel with the log, named by their SHA-256
         for rel in e.get("photos") or []:
             src = fieldlog.photo_path(rel)
-            if fieldlog._is_stored(rel) and src.exists() and not (out / rel).exists():
+            if fieldlog._is_stored(rel) and src.exists() and not _photo_ok(out / rel):
                 (out / rel).parent.mkdir(parents=True, exist_ok=True)
                 _copy_atomic(src, out / rel)
     atomic.write_text(out / f"{device}.manifest.json", json.dumps({
-        "device": device, "observer": observer, "entries": len(rows), "last_hash": rows[-1]["hash"],
+        "device": device, "name": fieldlog.identity().get("name", ""),     # whose notebook (U103)
+        "observer": observer, "entries": len(rows), "last_hash": rows[-1]["hash"],
         "shared_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "head": devicekey.signed_head(rows, device),
     }, indent=2))
+    return out
+
+
+def auto_share() -> Path | None:
+    """On a Cursiv drive (U103): keep this notebook's share at the top of the drive, cursiv-field-share,
+    so the main computer imports it in this person's name with Import from team (pick the drive). Off a
+    drive, nothing. Each file is written whole, as share() always does."""
+    from cursiv_engine.core import demo, paths
+    root = paths.portable_root()
+    if root is None or demo.active() or not fieldlog.log_file().exists():
+        return None
+    return share(root)
+
+
+def notebooks_here() -> list[dict]:
+    """Every notebook whose work is on this computer: its own and each team notebook imported here,
+    as {"id", "name", "entries", "own"} (U103: for choosing whose work goes onto a drive)."""
+    out = []
+    names = fieldlog.notebook_names()
+    me = fieldlog.identity()
+    if fieldlog.log_file().exists():
+        out.append({"id": me["id"], "name": me.get("name", ""), "entries": len(fieldlog.entries()), "own": True})
+    for f in _team_files():
+        try:
+            n = len(_read_lines(f))
+        except (OSError, ValueError):  # best-effort: a damaged copy isn't offered (team log names it)
+            continue
+        out.append({"id": f.stem, "name": names.get(f.stem, ""), "entries": n, "own": False})
+    return out
+
+
+def copy_notebooks_to(dest: Path, ids: list[str]) -> dict[str, int]:
+    """Copy the chosen notebooks (this computer's own and/or team notebooks imported here) with their photos
+    into the team view of the notebook folder `dest` (a field drive's Home/.cursiv/fieldlog), readable, as a
+    drive is. Only those chosen go (U103). Each copy is checked after writing. A copy already on the drive is
+    replaced only by one that continues it; a different history stops with an error and nothing replaced.
+    Returns {id: entries copied}."""
+    from cursiv_engine.core import atomic, private_store
+    import hashlib
+    dest = Path(dest)
+    me = fieldlog.identity()
+    names = fieldlog.notebook_names()
+    out = {}
+    for nid in ids:
+        src = fieldlog.log_file() if nid == me["id"] else team_dir() / f"{nid}.jsonl"
+        who = fieldlog.who(nid, names)
+        rows = _read_lines(src)
+        if chain_problems(rows) or any(fieldlog.record_problems(e) for e in rows):
+            raise ValueError(f"{who}'s notebook doesn't check out here; it wasn't copied")
+        target = dest / "team" / f"{nid}.jsonl"
+        if target.exists():
+            have = [e["hash"] for e in _read_lines(target)]
+            new = [e["hash"] for e in rows]
+            if have[:len(new)] == new:
+                out[nid] = 0                       # the drive already has all of it (or more)
+                continue
+            if new[:len(have)] != have:
+                raise ValueError(f"the drive's copy of {who}'s notebook has a different history; nothing was replaced")
+        for e in rows:                                       # photos first: an entry never arrives without them
+            for rel in e.get("photos") or []:
+                p, d = fieldlog.photo_path(rel), dest / rel
+                if fieldlog._is_stored(rel) and p.exists() and not d.exists():
+                    data = private_store.read_bytes(p)
+                    if hashlib.sha256(data).hexdigest() != Path(rel).stem:
+                        raise ValueError(f"photo {rel} of {who} doesn't match its fingerprint here; nothing more was copied")
+                    atomic.write_bytes(d, data, protect=False)
+        atomic.write_bytes(target, private_store.read_bytes(src), protect=False)
+        if [e["hash"] for e in _read_lines(target)] != [e["hash"] for e in rows]:
+            raise OSError(f"the drive's copy of {who}'s notebook didn't read back the same")
+        atomic.write_bytes(dest / "team" / f"{nid}.identity.json", json.dumps(
+            {"id": nid, "name": names.get(nid, ""), "names": [names[nid]] if nid in names else []},
+            indent=2, ensure_ascii=False).encode("utf-8"), protect=False)
+        out[nid] = len(rows)
     return out
 
 
@@ -202,8 +286,11 @@ def _check_shared_signed(log: Path) -> tuple[list[dict], list[str], dict | None]
                         f"{fieldlog.SCHEMA}). Update Cursiv, then import it again")
     other = next((e for e in rows if e.get("device") != log.stem), None)
     if other is not None:
+        # Kept strict (U103): the team view says whose work an entry is by this label, so a log may only
+        # hold its own notebook's entries, signed or not. (A drive used on two PCs before U103 carries two
+        # labels and is refused; a drive made since keeps one label on every PC.)
         problems.append(f"entry {other.get('seq')} says it's from {str(other.get('device'))[:30]}, not {log.stem}: "
-                        "it contains entries from a different laptop than its name says")
+                        "it contains entries from a different notebook than its name says")
     man = log.with_name(log.stem + ".manifest.json")
     if not man.exists():
         problems.append("its manifest is missing")
@@ -317,6 +404,7 @@ def import_folder(folder: Path) -> dict:
             _copy_import(log, mine, rows)
             report["added"][device] = len(rows)
             report["chain_verified"].append(device)
+            _remember_name(log, device)
             continue
         try:
             have = _read_lines(mine)
@@ -346,7 +434,34 @@ def import_folder(folder: Path) -> dict:
                 f"Both are kept ({mine.name} and {keep.name}); neither was chosen.")
             continue
         report['chain_verified'].append(device)
+        _remember_name(log, device)
     return report
+
+
+def _remember_name(log: Path, device: str) -> None:
+    """Keep the name a share came with (U103), so the team view shows whose work it is. Earlier names are
+    kept too: a renamed notebook is still the same person's, by its id."""
+    from cursiv_engine.core import atomic, private_store
+    try:
+        name = str(json.loads(private_store.read_text(log.with_name(log.stem + ".manifest.json"))).get("name") or "")
+    except (OSError, ValueError, AttributeError):
+        name = ""
+    path = team_dir() / f"{device}.identity.json"
+    try:
+        old = json.loads(private_store.read_text(path))
+    except (OSError, ValueError):
+        old = {}
+    try:
+        name = fieldlog.clean_name(name) if name else ""
+    except ValueError:
+        name = ""
+    names = [n for n in old.get("names", []) if n]
+    if name and name not in names:
+        names.append(name)
+    data = {"id": device, "name": name or old.get("name", ""), "names": names,
+            "first_seen_utc": old.get("first_seen_utc") or datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    if data != old:                  # importing the same share again changes nothing on disk
+        atomic.write_text(path, json.dumps(data, indent=2, ensure_ascii=False))
 
 
 # ── The phone notebook (website/notebook): one .cursivsync file per send ────────
@@ -525,7 +640,8 @@ def sample_clashes(rows: list[dict] | None = None) -> list[str]:
     for e in rows if rows is not None else team_current():
         if e.get("sample_id"):
             by_id.setdefault(e["sample_id"], set()).add(e["device"])
-    return [f"sample {sid} was recorded on {len(devs)} laptops ({', '.join(sorted(devs))})"
+    names = fieldlog.notebook_names()
+    return [f"sample {sid} was recorded on {len(devs)} notebooks ({', '.join(sorted(fieldlog.who(d, names) for d in devs))})"
             for sid, devs in sorted(by_id.items()) if len(devs) > 1]
 
 
@@ -537,10 +653,11 @@ def team_export(folder: Path | None = None) -> dict[str, Path]:
 
 def report_text(r: dict) -> str:
     lines = []
+    names = fieldlog.notebook_names()
     for device, n in r["added"].items():
-        lines.append(f"- {device}: {n} new entr{'y' if n == 1 else 'ies'}")
+        lines.append(f"- {fieldlog.who(device, names)}: {n} new entr{'y' if n == 1 else 'ies'}")
     for device in r["unchanged"]:
-        lines.append(f"- {device}: nothing new")
+        lines.append(f"- {fieldlog.who(device, names)}: nothing new")
     for c in r["conflicts"]:
         lines.append(f"- CONFLICT {c}")
     for x in r["rejected"]:
@@ -585,6 +702,18 @@ def command(text: str, observer: str = "") -> str | None:
             return f"Not revoked: {exc}."
         return (f"Revoked {m.group(1)}'s key ({r['reason']}). New files signed by it will be refused; "
                 f"entries imported before stay in the team log, marked as from a revoked key.")
+    m = re.match(r"(?i)^field ?log name(?:\s+(.+))?$", t)
+    if m:
+        if not m.group(1):
+            me = fieldlog.identity()
+            return (f"This notebook is named {me['name']} ({me['id'][:6]})." if me.get("name") else
+                    "This notebook has no name yet. Type: field log name <the person who records in it>")
+        try:
+            me = fieldlog.set_name(m.group(1).strip().strip('"'))
+        except ValueError as exc:
+            return f"Not named: {exc}."
+        return (f"This notebook is now named {me['name']}. Its entries keep their id ({me['id'][:6]}), so work "
+                "already shared or imported stays theirs; the new name shows on the next import.")
     m = re.match(r"(?i)^field ?log (share|import)\s+(.+)$", t)
     if m:
         folder = Path(m.group(2).strip().strip('"'))
@@ -604,14 +733,18 @@ def command(text: str, observer: str = "") -> str | None:
         if not rows:
             return "No field entries yet, from this laptop or any imported one."
         devices = sorted({e["device"] for e in rows})
+        names = fieldlog.notebook_names()
         head = f"Team field log: {len(rows)} entries from {len(devices)} device{'s' if len(devices) != 1 else ''}"
+        named = [names[d] for d in devices if d in names]
+        if named:
+            head += " (" + ", ".join(named) + ")"
         damaged = team_problems()
         if damaged:
             head = ("WARNING, left out because they no longer check out:\n" + "\n".join(f"- {d}" for d in damaged)
                     + "\n" + head)
         clash = sample_clashes(rows)
         gone = {v["device"]: v for v in revoked().values()}
-        body = "\n".join(f"[{e['device'] if e['device'].startswith('phone-') else e['device'][:6]}] "
+        body = "\n".join(f"[{names.get(e['device']) or (e['device'] if e['device'].startswith('phone-') else e['device'][:6])}] "
                          f"{fieldlog.summary(e)}"
                          + (f"  (key revoked {gone[e['device']]['revoked_utc'][:10]})" if e["device"] in gone else "")
                          for e in rows[-15:])

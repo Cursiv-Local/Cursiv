@@ -1,6 +1,19 @@
 # Changelog
 
-## 3.14-U103 — Overconfidence check, silent-error lint, phone and USB safety (2026-10-25)
+## 3.14-U103 — Team field drives, overconfidence check, silent-error lint (2026-10-25)
+
+- A team with one main computer: each scientist gets a drive made in their name, records on any PC
+  (the main computer included), and the main computer takes the drives one at a time. Every entry and
+  photo arrives in that scientist's name, byte for byte; the main computer's own notebook is never
+  replaced. Before this, a drive used on two PCs was refused at import, work typed on the main computer
+  was skipped, and "Bring drive data here" let each drive's notebook replace the last one.
+- Each field notebook has its own identity (an id and a name) that travels with it. Name it in the Field
+  Notebook (Name this notebook…) or with `field log name <name>`. Existing notebooks keep their id.
+- Making a drive, choose which notebooks on the computer it carries; none is included unless ticked.
+- Team exports (CSV, JSON, GeoJSON) say whose notebook each entry and photo came from.
+- A damaged photo in a team copy is now repaired on the next share instead of staying damaged.
+- The mandatory USB checks now include a team of 20 drives (1,200 entries with photos), damage on a drive,
+  a drive pulled mid-import, and choosing whose work goes on a drive.
 
 - When you ask about one reading, a look or one sample and the answer settles it anyway ("No, your meter
   isn't broken", "Yes, you can drink it without treating it"), Cursiv adds a line saying what the answer rests
