@@ -95,3 +95,25 @@ def test_the_reset_dialog_sends_the_typed_username(env, monkeypatch):
     d2._p0_submit()
     assert d2._stack.currentIndex() == 0 and "no security questions" in d2._p0_err.text()
     assert app is not None
+
+
+def test_guessing_security_answers_is_slowed_down_and_survives_reopening(env, monkeypatch):
+    # U103: there was no limit on wrong answers.
+    ag, sq = env
+    clock = {"t": 1_000_000.0}
+    monkeypatch.setattr("time.time", lambda: clock["t"])
+    for _ in range(sq.FREE_TRIES - 1):
+        assert not sq.verify_answers(["x", "y", "z"], "owner")
+    assert sq.wait_remaining("owner") == 0
+    assert not sq.verify_answers(["x", "y", "z"], "owner")          # the 5th wrong try starts a wait
+    assert sq.wait_remaining("owner") == sq.FIRST_WAIT
+    with pytest.raises(sq.TooManyAttempts):                          # even the right answers wait
+        sq.verify_answers(["rex", "boston", "lincoln"], "owner")
+    assert sq.wait_remaining("guest") == 0                           # other accounts aren't affected
+    clock["t"] += sq.FIRST_WAIT + 1
+    assert not sq.verify_answers(["x", "y", "z"], "owner")
+    assert sq.wait_remaining("owner") == 2 * sq.FIRST_WAIT           # doubles
+    clock["t"] += 2 * sq.FIRST_WAIT + 1
+    assert sq.verify_answers(["rex", "boston", "x"], "owner")        # 2 of 3 right clears the count
+    assert sq.wait_remaining("owner") == 0
+    assert json.loads((sq._RUNTIME / "sq_attempts.json").read_text(encoding="utf-8")) == {}

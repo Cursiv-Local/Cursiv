@@ -60,16 +60,11 @@ class Result:
                 else:
                     lines.append(f'No records mention {code}, so nothing was checked for it.')
             return '\n'.join(lines)
-        if not self.records:
-            lines = ['No matching Field Notebook entries.']
-            for code, rows in self.scope.items():          # read: records that only mention the sample
-                if rows:
-                    lines.append(f'No record has sample ID {code}, but {len(rows)} mention it in their text:')
-                    lines += ['[' + row['id'] + '] ' + fieldlog.summary(row) for row in rows]
-            return '\n'.join(lines)
-        return ('Field Notebook: ' + str(self.count) + ' matching record(s).\n' +
-                ('\n'.join('[' + row['id'] + '] ' + fieldlog.summary(row) for row in self.records)
-                 if self.records else 'No matching entries were found.'))
+        # One wording for every notebook lookup (U103): field_recall.render.
+        from . import field_recall
+        sample, mentions = next(iter(self.scope.items()), ("", []))
+        return field_recall.render(dict(records=self.records, total=self.count, warnings=[], more=False, offset=0,
+                                        mentions=mentions, sample=sample))
 
 
 def execute(tool: str, args: dict, *, observer: str = '') -> Result:

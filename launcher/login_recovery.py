@@ -292,7 +292,8 @@ class ResetPasswordDialog(_BaseDialog):
                 )
                 return
         except Exception as exc:
-            self._p1_err.setText(f"Verification error: {exc}")
+            # TooManyAttempts (U103) explains the wait in its message.
+            self._p1_err.setText(str(exc) if type(exc).__name__ == "TooManyAttempts" else f"Verification error: {exc}")
             return
 
         self._stack.setCurrentIndex(2)

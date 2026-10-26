@@ -108,8 +108,9 @@ def _load() -> dict:
 
 
 def _save(data: dict) -> None:
-    _RUNTIME.mkdir(parents=True, exist_ok=True)
-    _SQ_FILE.write_text(json.dumps({"accounts": data["accounts"]}, indent=2), encoding="utf-8")
+    from cursiv_engine.core import atomic
+    # Atomic (U103): a cut-off write here would lose the only way to reset a forgotten password.
+    atomic.write_bytes(_SQ_FILE, json.dumps({"accounts": data["accounts"]}, indent=2).encode("utf-8"), protect=False)
 
 
 def _key(username: str | None) -> str:
@@ -148,26 +149,76 @@ def get_selected_questions(username: str | None = None) -> list[str]:
     return [QUESTIONS[i] for i in entry["questions"]] if entry else []
 
 
+FREE_TRIES = 5          # wrong answers allowed before waiting (U103)
+FIRST_WAIT = 30         # seconds after the 5th wrong try; doubles each time, up to MAX_WAIT
+MAX_WAIT = 3600
+
+
+class TooManyAttempts(Exception):
+    """Wrong security answers were tried too often; the wait is in seconds."""
+
+    def __init__(self, wait: int):
+        super().__init__(f"Too many wrong answers. Try again in {wait // 60} min {wait % 60} s.")
+        self.wait = wait
+
+
+def _attempts_file() -> Path:
+    return _RUNTIME / "sq_attempts.json"
+
+
+def _attempts() -> dict:
+    try:
+        data = json.loads(_attempts_file().read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def wait_remaining(username: str | None = None) -> int:
+    """Seconds until this account's answers may be tried again (0 = now)."""
+    import time
+    row = _attempts().get(_key(username)) or {}
+    return max(0, int(row.get("until", 0) - time.time()))
+
+
 def verify_answers(answers: list[str], username: str | None = None) -> bool:
-    """True when at least RESET_THRESHOLD answers match this account's stored hashes."""
-    entry = _load()["accounts"].get(_key(username))
-    if not entry:
-        return False
-    stored = entry["answers"]
-    if len(answers) != len(stored):
-        return False
-    matches = sum(_check(a, h) for a, h in zip(answers, stored))
-    return matches >= RESET_THRESHOLD
+    """True when at least RESET_THRESHOLD answers match this account's stored hashes.
+
+    U103: wrong tries are counted per account on disk (closing the dialog doesn't reset them). After
+    FREE_TRIES, each wrong try means waiting FIRST_WAIT seconds, doubling, up to MAX_WAIT; during a wait
+    the answers aren't checked at all and TooManyAttempts is raised. A right answer clears the count."""
+    import time
+    from cursiv_engine.core import atomic
+    key = _key(username)
+    wait = wait_remaining(username)
+    if wait:
+        raise TooManyAttempts(wait)
+    entry = _load()["accounts"].get(key)
+    ok = False
+    if entry:
+        stored = entry["answers"]
+        if len(answers) == len(stored):
+            ok = sum(_check(a, h) for a, h in zip(answers, stored)) >= RESET_THRESHOLD
+    data = _attempts()
+    if ok:
+        data.pop(key, None)
+    else:
+        row = data.get(key) or {"wrong": 0}
+        row["wrong"] = int(row.get("wrong", 0)) + 1
+        extra = row["wrong"] - FREE_TRIES + 1            # the FREE_TRIES-th wrong try starts the first wait
+        row["until"] = (time.time() + min(MAX_WAIT, FIRST_WAIT * 2 ** (extra - 1))) if extra > 0 else 0
+        data[key] = row
+    atomic.write_bytes(_attempts_file(), json.dumps(data).encode("utf-8"), protect=False)
+    return ok
 
 
 def clear_security_questions(username: str | None = None, *, account_hash: str = "") -> None:
-    """Remove one account's set (by username or its hash), or every set when neither is given."""
-    try:
-        if not username and not account_hash:
-            _SQ_FILE.unlink(missing_ok=True)
-            return
-        data = _load()
-        data["accounts"].pop(account_hash or _uhash(username), None)
-        _save(data)
-    except Exception:
-        pass
+    """Remove one account's set (by username or its hash), or every set when neither is given.
+    A failure raises (U103): left behind, a removed person's answers could reset a new account
+    with the same name. Every caller shows the error and stops."""
+    if not username and not account_hash:
+        _SQ_FILE.unlink(missing_ok=True)
+        return
+    data = _load()
+    data["accounts"].pop(account_hash or _uhash(username), None)
+    _save(data)

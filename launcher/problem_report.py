@@ -43,6 +43,11 @@ _SECRET_PATTERNS = [
 _EMAIL = re.compile(r"[\w.+-]+@[\w-]+\.[\w.-]+")
 
 
+def has_secret(text: str) -> bool:
+    """A key, token or password in the text (the same patterns scrub() removes)."""
+    return any(pat.search(text or "") for pat in _SECRET_PATTERNS)
+
+
 def scrub(text: str) -> str:
     for pat in _SECRET_PATTERNS:
         text = pat.sub("[removed]", text)

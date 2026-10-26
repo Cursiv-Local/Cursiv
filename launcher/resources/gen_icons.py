@@ -1,110 +1,39 @@
 """
-Generate cursiv.ico and tray.ico for the Cursiv launcher.
+Generate cursiv.ico, tray.ico and cursiv_256.png for the Cursiv launcher from the logo
+(icons/cursiv-logo-source.png, the same image the website uses since U103).
 Run: python launcher/resources/gen_icons.py
 """
 from pathlib import Path
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 OUT = Path(__file__).parent / "icons"
-OUT.mkdir(exist_ok=True)
-
-BG    = (8,   9,  12, 255)   # matches the website's --bg: #08090C
-GOLD  = (255, 215,  0, 255)
+SOURCE = OUT / "cursiv-logo-source.png"
 
 SIZES = [16, 32, 48, 64, 128, 256]
 
-# Bold serif "C" (for Cursiv) -- Georgia Bold is the closest system font to
-# the site's EB Garamond branding, and stays legible down to 16px, which a
-# thinner or more decorative face would not.
-_C_GLYPH = "C"
-_C_FONT_CANDIDATES = [
-    "C:/Windows/Fonts/georgiab.ttf",   # Georgia Bold
-    "georgiab.ttf",
-]
-
-
-def _c_font(size: int) -> ImageFont.FreeTypeFont | None:
-    for path in _C_FONT_CANDIDATES:
-        try:
-            return ImageFont.truetype(path, size)
-        except OSError:
-            continue
-    return None
-
-
-def _draw_c(draw: ImageDraw.ImageDraw, cx: float, cy: float, size: int, scale: float):
-    """Gold serif 'C', centered -- falls back to a drawn arc if no font is found."""
-    font = _c_font(int(size * scale))
-    if font is not None:
-        bbox = draw.textbbox((0, 0), _C_GLYPH, font=font)
-        gw, gh = bbox[2] - bbox[0], bbox[3] - bbox[1]
-        draw.text(
-            (cx - gw / 2 - bbox[0], cy - gh / 2 - bbox[1]),
-            _C_GLYPH, font=font, fill=GOLD,
-        )
-        return
-
-    # Font unavailable on this machine -- draw a plain arc so the icon is
-    # never blank.
-    r = size * scale * 0.36
-    w = max(2, int(size * scale * 0.12))
-    draw.arc([cx - r, cy - r, cx + r, cy + r], start=55, end=305, fill=GOLD, width=w)
-
 
 def _draw_cursiv(size: int) -> Image.Image:
-    """Black circle, gold serif 'C' -- the app icon."""
-    img  = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx = cy = size / 2
-
-    # Background circle
-    pad = max(1, int(size * 0.04))
-    draw.ellipse([pad, pad, size - pad, size - pad], fill=BG)
-
-    _draw_c(draw, cx, cy, size, 0.62)
-    return img
+    """The logo on its dark disc, with transparent corners (no black square on the desktop)."""
+    big = size * 4                                   # mask drawn large, then scaled: smooth edge
+    logo = Image.open(SOURCE).convert("RGBA").resize((big, big), Image.LANCZOS)
+    mask = Image.new("L", (big, big), 0)
+    pad = big * 0.02
+    ImageDraw.Draw(mask).ellipse([pad, pad, big - pad, big - pad], fill=255)
+    logo.putalpha(mask)
+    return logo.resize((size, size), Image.LANCZOS)
 
 
-def _draw_tray(size: int) -> Image.Image:
-    """Transparent bg, gold 'C' only (looks good on dark/light taskbar)."""
-    img  = Image.new("RGBA", (size, size), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(img)
-    cx = cy = size / 2
-    _draw_c(draw, cx, cy, size, 0.85)
-    return img
-
-
-def _save_ico(draw_fn, path: Path):
-    """
-    Pillow ICO writer: pass the largest frame; specify sizes= list
-    and it auto-downscales each size from that master image.
-    """
-    master = draw_fn(256)
-    master.save(
-        path,
-        format="ICO",
-        sizes=[(s, s) for s in SIZES],
-    )
-    # Verify
-    check = Image.open(path)
-    frame_sizes = []
-    try:
-        i = 0
-        while True:
-            check.seek(i)
-            frame_sizes.append(check.size)
-            i += 1
-    except EOFError:
-        pass
-    print(f"  {path.name}: {len(frame_sizes)} frames {frame_sizes} — {path.stat().st_size:,} bytes")
+def _save_ico(path: Path):
+    """Pillow's ICO writer scales each listed size down from the largest frame."""
+    _draw_cursiv(256).save(path, format="ICO", sizes=[(s, s) for s in SIZES])
+    print(f"  {path.name}: {sorted(Image.open(path).info['sizes'])} — {path.stat().st_size:,} bytes")
 
 
 def main():
     print("Generating Cursiv icons...")
-    _save_ico(_draw_cursiv, OUT / "cursiv.ico")
-    _save_ico(_draw_tray,   OUT / "tray.ico")
-    # 256 PNG for Inno Setup wizard image
-    _draw_cursiv(256).save(OUT / "cursiv_256.png")
+    _save_ico(OUT / "cursiv.ico")
+    _save_ico(OUT / "tray.ico")          # the same mark: the disc keeps it visible on light and dark taskbars
+    _draw_cursiv(256).save(OUT / "cursiv_256.png")   # window icon, Inno Setup wizard, macOS .icns
     print("Done.")
 
 

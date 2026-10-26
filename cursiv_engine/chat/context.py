@@ -215,44 +215,6 @@ def load_vault_context(runtime: ChatRuntime) -> str:
     return ""
 
 
-def _legacy_vault_context(runtime: ChatRuntime) -> str:
-    registry_path = runtime.APP_DATA / "agent_registry.json"
-    vault_dir     = runtime.APP_DATA / "vault"
-    if not registry_path.exists():
-        return ""
-    try:
-        registry    = runtime.json.loads(registry_path.read_text(encoding="utf-8"))
-        agents_meta = registry.get("agents", {})
-        if not agents_meta:
-            return ""
-
-        lines = ["\n\n---\n## PIFORGE PHASE INTELLIGENCE (vault-active)\n"]
-
-        for agent_id, meta in list(agents_meta.items())[:14]:
-            agent_dir = vault_dir / agent_id
-            versions  = sorted(agent_dir.glob("v*.json")) if agent_dir.exists() else []
-            if not versions:
-                continue
-            try:
-                data = runtime.json.loads(versions[-1].read_text(encoding="utf-8"))
-            except Exception:
-                continue
-
-            km          = data.get("knowledge_map", {})
-            name        = data.get("name", meta.get("name", "?"))
-            domain      = km.get("domain", "")
-            directive   = (km.get("core_directive") or "")[:150].replace("\n", " ")
-            translation = (km.get("cursive_v2_translation") or "")[:150].replace("\n", " ")
-
-            lines.append(f"**{name}** [{domain}]: {directive}")
-            if translation:
-                lines.append(f"  V2: {translation}")
-
-        lines.append("\n---")
-        return "\n".join(lines)
-    except Exception:
-        return ""
-
 def _ref_evidence(runtime: ChatRuntime) -> dict:
     """id -> reference.evidence() for the entries given this turn."""
     if not runtime._REF_SHOWN or not runtime.turn_policy.current().inspect:

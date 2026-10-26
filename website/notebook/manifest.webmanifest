@@ -7,5 +7,5 @@
   "display": "standalone",
   "background_color": "#0e1016",
   "theme_color": "#0e1016",
-  "icons": [{ "src": "/assets/cursiv_256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" }]
+  "icons": [{ "src": "/assets/cursiv-logo-256.png", "sizes": "256x256", "type": "image/png", "purpose": "any" }]
 }

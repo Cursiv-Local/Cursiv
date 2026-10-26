@@ -318,8 +318,10 @@ def load_territories() -> dict[str, dict]:
     if TERRITORIES_FILE.exists():
         try:
             return json.loads(TERRITORIES_FILE.read_text(encoding="utf-8"))
-        except Exception:
-            pass
+        except (OSError, ValueError):
+            # U103: a damaged file used to be overwritten with the defaults. It's moved aside
+            # instead, so the person's own definitions can still be recovered by hand.
+            TERRITORIES_FILE.replace(TERRITORIES_FILE.with_name(f"territories.damaged-{int(time.time())}.json"))
     _write_default_territories()
     return _DEFAULT_TERRITORIES.copy()
 
@@ -432,7 +434,7 @@ def save_strand(
         # returning "" like the caller expects.
         try:
             print(f"  [strand save failed: {type(exc).__name__}: {exc}]")
-        except Exception:
+        except Exception:  # best-effort: no console in the packaged build; the failure is still returned
             pass
         return ""
 

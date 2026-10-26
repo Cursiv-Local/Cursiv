@@ -256,21 +256,6 @@ def verify_usb(runtime: UsbRuntime, plan: list[tuple[Path, Path]]) -> list[str]:
             problems.append(f"different: {dest}")
     return problems
 
-def wipe_private_copy(runtime: UsbRuntime, root: Path) -> bool:
-    """Remove personal data that an earlier private copy put on the drive.
-    Only acts when the marker says a private copy was made -- data the drive's
-    own user created later on a fresh copy is left alone."""
-    if not (root / runtime.PRIVATE_MARKER).exists():
-        return False
-    runtime.shutil.rmtree(root / "Home" / ".cursiv", ignore_errors=True)
-    prog = root / "Cursiv"
-    if prog.is_dir():
-        for d in sorted(prog.rglob(".cursiv"), key=lambda p: len(p.parts), reverse=True):
-            if d.is_dir():
-                runtime.shutil.rmtree(d, ignore_errors=True)
-    (root / runtime.PRIVATE_MARKER).unlink(missing_ok=True)
-    return True
-
 def copy_files(runtime: UsbRuntime, todo: list[tuple[Path, Path]], progress, cancel: threading.Event) -> None:
     """Copy each file to a .part file, flush it to disk, then rename it into
     place -- an interrupted copy never leaves a half-written file behind."""
@@ -353,7 +338,6 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
 
         # Program files only; personal data is compared and updated separately
         # below (usb_sync), so drive data that is newer is never overwritten.
-        wiped = False
         plan = runtime.update_plan(root, runtime.build_plan(models, include_private, osrc))
         todo = [(s, d) for s, d in plan if runtime._needs_copy(s, d)]
         data_dir = root / "Home" / ".cursiv"
@@ -428,8 +412,6 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         if tmp_zip_dir:
             runtime.shutil.rmtree(tmp_zip_dir, ignore_errors=True)
         note = data_note + ' Private data on this drive is not encrypted by Cursiv.'
-        if wiped:
-            note += " The private data from the earlier copy was removed from the drive."
         sig.done.emit(True, f"Done. Plug the drive into any Windows PC and double-click "
                             f"\"Start Cursiv\".{note}")
     except InterruptedError:

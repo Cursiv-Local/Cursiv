@@ -141,12 +141,14 @@ def request(text: str) -> dict | None:
 
 
 def render(result: dict, *, summarize: bool = False) -> str:
+    """The one way notebook lookups are shown (U103: chat lookups and notebook_tools reads used to
+    word the same answer two ways)."""
     if 'clarification' in result:
         return result['clarification']
-    lines = ['Field-log retrieval: ' + str(result['total']) + ' matching record(s).']
-    lines += ['Warning: ' + w for w in result['warnings']]
+    lines = [('Field Notebook: ' + str(result['total']) + ' matching record(s).') if result['records'] or result['total']
+             else 'No matching Field Notebook entries.']
+    lines += ['Warning: ' + w for w in result.get('warnings', [])]
     if not result['records']:
-        lines.append('No matching entries were found in the readable, integrity-checked records.')
         if result.get('mentions'):
             lines.append(f"No record has sample ID {result['sample']}, but {len(result['mentions'])} mention it in their text:")
             lines += ['[' + row['id'] + '] ' + fieldlog.summary(row) for row in result['mentions']]
@@ -154,7 +156,7 @@ def render(result: dict, *, summarize: bool = False) -> str:
         lines.append('Extractive summary of recorded observations; no causal interpretation was generated.')
     for row in result['records']:
         lines.append('[' + row['id'] + '] ' + fieldlog.summary(row))
-    if result['more']:
+    if result.get('more'):
         lines.append(f"More records available. Repeat with offset {result['offset'] + len(result['records'])}.")
     return '\n'.join(lines)
 
