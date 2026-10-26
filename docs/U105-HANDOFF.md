@@ -6,7 +6,7 @@ runs out of usage. Owner: Joshua Winkler. Repo: https://github.com/Cursiv-Local/
 **`claude/u105`** (from `main` at `b5d457d`, after the U104 release). For the separate Raspberry Pi work see
 `docs/FIELD-STATION-HANDOFF.md`.
 
-Last updated: 2026-10-26, 2 of 4 items done.
+Last updated: 2026-10-26, 3 of 4 items done.
 
 ## What U105 is
 
@@ -16,7 +16,7 @@ Four fixes from an outside review (the owner approved "Start U105" with exactly 
 |---|---|---|
 | 1 | Drive signing-key passphrase, and a warning when a drive is made | **done**, commits `1c13882` + `14065aa` (fix) |
 | 2 | Strict, photo-complete team import | **done**, commit `9eb3161` |
-| 3 | Vosk model checksum + safe unzip limits (also for the Ollama zip) | **not started** |
+| 3 | Vosk model checksum + safe unzip limits (also for the Ollama zip) | **done**, commit `9b9089c` |
 | 4 | Release-document consistency test | **not started** |
 
 Then: full suite, CHANGELOG + `docs/RELEASE-U105.md`, version bump, PR, CI, merge, release (runbook below).
@@ -49,7 +49,9 @@ Then: full suite, CHANGELOG + `docs/RELEASE-U105.md`, version bump, PR, CI, merg
   count real uncompressed bytes while reading (sizes in a zip can lie) and stop past the limit; extract
   into a temporary folder next to `dest`, then `os.replace` into place; never overwrite an existing folder.
   Limits: Vosk 2,000 files / 200 MB; Ollama 20,000 files / 8 GB (check the real unpacked size first).
-- Pin the Vosk zip: download it once, compute SHA-256, store it as `_VOSK_SHA256` and check before
+- Pin the Vosk zip: MEASURED 2026-10-26 by downloading it: SHA-256
+  `30f26242c4eb449f948e42cb302dd7a686cb29a3423a8367f99ff41780942498`, 41,205,931 bytes, 20 files, 70,898,967
+  bytes unpacked, one top folder `vosk-model-small-en-us-0.15/`. Store it as `_VOSK_SHA256` and check before
   extracting (delete the zip and raise on mismatch, like `_download_ollama`). Do NOT guess the hash.
 - Tests (`tests/test_safe_zip.py`): traversal names, absolute names, symlink entries, too many files, a zip
   whose declared sizes understate the data, a good zip extracted completely, checksum mismatch refused,
@@ -95,5 +97,11 @@ commit/push/release only when the owner asks (he asked for U105 work; ask before
 
 ## Progress log (newest first)
 
+- 2026-10-26: item 3 committed (`9b9089c`): `cursiv_engine/core/safe_zip.py` (`extract(zip, dest, max_files,
+  max_bytes, max_file_bytes)`, raises `UnsafeZip`), `voice_agent._install_vosk_zip()` checks `_VOSK_SHA256`
+  then unpacks via safe_zip into a temp folder and moves `vosk-model-small-en-us-0.15/` into place;
+  `usb_ops._download_ollama` uses safe_zip (20,000 files / 12 GB / 4 GB per file). `tests/test_safe_zip.py`
+  (16; the real-download pin check runs when `CURSIV_VOSK_ZIP` points at the downloaded zip, otherwise
+  skipped). Next: item 4 `tests/test_release_docs.py`, then the release runbook.
 - 2026-10-26: items 1 and 2 committed on `claude/u105` (`1c13882`, `14065aa`, `9eb3161`); branch pushed.
   Next: item 3 (safe_zip + Vosk pin), item 4 (release-doc test), then the release runbook.
