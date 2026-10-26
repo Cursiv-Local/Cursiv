@@ -416,9 +416,10 @@ class UsbMakerDialog(QDialog):
         lay.addWidget(self._field)
 
         # Whose drive, and whose work it carries (U103)
+        lay.addWidget(QLabel("Whose drive is this? (optional; their field notebook is kept in this name)"))
         self._workspace = QLineEdit()
         self._workspace.setMaxLength(60)
-        self._workspace.setPlaceholderText("Whose drive is this? (optional: their name)")
+        self._workspace.setPlaceholderText("Their name, e.g. Ana Ruiz")
         self._workspace.setToolTip("The drive gets its own field notebook in this name. When it comes back, its work "
                                    "goes into this computer's team view under this name, never over this "
                                    "computer's notebook.")
@@ -426,7 +427,7 @@ class UsbMakerDialog(QDialog):
         self._team_label = QLabel("Also put these notebooks on the drive (read only there):")
         lay.addWidget(self._team_label)
         self._team_list = QListWidget()
-        self._team_list.setMaximumHeight(110)
+        self._team_list.setMaximumHeight(170)
         lay.addWidget(self._team_list)
         self._load_notebooks()
 
@@ -687,7 +688,8 @@ class UsbMakerDialog(QDialog):
         except (OSError, ValueError):
             books = []
         for b in books:
-            label = (b["name"] or b["id"]) + (" (this computer)" if b["own"] else "") + f" · {b['entries']} entries"
+            label = ((b["name"] or b["id"]) + (" (this computer)" if b["own"] else "")
+                     + f" · {b['entries']} entr{'y' if b['entries'] == 1 else 'ies'}")
             item = QListWidgetItem(label)
             item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
             item.setCheckState(Qt.CheckState.Unchecked)

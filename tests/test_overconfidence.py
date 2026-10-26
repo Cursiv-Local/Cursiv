@@ -91,3 +91,11 @@ def test_a_measurement_is_not_read_as_a_saturation_claim():
     assert "14.6 mg/L" in note and "12.5" not in note
     assert sc.do_note("Dissolved oxygen saturation: my reading at 18.6 °C was 4.2 mg/L.") == ""
     assert "14.3 mg/L" in sc.do_note("DO saturation at 18.6 °C is 14.3 mg/L")
+
+
+def test_a_saturation_range_is_still_checked():
+    # The demo's live answer (U103): "At 10 °C, the solubility of oxygen in water is about 12.5–13.0 mg/L".
+    d = ("No, your meter is not broken. 12.5 mg/L is well within the normal range for water at 10 °C.\n"
+         "At 10 °C, the solubility of oxygen in water is about 12.5–13.0 mg/L — the maximum it can hold.")
+    note = sc.do_note(d)
+    assert "13.0 mg/L" in note and "11.29" in note
