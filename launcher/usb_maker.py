@@ -266,12 +266,6 @@ def verify_usb(plan: list[tuple[Path, Path]]) -> list[str]:
 
 
 
-def wipe_private_copy(root: Path) -> bool:
-    """Compatibility entry point; implementation in chat.usb_ops."""
-    return _usb_ops.wipe_private_copy(_runtime(), root)
-
-
-
 def copy_files(todo: list[tuple[Path, Path]], progress, cancel: threading.Event) -> None:
     """Compatibility entry point; implementation in chat.usb_ops."""
     return _usb_ops.copy_files(_runtime(), todo, progress, cancel)

@@ -115,30 +115,24 @@ def test_stopped_copy_leaves_no_half_written_file():
         shutil.rmtree(drive, ignore_errors=True)
 
 
-def test_fresh_copy_removes_an_earlier_private_copy():
+def test_updating_a_drive_never_removes_its_data_or_models():
+    # U103: wipe_private_copy (unused since U83, when updates stopped resetting drive data) is gone.
+    # Even with the private-copy marker, only program files the build dropped are pruned.
     drive = _tmp()
     try:
-        _write(drive / "Home" / ".cursiv" / "config.json", '{"gemini_key": "secret"}')
-        _write(drive / "Cursiv" / "_internal" / ".cursiv" / "memory.json", "{}")
+        notes = _write(drive / "Home" / ".cursiv" / "fieldlog" / "field_log.jsonl", "{}")
+        older = _write(drive / "Cursiv" / ".cursiv.moved-2026-01-01" / "memory.json", "{}")
+        model = _write(drive / "Models" / "blobs" / "sha256-pulled-on-another-pc", "x")
         _write(drive / um.PRIVATE_MARKER, "private")
-        assert um.wipe_private_copy(drive) is True
-        assert not (drive / "Home" / ".cursiv").exists()
-        assert not (drive / "Cursiv" / "_internal" / ".cursiv").exists()
-        assert not (drive / um.PRIVATE_MARKER).exists()
+        dropped = _write(drive / "Cursiv" / "_internal" / "old_library.dll", "x")
+        kept = _write(drive / "Cursiv" / "_internal" / "current.dll", "x")
+        stale = um.stale_files(drive, [(kept, kept)])
+        assert stale == [dropped]
+        assert not hasattr(um, "wipe_private_copy")
+        assert notes.exists() and older.exists() and model.exists()
     finally:
         shutil.rmtree(drive, ignore_errors=True)
 
-
-def test_data_the_drive_user_made_is_kept_without_the_marker():
-    drive = _tmp()
-    try:
-        theirs = _write(drive / "Home" / ".cursiv" / "memory.json", "{}")
-        assert um.wipe_private_copy(drive) is False and theirs.exists()
-    finally:
-        shutil.rmtree(drive, ignore_errors=True)
-
-
-# ── Login ───────────────────────────────────────────────────────────────────
 
 def _temp_login(monkeypatch):
     from cursiv_engine.guardian import access_gate as ag
