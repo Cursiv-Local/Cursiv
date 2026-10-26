@@ -3,10 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cursiv: Open-Source Offline AI Assistant for Windows</title>
-<meta name="description" content="Cursiv is an open-source, local-first AI assistant for Windows, built for fieldwork and research. Supported features work offline after setup.">
+<title>Cursiv: Offline Field Research Software with a Tamper-Evident Notebook</title>
+<meta name="description" content="Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.">
 <link rel="canonical" href="https://cursiv.us/">
-<meta property="og:title" content="Cursiv: Open-Source Offline AI Assistant for Windows">
+<meta property="og:title" content="Cursiv: Offline Field Research Software with a Tamper-Evident Notebook">
 <meta property="og:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
 <meta property="og:image" content="https://cursiv.us/assets/cursiv-social-preview-20261021.png">
 <meta property="og:image:width" content="1200">
@@ -17,7 +17,7 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cursiv: Open-Source Offline AI Assistant for Windows">
+<meta name="twitter:title" content="Cursiv: Offline Field Research Software with a Tamper-Evident Notebook">
 <meta name="twitter:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
 <meta name="twitter:image" content="https://cursiv.us/assets/cursiv-social-preview-20261021.png">
 <meta name="twitter:image:alt" content="Cursiv, local-first AI for Windows fieldwork and research, with offline-capable supported features.">
@@ -34,8 +34,25 @@
   "@type": "WebSite",
   "@id": "https://cursiv.us/#website",
   "name": "Cursiv",
-  "alternateName": "Cursiv Offline AI",
+  "alternateName": "Cursiv field research software",
   "url": "https://cursiv.us/"
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "SoftwareApplication",
+  "@id": "https://cursiv.us/#software",
+  "name": "Cursiv",
+  "applicationCategory": "ScienceApplication",
+  "applicationSubCategory": "Field research notebook",
+  "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+  "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+  "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+  "downloadUrl": "https://cursiv.us/start",
+  "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+  "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+  "featureList": ["Tamper-evident field notebook with signed exports", "Field calculations worked out by code", "Runs from a USB drive", "Works offline after setup", "Optional local AI assistant"]
 }
 </script>
 </head>
@@ -46,6 +63,7 @@
     <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv_256.png" alt=""> Cursiv</a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
     <nav class="nav-links" id="navLinks" aria-label="Main navigation">
+      <a href="/field-research">Field research</a>
       <a href="#capabilities">Features</a>
       <a href="#testing">Testing</a>
       <a href="#faq">Questions</a>
@@ -60,8 +78,8 @@
   <div class="wrap grid2">
     <div>
       <span class="eyebrow">Free · Open source · Windows</span>
-      <h1>Cursiv: offline AI for your PC.</h1>
-      <p class="lede">An AI assistant for fieldwork, research and everyday questions. Runs fully offline on your Windows PC through Ollama after setup.</p>
+      <h1>Offline field research software.</h1>
+      <p class="lede">A tamper-evident field notebook, field calculations checked against published methods, and a workspace that runs from a USB drive, with an optional local AI assistant. Works offline on your Windows PC after setup. <a href="/field-research">See how it works for field research</a>.</p>
       <div class="cta-row">
         <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U102/Cursiv-Setup-3.14-U102.exe">Download the latest release</a>
         <a class="btn btn-ghost" href="/start">Setup guide</a>
@@ -124,7 +142,7 @@
     <div class="faq">
       <details><summary>What do I need to run it?</summary><p>Windows 10 or 11, 64-bit, with 8 GB RAM as a starting point; 16 GB is recommended. Allow space for Cursiv, Ollama and your model. A graphics card helps, but speed depends on the model and hardware. Setup can install Ollama and download a model. See the <a href="/local-ai-hardware-requirements">hardware guide</a> and <a href="/start">installation steps</a>.</p></details>
       <details><summary>What works without internet?</summary><p>After setup, local chat, memory, saved conversations and supported local tools work with their required files installed. Offline mode blocks outside connections and stays on after a restart. Web search, cloud AI, the website phone companion, downloads and update checks need a connection. Optional online features send the content needed for their requests. <a href="/open-source-offline-ai">Read the offline guide</a>.</p></details>
-      <details id="privacy"><summary>Does local storage mean encryption?</summary><p>No. Conversations and memories are stored locally but are not encrypted on disk. The local login does not replace disk encryption. Saved API keys use Windows account protection. If you use an online provider or the website phone companion, those services have separate data paths. The <a href="/privacy/">Privacy Policy</a> explains what is stored, what can leave the computer and the website's download analytics.</p></details>
+      <details id="privacy"><summary>Does local storage mean encryption?</summary><p>On a computer, yes: since U97 conversations, memories, the field notebook and its photos are encrypted on disk with your passphrase, and there's no way in without it. A Cursiv USB drive stays readable by design, so it works on any computer; use full-drive encryption if you carry sensitive records. Saved API keys use Windows account protection. If you use an online provider or the website phone companion, those services have separate data paths. The <a href="/privacy/">Privacy Policy</a> explains what is stored, what can leave the computer and the website's download analytics.</p></details>
       <details id="architecture"><summary>How are answers checked?</summary><p>Ollama generates a local answer. Cursiv can supply relevant reference material, saved information and results from supported calculations, then check selected claims. These checks are limited and can miss mistakes. Some reference entries still lack published sources, and none has medical-professional review. The <a href="/ai-reliability-testing">testing guide</a> explains the evidence; <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/TECH.md">technical documentation</a> covers the architecture.</p></details>
       <details><summary>Is it free? Which platforms are supported?</summary><p>Cursiv's source code is free under the MIT license. Models have their own licenses; review the terms of the model you choose. Windows is the main platform. An early Apple Silicon Mac build is on the <a href="/start">download page</a>; Linux is not yet supported. Portable USB/SSD operation is Windows-only, and broader field validation is still needed.</p></details>
       <details><summary>Why does Windows show an unknown publisher?</summary><p>Windows publisher signing is pending; Release manifests are owner-signed with a separate pinned key. Cursiv is seeking open-source signing support from the SignPath Foundation. Review the source, release notes and published SHA-256 checksum before deciding to install. The <a href="/start#code-signing">download guide</a> explains signing status and setup. Public source code and a matching checksum identify a build; they do not guarantee it is free of defects.</p></details>
