@@ -6,7 +6,7 @@ runs out of usage. Owner: Joshua Winkler. Repo: https://github.com/Cursiv-Local/
 **`claude/u105`** (from `main` at `b5d457d`, after the U104 release). For the separate Raspberry Pi work see
 `docs/FIELD-STATION-HANDOFF.md`.
 
-Last updated: 2026-10-26, 3 of 4 items done.
+Last updated: 2026-10-26, all 4 items done; release prep next.
 
 ## What U105 is
 
@@ -17,7 +17,7 @@ Four fixes from an outside review (the owner approved "Start U105" with exactly 
 | 1 | Drive signing-key passphrase, and a warning when a drive is made | **done**, commits `1c13882` + `14065aa` (fix) |
 | 2 | Strict, photo-complete team import | **done**, commit `9eb3161` |
 | 3 | Vosk model checksum + safe unzip limits (also for the Ollama zip) | **done**, commit `9b9089c` |
-| 4 | Release-document consistency test | **not started** |
+| 4 | Release-document consistency test | **done**: `tests/test_release_docs.py` |
 
 Then: full suite, CHANGELOG + `docs/RELEASE-U105.md`, version bump, PR, CI, merge, release (runbook below).
 
@@ -97,6 +97,11 @@ commit/push/release only when the owner asks (he asked for U105 work; ask before
 
 ## Progress log (newest first)
 
+- 2026-10-26: item 4 committed: `tests/test_release_docs.py` (current version has RELEASE notes + CHANGELOG
+  heading; every linked verification doc exists except the current release's own; README names U<n> or
+  U<n-1>; website has cursiv-owner-release-U<k>.json for every verified release >= U89; docs/README.md lists
+  every verified release >= U100). Checked it fails when a verification doc is missing. Next: CHANGELOG +
+  docs/RELEASE-U105.md + version bump to 3.14-U105, full suite, PR. Release only when the owner says so.
 - 2026-10-26: item 3 committed (`9b9089c`): `cursiv_engine/core/safe_zip.py` (`extract(zip, dest, max_files,
   max_bytes, max_file_bytes)`, raises `UnsafeZip`), `voice_agent._install_vosk_zip()` checks `_VOSK_SHA256`
   then unpacks via safe_zip into a temp folder and moves `vosk-model-small-en-us-0.15/` into place;
