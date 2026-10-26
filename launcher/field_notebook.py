@@ -138,6 +138,7 @@ class FieldNotebookDialog(QDialog):
                                                                   "QPushButton::menu-indicator { image: none; width: 0; }")
         imp_menu = QMenu(imp)
         imp_menu.addAction("From a USB stick or shared folder…", self._import)
+        imp_menu.addAction("From a USB stick or shared folder, every photo required…", self._import_strict)
         imp_menu.addAction("From the phone notebook (.cursivsync file)…", self._import_phone)
         imp_menu.addAction("Receive from a phone over Wi-Fi…", self._receive_phone)
         imp_menu.addSeparator()
@@ -518,6 +519,14 @@ class FieldNotebookDialog(QDialog):
         folder = QFileDialog.getExistingDirectory(self, "Import field logs from…")
         if folder:
             self._show_import(lambda: fieldsync.import_folder(Path(folder)))
+
+    def _import_strict(self):
+        """U105: refuse a notebook whose photos aren't all present and intact, so the import is complete."""
+        from pathlib import Path
+        from cursiv_engine.core import fieldsync
+        folder = QFileDialog.getExistingDirectory(self, "Import field logs (every photo required) from…")
+        if folder:
+            self._show_import(lambda: fieldsync.import_folder(Path(folder), strict=True))
 
     def _show_import(self, run):
         from cursiv_engine.core import fieldsync

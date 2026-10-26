@@ -263,3 +263,24 @@ def test_naming_a_notebook_keeps_its_work(team):
         assert "Not named" in fieldsync.command("field log name " + "x" * 61)
         fieldlog.add(observer="lead", note="second")
         assert {e["device"] for e in fieldlog.entries()} == {nid}
+
+
+def test_strict_import_refuses_a_notebook_with_a_damaged_photo_and_copies_nothing(team):
+    # U105 (outside review): an import that must be a complete dataset, or nothing.
+    good, bad = team.drive("Ana Ruiz"), team.drive("Ben Okafor")
+    _record(team, good, "Ana Ruiz", 6)
+    _record(team, bad, "Ben Okafor", 6)
+    p = next((bad / fieldsync.SHARE_DIR).glob("photos/*"))
+    p.write_bytes(p.read_bytes()[:-1] + b"\x00")
+    with team.at("main"):
+        photos_before = _snapshot(fieldlog.log_dir() / "photos") if (fieldlog.log_dir() / "photos").exists() else {}
+        r = fieldsync.import_folder(bad, strict=True)
+        assert not r["added"] and "Strict import refused" in r["rejected"][0]
+        bens = [f for f in fieldsync.team_dir().glob("*.jsonl")] if fieldsync.team_dir().exists() else []
+        assert bens == []                                                   # none of Ben's entries
+        now = _snapshot(fieldlog.log_dir() / "photos") if (fieldlog.log_dir() / "photos").exists() else {}
+        assert now == photos_before                                         # and none of his photos
+        assert sum(fieldsync.import_folder(good, strict=True)["added"].values()) == 6   # complete: imported
+        r = fieldsync.import_folder(bad)                                     # the default keeps entries, names the photo
+        assert sum(r["added"].values()) == 6 and list(r["photos_missing"].values()) == [1]
+        assert "Strict import refused" in fieldsync.command(f'field log import --strict "{bad}"')   # the command too
