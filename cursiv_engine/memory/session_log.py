@@ -24,7 +24,7 @@ def _failed(stage: str, exc: BaseException) -> None:
     try:
         from cursiv_engine.memory import formation
         formation.record(stage, exc)
-    except Exception:
+    except Exception:  # best-effort: the failure log itself could not be written
         pass
 
 ROOT         = Path(__file__).parent.parent.parent
@@ -147,7 +147,7 @@ def get_boot_summary() -> dict:
             continue
         try:
             session_date = date.fromisoformat(f.stem)
-        except Exception:
+        except Exception:  # best-effort: not a dated session file
             continue
 
         # Extract short topic labels from last few user messages
@@ -181,7 +181,7 @@ def load_session_context(max_exchanges: int = 4) -> str:
             continue
         try:
             session_date = date.fromisoformat(f.stem)
-        except Exception:
+        except Exception:  # best-effort: not a dated session file
             continue
 
         recent = entries[-max_exchanges:]

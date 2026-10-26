@@ -159,7 +159,7 @@ def record(stage: str, error: BaseException | None = None) -> None:
                 _logger.addHandler(RotatingFileHandler(folder / 'memory.log', maxBytes=65536, backupCount=1,
                                                        encoding='utf-8'))
             _logger.warning('%s%s', stage, ':' + type(error).__name__ if error else '')
-        except OSError:
+        except OSError:  # best-effort: this is the failure log itself
             pass
 
 

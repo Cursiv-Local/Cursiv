@@ -106,7 +106,7 @@ def scan(person: str) -> list[dict]:
             seen.add(key)
             found.append({"store": "style", "id": text, "code": _style_code(text), "reason": reason,
                           "preview": _preview(text)})
-    except (OSError, ValueError):
+    except (OSError, ValueError):  # best-effort: a read-only suggestion list; nothing is changed
         pass
     return found
 

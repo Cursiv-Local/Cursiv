@@ -130,7 +130,7 @@ def _save_cache() -> None:
     try:
         CURSIV_DIR.mkdir(parents=True, exist_ok=True)
         _atomic.write_text(EMB_CACHE_FILE, json.dumps(_load_cache()))
-    except Exception:
+    except Exception:  # best-effort: a cache; rebuilt when missing
         pass
 
 
@@ -164,7 +164,7 @@ def _pull_embed_model() -> None:
         with urllib.request.urlopen(req, timeout=3600) as r:
             r.read()
         _embed_ok = None            # re-check next time
-    except Exception:
+    except Exception:  # best-effort: optional model download; re-checked next time
         pass
     finally:
         _pulling = False

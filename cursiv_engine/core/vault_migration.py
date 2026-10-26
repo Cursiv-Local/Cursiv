@@ -32,7 +32,7 @@ def require_closed() -> None:
             module = any(command[i:i + 2] == ['-m', 'launcher'] for i in range(len(command)))
             if name in ('cursiv.exe', 'cursiv') or source or module:
                 raise vault.VaultError('Close every other Cursiv process, including older versions, before migration')
-        except psutil.NoSuchProcess:
+        except psutil.NoSuchProcess:  # best-effort: the process ended while being looked at
             continue
         except psutil.AccessDenied as exc:
             raise vault.VaultError('Could not establish whether Cursiv data is in use; migration refused') from exc

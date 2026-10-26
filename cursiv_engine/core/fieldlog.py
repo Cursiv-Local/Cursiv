@@ -99,7 +99,7 @@ def photo_info(path: Path) -> dict:
                     lon = -lon
                 if -90 <= lat <= 90 and -180 <= lon <= 180:
                     info["lat"], info["lon"] = round(lat, 7), round(lon, 7)
-    except Exception:
+    except Exception:  # best-effort: photo location is optional; a bad EXIF block just means no location
         pass
     return info
 
@@ -694,13 +694,13 @@ def _signer(key_id: str) -> str:
         mine = json.loads(devicekey.key_file().read_text(encoding="utf-8"))
         if mine.get("key_id") == key_id:
             return "this installation's key"
-    except (OSError, ValueError):
+    except (OSError, ValueError):  # best-effort: no key saved here yet; checked against team keys next
         pass
     team = log_dir() / "team"
     for f in sorted(team.glob("*.key.json")) if team.is_dir() else []:
         try:
             k = json.loads(f.read_text(encoding="utf-8"))
-        except (OSError, ValueError):
+        except (OSError, ValueError):  # best-effort: an unreadable team key file can't match; others are still checked
             continue
         if k.get("key_id") == key_id:
             return f"not this installation's key; it's the key of {k.get('device')}, imported before"

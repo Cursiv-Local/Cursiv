@@ -108,8 +108,9 @@ def _load() -> dict:
 
 
 def _save(data: dict) -> None:
-    _RUNTIME.mkdir(parents=True, exist_ok=True)
-    _SQ_FILE.write_text(json.dumps({"accounts": data["accounts"]}, indent=2), encoding="utf-8")
+    from cursiv_engine.core import atomic
+    # Atomic (U103): a cut-off write here would lose the only way to reset a forgotten password.
+    atomic.write_bytes(_SQ_FILE, json.dumps({"accounts": data["accounts"]}, indent=2).encode("utf-8"), protect=False)
 
 
 def _key(username: str | None) -> str:
@@ -212,13 +213,12 @@ def verify_answers(answers: list[str], username: str | None = None) -> bool:
 
 
 def clear_security_questions(username: str | None = None, *, account_hash: str = "") -> None:
-    """Remove one account's set (by username or its hash), or every set when neither is given."""
-    try:
-        if not username and not account_hash:
-            _SQ_FILE.unlink(missing_ok=True)
-            return
-        data = _load()
-        data["accounts"].pop(account_hash or _uhash(username), None)
-        _save(data)
-    except Exception:
-        pass
+    """Remove one account's set (by username or its hash), or every set when neither is given.
+    A failure raises (U103): left behind, a removed person's answers could reset a new account
+    with the same name. Every caller shows the error and stops."""
+    if not username and not account_hash:
+        _SQ_FILE.unlink(missing_ok=True)
+        return
+    data = _load()
+    data["accounts"].pop(account_hash or _uhash(username), None)
+    _save(data)

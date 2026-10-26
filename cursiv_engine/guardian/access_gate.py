@@ -237,11 +237,16 @@ def reset_password(new_password: str, username: str | None = None) -> None:
 
 def reset_credentials() -> None:
     """Delete all stored credential files, returning the app to first-run state."""
+    left = []
     for f in (_HASH_FILE, _META_FILE, _FLAG_FILE, _ACCOUNTS_FILE, _backup()):   # the backup too: no old accounts back
         try:
             f.unlink(missing_ok=True)
-        except Exception:
-            pass
+        except OSError as exc:
+            left.append(f"{f.name} ({exc.strerror or exc})")
+    if left:
+        # U103: a locked file used to be skipped silently, so a reset could leave a login behind.
+        raise OSError("Some login files could not be removed: " + ", ".join(left)
+                      + ". Close other Cursiv windows and try again.")
 
 
 def _uhash(username: str) -> str:
