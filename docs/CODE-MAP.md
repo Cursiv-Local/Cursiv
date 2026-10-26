@@ -162,7 +162,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/profile.py` — research vs. full feature profile; the "removed" notes.
 
 ### Older parts (few or no users; candidates for U100/U101 clean-up)
-- `core/agent.py`, `core/constitution.py`, `core/sigil.py`, `core/scan_display.py`, `core/quality_scorer.py`
+- `core/agent.py`, `core/constitution.py`, `core/sigil.py`, `core/scan_display.py`
 - `obsidian/exporter.py` — Obsidian vault export.
 - `training/lora_trainer.py`, `training/ollama_merge.py`, `training/paths.py` — optional local fine-tuning.
 
