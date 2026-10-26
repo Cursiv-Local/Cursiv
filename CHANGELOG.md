@@ -1,5 +1,25 @@
 # Changelog
 
+## 3.14-U102 — Reliability: OS-enforced isolation, verified calculations, recovery (2026-10-25)
+
+An engineering reliability release: no new features, the existing ones made harder to break.
+
+- Plugins, Forge self-tests and Codex test runs run under limits Windows enforces (a Job Object): no
+  other programs, capped memory and CPU time, no clipboard, stopped with Cursiv. If the limits can't be
+  applied, nothing runs. Code runs no longer see your environment variables. macOS and Linux get
+  resource limits only.
+- A 237-case calculation benchmark against published values (NIST, APHA, IUPAC) runs on every change.
+  It found and fixed: temperatures below absolute zero were converted, negative dissolved oxygen gave a
+  negative percentage, a negative dilution volume lost its sign, an impossible dilution was left to the
+  AI, knots were slightly rounded, and conductivity measured at 25 °C got no answer.
+- The field notebook's 13 integrity scenarios (edits, deletions, reordering, power cuts, concurrent
+  writers, corruption, export round trips) are tested together; a passing check now says what it does and
+  doesn't prove.
+- Encryption: a full disk or a damaged encrypted file is an error, never empty data, and the copies made
+  at encryption can be written back out to a new file.
+- Docs: threat model update, supported-platform matrix, recovery procedures, notebook integrity results.
+  CI keeps machine-readable test results for every platform.
+
 ## 3.14-U101 — Starter profiles, field formulas, safer storage (2026-10-25)
 
 - Five profiles come with Cursiv, ready to use: @field (Field assistant), @checker (Data checker), @report
