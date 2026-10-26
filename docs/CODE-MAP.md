@@ -229,7 +229,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 
 ## Elsewhere
 - `tests/` — the suite (`-m usb` is the USB gate run before every commit).
-- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories, `scripts/fieldcalc_bench.py` for field calculations end to end, `scripts/calc_bench.py` the 237-case calculation benchmark, `scripts/overconfidence_bench.py` for overconfident answers on the live model), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder), `scripts/team_demo.py` (the team-drive demo: three named drives into one main computer and a new drive out, real windows, throwaway folder).
+- `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories, `scripts/fieldcalc_bench.py` for field calculations end to end, `scripts/calc_bench.py` the 237-case calculation benchmark, `scripts/overconfidence_bench.py` for overconfident answers on the live model), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder), `scripts/team_demo.py` (the team-drive demo: three named drives into one main computer and a new drive out, real windows, throwaway folder), `scripts/station_dev.py` (the Field Station against a throwaway folder), `scripts/station_shots.py` + `scripts/cdp_shots.mjs` (real Field Station screenshots for the website).
 - `bench/` — truth benchmark and the U99 phrasing set.
 - `website/`, `cloudflare/` — cursiv.us and its deploy.
 - `installer/` — the Windows installer script.

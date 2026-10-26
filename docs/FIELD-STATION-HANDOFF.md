@@ -72,6 +72,14 @@ later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 (release, owner asked "release, commit, push, publish, and a webpage"): PR #40 merged to main
+  (`cac12de`). Branch `claude/u104`: version 3.14-U104 (selfknow, launcher, installer), `docs/RELEASE-U104.md`,
+  CHANGELOG. New page `website/field-station.html` (real screens from `scripts/station_shots.py` +
+  `scripts/cdp_shots.mjs`: the station run against a throwaway folder, sample entries via the API, headless
+  Edge over the DevTools protocol), social card, links from home / field-research / team-drives, sitemap.
+  Interface fixes from the screenshots: one shared "unavailable" note per card, storage labels, wider label
+  column. The outside-review items move to U105. Next: PR, CI, merge, tag v3.14-U104, build, sign, publish,
+  evidence PR, publish the website.
 - 2026-10-26 step 7: full suite 2,175 passed / 14 skipped (the usual live-model + Keychain skips). Committed and pushed `claude/field-station`; PR #40 (https://github.com/Cursiv-Local/Cursiv/pull/40) opened for the owner (not merged, not released). Earlier note: `docs/CODE-MAP.md` has a "Field Station preview" section (code-map test
   passes); `docs/FIELD-STATION-PLAN.md` gained section 8 (status of every deliverable, labelled) and section 9
   (API reference); CHANGELOG has "3.14-U104 — in progress". Full suite running. Not yet committed. Then: commit,

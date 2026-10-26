@@ -65,7 +65,7 @@ button, .button { font: inherit; border-radius: 8px; padding: 10px 16px; min-hei
 .src { font-size: .72rem; letter-spacing: .04em; text-transform: uppercase; border-radius: 4px; padding: 1px 6px; border: 1px solid currentColor; white-space: nowrap; }
 .src.real { color: var(--ok); } .src.derived { color: var(--gold); } .src.simulated { color: var(--sim); }
 .src.unavailable { color: var(--muted); } .src.stale { color: var(--warn); }
-.kv { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px; align-items: baseline; margin: 0; }
+.kv { display: grid; grid-template-columns: minmax(7em, 1fr) auto; gap: 6px 12px; align-items: baseline; margin: 0; }
 .kv dt { color: var(--muted); } .kv dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
 .kv .note { grid-column: 1 / -1; color: var(--muted); font-size: .8rem; margin-top: -4px; }
 .status-normal, .status-ok { color: var(--ok); } .status-elevated, .status-low { color: var(--warn); }
