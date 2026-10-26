@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 5 of 7 done (browser interface).
+Last updated: 2026-10-26, step 6 of 7 done (drive discovery tests + ARM64 CI).
 
 ## What this work is
 
@@ -64,14 +64,21 @@ these choices (2026-10-26):
 | 3 | `station/sessions.py`: sign-in with existing accounts, session cookie (HttpOnly, SameSite=Strict, idle + absolute expiry), CSRF token, login rate limit, encryption unlock | done: `tests/test_station_sessions.py` 7 passed |
 | 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | done: `tests/test_station_server.py` 13 passed (live loopback server) |
 | 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | done: walked through live (setup, restart -> locked -> unlock, record, correct, verify, health at phone width); 15 server tests |
-| 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | next |
-| 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | planned |
+| 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | done: `tests/test_station_storage.py` 5 passed; CI job `station-arm64` added (first run on the PR) |
+| 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | next |
 
 Phases 6–9 (install script + systemd, Wi-Fi access point, local AI benchmark on ARM, SSD/USB mounting) come
 later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 step 6: `tests/test_station_storage.py` (lsblk JSON parsed to UUID-identified mounted drives, swap
+  and unmounted skipped; workspace recognition writes nothing; psutil fallback marked not stable; the station
+  imports with `sys.modules['PyQt6'] = None`). `requirements-station.txt` (engine deps only, versions from
+  `requirements-release.lock`, no Qt/PyInstaller). CI job `station-arm64` on `ubuntu-24.04-arm` runs 11 test
+  files (113 tests locally with Qt blocked). A GitHub ARM server is not a Pi: hardware stays "awaiting
+  validation". Committed. Next: step 7 (CODE-MAP lines for every station module, plan status labels, full
+  suite, PR).
 - 2026-10-26 step 5: `station/web/index.html`, `app.css`, `app.js` (views: setup with station name, sign in,
   unlock, dashboard, notebook with corrections/search/verify/export, health with source chips, workspaces,
   settings with two-step safe shutdown; textContent only, no inline code, CSP-clean). Walked through in a live

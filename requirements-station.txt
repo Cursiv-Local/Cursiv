@@ -1,0 +1,11 @@
+# Cursiv Field Station (Raspberry Pi 5, Linux ARM64): the engine's own dependencies only. The desktop's
+# Qt toolkit and the PyInstaller packager aren't needed headless. Versions match requirements-release.lock.
+bcrypt==5.0.0
+cffi==2.1.1
+cryptography==50.0.2
+numpy==2.5.4
+pillow==13.0.0
+psutil==7.2.2
+pycparser==3.12
+pypdf==6.21.2
+pytest==9.1.1
