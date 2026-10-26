@@ -2,7 +2,7 @@
 export const adminPage = `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Cursiv download statistics — Admin</title><meta name="robots" content="noindex,nofollow,noarchive">
-<link rel="icon" href="/assets/cursiv_256.png"><link rel="stylesheet" href="/assets/site.css?v=u103-1">
+<link rel="icon" href="/assets/cursiv-logo-256.png"><link rel="stylesheet" href="/assets/site.css?v=u103-1">
 <link rel="stylesheet" href="/assets/download-admin.css?v=1">
 <script defer src="/assets/download-admin.js?v=1"></script></head><body>
 <header class="nav"><div class="wrap"><a class="brand" href="/">Cursiv</a><a href="/start">Download page</a></div></header>
