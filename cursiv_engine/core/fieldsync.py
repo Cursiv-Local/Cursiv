@@ -663,17 +663,17 @@ def report_text(r: dict) -> str:
     for x in r["rejected"]:
         lines.append(f"- NOT IMPORTED {x}")
     for device, kid in r.get("signed", {}).items():
-        lines.append(f"- {device}: signature checked (key {kid})")
+        lines.append(f"- {fieldlog.who(device, names)}: signature checked (key {kid})")
     for device, n in r.get("photos_missing", {}).items():
-        lines.append(f"- {device}: {n} photo(s) missing, over {fieldlog.PHOTO_MAX_MB} MB, or not matching their "
+        lines.append(f"- {fieldlog.who(device, names)}: {n} photo(s) missing, over {fieldlog.PHOTO_MAX_MB} MB, or not matching their "
                      f"fingerprint (the entries are in)")
     for device, mins in r.get("clock", {}).items():
-        lines.append(f"- CHECK {device}: its clock looks about {mins} minutes ahead of this computer's. Its times are "
+        lines.append(f"- CHECK {fieldlog.who(device, names)}: its clock looks about {mins} minutes ahead of this computer's. Its times are "
                      f"kept as recorded; check that device's date and time")
     for device in r.get("unsigned", []):
         why = ("its browser couldn't make a signing key" if device.startswith("phone-")
                else "shared by Cursiv before U73")
-        lines.append(f"- {device}: not signed ({why}); its chain was checked, but not who made it")
+        lines.append(f"- {fieldlog.who(device, names)}: not signed ({why}); its chain was checked, but not who made it")
     for c in sample_clashes():
         lines.append(f"- CHECK {c}")
     if r["own"] and len(lines) == 0:

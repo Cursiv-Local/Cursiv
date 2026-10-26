@@ -30,10 +30,11 @@ def do_saturation(temp_c: float) -> float:
     return math.exp(-139.34411 + 1.575701e5 / t - 6.642308e7 / t ** 2 + 1.243800e10 / t ** 3 - 8.621949e11 / t ** 4)
 
 
-_DO = re.compile(r"(?i)\b(?:dissolved oxygen|DO_?sat\w*|\bDO\b|oxygen (?:saturation|solubility))")
+_DO = re.compile(r"(?i)\b(?:dissolved oxygen|DO_?sat\w*|\bDO\b|oxygen (?:saturation|solubility)|(?:saturation|solubility) of oxygen)")
 _SAT_CLAIM = re.compile(
-    r"(?i)(?:at|of)\s+(-?\d+(?:\.\d+)?)\s*°?\s*C\b[^.\n]{0,120}?\b(\d{1,2}(?:\.\d+)?)\s*mg\s*/\s*L"
-    r"|(\d{1,2}(?:\.\d+)?)\s*mg\s*/\s*L[^.\n]{0,80}?\bat\s+(-?\d+(?:\.\d+)?)\s*°?\s*C\b")
+    r"(?i)(?:at|of)\s+(-?\d+(?:\.\d+)?)\s*°?\s*C\b(?:[^.\n]|\.(?=\d)){0,120}?\b(\d{1,2}(?:\.\d+)?)\s*mg\s*/\s*L"
+    r"|(\d{1,2}(?:\.\d+)?)\s*mg\s*/\s*L(?:[^.\n]|\.(?=\d)){0,80}?\bat\s+(-?\d+(?:\.\d+)?)\s*°?\s*C\b")
+# A decimal point inside a number ("12.5–13.0 mg/L") doesn't end the sentence (U103 demo: a range hid the claim).
 _MADE_UP_FORMULA = re.compile(r"(?i)DO_?sat\w*\s*(?:\([^)]*\))?\s*=\s*[-\d.]")
 
 
