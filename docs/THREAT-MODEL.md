@@ -57,3 +57,24 @@ release signing key, provider order or network policy changes are involved.
 
 See [PRIVACY.md](../PRIVACY.md), [security tests and findings](MAINTENANCE-HARDENING.md),
 and [public claim evidence](CLAIM-EVIDENCE.md).
+
+## U102 updates
+
+- **Plugins, Forge self-tests and Codex test runs** now also run under OS-enforced limits
+  (`core/confined.py`). On Windows the child starts suspended and runs inside a Job Object: one process
+  only (no shell or other program even if the audit hook were bypassed), memory and CPU-time caps, no
+  clipboard or desktop access, killed when Cursiv's handle closes. If the job can't be applied the child
+  is killed and nothing runs; there is no unconfined fallback. Code runs get only the system variables
+  Python needs. macOS and Linux get resource limits (CPU, file size, memory where enforced) and the audit
+  hook only. Still the same user: reading files the user can read is stopped by the audit hook, not by
+  the OS. No restricted token or AppContainer yet.
+- **Phone uploads and import staging** are encrypted on a computer (U101); uploads over 64 MB stay
+  readable in `fieldlog/received-large/` and the receiver lists them.
+- **Login files** are written atomically with an accounts backup (U101); damage is reported, never read
+  as "no accounts".
+- **A chain isn't authorship.** A notebook rebuilt consistently from start to end passes `field log check`
+  (tests/test_notebook_integrity_matrix.py, case 14); a passing check now says so. Signed exports and
+  shares show which device made them.
+- **Recovery copies** made at encryption can be written out to a new file (`docs/RECOVERY.md`).
+- Platform coverage: [SUPPORT-MATRIX](SUPPORT-MATRIX.md). Everything here is the project's own testing;
+  nothing has been independently reviewed.

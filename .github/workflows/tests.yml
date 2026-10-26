@@ -50,7 +50,13 @@ jobs:
       - name: Test
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest tests -q
+        run: python -m pytest tests -q --junitxml=test-results-${{ matrix.os }}.xml
+      - name: Keep the machine-readable results (U102)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ matrix.os }}
+          path: test-results-${{ matrix.os }}.xml
   test-linux:
     # Linux (U101): the same suite on Ubuntu, so a Linux build has something to stand on. Not yet a
     # required check; it becomes one once it has passed on main for a while.
@@ -75,7 +81,13 @@ jobs:
       - name: Test
         env:
           QT_QPA_PLATFORM: offscreen
-        run: python -m pytest tests -q
+        run: python -m pytest tests -q --junitxml=test-results-ubuntu-latest.xml
+      - name: Keep the machine-readable results (U102)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-ubuntu-latest
+          path: test-results-ubuntu-latest.xml
   security:
     runs-on: ubuntu-latest
     steps:
