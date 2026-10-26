@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 2 of 7 done (telemetry + simulation).
+Last updated: 2026-10-26, step 3 of 7 done (sessions, setup, unlock).
 
 ## What this work is
 
@@ -61,8 +61,8 @@ these choices (2026-10-26):
 |---|---|---|
 | 1 | Check the engine functions the station calls (vault, accounts, notebook) | done |
 | 2 | `station/telemetry.py` (temperature via discovered thermal zone, `vcgencmd get_throttled` parsing, CPU/RAM via psutil, disk, board model, battery providers: Linux `power_supply`, unavailable, simulated) + `station/simulation.py` (scenarios A–E from the spec, plus F undervoltage) | done: `tests/test_station_telemetry.py` 25 passed |
-| 3 | `station/sessions.py`: sign-in with existing accounts, session cookie (HttpOnly, SameSite=Strict, idle + absolute expiry), CSRF token, login rate limit, encryption unlock | next |
-| 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | planned |
+| 3 | `station/sessions.py`: sign-in with existing accounts, session cookie (HttpOnly, SameSite=Strict, idle + absolute expiry), CSRF token, login rate limit, encryption unlock | done: `tests/test_station_sessions.py` 7 passed |
+| 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | next |
 | 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | planned |
 | 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | planned |
 | 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | planned |
@@ -72,6 +72,13 @@ later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 step 3: `station/sessions.py`: `Sessions` (token + per-session CSRF, idle 30 min, absolute 12 h),
+  `Limiter` (5 free tries, then 30 s doubling to 15 min, per client address and per account), `Gate`
+  (`sign_in` via `access_gate.verify_credentials`; `first_setup` needs the 8-digit setup code printed on the
+  station console, runs `vault_migration.migrate(passphrase)` then `access_gate.setup_credentials`;
+  `encryption()` status; `unlock()` = `vault.unlock` + `vault_migration.adopt_new_stores()`). The server must
+  hold `core/data_lease.DataLease` for its whole life, as `launcher/main.py` does. Tests 7 passed. Committed.
+  Next: step 4 `station/server.py`.
 - 2026-10-26 step 2: `cursiv_engine/station/__init__.py`, `telemetry.py` (Reading with source real/derived/
   simulated/unavailable + stale; CPU sensor found by thermal-zone type, implausible values rejected;
   `parse_throttled` bits 0-3 now / 16-19 since boot; battery providers `SysfsBattery` (/sys/class/power_supply),
