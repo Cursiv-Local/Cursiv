@@ -113,7 +113,11 @@
     const dd = el('dd', '', text !== undefined ? text : fmtReading(r));
     dd.append(' ', srcChip(r));
     dl.append(dd);
-    if (r && r.note && (r.source === 'unavailable' || r.stale)) dl.append(el('dd', 'note', r.note));
+    // the same explanation under several rows (a power bank that reports nothing) is shown once
+    if (r && r.note && (r.source === 'unavailable' || r.stale) && dl.dataset.lastNote !== r.note) {
+      dl.append(el('dd', 'note', r.note));
+      dl.dataset.lastNote = r.note;
+    }
   }
   function bytes(n) { if (n === null || n === undefined) return '?'; const g = n / 1e9; return g >= 1 ? g.toFixed(1) + ' GB' : (n / 1e6).toFixed(0) + ' MB'; }
   function uptimeText(r) { if (!r || r.value === null) return 'not available'; const s = r.value, h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60); return h + ' h ' + m + ' min'; }
@@ -291,7 +295,8 @@
     pw.append(pl); box.append(pw);
 
     const sto = card('Storage'); const stl = el('dl', 'kv');
-    Object.entries(h.storage || {}).forEach(([k, s]) => kvRow(stl, k, s, s.value ? bytes(s.value.free) + ' free of ' + bytes(s.value.total) : undefined));
+    const STORE = { internal: 'Internal storage', ssd: 'External SSD' };
+    Object.entries(h.storage || {}).forEach(([k, s]) => kvRow(stl, STORE[k] || k, s, s.value ? bytes(s.value.free) + ' free of ' + bytes(s.value.total) : undefined));
     sto.append(stl); box.append(sto);
   }
 

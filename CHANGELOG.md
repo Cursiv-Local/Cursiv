@@ -1,12 +1,18 @@
 # Changelog
 
-## 3.14-U104 — in progress
+## 3.14-U104 — Field Station preview, team-drive fixes (2026-10-26)
 
 - **Field Station preview** (Raspberry Pi 5, browser interface; not validated on a Pi yet): a local web
   server for Cursiv's engine with sign-in, encrypted notebook unlocked from the browser after a restart, the
   field notebook (record, correct, search, verify, export), station health with every reading labelled real,
   derived, simulated or unavailable, read-only drive discovery, safe shutdown, and hardware simulation
   scenarios. Plan, status and API: docs/FIELD-STATION-PLAN.md. The desktop app is unchanged.
+- Import reports name the scientist on every line; Make a Cursiv USB shows every notebook without scrolling,
+  keeps the name box's label and says "1 entry"; the dissolved-oxygen check catches a saturation figure
+  given as a range.
+- Website: cursiv.us/field-station (the preview, with real screens) and cursiv.us/team-drives.
+- Moved to U105: drive signing-key passphrase, strict photo-complete import, voice-model checksum, a
+  release-document check.
 
 ## 3.14-U103 — Team field drives, overconfidence check, silent-error lint (2026-10-25)
 

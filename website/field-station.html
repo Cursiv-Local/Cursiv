@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cursiv Field Station: an Offline Research Server on a Raspberry Pi | Cursiv</title>
+<meta name="description" content="Cursiv Field Station (preview): Cursiv's field notebook and research tools served from a Raspberry Pi 5 to phones, tablets and laptops over its own Wi-Fi, with no internet. Real screens; not yet validated on a Pi.">
+<link rel="canonical" href="https://cursiv.us/field-station">
+<meta property="og:title" content="Cursiv Field Station (preview) | Cursiv">
+<meta property="og:description" content="An offline research server for the field: a Raspberry Pi runs Cursiv, phones and laptops are the screens. Preview, with real screens.">
+<meta property="og:image" content="https://cursiv.us/assets/cursiv-field-station-preview-20261026.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cursiv Field Station preview: a Raspberry Pi 5 serving Cursiv to a phone, a tablet and a laptop over its own Wi-Fi, offline.">
+<meta property="og:url" content="https://cursiv.us/field-station">
+<meta property="og:type" content="article">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cursiv Field Station (preview) | Cursiv">
+<meta name="twitter:description" content="An offline research server for the field: a Raspberry Pi runs Cursiv, phones and laptops are the screens.">
+<meta name="twitter:image" content="https://cursiv.us/assets/cursiv-field-station-preview-20261026.png">
+<meta name="theme-color" content="#07090e">
+<link rel="icon" type="image/png" href="/assets/cursiv-logo-256.png">
+<link rel="stylesheet" href="/assets/site.css?v=u103-1">
+<style>
+.grid2 > * { min-width: 0; }            /* a wide screenshot must not squeeze the text column */
+.preview-badge { display: inline-block; border: 1px solid var(--gold); color: var(--gold); border-radius: 999px; padding: 4px 12px; font-size: 13px; font-weight: 600; }
+.shots2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; margin-top: 24px; align-items: start; }
+.phones { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 24px; align-items: start; }
+@media (max-width: 760px) { .shots2 { grid-template-columns: 1fr; } .phones { grid-template-columns: 1fr; max-width: 360px; } }
+.fs-shot { margin: 0; }
+.fs-shot img { width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--line2); display: block; }
+.fs-shot figcaption { margin-top: 8px; }
+.status { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; border: 1px solid var(--line2); border-radius: var(--radius); overflow: hidden; }
+.status li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 14px; padding: 13px 16px; border-bottom: 1px solid var(--line); align-items: baseline; }
+.status li:last-child { border-bottom: 0; }
+.status b { font-weight: 600; }
+.status span { font-size: 13px; white-space: nowrap; }
+.s-done { color: #5ccf8f; } .s-wait { color: var(--gold); } .s-plan { color: var(--muted); }
+@media (max-width: 560px) { .status li { grid-template-columns: 1fr; gap: 4px; } }
+.kit { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr)); gap: 12px; list-style: none; padding: 0; margin: 0; }
+.kit li { border: 1px solid var(--line2); border-radius: var(--radius); padding: 14px 16px; color: var(--muted); }
+.kit b { color: var(--text); display: block; margin-bottom: 4px; }
+.fs-steps { counter-reset: s; list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.fs-steps li { counter-increment: s; position: relative; padding-left: 40px; color: var(--muted); }
+.fs-steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--gold); color: var(--gold); display: grid; place-items: center; font-size: 14px; }
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://cursiv.us/"},{"@type":"ListItem","position":2,"name":"Field research","item":"https://cursiv.us/field-research"},{"@type":"ListItem","position":3,"name":"Field Station","item":"https://cursiv.us/field-station"}]}
+</script>
+</head>
+<body>
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/">Home</a><a href="/field-research">Field research</a><a href="/team-drives">Team drives</a><a href="/ai-reliability-testing">Testing</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
+<main>
+<section class="hero"><div class="wrap"><span class="preview-badge">Preview · not yet tested on a Raspberry Pi</span><h1 style="margin-top:16px">Cursiv Field Station</h1><p class="lede">A research station you can carry. A Raspberry Pi runs Cursiv and its own Wi-Fi; your phone, tablet or laptop is the screen. Record observations, check the notebook's integrity and watch the station's health with no internet at all.</p><p class="fine">The software is in Cursiv 3.14-U104 as a preview. Every screen below is real, running on a Windows PC with simulated hardware readings, each labelled SIMULATED. Nothing here has run on a Raspberry Pi yet; that comes when the hardware arrives, and results will be published as measured.</p></div></section>
+
+<section id="how"><div class="wrap"><div class="grid2"><div class="stack"><h2>How it will work on the Pi</h2><ol class="fs-steps"><li>Take the station out of its case and power it on.</li><li>Join its Wi-Fi network from a phone, tablet or laptop. Each station will get its own password (the Wi-Fi setup is planned).</li><li>Open Cursiv in the browser and sign in with a Cursiv account.</li><li>Unlock the notebook with the encryption passphrase. After every restart it stays encrypted until someone does.</li><li>Record observations, correct mistakes (the original is never edited), check integrity, and watch temperature, storage and power.</li><li>Shut down from Settings before unplugging the battery.</li></ol></div><figure class="fs-shot"><img src="/assets/field-station/station-dashboard.webp" width="1280" height="860" loading="lazy" alt="The Cursiv Field Station dashboard in a browser: field notebook with 4 entries, intact and in order; thermal 52 °C normal; power 82%; system CPU and memory; local AI not running; notebook encrypted and unlocked. A purple banner says the hardware is simulated."><figcaption class="fine">The dashboard. Hardware values come from simulation scenario A and say so on every reading.</figcaption></figure></div></div></section>
+
+<section id="phones"><div class="wrap"><div class="stack"><h2>Made for the phone in your hand</h2><p>The interface is built for small screens first, works in any current browser, and needs nothing installed on the phone. It keeps working when the internet doesn't exist: the station never connects out.</p></div>
+<div class="phones">
+<figure class="fs-shot"><img src="/assets/field-station/station-phone-unlock.webp" width="780" height="1688" loading="lazy" alt="Phone screen: Unlock the notebook. The station restarted, so its notebook is encrypted until someone enters the encryption passphrase. Health readings work meanwhile."><figcaption class="fine">After a restart: encrypted until the passphrase is entered.</figcaption></figure>
+<figure class="fs-shot"><img src="/assets/field-station/station-phone-dashboard.webp" width="780" height="1688" loading="lazy" alt="Phone screen: the Field Station dashboard with notebook, thermal and power cards."><figcaption class="fine">The dashboard on a phone.</figcaption></figure>
+<figure class="fs-shot"><img src="/assets/field-station/station-phone-notebook.webp" width="780" height="1688" loading="lazy" alt="Phone screen: the field notebook form with site, sample ID, project, observer and measurements kept exactly as typed."><figcaption class="fine">New observation: values kept exactly as typed.</figcaption></figure>
+</div></div></section>
+
+<section id="honest-readings"><div class="wrap"><div class="grid2"><div class="stack"><h2>Readings that never make things up</h2><p>Every value on the Health page says where it came from: <b>real</b> from the hardware, <b>derived</b> from real readings, <b>simulated</b> in a test scenario, or <b>unavailable</b>. Old readings are marked stale.</p><p>Most USB-C power banks power a Raspberry Pi without telling it anything. Cursiv says exactly that: "Battery telemetry unavailable", never a percentage worked out from elapsed time or load. A battery board that reports its charge to Linux is read and labelled real.</p><p>Temperature comes from the board's own sensor, and throttling and undervoltage from the Pi's firmware flags. The warning levels (65, 75 and 80 °C) are advice you can change, not hardware limits.</p></div><figure class="fs-shot"><img src="/assets/field-station/station-phone-health-powerbank.webp" width="780" height="2719" loading="lazy" alt="Phone screen: Field Station health with a plain power bank. Battery, charging, power draw, voltage and runtime all read not available, with one note: battery telemetry unavailable; an external power source may be connected, but its charge can't be determined."><figcaption class="fine">Health with an ordinary power bank (scenario E): no battery numbers, because there are none to read.</figcaption></figure></div></div></section>
+
+<section id="notebook"><div class="wrap"><div class="stack"><h2>The same trustworthy notebook</h2><p>The station runs the same field notebook as Cursiv on Windows: append-only, each entry fingerprinted with the one before it, corrections added as new entries with a reason. One server process writes the notebook, so twenty people saving at once still produce one unbroken chain (tested). The integrity check runs without any AI model and says what a pass does and doesn't show.</p></div>
+<figure class="fs-shot shot-wide"><img src="/assets/field-station/station-notebook.webp" width="1280" height="1539" loading="lazy" alt="The Field Station notebook in a desktop browser: the new-observation form and a list of entries from Willow Creek with water temperature, pH, dissolved oxygen, turbidity and conductivity, including a correction that keeps the original entry."><figcaption class="fine">The notebook in a laptop browser, with a correction that keeps the original entry.</figcaption></figure></div></section>
+
+<section id="security"><div class="wrap"><div class="grid2"><div class="stack"><h2>Who can get in</h2><ul class="ticks" style="list-style:none;padding:0;display:grid;gap:10px;color:var(--muted)"><li>Being on the Wi-Fi authorizes nothing: every page needs a Cursiv sign-in, and wrong passwords are slowed down.</li><li>The station only answers devices on its own private network, and checks every request came from its own page.</li><li>The first person to join can't make themselves administrator: setup needs a code shown only on the station itself.</li><li>The notebook is encrypted on the station's storage and locked after every restart.</li><li>No internet connections, ever, unless you turn them on.</li></ul></div><div class="card stack"><h3>Plain about the limits</h3><p>The preview uses plain HTTP on the station's own Wi-Fi. The Wi-Fi password protects that traffic; the web page itself isn't encrypted, and the interface says so. Encrypted HTTPS without browser warnings needs more work and is planned as an option.</p><p>A Raspberry Pi is slower than a laptop. The notebook, checks, calculations and health readings don't need an AI model at all; local AI will be measured on the Pi before Cursiv recommends a model for it.</p></div></div></div></section>
+
+<section id="status"><div class="wrap stack"><span class="eyebrow">Where it stands</span><h2>What's built, and what's waiting for hardware</h2>
+<ul class="status">
+<li><b>Local server, sign-in, encrypted notebook, unlock after restart</b><span class="s-done">built and tested</span></li>
+<li><b>Field notebook in the browser: record, correct, search, verify, export</b><span class="s-done">built and tested</span></li>
+<li><b>Health readings with honest labels, simulation scenarios</b><span class="s-done">built and tested</span></li>
+<li><b>Runs on 64-bit ARM Linux (the Pi's processor type)</b><span class="s-done">tested on every change</span></li>
+<li><b>Real Pi 5 temperature, throttling and battery boards</b><span class="s-wait">awaiting hardware</span></li>
+<li><b>iPhone, Android and tablet browsers</b><span class="s-wait">awaiting hardware</span></li>
+<li><b>One-step installer and automatic start on the Pi</b><span class="s-plan">planned</span></li>
+<li><b>The station's own Wi-Fi network and cursiv.local</b><span class="s-plan">planned</span></li>
+<li><b>External SSD and USB workspaces: import, export, safe eject</b><span class="s-plan">planned</span></li>
+<li><b>Local AI benchmarks on the Pi, research chat in the browser</b><span class="s-plan">planned</span></li>
+</ul>
+<p class="fine">The full plan, the status of every piece and the API: <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/FIELD-STATION-PLAN.md">FIELD-STATION-PLAN.md</a>.</p></div></section>
+
+<section id="kit"><div class="wrap stack"><span class="eyebrow">The kit being designed</span><h2>A station that travels in one case</h2>
+<ul class="kit"><li><b>Raspberry Pi 5</b>8 or 16 GB, with active cooling</li><li><b>512 GB external SSD</b>for the station's research data</li><li><b>USB workspaces</b>each a named, portable notebook, like <a href="/team-drives">team drives</a></li><li><b>Rechargeable battery</b>tested for the Pi's power needs before it's recommended</li><li><b>Waterproof case</b>for transport and storage; the station runs out of the case</li></ul>
+<p class="fine">Nothing in the kit is for sale yet, and no battery is called compatible until it's been tested with a Pi 5.</p>
+<div class="cta-row"><a class="btn btn-gold" href="/start">Get Cursiv for Windows today</a><a class="btn btn-ghost" href="https://github.com/Cursiv-Local/Cursiv">Follow the source</a></div></div></section>
+</main>
+<footer><div class="wrap"><div class="foot"><div><a class="brand" href="/"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><p style="margin-top:10px">Offline field research software, with clear limits.</p></div><div><h4>Use cases</h4><ul><li><a href="/field-research">Field research</a></li><li><a href="/team-drives">Team field drives</a></li><li><a href="/field-station">Field Station (preview)</a></li><li><a href="/offline-research">Offline research</a></li><li><a href="/portable-workspace">Portable workspace</a></li></ul></div><div><h4>Project</h4><ul><li><a href="https://github.com/Cursiv-Local/Cursiv">Source code</a></li><li><a href="/ai-reliability-testing">Testing</a></li><li><a href="/privacy/">Privacy Policy</a></li></ul></div></div><div class="copy"><span>Built by Joshua Winkler</span><span>Cursiv · MIT License</span></div></div></footer>
+<script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
+</body></html>
