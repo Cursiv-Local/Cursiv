@@ -219,7 +219,7 @@ def plan(sources: list[Path], dest: Path, *, keys: bool = True) -> list[dict]:
 
 
 def summary(items: list[dict]) -> dict[str, int]:
-    out = {"add": 0, "update": 0, "same": 0, "keep": 0, "skip": 0}
+    out = {"add": 0, "update": 0, "same": 0, "keep": 0, "skip": 0, "team": 0}
     for it in items:
         out[it["action"]] += 1
     return out
@@ -351,13 +351,48 @@ def _vault_on(*roots: Path) -> bool:
     return any((r / vault.MARKER).exists() for r in roots)
 
 
+def team_notebook(drive_data: Path, home: Path) -> str:
+    """The drive's field notebook belongs to someone else (U103): its name (or id), else "".
+
+    Copying file by file, a drive's notebook would replace this computer's (the newer file wins), so three
+    scientists' drives brought in one after another would each replace the last. A drive notebook with a
+    name (a team drive), or with a different id from a notebook this computer already has, goes to the
+    team view in that person's name instead (fieldsync.import_folder on the drive's share)."""
+    from cursiv_engine.core import fieldlog, vault
+    try:
+        drive = fieldlog.read_identity(drive_data / "fieldlog")
+    except fieldlog.IdentityDamaged as exc:
+        raise OSError(f"a field notebook's identity can't be read ({exc}); nothing was brought in") from None
+    except vault.VaultError:
+        return ""                     # encrypted by an older release: its notebook files are skipped anyway
+    try:
+        here = fieldlog.read_identity(home / "fieldlog")
+    except fieldlog.IdentityDamaged as exc:
+        raise OSError(f"a field notebook's identity can't be read ({exc}); nothing was brought in") from None
+    except vault.VaultError:
+        # Locked here (a read-only check before sign-in): it can't be compared, so a notebook this
+        # computer has is treated as someone else's. Never copied over one it couldn't compare with.
+        here = {"id": "?"} if (home / "fieldlog" / "observations.jsonl").exists() else {}
+    if not drive.get("id") or drive.get("id") == here.get("id"):
+        return ""
+    if here.get("id") or drive.get("name"):
+        return drive.get("name") or drive["id"]
+    return ""
+
+
 def plan_import(drive_data: Path, app: Path, home: Path) -> list[dict]:
     """Read-only: what bringing the drive's data to this computer would do."""
     from cursiv_engine.core import vault
     drive_locked = _vault_on(drive_data)      # a drive encrypted by an older release
+    team = team_notebook(drive_data, home)
     items = []
     for rel, src in sorted(collect([drive_data]).items()):
         if rel.parts[0] in IMPORT_SKIP_TOP or rel.name in IMPORT_SKIP_NAMES:
+            continue
+        if team and rel.parts[0] == "fieldlog":
+            items.append({"rel": rel, "src": src, "dest": None, "action": "team",
+                          "reason": f"{team}'s field notebook: added to the team view in their name, never copied "
+                                    "over this computer's notebook"})
             continue
         target = _target(rel, app, home)
         if drive_locked and vault.covered(rel) and _sealed(src):
@@ -386,6 +421,9 @@ def describe_import(items: list[dict]) -> str:
         parts.append(f"{c['keep']} newer on this computer (kept)")
     if c["skip"]:
         parts.append(f"{c['skip']} encrypted (skipped)")
+    team = next((it["reason"].split("'s field notebook")[0] for it in items if it["action"] == "team"), "")
+    if team:
+        parts.append(f"{team}'s field notebook goes to the team view in their name")
     parts.append(f"{c['same']} already the same")
     return "From the drive to this computer: " + ", ".join(parts) + "."
 

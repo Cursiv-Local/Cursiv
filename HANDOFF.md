@@ -41,7 +41,18 @@ support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELE
 Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
 sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
 
-## U103 work (Claude, 2026-10-25, branch `claude/u103`, not released)
+## U103 team drives (Claude, 2026-10-25, branch `claude/u103-team-drives`)
+Notebook identity: `fieldlog/notebook.json` {id, name}; `_device()` returns the notebook id (an existing
+notebook keeps its first entry's label; nothing is written until it's named). Shares carry the name;
+imports keep `team/<id>.identity.json` (written only when it changes, so re-import is byte-identical).
+A log may hold only its own notebook's label (strict, signed or not: the team view attributes by it; a drive used on two PCs before U103 is refused). On a drive,
+`fieldsync.auto_share()` keeps `cursiv-field-share` at the drive top (start, quit, notebook close, and at most
+every 30 s while recording). `usb_sync.team_notebook` routes another person's notebook to the team view
+(action "team"), never a file copy over this computer's. `make_usb(workspace_name, team_ids)`: a named drive
+gets its own notebook and key; `fieldsync.copy_notebooks_to` puts only chosen notebooks on it.
+Mandatory gate: tests/test_team_drives.py (+ test_fieldsync.py) under `-m usb`.
+
+## U103 work (Claude, 2026-10-25, merged in PR #35)
 Finishes the review list. `science_check.overconfidence_note` (wired in chat/completion.py beside the other
 science notes) judges the verdict lines only (first sentence, lines starting Yes/No/So); measured with
 `scripts/overconfidence_bench.py`, results and hand labels in bench/overconfidence/RESULTS.md. Re-run

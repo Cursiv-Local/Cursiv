@@ -319,9 +319,18 @@ def _download_ollama(runtime: UsbRuntime, dest_dir: Path, progress, cancel: thre
         z.extractall(out_dir)
     return out_dir
 
+def _own_notebook(items: list[dict]) -> list[dict]:
+    """A drive named for one person (U103) starts its own field notebook and signing key: this computer's
+    notebook and key aren't copied onto it (whose work it carries is chosen separately)."""
+    return [it for it in items if it["rel"].parts[0] != "fieldlog" and it["rel"].name != "device_key.json"]
+
+
 def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool,
-             include_keys: bool = False) -> None:
+             include_keys: bool = False, workspace_name: str = "", team_ids: list[str] | tuple = ()) -> None:
     try:
+        if workspace_name:
+            from cursiv_engine.core import fieldlog
+            workspace_name = fieldlog.clean_name(workspace_name)
         have = {m["name"] for m in runtime.list_models()}
         for tag in runtime.required_names(runtime.list_models()):
             if tag not in have:
@@ -342,6 +351,8 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
         todo = [(s, d) for s, d in plan if runtime._needs_copy(s, d)]
         data_dir = root / "Home" / ".cursiv"
         data_items = usb_sync.plan(usb_sync.data_sources(), data_dir, keys=include_keys) if include_private else []
+        if workspace_name:
+            data_items = _own_notebook(data_items)
         total = (sum(s.stat().st_size for s, _ in todo)
                  + sum(it["src"].stat().st_size for it in usb_sync.todo(data_items))) or 1
 
@@ -372,6 +383,8 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             import portable
             portable.migrate_data(root, data_dir)
             data_items = usb_sync.plan(usb_sync.data_sources(), data_dir, keys=include_keys)
+            if workspace_name:
+                data_items = _own_notebook(data_items)
             config = data_dir / "config.json"
             previous = config.read_bytes() if config.is_file() else None
             result = usb_sync.apply(data_items, data_dir, sig.progress.emit, cancel)
@@ -394,6 +407,20 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
                     usb_sync.keep_drive_keys(config, previous)
             data_note += (" Your AI keys were copied and are readable on this drive." if include_keys
                           else " Your AI keys were not copied.")
+
+        if workspace_name or team_ids:
+            # Whose drive this is, and whose work it carries (U103). The drive's own notebook keeps its id if
+            # it already has one, so a re-made drive is still the same person's.
+            from cursiv_engine.core import fieldlog, fieldsync
+            notebook = data_dir / "fieldlog"
+            if workspace_name:
+                me = fieldlog.name_new_notebook(notebook, workspace_name)
+                data_note += f" Its field notebook is {me['name']}'s."
+            if team_ids:
+                sig.progress.emit(-1, "Copying the chosen team notebooks…")
+                copied = fieldsync.copy_notebooks_to(notebook, list(team_ids))
+                names = fieldlog.notebook_names()
+                data_note += (" Team notebooks on it: " + ", ".join(fieldlog.who(i, names) for i in copied) + ".")
 
         runtime.write_licenses(root, models)
 

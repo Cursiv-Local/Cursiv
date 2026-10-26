@@ -76,7 +76,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/tools.py` — read-only computer tools and the tool planner.
 
 ### Field work
-- `core/fieldlog.py` — the field notebook: entries, hash chain, photos, exports, reports, signatures.
+- `core/fieldlog.py` — the field notebook: entries, hash chain, photos, exports, reports, signatures; whose notebook it is (notebook.json: id and name).
 - `core/notebook_tools.py` — notebook commands from chat.
 - `core/field_recall.py` — searching the notebook and its averages.
 - `core/conversation_recall.py` — "what did I ask three messages ago?" answered from this conversation's stored messages (no model).
@@ -85,7 +85,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/science_check.py` — notes under a draft: oxygen saturation against the standard equation, invented example numbers, impossible coordinates, a settled verdict from one reading (overconfidence).
 - `agents/profile_context.py` — what a starter profile may read (notebook, documents, a calculation), fetched by code, read only; the Data checker's findings; the check under a profile's answer.
 - `core/notebook_proposals.py` — confirm cards built by Cursiv's parser: plain-words records, codes kept out of `site`, append-only corrections ("Correct W-001 temperature from 18.6 to 18.9").
-- `core/fieldsync.py` — team sharing and phone imports, without internet.
+- `core/fieldsync.py` — team sharing and phone imports, without internet; team field drives in each scientist's name, and choosing whose work goes on a drive.
 - `core/phone_receive.py` — receiving a phone file over local Wi-Fi.
 - `core/devicekey.py` — this installation's signing key for exports.
 - `core/demo.py` — the field demo's separate sample data.

@@ -194,6 +194,17 @@ def main():
                                 f"The data copied from your USB wasn't fully applied. Files already brought in "
                                 f"stay (each replaced one was backed up); the rest is tried again at the next "
                                 f"start.\n\n{exc}")
+    else:
+        # On a drive (U103): bring the notebook's team copy at the top of the drive up to date, so the
+        # main computer can import this person's work by picking the drive, even with no new entry today.
+        def _team_copy():
+            try:
+                from cursiv_engine.core import fieldsync
+                fieldsync.auto_share()
+            except (OSError, ValueError):  # best-effort: Share with team… in the notebook says why
+                pass
+        import threading
+        threading.Thread(target=_team_copy, daemon=True).start()
 
     # ── Single-instance enforcement ───────────────────────────────────────
     try:
@@ -267,6 +278,15 @@ def main():
         )
         sys.exit(1)
 
+    if os.environ.get('CURSIV_PORTABLE') == '1':
+        def _team_copy_at_quit():
+            # Leaving the drive (U103): the main computer then gets everything recorded today.
+            try:
+                from cursiv_engine.core import fieldsync
+                fieldsync.auto_share()
+            except (OSError, ValueError):  # best-effort: refreshed at the next start on any PC
+                pass
+        app.aboutToQuit.connect(_team_copy_at_quit)
     sys.exit(app.exec())
 
 

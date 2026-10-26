@@ -39,7 +39,7 @@ from pathlib import Path
 
 from PyQt6.QtCore import QObject, Qt, pyqtSignal
 from PyQt6.QtWidgets import (
-    QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QListWidget,
+    QCheckBox, QComboBox, QDialog, QHBoxLayout, QLabel, QLineEdit, QListWidget,
     QListWidgetItem, QMessageBox, QProgressBar, QPushButton, QVBoxLayout,
 )
 import usb_sync
@@ -131,6 +131,20 @@ TAKING YOUR WORK BACK TO A COMPUTER
   in place the next time Cursiv starts. Anything newer on the computer is kept,
   and every replaced file is backed up first. Accounts and passwords stay as they
   are on each computer.
+
+A TEAM WITH ONE MAIN COMPUTER
+  Each person gets a drive made with their name ("Whose drive is this?" in Make
+  a Cursiv USB). The drive's field notebook is theirs, on any computer they plug
+  it into. Cursiv keeps a team copy of it at the top of the drive
+  (cursiv-field-share), brought up to date when Cursiv starts and quits.
+  On the main computer, plug the drives in one at a time and use Import from
+  team... in the Field Notebook (or "Bring drive data here"): each person's
+  entries and photos go into the team view in their name, never over the main
+  computer's own notebook. A damaged copy is refused whole; importing again
+  changes nothing. "team log" and "team log export" show everyone's work, with
+  whose each entry and photo is. Nothing is encrypted per person: anyone signed
+  in on the main computer can read the team's work.
+  Making a drive, tick only the team notebooks that drive should carry.
 
 More: https://cursiv.us  ·  Source: https://github.com/Cursiv-Local/Cursiv
 """
@@ -288,10 +302,26 @@ class _Signals(QObject):
 
 
 def make_usb(root: Path, models: list[dict], include_private: bool, sig: _Signals, cancel: threading.Event, field: bool=False,
-             include_keys: bool=False) -> None:
+             include_keys: bool=False, workspace_name: str = "", team_ids: list[str] | tuple = ()) -> None:
     """Compatibility entry point; implementation in chat.usb_ops."""
-    return _usb_ops.make_usb(_runtime(), root, models, include_private, sig, cancel, field, include_keys)
+    return _usb_ops.make_usb(_runtime(), root, models, include_private, sig, cancel, field, include_keys,
+                             workspace_name, team_ids)
 
+
+
+def _team_import(root: Path) -> str:
+    """A team drive's notebook (U103): imported into the team view in that person's name, from the share
+    Cursiv on the drive keeps at the drive's top. Checked like any team share; never copied over this
+    computer's own notebook."""
+    from cursiv_engine.core import fieldsync
+    if not (root / fieldsync.SHARE_DIR).is_dir():
+        return ("Field notebook: this drive's notebook belongs to someone else, but its team copy isn't on the "
+                "drive yet. Start Cursiv from the drive once (or use Share with team… in its notebook), then "
+                "bring the drive in again. Nothing from the notebook was copied.")
+    try:
+        return "Field notebook, added to the team view:\n" + fieldsync.report_text(fieldsync.import_folder(root))
+    except (OSError, ValueError) as exc:
+        return f"Field notebook: not imported ({exc}). Nothing from it was copied."
 
 
 def check_usb(root: Path, models: list[dict], include_private: bool, include_keys: bool=False) -> tuple[bool, str]:
@@ -326,7 +356,7 @@ class UsbMakerDialog(QDialog):
                            padding: 6px 14px; font-weight: 600; }}
             QPushButton:disabled {{ background: #2a2a3f; color: #777; }}
             QPushButton#ghost {{ background: transparent; color: {SILVER}; border: 1px solid {BORDER}; font-weight: 400; }}
-            QComboBox, QListWidget {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER};
+            QComboBox, QListWidget, QLineEdit {{ background: {BG2}; color: {SILVER}; border: 1px solid {BORDER};
                                       border-radius: 4px; padding: 4px; }}
             QProgressBar {{ background: {BG}; border: 1px solid {BORDER}; border-radius: 3px; color: {SILVER};
                             text-align: center; height: 16px; }}
@@ -384,6 +414,21 @@ class UsbMakerDialog(QDialog):
         self._field = QCheckBox("Field copy: starts in offline mode, no break reminders, no learned guesses")
         self._field.setToolTip("For research or field use. All three can be changed in Settings on the drive.")
         lay.addWidget(self._field)
+
+        # Whose drive, and whose work it carries (U103)
+        self._workspace = QLineEdit()
+        self._workspace.setMaxLength(60)
+        self._workspace.setPlaceholderText("Whose drive is this? (optional: their name)")
+        self._workspace.setToolTip("The drive gets its own field notebook in this name. When it comes back, its work "
+                                   "goes into this computer's team view under this name, never over this "
+                                   "computer's notebook.")
+        lay.addWidget(self._workspace)
+        self._team_label = QLabel("Also put these notebooks on the drive (read only there):")
+        lay.addWidget(self._team_label)
+        self._team_list = QListWidget()
+        self._team_list.setMaximumHeight(110)
+        lay.addWidget(self._team_list)
+        self._load_notebooks()
 
         self._total = QLabel("")
         self._total.setStyleSheet(f"color: {SILV2}; font-size: 12px;")
@@ -536,7 +581,10 @@ class UsbMakerDialog(QDialog):
         def work():
             try:
                 items = usb_sync.plan_import(drive_data, *usb_sync.import_targets())
-                self._sig.planned.emit(items, usb_sync.describe_import(items))
+                message = usb_sync.describe_import(items)
+                if any(it["action"] == "team" for it in items):
+                    message = _team_import(Path(d["root"])) + "\n\n" + message
+                self._sig.planned.emit(items, message)
             except Exception as exc:
                 self._sig.planned.emit(None, f"Couldn't compare the drive: {exc}")
         threading.Thread(target=work, daemon=True).start()
@@ -625,8 +673,32 @@ class UsbMakerDialog(QDialog):
         threading.Thread(target=make_usb,
                          args=(Path(d["root"]), self._chosen_models(), self._private.isChecked(),
                                self._sig, self._cancel, self._field.isChecked(),
-                               self._private.isChecked() and self._keys.isChecked()),
+                               self._private.isChecked() and self._keys.isChecked(),
+                               self._workspace.text().strip(), self._chosen_notebooks()),
                          daemon=True).start()
+
+    def _load_notebooks(self):
+        """This computer's notebook and the team notebooks imported here, none ticked: only the work someone
+        chooses goes onto a drive."""
+        self._team_list.clear()
+        try:
+            from cursiv_engine.core import fieldsync
+            books = fieldsync.notebooks_here()
+        except (OSError, ValueError):
+            books = []
+        for b in books:
+            label = (b["name"] or b["id"]) + (" (this computer)" if b["own"] else "") + f" · {b['entries']} entries"
+            item = QListWidgetItem(label)
+            item.setFlags(item.flags() | Qt.ItemFlag.ItemIsUserCheckable)
+            item.setCheckState(Qt.CheckState.Unchecked)
+            item.setData(Qt.ItemDataRole.UserRole, b["id"])
+            self._team_list.addItem(item)
+        self._team_label.setVisible(bool(books))
+        self._team_list.setVisible(bool(books))
+
+    def _chosen_notebooks(self) -> list[str]:
+        return [self._team_list.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self._team_list.count())
+                if self._team_list.item(i).checkState() == Qt.CheckState.Checked]
 
     def _on_progress(self, pct: int, text: str):
         if pct < 0:
