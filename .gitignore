@@ -50,3 +50,6 @@ private/
 
 # Local release staging (signed installers); never commit
 release-u*/
+
+# Field Station development data (scripts/station_dev.py)
+.station-dev/

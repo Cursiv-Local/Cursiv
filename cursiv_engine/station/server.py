@@ -227,6 +227,16 @@ def make_handler(station: Station):
                 return self._json(200, {"notebooks": fieldsync.notebooks_here(), "drives": storage.discover()})
             return self._json(404, {"error": "not found"})
 
+        def do_HEAD(self):                                  # monitors: /healthz status only, no body
+            if not self._allowed():
+                return
+            ok = urlparse(self.path).path == "/healthz"
+            self.send_response(200 if ok and station.state == "running" else (503 if ok else 405))
+            for k, v in SECURITY_HEADERS.items():
+                self.send_header(k, v)
+            self.send_header("Content-Length", "0")
+            self.end_headers()
+
         # POST
         def do_POST(self):
             if not self._allowed():
@@ -244,7 +254,7 @@ def make_handler(station: Station):
             try:
                 if url.path == "/api/setup":
                     station.gate.first_setup(body.get("code", ""), body.get("username", ""), body.get("password", ""),
-                                             body.get("passphrase", ""), client)
+                                             body.get("passphrase", ""), client, body.get("station_name") or "Field station")
                     return self._json(200, {"ok": True})
                 if url.path == "/api/login":
                     if station.state != "running":

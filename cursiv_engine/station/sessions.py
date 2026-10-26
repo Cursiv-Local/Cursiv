@@ -131,9 +131,11 @@ class Gate:
             self.limiter.fail(*keys)
         return ok
 
-    def first_setup(self, code: str, username: str, password: str, passphrase: str, client: str) -> None:
-        """Create the administrator account and encrypt this station's data. Only while no account exists,
-        and only with the console's setup code."""
+    def first_setup(self, code: str, username: str, password: str, passphrase: str, client: str,
+                    station_name: str = "Field station") -> None:
+        """Create the administrator account, encrypt this station's data and name its notebook (so its entries
+        show a name, not an id, in team views). Only while no account exists, and only with the console's
+        setup code."""
         from cursiv_engine.guardian import access_gate
         from cursiv_engine.core import vault_migration
         keys = (f"ip:{client}", "setup")
@@ -149,8 +151,11 @@ class Gate:
             raise ValueError("use a password of at least 8 characters and a passphrase of at least 12")
         if password == passphrase:
             raise ValueError("the encryption passphrase must be different from the sign-in password")
+        from cursiv_engine.core import fieldlog
+        station_name = fieldlog.clean_name(station_name or "Field station")
         vault_migration.migrate(passphrase)           # encrypt first: no account exists without it
         access_gate.setup_credentials(username, password)
+        fieldlog.set_name(station_name)
         self.setup_code = f"{secrets.randbelow(10**8):08d}"   # spent
 
     # encryption

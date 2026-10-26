@@ -224,3 +224,25 @@ def test_workspaces_lists_notebooks_and_drives(station):
     c.call("POST", "/api/notebook", {"note": "x"})
     body = c.call("GET", "/api/workspaces")[1]
     assert body["notebooks"][0]["own"] is True and isinstance(body["drives"], list)
+
+
+def test_setup_names_the_stations_notebook_and_head_healthz_works(station):
+    from cursiv_engine.core import fieldlog
+    st, c, _ = station
+    assert c.call("POST", "/api/setup", {"code": st.gate.setup_code, "username": "lead", "password": "password1",
+                                         "passphrase": "a long passphrase", "station_name": "Base camp"})[0] == 200
+    assert fieldlog.identity()["name"] == "Base camp"
+    assert c.call("HEAD", "/healthz")[0] == 200 and c.call("HEAD", "/api/session")[0] == 405
+
+
+def test_the_interface_is_served_safely(station):
+    _, c, _ = station
+    status, page, r = c.call("GET", "/")
+    assert status == 200 and "Cursiv Field Station" in page and "script-src 'self'" in r.getheader("Content-Security-Policy")
+    assert c.call("GET", "/static/app.js")[0] == 200 and c.call("GET", "/static/app.css")[0] == 200
+    for path in ("/static/../server.py", "/static/..%2Fserver.py", "/static/server.py", "/static/APP.JS", "/etc/passwd"):
+        assert c.call("GET", path)[0] == 404, path
+    js = (srv.WEB / "app.js").read_text(encoding="utf-8")
+    assert "innerHTML" not in js and "eval(" not in js                     # station data is only ever text
+    html = (srv.WEB / "index.html").read_text(encoding="utf-8")
+    assert "<script>" not in html and " style=" not in html and " on" + "click=" not in html   # the CSP allows no inline code

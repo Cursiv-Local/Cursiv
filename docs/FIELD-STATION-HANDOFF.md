@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 4 of 7 done (server + API).
+Last updated: 2026-10-26, step 5 of 7 done (browser interface).
 
 ## What this work is
 
@@ -63,8 +63,8 @@ these choices (2026-10-26):
 | 2 | `station/telemetry.py` (temperature via discovered thermal zone, `vcgencmd get_throttled` parsing, CPU/RAM via psutil, disk, board model, battery providers: Linux `power_supply`, unavailable, simulated) + `station/simulation.py` (scenarios A–E from the spec, plus F undervoltage) | done: `tests/test_station_telemetry.py` 25 passed |
 | 3 | `station/sessions.py`: sign-in with existing accounts, session cookie (HttpOnly, SameSite=Strict, idle + absolute expiry), CSRF token, login rate limit, encryption unlock | done: `tests/test_station_sessions.py` 7 passed |
 | 4 | `station/server.py`: stdlib server; private/loopback clients only; Host + Origin checks; security headers; API: session, login/logout, unlock, status, health, notebook list/add/correct/verify/export, workspaces, safe shutdown (state machine; real OS shutdown only if configured) | done: `tests/test_station_server.py` 13 passed (live loopback server) |
-| 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | next |
-| 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | planned |
+| 5 | `station/web/` browser UI (dashboard, notebook, health, workspaces, settings), phone-first, Cursiv dark-and-gold look | done: walked through live (setup, restart -> locked -> unlock, record, correct, verify, health at phone width); 15 server tests |
+| 6 | `station/storage.py` Linux drive discovery by filesystem UUID (lsblk JSON / psutil), recognizes Cursiv workspaces (`Home/.cursiv/fieldlog/notebook.json`, `cursiv-field-share/`); ARM64 CI job (`ubuntu-24.04-arm`) | next |
 | 7 | Tests for all of the above, `docs/CODE-MAP.md` lines, update `FIELD-STATION-PLAN.md` status labels, full suite, PR | planned |
 
 Phases 6–9 (install script + systemd, Wi-Fi access point, local AI benchmark on ARM, SSD/USB mounting) come
@@ -72,6 +72,16 @@ later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26 step 5: `station/web/index.html`, `app.css`, `app.js` (views: setup with station name, sign in,
+  unlock, dashboard, notebook with corrections/search/verify/export, health with source chips, workspaces,
+  settings with two-step safe shutdown; textContent only, no inline code, CSP-clean). Walked through in a live
+  preview: setup -> sign in -> server restart -> signed out and notebook locked -> unlock -> record (value
+  "12.40" kept as typed, `<b>` in a note shown as text) -> correction kept the original -> integrity check;
+  Health at 375 px wide without sideways scroll. Fixes from the walkthrough: setup names the station's notebook
+  (`station_name`), HEAD /healthz, notes only for unavailable/stale readings. `scripts/station_dev.py` runs the
+  server against `.station-dev/` (git-ignored); NEVER run `python -m cursiv_engine.station` on a development PC
+  (it holds the data lease and setup encrypts `~/.cursiv`). `.claude/launch.json` config `field-station`
+  (port 8090, scenario A). Committed. Next: step 6, storage tests (`parse_lsblk`) + ARM64 CI job.
 - 2026-10-26 step 4: `station/server.py` (`Station` state + `make_handler`; `local_client()` = the inbound rule:
   loopback or RFC1918/ULA only; Host must be a station name; Origin must match; CSRF header `X-CSRF-Token` on
   every POST after sign-in; security headers + CSP; cookie `cursiv_station` HttpOnly SameSite=Strict (no
