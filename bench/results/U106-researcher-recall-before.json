@@ -1,0 +1,420 @@
+{
+  "method": "Native notebook lookup on synthetic records; no model calls or human usability claim",
+  "date": "2026-10-26",
+  "isolated_home": "C:\\Users\\joshu\\AppData\\Local\\Temp\\cursiv-u106-recall-9eb9v9j5",
+  "records": [
+    {
+      "schema": 1,
+      "id": "e550c694ead2",
+      "seq": 1,
+      "recorded_utc": "2026-10-25T16:00:00Z",
+      "recorded_local": "2026-10-25T12:00:00-04:00",
+      "observer": "",
+      "sample_id": "WB-001",
+      "site": "Willow Basin",
+      "lat": null,
+      "lon": null,
+      "location_source": "",
+      "location_accuracy_m": null,
+      "location_fix_utc": "",
+      "measurements": [
+        {
+          "name": "water temp",
+          "value": "21.4",
+          "number": 21.4,
+          "unit": "C"
+        }
+      ],
+      "note": "Synthetic fixture: cloudy",
+      "photos": [],
+      "corrects": null,
+      "reason": "",
+      "device": "5f932678a65d",
+      "app_version": "",
+      "prev": "genesis",
+      "hash": "89f01f030428b02322785503dd4068914b59e3032b1f5a0fd5a44d1ab75397b7"
+    },
+    {
+      "schema": 1,
+      "id": "5fbed4781727",
+      "seq": 2,
+      "recorded_utc": "2026-10-25T16:00:00Z",
+      "recorded_local": "2026-10-25T12:00:00-04:00",
+      "observer": "",
+      "sample_id": "WB-002",
+      "site": "Willow Basin",
+      "lat": null,
+      "lon": null,
+      "location_source": "",
+      "location_accuracy_m": null,
+      "location_fix_utc": "",
+      "measurements": [
+        {
+          "name": "soil temp",
+          "value": "17.5",
+          "number": 17.5,
+          "unit": "C"
+        }
+      ],
+      "note": "Synthetic fixture: dry soil",
+      "photos": [],
+      "corrects": null,
+      "reason": "",
+      "device": "5f932678a65d",
+      "app_version": "",
+      "prev": "89f01f030428b02322785503dd4068914b59e3032b1f5a0fd5a44d1ab75397b7",
+      "hash": "17618455a4b650917c5a40a9e21203b25296fc5f404a669bb68620a1e503a692"
+    },
+    {
+      "schema": 1,
+      "id": "617ccb5a22de",
+      "seq": 3,
+      "recorded_utc": "2026-10-25T16:00:00Z",
+      "recorded_local": "2026-10-25T12:00:00-04:00",
+      "observer": "",
+      "sample_id": "EM-001",
+      "site": "East Meadow",
+      "lat": null,
+      "lon": null,
+      "location_source": "",
+      "location_accuracy_m": null,
+      "location_fix_utc": "",
+      "measurements": [
+        {
+          "name": "water temp",
+          "value": "19.2",
+          "number": 19.2,
+          "unit": "C"
+        }
+      ],
+      "note": "Synthetic fixture: clear",
+      "photos": [],
+      "corrects": null,
+      "reason": "",
+      "device": "5f932678a65d",
+      "app_version": "",
+      "prev": "17618455a4b650917c5a40a9e21203b25296fc5f404a669bb68620a1e503a692",
+      "hash": "8b11e32ee01194e82289e4abcbb7f564bef1821e9b9e664723367ed206790389"
+    },
+    {
+      "schema": 1,
+      "id": "727d8e9c9552",
+      "seq": 4,
+      "recorded_utc": "2026-10-26T16:00:00Z",
+      "recorded_local": "2026-10-26T12:00:00-04:00",
+      "observer": "",
+      "sample_id": "WB-003",
+      "site": "Willow Basin",
+      "lat": null,
+      "lon": null,
+      "location_source": "",
+      "location_accuracy_m": null,
+      "location_fix_utc": "",
+      "measurements": [
+        {
+          "name": "water temp",
+          "value": "22.0",
+          "number": 22.0,
+          "unit": "C"
+        }
+      ],
+      "note": "Synthetic fixture: clear",
+      "photos": [],
+      "corrects": null,
+      "reason": "",
+      "device": "5f932678a65d",
+      "app_version": "",
+      "prev": "8b11e32ee01194e82289e4abcbb7f564bef1821e9b9e664723367ed206790389",
+      "hash": "902a5a6876a5651f9f24b89018d2603f4b9512ae35675f23183f78c3da4210f1"
+    },
+    {
+      "schema": 1,
+      "id": "a2d96d54f5bc",
+      "seq": 5,
+      "recorded_utc": "2026-10-20T16:00:00Z",
+      "recorded_local": "2026-10-20T12:00:00-04:00",
+      "observer": "",
+      "sample_id": "WB-004",
+      "site": "Willow Basin",
+      "lat": null,
+      "lon": null,
+      "location_source": "",
+      "location_accuracy_m": null,
+      "location_fix_utc": "",
+      "measurements": [
+        {
+          "name": "water temp",
+          "value": "18.0",
+          "number": 18.0,
+          "unit": "C"
+        }
+      ],
+      "note": "Synthetic fixture: clear",
+      "photos": [],
+      "corrects": null,
+      "reason": "",
+      "device": "5f932678a65d",
+      "app_version": "",
+      "prev": "902a5a6876a5651f9f24b89018d2603f4b9512ae35675f23183f78c3da4210f1",
+      "hash": "48cb5ab452f36cc87746eed6fc0582190f1424bab6df3b06b012565312a2b8c9"
+    }
+  ],
+  "question_sha256": "6a5298c58fe79dff5326cf4c48481895e28beda2a2f8a3a29dc3e9d5bf59bb74",
+  "score": {
+    "exact_selection": "3/12",
+    "negatives_preserved": "8/8",
+    "total": "11/20",
+    "median_seconds": 6.980000762268901e-05
+  },
+  "rows": [
+    {
+      "name": "record_yesterday",
+      "question": "What did I record yesterday?",
+      "expected_samples": [
+        "WB-001",
+        "WB-002",
+        "EM-001"
+      ],
+      "selected_samples": [
+        "EM-001",
+        "WB-001",
+        "WB-002"
+      ],
+      "handled": true,
+      "ok": true,
+      "answer": "Field Notebook: 3 matching record(s).\n[617ccb5a22de] #3 · 2026-10-25 12:00:00-04:00 · sample EM-001 · East Meadow — water temp 19.2 C — Synthetic fixture: clear\n[5fbed4781727] #2 · 2026-10-25 12:00:00-04:00 · sample WB-002 · Willow Basin — soil temp 17.5 C — Synthetic fixture: dry soil\n[e550c694ead2] #1 · 2026-10-25 12:00:00-04:00 · sample WB-001 · Willow Basin — water temp 21.4 C — Synthetic fixture: cloudy",
+      "seconds": 0.02412790001835674
+    },
+    {
+      "name": "write_down_yesterday",
+      "question": "What did I write down yesterday?",
+      "expected_samples": [
+        "WB-001",
+        "WB-002",
+        "EM-001"
+      ],
+      "selected_samples": [],
+      "handled": false,
+      "ok": false,
+      "answer": null,
+      "seconds": 6.640003994107246e-05
+    },
+    {
+      "name": "jot_today",
+      "question": "Show what I jotted down today.",
+      "expected_samples": [
+        "WB-003"
+      ],
+      "selected_samples": [],
+      "handled": false,
+      "ok": false,
+      "answer": null,
+      "seconds": 4.100007936358452e-05
+    },
+    {
+      "name": "last_tuesday",
+      "question": "What did I record last Tuesday?",
+      "expected_samples": [
+        "WB-004"
+      ],
+      "selected_samples": [
+        "EM-001",
+        "WB-001",
+        "WB-002",
+        "WB-003",
+        "WB-004"
+      ],
+      "handled": true,
+      "ok": false,
+      "answer": "Field Notebook: 5 matching record(s).\n[a2d96d54f5bc] #5 · 2026-10-20 12:00:00-04:00 · sample WB-004 · Willow Basin — water temp 18.0 C — Synthetic fixture: clear\n[727d8e9c9552] #4 · 2026-10-26 12:00:00-04:00 · sample WB-003 · Willow Basin — water temp 22.0 C — Synthetic fixture: clear\n[617ccb5a22de] #3 · 2026-10-25 12:00:00-04:00 · sample EM-001 · East Meadow — water temp 19.2 C — Synthetic fixture: clear\n[5fbed4781727] #2 · 2026-10-25 12:00:00-04:00 · sample WB-002 · Willow Basin — soil temp 17.5 C — Synthetic fixture: dry soil\n[e550c694ead2] #1 · 2026-10-25 12:00:00-04:00 · sample WB-001 · Willow Basin — water temp 21.4 C — Synthetic fixture: cloudy",
+      "seconds": 0.003026299993507564
+    },
+    {
+      "name": "notebook_yesterday",
+      "question": "Show my field notebook from yesterday.",
+      "expected_samples": [
+        "WB-001",
+        "WB-002",
+        "EM-001"
+      ],
+      "selected_samples": [
+        "EM-001",
+        "WB-001",
+        "WB-002",
+        "WB-003",
+        "WB-004"
+      ],
+      "handled": true,
+      "ok": false,
+      "answer": "Field Notebook: 5 matching record(s).\n[a2d96d54f5bc] #5 · 2026-10-20 12:00:00-04:00 · sample WB-004 · Willow Basin — water temp 18.0 C — Synthetic fixture: clear\n[727d8e9c9552] #4 · 2026-10-26 12:00:00-04:00 · sample WB-003 · Willow Basin — water temp 22.0 C — Synthetic fixture: clear\n[617ccb5a22de] #3 · 2026-10-25 12:00:00-04:00 · sample EM-001 · East Meadow — water temp 19.2 C — Synthetic fixture: clear\n[5fbed4781727] #2 · 2026-10-25 12:00:00-04:00 · sample WB-002 · Willow Basin — soil temp 17.5 C — Synthetic fixture: dry soil\n[e550c694ead2] #1 · 2026-10-25 12:00:00-04:00 · sample WB-001 · Willow Basin — water temp 21.4 C — Synthetic fixture: cloudy",
+      "seconds": 0.004799999995157123
+    },
+    {
+      "name": "willow_water_yesterday",
+      "question": "What was the water temperature at Willow Basin yesterday?",
+      "expected_samples": [
+        "WB-001"
+      ],
+      "selected_samples": [],
+      "handled": false,
+      "ok": false,
+      "answer": null,
+      "seconds": 6.619992200285196e-05
+    },
+    {
+      "name": "east_water_yesterday",
+      "question": "What was the water temperature at East Meadow yesterday?",
+      "expected_samples": [
+        "EM-001"
+      ],
+      "selected_samples": [],
+      "handled": false,
+      "ok": false,
+      "answer": null,
+      "seconds": 3.470003139227629e-05
+    },
+    {
+      "name": "site_yesterday",
+      "question": "Show observations at Willow Basin yesterday.",
+      "expected_samples": [
+        "WB-001",
+        "WB-002"
+      ],
+      "selected_samples": [
+        "EM-001",
+        "WB-001",
+        "WB-002"
+      ],
+      "handled": true,
+      "ok": false,
+      "answer": "Field Notebook: 3 matching record(s).\n[617ccb5a22de] #3 · 2026-10-25 12:00:00-04:00 · sample EM-001 · East Meadow — water temp 19.2 C — Synthetic fixture: clear\n[5fbed4781727] #2 · 2026-10-25 12:00:00-04:00 · sample WB-002 · Willow Basin — soil temp 17.5 C — Synthetic fixture: dry soil\n[e550c694ead2] #1 · 2026-10-25 12:00:00-04:00 · sample WB-001 · Willow Basin — water temp 21.4 C — Synthetic fixture: cloudy",
+      "seconds": 0.002252899925224483
+    },
+    {
+      "name": "sample_today",
+      "question": "Show measurements for sample WB-003 today.",
+      "expected_samples": [
+        "WB-003"
+      ],
+      "selected_samples": [
+        "WB-003"
+      ],
+      "handled": true,
+      "ok": true,
+      "answer": "Field Notebook: 1 matching record(s).\n[727d8e9c9552] #4 · 2026-10-26 12:00:00-04:00 · sample WB-003 · Willow Basin — water temp 22.0 C — Synthetic fixture: clear",
+      "seconds": 0.002412599977105856
+    },
+    {
+      "name": "sample_other_day",
+      "question": "Show measurements for sample WB-003 yesterday.",
+      "expected_samples": [],
+      "selected_samples": [],
+      "handled": true,
+      "ok": true,
+      "answer": "No matching Field Notebook entries.",
+      "seconds": 0.0022905999794602394
+    },
+    {
+      "name": "words_yesterday",
+      "question": "Find observations mentioning cloudy yesterday.",
+      "expected_samples": [
+        "WB-001"
+      ],
+      "selected_samples": [],
+      "handled": true,
+      "ok": false,
+      "answer": "No matching Field Notebook entries.",
+      "seconds": 0.002426000079140067
+    },
+    {
+      "name": "empty_site",
+      "question": "What was the water temperature at Empty Reach yesterday?",
+      "expected_samples": [],
+      "selected_samples": [],
+      "handled": false,
+      "ok": false,
+      "answer": null,
+      "seconds": 7.319997530430555e-05
+    },
+    {
+      "name": "general_temperature",
+      "question": "What is water temperature?",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 3.060000017285347e-05
+    },
+    {
+      "name": "measurement_howto",
+      "question": "How do I measure water temperature at Willow Basin?",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 2.889998722821474e-05
+    },
+    {
+      "name": "creative",
+      "question": "Write a story about observations yesterday.",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 0.000994000001810491
+    },
+    {
+      "name": "workspace_file",
+      "question": "Find notes.txt about water temperature.",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 4.529999569058418e-05
+    },
+    {
+      "name": "saved_notes",
+      "question": "Show my saved notes.",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 2.989999484270811e-05
+    },
+    {
+      "name": "memory_write",
+      "question": "Remember that water temperature was 21 degrees.",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 3.0099996365606785e-05
+    },
+    {
+      "name": "negated",
+      "question": "Do not show my field notebook.",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 0.000597700010985136
+    },
+    {
+      "name": "future",
+      "question": "What might water temperature at Willow Basin be tomorrow?",
+      "expected_samples": null,
+      "selected_samples": [],
+      "handled": false,
+      "ok": true,
+      "answer": null,
+      "seconds": 6.019999273121357e-05
+    }
+  ]
+}

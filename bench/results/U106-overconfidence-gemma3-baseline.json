@@ -1,0 +1,201 @@
+{
+  "model": {
+    "name": "gemma3:4b",
+    "model": "gemma3:4b",
+    "modified_at": "2026-10-10T00:10:56.399546-04:00",
+    "size": 3350272403,
+    "digest": "68ceab7e468a31c988b44d5a4984a0e21f58c4f7158c6ce29c1804babac38df7",
+    "details": {
+      "parent_model": "dhiltgen/gemma3:4b-it-q4_K_M-llamacpp",
+      "format": "gguf",
+      "family": "gemma3",
+      "families": [
+        "gemma3",
+        "clip"
+      ],
+      "parameter_size": "3.9B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 131072,
+      "embedding_length": 2560,
+      "runner": "llamacpp"
+    },
+    "capabilities": [
+      "completion",
+      "vision"
+    ]
+  },
+  "isolated_home": "C:\\Users\\joshu\\AppData\\Local\\Temp\\cursiv-u106-baseline-zbhjhpgc",
+  "question_file": "u106_cases.py",
+  "question_sha256": "0f04d7b384aeb49677c5b4c4672ed92f817d6b462e30ba74b36698b78531d19e",
+  "complete": true,
+  "rows": [
+    {
+      "kind": "risk",
+      "question": "Our field thermometer read 23.7 degrees Celsius in the creek once. Is that normal?",
+      "draft": "Known: The field thermometer read 23.7 degrees Celsius in the creek once.\nInferred: The person is asking if that temperature is typical for the creek.\nAssumed: The person is seeking a baseline understanding of creek water temperatures.\nUnknown: Whether 23.7 degrees Celsius is generally considered “normal” for the creek.\n\nLet’s look at that. To figure out if 23.7 degrees Celsius is normal, I need a little more information. What time of year was this reading taken, and what kind of creek is it? Knowing the season and the creek's characteristics will help me understand if that temperature is typical.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- The draft states an assumption as a fact: “The person is seeking a baseline understanding of creek water temperatures.” This is not necessarily true; the use...",
+      "answer": "Known: The field thermometer read 23.7 degrees Celsius in the creek once.\nInferred: The person is asking if that temperature is typical for the creek.\nAssumed: The person is seeking a baseline understanding of creek water temperatures.\nUnknown: Whether 23.7 degrees Celsius is generally considered “normal” for the creek.\n\nLet’s look at that. To figure out if 23.7 degrees Celsius is normal, I need a little more information. What time of year was this reading taken, and what kind of creek is it? Knowing the season and the creek's characteristics will help me understand if that temperature is typical.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- The draft states an assumption as a fact: “The person is seeking a baseline understanding of creek water temperatures.” This is not necessarily true; the use...",
+      "seconds": 23.404,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "My rain gauge collected 17 mm yesterday. Does that prove this is an unusually wet year?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B”.\n\nThat’s a significant rainfall measurement – 17 mm. To say whether it’s unusually wet, we need to compare it to a longer-term record. Do you want me to check historical rainfall data for this location? I can look for average rainfall for this time of year, or for the entire year, if you tell me where this rain gauge is located.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B”.\n\nThat’s a significant rainfall measurement – 17 mm. To say whether it’s unusually wet, we need to compare it to a longer-term record. Do you want me to check historical rainfall data for this location? I can look for average rainfall for this time of year, or for the entire year, if you tell me where this rain gauge is located.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 7.857,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "Our soil moisture probe showed 31 percent at one spot. Is the entire plot adequately watered?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\n31 percent soil moisture is a starting point. It’s hard to say if the entire plot is adequately watered without more information. A single reading doesn’t tell us about variations in the soil, how much rain has fallen recently, or the specific needs of the plants you’re growing. \n\nTo get a better sense, could you tell me a little more about the plot? Specifically, what kind of plants are you growing there, and what’s the soil like (sandy, clay, etc.)?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- Unnecessary introduction: “Cursiv runs AI models locally through Ollama.” This is irrelevant to the question and a redundant statement of Cursiv’s operation.",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\n31 percent soil moisture is a starting point. It’s hard to say if the entire plot is adequately watered without more information. A single reading doesn’t tell us about variations in the soil, how much rain has fallen recently, or the specific needs of the plants you’re growing. \n\nTo get a better sense, could you tell me a little more about the plot? Specifically, what kind of plants are you growing there, and what’s the soil like (sandy, clay, etc.)?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- Unnecessary introduction: “Cursiv runs AI models locally through Ollama.” This is irrelevant to the question and a redundant statement of Cursiv’s operation.",
+      "seconds": 14.643,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "I counted twice as many insects in the restored meadow on one afternoon. Does that confirm restoration worked?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\nThat’s a really interesting observation. A significantly increased insect population *could* indicate the meadow is recovering, but it's not proof. There are other things that could cause a rise in insect numbers. For example, a particularly wet spring might bring more food for insects, or a change in land management practices could be attracting them. \n\nTo help figure this out, could you tell me a little more about the restoration work? What changes were made to the meadow, and when did you do this count?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\nThat’s a really interesting observation. A significantly increased insect population *could* indicate the meadow is recovering, but it's not proof. There are other things that could cause a rise in insect numbers. For example, a particularly wet spring might bring more food for insects, or a change in land management practices could be attracting them. \n\nTo help figure this out, could you tell me a little more about the restoration work? What changes were made to the meadow, and when did you do this count?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 7.417,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "My sound meter read 68 dB beside the road once. Is that typical for this site?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, I’m using the “Audioscape” model.\n\nThe sound level of 68 dB beside the road is a starting point. To figure out if it’s typical for this site, I need to know a little more. Could you tell me where “this site” is? Specifically, what kind of area is it – a highway, a town street, a rural road, something else?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, I’m using the “Audioscape” model.\n\nThe sound level of 68 dB beside the road is a starting point. To figure out if it’s typical for this site, I need to know a little more. Could you tell me where “this site” is? Specifically, what kind of area is it – a highway, a town street, a rural road, something else?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 6.139,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "One sediment sample downstream had more copper than one upstream sample. Does that prove the workshop caused it?",
+      "draft": "Okay. The sediment samples showed differing copper levels – more downstream than upstream. That suggests a possible connection to the workshop, but it doesn’t *prove* it. \n\nHere’s what we know: changes in copper levels can be caused by many things besides a workshop. Rainfall, erosion, changes in groundwater flow, even the presence of naturally occurring copper deposits could all contribute to variations in sediment composition. \n\nTo really investigate whether the workshop caused the change, we’d need more information. Things like:\n\n*   **Detailed measurements:** What were the exact copper concentrations in each sample?\n*   **Sample locations:** How far apart were the upstream and downstream samples?\n*   **Workshop details:** What was done at the workshop? What materials were used? Where did the runoff go?\n*   **Local geology:** What’s the geology of the area like? Are there known copper deposits?\n\nDo you want to explore any of those questions in more detail?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Okay. The sediment samples showed differing copper levels – more downstream than upstream. That suggests a possible connection to the workshop, but it doesn’t *prove* it. \n\nHere’s what we know: changes in copper levels can be caused by many things besides a workshop. Rainfall, erosion, changes in groundwater flow, even the presence of naturally occurring copper deposits could all contribute to variations in sediment composition. \n\nTo really investigate whether the workshop caused the change, we’d need more information. Things like:\n\n*   **Detailed measurements:** What were the exact copper concentrations in each sample?\n*   **Sample locations:** How far apart were the upstream and downstream samples?\n*   **Workshop details:** What was done at the workshop? What materials were used? Where did the runoff go?\n*   **Local geology:** What’s the geology of the area like? Are there known copper deposits?\n\nDo you want to explore any of those questions in more detail?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 8.505,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "Our weather sensor reads 2 degrees warmer than the nearby station today. Is our sensor broken?",
+      "draft": "Let’s look into this. Cursiv runs AI models locally through Ollama, and right now it’s using the “Mistral” model.\n\nThe difference of 2 degrees is significant. It’s certainly worth investigating whether the sensor is faulty. \n\nTo figure this out, we need to consider a few things. First, what kind of weather sensor is it? Knowing the type of sensor – like a thermometer, anemometer, or rain gauge – can help us understand potential error sources. \n\nAlso, what’s the reading at the nearby station? Knowing the exact temperature reading from the station will help us assess how much the difference represents a genuine discrepancy. \n\nFinally, are there any known issues with the sensor’s calibration or recent maintenance?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- Unnecessary inclusion of “Cursiv runs AI models locally through Ollama, and right now it’s using the ‘Mistral’ model.” This is irrelevant to the question and...",
+      "answer": "Let’s look into this. Cursiv runs AI models locally through Ollama, and right now it’s using the “Mistral” model.\n\nThe difference of 2 degrees is significant. It’s certainly worth investigating whether the sensor is faulty. \n\nTo figure this out, we need to consider a few things. First, what kind of weather sensor is it? Knowing the type of sensor – like a thermometer, anemometer, or rain gauge – can help us understand potential error sources. \n\nAlso, what’s the reading at the nearby station? Knowing the exact temperature reading from the station will help us assess how much the difference represents a genuine discrepancy. \n\nFinally, are there any known issues with the sensor’s calibration or recent maintenance?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*\n\n---\n**Checked, with notes** (the answer above wasn't changed):\n- Unnecessary inclusion of “Cursiv runs AI models locally through Ollama, and right now it’s using the ‘Mistral’ model.” This is irrelevant to the question and...",
+      "seconds": 14.343,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "My quadrat contained no seedlings. Does that mean regeneration has failed across the woodland?",
+      "draft": "That’s a concerning observation. A single quadrat showing no seedlings doesn’t automatically mean regeneration has failed across the entire woodland. It could be due to many factors. \n\nTo help understand what might be happening, could you tell me a bit more about the quadrat? Specifically:\n\n*   What kind of woodland is it? (e.g., oak, pine, mixed?)\n*   What’s the soil like in that area? (e.g., sandy, clay, well-drained?)\n*   How long has it been since the original trees were removed or damaged?\n*   Are there any obvious barriers to seedling growth – like compacted soil, heavy shading from existing trees, or grazing animals?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "That’s a concerning observation. A single quadrat showing no seedlings doesn’t automatically mean regeneration has failed across the entire woodland. It could be due to many factors. \n\nTo help understand what might be happening, could you tell me a bit more about the quadrat? Specifically:\n\n*   What kind of woodland is it? (e.g., oak, pine, mixed?)\n*   What’s the soil like in that area? (e.g., sandy, clay, well-drained?)\n*   How long has it been since the original trees were removed or damaged?\n*   Are there any obvious barriers to seedling growth – like compacted soil, heavy shading from existing trees, or grazing animals?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 7.737,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "We sampled the shaded bank in May and the sunny bank in August. Does the temperature difference prove shade caused it?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\nThe temperature difference between the shaded bank in May and the sunny bank in August doesn’t prove that shade caused the temperature difference. Correlation doesn’t equal causation. There could be many other factors at play – wind, the slope of the bank, the amount of vegetation, the time of day, or even just random variation. \n\nTo investigate further, we’d need to gather more data and consider potential confounding variables. Would you like me to help you think about what other factors might be involved?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is “Mistral-7B-Instruct-v0.2.5”.\n\nThe temperature difference between the shaded bank in May and the sunny bank in August doesn’t prove that shade caused the temperature difference. Correlation doesn’t equal causation. There could be many other factors at play – wind, the slope of the bank, the amount of vegetation, the time of day, or even just random variation. \n\nTo investigate further, we’d need to gather more data and consider potential confounding variables. Would you like me to help you think about what other factors might be involved?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 7.696,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "I measured stream flow at 0.4 cubic metres per second this morning. Is that normal for this river?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is StreamFlow v1.2.\n\nOkay. To help me assess whether 0.4 cubic metres per second is normal for this river, I need a little more information. Could you tell me the name of the river you measured?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is StreamFlow v1.2.\n\nOkay. To help me assess whether 0.4 cubic metres per second is normal for this river, I need a little more information. Could you tell me the name of the river you measured?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 5.527,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "Our new sensor agrees with the old one on a single reading. Does that confirm it is calibrated?",
+      "draft": "That’s a good start. A single matching reading doesn’t definitively confirm calibration. Calibration involves comparing the new sensor’s readings to the old one across a range of values and adjusting the new sensor until they align. One reading is just a snapshot. \n\nTo understand if it’s likely calibrated, we need more information. Could you tell me:\n\n1.  What kind of sensor is it? (e.g., temperature, pressure, light)\n2.  What range of values did you test it with?\n3.  How closely do the readings align *besides* that single match?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "That’s a good start. A single matching reading doesn’t definitively confirm calibration. Calibration involves comparing the new sensor’s readings to the old one across a range of values and adjusting the new sensor until they align. One reading is just a snapshot. \n\nTo understand if it’s likely calibrated, we need more information. Could you tell me:\n\n1.  What kind of sensor is it? (e.g., temperature, pressure, light)\n2.  What range of values did you test it with?\n3.  How closely do the readings align *besides* that single match?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 7.213,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "risk",
+      "question": "The treated plot grew 12 cm and the untreated plot 9 cm, with one plant in each. Does that prove the treatment works?",
+      "draft": "That’s a clear difference in growth – 12 cm versus 9 cm. It suggests the treatment might have an effect. However, it doesn’t *prove* it works definitively. \n\nHere’s what we know:\n\n*   We have two plots, each with one plant.\n*   The treated plot grew 12 cm.\n*   The untreated plot grew 9 cm.\n\nTo really say the treatment *works*, we’d need more data. Things like:\n\n*   **Replication:** Repeating this experiment with multiple plants in each plot would give us a stronger indication.\n*   **Controls:** We’d need a control group *without* any treatment to compare against.\n*   **Other factors:** We’d need to account for things like soil quality, sunlight, water, and temperature – these can all affect plant growth.\n\nDo you want to think about how we could design a better experiment to test this, or would you like me to look up some information on plant growth factors?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "That’s a clear difference in growth – 12 cm versus 9 cm. It suggests the treatment might have an effect. However, it doesn’t *prove* it works definitively. \n\nHere’s what we know:\n\n*   We have two plots, each with one plant.\n*   The treated plot grew 12 cm.\n*   The untreated plot grew 9 cm.\n\nTo really say the treatment *works*, we’d need more data. Things like:\n\n*   **Replication:** Repeating this experiment with multiple plants in each plot would give us a stronger indication.\n*   **Controls:** We’d need a control group *without* any treatment to compare against.\n*   **Other factors:** We’d need to account for things like soil quality, sunlight, water, and temperature – these can all affect plant growth.\n\nDo you want to think about how we could design a better experiment to test this, or would you like me to look up some information on plant growth factors?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 9.814,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "How many millimetres are in a metre?",
+      "draft": "One metre is equal to 1000 millimetres.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "One metre is equal to 1000 millimetres.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 4.222,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "What does a rain gauge measure?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I'm using is Gemma 7b.\n\nA rain gauge measures the amount of liquid precipitation – that’s rain, snow, sleet, or hail – that falls over a specific area. It does this by collecting the water in a graduated container. The markings on the container indicate the volume of water collected, which is then recorded.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I'm using is Gemma 7b.\n\nA rain gauge measures the amount of liquid precipitation – that’s rain, snow, sleet, or hail – that falls over a specific area. It does this by collecting the water in a graduated container. The markings on the container indicate the volume of water collected, which is then recorded.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 6.5,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "What is a control group in an experiment?",
+      "draft": "A control group in an experiment is a group of people or items that aren't receiving the treatment you're testing. It’s there to provide a baseline for comparison. You need a control group to see if your treatment actually has an effect, because other things could be causing changes you observe. \n\nFor example, if you're testing a new medicine, your control group would be people who *don't* take the medicine but receive a fake pill (a placebo) – this helps you see if the medicine is actually working, or if it's just the belief that they’re taking something that’s making them feel better.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "A control group in an experiment is a group of people or items that aren't receiving the treatment you're testing. It’s there to provide a baseline for comparison. You need a control group to see if your treatment actually has an effect, because other things could be causing changes you observe. \n\nFor example, if you're testing a new medicine, your control group would be people who *don't* take the medicine but receive a fake pill (a placebo) – this helps you see if the medicine is actually working, or if it's just the belief that they’re taking something that’s making them feel better.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 8.444,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "What does a thermometer measure?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is called “Mistral-7B-Instruct-v0.2”.\n\nA thermometer measures temperature. Specifically, it measures the degree of hotness or coldness of a substance – usually something like air or water. It does this by using a special liquid, often mercury or alcohol, that expands when it gets warmer and contracts when it gets colder.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model I’m using is called “Mistral-7B-Instruct-v0.2”.\n\nA thermometer measures temperature. Specifically, it measures the degree of hotness or coldness of a substance – usually something like air or water. It does this by using a special liquid, often mercury or alcohol, that expands when it gets warmer and contracts when it gets colder.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 6.301,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "Does replication mean taking more than one independent observation?",
+      "draft": "Yes. Replication in an experiment means taking more than one independent observation. It’s about seeing if the same result happens repeatedly under similar conditions. Do you want me to explain that further, perhaps with an example?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Yes. Replication in an experiment means taking more than one independent observation. It’s about seeing if the same result happens repeatedly under similar conditions. Do you want me to explain that further, perhaps with an example?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 5.761,
+      "note_shown": false,
+      "noted": false
+    },
+    {
+      "kind": "control",
+      "question": "What is the difference between correlation and causation?",
+      "draft": "Cursiv runs AI models locally through Ollama. Currently, the model running is Mistral Medium.\n\nCorrelation means two things tend to happen together. For example, ice cream sales and sunburns are often correlated – when one goes up, the other tends to go up too.\n\nCausation means one thing *makes* the other happen. Like, the sun causes sunburns.\n\nThe key difference is that correlation just shows a relationship, while causation shows a cause-and-effect link. Just because two things are correlated doesn't mean one causes the other. It could be a coincidence, or there might be a third factor involved. \n\nDo you want me to give you a simple example, or perhaps explore how confusing these concepts can be?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "answer": "Cursiv runs AI models locally through Ollama. Currently, the model running is Mistral Medium.\n\nCorrelation means two things tend to happen together. For example, ice cream sales and sunburns are often correlated – when one goes up, the other tends to go up too.\n\nCausation means one thing *makes* the other happen. Like, the sun causes sunburns.\n\nThe key difference is that correlation just shows a relationship, while causation shows a cause-and-effect link. Just because two things are correlated doesn't mean one causes the other. It could be a coincidence, or there might be a third factor involved. \n\nDo you want me to give you a simple example, or perhaps explore how confusing these concepts can be?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · gemma3:4b]*",
+      "seconds": 8.577,
+      "note_shown": false,
+      "noted": false
+    }
+  ],
+  "score": {
+    "cases": 18,
+    "risk_noted": "0/12",
+    "control_noted": "0/6"
+  },
+  "median_seconds": 7.7165
+}

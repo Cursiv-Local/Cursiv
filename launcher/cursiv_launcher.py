@@ -63,7 +63,7 @@ _ICONS = (
 _LOCK_PORT       = 17_860        # local socket port for single-instance lock
 
 # ── Update checker ─────────────────────────────────────────────────────────────
-_CURRENT_VERSION   = "3.14-U105"
+_CURRENT_VERSION   = "3.14-U106"
 _GITHUB_API        = "https://api.github.com/repos/Cursiv-Local/Cursiv/releases/latest"
 _GITHUB_RELEASES   = "https://github.com/Cursiv-Local/Cursiv/releases"
 
@@ -540,7 +540,9 @@ class CursivLauncher(QMainWindow):
         # The window's edge strips show resize arrows; everything inside gets the
         # normal cursor explicitly -- otherwise it inherits the root's last arrow.
         chat_wrap.setCursor(Qt.CursorShape.ArrowCursor)
-        vlay.addWidget(chat_wrap, 1)
+        from research_workspace import ResearchWorkspace
+        self._research_workspace = ResearchWorkspace(chat_wrap, self._chat_panel, self)
+        vlay.addWidget(self._research_workspace, 1)
         _footer = self._build_footer()
         _footer.setCursor(Qt.CursorShape.ArrowCursor)
         vlay.addWidget(_footer)
@@ -742,11 +744,8 @@ class CursivLauncher(QMainWindow):
         # Fired via QTimer.singleShot(1800, ...) on first run only; runs after
         # main.py's try/except has returned, so it must never raise.
         try:
-            from nav_windows import WelcomeDialog
-            dlg = WelcomeDialog(self, setup_needed=not _is_ollama_installed_quick())
-            dlg.exec()
-            if dlg.dont_show_again():
-                _mark_getting_started_seen()
+            self._research_workspace.show_getting_started()
+            _mark_getting_started_seen()
         except Exception as e:
             self._set_status(f"Getting Started dialog failed to open: {e}")
 
@@ -913,14 +912,15 @@ class CursivLauncher(QMainWindow):
 
     def _open_field_notebook(self, photos=None):
         try:
-            from field_notebook import FieldNotebookDialog
-            from cursiv_engine.memory.semantic import current_person
-            dlg = FieldNotebookDialog(self, observer=current_person().title())
-            if photos:
-                dlg.add_photos(photos)
-            dlg.exec()
+            self._research_workspace.open_notebook(photos)
         except Exception as e:
             self._set_status(f"Field Notebook failed to open: {e}")
+
+    def _open_research_files(self):
+        try:
+            self._research_workspace.open_files()
+        except Exception as e:
+            self._set_status(f"Research Files failed to open: {e}")
 
     def _open_tools(self):
         try:

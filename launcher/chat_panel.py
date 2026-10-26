@@ -311,6 +311,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def new_conversation(self) -> None:
         self._cancel_review()
+        self._intents = {}
+        self._pending_intent = None
         self._reset_rendering()
         self._transcript.clear()
         self._transcript_cache.reset()
@@ -419,6 +421,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         if not data:
             return False
         self._cancel_review()
+        self._intents = {}
+        self._pending_intent = None
         self._reset_rendering()
         saved_html = theme.to_current(data.get("html", ""))
         self._transcript.setHtml(saved_html)
@@ -574,6 +578,15 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             from cursiv_engine.core import turn_policy
             unrestricted = turn_policy.effective(stripped) == turn_policy.Policy()
             workspace_request = file_requests.recognizes(stripped)
+            if propose and unrestricted and not workspace_request:
+                from cursiv_engine.core import notebook_proposals
+                preview = (self._memory_confirmation(stripped, history)
+                           or notebook_proposals.context_correction(stripped, history))
+                if preview is not None:
+                    self._pending_intent = preview
+                    self._pending_history_append = None
+                    self._signals.done.emit()
+                    return
             native = unrestricted and not workspace_request and (notebook_tools.is_request(stripped, history) or intents.is_request(
                 stripped, history, person=semantic.current_person(), scope=self._conv_id or ''))
             if native and self._conv_id is None:
@@ -581,7 +594,15 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 self._conv_id = uuid.uuid4().hex[:12]
             result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted and not workspace_request else None
             if result is None and unrestricted and not workspace_request:
-                result = cc.memory_command(stripped, history, scope=self._conv_id or '')
+                result = cc.memory_command(stripped, history, scope=self._conv_id or '', preview_saves=propose)
+                if result is not None and result.save_preview:
+                    from cursiv_engine.core.intent import ACTIONS, Proposal
+                    facts = result.save_preview
+                    self._pending_intent = Proposal(ACTIONS['memory.save'], {'fact': facts[0]}, 'remember ' + facts[0],
+                        [] if len(facts) == 1 else ['Save one memory at a time so you can check its preview.'], edit_text=stripped)
+                    self._pending_history_append = None
+                    self._signals.done.emit()
+                    return
             if result is None and not force_provider:
                 result = cc.handle_command(text, self._cfg, history)
 

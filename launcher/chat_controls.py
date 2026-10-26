@@ -27,7 +27,7 @@ class _ChatInput(QPlainTextEdit):
         self._on_send = on_send
         self._on_paste_image = on_paste_image
         self.setFixedHeight(64)
-        self.setPlaceholderText("Message Cursiv…   (Enter to send · Shift+Enter for a new line · help for commands)")
+        self.setPlaceholderText("Ask a question or describe an observation…   (Enter to send · Shift+Enter for a new line)")
         self.setStyleSheet(f"""
             QPlainTextEdit {{
                 background: {theme.SURFACE}; color: {theme.TEXT};
@@ -62,8 +62,9 @@ class ChatControlsMixin:
         # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
         self._model_box = QComboBox()
         self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
-        self._model_box.setMinimumWidth(320)
-        self._model_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+        self._model_box.setMinimumWidth(180)
+        self._model_box.setMinimumContentsLength(18)
+        self._model_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
         self._model_box.addItem("Looking for local models…", "")
         self._model_box.setEnabled(False)
         self._model_box.activated.connect(self._on_model_chosen)

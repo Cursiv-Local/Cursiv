@@ -1,5 +1,28 @@
 # Changelog
 
+## 3.14-U106 — Research in one window (2026-10-26)
+
+- Four persistent actions: Record Observation, Ask Cursiv, Research Files and Field Notebook. The existing
+  notebook and imported-document library open inside the main window; navigation preserves an unfinished
+  message. Skippable inline guidance labels sample data clearly and never sends or saves it automatically.
+- Supported ordinary measurement descriptions receive an editable confirmation preview. Unknown temperature
+  scales block saving; reported times and days stay notes rather than invented observation timestamps.
+- Desktop memory saves wait for confirmation, including model-assisted interpretations and numbered choices.
+  Contextual corrections use an actual notebook receipt, append a linked correction and keep the original;
+  ambiguous or stale targets do not execute. Pending cards are cleared when conversations change.
+- Notebook reads retain date, site, sample and measurement filters, including yesterday and last weekdays,
+  and show the searched scope with record identifiers. File imports report real outcomes; removal of a
+  library copy requires confirmation and leaves its original file unchanged.
+- Automated synthetic probes: deterministic action/clarification routing 10/18 → 18/18; exact record
+  selection 3/12 → 12/12; unrelated recall requests left alone 8/8 in both runs. These are not live-model
+  accuracy or human-usability scores. A separate fresh probe set first scored 11/12; the missed dated-record
+  phrase was then fixed with a regression, without relabelling that result as held out.
+- The pre-release source suite passed 2,253 tests with 15 skips; the USB gate passed 45 tests. Restart-test
+  subprocesses now isolate their own app data instead of inheriting the outer test run's configuration.
+- Limits remain: no isolated project scopes, general unspecified-report comparison or broad natural-language
+  export workflow; date-scoped aggregate statistics and human usability studies are unfinished. Existing
+  exports remain available. No science/overconfidence rule, model option or Field Station change is claimed.
+
 ## 3.14-U105 — Fixes from an outside review (2026-10-26)
 
 - A drive's signing key can be protected with a passphrase (Field Notebook: Signing key…). Same key, so main

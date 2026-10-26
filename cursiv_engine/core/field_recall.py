@@ -11,7 +11,8 @@ MAX_ROWS = 100000
 
 
 def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
-          entry: str = '', corrections: bool = False, limit: int = 10, offset: int = 0) -> dict:
+          entry: str = '', corrections: bool = False, limit: int = 10, offset: int = 0,
+          site: str = '', measure: str = '') -> dict:
     """Read one authorized notebook, verifying chain while scanning bounded input."""
     path = state_store.checked(fieldlog.log_file())
     if not path.parent.exists():
@@ -33,7 +34,8 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
             raise ValueError('Field log exceeds safe scan budget; use an authorized smaller export for review')
         stream = io.BytesIO(private_store.read_bytes(path))       # encrypted on a computer (U98)
     except FileNotFoundError:
-        return dict(records=[], total=0, offset=offset, more=False, warnings=[], source='field log')
+        return dict(records=[], total=0, offset=offset, more=False, warnings=[], source='field log',
+                    filters=dict(words=words, sample=sample, start=start, end=end, entry=entry, site=site, measure=measure))
     with stream:
         for n in range(1, MAX_ROWS + 2):
             line = stream.readline(1024 * 1024 + 1)
@@ -76,25 +78,72 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
         if not rows:
             # No record has that sample ID; say which ones only mention it (U100 audit: W-003 was in a note).
             mentions = [r for r in everything if sample.casefold() in ' '.join(
-                str(r.get(k, '')) for k in ('site', 'project', 'note', 'measurements')).casefold()][-10:]
+                str(r.get(k, '')) for k in ('site', 'project', 'note', 'measurements')).casefold()]
     if start:
         rows = [r for r in rows if r['recorded_local'][:10] >= start]
+        mentions = [r for r in mentions if r['recorded_local'][:10] >= start]
     if end:
         rows = [r for r in rows if r['recorded_local'][:10] <= end]
+        mentions = [r for r in mentions if r['recorded_local'][:10] <= end]
+    if site:
+        wanted_site = ' '.join(site.casefold().split())
+        rows = [r for r in rows if ' '.join(r.get('site', '').casefold().split()) == wanted_site]
+        mentions = [r for r in mentions if ' '.join(r.get('site', '').casefold().split()) == wanted_site]
+    if measure:
+        wanted_measure = _words(measure)
+        rows = [r for r in rows if any(all(word in _words(item.get('name', '')) for word in wanted_measure)
+                                      for item in r.get('measurements') or [])]
+        mentions = [r for r in mentions if any(all(word in _words(item.get('name', '')) for word in wanted_measure)
+                                              for item in r.get('measurements') or [])]
     if words:
         terms = re.findall(r'[\w.-]+', words.casefold())
         rows = [r for r in rows if all(term in ' '.join(str(r.get(k, '')) for k in
                 ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold() for term in terms)]
+        mentions = [r for r in mentions if all(term in ' '.join(str(r.get(k, '')) for k in
+                    ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold() for term in terms)]
     if corrections:
         rows = [r for r in rows if r.get('corrects')]
+        mentions = [r for r in mentions if r.get('corrects')]
     total = len(rows)
     selected = list(reversed(rows))[offset:offset + limit]
     return dict(records=selected, total=total, offset=offset, more=offset + limit < total,
-                warnings=warnings[:20], source='field log', mentions=list(reversed(mentions)), sample=sample)
+                warnings=warnings[:20], source='field log', mentions=list(reversed(mentions[-10:])), sample=sample,
+                filters=dict(words=words, sample=sample, start=start, end=end, entry=entry, site=site, measure=measure))
+
+
+_MEASURE_TOPIC = (r'(?:(?:water|soil|air)\s+)?(?:temperature|temp)|'
+                  r'(?:water\s+)?(?:pH|dissolved oxygen|conductivity|turbidity|depth)|soil moisture')
+_WEEKDAYS = ('monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday')
+_DATE_SUFFIX = (r'\s+(?:yesterday|today|last\s+(?:week|' + '|'.join(_WEEKDAYS) + r')|'
+                r'(?:on|since|from|between)\s+\d{4}-\d{2}-\d{2})\b.*$')
+
+
+def _outside_notebook(text: str) -> bool:
+    """Do not reinterpret a file, saved-note, memory, hypothetical or negated request."""
+    from . import file_requests
+    return bool(file_requests.recognizes(text)
+                or re.match(r"(?i)^\s*(?:do not|don't|never|remember|forget)\b", text)
+                or re.search(r'(?i)\b(?:saved notes|memories|story|poem|hypothetical|imagine|tomorrow)\b', text)
+                or re.search(r'(?i)\b[\w-]+\.(?:txt|md|csv|json|pdf|docx)\b', text))
 
 
 def is_request(text: str) -> bool:
+    if _outside_notebook(text):
+        return False
     if text.strip().lower() in ('field log', 'fieldlog', 'field notes', 'show field log'):
+        return True
+    if re.search(r"(?i)^(?:what (?:did|have) I (?:write|written|jot|jotted) down|"
+                 r"(?:show|list|find)\b.*\bwhat I (?:wrote|have written|jotted) down)\b", text):
+        return True
+    if (re.match(r'(?i)^(?:find|show|list|retrieve)\s+(?:(?:my|the)\s+)?records\b', text)
+            and re.search(r'(?i)\b(?:today|yesterday|last week|last (?:' + '|'.join(_WEEKDAYS) +
+                          r'))\b|\b\d{4}-\d{2}-\d{2}\b', text)):
+        return True
+    # Historical measurements need an explicit personal record, place or date cue.
+    # General explanations and forecasts stay in ordinary chat.
+    if (re.match(r'(?i)^(?:what (?:was|were)|what\b.*\bdid I (?:measure|record)|show|list|find)\b', text)
+            and re.search(r'(?i)\b(?:' + _MEASURE_TOPIC + r')\b', text)
+            and re.search(r'(?i)\b(?:at|recorded|measured|yesterday|today|last|sample)\b|\d{4}-\d{2}-\d{2}', text)):
         return True
     return bool(re.search(r'(?i)^(?:field\s*log (?:search|entry|sample|recent|since|between|corrections)\b)|'
         r'\b(?:what did I (?:record|log)|(?:find|show|summari[sz]e|search|retrieve|recall|what|which)\b.*'
@@ -102,9 +151,12 @@ def is_request(text: str) -> bool:
         r'what corrections have I made)', text))
 
 
-def request(text: str) -> dict | None:
-    if not is_request(text):
-        return None
+def filters_for_request(text: str) -> dict:
+    """One pure filter parser for both native notebook read routes.
+
+    Dates refer to saved local recording timestamps. A weekday introduced by
+    "last" is the most recent occurrence strictly before today.
+    """
     low = text.lower()
     if 'last field session' in low:
         return {'clarification': 'Field records have no session identifier. Choose a date range or sample ID.'}
@@ -117,13 +169,25 @@ def request(text: str) -> dict | None:
         filters.update(start=str(monday - timedelta(days=7)), end=str(monday - timedelta(days=1)))
     elif 'today' in low:
         filters.update(start=str(today), end=str(today))
+    weekday = re.search(r'(?i)\blast\s+(' + '|'.join(_WEEKDAYS) + r')\b', text)
+    if weekday:
+        day = today - timedelta(days=(today.weekday() - _WEEKDAYS.index(weekday[1].lower())) % 7 or 7)
+        filters.update(start=str(day), end=str(day))
     dates = re.findall(r'\b\d{4}-\d{2}-\d{2}\b', text)
     if dates:
         filters.update(start=dates[0], end=dates[-1] if len(dates) > 1 or 'since' not in low else '')
+        try:
+            for value in dates:
+                date.fromisoformat(value)
+        except ValueError:
+            return {'clarification': 'That calendar date is not valid. Which date should I search?'}
+    elif (re.search(r'(?i)\b(?:last month|last year|this week|this month|next week)\b', text)
+          or (re.search(r'(?i)\bon\s+(?:' + '|'.join(_WEEKDAYS) + r')\b', text) and not weekday)):
+        return {'clarification': 'Which date or date range should I search? Use a calendar date, yesterday, or last Tuesday.'}
     sample = re.search(r'(?i)\bsample\s+([\w.-]+)', text)
     if sample:
         filters['sample'] = sample[1].rstrip('.?')
-    entry = re.search(r'(?i)^field\s*log entry\s+([\w#-]+)', text)
+    entry = re.search(r'(?i)\bentry\s+([0-9a-f]{12}|#?\d+)\b', text)
     if entry:
         filters['entry'] = entry[1]
     count = re.search(r'(?i)\b(?:last|latest|recent)\s+(ten|\d+)\b', text)
@@ -136,7 +200,23 @@ def request(text: str) -> dict | None:
         filters['corrections'] = True
     terms = re.search(r'(?i)(?:mentioning|about|search)\s+(.+?)[?.!]*$', text)
     if terms and not sample:
-        filters['words'] = terms[1].strip(' .?!"\'')
+        filters['words'] = re.sub(_DATE_SUFFIX, '', terms[1], flags=re.I).strip(' .?!"\'')
+    site = re.search(r'(?i)\bat\s+(.+?)(?=\s+(?:yesterday|today|last\s+\w+|for\s+sample|'
+                     r'(?:on|since|from|between)\s+\d{4}-\d{2}-\d{2})\b|[?.!]|$)', text)
+    if site:
+        filters['site'] = site[1].strip()
+    measurement = re.search(r'(?i)\b(' + _MEASURE_TOPIC + r')\b', text)
+    if measurement and not terms:
+        filters['measure'] = measurement[1]
+    return filters
+
+
+def request(text: str) -> dict | None:
+    if not is_request(text):
+        return None
+    filters = filters_for_request(text)
+    if 'clarification' in filters:
+        return filters
     return query(**filters)
 
 
@@ -147,6 +227,15 @@ def render(result: dict, *, summarize: bool = False) -> str:
         return result['clarification']
     lines = [('Field Notebook: ' + str(result['total']) + ' matching record(s).') if result['records'] or result['total']
              else 'No matching Field Notebook entries.']
+    filters = result.get('filters') or {}
+    scope = []
+    if filters.get('start') or filters.get('end'):
+        scope.append('recorded ' + (filters.get('start') or 'earlier') + ' to ' + (filters.get('end') or 'now'))
+    for key, label in (('site', 'site'), ('sample', 'sample'), ('measure', 'measurement'), ('words', 'containing')):
+        if filters.get(key):
+            scope.append(label + ': ' + filters[key])
+    if scope:
+        lines.append('Searched this field notebook — ' + '; '.join(scope) + '. Dates use saved local record timestamps.')
     lines += ['Warning: ' + w for w in result.get('warnings', [])]
     if not result['records']:
         if result.get('mentions'):

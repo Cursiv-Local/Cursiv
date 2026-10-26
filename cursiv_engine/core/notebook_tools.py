@@ -34,6 +34,7 @@ class Result:
     problems: list[str] = field(default_factory=list)
     count: int = 0
     scope: dict = field(default_factory=dict)      # verify: {code: [records that mention it]}
+    filters: dict = field(default_factory=dict)    # read: the actual date/site/sample filters searched
 
     @property
     def ok(self) -> bool:
@@ -64,7 +65,7 @@ class Result:
         from . import field_recall
         sample, mentions = next(iter(self.scope.items()), ("", []))
         return field_recall.render(dict(records=self.records, total=self.count, warnings=[], more=False, offset=0,
-                                        mentions=mentions, sample=sample))
+                                        mentions=mentions, sample=sample, filters=self.filters))
 
 
 def execute(tool: str, args: dict, *, observer: str = '') -> Result:
@@ -74,7 +75,7 @@ def execute(tool: str, args: dict, *, observer: str = '') -> Result:
             raise ValueError('unsupported notebook operation')
         if not isinstance(args, dict):
             raise ValueError('notebook arguments must be an object')
-        allowed = {CREATE: {'fields', 'request_id'}, READ: {'words', 'entry', 'sample', 'limit', 'offset', 'start', 'end'}, VERIFY: set()}[tool]
+        allowed = {CREATE: {'fields', 'request_id'}, READ: {'words', 'entry', 'sample', 'limit', 'offset', 'start', 'end', 'site', 'measure'}, VERIFY: set()}[tool]
         if args.keys() - allowed:
             raise ValueError('unsupported notebook arguments (file paths and permissions are not notebook tools)')
         with _lock:
@@ -92,7 +93,8 @@ def execute(tool: str, args: dict, *, observer: str = '') -> Result:
                 if result['warnings']:
                     return Result(tool, 'failed', error='Some notebook records could not be validated.', problems=result['warnings'])
                 return Result(tool, 'read', records=result['records'], count=result['total'],
-                              scope={result['sample']: result['mentions']} if result.get('mentions') else {})
+                              scope={result['sample']: result['mentions']} if result.get('mentions') else {},
+                              filters=result.get('filters', {}))
             fields = args.get('fields')
             if not isinstance(fields, dict) or fields.keys() - _FIELDS:
                 raise ValueError('unsupported observation fields; photos and record corrections use the notebook window')
@@ -320,10 +322,19 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
                 result.scope[code] = field_recall.query(words=code, limit=50)['records']
         return result
     if intent.kind == 'read' and not intent.reference:
+        from . import field_recall
         entry = re.search(r'(?i)\bentry\s+([0-9a-f]{12}|#?\d+)\b', intent.payload)
         sample = re.search(r'(?i)\bsample\s+([\w.-]+)', intent.payload)
         words = re.search(r'(?i)\bfor\s+(.+?)[.?]?$', intent.payload)
-        args = {'entry': entry[1]} if entry else {'sample': sample[1].rstrip('.?')} if sample else {'words': words[1]} if words else {}
+        args = field_recall.filters_for_request(intent.payload)
+        if 'clarification' in args:
+            return Result(READ, 'clarification', error=args['clarification'])
+        if entry:
+            args['entry'] = entry[1]
+        elif sample:
+            args['sample'] = sample[1].rstrip('.?')
+        elif words and 'words' not in args:
+            args['words'] = words[1]
         if re.search(r'(?i)\bentry\s+\S+', intent.payload) and not entry:
             return Result(READ, 'failed', error='Supply an actual notebook record identifier or entry number.')
         return execute(READ, args, observer=observer)

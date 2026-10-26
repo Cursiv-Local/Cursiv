@@ -1,0 +1,99 @@
+{
+  "method": "Deterministic source calls, isolated HOME and app data, no model calls; synthetic small probe set only",
+  "conflicts": [
+    {
+      "case": "lexical number conflict",
+      "a": "My creek sampling interval is 7 days",
+      "b": "My creek sampling interval is 14 days",
+      "expected_conflict": true,
+      "reason": "they give different numbers"
+    },
+    {
+      "case": "paraphrased interval conflict",
+      "a": "My creek sampling interval is 7 days",
+      "b": "We collect stream samples every 14 days",
+      "expected_conflict": true,
+      "reason": null
+    },
+    {
+      "case": "paraphrased length conflict",
+      "a": "My preferred answer length is 100 words",
+      "b": "I want replies limited to 500 words",
+      "expected_conflict": true,
+      "reason": null
+    },
+    {
+      "case": "paraphrased preference conflict",
+      "a": "I prefer concise answers",
+      "b": "I dislike brief replies",
+      "expected_conflict": true,
+      "reason": null
+    },
+    {
+      "case": "compatible preference",
+      "a": "I prefer short answers",
+      "b": "I prefer brief replies",
+      "expected_conflict": false,
+      "reason": null
+    }
+  ],
+  "retrieval": [
+    {
+      "question": "What is Newton's second law of motion?",
+      "expected_title": "Newton's second law of motion",
+      "actual_titles": [
+        "Newton's second law of motion",
+        "Newton's first law of motion"
+      ],
+      "hit": true
+    },
+    {
+      "question": "How does the push needed change when I double an object's mass but keep its acceleration fixed?",
+      "expected_title": "Newton's second law of motion",
+      "actual_titles": [],
+      "hit": false
+    },
+    {
+      "question": "What is photosynthesis?",
+      "expected_title": "photosynthesis",
+      "actual_titles": [
+        "photosynthesis"
+      ],
+      "hit": true
+    },
+    {
+      "question": "How do green leaves turn sunlight into sugars?",
+      "expected_title": "photosynthesis",
+      "actual_titles": [],
+      "hit": false
+    },
+    {
+      "question": "What is the first law of thermodynamics?",
+      "expected_title": "first law of thermodynamics",
+      "actual_titles": [
+        "first law of thermodynamics"
+      ],
+      "hit": true
+    },
+    {
+      "question": "Can energy appear from nothing in a closed system?",
+      "expected_title": "first law of thermodynamics",
+      "actual_titles": [],
+      "hit": false
+    },
+    {
+      "question": "Explain the nitrogen cycle.",
+      "expected_title": "nitrogen cycle",
+      "actual_titles": [
+        "nitrogen cycle"
+      ],
+      "hit": true
+    },
+    {
+      "question": "How do soil microbes turn atmospheric N2 into compounds plants can use?",
+      "expected_title": "nitrogen cycle",
+      "actual_titles": [],
+      "hit": false
+    }
+  ]
+}

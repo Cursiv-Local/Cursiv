@@ -122,6 +122,7 @@ class Proposal:
     slots: dict
     command: str
     problems: list[str] = field(default_factory=list)
+    edit_text: str = ''              # optional original wording for beginner-friendly editing
 
     @property
     def needs_confirm(self) -> bool:

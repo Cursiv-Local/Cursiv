@@ -24,9 +24,10 @@ def _image_folder(runtime: CommandRuntime, cfg: dict) -> Path:
     folder.mkdir(parents=True, exist_ok=True)
     return folder.resolve()
 
-def memory_command(runtime: CommandRuntime, text: str, history: list[dict], *, scope: str) -> MemoryResult | None:
+def memory_command(runtime: CommandRuntime, text: str, history: list[dict], *, scope: str,
+                   preview_saves: bool = False) -> MemoryResult | None:
     from cursiv_engine.memory import intents, semantic
-    result = intents.command(text, history, person=semantic.current_person(), scope=scope)
+    result = intents.command(text, history, person=semantic.current_person(), scope=scope, preview_saves=preview_saves)
     return runtime.MemoryResult(result) if result is not None else None
 
 def notebook_command(runtime: CommandRuntime, text: str, history: list[dict], *, scope: str, cfg: dict | None) -> NotebookResult | None:

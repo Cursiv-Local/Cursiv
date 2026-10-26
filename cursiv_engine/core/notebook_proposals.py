@@ -80,6 +80,52 @@ def record(text: str) -> Proposal | None:
     return Proposal(LOG, {"details": details}, f"log {details}", problems)
 
 
+# A deliberately narrow sentence grammar: a reported measurement, an explicit place,
+# and an optional reported clock time. Questions and illustrative prose cannot match.
+_OBSERVATION = re.compile(
+    r"(?i)^(?P<name>water temp(?:erature)?|air temperature|soil temperature|temperature|pH|"
+    r"water depth|depth|conductivity|turbidity|dissolved oxygen)\s+"
+    r"(?:(?:was|is|measured|reads?|of)\s+)?(?P<value>" + _NUM + r")\s*"
+    r"(?P<unit>degrees?(?:\s+(?:Celsius|Fahrenheit))?|Celsius|Fahrenheit|°?\s?[CF]|"
+    r"mg\s*/\s*[Ll]|[uµ]S\s*/\s*cm|NTU|ppm|cm|mm|m|%)?\s+"
+    r"(?:at|in)\s+(?P<site>[A-Za-z][A-Za-z0-9 '\-]{0,79}?)"
+    r"(?:\s+(?:around|at|about)\s+(?P<time>(?:[01]?\d|2[0-3]):[0-5]\d(?:\s*[ap]\.?m\.?)?))?[.!]?$"
+)
+
+
+def observation(text: str) -> Proposal | None:
+    """Preview ordinary reported measurements; never infer scale, date or AM/PM."""
+    said = re.sub(r"\s+", " ", (text or "").strip())
+    match = _OBSERVATION.fullmatch(said)
+    if not match:
+        return None
+    name, unit = match['name'], (match['unit'] or '').strip()
+    if 'temp' in name.lower():
+        if re.fullmatch(r'(?i)(?:degrees?\s+)?Celsius|°?\s?C', unit):
+            unit = '°C'
+        elif re.fullmatch(r'(?i)(?:degrees?\s+)?Fahrenheit|°?\s?F', unit):
+            unit = '°F'
+        elif re.fullmatch(r'(?i)degrees?', unit):
+            unit = ''
+    site = match['site']
+    notes = [f"Reported observation time: {match['time']}"] if match['time'] else []
+    day = re.search(r'(?i)\s+(today|yesterday)$', site)
+    if day:
+        notes.append('Reported observation date: ' + day[1])
+        site = site[:day.start()]
+    fields = {'site': site, 'measurements': [dict(name=name, value=match['value'], unit=unit)],
+              'note': '; '.join(notes)}
+    problems = []
+    if re.search(r'(?i)\s+(?:at|around|about|on|last|this|today|yesterday|tomorrow)\b', site):
+        problems.append('The place and reported time are unclear. Keep just the place after "at", '
+                        'and use a clock time after "around" before saving.')
+    if not unit and name.lower() != 'ph':
+        problems.append('Was that Celsius or Fahrenheit? Add the scale before saving.' if 'temp' in name.lower()
+                        else 'What unit was this measured in? Add it before saving.')
+    details = _details(fields)
+    return Proposal(LOG, {'details': details}, 'log ' + details, problems, edit_text=said)
+
+
 def understood(proposal: Proposal | None) -> bool:
     """The parser read the whole message: a reading or a labelled code, and every note piece
     is only a code or a clock time. Then its card is used rather than the model's rewording
@@ -123,3 +169,42 @@ def correction(text: str) -> Proposal | None:
     slots.update(entry=row["id"], measure=current["name"], unit=unit or current.get("unit", ""))
     slots["change"] = f"{current['name']}: {current['value']} → {new} {slots['unit']}".strip()
     return Proposal(CORRECT, slots, re.sub(r"\s+", " ", CORRECT.template.format(**slots)), [])
+
+
+def context_correction(text: str, history: list[dict]) -> Proposal | None:
+    """Use only an actual notebook receipt in this conversation, never assistant prose."""
+    match = re.fullmatch(
+        r"(?i)(?:I|we) (?:recorded|entered|wrote down) (?:the )?wrong "
+        r"(?P<name>water temperature|temperature|pH|depth|turbidity|dissolved oxygen) "
+        r"(?:earlier|in (?:my|the) last entry)[.!]?\s*It should (?:have been|be) "
+        r"(?P<value>" + _NUM + r")\s*(?P<unit>°?[CF]|cm|mm|m|NTU|mg/L)?[.!]?", (text or '').strip())
+    if not match:
+        return None
+    name = match['name']
+    slots = dict(record='', change=f"{name} → {match['value']}")
+    candidates = []
+    for turn in reversed(history or []):
+        receipt = turn.get('notebook_receipt') or {}
+        if turn.get('role') == 'assistant' and receipt.get('ok') and receipt.get('status') in ('saved', 'already_recorded', 'read'):
+            candidates = receipt.get('records') or []
+            break
+    current = {row['id']: row for row in fieldlog.current()}
+    targets = [current[row['id']] for row in candidates if row.get('id') in current and
+               any(_same_measure(item['name'], name) for item in current[row['id']].get('measurements', []))]
+    if len(targets) != 1:
+        return Proposal(CORRECT, slots, '', ['Which observation should change? Open Field Notebook and select it, '
+                                           'or give the sample ID and the old and new readings.'])
+    row = targets[0]
+    measures = [item for item in row['measurements'] if _same_measure(item['name'], name)]
+    if len(measures) != 1:
+        return Proposal(CORRECT, slots, '', ['Several readings match. Select the observation in Field Notebook.'])
+    item = measures[0]
+    if match['unit'] and match['unit'].lstrip('°').casefold() != item.get('unit', '').lstrip('°').casefold():
+        return Proposal(CORRECT, slots, '', ['The correction uses a different unit. State the new value in the stored unit.'])
+    result = correction(f"Correct {row['id']} {item['name']} from {item['value']} {item.get('unit', '')} "
+                        f"to {match['value']} {item.get('unit', '')}")
+    if result and result.ok:
+        result.slots['reason'] = re.sub(r'\s+', ' ', text.strip())[:200].replace('::', ':')
+        result.command = re.sub(r'\s+', ' ', CORRECT.template.format(**result.slots))
+        result.edit_text = text
+    return result

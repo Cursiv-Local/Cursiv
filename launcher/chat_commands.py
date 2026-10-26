@@ -211,9 +211,9 @@ def _image_folder(cfg: dict) -> Path:
 
 
 
-def memory_command(text: str, history: list[dict], *, scope: str='') -> MemoryResult | None:
+def memory_command(text: str, history: list[dict], *, scope: str='', preview_saves: bool = False) -> MemoryResult | None:
     """Compatibility entry point; implementation in command_support."""
-    return _support.memory_command(_runtime(), text, history, scope=scope)
+    return _support.memory_command(_runtime(), text, history, scope=scope, preview_saves=preview_saves)
 
 
 

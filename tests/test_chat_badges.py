@@ -44,7 +44,7 @@ def test_problems_are_plain_and_say_what_to_do():
 
 def test_starters_cover_the_core_jobs():
     html = cb.starters(lambda t: "cursiv://prompt/" + t)
-    for title in ("Field notes", "Calculations", "Your documents", "Offline"):
+    for title in ("Record an observation", "Calculations", "Research files", "Working offline"):
         assert title in html
     assert html.count("cursiv://prompt/") == 4
 

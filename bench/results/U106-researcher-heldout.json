@@ -1,0 +1,164 @@
+{
+  "method": "fresh conservative source-route probes; model unavailable, no synthetic model answers; no human-usability claim",
+  "question_sha256": "2a21ce7242164e4d4e1a91d6e94899303eece345d67c90785be8b163bf43bcbf",
+  "correct": 11,
+  "cases": 12,
+  "rows": [
+    {
+      "id": "heldout-depth-place-clock",
+      "text": "Water depth measured 47 cm in Pine Reach about 16:05.",
+      "expected": "observation_preview",
+      "actual": "observation_preview",
+      "correct": true,
+      "details": {
+        "site": "Pine Reach",
+        "observer": "",
+        "lat": null,
+        "lon": null,
+        "measurements": [
+          {
+            "name": "Water depth",
+            "value": "47",
+            "unit": "cm"
+          }
+        ],
+        "note": "Reported observation time: 16:05",
+        "sample_id": "",
+        "project": ""
+      }
+    },
+    {
+      "id": "heldout-negative-fahrenheit",
+      "text": "Air temperature reads -3.20 Fahrenheit at Ridge Hut at 07:10.",
+      "expected": "observation_preview",
+      "actual": "observation_preview",
+      "correct": true,
+      "details": {
+        "site": "Ridge Hut",
+        "observer": "",
+        "lat": null,
+        "lon": null,
+        "measurements": [
+          {
+            "name": "Air temperature",
+            "value": "-3.20",
+            "unit": "\u00b0F"
+          }
+        ],
+        "note": "Reported observation time: 07:10",
+        "sample_id": "",
+        "project": ""
+      }
+    },
+    {
+      "id": "heldout-temperature-scale-missing",
+      "text": "Soil temperature was 12.6 degrees at Orchard Plot.",
+      "expected": "unit_clarification",
+      "actual": "unit_clarification",
+      "correct": true,
+      "details": {
+        "site": "Orchard Plot",
+        "observer": "",
+        "lat": null,
+        "lon": null,
+        "measurements": [
+          {
+            "name": "Soil temperature",
+            "value": "12.6",
+            "unit": ""
+          }
+        ],
+        "note": "",
+        "sample_id": "",
+        "project": ""
+      }
+    },
+    {
+      "id": "heldout-manual-example",
+      "text": "The manual gives this example: water temperature was 18 C at Cedar Bay.",
+      "expected": "no_action",
+      "actual": "no_action",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-quoted-observation",
+      "text": "\"Water depth was 47 cm at Pine Reach.\"",
+      "expected": "no_action",
+      "actual": "no_action",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-negated-save",
+      "text": "Don't save this: water temperature was 18.2 C at Quarry Inlet.",
+      "expected": "no_action",
+      "actual": "no_action",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-stated-day-not-site",
+      "text": "Water temperature was 18.2 C at Quarry Inlet yesterday.",
+      "expected": "clarification_or_correct_preview",
+      "actual": "observation_preview",
+      "correct": true,
+      "details": {
+        "site": "Quarry Inlet",
+        "observer": "",
+        "lat": null,
+        "lon": null,
+        "measurements": [
+          {
+            "name": "Water temperature",
+            "value": "18.2",
+            "unit": "\u00b0C"
+          }
+        ],
+        "note": "Reported observation date: yesterday",
+        "sample_id": "",
+        "project": ""
+      }
+    },
+    {
+      "id": "heldout-memory-season",
+      "text": "Please keep in mind that our sampling season runs from April through June.",
+      "expected": "memory_preview",
+      "actual": "memory_preview",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-memory-classifier-wording",
+      "text": "Make a mental note that our control plot is Pine Reach.",
+      "expected": "memory_preview_or_clarification",
+      "actual": "clarification",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-range-place-retrieval",
+      "text": "Find records at Pine Reach from 2026-10-11 to 2026-10-13.",
+      "expected": "notebook_read",
+      "actual": "unhandled",
+      "correct": false,
+      "details": {}
+    },
+    {
+      "id": "heldout-correction-no-receipt",
+      "text": "We entered the wrong depth in the last entry. It should be 48 cm.",
+      "expected": "correction_clarification",
+      "actual": "correction_clarification",
+      "correct": true,
+      "details": {}
+    },
+    {
+      "id": "heldout-correction-model-prose",
+      "text": "We entered the wrong depth in the last entry. It should be 48 cm.",
+      "expected": "correction_clarification",
+      "actual": "correction_clarification",
+      "correct": true,
+      "details": {}
+    }
+  ]
+}
