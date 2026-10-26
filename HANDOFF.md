@@ -33,6 +33,14 @@ Profiles are markdown files in `agents/starters/`; `agents/profile_context.py` f
 Report writer invented a unit, methods and a model name before the code check and rules were added. No First
 aid profile (medical stays with the reviewed reference). Owner rule: no self-editing agents.
 
+## U102 published (Claude, 2026-10-25)
+Tag `v3.14-U102` = `36a2428` (PR #32): Windows Job Object isolation (`core/confined.py`; a venv/py launcher
+is resolved to the real interpreter because the job allows one process), 237-case calc benchmark (six
+defects fixed), notebook integrity matrix, encryption recovery tests + `write_recovery_copy`, threat model /
+support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELEASE-VERIFICATION](docs/U102-RELEASE-VERIFICATION.md).
+Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
+sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
+
 ## U101 published (Claude, 2026-10-25)
 Tag `v3.14-U101` = `df74806` (PRs #28, #29, #30). Evidence: [U101-RELEASE-VERIFICATION](docs/U101-RELEASE-VERIFICATION.md).
 Next from the review: tests for problem_report / login_recovery / chat_actions, one notebook read path,
