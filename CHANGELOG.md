@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.14-U105 — Fixes from an outside review (2026-10-26)
+
+- A drive's signing key can be protected with a passphrase (Field Notebook: Signing key…). Same key, so main
+  computers keep accepting its shares; locked after each start until unlocked, and never quietly replaced.
+  Making a drive for a named person warns the key is readable until protected.
+- Strict team import (every photo required; `field log import --strict`): a notebook with a missing or
+  damaged photo is refused whole and nothing from it is copied. The usual import is unchanged.
+- The Vosk voice model is checked against its SHA-256 before use; downloaded zips (Vosk, Ollama) are unpacked
+  with path, link, file-count and size limits, all or nothing (core/safe_zip.py).
+- A test keeps release notes, verification documents, the README and the website's signed manifests in step.
+
 ## 3.14-U104 — Field Station preview, team-drive fixes (2026-10-26)
 
 - **Field Station preview** (Raspberry Pi 5, browser interface; not validated on a Pi yet): a local web

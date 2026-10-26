@@ -97,6 +97,9 @@ commit/push/release only when the owner asks (he asked for U105 work; ask before
 
 ## Progress log (newest first)
 
+- 2026-10-26: version bumped to 3.14-U105 (selfknow, launcher, installer), `docs/RELEASE-U105.md` and the
+  CHANGELOG entry written. Full suite 2,200 passed / 15 skipped (the 15th is the Vosk real-download check,
+  which needs CURSIV_VOSK_ZIP). Committed and pushed; PR opened (see below). Then STOP and ask the owner before merging/releasing (runbook above if he says go).
 - 2026-10-26: item 4 committed: `tests/test_release_docs.py` (current version has RELEASE notes + CHANGELOG
   heading; every linked verification doc exists except the current release's own; README names U<n> or
   U<n-1>; website has cursiv-owner-release-U<k>.json for every verified release >= U89; docs/README.md lists
