@@ -5,7 +5,7 @@ date after every step by the assistant doing the work (Claude), in case that ses
 The owner is Joshua Winkler. Repository: https://github.com/Cursiv-Local/Cursiv (local checkout:
 `C:\Users\joshu\OneDrive\Documents\GitHub\Cursiv-v3`, Windows 11, Git Bash and PowerShell).
 
-Last updated: 2026-10-26, step 7 of 7: full suite passed, PR opened (see log).
+Last updated: 2026-10-26: released in Cursiv v3.14-U104 as a preview (see log).
 
 ## What this work is
 
@@ -72,6 +72,16 @@ later and need a real Pi 5 to validate.
 
 ## Progress log (newest first)
 
+- 2026-10-26: **Released** as part of v3.14-U104 (tag `47c4ceb`): https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U104
+  Evidence: docs/U104-RELEASE-VERIFICATION.md. Public page: https://cursiv.us/field-station (real screens,
+  simulated readings labelled). NEXT for the Pi (needs hardware for validation): phase 6 install script +
+  systemd unit (dedicated `cursiv` user, `python -m cursiv_engine.station --host <wifi address>`,
+  `--shutdown-command sudo -n /usr/bin/systemctl poweroff` with a sudoers rule for exactly that), phase 7
+  NetworkManager hotspot with a generated password + Avahi for cursiv.local, phase 8 ARM model benchmark,
+  phase 9 SSD/USB mounting by UUID with explicit user steps, and docs/FIELD-STATION-ACCEPTANCE.md.
+- 2026-10-26: PR #41 merged; main CI passed (Windows 2,175/14, Mac 2,158/31, Linux 2,157/32, station-arm64
+  113). Tag `v3.14-U104` = `47c4ceb`. Mac build, Windows build and the tag suite running; then sign, publish,
+  evidence PR (`scripts/website_release.py --old U103 --new U104 ...`), website publish.
 - 2026-10-26 (release, owner asked "release, commit, push, publish, and a webpage"): PR #40 merged to main
   (`cac12de`). Branch `claude/u104`: version 3.14-U104 (selfknow, launcher, installer), `docs/RELEASE-U104.md`,
   CHANGELOG. New page `website/field-station.html` (real screens from `scripts/station_shots.py` +
