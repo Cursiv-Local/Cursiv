@@ -37,7 +37,8 @@ def conductance_25(question: str) -> Result | None:
             r"(?i)\b25\s*°?\s*C\b|\bspecific conductance\b|correct(?:ed)? (?:it|this|that)? ?to 25|compensat", q):
         return None
     k = re.search(_N + r"\s*(" + _US + "|" + _MS + ")", q, re.I)
-    temps = [float(t) for t in re.findall(_TEMP, q) if float(t) != 25]
+    at = re.search(r"(?i)\bat\s+(?:a\s+)?(?:water\s+temperature\s+of\s+)?" + _TEMP, q)
+    temps = [float(at.group(1))] if at else [float(t) for t in re.findall(_TEMP, q) if float(t) != 25]
     if not k or not temps:
         return None
     value, unit = float(k.group(1)), "µS/cm" if not re.match(_MS, k.group(2), re.I) else "mS/cm"
@@ -86,6 +87,9 @@ def do_percent(question: str) -> Result | None:
     if not (m and t):
         return None
     from .science_check import DO_SOURCE, do_saturation
+    if float(m.group(1)) < 0:
+        return Result(f"Cursiv didn't calculate this: dissolved oxygen can't be negative ({m.group(1)} mg/L). "
+                      "Check the meter reading.", float("nan"), 0.0)
     try:
         sat = do_saturation(float(t.group(1)))
     except ValueError as exc:

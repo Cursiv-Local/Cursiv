@@ -337,6 +337,11 @@ def current() -> list[dict]:
     return [e for e in all_entries if e["id"] not in replaced]
 
 
+# What a passing chain check does and doesn't show (U102): said wherever the check is reported.
+CHECK_MEANS = ("This shows no entry was changed, removed or reordered after it was recorded; it doesn't show who "
+               "made them, or that the whole notebook wasn't rebuilt -- a signed export does.")
+
+
 def verify() -> list[str]:
     """Problems with the log, or [] when every entry is intact and in order."""
     all_entries, problems = _read()
@@ -1013,7 +1018,7 @@ def command(text: str, observer: str = "") -> str | None:
     if low in ("field log check", "fieldlog check", "check field log"):
         problems = verify() + photo_problems()
         n = len(entries())
-        return (f"All {n} entries are intact and in order." if not problems else
+        return (f"All {n} entries are intact and in order. " + CHECK_MEANS if not problems else
                 "The field log has problems:\n" + "\n".join(f"- {p}" for p in problems))
     if low in ("field log export", "fieldlog export", "export field log"):
         try:

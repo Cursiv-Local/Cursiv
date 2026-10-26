@@ -83,14 +83,21 @@ def run(code: str, timeout: int = 20) -> tuple[bool, str]:
         # and files only in this temp folder and Python's library (core/plugin_runner.py, stdlib only).
         guard = os.path.join(tmp, "_cursiv_guard.py")
         shutil.copyfile(_GUARD, guard)
-        env = {k: v for k, v in os.environ.items() if not re.search(r"KEY|TOKEN|SECRET|PASS", k, re.I)}
+        # U102: only what Python needs to start, as for plugins (was: everything except names that looked
+        # like secrets, which a key under any other name got past).
+        keep = ("SYSTEMROOT", "WINDIR", "TEMP", "TMP", "PATH", "LANG")
+        env = {k: v for k, v in os.environ.items() if k.upper() in keep}
         env["PYTHONIOENCODING"] = "utf-8"
-        flags = 0x08000000 if os.name == "nt" else 0          # CREATE_NO_WINDOW
+        from cursiv_engine.core import confined        # OS-enforced limits too: no child processes, memory, CPU
         try:
-            p = subprocess.run([exe, "-I", guard, "--script", path], cwd=tmp, capture_output=True, text=True, timeout=timeout,
-                               env=env, creationflags=flags, stdin=subprocess.DEVNULL)
+            p = confined.run([confined.real_python(exe), "-I", guard, "--script", path], cwd=tmp,
+                             timeout=timeout, env=env, memory_mb=1024)
         except subprocess.TimeoutExpired:
             return False, f"TIMEOUT after {timeout}s"
+        except confined.ConfinementError as exc:
+            return False, f"SANDBOX: the safety limits couldn't be applied ({exc}), so it wasn't run"
+        if p.limit:
+            return False, f"SANDBOX: it went over the {p.limit} limit for test runs"
         out = (p.stdout or "")[-3000:]
         err = (p.stderr or "")[-3000:].replace(tmp, ".")
         refused = re.search(r"PermissionError: plugins may (?:not |only )(.+)", err)

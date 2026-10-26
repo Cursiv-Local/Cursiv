@@ -318,7 +318,7 @@ class FieldNotebookDialog(QDialog):
         problems = fieldlog.verify() + fieldlog.photo_problems()     # photos too (slower, so only on request)
         if not problems:
             QMessageBox.information(self, "Field log", f"All {len(fieldlog.entries())} entries are intact and in order, "
-                                                       "and every photo matches its fingerprint.")
+                                                       "and every photo matches its fingerprint.\n\n" + fieldlog.CHECK_MEANS)
         else:
             QMessageBox.warning(self, "Field log", "\n".join(problems))
         self._show_integrity()

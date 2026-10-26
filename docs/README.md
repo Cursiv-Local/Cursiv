@@ -19,6 +19,11 @@ link to them.
 - [CONTRIBUTING](../CONTRIBUTING.md): setup, the gates, boundaries to keep
 - [Code map](CODE-MAP.md): every module in one line; [good first issues](GOOD-FIRST-ISSUES.md)
 
+## Trust and recovery (U102)
+
+- [Threat model](THREAT-MODEL.md), [supported platforms](SUPPORT-MATRIX.md), [recovery procedures](RECOVERY.md),
+  [notebook integrity](NOTEBOOK-INTEGRITY.md)
+
 ## Design and plans
 
 - [Architecture plan](ARCHITECTURE-PLAN.md) (see also [ARCHITECTURE](../ARCHITECTURE.md)

@@ -38,7 +38,8 @@ def test_240_liters_120_people_48_hours_at_2_liters_per_person_per_day():
     assert w.record() == {"tool": "resources", "inputs": {"people": "120", "period": "48 hours",
                                                           "allocation": "2 liters per person per day",
                                                           "supply": "240 liters"},
-                          "result": w.statement, "ok": True}
+                          "result": w.statement, "ok": True, "version": __import__(
+                              "cursiv_engine.core.selfknow", fromlist=["VERSION"]).VERSION}
 
 
 def test_seven_18_liter_containers_84_people_three_days():

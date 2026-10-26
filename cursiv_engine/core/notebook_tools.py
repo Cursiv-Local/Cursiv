@@ -50,7 +50,8 @@ class Result:
             from .feedback import logged_receipt
             return logged_receipt(self.records[0], duplicate=self.status == 'already_recorded')
         if self.status == 'verified':
-            lines = [f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified).']
+            lines = [f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified). '
+                     + fieldlog.CHECK_MEANS]
             # A scoped check says which records it found; none found is never "verified" (U100 audit).
             for code, rows in self.scope.items():
                 if rows:

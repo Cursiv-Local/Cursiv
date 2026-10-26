@@ -117,12 +117,15 @@ def sandbox_test(code: str, timeout: int = 25) -> tuple[bool, str, dict]:
         env.update(PYTHONIOENCODING="utf-8", CURSIV_PLUGIN_SANDBOX="1")
         request = {"path": str(path), "data_dir": str(Path(tmp, "plugin_data")), "action": "selftest",
                    "person": "tester"}
+        from cursiv_engine.core import confined
         try:
-            p = subprocess.run(plugins.runner_command(), input=json.dumps(request), capture_output=True,
-                               text=True, encoding="utf-8", timeout=timeout, env=env,
-                               creationflags=0x08000000 if os.name == "nt" else 0)
+            p = confined.run(plugins.runner_command(), input=json.dumps(request), timeout=timeout, env=env)
         except subprocess.TimeoutExpired:
             return False, f"The test took longer than {timeout} seconds (an endless loop?).", {}
+        except confined.ConfinementError as exc:
+            return False, f"The plugin wasn't run: Cursiv couldn't apply its safety limits ({exc}).", {}
+        if p.limit:
+            return False, f"The plugin was stopped by a safety limit ({p.limit}).", {}
         marker = "@@CURSIV-PLUGIN@@"
         if marker not in (p.stdout or ""):
             return False, ((p.stderr or p.stdout or "no output")[-1500:]).replace(tmp, "."), {}

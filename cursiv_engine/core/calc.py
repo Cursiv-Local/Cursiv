@@ -54,7 +54,9 @@ class Worked:
 
     def record(self) -> dict:
         """What actually ran, for the trace and for checking claims of tool use."""
-        return {"tool": self.tool, "inputs": dict(self.inputs), "result": self.statement, "ok": self.ok}
+        from .selfknow import VERSION            # which implementation worked it out (U102)
+        return {"tool": self.tool, "inputs": dict(self.inputs), "result": self.statement, "ok": self.ok,
+                "version": VERSION}
 
 
 def _num(text: str) -> float:
