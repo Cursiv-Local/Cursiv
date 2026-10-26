@@ -41,6 +41,13 @@ support matrix / recovery / notebook docs, JUnit artifacts. Evidence: [U102-RELE
 Next: website repositioning toward field research (owner approved), then U103 (USB/FS matrix, sync, exports
 sidecar metadata, retrieval) and U104 (performance/UX). A recovery menu item is planned, not built.
 
+## U105 published (Claude, 2026-10-26)
+Tag `v3.14-U105` = `501d94e` (PR #43): signing-key passphrase (`core/devicekey.py` protect/unlock/KeyLocked),
+strict photo-complete import (`fieldsync.import_folder(strict=True)`), `core/safe_zip.py` + Vosk SHA-256 pin,
+`tests/test_release_docs.py`. Evidence: [U105-RELEASE-VERIFICATION](docs/U105-RELEASE-VERIFICATION.md).
+Handoffs for other assistants: docs/U105-HANDOFF.md, docs/FIELD-STATION-HANDOFF.md. Next: Field Station
+phases 6-9 when a Raspberry Pi 5 arrives.
+
 ## U104 published (Claude, 2026-10-26)
 Tag `v3.14-U104` = `47c4ceb` (PRs #38, #40, #41). Field Station preview (`cursiv_engine/station/`, plan and
 status in docs/FIELD-STATION-PLAN.md, handoff for other assistants in docs/FIELD-STATION-HANDOFF.md) and
