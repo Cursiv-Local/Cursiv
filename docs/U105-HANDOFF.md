@@ -97,6 +97,9 @@ commit/push/release only when the owner asks (he asked for U105 work; ask before
 
 ## Progress log (newest first)
 
+- 2026-10-26: PR #43 CI all green (Windows, Mac, Linux, station-arm64, workspace gates, security). Waiting
+  for the owner to say "release" before merging; then follow the release runbook above from step 3
+  (merge, main CI, tag, builds, sign, publish, evidence PR, website).
 - 2026-10-26: version bumped to 3.14-U105 (selfknow, launcher, installer), `docs/RELEASE-U105.md` and the
   CHANGELOG entry written. Full suite 2,200 passed / 15 skipped (the 15th is the Vosk real-download check,
   which needs CURSIV_VOSK_ZIP). Committed and pushed; PR #43 opened: https://github.com/Cursiv-Local/Cursiv/pull/43 (not merged, not released). Then STOP and ask the owner before merging/releasing (runbook above if he says go).
