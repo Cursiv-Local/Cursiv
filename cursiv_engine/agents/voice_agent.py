@@ -24,7 +24,6 @@ import json
 import tempfile
 import urllib.request
 import wave
-import zipfile
 from pathlib import Path
 from cursiv_engine.core.paths import APP_DATA   # where program data lives (core/paths.py)
 
@@ -37,6 +36,9 @@ SAMPLE_RATE = 16_000   # all backends expect 16 kHz mono
 _VOSK_MODEL_NAME = "vosk-model-small-en-us-0.15"
 _VOSK_MODEL_URL  = f"https://alphacephei.com/vosk/models/{_VOSK_MODEL_NAME}.zip"
 _VOSK_MODEL_DIR  = _VOICE_DIR / _VOSK_MODEL_NAME
+# U105 (outside review): the download is checked against this before it's unpacked. Measured 2026-10-26 from
+# the file at _VOSK_MODEL_URL (41,205,931 bytes; 20 files, 70,898,967 bytes unpacked).
+_VOSK_SHA256 = "30f26242c4eb449f948e42cb302dd7a686cb29a3423a8367f99ff41780942498"
 
 # faster-whisper uses HuggingFace hub cache by default (~/.cache/huggingface)
 # Override with WHISPER_CACHE env var or pass download_root to WhisperModel.
@@ -153,12 +155,32 @@ def _ensure_vosk_model(status_cb=None) -> Path:
     if status_cb:
         status_cb("Downloading Vosk model (~40 MB)…")
     urllib.request.urlretrieve(_VOSK_MODEL_URL, zip_path)
-    with zipfile.ZipFile(zip_path, "r") as zf:
-        zf.extractall(_VOICE_DIR)
+    return _install_vosk_zip(zip_path)
+
+
+def _install_vosk_zip(zip_path: Path) -> Path:
+    """Check the downloaded model against its pinned SHA-256, unpack it safely (core/safe_zip.py) into a
+    temporary folder, and move the model into place. Anything that doesn't check out is refused and removed."""
+    import hashlib
+    import os
+    import shutil
+    import uuid
+    from cursiv_engine.core import safe_zip
     try:
-        zip_path.unlink()
-    except Exception:
-        pass
+        digest = hashlib.sha256(zip_path.read_bytes()).hexdigest()
+        if digest != _VOSK_SHA256:
+            raise safe_zip.UnsafeZip("the Vosk model download doesn't match its published checksum, so it wasn't used")
+        unpack = _VOICE_DIR / f".vosk-unpack-{uuid.uuid4().hex[:8]}"
+        try:
+            safe_zip.extract(zip_path, unpack, max_files=200, max_bytes=200 << 20, max_file_bytes=100 << 20)
+            inner = unpack / _VOSK_MODEL_NAME
+            if not inner.is_dir():
+                raise safe_zip.UnsafeZip(f"the zip doesn't contain {_VOSK_MODEL_NAME}/")
+            os.replace(inner, _VOSK_MODEL_DIR)
+        finally:
+            shutil.rmtree(unpack, ignore_errors=True)
+    finally:
+        zip_path.unlink(missing_ok=True)
     return _VOSK_MODEL_DIR
 
 

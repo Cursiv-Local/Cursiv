@@ -315,8 +315,9 @@ def _download_ollama(runtime: UsbRuntime, dest_dir: Path, progress, cancel: thre
         zpath.unlink(missing_ok=True)
         raise RuntimeError("The Ollama download didn't match its published checksum, so it wasn't used. Try again.")
     out_dir = dest_dir / "ollama"
-    with runtime.zipfile.ZipFile(zpath) as z:
-        z.extractall(out_dir)
+    # U105: unpacked with limits and nothing outside out_dir (core/safe_zip.py), all or nothing
+    from cursiv_engine.core import safe_zip
+    safe_zip.extract(zpath, out_dir, max_files=20_000, max_bytes=12 << 30, max_file_bytes=4 << 30)
     return out_dir
 
 def _own_notebook(items: list[dict]) -> list[dict]:
