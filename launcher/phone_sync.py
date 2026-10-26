@@ -56,8 +56,11 @@ def _person(st: dict) -> str:
 
 
 def _digest(person: str) -> str:
+    """The summary the phone gets. A memory with a key, token or password in it stays on this
+    computer (U103): the summary is stored on cursiv.us."""
     from cursiv_engine.memory import semantic
-    facts = semantic.list_facts(person)
+    import problem_report
+    facts = [f for f in semantic.list_facts(person) if not problem_report.has_secret(f.get("text", ""))]
     return "\n".join(f"- {f['text']}" for f in facts[-25:])
 
 
@@ -127,8 +130,10 @@ def sync_once() -> str:
             try:
                 pl.api("/api/space/memory", {"digest": digest, "person": person}, token, timeout=20)
                 st["digest_hash"] = h
-            except Exception:
-                pass
+            except Exception as exc:
+                # U103: was ignored and still reported "shared". Retried on the next sync.
+                _save_state(st)
+                return f"learned {learned} fact(s); summary not updated on cursiv.us ({exc})"
         _save_state(st)
         return f"learned {learned} fact(s); summary {'shared' if digest else 'not shared'}"
     finally:

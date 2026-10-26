@@ -77,6 +77,17 @@ def _fmt(text: str) -> str:
     return t.replace("\n", "<br>")
 
 
+_IMAGE_TYPES = ("image/jpeg", "image/png", "image/webp", "image/gif")
+
+
+def _image_url(mime: str, data: str) -> str:
+    """A data URL for a photo from the phone space, or "" when it isn't a plain image (U103: both
+    parts go into the window's HTML, so nothing else may get through)."""
+    if mime not in _IMAGE_TYPES or not re.fullmatch(r"[A-Za-z0-9+/]+={0,2}", data or ""):
+        return ""
+    return f"data:{mime};base64,{data}"
+
+
 class _Signals(QObject):
     messages = pyqtSignal(list)
     image = pyqtSignal(str, str)          # message id, data URL
@@ -236,7 +247,9 @@ class PhoneDialog(QDialog):
                 for m in msgs:
                     if m.get("has_image") and m["id"] not in self._images:
                         r = api(f"/api/space/image/{m['id']}", token=token, timeout=30)
-                        self._sig.image.emit(m["id"], f"data:{r['mime']};base64,{r['image']}")
+                        url = _image_url(r.get("mime", ""), r.get("image", ""))
+                        if url:
+                            self._sig.image.emit(m["id"], url)
             except Exception as exc:
                 if "isn't paired" in str(exc):
                     self._sig.done.emit("unpaired", False, str(exc))
