@@ -1,0 +1,209 @@
+{
+  "checked_utc": "2026-10-27T02:27:04.795941+00:00",
+  "initial_source_commit": "8568768fe6df384eba78594308ab2342e2eb808a",
+  "initial_source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/48",
+  "deployment_source_commit": "efeffac1c6fde6e820a2d95734448f234e254360",
+  "deployment_version": "a235ea1c-f00d-4639-b51c-39b2ad448295",
+  "public_html_pages_verified": 17,
+  "main_http_probes": 46,
+  "additional_www_icon_probes": 3,
+  "indexable_pages_match_deployed_source_bytes": true,
+  "favicon_images_match_official_source_derivatives": true,
+  "favicon_dimensions": {
+    "png": [
+      96,
+      96
+    ],
+    "apple": [
+      180,
+      180
+    ],
+    "ico": [
+      256,
+      256
+    ]
+  },
+  "root_icon_content_types_verified": true,
+  "google_user_agent_probes_passed": true,
+  "actual_googlebot_verification_limit": "User-agent probes are not verified Google requests; dashboard Googlebot block toggle was separately observed off",
+  "sitemap_canonical_urls": 17,
+  "sitemap_lastmod_from_source": true,
+  "www_dns_tls_and_redirects_verified": true,
+  "all_ten_owner_exclusions_retained": true,
+  "private_endpoints_queried": false,
+  "release_tag_unchanged": true,
+  "manual_checklist_only": true,
+  "directory_submissions_sent": false,
+  "recommendation_improvement_claimed": false,
+  "www_icon_redirects": [
+    {
+      "requested_url": "https://www.cursiv.us/favicon.ico",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://www.cursiv.us/favicon.ico",
+          "status": 301,
+          "location": "https://cursiv.us/favicon.ico"
+        },
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "image": {
+        "format": "ICO",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": [
+          [
+            16,
+            16
+          ],
+          [
+            32,
+            32
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            96,
+            96
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      }
+    },
+    {
+      "requested_url": "https://www.cursiv.us/favicon-96x96.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://www.cursiv.us/favicon-96x96.png",
+          "status": 301,
+          "location": "https://cursiv.us/favicon-96x96.png"
+        },
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "image": {
+        "format": "PNG",
+        "size": [
+          96,
+          96
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://www.cursiv.us/apple-touch-icon.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://www.cursiv.us/apple-touch-icon.png",
+          "status": 301,
+          "location": "https://cursiv.us/apple-touch-icon.png"
+        },
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "image": {
+        "format": "PNG",
+        "size": [
+          180,
+          180
+        ],
+        "ico_sizes": []
+      }
+    }
+  ],
+  "previous_deployment_version": "e3aa350b-77ad-4c51-98fb-daf710590bda",
+  "www_icon_probe_note": "Three additional www icon responses collected before the history-only deployment; their image hashes match the final apex audit.",
+  "www_icon_bytes_match_apex": true,
+  "recurring_discovery_automation_created": false,
+  "ci_on_code_changes": true,
+  "schema_org_live_validation": {
+    "errors": 0,
+    "warnings": 0,
+    "top_level_items": 2,
+    "url": "https://validator.schema.org/#url=https%3A%2F%2Fcursiv.us%2F"
+  },
+  "google_live_homepage_test": {
+    "result": "URL is available to Google",
+    "completed_local": "2026-10-26 22:08 America/New_York",
+    "indexing_request_sent": false,
+    "limit": "Precedes the history-only copy update; does not establish icon selection, new-page indexing or recommendations."
+  },
+  "cloudflare_googlebot_block_toggle_observed_off": true,
+  "github_metadata_after": {
+    "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval, calculations in code and portable Windows USB/SSD workspaces.",
+    "homepage": "https://cursiv.us",
+    "topics": [
+      "ai-assistant",
+      "data-collection",
+      "document-retrieval",
+      "field-notebook",
+      "field-research",
+      "local-ai",
+      "local-llm",
+      "offline-ai",
+      "offline-first",
+      "ollama",
+      "open-source",
+      "portable-ai",
+      "private-ai",
+      "research-tools",
+      "scientific-computing",
+      "tamper-evident",
+      "windows"
+    ],
+    "topic_count": 17
+  },
+  "original_release_verified": {
+    "url": "https://github.com/joshua1993winkler-jpg/Cursiv/releases/tag/V3",
+    "public_api": "https://api.github.com/repos/joshua1993winkler-jpg/Cursiv/releases/tags/V3",
+    "published_at": "2026-05-17T07:11:03Z",
+    "tag": "V3",
+    "method": "Read public GitHub release API; notes describe historical capabilities, not an independent software test."
+  },
+  "history_copy_published": true
+}

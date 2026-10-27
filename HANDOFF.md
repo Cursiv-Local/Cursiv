@@ -10,8 +10,10 @@ Continuing handoff: [DISCOVERABILITY-HANDOFF](docs/DISCOVERABILITY-HANDOFF.md); 
 Search Console exclusion classifications: [DISCOVERABILITY-REPORT](docs/DISCOVERABILITY-REPORT.md).
 The website update leads with free/open-source local AI, retains notebook integrity as its distinction,
 and adds local-AI/comparison/evidence pages, official favicons, canonical www handling and an experimental
-llms.txt guide. Local checks: 31 website tests and 6 aggregate-measurement tests passed. Deployment and
-live checks are recorded in that handoff as they happen. Intentional private/noindex exclusions remain;
+llms.txt guide. Checks: 31 website tests and 6 aggregate-measurement tests passed. Published pages/icons
+and redirects were checked live; Google reported the homepage available and Schema.org reported zero
+errors/warnings. The owner chose manual discovery checks; no recurring monitor was created.
+Publication proof and future measurements are in that handoff. Intentional private/noindex exclusions remain;
 no app behavior, station code, model defaults, installer bytes or release tag changes. Directory/review
 drafts require owner approval before sending; no search ranking or AI endorsement is promised.
 
