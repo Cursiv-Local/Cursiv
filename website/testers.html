@@ -24,63 +24,18 @@
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<link rel="stylesheet" href="/assets/site.css?v=u103-1">
+
+
+<link rel="stylesheet" href="/assets/site.css?v=clear-copy-1">
 </head>
 <body>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a>
-    <nav class="nav-links" style="display:flex" aria-label="Main navigation"><a href="/">← Home</a></nav>
-  </div>
-</header>
-
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/local-ai">Local AI</a><a href="/compare">Compare</a><a href="/documentation">Guides</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
 <main>
-  <section class="hero">
-    <div class="wrap stack" style="max-width:800px">
-      <h1>Help test Cursiv</h1>
-      <p class="lede">Your notes go straight into how the next version is built.</p>
-      <p>Cursiv is a local-first assistant focused on field notes, offline use and checkable answers.</p>
-      <p>Testing means trying real tasks—logging an observation, asking a question offline or checking a calculation—and telling me what felt off, slow or unclear.</p>
-      <p>You do not need to be a developer. Clear descriptions of what you did and what happened are enough.</p>
-      <p>I read feedback and use it to decide what gets fixed next. There is no formal program, no payment and no guarantee every suggestion ships. Direct tester notes have already changed parsing, restrictions and source labeling.</p>
-    </div>
-  </section>
+<section class="hero"><div class="wrap stack"><span class="eyebrow">Help test Cursiv</span><h1>Help make Cursiv easier to use.</h1><p class="lede">Try a real task and tell me what felt wrong, slow or confusing. No developer experience needed.</p></div></section>
+<section><div class="wrap stack"><h2>A useful report includes</h2><ul class="short-list"><li>What you tried and the exact steps or prompt.</li><li>What you expected and what happened.</li><li>Your Cursiv version, operating system and online/offline state.</li><li>A screenshot or reply, with private details removed.</li></ul></div></section>
+<section><div class="wrap stack"><h2>Send it directly</h2><p><a href="mailto:cursiv.local@yahoo.com">cursiv.local@yahoo.com</a> · <a href="https://github.com/Cursiv-Local/Cursiv/issues/new">Open a GitHub issue</a></p><p>Feedback informs development. There is no formal program, payment or guarantee a suggestion will ship.</p><div class="cta-row"><a class="btn btn-gold" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download for Windows</a><a class="btn btn-ghost" href="/start">Setup help</a></div></div></section>
 
-  <section style="padding:40px 0">
-    <div class="wrap stack" style="max-width:800px">
-      <h2>What helps most</h2>
-      <ul class="checks">
-        <li><span>Exact prompts or steps you tried</span></li>
-        <li><span>What you expected vs what happened</span></li>
-        <li><span>Screenshots or copy-pasted replies when something looked wrong</span></li>
-        <li><span>Your OS and whether you were online or offline</span></li>
-        <li><span>Anything that felt confusing even if it technically worked</span></li>
-      </ul>
-    </div>
-  </section>
-
-  <section style="padding:40px 0 56px">
-    <div class="wrap stack" style="max-width:800px">
-      <h2>How to send it</h2>
-      <p>Email <a href="mailto:cursiv.local@yahoo.com"><strong>cursiv.local@yahoo.com</strong></a>, or <a href="https://github.com/Cursiv-Local/Cursiv/issues/new">open a GitHub issue</a> on Cursiv-Local/Cursiv.</p>
-      <p>Including your Cursiv version is useful. Find it in the app’s about line or ask “what is your version?”</p>
-      <p>Thanks for looking. Even one clear report is useful.</p>
-      <div class="cta-row">
-        <a class="btn btn-gold" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download Cursiv for Windows</a>
-        <a class="btn btn-ghost" href="/start">Setup help and Mac download</a>
-      </div>
-    </div>
-  </section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <div class="copy">
-      <span>Built by Joshua Winkler · Cursiv · MIT license</span>
-      <span><a href="/">Home</a> · <a href="/start">Setup</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source code</a></span>
-    </div>
-  </div>
-</footer>
-</body>
-</html>
+<footer><div class="wrap"><div class="copy"><span>Built by Joshua Winkler · Cursiv · MIT license</span><span><a href="/start">Setup</a> · <a href="/documentation">Guides &amp; reference</a> · <a href="/testers">Help test</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a></span></div></div></footer>
+<script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
+</body></html>

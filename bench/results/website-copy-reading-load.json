@@ -1,0 +1,210 @@
+{
+  "method": "Whitespace-delimited main-content text; excludes scripts, styles and navigation. Initial words omit closed disclosure bodies but retain their summaries. Counts are a reading-load proxy, not measured human usability.",
+  "baseline_commit": "a4cef6f6610d4981d26ec31aad2b57be5b5c9094",
+  "pages": [
+    {
+      "page": "/ai-reliability-testing",
+      "before": {
+        "all_words": 4539,
+        "initial_words": 4490
+      },
+      "after": {
+        "all_words": 4119,
+        "initial_words": 220
+      }
+    },
+    {
+      "page": "/compare",
+      "before": {
+        "all_words": 749,
+        "initial_words": 749
+      },
+      "after": {
+        "all_words": 199,
+        "initial_words": 199
+      }
+    },
+    {
+      "page": "/documentation",
+      "before": {
+        "all_words": 494,
+        "initial_words": 494
+      },
+      "after": {
+        "all_words": 120,
+        "initial_words": 120
+      }
+    },
+    {
+      "page": "/field-research",
+      "before": {
+        "all_words": 624,
+        "initial_words": 624
+      },
+      "after": {
+        "all_words": 144,
+        "initial_words": 144
+      }
+    },
+    {
+      "page": "/field-station",
+      "before": {
+        "all_words": 863,
+        "initial_words": 863
+      },
+      "after": {
+        "all_words": 141,
+        "initial_words": 141
+      }
+    },
+    {
+      "page": "/",
+      "before": {
+        "all_words": 1030,
+        "initial_words": 574
+      },
+      "after": {
+        "all_words": 284,
+        "initial_words": 175
+      }
+    },
+    {
+      "page": "/local-ai-hardware-requirements",
+      "before": {
+        "all_words": 651,
+        "initial_words": 651
+      },
+      "after": {
+        "all_words": 141,
+        "initial_words": 141
+      }
+    },
+    {
+      "page": "/local-ai",
+      "before": {
+        "all_words": 816,
+        "initial_words": 816
+      },
+      "after": {
+        "all_words": 150,
+        "initial_words": 150
+      }
+    },
+    {
+      "page": "/offline-research",
+      "before": {
+        "all_words": 300,
+        "initial_words": 300
+      },
+      "after": {
+        "all_words": 105,
+        "initial_words": 105
+      }
+    },
+    {
+      "page": "/open-source-offline-ai",
+      "before": {
+        "all_words": 1041,
+        "initial_words": 876
+      },
+      "after": {
+        "all_words": 132,
+        "initial_words": 132
+      }
+    },
+    {
+      "page": "/portable-workspace",
+      "before": {
+        "all_words": 498,
+        "initial_words": 498
+      },
+      "after": {
+        "all_words": 149,
+        "initial_words": 149
+      }
+    },
+    {
+      "page": "/start",
+      "before": {
+        "all_words": 898,
+        "initial_words": 684
+      },
+      "after": {
+        "all_words": 360,
+        "initial_words": 226
+      }
+    },
+    {
+      "page": "/story",
+      "before": {
+        "all_words": 904,
+        "initial_words": 904
+      },
+      "after": {
+        "all_words": 98,
+        "initial_words": 98
+      }
+    },
+    {
+      "page": "/team-drives",
+      "before": {
+        "all_words": 1038,
+        "initial_words": 1038
+      },
+      "after": {
+        "all_words": 134,
+        "initial_words": 134
+      }
+    },
+    {
+      "page": "/testers",
+      "before": {
+        "all_words": 198,
+        "initial_words": 198
+      },
+      "after": {
+        "all_words": 90,
+        "initial_words": 90
+      }
+    },
+    {
+      "page": "/vision",
+      "before": {
+        "all_words": 819,
+        "initial_words": 819
+      },
+      "after": {
+        "all_words": 114,
+        "initial_words": 91
+      }
+    },
+    {
+      "page": "/privacy/",
+      "before": {
+        "all_words": 1732,
+        "initial_words": 1732
+      },
+      "after": {
+        "all_words": 1723,
+        "initial_words": 79
+      }
+    }
+  ],
+  "new_references": {
+    "local-ai-reference": {
+      "all_words": 857,
+      "initial_words": 857
+    },
+    "notebook-reference": {
+      "all_words": 661,
+      "initial_words": 661
+    },
+    "portable-ai-reference": {
+      "all_words": 651,
+      "initial_words": 651
+    }
+  },
+  "old_repository_links": 0,
+  "checked_local_links": 391,
+  "broken_local_or_source_links": []
+}

@@ -22,7 +22,8 @@ import urllib.robotparser
 import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
-PUBLIC = ('/', '/start', '/local-ai', '/compare', '/documentation', '/open-source-offline-ai',
+PUBLIC = ('/', '/start', '/local-ai', '/compare', '/documentation', '/local-ai-reference',
+          '/notebook-reference', '/portable-ai-reference', '/open-source-offline-ai',
           '/local-ai-hardware-requirements', '/portable-workspace', '/field-research',
           '/offline-research', '/team-drives', '/field-station', '/ai-reliability-testing',
           '/vision', '/story', '/testers', '/privacy/')

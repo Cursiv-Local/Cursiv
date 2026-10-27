@@ -42,7 +42,11 @@ test('robots restrictions remain private while all public pages and favicon path
   for (const path of [...urls.map(url => new URL(url).pathname), '/favicon.ico', '/favicon-96x96.png', '/apple-touch-icon.png']) {
     assert(!blocked.some(prefix => path.startsWith(prefix)), path);
   }
-  for (const path of ['/api/', '/remote/', '/admin/', '/notebook', '/app', '/chat', '/profile', '/letters', '?x=2']) assert(!urls.some(url => url.includes(path)), path);
+  for (const path of ['/api', '/remote', '/admin', '/notebook', '/app', '/chat', '/profile', '/letters']) assert(!urls.some(url => {
+    const pathname = new URL(url).pathname;
+    return pathname === path || pathname.startsWith(path + '/');
+  }), path);
+  assert(!urls.some(url => new URL(url).search));
 });
 
 test('interactive tools and the missing-page response retain intentional noindex', () => {
@@ -108,12 +112,13 @@ test('software identity uses supported schema types and contains no invented rep
 
 test('discovery content is useful static HTML with sources and explicit boundaries', () => {
   const local = read(built('/local-ai')), compare = read(built('/compare')), docs = read(built('/documentation'));
+  const reference = read(built('/local-ai-reference'));
   assert.match(local, /free, open-source local AI/i);
-  for (const term of ['Ollama', 'not a new foundational model', 'separate licenses', 'shared across workspaces', 'tamper-proof', 'host traces']) assert(local.includes(term), term);
+  for (const term of ['Ollama', 'not a new foundational model', 'separate licenses', 'shared across workspaces', 'tamper-proof', 'host traces']) assert(reference.includes(term), term);
   for (const term of ['AnythingLLM', 'LM Studio', 'Jan', 'Open WebUI', 'not an independent review', 'license', 'No ratings']) assert(compare.includes(term), term);
   for (const host of ['docs.anythingllm.com', 'lmstudio.ai', 'docs.jan.ai', 'docs.openwebui.com']) assert(compare.includes('https://' + host));
   assert(docs.includes('NOTEBOOK-INTEGRITY.md') && docs.includes('OFFLINE-DEMO.md') && docs.includes('SUPPORT-MATRIX.md'));
-  for (const html of [local, compare, docs]) {
+  for (const html of [local, compare, docs, reference, read(built('/notebook-reference')), read(built('/portable-ai-reference'))]) {
     entities(html);
     for (const row of html.matchAll(/href="https:\/\/github.com\/Cursiv-Local\/Cursiv\/blob\/(?:main|v3\.14-U106)\/([^"]+)"/g)) {
       assert(existsSync(new URL(row[1], root)), row[1]);

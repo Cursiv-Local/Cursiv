@@ -1,0 +1,555 @@
+{
+  "checked_utc": "2026-10-27T03:12:26.466825+00:00",
+  "source_commit": "4cbb36dcf42112a4776979f228372334156e0649",
+  "deployment_version": "ae94cf83-ed22-44df-abdf-6ea8b5f4fd41",
+  "public_pages": 20,
+  "main_probes": 49,
+  "main_final_200": 48,
+  "intentional_letters_404": true,
+  "request_errors": 0,
+  "public_pages_match_deployed_source_bytes": true,
+  "canonical_indexable_sitemap_urls": 20,
+  "sitemap_lastmod_from_source": true,
+  "official_icons_unchanged_and_accessible": true,
+  "private_exclusions_retained": true,
+  "former_repository_links_removed": true,
+  "old_link_check": "All public HTML source checked; production bytes match audited source.",
+  "reference_user_agent_probes": [
+    {
+      "requested_url": "https://cursiv.us/local-ai-reference",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ab74821e7168f32e52313820041a737dbb667501755b198d566228abc5367464",
+      "title": "Local AI Capabilities Reference | Cursiv",
+      "h1": [
+        "Cursiv local AI: capabilities and limits."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ],
+      "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/local-ai-reference",
+          "headline": "Local AI Capabilities Reference",
+          "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai-reference",
+      "user_agent": "oai-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ab74821e7168f32e52313820041a737dbb667501755b198d566228abc5367464",
+      "title": "Local AI Capabilities Reference | Cursiv",
+      "h1": [
+        "Cursiv local AI: capabilities and limits."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ],
+      "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/local-ai-reference",
+          "headline": "Local AI Capabilities Reference",
+          "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai-reference",
+      "user_agent": "claude-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ab74821e7168f32e52313820041a737dbb667501755b198d566228abc5367464",
+      "title": "Local AI Capabilities Reference | Cursiv",
+      "h1": [
+        "Cursiv local AI: capabilities and limits."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ],
+      "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/local-ai-reference",
+          "headline": "Local AI Capabilities Reference",
+          "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook-reference",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "a8ce91421488b2b22e4989da64d5f6719a2e3de90b8b12efde42c32ba054e21c",
+      "title": "Notebook Integrity and Retrieval Reference | Cursiv",
+      "h1": [
+        "Notebooks, retrieval and evidence."
+      ],
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ],
+      "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/notebook-reference",
+          "headline": "Notebook Integrity and Retrieval Reference",
+          "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook-reference",
+      "user_agent": "oai-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "a8ce91421488b2b22e4989da64d5f6719a2e3de90b8b12efde42c32ba054e21c",
+      "title": "Notebook Integrity and Retrieval Reference | Cursiv",
+      "h1": [
+        "Notebooks, retrieval and evidence."
+      ],
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ],
+      "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/notebook-reference",
+          "headline": "Notebook Integrity and Retrieval Reference",
+          "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook-reference",
+      "user_agent": "claude-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "a8ce91421488b2b22e4989da64d5f6719a2e3de90b8b12efde42c32ba054e21c",
+      "title": "Notebook Integrity and Retrieval Reference | Cursiv",
+      "h1": [
+        "Notebooks, retrieval and evidence."
+      ],
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ],
+      "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/notebook-reference",
+          "headline": "Notebook Integrity and Retrieval Reference",
+          "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-ai-reference",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "3ba86ad8c3c8ba05046eca738fb93d7b7bb85a9f4047c2c764c54e6d6c10e974",
+      "title": "Portable and Offline AI Reference | Cursiv",
+      "h1": [
+        "Portable AI: kit and offline reference."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ],
+      "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/portable-ai-reference",
+          "headline": "Portable and Offline AI Reference",
+          "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-ai-reference",
+      "user_agent": "oai-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "3ba86ad8c3c8ba05046eca738fb93d7b7bb85a9f4047c2c764c54e6d6c10e974",
+      "title": "Portable and Offline AI Reference | Cursiv",
+      "h1": [
+        "Portable AI: kit and offline reference."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ],
+      "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/portable-ai-reference",
+          "headline": "Portable and Offline AI Reference",
+          "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-ai-reference",
+      "user_agent": "claude-searchbot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "3ba86ad8c3c8ba05046eca738fb93d7b7bb85a9f4047c2c764c54e6d6c10e974",
+      "title": "Portable and Offline AI Reference | Cursiv",
+      "h1": [
+        "Portable AI: kit and offline reference."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ],
+      "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/portable-ai-reference",
+          "headline": "Portable and Offline AI Reference",
+          "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    }
+  ],
+  "reference_html_same_for_browser_and_crawler_probes": true,
+  "crawler_probe_limit": "User-agent access probes do not establish verified crawler identity, actual indexing, recommendations or ranking.",
+  "local_checks": {
+    "website": 31,
+    "measurement": 6,
+    "mandatory_usb": 45
+  },
+  "layout_pages_desktop": 20,
+  "layout_pages_mobile": 20,
+  "protected_u106_tag": "10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a",
+  "app_release_changed": false,
+  "user_data_or_private_apis_accessed": false,
+  "recurring_automation_created": false,
+  "preview_server_stopped": true
+}

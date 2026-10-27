@@ -36,7 +36,8 @@ Website build/tests on code changes are separate from a scheduled search monitor
    ```
 
    Check public status/canonical/noindex, the three favicon formats, Google user-agent responses,
-   canonical redirects and the 17-entry sitemap. It never queries private APIs. User-agent probes alone
+   canonical redirects and the sitemap's current canonical public entries. The copy cleanup expanded
+   it to 20 URLs, including three detailed references. It never queries private APIs. User-agent probes alone
    do not establish verified crawler identity.
 7. Use Search Console URL Inspection when needed. Its live homepage test reported **URL is available
    to Google**, October 26, 2026 at 10:08 PM local time. Check new pages as Google discovers them. The

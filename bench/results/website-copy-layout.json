@@ -1,0 +1,249 @@
+{
+  "method": "Browser DOM measurements at default desktop viewport and explicit 390px mobile viewport; not a human usability study.",
+  "mobile": [
+    {
+      "path": "/",
+      "brokenImages": 0,
+      "h1": "Local AI built for records you can verify.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/start",
+      "brokenImages": 0,
+      "h1": "Install Cursiv.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/compare",
+      "brokenImages": 0,
+      "h1": "Choose the tool for your work.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/documentation",
+      "brokenImages": 0,
+      "h1": "Find the guide you need.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/local-ai",
+      "brokenImages": 0,
+      "h1": "Local AI for your documents and notes.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/local-ai-reference",
+      "brokenImages": 0,
+      "h1": "Cursiv local AI: capabilities and limits.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/notebook-reference",
+      "brokenImages": 0,
+      "h1": "Notebooks, retrieval and evidence.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/portable-ai-reference",
+      "brokenImages": 0,
+      "h1": "Portable AI: kit and offline reference.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/ai-reliability-testing",
+      "brokenImages": 0,
+      "h1": "Tests you can inspect.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/privacy/",
+      "brokenImages": 0,
+      "h1": "Cursiv Privacy Policy",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/field-research",
+      "brokenImages": 0,
+      "h1": "Record it. Keep the original.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/team-drives",
+      "brokenImages": 0,
+      "h1": "Team records. One place to bring them back.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/field-station",
+      "brokenImages": 0,
+      "h1": "A notebook server for the field.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/offline-research",
+      "brokenImages": 0,
+      "h1": "Keep recording when the signal goes.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/portable-workspace",
+      "brokenImages": 0,
+      "h1": "Take your workspace with you.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/open-source-offline-ai",
+      "brokenImages": 0,
+      "h1": "AI without a connection.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/local-ai-hardware-requirements",
+      "brokenImages": 0,
+      "h1": "Will it run on your computer?",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/vision",
+      "brokenImages": 0,
+      "h1": "Make the everyday work dependable.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/story",
+      "brokenImages": 0,
+      "h1": "Built by doing the work.",
+      "page": 375,
+      "width": 375
+    },
+    {
+      "path": "/testers",
+      "brokenImages": 0,
+      "h1": "Help make Cursiv easier to use.",
+      "page": 375,
+      "width": 375
+    }
+  ],
+  "desktop": [
+    {
+      "path": "/",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/start",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/compare",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/documentation",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/local-ai",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/local-ai-reference",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/notebook-reference",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/portable-ai-reference",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/ai-reliability-testing",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/privacy/",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/field-research",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/team-drives",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/field-station",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/offline-research",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/portable-workspace",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/open-source-offline-ai",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/local-ai-hardware-requirements",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/vision",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/story",
+      "page": 1265,
+      "width": 1265
+    },
+    {
+      "path": "/testers",
+      "page": 1265,
+      "width": 1265
+    }
+  ],
+  "mobile_menu_open_close_verified": true,
+  "viewport_reset": true
+}

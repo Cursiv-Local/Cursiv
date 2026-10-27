@@ -22,144 +22,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css?v=u103-1">
+
+
+<link rel="stylesheet" href="/assets/site.css?v=clear-copy-1">
 </head>
 <body>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a>
-    <nav class="nav-links" style="display:flex">
-      <a href="/">← Home</a>
-    </nav>
-  </div>
-</header>
-
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/local-ai">Local AI</a><a href="/compare">Compare</a><a href="/documentation">Guides</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
 <main>
-<section class="hero">
-  <div class="wrap">
-    <span class="eyebrow">Direction</span>
-    <h1>Trustworthy first. Then bigger.</h1>
-    <p class="lede">Cursiv is meant to become a local intelligence system that keeps reliable knowledge even when connectivity,
-      hardware, information or the AI itself are unreliable. It gets there one level at a time, and each level has to be shown to
-      work before the next one is built.</p>
-    <p class="principle">Connectivity is optional. Trust is not.</p>
-  </div>
-</section>
+<section class="hero"><div class="wrap stack"><span class="eyebrow">Project direction</span><h1>Make the everyday work dependable.</h1><p class="lede">Keep local AI useful, records inspectable and important actions under your control.</p></div></section>
+<section><div class="wrap stack"><h2>What matters</h2><ul class="short-list"><li><b>Useful offline.</b> Local records and tools after setup.</li><li><b>Evidence you can inspect.</b> Source references, calculation methods and preserved corrections.</li><li><b>Clear control.</b> Confirmation before supported record changes.</li><li><b>Honest limits.</b> Missing evidence and unfinished work stay visible.</li></ul></div></section>
+<section><div class="wrap stack"><h2>Where things stand</h2><p>U106 adds easier access to research tools and confirmed observation previews. Project isolation, broader report comparisons and human usability studies remain unfinished.</p><p><a href="/ai-reliability-testing#u106">Current release evidence</a> · <a href="https://github.com/Cursiv-Local/Cursiv/issues">Open issues</a></p><details class="more"><summary>Software and model results</summary><p>U106 source passed 2,253 Windows software regression tests, with 15 skipped. Historical model measurements are separate; neither is a new U106 accuracy result.</p></details></div></section>
 
-<section id="honesty">
-  <div class="wrap grid2">
-    <div class="stack">
-      <span class="eyebrow">What "trustworthy" means here</span>
-      <h2>Honest about what it knows.</h2>
-      <p class="lede">Not "always right". No AI is. The goal is that Cursiv is always clear about what it knows, what it
-        inferred, what it's assuming, and what it can't tell, and that it says "I don't have enough evidence" instead of
-        inventing an answer.</p>
-    </div>
-    <div class="card">
-      <h3>Kinds of knowledge kept apart</h3>
-      <ul>
-        <li><b>Memory:</b> what a person told Cursiv</li>
-        <li><b>Reference:</b> curated material, with its source</li>
-        <li><b>Observation:</b> something a person or instrument recorded</li>
-        <li><b>Inference:</b> a conclusion drawn from the above</li>
-        <li><b>Hypothesis:</b> a possible explanation, not established</li>
-        <li><b>Unknown:</b> not enough evidence</li>
-      </ul>
-      <p class="fine" style="margin-top:10px">Today Cursiv separates memory origin and Known / Inferred / Assumed / Unknown in answers. Observations and hypotheses as records are planned.</p>
-    </div>
-  </div>
-</section>
-
-<section id="demonstrate">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">What has to be demonstrated</span>
-      <h2>Five things, each shown with evidence.</h2>
-      <p class="lede">Not more agents or features: proof that it works.</p>
-    </div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>Goal</th><th>Status</th><th>Where it stands</th></tr></thead>
-        <tbody>
-          <tr><td><b>1. Reliable answers</b><br>A repeatable benchmark shows how often Cursiv is right, when it invents things, and whether it recognizes missing evidence.</td><td class="st"><span class="badge b-tested">Baseline done</span></td><td>U106 source passed 2,253 Windows software regression tests, with one platform skip. Native guidance, restricted-turn gates and verified receipts cover specific code behavior. The historical U85 158-case model run and controlled rendering measurements remain public; neither is a new U106 accuracy result. See the <a href="/ai-reliability-testing#u106">current evidence and limitations</a>.</td></tr>
-          <tr><td><b>2. Genuine offline operation</b><br>Disconnect the computer and show what still works.</td><td class="st"><span class="badge b-tested">Demonstrated</span></td><td>One documented run on October 18, 2026 tested 15 listed scenarios on a fresh copy with qwen3:4b-instruct, offline mode and socket-level outbound blocking. All listed checks passed and there were no outbound attempts. This is a subset of scenarios, not a feature-by-feature test of every capability or configuration. See <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/OFFLINE-DEMO.md">the run record</a>.</td></tr>
-          <tr><td><b>3. Traceable knowledge</b><br>Tell a recorded observation from an AI inference, and show where claims came from.</td><td class="st"><span class="badge b-impl">Started</span></td><td>Native observation records have append-only hash chains and signed exports. Application-owned labels distinguish supplied references, calculations, confirmed actions and saved-memory context. Model prose does not establish execution or observation truth.</td></tr>
-          <tr><td><b>4. Resilience</b><br>Survive interrupted connections, restarts, conflicting records and sync failures without silently corrupting information.</td><td class="st"><span class="badge b-impl">Automated checks</span></td><td>Regression tests cover persistence, failed writes, authorization and notebook integrity. Physical portable-drive tests on two clean Windows PCs and independent field validation remain outstanding.</td></tr>
-          <tr><td><b>5. A field demonstration</b><br>Someone who didn't build Cursiv uses it to solve a real problem and evaluates the result independently.</td><td class="st"><span class="badge b-planned">Planned</span></td><td>After 1–4.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</section>
-
-<section id="ladder">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">The build order</span>
-      <h2>Each level depends on the one below it.</h2>
-    </div>
-    <div class="arch" aria-label="Build order, from the foundation at the bottom">
-      <div class="row"><div class="box plan"><b>Specialized applications</b><span>For example field science or mission support. Only after everything below is proven. Would need independent evaluation and validation.</span></div></div>
-      <div class="arrow">▲</div>
-      <div class="row"><div class="box plan"><b>Local hub</b><span>Gathers authorized information from several nodes; larger models; timeline; backups. Works without internet.</span></div></div>
-      <div class="arrow">▲</div>
-      <div class="row"><div class="box plan"><b>Independent nodes and synchronization</b><span>Each Cursiv works alone; when a link appears (network, USB, anything) records sync, with duplicate, conflict and integrity checks.</span></div></div>
-      <div class="arrow">▲</div>
-      <div class="row"><div class="box plan"><b>Structured knowledge</b><span>Observations, an append-only record of events with provenance, corrections and retractions; "why do you believe this?"</span></div></div>
-      <div class="arrow">▲</div>
-      <div class="row"><div class="box core"><b>Reliable local AI — now</b><span>Answer checking, offline reference, memory with origin, offline mode, and the truth benchmark to measure it.</span></div></div>
-    </div>
-  </div>
-</section>
-
-<section id="field">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Next: field science</span>
-      <h2>A dependable offline tool for research in the field.</h2>
-      <p class="lede">Where recording data correctly matters more than clever answers. Each step ends with something a reviewer can check.</p>
-    </div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>Step</th><th>What</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td><b>Field notebook</b></td><td>Structured observations kept apart from AI inferences; corrections never overwrite; export to CSV, JSON, GeoJSON.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
-          <tr><td><b>Calculations in code</b></td><td>Units, dilutions, coordinates, statistics: computed, not guessed.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
-          <tr><td><b>The team's documents</b></td><td>Protocols and field guides offline, answers quoting the page.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
-          <tr><td><b>Integrity and chain of custody</b></td><td>Tamper-evident entries and sample IDs with printable labels (built); signed exports next.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
-          <tr><td><b>Hardware and endurance</b></td><td>Battery, no-GPU laptops, power loss, the SSD kit on clean machines.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
-          <tr><td><b>Team sync without internet</b></td><td>Laptops share field logs by USB drive or shared folder; changed copies refused, conflicts shown, never silently resolved; personal memory never syncs.</td><td class="st"><span class="badge b-tested">Built and tested</span></td></tr>
-          <tr><td><b>Safety and discipline packs</b></td><td>Sourced expedition safety, then ecology, geology, hydrology and atmospheric references from open sources.</td><td class="st"><span class="badge b-partial">Started</span></td></tr>
-          <tr><td><b>Field pilot</b></td><td>A real team on a real trip, with the results published, including failures.</td><td class="st"><span class="badge b-planned">Planned</span></td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="fine" style="margin-top:12px"><a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/RESEARCH-ROADMAP.md">The full roadmap, with what "done" means for each step →</a></p>
-  </div>
-</section>
-
-<section id="not">
-  <div class="wrap grid2">
-    <div class="stack">
-      <span class="eyebrow">Not the goal</span>
-      <h2>What Cursiv isn't trying to be.</h2>
-    </div>
-    <ul class="checks warn">
-      <li><span>Another general chatbot competing on personality or size.</span></li>
-      <li><span>Features added because they sound futuristic.</span></li>
-      <li><span>A system that claims perfect accuracy, or certification it doesn't have. Cursiv is not certified for medical, safety-critical, aerospace or spaceflight use.</span></li>
-      <li><span>A product that needs the cloud. Online services stay optional.</span></li>
-      <li><span>A distributed system built before the single-computer version is shown to be reliable.</span></li>
-    </ul>
-  </div>
-</section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="/start">Download</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a> · <a href="/privacy/">Privacy Policy</a></span><span>MIT License</span></div>
-  </div>
-</footer>
-</body>
-</html>
+<footer><div class="wrap"><div class="copy"><span>Built by Joshua Winkler · Cursiv · MIT license</span><span><a href="/start">Setup</a> · <a href="/documentation">Guides &amp; reference</a> · <a href="/testers">Help test</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a></span></div></div></footer>
+<script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
+</body></html>

@@ -220,3 +220,22 @@ footer { border-top: 1px solid var(--line); padding: 44px 0 32px; color: var(--m
 .comparison-scroll th, .comparison-scroll td { padding: 16px; border-top: 1px solid var(--line); vertical-align: top; }
 .comparison-scroll thead { background: var(--card); }
 .comparison-scroll td { color: var(--muted); }
+
+/* Short guides, with optional evidence kept easy to open. */
+.short-list {padding-left:22px;display:grid;gap:12px;max-width:760px;color:var(--muted)}
+.short-list b {color:var(--text)}
+.hero-shot {margin:0;max-width:460px;justify-self:end}
+.hero-shot img {border:1px solid var(--line2);border-radius:var(--radius)}
+.shot img {width:100%;height:auto}
+figcaption {color:var(--muted);font-size:13px;padding-top:10px}
+.evidence-archive {border-top:1px solid var(--line);padding:32px max(20px,calc((100% - 1040px)/2));}
+.evidence-archive>summary,.more>summary {cursor:pointer;font-weight:600}
+.evidence-archive[open] {padding:32px 0}
+.evidence-archive[open]>summary {max-width:1040px;margin:0 auto;padding:0 20px}
+.reference-page .wrap {max-width:920px}
+.reference-page .lede {max-width:760px}
+.more p,.more figure {margin-top:16px}
+section[id],details[id] {scroll-margin-top:84px}
+.copy {gap:16px;flex-wrap:wrap}
+.copy a {display:inline-block}
+@media(max-width:700px){.hero-shot{max-width:100%;justify-self:start}.reference-page h1{font-size:36px}}

@@ -26,6 +26,9 @@ const PAGES = [
   ["website/local-ai.html", "local-ai.html"],
   ["website/compare.html", "compare.html"],
   ["website/documentation.html", "documentation.html"],
+  ["website/local-ai-reference.html", "local-ai-reference.html"],
+  ["website/notebook-reference.html", "notebook-reference.html"],
+  ["website/portable-ai-reference.html", "portable-ai-reference.html"],
   ["website/ai-reliability-testing.html", "ai-reliability-testing.html"],
   ["website/local-ai-hardware-requirements.html", "local-ai-hardware-requirements.html"],
   ["website/app.html", "app.html"],
@@ -88,6 +91,7 @@ const SITEMAP_URLS = [
   "/", "/field-research", "/team-drives", "/field-station", "/offline-research", "/portable-workspace", "/start", "/vision", "/story", "/open-source-offline-ai",
   "/ai-reliability-testing", "/local-ai-hardware-requirements", "/privacy/", "/testers",
   "/local-ai", "/compare", "/documentation",
+  "/local-ai-reference", "/notebook-reference", "/portable-ai-reference",
 ];
 
 // Resolve the destructive build target before removing it; a link must never redirect
