@@ -88,8 +88,9 @@ def execute_tool(runtime: ChatRuntime, name: str, args: dict, root: Path, *, con
             entry = runtime._queue_enqueue(prompt, tags=tags)
             return f"Queued: {entry['id']} — '{prompt[:60]}'"
         elif action == "flush":
-            results = runtime._queue_flush(lambda p: "[flush requires active connection]")
-            return f"Flushed {len(results)} task(s)." if results else "Queue empty."
+            # A model selecting a tool is not permission to replay arbitrary stored prompts.
+            # File-write confirmation/automatic mode does not authorize queue execution.
+            return 'Deferred tasks were not executed. Type queue flush to authorize bounded local read-only execution.'
         else:
             return runtime._queue_format()
 

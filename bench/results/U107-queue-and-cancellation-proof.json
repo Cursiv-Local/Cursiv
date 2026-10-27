@@ -1,0 +1,20 @@
+{
+  "baseline_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "synthetic_only": true,
+  "owner_tasks_replayed": false,
+  "placeholder_before_status": "fired",
+  "placeholder_after_status": "failed",
+  "live_queue_status": "succeeded",
+  "live_model_requests": [
+    {
+      "model": "qwen3:4b-instruct"
+    }
+  ],
+  "live_history_states": [
+    "running",
+    "succeeded"
+  ],
+  "live_result": "Careful record keeping helps you stay organized and remember important details, no matter how small they seem. It turns chaos into clarity, so you can always refer back to what\u2019s truly happened.\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+  "cancelled_chunk_before": 1,
+  "cancelled_chunk_after": 0
+}

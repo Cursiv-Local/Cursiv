@@ -1,0 +1,499 @@
+{
+  "source_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "created_utc": "2026-10-27T04:15:58.459876+00:00",
+  "question_set": "development",
+  "question_sha256": "ca078508a838eebfb2d0af035cb30af1206044339082bf76704f93f94b5bcffe",
+  "live": true,
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "settings": {
+    "model": "qwen3:4b-instruct",
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "offline": true,
+    "review": "fast",
+    "provider_permissions": "local only; no downloads"
+  },
+  "hardware": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "gpu": "NVIDIA GeForce RTX 2050, 4096 MiB"
+  },
+  "metrics_limit": "Token counts from real Ollama terminal events. Cache hits and peak process/server memory unavailable. No fake timing establishes speed. Synthetic records only.",
+  "rows": [
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "ordinary",
+      "handled": true,
+      "seconds": 7.196668799966574,
+      "first_display_seconds": 3.885558200068772,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1934,
+          "output_tokens": 110,
+          "first_token_seconds": 1.384148999932222,
+          "load_nanoseconds": 43938000
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1934,
+      "output_tokens": 110,
+      "response": "To label a field sample, write a clear, concise identifier (like a code or date) on the sample container or tag, including key details such as location, date collected, and sample type. For example: \"Sample-20261027-01: Soil, near Oak Ridge, October 27, 2026.\"  \n\nNote: This assumes you have access to a physical sample and a labeling tool. If you're working without direct access to the sample, you can't label it.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "individual",
+      "handled": true,
+      "seconds": 3.4193986000027508,
+      "first_display_seconds": 3.4193650000961497,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 559,
+          "output_tokens": 70,
+          "first_token_seconds": 0.37215870001818985,
+          "load_nanoseconds": 39479700
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 559,
+      "output_tokens": 70,
+      "response": "1. Label each field sample with the site name, sample type (e.g., soil, water), date collected, and a unique sample ID, all written clearly and legibly on the label.  \n2. Attach the label directly to the sample container or bag, ensuring it is secure and not obscured by the container\u2019s contents or material.\n\n*[Profiles completed: @field; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "group",
+      "handled": true,
+      "seconds": 3.1833734000101686,
+      "first_display_seconds": 3.1833416000008583,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 559,
+          "output_tokens": 70,
+          "first_token_seconds": 0.107265800004825,
+          "load_nanoseconds": 38899100
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 559,
+      "output_tokens": 70,
+      "response": "1. Label each field sample with the site name, sample type (e.g., soil, water), date collected, and a unique sample ID, all written clearly and legibly on the label.  \n2. Attach the label directly to the sample container or bag, ensuring it is secure and not obscured by the container\u2019s contents or material.\n\n*[Profiles completed: @field; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "plural",
+      "handled": true,
+      "seconds": 3.1554008999373764,
+      "first_display_seconds": 3.1553691999288276,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 559,
+          "output_tokens": 70,
+          "first_token_seconds": 0.090741700027138,
+          "load_nanoseconds": 35009500
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 559,
+      "output_tokens": 70,
+      "response": "1. Label each field sample with the site name, sample type (e.g., soil, water), date collected, and a unique sample ID, all written clearly and legibly on the label.  \n2. Attach the label directly to the sample container or bag, ensuring it is secure and not obscured by the container\u2019s contents or material.\n\n*[Profiles completed: @field; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "ordinary",
+      "handled": true,
+      "seconds": 5.695576300029643,
+      "first_display_seconds": 2.76823239994701,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1932,
+          "output_tokens": 100,
+          "first_token_seconds": 1.233941200072877,
+          "load_nanoseconds": 37282100
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1932,
+      "output_tokens": 100,
+      "response": "I can't check your notebook right now because file access is turned off.  \n\nThat means I can't see or read any files, including your notebook.  \n\nIf you'd like, you can:  \n- Open your notebook in a file viewer (like a text editor or spreadsheet)  \n- Copy and paste the contents here  \n- Or tell me which file you're referring to and I\u2019ll help you check it once you share it  \n\nJust let me know how you'd like to proceed.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.044552400009706616,
+      "first_display_seconds": 0.04453099996317178,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [179c26a944bf], [c7a398c09cb7].\nSample ID S-001 is used by 2 current records: [832dacb77cf1], [4f67bf6e0930].\n[c7a398c09cb7] nitrate 2.5 has no unit.\n[4f67bf6e0930] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.033114599995315075,
+      "first_display_seconds": 0.033093899954110384,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [179c26a944bf], [c7a398c09cb7].\nSample ID S-001 is used by 2 current records: [832dacb77cf1], [4f67bf6e0930].\n[c7a398c09cb7] nitrate 2.5 has no unit.\n[4f67bf6e0930] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "plural",
+      "handled": true,
+      "seconds": 0.037974500097334385,
+      "first_display_seconds": 0.03795400005765259,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [179c26a944bf], [c7a398c09cb7].\nSample ID S-001 is used by 2 current records: [832dacb77cf1], [4f67bf6e0930].\n[c7a398c09cb7] nitrate 2.5 has no unit.\n[4f67bf6e0930] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "ordinary",
+      "handled": true,
+      "seconds": 2.414503800100647,
+      "first_display_seconds": 2.3843239000998437,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 423,
+          "output_tokens": 15,
+          "first_token_seconds": 0.34224220004398376,
+          "load_nanoseconds": 37641700
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 423,
+      "output_tokens": 15,
+      "response": "*(Searched your documents (Procedures.txt): no matching passage found.)*\n\nNo matching passage was found. I cannot establish that from the imported documents.\n\n*[Sources: your documents searched; no matching passage found. Written by Cursiv, no AI model]*\n\n*(Cursiv's check: this answer sounds more certain (\"No matching passage was found.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.032991799991577864,
+      "first_display_seconds": 0.03297190007288009,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Your imported documents don't cover that, so the Protocol helper won't answer from general knowledge (your protocol may differ).\n\n*[Profiles completed: @protocol; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.023048799950629473,
+      "first_display_seconds": 0.02303009992465377,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Your imported documents don't cover that, so the Protocol helper won't answer from general knowledge (your protocol may differ).\n\n*[Profiles completed: @protocol; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "plural",
+      "handled": true,
+      "seconds": 0.02732069999910891,
+      "first_display_seconds": 0.02730019995942712,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Your imported documents don't cover that, so the Protocol helper won't answer from general knowledge (your protocol may differ).\n\n*[Profiles completed: @protocol; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "ordinary",
+      "handled": true,
+      "seconds": 4.67662130005192,
+      "first_display_seconds": 2.317729500005953,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1938,
+          "output_tokens": 80,
+          "first_token_seconds": 0.6079910999396816,
+          "load_nanoseconds": 69432100
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1938,
+      "output_tokens": 80,
+      "response": "I don\u2019t have access to any recorded pond temperature readings. File access is currently off, and no data has been uploaded or stored in this session.\n\nIf you have a file with temperature readings (e.g., a CSV or text file), you can share it, and I can help analyze it \u2014 just let me know the path or content.\n\nOtherwise, there\u2019s no recorded data to report.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "individual",
+      "handled": true,
+      "seconds": 12.877090999973007,
+      "first_display_seconds": 12.877063899999484,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1313,
+          "output_tokens": 381,
+          "first_token_seconds": 0.8025416999589652,
+          "load_nanoseconds": 39089000
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1313,
+      "output_tokens": 381,
+      "response": "@report draft withdrawn after Cursiv\u2019s code checks:\n- 10 \u00b0C is not a supplied quantity and unit.\n- 14 \u00b0C is not a supplied quantity and unit.\n- 12 \u00b0C is not a supplied quantity and unit.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "group",
+      "handled": true,
+      "seconds": 14.485273700091057,
+      "first_display_seconds": 14.485239800065756,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1313,
+          "output_tokens": 398,
+          "first_token_seconds": 0.44905100006144494,
+          "load_nanoseconds": 38909500
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1313,
+      "output_tokens": 398,
+      "response": "@report draft withdrawn after Cursiv\u2019s code checks:\n- 10 \u00b0C is not a supplied quantity and unit.\n- 14 \u00b0C is not a supplied quantity and unit.\n- 12 \u00b0C is not a supplied quantity and unit.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "plural",
+      "handled": true,
+      "seconds": 12.655979300034232,
+      "first_display_seconds": 12.655946100014262,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1313,
+          "output_tokens": 398,
+          "first_token_seconds": 0.10523380001541227,
+          "load_nanoseconds": 40917600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1313,
+      "output_tokens": 398,
+      "response": "@report draft withdrawn after Cursiv\u2019s code checks:\n- 10 \u00b0C is not a supplied quantity and unit.\n- 14 \u00b0C is not a supplied quantity and unit.\n- 12 \u00b0C is not a supplied quantity and unit.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "ordinary",
+      "handled": true,
+      "seconds": 4.006688500056043,
+      "first_display_seconds": 2.2404755000025034,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1939,
+          "output_tokens": 60,
+          "first_token_seconds": 0.6903141000075266,
+          "load_nanoseconds": 36868800
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1939,
+      "output_tokens": 60,
+      "response": "Hi there! Would you like to help clean up the [creek name] on [date] from [start time] to [end time]? We\u2019ll gather at [meeting spot] and focus on removing litter, sorting waste, and protecting the ecosystem\u2014just like we did last time!\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "individual",
+      "handled": true,
+      "seconds": 2.974272200022824,
+      "first_display_seconds": 2.9742399000097066,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 485,
+          "output_tokens": 54,
+          "first_token_seconds": 0.34275569999590516,
+          "load_nanoseconds": 36166600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 485,
+      "output_tokens": 54,
+      "response": "You're invited to join us for a creek cleanup on [date] from [start time] to [end time] at [location]. Please bring gloves, a trash bag, and [to add, e.g., water bottle or rain gear] if needed.\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "group",
+      "handled": true,
+      "seconds": 2.370167799992487,
+      "first_display_seconds": 2.370138099999167,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 485,
+          "output_tokens": 39,
+          "first_token_seconds": 0.10189149994403124,
+          "load_nanoseconds": 42919600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 485,
+      "output_tokens": 39,
+      "response": "Join us for a creek cleanup on [date] from [start time] to [end time] at [location]! Please bring gloves, a trash bag, and [to add].\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "plural",
+      "handled": true,
+      "seconds": 2.3288337000412866,
+      "first_display_seconds": 2.3288059000624344,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 485,
+          "output_tokens": 39,
+          "first_token_seconds": 0.09405620000325143,
+          "load_nanoseconds": 35108000
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 485,
+      "output_tokens": 39,
+      "response": "Join us for a creek cleanup on [date] from [start time] to [end time] at [location]! Please bring gloves, a trash bag, and [to add].\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    }
+  ],
+  "handled": 20,
+  "model_switches": 0,
+  "median_seconds": 3.0648365499801002,
+  "evaluation_answers_for_tuning": false
+}

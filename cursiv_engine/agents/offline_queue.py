@@ -1,131 +1,218 @@
-"""
-Offline Queue — capture cloud-dependent tasks, fire when back online.
+"""Atomic deferred read-only tasks with explicit, recoverable execution outcomes.
 
-Tasks are written to .cursiv/offline_queue.jsonl.
-Each entry stores the prompt, timestamp, and optional tags.
-Call flush() to replay queued tasks through a provided executor.
+Enqueuing text grants no tools/network. A deliberate flush is local-only.
+Legacy records and task history are preserved; damage fails closed.
 """
 from __future__ import annotations
-
+from contextlib import contextmanager
+from dataclasses import dataclass
+from datetime import datetime, timezone
 import json
-from datetime import datetime
-from pathlib import Path
-from typing import Any, Callable, Optional
-from cursiv_engine.core.paths import APP_DATA   # where program data lives (core/paths.py)
+import os
+import threading
+import time
+import uuid
+from cursiv_engine.core import atomic, private_store, state_store
+from cursiv_engine.core.paths import APP_DATA
 
-_CURSIV_ROOT = Path(__file__).resolve().parent.parent.parent
-_QUEUE_FILE  = APP_DATA / "offline_queue.jsonl"
+_QUEUE_FILE = APP_DATA / 'offline_queue.jsonl'
+_LOCK = threading.RLock()
+STATES = {'pending', 'running', 'succeeded', 'failed', 'blocked', 'cancelled'}
+LEASE_SECONDS = 480
 
+@dataclass(frozen=True)
+class Outcome:
+    status: str
+    response: str = ''
+    error: str = ''
+    uncertain: bool = False
 
-def _ensure_dir() -> None:
-    _QUEUE_FILE.parent.mkdir(parents=True, exist_ok=True)
+def _now():
+    return datetime.now(timezone.utc).isoformat()
 
+@contextmanager
+def _locked():
+    """OS releases the byte lock after process death; never held during inference."""
+    with _LOCK:
+        state_store.checked(_QUEUE_FILE)
+        lock_path = state_store.checked(_QUEUE_FILE.with_suffix('.lock'))
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with lock_path.open('a+b') as stream:
+            stream.seek(0, os.SEEK_END)
+            if stream.tell() == 0:
+                stream.write(b'0')
+                stream.flush()
+            stream.seek(0)
+            if os.name == 'nt':
+                import msvcrt
+                msvcrt.locking(stream.fileno(), msvcrt.LK_LOCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(stream, fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                stream.seek(0)
+                if os.name == 'nt':
+                    msvcrt.locking(stream.fileno(), msvcrt.LK_UNLCK, 1)
+                else:
+                    fcntl.flock(stream, fcntl.LOCK_UN)
 
-def enqueue(prompt: str, tags: list[str] | None = None, note: str = "") -> dict[str, Any]:
-    """Add a task to the offline queue. Returns the queued entry."""
-    _ensure_dir()
-    entry: dict[str, Any] = {
-        "id":        datetime.now().strftime("%Y%m%d_%H%M%S_%f"),
-        "timestamp": datetime.now().isoformat(),
-        "prompt":    prompt.strip(),
-        "tags":      tags or [],
-        "note":      note,
-        "status":    "queued",
-    }
-    with _QUEUE_FILE.open("a", encoding="utf-8") as f:
-        f.write(json.dumps(entry) + "\n")
+def _read():
+    try:
+        if _QUEUE_FILE.stat().st_size > state_store.MAX_BYTES * 2:
+            raise ValueError('Queue exceeds safe read limit; existing data preserved.')
+        text = private_store.read_text(_QUEUE_FILE)
+    except FileNotFoundError:
+        return []
+    rows, ids = [], set()
+    for line in text.splitlines():
+        if not line.strip():
+            continue
+        row = json.loads(line)
+        if not isinstance(row, dict) or not isinstance(row.get('id'), str) or row['id'] in ids or not isinstance(row.get('prompt'), str):
+            raise ValueError('Damaged or duplicate queue entry; no tasks dispatched or rewritten.')
+        ids.add(row['id'])
+        old = row.get('status')
+        if old in ('queued', 'fired', 'error'):
+            row['legacy_status'] = old
+            row['status'] = 'blocked'
+            row['error'] = 'Legacy task needs explicit review/retry; old fired text is not proof of execution.'
+            row['uncertain'] = old == 'fired'
+        if row.get('status') not in STATES or not isinstance(row.get('history', []), list):
+            raise ValueError('Unsupported queue state; no tasks dispatched or rewritten.')
+        rows.append(row)
+    return rows
+
+def _save(rows):
+    text = ''.join(json.dumps(r, ensure_ascii=False, allow_nan=False) + '\n' for r in rows)
+    if len(text.encode()) > state_store.MAX_BYTES:
+        raise ValueError('Queue exceeds safe storage budget; archive history before continuing.')
+    atomic.write_text(_QUEUE_FILE, text)
+
+def _set(row, status, **detail):
+    row.setdefault('history', []).append(dict(at=_now(), previous=row['status'], status=status, error=detail.get('error', '')))
+    row.update(status=status, updated=_now(), **detail)
+
+def enqueue(prompt, tags=None, note=''):
+    from .workflow import identity
+    prompt = prompt.strip()
+    if not prompt or len(prompt) > 4000:
+        raise ValueError('Queue tasks need a non-empty prompt of at most 4000 characters.')
+    entry = dict(id=uuid.uuid4().hex, timestamp=_now(), prompt=prompt, tags=tags or [], note=note,
+                 status='pending', owner=list(identity()), authorization='local-read-only-v1', history=[])
+    with _locked():
+        rows = _read()
+        rows.append(entry)
+        _save(rows)
     return entry
 
+def history():
+    with _locked():
+        return _read()
 
-def list_queued() -> list[dict[str, Any]]:
-    """Return all queued (not yet fired) tasks."""
-    if not _QUEUE_FILE.exists():
-        return []
-    tasks = []
-    for line in _QUEUE_FILE.read_text(encoding="utf-8").splitlines():
-        try:
-            t = json.loads(line)
-            if t.get("status") == "queued":
-                tasks.append(t)
-        except Exception:
-            pass
-    return tasks
+def list_queued():
+    return [r for r in history() if r['status'] == 'pending']
 
-
-def count() -> int:
+def count():
     return len(list_queued())
 
+def cancel(task_id):
+    with _locked():
+        rows = _read()
+        row = next(r for r in rows if r['id'] == task_id)
+        if row['status'] in ('pending', 'running', 'blocked', 'failed'):
+            _set(row, 'cancelled', uncertain=row['status'] == 'running' or row.get('uncertain', False),
+                 error='Cancelled explicitly; no completion is claimed.')
+            _save(rows)
+        return row
 
-def flush(executor: Callable[[str], str]) -> list[dict[str, Any]]:
-    """
-    Fire all queued tasks through executor(prompt) -> response.
-    Marks each as 'fired' with the response inline.
-    Returns list of results.
-    """
-    if not _QUEUE_FILE.exists():
-        return []
+def retry(task_id, *, reconciled=False):
+    from .workflow import identity
+    with _locked():
+        rows = _read()
+        row = next(r for r in rows if r['id'] == task_id)
+        if row['status'] in ('running', 'pending', 'succeeded'):
+            raise ValueError('Task is already active or completed; retry refused.')
+        if row.get('uncertain') and not reconciled:
+            raise ValueError('Outcome is uncertain. Reconcile previous effects before retrying with --reconciled.')
+        _set(row, 'pending', owner=list(identity()), authorization='local-read-only-v1', uncertain=False, error='')
+        _save(rows)
+        return row
 
-    lines = _QUEUE_FILE.read_text(encoding="utf-8").splitlines()
+def active(task_id, execution):
+    with _locked():
+        row = next((r for r in _read() if r['id'] == task_id), {})
+        return row.get('status') == 'running' and row.get('execution') == execution
+
+def flush(executor, *, cancel_event=None, limit=5):
+    """Durably claim bounded tasks, execute outside lock, persist explicit outcomes.
+
+    Expired running leases are uncertain and require reconciliation, never silently
+    redispatched. Strings/empty/error-shaped responses cannot establish success.
+    """
+    from .workflow import identity
     results = []
-    updated_lines = []
-
-    for line in lines:
+    with _locked():
+        rows = _read()
+        changed = False
+        for row in rows:
+            if row['status'] == 'running' and row.get('lease_until', 0) < time.time():
+                _set(row, 'blocked', uncertain=True, error='Interrupted execution; reconcile before retry.')
+                changed = True
+        if changed:
+            _save(rows)
+        ids = [r['id'] for r in rows if r['status'] == 'pending'][:max(0, min(limit, 5))]
+    for task_id in ids:
+        if cancel_event and cancel_event.is_set():
+            break
+        with _locked():
+            rows = _read()
+            row = next(r for r in rows if r['id'] == task_id)
+            if row['status'] != 'pending':
+                continue
+            if row.get('authorization') != 'local-read-only-v1' or row.get('owner') != list(identity()):
+                _set(row, 'blocked', error='Person/workspace or permission changed; review and retry explicitly.')
+                _save(rows)
+                results.append(dict(row))
+                continue
+            execution = uuid.uuid4().hex
+            _set(row, 'running', execution=execution, lease_until=time.time() + LEASE_SECONDS, error='')
+            _save(rows)
+            claimed = dict(row)
         try:
-            entry = json.loads(line)
-        except Exception:
-            updated_lines.append(line)
-            continue
-
-        if entry.get("status") != "queued":
-            updated_lines.append(line)
-            continue
-
-        try:
-            response = executor(entry["prompt"])
-            entry["status"]   = "fired"
-            entry["response"] = response
-            entry["fired_at"] = datetime.now().isoformat()
-            results.append(entry)
-        except Exception as e:
-            entry["status"] = "error"
-            entry["error"]  = str(e)
-            results.append(entry)
-
-        updated_lines.append(json.dumps(entry))
-
-    _QUEUE_FILE.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+            outcome = executor(claimed)
+            if not isinstance(outcome, Outcome) or outcome.status not in ('succeeded', 'failed', 'blocked', 'cancelled'):
+                outcome = Outcome('failed', error='Executor returned no explicit execution outcome.')
+            if outcome.status == 'succeeded' and (not outcome.response.strip() or outcome.error or outcome.response.lstrip().lower().startswith(('error:', '[error', '[flush requires', '[ollama unavailable'))):
+                outcome = Outcome('failed', error='Executor returned an empty or error-shaped result.')
+        except Exception as exc:
+            outcome = Outcome('blocked', error=f'{type(exc).__name__}: {exc}; reconcile before retry.', uncertain=True)
+        with _locked():
+            rows = _read()
+            row = next(r for r in rows if r['id'] == task_id)
+            if row['status'] == 'running' and row.get('execution') == execution:
+                if cancel_event and cancel_event.is_set():
+                    outcome = Outcome('cancelled', error='Cancelled before completion could be accepted.')
+                if row.get('owner') != list(identity()):
+                    outcome = Outcome('blocked', error='Person/workspace changed; old result rejected.')
+                _set(row, outcome.status, response=outcome.response, error=outcome.error, uncertain=outcome.uncertain)
+                _save(rows)
+            results.append(dict(row))
     return results
 
+def clear_fired():
+    """Compatibility: hide successful history, retaining records and all failures."""
+    with _locked():
+        rows = _read()
+        done = [r for r in rows if r['status'] == 'succeeded' and not r.get('archived')]
+        for row in done:
+            row['archived'] = True
+        if done:
+            _save(rows)
+        return len(done)
 
-def clear_fired() -> int:
-    """Remove all fired/error entries from the queue file. Returns count removed."""
-    if not _QUEUE_FILE.exists():
-        return 0
-    lines = _QUEUE_FILE.read_text(encoding="utf-8").splitlines()
-    keep = []
-    removed = 0
-    for line in lines:
-        try:
-            entry = json.loads(line)
-            if entry.get("status") == "queued":
-                keep.append(line)
-            else:
-                removed += 1
-        except Exception:
-            keep.append(line)
-    _QUEUE_FILE.write_text("\n".join(keep) + ("\n" if keep else ""), encoding="utf-8")
-    return removed
-
-
-def format_queue() -> str:
-    """Human-readable queue summary for display in the UI/CLI."""
-    tasks = list_queued()
-    if not tasks:
-        return "[Offline Queue] Empty — nothing pending."
-    lines = [f"[Offline Queue] {len(tasks)} task(s) waiting:\n"]
-    for i, t in enumerate(tasks, 1):
-        ts   = t.get("timestamp", "?")[:16].replace("T", " ")
-        tags = ", ".join(t.get("tags", [])) or "no tags"
-        prompt = t["prompt"][:80] + ("…" if len(t["prompt"]) > 80 else "")
-        lines.append(f"  {i}. [{ts}] ({tags}) {prompt}")
-    return "\n".join(lines)
+def format_queue():
+    rows = [r for r in history() if not r.get('archived')]
+    return ('[Deferred tasks] ' + str(len(rows)) + ' task(s). Local read-only execution; no unattended network/tools.\n'
+            + '\n'.join(f"{r['id']} [{r['status']}] {r['prompt'][:80]}" + (' — ' + r['error'] if r.get('error') else '') for r in rows))

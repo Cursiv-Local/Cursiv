@@ -83,7 +83,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/confined.py` — runs plugins and code under OS limits: a Windows Job Object (no child processes, memory/CPU caps, no clipboard), resource limits elsewhere.
 - `core/fieldsci.py` — field formulas worked out by code: conductivity to 25 °C (APHA 2510 B), velocity-area discharge with the 0.85 float coefficient, percent DO saturation, µS/cm↔mS/cm, molar solutions.
 - `core/science_check.py` — notes under a draft: oxygen saturation against the standard equation, invented example numbers, impossible coordinates, a settled verdict from one reading (overconfidence).
-- `agents/profile_context.py` — what a starter profile may read (notebook, documents, a calculation), fetched by code, read only; the Data checker's findings; the check under a profile's answer.
+- `agents/profile_context.py` — compatible read-permission/context helpers and deterministic notebook findings; owned command runs use `agents/evidence.py` for snapshots/checks.
 - `core/notebook_proposals.py` — confirm cards built by Cursiv's parser: plain-words records, codes kept out of `site`, append-only corrections ("Correct W-001 temperature from 18.6 to 18.9").
 - `core/fieldsync.py` — team sharing and phone imports, without internet; team field drives in each scientist's name, and choosing whose work goes on a drive.
 - `core/phone_receive.py` — receiving a phone file over local Wi-Fi.
@@ -107,7 +107,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `memory/recall.py` — date-scoped recall.
 - `memory/projects.py` — running project summaries.
 - `memory/session_log.py` — the session log ("session memory"; left out of writing requests since U99).
-- `memory/session_notes.py` — U100: each conversation's note (goal, done from records, decided, open, next), used when it's picked up.
+- `memory/session_notes.py` — each conversation's note; captured storage and validity guards stop stale background updates.
 - `memory/cleanup.py` — `memory cleanup`.
 - `memory/suggestions.py` — U100: the model's guesses wait as "Remember this?" suggestions; only confirmed ones are saved.
 - `memory/markdown.py` — U100: memory as readable .md files with a MEMORY.md index ("show my memory folder").
@@ -147,11 +147,17 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/plugin_runner.py` — runs one plugin call in its own guarded process.
 - `coding/brain.py`, `coding/playbook.py`, `coding/runner.py` — coding answers, examples, run-and-fix.
 - `coding/forge.py` — `evolve`: writes a plugin and tests it in the runner.
-- `agents/custom.py` — `agent new …`, `@name`, `agents ask`.
+- `agents/custom.py` — one starter/personal registry and saved teaching; personal overrides win; saved tools grant no powers.
+- `agents/workflow.py` — bounded research runs, deterministic role selection, stage outcomes, cancellation and final review.
+- `agents/evidence.py` — one verified snapshot, role-specific evidence, full-scope code statistics and strict output checks.
+- `agents/draft_rules.py` — code replaces unprovided relative schedules with placeholders in writing requests that explicitly leave details undecided.
+- `chat/request_budget.py` — shared attempted-request/context/time limits at generation transports, including retries; private-text-free counters.
+- `chat/activity.py` — serialize legacy turn state and shared model transports across request surfaces.
+- `agents/queue_executor.py` — deliberate bounded local read-only research execution for queued prompts; no native actions or cloud cascade.
 - `agents/babel_agent.py` — translation.
 - `agents/codex_agent.py` — the offline coding specialist bridge.
-- `agents/hermes_agent.py` — multi-step helper.
-- `agents/offline_queue.py` — tasks waiting for a connection.
+- `agents/hermes_agent.py` — optional external integration; requires Hermes/Ollama and is separate from research profiles.
+- `agents/offline_queue.py` — atomic deferred-task claims, explicit outcomes, cross-process coordination, history and recovery.
 - `agents/reference_brain.py` — offline reference lookup.
 - `agents/voice_agent.py` — local speech to text.
 
@@ -192,7 +198,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 
 ### Chat window
 - `chat_panel.py` — turns, signals, conversations.
-- `chat_actions.py` — U99/U100 in the window: the action confirm card, suggested memories, session notes, memory folder, workspace map.
+- `chat_actions.py` — action confirm cards, suggestions, owned background session notes, memory folder and workspace map.
 - `chat_transcript.py` — rendering, badges, receipts, the one-time tour.
 - `chat_badges.py` — badge, receipt, starter, problem and intent-card HTML.
 - `chat_rendering.py` — streaming Markdown and the export cache.

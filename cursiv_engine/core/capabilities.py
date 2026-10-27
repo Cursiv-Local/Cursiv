@@ -220,7 +220,8 @@ CAPABILITIES: tuple[Capability, ...] = (
                "only inside the chosen workspace; never Cursiv's own data or keys", None),
     Capability("agents", "Custom agents", SUPPORTED,
                "Specialists you create with a name and a job (agent new …, @name, agents ask). Today an agent can only "
-               "talk: it has no access to files, the notebook, the network or other tools.",
+               "talk and receive the read-only notebook, document or calculation evidence its profile permits. "
+               "It cannot run tools or change records.",
                "uses the same engine as chat", ("agent", "agents", "custom agent", "specialist"),
                ("cursiv_engine/agents/custom.py",), ("tests/test_agents_vault.py",),
                "giving agents limited tools is planned, not built", _read(_agents)),
@@ -384,11 +385,9 @@ def agent_permissions(agent: dict) -> str:
         # U101 starter profiles: Cursiv's code shows them these, read only (agents/profile_context.py).
         shown = {"notebook": "your field notebook's records (read only)", "documents": "matching passages from your "
                  "imported documents (read only)", "calculations": "calculations worked out by Cursiv's code"}
-        return ("Cursiv shows this profile " + ", ".join(shown[r] for r in reads) + ". It cannot save, change, correct "
+        return ("Cursiv may supply this conversation, saved profile teaching and your writing style, plus " + ", ".join(shown[r] for r in reads) + ". It cannot save, change, correct "
                 "or delete anything, read other files, search the web, or use any other tool.")
-    tools = [t for t in (agent.get("tools") or []) if t in BY_KEY]
-    if not tools:
-        return ("This agent can only talk. It cannot read, create, change or delete files, use the field notebook, "
-                "search the web, or use any other Cursiv tool, whatever Cursiv itself can do. Your workspace and data "
-                "are not available to it.")
-    return "This agent may use: " + ", ".join(BY_KEY[t].name for t in tools) + ". Nothing else."
+    return ("This agent can only talk, using this conversation, your writing style and any teaching saved in its profile. "
+            "It cannot read, create, change or delete files, use the field notebook, search the web, "
+            "or use any other Cursiv tool. A saved tools field grants no powers. "
+            "Automatic personal-memory recall is withheld from research profile runs.")

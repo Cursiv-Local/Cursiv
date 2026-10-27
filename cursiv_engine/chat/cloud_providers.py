@@ -7,6 +7,7 @@ Provider calls retain their existing offline gate and authorization checks.
 Entry points: _text_messages, _post_json, _slim, _call_gemini_direct, check_free_key, _call_groq_direct, _cloud_settings, _save_cloud_settings, cloud_enabled, set_cloud_enabled, _call_cursiv_cloud, free_key_command, _local_llm, _free_key_llm, _quick_llm, _memory_llm, _local_model_ready, _call_xai_stream, _generate_with_claude, _call_claude_direct, _call_openai_direct.
 """
 from __future__ import annotations
+from . import request_budget
 
 from typing import Callable, Generator
 from pathlib import Path
@@ -29,7 +30,7 @@ def _post_json(runtime: ChatRuntime, url: str, payload: dict, headers: dict, tim
     req = runtime.urllib.request.Request(url, data=runtime.json.dumps(payload).encode(),
                                  headers={"Content-Type": "application/json",
                                           "User-Agent": "Cursiv-Desktop/3.14", **headers})
-    with runtime.urllib.request.urlopen(req, timeout=timeout) as resp:
+    with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=timeout) as resp:
         return runtime.json.loads(resp.read().decode("utf-8"))
 
 def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]:
@@ -332,7 +333,7 @@ def _call_xai_stream(runtime: ChatRuntime, messages: list[dict], api_key: str, h
                 "Authorization": f"Bearer {api_key}",
             },
         )
-        with runtime.urllib.request.urlopen(req, timeout=90) as resp:
+        with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=90) as resp:
             for raw_line in resp:
                 line = raw_line.decode("utf-8").strip()
                 if not line or line == "data: [DONE]":
@@ -405,7 +406,7 @@ def _generate_with_claude(runtime: ChatRuntime, filepath: str, anthropic_key: st
                 "anthropic-version": runtime.ANTHROPIC_VERSION,
             },
         )
-        with runtime.urllib.request.urlopen(req, timeout=120) as resp:
+        with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=120) as resp:
             data = runtime.json.loads(resp.read().decode())
             return data["content"][0]["text"].strip()
     except Exception:
@@ -438,7 +439,7 @@ def _call_claude_direct(runtime: ChatRuntime, messages: list[dict], anthropic_ke
                     "anthropic-version": runtime.ANTHROPIC_VERSION,
                 },
             )
-            with runtime.urllib.request.urlopen(req, timeout=120) as resp:
+            with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=120) as resp:
                 data = runtime.json.loads(resp.read().decode())
             if runtime._rate_limiter:
                 usage  = data.get("usage", {})
@@ -480,7 +481,7 @@ def _call_openai_direct(runtime: ChatRuntime, messages: list[dict], openai_key: 
                 "Authorization": f"Bearer {openai_key}",
             },
         )
-        with runtime.urllib.request.urlopen(req, timeout=120) as resp:
+        with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=120) as resp:
             data = runtime.json.loads(resp.read().decode())
         content = data["choices"][0]["message"]["content"] or ""
         for word in content.split(" "):

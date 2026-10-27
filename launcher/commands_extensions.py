@@ -71,7 +71,7 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
     except Exception:
         pass
 
-    if cmd in ("agents", "agent", "agent list") or cmd.startswith(("agent ", "@")):
+    if __import__('re').match(r'(?i)^(?:agents?\b|@)', text.strip()):
         res = runtime._agent_command(text, cfg, history)
         if res is not None:
             return res

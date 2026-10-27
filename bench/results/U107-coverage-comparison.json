@@ -1,0 +1,268 @@
+{
+  "before": "bench\\results\\U107-agent-live-before.json",
+  "after": "bench\\results\\U107-coverage-live.json",
+  "all_tasks": {
+    "before": {
+      "ordinary": {
+        "n": 6,
+        "attempted": 7,
+        "successful": 7,
+        "median_seconds": 5.828321450040676,
+        "p95_seconds": 8.81204147497192,
+        "median_total_tokens": 2026.0,
+        "median_transport_first_token_seconds": 0.6531301999930292,
+        "median_first_display_seconds": 2.2995252000400797,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "individual": {
+        "n": 6,
+        "attempted": 6,
+        "successful": 6,
+        "median_seconds": 4.946799949975684,
+        "p95_seconds": 85.1854454249551,
+        "median_total_tokens": 2586.5,
+        "median_transport_first_token_seconds": 1.6957353000179864,
+        "median_first_display_seconds": 2.832934599951841,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "group": {
+        "n": 6,
+        "attempted": 24,
+        "successful": 24,
+        "median_seconds": 23.87617494998267,
+        "p95_seconds": 31.696283024997683,
+        "median_total_tokens": 3354.0,
+        "median_transport_first_token_seconds": 0.37037124997004867,
+        "median_first_display_seconds": 0.009115699969697744,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "plural": {
+        "n": 6,
+        "attempted": 0,
+        "successful": 0,
+        "median_seconds": 0.0005542000290006399,
+        "p95_seconds": 0.000698100047884509,
+        "median_total_tokens": 0.0,
+        "median_transport_first_token_seconds": null,
+        "median_first_display_seconds": null,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      }
+    },
+    "after": {
+      "ordinary": {
+        "n": 6,
+        "attempted": 7,
+        "successful": 7,
+        "median_seconds": 6.514272800006438,
+        "p95_seconds": 8.614803399948869,
+        "median_total_tokens": 2040.0,
+        "median_transport_first_token_seconds": 0.6954847499728203,
+        "median_first_display_seconds": 2.4392217500135303,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "individual": {
+        "n": 6,
+        "attempted": 4,
+        "successful": 4,
+        "median_seconds": 1.1409131999826059,
+        "p95_seconds": 4.3770342499774415,
+        "median_total_tokens": 265.0,
+        "median_transport_first_token_seconds": 0.4319769999710843,
+        "median_first_display_seconds": 1.1408793000155129,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 6,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "group": {
+        "n": 6,
+        "attempted": 4,
+        "successful": 4,
+        "median_seconds": 1.0549856000579894,
+        "p95_seconds": 4.0150550249964,
+        "median_total_tokens": 265.0,
+        "median_transport_first_token_seconds": 0.09585649997461587,
+        "median_first_display_seconds": 1.0548893999657594,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 6,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "plural": {
+        "n": 6,
+        "attempted": 4,
+        "successful": 4,
+        "median_seconds": 1.0560781500535086,
+        "p95_seconds": 3.761771724995924,
+        "median_total_tokens": 265.0,
+        "median_transport_first_token_seconds": 0.1007180999731645,
+        "median_first_display_seconds": 1.0560404999996535,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 6,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      }
+    }
+  },
+  "comparable_routine_tasks": {
+    "before": {
+      "individual": {
+        "n": 3,
+        "attempted": 3,
+        "successful": 3,
+        "median_seconds": 2.5307215000502765,
+        "p95_seconds": 6.372843009978532,
+        "median_total_tokens": 670,
+        "median_transport_first_token_seconds": 0.2754308999283239,
+        "median_first_display_seconds": 1.5373172000981867,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "group": {
+        "n": 3,
+        "attempted": 12,
+        "successful": 12,
+        "median_seconds": 12.352108299965039,
+        "p95_seconds": 22.64058546994347,
+        "median_total_tokens": 2809,
+        "median_transport_first_token_seconds": 0.22893560002557933,
+        "median_first_display_seconds": 0.008818799979053438,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "plural": {
+        "n": 3,
+        "attempted": 0,
+        "successful": 0,
+        "median_seconds": 0.0004360999446362257,
+        "p95_seconds": 0.0005471600568853318,
+        "median_total_tokens": 0,
+        "median_transport_first_token_seconds": null,
+        "median_first_display_seconds": null,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 0,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      }
+    },
+    "after": {
+      "individual": {
+        "n": 3,
+        "attempted": 2,
+        "successful": 2,
+        "median_seconds": 2.1710184999974445,
+        "p95_seconds": 2.673280150012579,
+        "median_total_tokens": 530,
+        "median_transport_first_token_seconds": 0.33677054999861866,
+        "median_first_display_seconds": 2.1709823000710458,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 3,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "group": {
+        "n": 3,
+        "attempted": 2,
+        "successful": 2,
+        "median_seconds": 2.0492430001031607,
+        "p95_seconds": 2.323318379954435,
+        "median_total_tokens": 530,
+        "median_transport_first_token_seconds": 0.09416904993122444,
+        "median_first_display_seconds": 2.049200400011614,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 3,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      },
+      "plural": {
+        "n": 3,
+        "attempted": 2,
+        "successful": 2,
+        "median_seconds": 2.0415895000332966,
+        "p95_seconds": 2.3446372299455107,
+        "median_total_tokens": 530,
+        "median_transport_first_token_seconds": 0.09642234997591004,
+        "median_first_display_seconds": 2.0415478999493644,
+        "errors": 0,
+        "statuses": {
+          "succeeded": 3,
+          "failed": 0,
+          "blocked": 0,
+          "cancelled": 0
+        }
+      }
+    }
+  },
+  "group_median_token_reduction_percent": 81.13207547169812,
+  "group_median_latency_reduction_percent": 83.40977143060702,
+  "individual_median_change_percent": -14.21345652003534,
+  "individual_p95_change_percent": -58.052000561966075,
+  "caveats": [
+    "Three comparable routine tasks; small-sample descriptive results, not a population speed claim.",
+    "Record-dependent tasks are separate correctness comparisons because the old group supplied no evidence.",
+    "Individual comparison uses the same requested field/writing task scope and fast-review settings; the new context removes irrelevant excerpts.",
+    "First ordinary baseline request includes model cold load; transport load events are retained separately.",
+    "First-display time includes buffered deterministic checking; transport first-token time excludes retrieval/setup.",
+    "Cache hits and process/server peak memory are unavailable. No private telemetry is written by default.",
+    "Original evaluation was used to repair findings; this after run is a regression/performance retest. Fresh confirmation is separate.",
+    "Manual labels are an agent review of synthetic answers, not an independent human evaluation."
+  ]
+}

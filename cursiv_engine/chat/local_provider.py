@@ -7,6 +7,7 @@ Provider calls retain their existing offline gate and authorization checks.
 Entry points: _call_ollama_raw, _call_ollama, _ollama_running, _ensure_ollama, _ollama_pulled_models, _ollama_tags, _models_on_disk, _resolve_ollama_model, _pull_ollama_model, _call_ollama_model, _big_gpu, _num_ctx, _call_ollama_code_council.
 """
 from __future__ import annotations
+from . import request_budget
 
 from typing import Callable, Generator
 from pathlib import Path
@@ -22,7 +23,8 @@ def _call_ollama_raw(runtime: ChatRuntime, messages: list[dict], max_tokens: int
     from cursiv_engine.core import speed as _speed
     # Small GPUs: the CPU reads the whole prompt before the first word, so send the
     # compact persona + what fits (the full one took up to a minute on a 4 GB card).
-    messages = runtime._slim(messages, 14000 if _speed.small_gpu() else 48000)
+    if request_budget.current() is None:
+        messages = runtime._slim(messages, 14000 if _speed.small_gpu() else 48000)
     system_parts = [
         m["content"] for m in messages
         if m.get("role") == "system" and isinstance(m.get("content"), str)
@@ -89,7 +91,7 @@ def _call_ollama_raw(runtime: ChatRuntime, messages: list[dict], max_tokens: int
             req = runtime.urllib.request.Request(runtime.OLLAMA_URL, data=payload,
                                          headers={"Content-Type": "application/json"})
             # 600 s: loading a model that doesn't fit the GPU can take ~2 minutes
-            with runtime.urllib.request.urlopen(req, timeout=600) as resp:
+            with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=600) as resp:
                 for line in resp:
                     chunk = _json.loads(line.decode())
                     token = chunk.get("response", "")
@@ -178,6 +180,9 @@ def _resolve_ollama_model(runtime: ChatRuntime, standard: bool) -> str | None:
     if tags is None:
         return None
     available = set(tags) | {t.split(":")[0] for t in tags}
+    budget = request_budget.current()
+    if budget and budget.local_model:
+        return budget.local_model if budget.local_model in available else None
     from cursiv_engine.core import speed as _speed
     if not standard and _speed.deep_think_on() and _speed.DEEP_THINK_MODEL in available:
         return _speed.DEEP_THINK_MODEL
@@ -196,6 +201,9 @@ def _resolve_ollama_model(runtime: ChatRuntime, standard: bool) -> str | None:
 
 def _pull_ollama_model(runtime: ChatRuntime, model: str) -> Generator[str, None, None]:
     """Download a model through Ollama's API, yielding short progress lines."""
+    if request_budget.current() is not None:
+        yield '\n[No installed model available. Research runs never download a model.]'
+        return
     if not runtime.netgate.allowed():
         yield (f"\n[No local model installed yet, and offline mode is on, so {model} can't be "
                "downloaded. Type 'offline off' to allow it.]\n")
@@ -251,7 +259,7 @@ def _call_ollama_model(runtime: ChatRuntime, model: str, system_str: str, prompt
             runtime.OLLAMA_URL, data=payload,
             headers={"Content-Type": "application/json"},
         )
-        with runtime.urllib.request.urlopen(req, timeout=600) as resp:
+        with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=600) as resp:
             if collect:
                 data = _json.loads(resp.read().decode())
                 yield data.get("response", "")

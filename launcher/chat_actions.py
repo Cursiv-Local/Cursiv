@@ -157,17 +157,26 @@ class ChatActionsMixin:
         conv_id, history = self._conv_id, list(self._history)
         if not conv_id or not history:
             return
+        from cursiv_engine.memory import session_notes
+        from cursiv_engine.agents.workflow import identity
+        from cursiv_engine.chat.activity import guard, exclusive
+        folder, owner, target = session_notes.DIR, identity(), self._run_target()
+        valid = lambda: (self._current_run_target(target) and identity() == owner
+                         and session_notes.DIR == folder and (target[1] is None or not target[1].is_set()))
+        if not valid():
+            return
+        allow_model = getattr(self, '_session_note_model_allowed', True)
 
         def work():
             try:
-                from cursiv_engine.memory import session_notes
                 from cursiv_engine.ui import chat_app as _ca
                 import conversations
-                title = next((c["title"] for c in conversations.list_all() if c["id"] == conv_id), "Conversation")
-                ask = (lambda m: _ca._local_llm(m, 260)) if _ca._local_model_ready() else None
-                note = session_notes.update(conv_id, title, history, ask)
-                if session_notes._active.get("conv") == conv_id:
-                    session_notes._active["note"] = note
+                with guard(valid), exclusive():
+                    title = next((c["title"] for c in conversations.list_all() if c["id"] == conv_id), "Conversation")
+                    ask = (lambda m: _ca._local_llm(m, 260)) if allow_model and _ca._local_model_ready() else None
+                    note = session_notes.update(conv_id, title, history, ask, folder=folder, valid=valid)
+                    if valid() and note and session_notes._active.get("conv") == conv_id:
+                        session_notes._active["note"] = note
             except Exception:
                 pass                                 # a note is a convenience; never break the chat
         threading.Thread(target=work, daemon=True, name="cursiv-session-note").start()

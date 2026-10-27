@@ -44,6 +44,7 @@ SHARED = "family"
 _lock = threading.RLock()
 _person = SHARED
 _generation = 0                       # invalidate pending learning after forget/disable
+_person_revision = 0                  # identity switches, independent of authorized data changes
 _emb_cache: dict[str, list[float]] | None = None
 _embed_ok: bool | None = None          # None = not checked yet
 _pulling = False
@@ -53,8 +54,12 @@ _pulling = False
 
 def set_person(name: str) -> None:
     """Who is using Cursiv right now (the login name)."""
-    global _person
-    _person = (name or SHARED).strip().lower() or SHARED
+    global _person, _person_revision
+    selected = (name or SHARED).strip().lower() or SHARED
+    with _lock:
+        if selected != _person:
+            _person_revision += 1
+        _person = selected
 
 
 def current_person() -> str:

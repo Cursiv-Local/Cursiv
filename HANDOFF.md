@@ -4,6 +4,21 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U107 agents — release authorized, preparation underway (Codex, 2026-10-27)
+
+Branch `codex/u107-agent-reliability`, based on main `2a63932`; the published application remains U106.
+Continuing state/processes: [U107-HANDOFF](docs/U107-HANDOFF.md). Owner review:
+[U107-PREVIEW](docs/U107-PREVIEW.md); defect matrix, raw evidence and limits:
+[U107-VALIDATION](docs/U107-VALIDATION.md). Public command routing, shared scoped evidence, code
+statistics/checks, request ceilings, durable real queue execution and stale desktop-result rejection
+are implemented. Latest affected checks170 passed; final Windows2382 passed/15 skipped/19 subtests
+in539.19s and dedicated automated USB45/45 in87.10s. Real installed
+Qwen routine sample n3 measured81.13% fewer group tokens and83.41% lower median completion time.
+Final profile-route retests18/18 original and15/15 previously seen holdout met requested substance;
+writing timing embellishments remain disclosed. Owner then authorized commit, push, release and
+publication. Version preparation is underway; tagged builds/publication remain pending until verified.
+Preserve the U106 release and owner exclusions recorded in the U107 handoff.
+
 ## Website general-search discoverability (Codex, 2026-10-26)
 
 Latest website copy cleanup: [WEBSITE-COPY-HANDOFF](docs/WEBSITE-COPY-HANDOFF.md).

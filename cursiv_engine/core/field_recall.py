@@ -11,7 +11,7 @@ MAX_ROWS = 100000
 
 
 def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
-          entry: str = '', corrections: bool = False, limit: int = 10, offset: int = 0,
+          entry: str = '', corrections: bool = False, limit: int | None = 10, offset: int = 0,
           site: str = '', measure: str = '') -> dict:
     """Read one authorized notebook, verifying chain while scanning bounded input."""
     path = state_store.checked(fieldlog.log_file())
@@ -20,7 +20,8 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
         root = portable_root()
         if root and not root.exists():
             raise OSError('Portable drive unavailable')
-    limit, offset = max(1, min(int(limit), 50)), max(0, int(offset))
+    # None is an internal full-snapshot request, still bounded by MAX_BYTES/MAX_ROWS.
+    limit, offset = MAX_ROWS if limit is None else max(1, min(int(limit), 50)), max(0, int(offset))
     for value in (start, end):
         if value:
             date.fromisoformat(value)

@@ -656,7 +656,7 @@ def _fill_ledger(user_text: str, draft: str, ask, context: str = "", sources: st
 
 def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = False,
              context: str = "", sources: str = "", assess=None, mode: str = 'full',
-             update_session: bool = True) -> PassResult:
+             update_session: bool = True, previous_failed: bool | None = None) -> PassResult:
     """Check one draft. `ask` is messages -> text. Casual turns return immediately.
 
     context is the recent conversation and recalled memory; sources is text looked
@@ -692,7 +692,7 @@ def run_pass(user_text: str, draft: str, ask=None, *, memory_update: bool = Fals
     if _CRISIS.search(user_text or ''):
         return failed(issues) if issues else PassResult()
     if mode != 'full' and not issues and not should_verify(user_text, draft, memory_update=memory_update,
-                                        previous_failed=_previous_failed):
+                                        previous_failed=_previous_failed if previous_failed is None else previous_failed):
         return PassResult()
     # Safety, provenance, failed checks and unconfirmed actions get notes only.
     # A language model cannot authorize an action or override source evidence.

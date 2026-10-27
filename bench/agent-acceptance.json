@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fixture": "Same synthetic stores. Last untouched five-profile smoke check after the final runtime freeze. Earlier failures remain in their original result files; this is a small targeted confirmation, not a broad independent quality study.",
+  "acceptance": [
+    {"id":"accept-field","role":"field","question":"Give me three concise tips for field notebook entries."},
+    {"id":"accept-writer","role":"writer","question":"Write two clear sentences from these facts only: volunteers need gloves to collect rubbish beside the river, and the schedule and meeting location are not yet set."},
+    {"id":"accept-checker","role":"checker","question":"Review all saved notebook records for missing units, duplicate sample identifiers, and nonnumeric measurements."},
+    {"id":"accept-protocol","role":"protocol","question":"List preserved and unpreserved sample holding times in Procedures.txt, and cite each page."},
+    {"id":"accept-report","role":"report","question":"Calculate the mean and range for all Pond temperature records, with the exact record and usable measurement counts, units, and omitted values."}
+  ]
+}

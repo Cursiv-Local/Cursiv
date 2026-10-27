@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fixture": "Same synthetic stores. Final fresh confirmation frozen after relevance-based withholding was implemented; five previously unrun prompts. Earlier confirmation failures remain published.",
+  "confirmation3": [
+    {"id":"final-field","role":"field","question":"Suggest two practical habits for legible field notes that another researcher can revisit."},
+    {"id":"final-writer","role":"writer","question":"Rewrite as two plain sentences without adding details: Please help collect litter at the creek. Bring gloves. Date, time and meeting place are undecided."},
+    {"id":"final-checker","role":"checker","question":"Check every saved record for duplicate identifiers, missing measurement units, and non-numeric readings."},
+    {"id":"final-protocol","role":"protocol","question":"What does Procedures.txt record about holding times for preserved samples and unpreserved samples? Cite the page."},
+    {"id":"final-report","role":"report","question":"Give an exact numerical summary of Pond temperature readings: total records, usable values, average, lowest and highest readings, and exclusions."}
+  ]
+}

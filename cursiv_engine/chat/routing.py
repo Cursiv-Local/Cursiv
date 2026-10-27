@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
+from .activity import serialized_work
 
 def cascade_stream(runtime: ChatRuntime, messages: list[dict], keys: dict, max_tokens: int, local_fn: Callable[[list[dict]], Generator[str, None, None]] | None) -> tuple[Generator[str, None, None], list[str]]:
     """
@@ -30,11 +31,11 @@ def cascade_stream(runtime: ChatRuntime, messages: list[dict], keys: dict, max_t
     if runtime._local_model_ready():
         attempts.append(("Ollama (local)", local))     # tried like a provider: may fall through
     if keys.get("anthropic_key"):
-        attempts.append(("Claude", lambda: runtime._call_claude_direct(messages, keys["anthropic_key"])))
+        attempts.append(("Claude", lambda: runtime._call_claude_direct(messages, keys["anthropic_key"], max_tokens=max_tokens)))
     if keys.get("api_key"):
         attempts.append(("xAI", lambda: runtime._call_xai_stream(messages, keys["api_key"], False, max_tokens)))
     if keys.get("openai_key"):
-        attempts.append(("OpenAI", lambda: runtime._call_openai_direct(messages, keys["openai_key"])))
+        attempts.append(("OpenAI", lambda: runtime._call_openai_direct(messages, keys["openai_key"], max_tokens=max_tokens)))
     gemini_key = keys.get("gemini_key") or (runtime._saved_key("gemini_key") if runtime.netgate.allowed() else "")
     groq_key = keys.get("groq_key") or (runtime._saved_key("groq_key") if runtime.netgate.allowed() else "")
     if groq_key:
@@ -51,6 +52,7 @@ def cascade_stream(runtime: ChatRuntime, messages: list[dict], keys: dict, max_t
 
     used: list[str] = []
 
+    @serialized_work
     def _gen() -> Generator[str, None, None]:
         failures: list[str] = []
         for label, start in attempts:

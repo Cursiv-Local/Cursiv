@@ -129,7 +129,20 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
                 return runtime.TextResult("Usage: queue add <task>")
             entry = runtime._queue_enqueue(task)
             return runtime.TextResult(f"Queued:  {entry.get('id', '?')} — {task[:60]}")
-        return runtime.TextResult("Usage:  queue list  |  queue add <task>")
+        if sub == 'flush':
+            from cursiv_engine.agents import queue_executor
+            return queue_executor.command(runtime, cfg)
+        if sub.startswith(('cancel ', 'retry ')):
+            from cursiv_engine.agents import offline_queue
+            parts = sub.split()
+            try:
+                row = (offline_queue.cancel(parts[1]) if parts[0] == 'cancel' else
+                       offline_queue.retry(parts[1], reconciled='--reconciled' in parts[2:]))
+                return runtime.TextResult(row['id'] + ' [' + row['status'] + ']')
+            except Exception as exc:
+                return runtime.TextResult(f'Queue unchanged: {type(exc).__name__}: {exc}')
+        return runtime.TextResult('Usage: queue list | queue add <task> | queue flush | queue cancel <ID> | '
+                                  'queue retry <ID> [--reconciled]. Flush uses only local read-only profiles.')
 
     if cmd.startswith("remember ") or cmd == "remember":
         if not runtime._STRAND_OK:

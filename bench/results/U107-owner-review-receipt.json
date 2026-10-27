@@ -1,0 +1,101 @@
+{
+  "recorded_utc": "2026-10-27T07:10:25.823662+00:00",
+  "branch": "codex/u107-agent-reliability",
+  "base_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "uncommitted": true,
+  "staged_files": [],
+  "published_app_tag": "v3.14-U106",
+  "published_app_commit": "10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a",
+  "release_tag_unchanged": true,
+  "full_summary": "2382 passed, 15 skipped, 19 subtests passed in 539.19s",
+  "usb_summary": "45 passed, 2352 deselected in 87.10s",
+  "skips": {
+    "Mac Keychain unavailable": 1,
+    "supplied Vosk archive unavailable": 1,
+    "opt-in live self-knowledge suite": 13
+  },
+  "tests": {
+    "full": {
+      "path": "bench\\results\\U107-owner-review-full.xml",
+      "sha256": "ad0d716cb28a49a29534a902af778217b40bf16120eb54e34f63529a2468cf84",
+      "junit": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "15",
+        "tests": "2416",
+        "time": "537.903",
+        "timestamp": "2026-10-27T02:58:52.678568-04:00",
+        "hostname": "Josh"
+      }
+    },
+    "usb": {
+      "path": "bench\\results\\U107-owner-review-usb.xml",
+      "sha256": "59e1dfa08e5db8db861d0016829482b16a9ee2c222b4b08871b80b4d525ca90f",
+      "junit": {
+        "name": "pytest",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "tests": "45",
+        "time": "86.740",
+        "timestamp": "2026-10-27T03:07:53.266248-04:00",
+        "hostname": "Josh"
+      }
+    }
+  },
+  "runtime_source_sha256": {
+    "cursiv_engine/agents/custom.py": "3a5f78c897e1807dd24be78494973f31629e0a050ede8825afae6acb047678f8",
+    "cursiv_engine/agents/draft_rules.py": "22184065c8eee4285748685c7177208a783b30c628c3b62d9386bc11759a0261",
+    "cursiv_engine/agents/evidence.py": "549b6a4a513a9fa69b2eec913f786e614e9dd4b7650ee884d8ac6a373485ae5f",
+    "cursiv_engine/agents/offline_queue.py": "df3c3373289808cf8708fff5fad5e7eaa455c901265b60b1d29536acf4b94a09",
+    "cursiv_engine/agents/queue_executor.py": "7b2c4cc4891150376551c5a7dc70a598c6582683e58200a2459f76d8da93108e",
+    "cursiv_engine/agents/workflow.py": "2876fd97e302405a009b2db0ad1f6ef7e19337967f086f798e60d890e468e9f4",
+    "cursiv_engine/chat/activity.py": "38585c1a4bdaa42de0820a00eec6bfd9a7907d93d9514cbc47da087dc1cefc63",
+    "cursiv_engine/chat/cloud_providers.py": "e28091fd0775e2a147d0ef5ee8ca05dfcfea91c73e8d890b3954cf8f48827fde",
+    "cursiv_engine/chat/completion.py": "cda45f29e9d728876ef9de30dcbf2042d84f93a31c1c8a6d5741f9fb01927871",
+    "cursiv_engine/chat/context.py": "3b47585a6361f5dcca3c9cbb45f30b035412adaeba6fa7924b0629e752c1e92b",
+    "cursiv_engine/chat/local_provider.py": "5d1b1dabf1a3d494a49a1b9ab876d53148eeed1610d3c07ad5ce547d121a0cbf",
+    "cursiv_engine/chat/request_budget.py": "50d057b078384793eb2ee6c81b5f427f4d1ff8d59975149a30252b7b2fdf4c8f",
+    "cursiv_engine/chat/review.py": "0b6c2928260b2e3c69100cf64e6d0d92c698ca8fa8a3e1293aa15161cf268726",
+    "cursiv_engine/chat/routing.py": "dcc6458e09468b18db0c426d3d3d934717db1b7ab0b5b9c4e6d594882126ddef",
+    "cursiv_engine/core/capabilities.py": "de400ef8b6434b8ce51122bae105a72f2c8bdaca8af41508652911d430aaf684",
+    "cursiv_engine/core/command_api.py": "44b3777fb428392f4cf8f93b223b94a76b4c2c4485ea6df359e071a9eed1b472",
+    "cursiv_engine/core/documents.py": "df96e4756f54c14bc9bc67d3b3d7184f511f617f2ce3ea5c14a3246c279c3336",
+    "cursiv_engine/core/field_recall.py": "4aec10321624a38dc5f880bc746f84ac6d67513b433b2d53beadc03641a716ec",
+    "cursiv_engine/core/verify.py": "73d0d694e3dd118f10f7def945d2600923e924b463f3578e54d8c0d3484a81b3",
+    "cursiv_engine/memory/semantic.py": "69ab738c5f427327bc69d0e715912da58d59f073a0f74132cfba5a7be816a13b",
+    "launcher/chat_commands.py": "8f4ef2e7e9b3a329fab476d931edbe23819621d536d2387e1766b9be87bdd40f",
+    "launcher/chat_panel.py": "439c8b7a5a5cae10a3830137d4b08d4f4e3bb8af93fca83025c634f174ad974a",
+    "launcher/chat_review.py": "509165cb000ee1774a4d70f42ab8ef678a3ed0ad475add1a55e998df3e6d2d90",
+    "launcher/command_agents.py": "872d6a975dd00db249960a9894ce9eaa855e0b743ccf5142c0a3139d943979e8",
+    "launcher/commands_extensions.py": "0a84c0b05a779c6222d86fbf1fb4887be60e1207923b14ead82d8e6675a24eb3",
+    "launcher/commands_notes.py": "263d45c47915207aaffc6bbe7d1f8239b36589579a1ded2d2fa17fbad615aacd"
+  },
+  "proof_source_sha256": {
+    "tests/test_agent_workflows.py": "349a2a5d5b5a0c71ca4484a4affb531f3e633194d692c46787a15c6e56da0066",
+    "tests/test_agent_evidence_runs.py": "a79a0f1c09184bcbf4785fb15016a1b0b80eb7faed40d40a57a9262fb79c8690",
+    "tests/test_agent_request_budgets.py": "84c163286ed0bcf41bb10546abf4dd51826080c44c2e3a0640981043a0b433e4",
+    "tests/test_agent_ui.py": "f9904b4ab024a4958032b43297c7bfd9d8f62253078eb1b32e9fa9dffab1e330",
+    "tests/test_deferred_tasks.py": "4c1af87d69337ea32dca3213ae3a32adc7c27b77ed1dc403ffe953f635ee3ed2",
+    "scripts/agent_workflow_bench.py": "2980dc539da54df7a1089af791ea791fbf9ac56893d1c37991a6f975f56a29ed",
+    "scripts/agent_workflow_report.py": "b73dfdcb985dab8a8fdf183e9d42d25e04e377ba82599e0d006f7c275aea608a",
+    "scripts/agent_queue_proof.py": "689cbed342f53b6818f657a62e9e2ff1b0b27f728b46388fce3e31f6c4ef1d7c",
+    "bench/agent-workflows.json": "ca078508a838eebfb2d0af035cb30af1206044339082bf76704f93f94b5bcffe",
+    "bench/agent-final-holdout.json": "904124984cf28c6432e5e8f35f208edd0990365a3a215580240025fecaefd54a"
+  },
+  "live_model_artifacts": [
+    "U107-coverage-live.json",
+    "U107-coverage-holdout.json"
+  ],
+  "analysis": "U107-coverage-comparison.json",
+  "manual_quality": "U107-coverage-quality.json",
+  "model_source_reconciliation": "Only later runtime edit: four lines in launcher/chat_review.py cancel the stale worker, clear pending history and release controls after workspace authorization changes. No inference-path change; final focused/full/USB include the repair.",
+  "limitations": [
+    "Windows source/offscreen Qt and automated USB validation only; no Mac/Linux native execution, new package build, physical-drive test or publication.",
+    "Synthetic Qwen n=3 routine performance sample; not population latency or model accuracy.",
+    "Previously seen evaluation/holdout sets are regression retests; writing timing embellishments disclosed.",
+    "Cache hits and peak process/server memory unavailable."
+  ],
+  "running_commands": []
+}

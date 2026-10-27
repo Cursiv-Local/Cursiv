@@ -59,6 +59,27 @@ Checked, not just claimed: `scripts/offline_demo.py` runs 15 tasks on a fresh co
 every outside connection refused and counts the attempts (`OFFLINE-DEMO.md`: 15 of 15
 pass, 0 attempts). `scripts/net_audit.py` logs every connection a fresh install makes.
 
+## Research profiles and deferred tasks (U107 implementation, unreleased)
+
+Research profiles receive only their declared notebook, document and calculation views, plus the
+current conversation, saved writing style and teaching saved in that profile. Automatic personal-memory
+recall is withheld. When a retrieved passage contains detected instructions to the AI, saved teaching,
+writing style and conversation history are withheld from every model stage in that run. A profile cannot
+run tools, save records, open arbitrary files or grant itself powers.
+Delayed conversation-note updates retain their original destination and stop after ownership changes.
+Notes following research-profile/native-command replies use records without an extra model summary.
+Normal profile generation follows the existing provider/offline permissions; optional review uses
+only an installed local model. No research run downloads a model.
+
+Deferred prompts and results remain in the local queue with their owner/workspace authorization and
+status history. `queue flush` deliberately executes at most five read-only research tasks using only
+an installed local model. It does not replay arbitrary commands, go online, or grant future tools.
+Legacy tasks require explicit review/retry. Interrupted outcomes may require reconciliation before
+retry, and cancelling a running task never establishes success. Completed history is retained when
+hidden from the queue view. The queue uses the existing private-store encryption policy; portable
+copies follow the existing readable-drive policy. Default run counters contain no prompt/answer text;
+the published benchmark fixtures and answers are explicitly synthetic.
+
 ## What Cursiv can't protect
 
 - Cursiv's login keeps people at your keyboard out. It is not encryption. Since U97,

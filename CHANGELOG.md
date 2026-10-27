@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.14-U107 — Dependable research profiles (2026-10-27)
+
+- Repair advertised plural agent commands; use shipped and personal profiles through one bounded,
+  deterministic selector, respecting explicit names and rejecting over-budget role lists.
+- Give individual/group runs one authorized evidence snapshot. Compute notebook checks and full-scope
+  statistics in code, show coverage/omissions and preserve failed evidence through later stages.
+- Check profile drafts and synthesis against supplied references, quantities, units and action records;
+  share attempted-request limits across transports, retries, review and rewriting.
+- Replace placeholder queue completion with deliberate local read-only execution, durable claims,
+  explicit outcomes, retained history, cancellation and reconciliation before uncertain retries.
+- Bind delayed session notes to their original conversation/person/workspace and destination; profile
+  and native-command results do not start an extra unbudgeted summary model call.
+- Validation, performance limits and release progress are tracked in docs/U107-HANDOFF.md.
+
 ## 3.14-U106 — Research in one window (2026-10-26)
 
 - Four persistent actions: Record Observation, Ask Cursiv, Research Files and Field Notebook. The existing
