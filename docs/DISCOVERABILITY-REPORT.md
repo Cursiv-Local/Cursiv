@@ -222,13 +222,14 @@ checks, so no recurring discovery automation was created.
   pre-existing public HTTP duplicate: it served 200 with an HTTPS canonical. A focused follow-up now
   redirects public HTTP pages to HTTPS while preserving existing APIs and localhost previews.
 - Follow-up source: `8abe5e667206e4480768cd8c4c8a8402a5207ec6`, checked locally with 31 website tests
-  and the mandatory 45-test USB gate before deployment. Final Cloudflare version:
+  and the mandatory 45-test USB gate before deployment. Redirect-fix Cloudflare version:
   `e3aa350b-77ad-4c51-98fb-daf710590bda`. The follow-up and this receipt use normal PR checks for merge.
   A Windows CRLF assumption in the llms.txt format test was corrected; valid LF/CRLF files pass.
 - Sourced development-history copy: `efeffac1c6fde6e820a2d95734448f234e254360`, published after the
   same 31 website checks and mandatory 45-test USB gate. Current Cloudflare version:
   `a235ea1c-f00d-4639-b51c-39b2ad448295`. The final 46-probe audit was refreshed after this publication;
   all 17 canonical public pages match its deployed bytes. [History screenshot](../bench/results/discovery-history-live.jpg).
+  Source integration and final CI are recorded in [PR #49](https://github.com/Cursiv-Local/Cursiv/pull/49).
 - Final verification: [HTTP audit](../bench/results/discoverability-after.json) and
   [publication receipt](../bench/results/discovery-publication.json). www DNS/TLS, redirects, icon
   content types/dimensions, all sitemap entries and retained exclusions passed. HTTPS page bytes match

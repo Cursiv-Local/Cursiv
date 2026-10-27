@@ -38,7 +38,8 @@ HTTP redirect correction `8abe5e667206e4480768cd8c4c8a8402a5207ec6` passed 31 we
 mandatory 45-test USB gate before deployment `e3aa350b-77ad-4c51-98fb-daf710590bda`.
 History copy `efeffac1c6fde6e820a2d95734448f234e254360` is deployed as Cloudflare version
 `a235ea1c-f00d-4639-b51c-39b2ad448295`, after 31 website tests and the mandatory 45-test USB gate.
-Final public proof is complete on codex/discovery-publication-proof; normal PR checks remain for merge.
+Final public proof is complete. Source integration and CI status are tracked in
+[PR #49](https://github.com/Cursiv-Local/Cursiv/pull/49); production does not depend on a local preview.
 
 - 31 website tests and 6 measurement tests pass. Mandatory USB hook runs on each commit.
 - Initial full production audit: 46 public probes, 45 final200, one intentional /letters404, no
@@ -61,8 +62,9 @@ Final public proof is complete on codex/discovery-publication-proof; normal PR c
 
 ## Remaining work and commands
 
-Commit explicit public receipts, push and merge the normal PR after CI passes. Production/history
-verification is complete. Current details live in ignored reports/discovery-state.json.
+Production/history verification and public receipts are complete. PR #49 records the normal merge
+checks; consult its status before continuing source work. Current local operational details live in
+ignored reports/discovery-state.json. No remaining website implementation or deployment is required.
 Local preview sessions54987/12013 stopped. No preview server remains from this work.
 Do not re-run the applied one-off reports/update_discovery_html.py or final_discovery_adjustments.py.
 
