@@ -192,11 +192,13 @@ CAPABILITIES: tuple[Capability, ...] = (
                "recall can miss a saved fact; remembering doesn't retrain the model", None),
     Capability("notebook", "Field notebook", SUPPORTED,
                "Records observations with measurements, sample IDs, places and photos in a hash-chained log; "
-               "searches, averages, reports, signed exports and team sharing without internet.",
+               "searches, averages, reports, signed exports and team sharing without internet. "
+               "The desktop previews supported ordinary measurement descriptions before saving and asks for missing units.",
                "local only (phone and team transfer use files or local Wi-Fi)",
                ("field notebook", "notebook", "field log", "observations", "log site", "samples"),
                ("cursiv_engine/core/fieldlog.py", "cursiv_engine/core/field_recall.py", "cursiv_engine/core/fieldsync.py"),
-               ("tests/test_notebook_integration.py",), "", None),
+               ("tests/test_notebook_integration.py", "tests/test_u106_actions.py", "tests/test_u106_recall.py"),
+               "project labels are not isolated project scopes; only supported phrasing is parsed without the model", None),
     Capability("calculations", "Calculations worked out in code", SUPPORTED,
                "Unit conversions, speed and time, flow, dilutions, statistics, dates and arithmetic are worked out by "
                "Cursiv's code, not the AI model, and say so.",
@@ -204,9 +206,11 @@ CAPABILITIES: tuple[Capability, ...] = (
                ("cursiv_engine/core/native_answers.py", "cursiv_engine/core/fieldcalc.py", "cursiv_engine/core/calc.py"),
                ("tests/test_file_claims.py",), "only clear question shapes; others go to the model", None),
     Capability("documents", "Your documents", SUPPORTED,
-               "Imports protocols and other documents and answers from them with page references.",
+               "Imports protocols and other documents through Research Files and answers from them with page references.",
                "local only", ("documents", "pdf", "protocol", "import a document"),
-               ("cursiv_engine/core/documents.py",), ("tests/test_documents.py",), "", None),
+               ("cursiv_engine/core/documents.py", "launcher/research_workspace.py"),
+               ("tests/test_documents.py", "tests/test_u106_research_ui.py"),
+               "the imported library is shared across workspaces, not isolated by project", None),
     Capability("files", "Files in your workspace", SUPPORTED,
                "Reads, lists, searches, creates and (with your approval) changes text files in one folder you choose "
                "and turn file access on for. It never deletes files.",

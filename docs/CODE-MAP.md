@@ -197,6 +197,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `chat_badges.py` — badge, receipt, starter, problem and intent-card HTML.
 - `chat_rendering.py` — streaming Markdown and the export cache.
 - `chat_controls.py` — input, buttons, status pill.
+- `research_workspace.py` — four persistent research actions, inline getting-started guidance, and the embedded research-file library and existing notebook window.
 - `chat_feedback.py` — quiet receipts and turn state.
 - `chat_review.py` — follow-up reviews in the window.
 - `conversations.py`, `conversation_sidebar.py` — saved chats and the sidebar.
@@ -233,6 +234,10 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `tests/` — the suite (`-m usb` is the USB gate run before every commit).
 - `scripts/` — releases (`scripts/build_release.py`, `scripts/website_release.py`), benchmarks (`scripts/intent_bench.py`, `scripts/suggest_bench.py` for suggested memories, `scripts/fieldcalc_bench.py` for field calculations end to end, `scripts/calc_bench.py` the 237-case calculation benchmark, `scripts/overconfidence_bench.py` for overconfident answers on the live model), `scripts/replay_notebook.py` (replays a notebook conversation on the real code in a throwaway folder), `scripts/team_demo.py` (the team-drive demo: three named drives into one main computer and a new drive out, real windows, throwaway folder), `scripts/station_dev.py` (the Field Station against a throwaway folder), `scripts/station_shots.py` + `scripts/cdp_shots.mjs` (real Field Station screenshots for the website).
 - `bench/` — truth benchmark and the U99 phrasing set.
+- `bench/overconfidence/u106_baseline.py` — isolated real-Ollama baseline runs using the existing overconfidence scorer; frozen questions in `bench/overconfidence/u106_cases.py` and audit reproductions in `bench/overconfidence/u106_science_cases.py`.
+- `scripts/researcher_action_bench.py` — frozen deterministic beginner-action routing benchmark (`bench/researcher/action_cases.py`), with the local model explicitly unavailable and no records saved.
+- `bench/researcher/action_heldout.py` — additional beginner paraphrase/negative probes, first measured separately before fixing the one missed dated-record request.
+- `scripts/researcher_recall_bench.py` — frozen beginner notebook-retrieval benchmark (`bench/researcher/recall_cases.py`) with real synthetic records, exact selection and read-only checks.
 - `website/`, `cloudflare/` — cursiv.us and its deploy.
 - `installer/` — the Windows installer script.
 - `docs/` — release notes, verification reports, plans; `docs/HANDOFF-HISTORY.md` is the old handoff.

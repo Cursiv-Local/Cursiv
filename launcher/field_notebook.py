@@ -151,10 +151,15 @@ class FieldNotebookDialog(QDialog):
         close = QPushButton("Close"); close.setStyleSheet(theme.ghost_button()); close.clicked.connect(self.accept)
         key = QPushButton("Signing key…"); key.setStyleSheet(theme.ghost_button()); key.clicked.connect(self._signing_key)
         key.setToolTip("Protect this notebook's signing key with a passphrase, or unlock it (U105).")
-        for b in (fix, check, exp, rep, share, imp, self._name_btn, key):
+        for b in (fix, check, exp, rep):
             foot.addWidget(b)
         foot.addStretch(1); foot.addWidget(close)
         outer.addLayout(foot)
+        sharing = QHBoxLayout()
+        for b in (share, imp, self._name_btn, key):
+            sharing.addWidget(b)
+        sharing.addStretch(1)
+        outer.addLayout(sharing)
         self.refresh()
         from cursiv_engine.core import devicekey
         if devicekey.protected() and not devicekey.unlocked():

@@ -1,5 +1,41 @@
 # Overconfidence benchmark: results (U103, 2026-10-25)
 
+## U106 baseline (2026-10-26)
+
+Fresh set frozen before reading previous benchmark results: `u106_cases.py`, 12 risks and 6 controls.
+`u106_baseline.py` uses the existing `scripts/overconfidence_bench.py` scorer and real Cursiv `chat()` path,
+with explicit model choice in throwaway settings and per-answer saves. No application code or checking
+rule has changed. This small set is observational, not evidence of general accuracy or a before/after gain.
+
+Qwen3:4b-instruct: 18/18 completed, median 10.86 seconds; risk notes 1/12, control notes 0/6.
+Manual review by Codex: 2 overconfident (1 noted), 2 borderline (0 noted), 8 fine (0 noted).
+Controls: 6 fine, 0 noted. Per-answer labels and rationale: `bench/results/U106-overconfidence-labels.md`;
+raw answers and installed model digest: `bench/results/U106-overconfidence-qwen3-baseline.json`.
+Llama 3.1 8B (installed tag `llama3.1:latest`, Ollama reports 8.0B): 18/18 completed,
+median 22.1715 seconds; risk notes 0/12, control notes 0/6. Manual labels: 0 overconfident,
+1 borderline, 11 fine, 6 fine controls. With no positive overconfidence examples, this run cannot
+estimate detection recall.
+
+Gemma3:4b: 18/18 completed, median 7.7165 seconds; risk notes 0/12, control notes 0/6.
+Manual confidence labels: 0 overconfident, 0 borderline, 12 fine, 6 fine controls. Detection recall
+cannot be estimated with no positive cases. Separately, 10/18 answers contain a false model-identity
+claim contradicting the runtime footer and installed-model evidence. Confidence labels assess the
+scientific verdict only and do not establish factual accuracy.
+
+All three installed model records/digests and full answers are in `bench/results/U106-overconfidence-*`.
+Each model ran once, sequentially, using default Cursiv chat/check behavior and no supplied history.
+Timing is observed end-to-end latency on this computer, including any model loading/checking and
+concurrent test-suite load, not a controlled model-speed comparison. These new questions are now
+observed evaluation data. Reserve another untouched set before tuning and validating any future change.
+No overconfidence rule change or before/after improvement is claimed.
+
+Separate Qwen audit reproduction: four additional frozen prompts completed, existing overconfidence note
+shown on 1/4. The exact two-thermometer audit answer remains overcertain without a note; a same-water
+normality answer is overcertain and is noted. Hypothetical status is clear in the experiment example and
+the existing invented-number note appears, but both experiment answers have method/design concerns.
+These prompts are reported separately from the fresh risk/control comparison. Full evidence:
+`bench/results/U106-overconfidence-science-qwen3-baseline.json`; review in the labels file above.
+
 Model: qwen3:4b-instruct through Ollama, Cursiv's full chat path, offline, in a throwaway home folder
 (`scripts/overconfidence_bench.py`). Saved runs, with every answer:
 `bench/results/U103-overconfidence-baseline-qwen3_4b-instruct.json` and `…-heldout-…json`.

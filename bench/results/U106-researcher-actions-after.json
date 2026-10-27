@@ -1,0 +1,172 @@
+{
+  "method": "deterministic desktop proposal routing with local model unavailable; synthetic only",
+  "correct": 18,
+  "cases": 18,
+  "rows": [
+    {
+      "text": "Water temperature was 21.4 degrees at Willow Basin around 2:15.",
+      "expected": "notebook.log",
+      "expected_clarification": true,
+      "actual": "notebook.log",
+      "problems": [
+        "Was that Celsius or Fahrenheit? Add the scale before saving."
+      ],
+      "correct": true,
+      "milliseconds": 11.26
+    },
+    {
+      "text": "Water temperature was 21.4 degrees Celsius at Willow Basin around 2:15.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.033
+    },
+    {
+      "text": "Air temperature was 68 degrees Fahrenheit at Pine Meadow at 9:10 AM.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.019
+    },
+    {
+      "text": "Soil temperature measured 12.6 C at Birch Plot.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.016
+    },
+    {
+      "text": "Water depth was 30 cm at Willow Basin.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.011
+    },
+    {
+      "text": "pH was 7.2 at Willow Basin.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.013
+    },
+    {
+      "text": "Turbidity was 4 NTU at North Creek.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.011
+    },
+    {
+      "text": "Dissolved oxygen was 8.1 mg/L at East Pond.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.011
+    },
+    {
+      "text": "Record site: North Creek; water temp 14.2 C",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.145
+    },
+    {
+      "text": "Record sample W-001, 18.6\u00b0C, site Willow Basin.",
+      "expected": "notebook.log",
+      "expected_clarification": false,
+      "actual": "notebook.log",
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.141
+    },
+    {
+      "text": "Is water temperature of 21.4 C normal at Willow Basin?",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.011
+    },
+    {
+      "text": "Imagine water temperature was 21.4 C at Willow Basin.",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.025
+    },
+    {
+      "text": "Do not save this: water temperature was 21.4 C at Willow Basin.",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.009
+    },
+    {
+      "text": "Write a story where water temperature was 21.4 C at Willow Basin.",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.026
+    },
+    {
+      "text": "The report says water temperature was 21.4 C at Willow Basin.",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.024
+    },
+    {
+      "text": "Compare water temperature at Willow Basin with last week.",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.019
+    },
+    {
+      "text": "What is pH?",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.004
+    },
+    {
+      "text": "Hello",
+      "expected": null,
+      "expected_clarification": false,
+      "actual": null,
+      "problems": [],
+      "correct": true,
+      "milliseconds": 0.004
+    }
+  ],
+  "observations_saved": 0
+}

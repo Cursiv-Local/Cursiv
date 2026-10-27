@@ -36,7 +36,7 @@ print(json.dumps({"offline": netgate.is_offline(), "blocked": blocked,
 
 def _run(code, home, app):
     env = {**os.environ, "USERPROFILE": str(home), "HOME": str(home), "QT_QPA_PLATFORM": "offscreen",
-           "PYTHONIOENCODING": "utf-8"}
+           "PYTHONIOENCODING": "utf-8", "CURSIV_APP_DATA": str(app / '.cursiv')}
     out = subprocess.run([sys.executable, "-c", code], cwd=app, env=env, capture_output=True, text=True,
                          encoding="utf-8", timeout=120)
     assert out.returncode == 0, out.stderr[-2000:]
@@ -87,7 +87,7 @@ def test_a_field_copy_starts_offline_quiet_and_not_learning(tmp_path):
     home = tmp_path / "home"
     home.mkdir()
     env = {**os.environ, "USERPROFILE": str(home), "HOME": str(home), "QT_QPA_PLATFORM": "offscreen",
-           "PYTHONIOENCODING": "utf-8"}
+           "PYTHONIOENCODING": "utf-8", "CURSIV_APP_DATA": str(app / '.cursiv')}
     out = subprocess.run([sys.executable, "-c", FIELD, str(home)], cwd=app, env=env, capture_output=True,
                          text=True, encoding="utf-8", timeout=120)
     assert out.returncode == 0, out.stderr[-2000:]

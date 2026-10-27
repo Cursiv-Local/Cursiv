@@ -46,6 +46,7 @@ class Outcome:
 class Result:
     outcomes: list[Outcome] = field(default_factory=list)
     clarification: str = ''
+    save_preview: list[str] = field(default_factory=list)
 
     @property
     def ok(self):
@@ -340,22 +341,24 @@ def execute(action: Action, *, person: str) -> Outcome:
         return Outcome(getattr(action, 'operation', ''), False, f'Not saved: memory operation not confirmed: {exc}.', status='failed')
 
 
-def command(text: str, history: list[dict], *, person: str, scope: str = '', classifier=None) -> Result | None:
+def command(text: str, history: list[dict], *, person: str, scope: str = '', classifier=None,
+            preview_saves: bool = False) -> Result | None:
     try:
         from cursiv_engine.core import command_sequence, turn_policy
         first, rest = command_sequence.split(text)
         if rest and len(_parse(text) or []) <= 1:
             with turn_policy.scope(text):
-                result = _command(first, history, person=person, scope=scope, classifier=classifier)
+                result = _command(first, history, person=person, scope=scope, classifier=classifier, preview_saves=preview_saves)
             if result is not None:
                 result.clarification = (result.clarification + '\n' + command_sequence.REST).strip()
             return result
-        return _command(text, history, person=person, scope=scope, classifier=classifier)
+        return _command(text, history, person=person, scope=scope, classifier=classifier, preview_saves=preview_saves)
     except (OSError, ValueError, TypeError, KeyError) as exc:
         return Result([Outcome('', False, f'Memory operation not confirmed: {type(exc).__name__}: {exc}', status='failed')])
 
 
-def _command(text: str, history: list[dict], *, person: str, scope: str = '', classifier=None) -> Result | None:
+def _command(text: str, history: list[dict], *, person: str, scope: str = '', classifier=None,
+             preview_saves: bool = False) -> Result | None:
     from . import semantic as sem
     key = _key(person, scope)
     with _lock:
@@ -437,7 +440,10 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
                     result.clarification = 'Choose one saved memory by number or ID:\n' + '\n'.join(
                         f"{i + 1}. {r['id']}: {r['text']}" for i, r in enumerate(targets))
                     break
-            result.outcomes.append(execute(action, person=person))
+            if preview_saves and action.operation == SAVE:
+                result.save_preview.append(action.content)
+            else:
+                result.outcomes.append(execute(action, person=person))
         while len(_pending) > 128:
             _pending.pop(next(iter(_pending)))
         return result

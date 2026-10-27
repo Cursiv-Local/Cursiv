@@ -132,14 +132,14 @@ def receipt(text: str, *, first_offline: bool = False) -> str | None:
 # ── A new chat ───────────────────────────────────────────────────────────────
 
 STARTERS = (
-    ("Field notes", "Log an observation with a measurement",
-     "log site: North transect; water temp 12.4 C; pH 7.2; note: first visit"),
+    ("Record an observation", "Example only — edit it to match your own observation",
+     "Water temperature was 21.4°C at Willow Basin at 2:15 pm."),
     ("Calculations", "Worked out in code, with a receipt",
      "How long to fill 20 L at 2 L/min?"),
-    ("Your documents", "Import a protocol, then ask about it",
+    ("Research files", "Import a protocol or report, then ask about it",
      "How do I add a document and ask about it?"),
-    ("Offline", "Keep everything on this computer",
-     "offline on"),
+    ("Working offline", "Ask what works without Wi-Fi",
+     "Does this work without Wi-Fi?"),
 )
 
 

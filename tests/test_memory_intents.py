@@ -247,6 +247,10 @@ def test_memory_ui_history_and_scoped_clarification_survive_command_delivery(mem
     panel._begin_turn()
     panel._run_turn('hey ollama remember permanently: HAWK-217', [])
     app.processEvents()
+    assert not memory.list_facts('dana')  # U106: even explicit desktop saves need the preview first.
+    preview = next(iter(panel._intents.values()))
+    panel._run_turn(preview.command, [], propose=False)  # native delivery after confirmation
+    app.processEvents()
     assert panel._history[-1]['memory_receipt']['ok'] and len(panel._history) == 2
     assert panel._conv_id and memory.list_facts('dana')
     conversations.wait_for_save()

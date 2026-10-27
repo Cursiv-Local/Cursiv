@@ -46,7 +46,7 @@ class ChatActionsMixin:
             self._append_system("That card was already answered.")
             return
         if what == "edit":
-            self.prefill(proposal.command)
+            self.prefill(proposal.edit_text or proposal.command)
             return
         if self._streaming:
             return
@@ -56,6 +56,11 @@ class ChatActionsMixin:
             return
         if what != "save" or not proposal.ok:
             return
+        if proposal.action.name == 'notebook.correct':
+            from cursiv_engine.core import fieldlog
+            if not any(row['id'] == proposal.slots.get('entry') for row in fieldlog.current()):
+                self._append_system('This observation has changed since the preview. Review its current entry before correcting it.')
+                return
         self._begin_turn(proposal.command)
         history_snapshot = list(self._history)
         threading.Thread(target=self._run_turn, args=(proposal.command, history_snapshot, False),
@@ -176,6 +181,9 @@ class ChatActionsMixin:
             fixed = notebook_proposals.correction(text)
             if fixed is not None:
                 return fixed
+            observed = notebook_proposals.observation(text)
+            if observed is not None:
+                return observed
             if not intent.might_be_action(text):
                 return None
             parsed = notebook_proposals.record(text)
@@ -191,3 +199,22 @@ class ChatActionsMixin:
             return proposal or parsed
         except Exception:
             return None
+
+    def _memory_confirmation(self, text: str, history: list[dict]):
+        """Preview an explicit memory save before the desktop calls the native writer."""
+        from cursiv_engine.memory import intents
+        from cursiv_engine.core.intent import ACTIONS, Proposal
+        actions = intents._parse(text)
+        if not actions or not any(action.operation == intents.SAVE for action in actions):
+            return None
+        action = ACTIONS['memory.save']
+        if len(actions) != 1:
+            return Proposal(action, {'fact': text}, '', ['Save one memory at a time so you can check its preview.'])
+        requested = actions[0]
+        content = requested.content
+        if requested.reference:
+            candidates = intents._context_candidates(history, content)
+            if len(candidates) != 1:
+                return Proposal(action, {'fact': content}, '', ['What should I remember? State the fact in your own words.'])
+            content = candidates[0]
+        return Proposal(action, {'fact': content}, 'remember ' + content, [], edit_text=text)
