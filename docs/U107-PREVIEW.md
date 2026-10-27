@@ -33,7 +33,8 @@ These screenshots use the actual desktop send/answer path with disposable synthe
 ![Complete-scope report](../bench/results/U107-ui-report-coverage.png)
 
 Full Windows checks passed: **2382 tests, 15 skips, 19 subtests**; the separate automated USB gate
-passed **45/45**. Mac/native-package and physical-drive tests remain future release work.
+passed **45/45** at that review checkpoint. Subsequent tagged Windows/Mac native packages passed;
+see [release verification](U107-RELEASE-VERIFICATION.md). Physical-drive testing is not claimed.
 See [validation](U107-VALIDATION.md) for measurements, limits and
 the defect-to-test matrix; [handoff](U107-HANDOFF.md) for current processes and remaining work.
 Tagged packages and publication are verified separately from these implementation results.

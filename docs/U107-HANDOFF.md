@@ -33,27 +33,38 @@ real bounded execution; isolation/cancellation and budgets; real-Qwen comparison
 
 ## Current status
 
-Implementation is uncommitted on codex/u107-agent-reliability, based on main2a63932 (engine matches
-U106). R1–R6 repairs and regressions are implemented. Latest affected checks170 passed in18.74s;
-final real-Qwen original/seen-heldout profile-route retests18/18 and15/15 met requested substance.
-Comparable routine n3: group tokens -81.13%, median latency -83.41%; individual median -14.21%.
-See U107-VALIDATION.md for raw artifacts, earlier failures, prose caveats and unavailable metrics.
+Owner approved release after reviewing the implementation. Source commit
+`0afe4ca51b7152d4056b2869aa6cd8925eeee0ea` (123 allowlisted files) is pushed on
+`codex/u107-agent-reliability`; source PR https://github.com/Cursiv-Local/Cursiv/pull/51.
+Final local versioned suite:2389 passed/15 skipped/19 subtests in496.51s. Workspace63/63;
+commit USB hook45/45 in99.24s. The post-review session-note race is repaired and covered;
+original failure/audit proof is retained, with the native restricted-turn guard unchanged.
 
-Final full Windows+USB gates passed sequentially after the authorization-control repair:
-2382 passed/15 skipped/19 subtests in539.19s; USB45 passed/2352 deselected in87.10s. Logs:
-reports/U107-owner-review-full.log then reports/U107-owner-review-usb.log; XML in bench/results with matching
-names. Model-facing source matches the recorded hashes; only launcher/chat_review.py has the later
-four-line stale-authorization cancellation/control fix. Runtime is frozen. No commands remain running.
-Final implementation receipt U107-owner-review-receipt.json records source/test hashes, gates,
-scope and limitations. Owner reviewed U107-PREVIEW.md and authorized release. Current phase: three
-versions bumped, release notes written, required workspace gate63 passed in5.02s; full versioned
-source suite running in session10113 (reports/U107-release-source-full.log). Next explicit scoped
-commit with USB hook, push/PR and required CI, merge/exact-main CI, prepare immutable tag, native
-Windows/Mac builds/frozen tests, trusted owner signing, draft/download verification, publish and
-website update. Reports/U107-release-state.json tracks concrete source/run/asset identities.
-All stores must be redirected before imports. Locked interpreter (do not modify):
+Source push CI40535846906 and PR CI40535882296 passed all16 checks. PR51 merged normally at
+`7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb`; exact-main CI40537766999 passed all8 jobs.
+The guarded preparation helper passed workspace63/63 and created/pushed immutable tagv3.14-U107
+at that merge. U106 tag remains unchanged. Exact-main JUnit artifacts are in
+reports/U107-main-ci-artifacts; Mac console summary2372 passed/32 skipped/19 subtests in519.44s.
+
+Current phase: GitHub published, website/evidence preparation. Native Windows and Mac builds/frozen
+checks passed. Source Windows2389/15/19 subtests, tagged Mac2372/32/19 subtests. Final8 platform assets
+passed source/lock/alias/checksum/provenance checks and existing owner signatures. Draft11/11 and
+anonymous public11/11 downloads matched;8/8 signatures and11/11 REST digests verified. Published
+https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U107 is latest. Redundant release-triggered
+Mac run40542462834 was cancelled; successful native build40539718907 and bytes remain unchanged.
+
+Website release links/hash/manifest and concise evidence/reference updates are prepared locally.
+Build23 HTML pages;31 website tests,6 release/version checks and63 workspace checks passed.
+Next scoped website/evidence commit with USB hook, protected PR/checks/merge, deploy from merged
+main, verify live HTML/headers/URLs/public manifest and record the final publication receipt.
+State/logs: reports/U107-release-state.json, U107-website-tests.log, U107-public-downloads.json.
+Evidence branchcodex/u107-publication is based on the immutable tagged commit. Only the saved
+progress handoff was restored from stashec3b7fbc754b4755f18f75313f131e71fa82ef08; excluded untracked
+owner files were never stashed. Locked interpreter (do not modify):
 `C:/Users/joshu/AppData/Local/Temp/cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8/Scripts/python.exe`.
-No commits/staging/push/new app release. Historical checkpoints below describe earlier states.
+All test stores are redirected before imports. No owner queue/data or excluded file is used.
+Earlier implementation checkpoints below are historical; the current authorization supersedes their
+old no-commit/release stopping notes.
 
 ## Completion evidence required
 
@@ -312,3 +323,11 @@ Directory audit identified cursiv-session-note thread (launcher/chat_actions.py 
 Session-note ownership/cancellation/zero-extra-model checks170 passed in5.01s (U107-session-note-final.xml); required workspace gate63 passed in2.05s. New full source gate running session7206, reports/U107-release-final-full.log -> bench/results/U107-release-final-full.xml. Current implementation retains original session-note destination, verifies current turn/person/workspace/storage and cancellation before and after model work, and leaves profile/native metadata notes code-only. No model-facing answer algorithms changed; prior actual-Qwen measurements remain descriptive of those algorithms, with this extra metadata-worker isolation fix separately covered. New source scope includes chat_actions.py, memory/session_notes.py and test_session_notes.py; explicit staging allowlist updated. No commit/push/tag/package/publication yet.
 
 Final versioned source gate7206 exit0:2389 passed,15 skipped,19 subtests in496.51s (U107-release-final-full.xml), after the session-note ownership/metadata-call fix. Workspace63 passed in2.05s. Native restricted-turn guard remained unchanged. Source/runtime is frozen; source commit with the real USB hook is next. Existing trusted signer/dependency/publisher preflights passed. All publication/build/tag steps remain pending until their actual gates pass.
+
+Source committed0afe4ca51b7152d4056b2869aa6cd8925eeee0ea:123 explicitly allowlisted files. USB commit hook45 passed/2359 deselected in99.24s; no bypass. Existing Git identity copied into isolated hook environment (global config unchanged). Source/docs whitespace clean; four raw failed-JUnit E-line trailing formats intentionally retained verbatim. Pushed codex/u107-agent-reliability; source PR https://github.com/Cursiv-Local/Cursiv/pull/51. Normal protected CI checks are running; reports/U107-source-pr-checks.log. No merge/tag/build/publication yet. This local handoff progress will be stashed by this single explicit path before clean-main tag preparation, then restored in the evidence branch. Never stash untracked/excluded owner files.
+
+Source push CI40535846906 and PR CI40535882296 run the actual123-file commit0afe4ca. Watch session66392 logs reports/U107-source-pr-checks.log. Security, ARM64 and Mac workspace checks have passed; full hosted platform checks remain pending. Source PR51 is attached to this chat. Existing owner/excluded files remain untracked and outside the source commit. Continue only after normal required checks pass; do not use admin bypass or move release tags.
+
+PR51 merged normally at7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb. Exact-main CI40537766999 passed all8 jobs. Required prepare_release helper workspace63 passed in3.34s, then created and pushed immutable tag v3.14-U107 at that merge. U106 tag remains10b40d6 unchanged. Windows tagged build running session50594, reports/U107-windows-build.log. Native Mac tagged workflow40539718907 running (upload=false); reports/U107-mac-build-watch.log. Main JUnit artifacts downloading to reports/U107-main-ci-artifacts. Evidence branch codex/u107-publication created from unchanged tag source, and only the saved progress handoff restored from stash ec3b7fbc754b4755f18f75313f131e71fa82ef08. No package/signature/release publication claims yet; next inspect builds and frozen checks, stage exact final assets, verify hashes/provenance, use existing trusted signer, create and verify draft, publish then update website.
+
+Both tagged native packages passed frozen self-tests; Windows installed and portable reports ALL PASSED, native Mac workflow40539718907 successful and frozen ALL PASSED (tagged Mac source2372/32/19 subtests in492.45s). Final8 platform assets passed alias, checksum, provenance, lock/source checks. WindowsSHA b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9; MacSHA59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101. Existing hash-verified installed signer signed8 assets and the independent repo verifier returned OwnerSignatureValid for all8; no private key copied. Draft11/11 downloaded back with identical hashes/sizes and8/8 signature checks. Published v3.14-U107 as latest on GitHub. Anonymous public verification is running; website still on U106 until the checked publication update. No asset bytes may change after signing.

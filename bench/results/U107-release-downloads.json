@@ -1,0 +1,133 @@
+{
+  "tag": "v3.14-U107",
+  "source_commit": "7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb",
+  "anonymous_public": true,
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U107-mac-arm64.dmg",
+      "size": 70804630,
+      "sha256": "59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101",
+      "github_digest": "sha256:59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101"
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 70804630,
+      "sha256": "59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101",
+      "github_digest": "sha256:59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101"
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "github_digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U107.exe",
+      "size": 57169813,
+      "sha256": "b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9",
+      "github_digest": "sha256:b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9"
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 57169813,
+      "sha256": "b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9",
+      "github_digest": "sha256:b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9"
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "sha256": "28e2ec91b5d4b9ae2ef3edb84e20e2e9d7e10c92705cffa64d0816aede7601b9",
+      "github_digest": "sha256:28e2ec91b5d4b9ae2ef3edb84e20e2e9d7e10c92705cffa64d0816aede7601b9"
+    },
+    {
+      "name": "provenance-3.14-U107.json",
+      "size": 1798,
+      "sha256": "1b2e2540c14f6410152d99a8ef8f81fb83cb524277a99f533e909ca27b1d79c7",
+      "github_digest": "sha256:1b2e2540c14f6410152d99a8ef8f81fb83cb524277a99f533e909ca27b1d79c7"
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1758,
+      "sha256": "7f65f15cd0af2270ffa4fed9d38e5313f76630a7a195943e6653955d87735d88",
+      "github_digest": "sha256:7f65f15cd0af2270ffa4fed9d38e5313f76630a7a195943e6653955d87735d88"
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "sha256": "58ca8eeba890f6a401ff8fba0568684e15a7b330c9dfbc590d6590927d93a8f4",
+      "github_digest": "sha256:58ca8eeba890f6a401ff8fba0568684e15a7b330c9dfbc590d6590927d93a8f4"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "sha256": "e202f8d672aa21a85419df9f76ea2ef640db7cf05f2d669a6041dd62cfb105ab",
+      "github_digest": "sha256:e202f8d672aa21a85419df9f76ea2ef640db7cf05f2d669a6041dd62cfb105ab"
+    },
+    {
+      "name": "u107-release-verification.json",
+      "size": 1601,
+      "sha256": "7099715a86f12501c365cf7d5aa763498530116f6c92cb07f4a35f49e29374bb",
+      "github_digest": "sha256:7099715a86f12501c365cf7d5aa763498530116f6c92cb07f4a35f49e29374bb"
+    }
+  ],
+  "downloaded": 11,
+  "owner_verified": 8,
+  "key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "rest_assets": [
+    {
+      "digest": "sha256:59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101",
+      "name": "Cursiv-3.14-U107-mac-arm64.dmg",
+      "size": 70804630
+    },
+    {
+      "digest": "sha256:59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101",
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 70804630
+    },
+    {
+      "digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "name": "cursiv-owner-release-key.json",
+      "size": 221
+    },
+    {
+      "digest": "sha256:b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9",
+      "name": "Cursiv-Setup-3.14-U107.exe",
+      "size": 57169813
+    },
+    {
+      "digest": "sha256:b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9",
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 57169813
+    },
+    {
+      "digest": "sha256:28e2ec91b5d4b9ae2ef3edb84e20e2e9d7e10c92705cffa64d0816aede7601b9",
+      "name": "owner-release.json",
+      "size": 1620
+    },
+    {
+      "digest": "sha256:1b2e2540c14f6410152d99a8ef8f81fb83cb524277a99f533e909ca27b1d79c7",
+      "name": "provenance-3.14-U107.json",
+      "size": 1798
+    },
+    {
+      "digest": "sha256:7f65f15cd0af2270ffa4fed9d38e5313f76630a7a195943e6653955d87735d88",
+      "name": "provenance-mac.json",
+      "size": 1758
+    },
+    {
+      "digest": "sha256:58ca8eeba890f6a401ff8fba0568684e15a7b330c9dfbc590d6590927d93a8f4",
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185
+    },
+    {
+      "digest": "sha256:e202f8d672aa21a85419df9f76ea2ef640db7cf05f2d669a6041dd62cfb105ab",
+      "name": "SHA256SUMS.txt",
+      "size": 185
+    },
+    {
+      "digest": "sha256:7099715a86f12501c365cf7d5aa763498530116f6c92cb07f4a35f49e29374bb",
+      "name": "u107-release-verification.json",
+      "size": 1601
+    }
+  ]
+}
