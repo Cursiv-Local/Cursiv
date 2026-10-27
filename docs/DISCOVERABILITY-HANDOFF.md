@@ -1,104 +1,84 @@
 # Cursiv general-search discoverability handoff
 
-Owner: Joshua Winkler. Started 2026-10-26 from main
-`09f40c66b4023ffa1a050a74268a645199f5a0ca` after the completed U106 release.
+Owner: Joshua Winkler. Started October 26, 2026, from main
+`09f40c66b4023ffa1a050a74268a645199f5a0ca`, after the completed U106 release.
 
-## Objective and boundaries
+## Scope and boundaries
 
-Prioritize non-branded discovery for free local AI, offline LLM applications and open-source AI
-assistants. Preserve the design, installer links, release identity, private routes and application code.
-Use the existing official Cursiv logo. This is a website/documentation update, not a new app release.
-Do not touch station code, the three excluded local paths, secrets, user records or unrelated profiles.
-External directory submissions require separate owner approval; prepare factual drafts only.
+Prioritize discovery for free local AI, offline LLM applications and open-source AI assistants.
+Preserve visual design, installer identity, private routes and application behavior. Use official
+branding. This is a website update, not an app release. Station code, excluded local paths, secrets,
+user records and unrelated profiles remain untouched. External submissions need owner approval.
 
-## Current audit
+## Completed
 
-- Homepage title/H1/schema primarily describe field-research software; local AI is secondary.
-- Existing useful pages: /open-source-offline-ai, /portable-workspace, /field-research,
-  /offline-research and /local-ai-hardware-requirements. Reuse them; add distinct /local-ai and
-  /compare pages rather than keyword variants of the same article.
-- Existing icon is /assets/cursiv-logo-256.png; official source is
-  launcher/resources/icons/cursiv-logo-source.png. Root favicon/Apple files are not in the publisher's
-  allowlist. Inspect live status and generate exact-size derivatives from the official source.
-- robots.txt blocks /api/, /remote/ and /admin/. Preserve these protections. Interactive tools have
-  intentional noindex directives. Sitemap currently lists 14 public canonical pages without lastmod.
-- SoftwareApplication metadata incorrectly places codeRepository on that type; move the repository
-  property to a linked SoftwareSourceCode entity. No invented ratings or reviews.
-- GitHub connector exposes read-only access for this repository and no description/topic editor;
-  use the existing configured gh client for authorized repository metadata work.
+- Broad homepage/README identity, useful /local-ai, /compare and /documentation pages; sourced
+  comparisons and precise offline/portable limits. Experimental llms.txt makes no ranking promises.
+- Official-source ICO (16–256px frames), PNG96 and Apple180; stable root links in all 22 HTML files.
+- Publisher allowlist, correct image content types, 17 canonical/indexable sitemap entries with
+  source-history lastmod, linked valid SoftwareApplication/SoftwareSourceCode metadata.
+- www DNS/TLS and canonical apex redirects work. Public HTTP pages now redirect to HTTPS;
+  existing APIs and localhost previews retain their behavior.
+- All ten exclusions supplied in the owner's screenshots are intentional and retained: six private
+  /api/space/ endpoints blocked by robots; /notebook/ and /app noindex; removed /letters real404;
+  /?x=2 canonical to /. No private API was queried. /remote/ and /admin/ blocks remain.
+- GitHub description updated; seven broad local-AI topics added while preserving the original ten.
+- Aggregate branded/non-branded/unknown CSV measurement helper, frozen queries, public before/after
+  evidence and factual directory/reviewer drafts. Nothing submitted or paid.
+- Owner chose **manual checklist only**. See DISCOVERY-MANUAL-CHECKLIST.md. No recurring discovery
+  automation created; CI runs on code changes only.
+- Verified May 17, 2026 V3 publication via GitHub's release API. Added sourced development history to
+  homepage and documentation, distinguishing the early cloud orchestration from today's local focus.
 
-## Search Console evidence supplied by owner
+## Production and verification
 
-Owner reports 9 indexed pages, 6 robots exclusions, 3 noindex exclusions and one alternate canonical.
-Screenshots identify the exact excluded URLs below. These are owner-supplied Search Console evidence,
-not a fresh authenticated Search Console/API export.
+Initial PR #48 merged at `8568768fe6df384eba78594308ab2342e2eb808a` after all source and website
+push/PR checks passed. First Cloudflare version: `d2d8a998-ce24-4dd8-9997-3ce77dc0953a`.
+HTTP redirect correction `8abe5e667206e4480768cd8c4c8a8402a5207ec6` passed 31 website tests and
+mandatory 45-test USB gate before deployment `e3aa350b-77ad-4c51-98fb-daf710590bda`.
+History copy `efeffac1c6fde6e820a2d95734448f234e254360` is deployed as Cloudflare version
+`a235ea1c-f00d-4639-b51c-39b2ad448295`, after 31 website tests and the mandatory 45-test USB gate.
+Final public proof is complete. Source integration and CI status are tracked in
+[PR #49](https://github.com/Cursiv-Local/Cursiv/pull/49); production does not depend on a local preview.
 
-| Exclusion | Exact URL | Initial interpretation; verify configuration/live public pages |
-|---|---|---|
-| robots | https://cursiv.us/api/space/ask | Private pairing/message API; retain block |
-| robots | https://cursiv.us/api/space/join | Private pairing/message API; retain block |
-| robots | https://cursiv.us/api/space/messages?since= | Private pairing/message API; retain block |
-| robots | https://cursiv.us/api/space/create | Private pairing/message API; retain block |
-| robots | https://cursiv.us/api/space/image/ | Private pairing/message API; retain block |
-| robots | https://cursiv.us/api/space/pair-code | Private pairing/message API; retain block |
-| noindex | https://cursiv.us/notebook/ | Interactive notebook; retain noindex |
-| noindex | https://cursiv.us/letters | Removed public letters page; inspect response, do not resurrect |
-| noindex | https://cursiv.us/app | Interactive photo tool; retain noindex |
-| alternate canonical | https://cursiv.us/?x=2 | Duplicate homepage; retain canonical https://cursiv.us/ |
+- 31 website tests and 6 measurement tests pass. Mandatory USB hook runs on each commit.
+- Initial full production audit: 46 public probes, 45 final200, one intentional /letters404, no
+  errors/challenges; 17 self-canonical indexable pages match deployed bytes. Three additional www
+  favicon probes redirect to matching apex images. Public evidence: bench/results/discoverability-*.json
+  and discovery-publication.json. The final history deployment's refreshed 46-probe audit also passed.
+- Actual Schema.org live URL validator: 0 errors, 0 warnings, 2 top-level items.
+- Authenticated Cloudflare view: Googlebot block toggle off, allowed traffic observed; no security
+  settings changed. Actual Search Console live homepage test, October 26 at 10:08 PM local:
+  URL is available to Google. Cached inspection also showed homepage already indexed.
+- Desktop1280/mobile390 reviews passed; comparison table scrolls inside its wrapper. Live homepage
+  screenshot: bench/results/discovery-home-live.jpg.
+- Same-provider frozen queries: 0/10 non-branded result sets before and immediately after. Branded
+  controls also absent. This is not Google rank or a cross-assistant recommendation evaluation.
+- GitHub aggregate baseline:117 views/34 unique visitors, October12–25 UTC; not website organic traffic.
+  Search Console's signed-in aggregate baseline was read; unshown query impressions stay unknown.
+  Raw exports/account details/private dashboard images remain in ignored reports/.
+- U106 tag remains `10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a`; signed installers and app/station
+  code unchanged. No new tag, package release or database change.
 
-Do not call pairing/message APIs during this audit. Evaluate robots against their paths locally.
-Crawler-user-agent requests are access probes, not proof of verified Googlebot traffic or WAF settings.
-Search Console impressions/clicks and dashboard security settings remain unverified until actually read.
+## Remaining work and commands
 
-## Work order
+Production/history verification and public receipts are complete. PR #49 records the normal merge
+checks; consult its status before continuing source work. Current local operational details live in
+ignored reports/discovery-state.json. No remaining website implementation or deployment is required.
+Local preview sessions54987/12013 stopped. No preview server remains from this work.
+Do not re-run the applied one-off reports/update_discovery_html.py or final_discovery_adjustments.py.
 
-1. Save pre-change local/live crawl, icon, canonical and general-query baselines.
-2. Update broad local-AI positioning, useful comparison/discovery content and evidence links.
-3. Add official favicons, crawler-safe publication, canonical-host handling and validated sitemap/schema.
-4. Add repeatable audits and branded/non-branded measurement, then build/test/review.
-5. Publish the authorized website update and verify production; record fixes versus retained exclusions.
-6. Prepare directory/review submissions for owner approval. Rankings, recommendations and future traffic
-   remain outcomes to measure, not guarantees.
+Future owner-led work: comparable Search Console exports and manual engine/assistant checks;
+owner-approved external listings and independent reviews. Google recrawl, icon selection, rankings
+and recommendations remain external outcomes, not proven improvements.
 
-## Progress and running work
+See DISCOVERABILITY-REPORT.md for exact excluded URLs, sources, measurements and publication evidence.
 
-- Baseline saved: reports/discovery-before.json (19 local pages, 45 live requests, two www DNS errors).
-  All three requested root favicons, /local-ai, /compare and /llms.txt returned 404. Existing logo PNG
-  worked. Homepage and logo were reachable with both Google crawler user-agent strings, without a
-  challenge header; this is not an authenticated Googlebot/WAF-dashboard check.
-- Exact exclusions verified: six API paths remain robots-blocked locally; /notebook/ and /app return
-  200/noindex; /letters returns 404/noindex; /?x=2 is 200 with canonical https://cursiv.us/.
-- Frozen owner query baseline: reports/discovery-search-before.json. No Cursiv URL was returned in any
-  of the ten non-branded result sets from the available web-search provider. Branded/control queries
-  also did not return this site. This does not override the owner's Google report of nine indexed pages
-  or establish a Google rank; different search systems and coverage must be measured separately.
-- GitHub aggregate views baseline: 117 views / 34 unique visitors in its returned short-term window;
-  three referring-domain rows. Raw aggregate exports are ignored reports/discovery-github-*-before.json.
-  Search Console performance/impression data has not been supplied; do not invent zero traffic.
-- Local edits: broad homepage/README identity; new /local-ai, /compare and /documentation; corrected
-  SoftwareApplication/SoftwareSourceCode relationship; experimental llms.txt; exact official-source
-  favicons (ICO frames 16–256 including 96; PNG96; Apple180); favicon links in all public HTML.
-- Portability copy now distinguishes complete app/runtime/model kits, authorized data, host dependencies
-  and system traces. It no longer promises that abrupt unplugging cannot damage files.
-- Publisher allowlist contains new public files, validates indexable/self-canonical sitemap entries and
-  derives optional lastmod from full Git source history. Noindex tools and private routes remain out.
-  www custom-domain/redirect configuration is prepared; not deployed or verified yet.
-- Current checks: **31 website tests passed** (original 22 plus nine discovery/icon/redirect groups),
-  **6 measurement tests passed**. New website CI uses Node 24 LTS and Python's standard library.
-  Sitemap validates 17 canonical indexable URLs; 22 HTML pages have stable favicon links.
-- Desktop/mobile review passed at 1280/390px with no body overflow; menu opens/closes. The comparison
-  table remains horizontally scrollable inside its own wrapper. Preview: reports/discovery-home-preview.jpg.
-- Public baseline evidence copied to bench/results/discoverability-before.json and
-  bench/results/discovery-search-before.json; frozen queries and source-icon fingerprint in bench/discovery/.
-  The documentation URL got one marked supplementary pre-deployment 404 check; original measurements
-  were preserved. Aggregate GitHub views window is October 12–25 UTC, not website/non-branded traffic.
-- docs/DISCOVERABILITY-REPORT.md records exact retained exclusions, source guidance and measurement
-  limits. docs/DISCOVERY-SUBMISSIONS.md contains owner-review drafts; nothing has been sent or submitted.
-- No app code or private data/API operations. No new release tag/version. Current branch:
-  codex/general-search-discovery. Local public-only preview server is session 54987 on 127.0.0.1:8768;
-  stop it before finishing. Earlier restricted server session 12013 was stopped.
-- Next: final review/commit/PR checks, deployment and actual live favicon/WWW/schema checks, GitHub
-  description/topics, post-change samples and final receipt. A recurring-check preference question is
-  pending asynchronously; no automation has been created yet.
-- Do not re-run the applied one-off reports/update_discovery_html.py or
-  reports/final_discovery_adjustments.py helpers. Continue from the saved local edits.
+## Agent-readiness screenshots
+
+Reviewed the owner's agent-readiness checklist against official Cloudflare and A2A documentation.
+robots/sitemap/crawler access are the relevant foundation already verified. Markdown negotiation is
+optional and plan-dependent; no paid upgrade or blanket content conversion enabled. Content Signals
+express reuse preferences, not ranking guarantees; training policy was not changed. API catalogs,
+auth instructions, A2A/MCP cards, skills, WebMCP and outbound-agent identity need real corresponding
+services. No private endpoint or fabricated integration was published to increase a checker score.

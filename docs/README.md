@@ -27,7 +27,7 @@ link to them.
 ## Design and plans
 
 - [General-search discoverability](DISCOVERABILITY-REPORT.md), [continuing handoff](DISCOVERABILITY-HANDOFF.md),
-  [external submission drafts](DISCOVERY-SUBMISSIONS.md)
+  [manual discovery checklist](DISCOVERY-MANUAL-CHECKLIST.md), [external submission drafts](DISCOVERY-SUBMISSIONS.md)
 
 - [Architecture plan](ARCHITECTURE-PLAN.md) (see also [ARCHITECTURE](../ARCHITECTURE.md)
   and [TECH](../TECH.md))
