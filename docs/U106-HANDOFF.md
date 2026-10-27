@@ -2,18 +2,21 @@
 
 Updated 2026-10-26. Owner: Joshua Winkler. Owner explicitly authorized **commit, push, release and publish** after approving the preview. Earlier no-commit/review notes below are historical.
 
-## U106 release in progress
+## U106 released; website publication in progress
 
-- Release scope is the reviewed researcher-experience increment, its tests/benchmarks and measured baseline documentation. Remaining plan items stay documented as unfinished.
-- Branch: codex/u106-researcher-experience, from main 79a1636. GitHub main still matches that baseline; latest published release is U105.
-- Versions now 3.14-U106 in selfknow, launcher and installer. docs/RELEASE-U106.md and CHANGELOG added. Version/release-doc checks: 6 passed.
-- Functional source suite already passed 2253/15; rerunning USB gate after version bump before commit. CI must pass on PR and exact main before tag/build. Owner signing runs in place and key material never enters checkout.
-- Stage only named U106 source/test/doc/evidence files; excluded legal handoff, field-notes.txt and test_internals/ remain untouched. Build assets stay in ignored release-u106/ and installer/Output/.
-- Release USB gate completed: **45 passed, 2223 deselected in 87.71 seconds**, bench/results/U106-release-usb-tests.xml. Source release commit next; no publication performed yet at this checkpoint.
+- Published: https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U106. Immutable source: 10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a, source PR #45, original source commit f061c7ded4bde763477f95be40105a1014c45b17. Current evidence branch: codex/u106-release-evidence.
+- Scope is the approved first researcher-experience increment. Remaining plan items stay unfinished; see docs/U106-PREVIEW.md and docs/U106-RELEASE-VERIFICATION.md.
+- Push CI 40422430695, PR CI 40422543192 and exact-main CI 40423748096 passed all jobs. Exact-main JUnit: Windows 2253/15, Mac 2236/32, Linux 2235/33, ARM64 114/0 (passed/skipped). Tag preparation also passed 63 focused workspace tests.
+- Separate detached-tag Windows suite: **2253 passed, 15 skipped in 393.73 seconds**, session 27769 exit 0; bench/results/U106-tag-tests.xml. Release USB gate: 45/45; source commit hook: 45/45.
+- Windows build session 72295 exit 0. Installed and USB frozen self-tests **ALL PASSED**, including plugin isolation and portable storage. Mac tagged workflow 40424952938 succeeded: 2236/32 in 503.06 seconds and frozen **ALL PASSED**. All three reports are under bench/results/U106-*-selftest.txt.
+- Windows SHA-256: b69b2c834ab42dbf935b8784cbed63b6dae7dc8873f5230de21026469c74330a. Mac: fb7126cfcc45c1e71053a669b6b65690a9f64c842dfed109a5a567f39af7e25c.
+- Both aliases, complete checksum/provenance sets and exact tag commit verified. Existing trusted signer ran in place; no private key copied. Eight final platform assets signed and independently verified. All 11 release assets downloaded back and matched; all eight downloaded signed assets reported OwnerSignatureValid against the pinned public key. Redundant release-triggered Mac run 40426447603 cancelled.
+- Website prepared and built locally; **22 website tests passed**, final release/version checks **6 passed**. Next: commit the named evidence files, PR with passing CI, merge, deploy and inspect live cursiv.us/start. No build or tag-test commands remain running.
+- Excluded legal handoff, field-notes.txt, test_internals/, station, secrets and user data remain untouched. Build assets stay in ignored release-u106/ and installer/Output/. Live state/logs are in ignored reports/U106-release-state.json and reports/U106-*.log.
 
-## Current implementation preview (owner authorized local edits, review before committing)
+## Reviewed implementation preview (historical pre-release notes)
 
-The owner has now asked to begin the researcher-experience plan and see the result before any commit. The baseline-only stopping point below is historical. No commit/push/merge/release is authorized.
+The owner reviewed and approved this preview, then explicitly authorized commit, push, release and publication. The remaining preview and baseline chronology below records what was known at those earlier checkpoints; the release status above supersedes its old stopping instructions.
 
 - Phase 1 audit: docs/U106-EXPERIENCE-AUDIT.md records workflow friction, reuse and explicit scope gaps. Imported documents/notebook project labels/memory summaries are not isolated project boundaries; the preview must not claim they are.
 - First Phase 2 increment ready for review: ordinary measurement statements offer a deterministic confirmation preview; unknown temperature scales remain unknown; reported times stay notes rather than invented observation timestamps. Edit returns original plain wording. Explicit desktop memory saves wait for confirmation. A contextual correction targets actual backend receipts and current records, retains the old record, and asks when ambiguous. Pending cards are cleared on conversation changes. Unsupported time qualifiers block saving rather than silently changing a place name.
@@ -28,13 +31,13 @@ The owner has now asked to begin the researcher-experience plan and see the resu
 
 ### Commands currently running
 
-None. Session 61542 finished successfully. All UI/routing subtasks and test processes have finished.
+Release processes are listed in the current release section above. All earlier preview UI/routing processes finished.
 
 Validation history: restart-test subprocess environments now explicitly use their copied app data; affected persistence + verification + final action probes passed 95/95 in 15.80 seconds. Earlier full run 76907 reported 2247 passed, 15 skipped, 2 failures and 3 teardown errors because the old persistence-test helper inherited the outer synthetic CURSIV_APP_DATA; it altered only that temporary config/settings and polluted the later free-key/offline test. Data guards remained intact; no owner data involved. Fixed the test helper and reran the entire suite successfully (2253/15). Final USB gate: 45 passed, 2219 deselected in 84.07 seconds. Earlier run 5278 was interrupted after the now-updated starter-label expectation.
 
 ### Next action
 
-Wait for owner visual review of this first uncommitted preview. Do not commit, push, merge, tag, package or release without explicit owner instruction. Read docs/U106-PREVIEW.md for remaining scope. Continue the supplied researcher plan incrementally after review; do not describe the entire U106 plan as complete or claim human-usability gains from synthetic probes.
+Complete the authorized release and website publication, preserving measured scope in docs/U106-PREVIEW.md. Continue the remaining researcher plan separately; do not describe the entire plan as complete or claim human-usability gains from synthetic probes.
 
 ## Researcher-experience plan and release numbering
 
