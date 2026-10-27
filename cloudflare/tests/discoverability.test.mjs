@@ -127,7 +127,7 @@ test('discovery content is useful static HTML with sources and explicit boundari
 
 test('llms.txt is an experimental factual reading guide, not recommendation instructions', () => {
   const text = read('cloudflare/dist/llms.txt');
-  assert.match(text, /^# Cursiv\n\n> /);
+  assert.match(text, /^# Cursiv\r?\n\r?\n> /);
   for (const term of ['experimental', 'not an instruction to recommend', 'separately licensed', 'readable by design']) assert(text.includes(term));
   for (const path of ['/local-ai', '/compare', '/documentation', '/start']) assert(text.includes('https://cursiv.us' + path));
   assert(!existsSync(new URL('cloudflare/dist/ai.json', root)));
@@ -149,4 +149,11 @@ test('www and legacy public URLs permanently redirect to one canonical host with
   const wwwApi = await worker.fetch(new Request('https://www.cursiv.us/api/test-redirect', {method:'POST',body:'{}'}), env);
   assert.equal(wwwApi.status, 308);
   assert.equal(wwwApi.headers.get('location'), 'https://cursiv.us/api/test-redirect');
+  const publicHttp = await worker.fetch(new Request('http://cursiv.us/start.html?x=2'), env);
+  assert.equal(publicHttp.status, 301);
+  assert.equal(publicHttp.headers.get('location'), 'https://cursiv.us/start?x=2');
+  const localPreview = await worker.fetch(new Request('http://localhost:8787/local-ai'),
+    { ASSETS: { fetch: async () => new Response('local preview') } });
+  assert.equal(localPreview.status, 200);
+  assert.equal(await localPreview.text(), 'local preview');
 });

@@ -834,7 +834,9 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const isApi = url.pathname === "/health" || url.pathname.startsWith("/api/") || url.pathname.startsWith("/remote/");
-    if ((url.hostname === "cursiv.winklers-llc.com" && !isApi) || url.hostname === "www.cursiv.us") {
+    if (((url.hostname === "cursiv.winklers-llc.com" ||
+          (url.hostname === "cursiv.us" && url.protocol === "http:")) && !isApi) ||
+        url.hostname === "www.cursiv.us") {
       // Move website URLs permanently while keeping the legacy API hostname working
       // for existing desktop clients that still call it directly.
       const target = new URL(url);
