@@ -6,6 +6,10 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 
 ## Website general-search discoverability (Codex, 2026-10-26)
 
+Latest website copy cleanup: [WEBSITE-COPY-HANDOFF](docs/WEBSITE-COPY-HANDOFF.md).
+Short public guides link substantial capability/notebook/portable references. Former GitHub-account
+links are removed; release evidence, privacy disclosures, icons and private exclusions are retained.
+
 Continuing handoff: [DISCOVERABILITY-HANDOFF](docs/DISCOVERABILITY-HANDOFF.md); measurements and exact
 Search Console exclusion classifications: [DISCOVERABILITY-REPORT](docs/DISCOVERABILITY-REPORT.md).
 The website update leads with free/open-source local AI, retains notebook integrity as its distinction,

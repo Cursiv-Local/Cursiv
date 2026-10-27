@@ -27,58 +27,44 @@
 .policy ul { display: grid; gap: 10px; padding-left: 22px; }
 .policy h2 { margin-bottom: 14px; }
 .policy a { overflow-wrap: anywhere; }
-</style>
+.policy-section {border-top:1px solid var(--line);padding:20px 0}.policy-section>summary{font-size:19px;font-weight:600;cursor:pointer}.policy-section>.stack{padding-top:18px}</style>
 </head>
 <body>
-<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/">Overview</a><a href="/ai-reliability-testing">Reliability</a><a href="https://github.com/winklersllc2026-bit/Cursiv">GitHub</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/">Overview</a><a href="/ai-reliability-testing">Reliability</a><a href="https://github.com/Cursiv-Local/Cursiv">GitHub</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
 <main class="policy">
   <section>
     <div class="stack">
       <span class="eyebrow">Privacy and data handling</span>
       <h1>Cursiv Privacy Policy</h1>
       <p><b>Effective date: October 23, 2026</b></p>
-      <p>This policy describes the Cursiv desktop software and the Cursiv website features reviewed for this release. Local processing is available for supported features, but some website and online features send information to servers or providers. Local storage does not by itself guarantee security.</p>
+      <p>Local AI runs on your computer. Optional online features and the Phone AI Companion send content to servers. Portable data and exports have different protection limits. The full policy below explains each data path.</p>
     </div>
   </section>
 
-  <section>
-    <div class="stack">
-      <h2>Desktop app: local processing and storage</h2>
+  <details class="policy-section"><summary>Desktop app: local processing and storage</summary><div class="stack">
       <p>When you use an installed compatible model through the local Ollama runtime, your prompt is processed on your computer. Cursiv can also use local conversations, memory, documents, reference material and calculations. What works offline depends on the feature, model, configuration and files already installed.</p>
       <p>The desktop app stores conversations and other user data on the computer. On a computer, conversations, memories, saved notes, session history, agents and the field notebook (entries, photos, other devices' logs and phone uploads up to 64 MB) are encrypted on disk with a passphrase you choose, since version 3.14-U97 (the notebook since U98). This is always on for a computer; Cursiv asks for the passphrase when it starts. A Cursiv USB drive stays readable by design, so it can run on any computer. Workspace documents, imported document text, logs, reports and explicit exports are not encrypted; existing external backups are not encrypted automatically. Losing the passphrase makes encrypted records unrecoverable. See <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/ENCRYPTION-MIGRATION-PLAN.md">coverage and recovery</a> and the <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/THREAT-MODEL.md">threat model</a>. On a standard Windows install, saved AI keys use Windows DPAPI, which protects those keys for the same Windows account on the same computer. macOS keys use the login Keychain. DPAPI does not encrypt other app data, and portable USB copies may contain readable keys. Protect access to the computer, backups, exports and USB drives.</p>
-    </div>
-  </section>
+    </div></details>
 
-  <section>
-    <div class="stack">
-      <h2>Phone Field Notebook: browser-local records</h2>
+  <details class="policy-section"><summary>Phone Field Notebook: browser-local records</summary><div class="stack">
       <p>The Field Notebook saves entries, photos and settings in IndexedDB, a database stored by the browser on that phone. The notebook code does not automatically upload these records. “Send to laptop” creates a file for you to transfer to the computer; it does not send the records to Cursiv's server.</p>
       <p>The browser may clear this storage, and it can be lost if site data is removed or the browser removes stored data. The notebook asks the browser to keep storage persistent where supported, but that request is not a backup or guarantee. Export and keep a separate copy of important records.</p>
-    </div>
-  </section>
+    </div></details>
 
-  <section>
-    <div class="stack">
-      <h2>Phone AI Companion: server-backed conversations</h2>
+  <details class="policy-section"><summary>Phone AI Companion: server-backed conversations</summary><div class="stack">
       <p>This is separate from the Field Notebook. When paired and used, the Phone AI Companion sends your message and any photo you submit to Cursiv's Worker service. The service stores user messages, AI replies and submitted images in Cloudflare D1 so the paired phone and desktop can access the conversation.</p>
       <p>For an answer, the service sends the prompt, recent conversation text and any submitted image to Google Gemini when configured. If Gemini is not configured or does not return an answer, the service can use Cloudflare Workers AI when available. Those providers receive the content included in that request under their own terms and privacy practices.</p>
       <p>When the phone is linked, memory-summary sharing is on by default unless you turn it off on the desktop. Cursiv sends a short memory summary and optional name to the paired space. Turning sharing off sends an empty summary that clears the stored summary. Do not treat this server-backed feature as local-only or offline.</p>
-    </div>
-  </section>
+    </div></details>
 
-  <section>
-    <div class="stack">
-      <h2>Optional AI providers and internet access</h2>
+  <details class="policy-section"><summary>Optional AI providers and internet access</summary><div class="stack">
       <p>If you configure and select an external AI provider in the desktop app, the prompt and any submitted content needed for that request may be sent to that provider. The provider's own terms and privacy policy govern its handling, retention and possible use of that information. Cursiv cannot make promises about a provider's retention or model-training practices.</p>
       <p>The desktop app's optional Cursiv Cloud feature sends the conversation needed for that answer to Cursiv's Worker service. The service tries configured Google Gemini and can fall back to Cloudflare Workers AI. Local-model inference remains on the computer; enabling Cursiv Cloud sends the request to the service and selected provider.</p>
       <p>When you ask the desktop app to search the web, your query is sent to DuckDuckGo or Brave, depending on the configured search provider. When you ask it to read a page, it requests the URL you provide from that website. Model/runtime downloads and update checks contact their respective download or GitHub services when you initiate them or enable automatic checks. Some website pages load fonts from Google Fonts; when you view one of those pages, your browser requests font resources from Google. See Google's <a href="https://policies.google.com/privacy">Privacy Policy</a>.</p>
       <p>When you choose a linked external service such as GitHub, Ollama or SignPath, that service's own privacy policy applies to your visit.</p>
-    </div>
-  </section>
+    </div></details>
 
-  <section>
-    <div class="stack">
-      <h2>Other website services and information they handle</h2>
+  <details class="policy-section"><summary>Other website services and information they handle</summary><div class="stack">
       <ul>
         <li><b>Cloudflare hosting and logs:</b> the site and API run on a Cloudflare Worker and use Cloudflare D1. The repository enables Worker observability, but does not specify or expose the account's log configuration, access, retention or deletion settings. Cloudflare may process connection and request data to serve and secure the service. See <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's Privacy Policy</a>.</li>
         <li><b>Rate-limit counters:</b> the public demo stores the visitor IP address with a count and guard score. The hourly count window resets in the application, but the code does not automatically delete the IP row. Cursiv Cloud stores the visitor IP with daily counts; the app's daily limit resets at UTC midnight, but its code does not automatically delete old counter rows. The demo also stores per-day aggregate counts. The report endpoint stores a truncated SHA-256 hash (16 hexadecimal characters) of the visitor IP for its daily limit; this is pseudonymous data, not a guarantee of anonymity.</li>
@@ -93,19 +79,15 @@
       <p>The application behavior described above is based on the repository routes and database schema. Users can delete their own public-board posts and can clear the optional phone memory summary; the inspected app does not offer account removal, letter deletion, report deletion, or deletion of stored phone conversations and images. Some data has application-level expiry or display limits, as described above; these do not necessarily remove database records.</p>
       <p>A maintainer with database access may be able to remove records directly, but the repository does not document an administrative deletion procedure, backup schedule, backup-retention period, or when deleted records are removed from backups. These account and infrastructure practices require maintainer and Cloudflare account review. No specific retention period is promised by this policy.</p>
       <p>Cloudflare Worker observability is enabled in the repository configuration. The actual logs available, who can access them, how long they are retained, and whether additional logging or security-cookie settings are enabled must be confirmed in the Cloudflare account. Cloudflare's handling is also subject to its <a href="https://www.cloudflare.com/privacypolicy/">Privacy Policy</a>.</p>
-    </div>
-  </section>
+    </div></details>
 
-  <section>
-    <div class="stack">
-      <h2>Contact and policy updates</h2>
-      <p>No private privacy-contact address is published in the project materials reviewed. For a privacy question, use the project's <a href="https://github.com/winklersllc2026-bit/Cursiv/issues">GitHub Issues</a>. Issues are public, so do not include passwords, access tokens, private prompts, photos or other sensitive information.</p>
+  <details class="policy-section"><summary>Contact and policy updates</summary><div class="stack">
+      <p>No private privacy-contact address is published in the project materials reviewed. For a privacy question, use the project's <a href="https://github.com/Cursiv-Local/Cursiv/issues">GitHub Issues</a>. Issues are public, so do not include passwords, access tokens, private prompts, photos or other sensitive information.</p>
       <p>This policy may be updated as the project and its services change. The effective date at the top will be revised when the policy changes. It describes the implementation reviewed and is not a legal certification or guarantee of compliance.</p>
-      <p><a href="https://github.com/winklersllc2026-bit/Cursiv/blob/main/PRIVACY.md">Read the desktop application's detailed privacy notes.</a></p>
-    </div>
-  </section>
+      <p><a href="https://github.com/Cursiv-Local/Cursiv/blob/main/PRIVACY.md">Read the desktop application's detailed privacy notes.</a></p>
+    </div></details>
 </main>
-<footer><div class="wrap"><div class="copy"><span><a href="/">Cursiv</a> · <a href="/start">Download</a> · <a href="https://github.com/winklersllc2026-bit/Cursiv">GitHub</a></span><span>Effective October 23, 2026</span></div></div></footer>
+<footer><div class="wrap"><div class="copy"><span><a href="/">Cursiv</a> · <a href="/start">Download</a> · <a href="https://github.com/Cursiv-Local/Cursiv">GitHub</a></span><span>Effective October 23, 2026</span></div></div></footer>
 <script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
 </body>
 </html>

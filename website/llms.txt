@@ -17,6 +17,12 @@ Windows 10/11 (64-bit) is the primary desktop platform. The Apple Silicon Mac bu
 - [Offline operation](https://cursiv.us/open-source-offline-ai): What works locally and what needs a connection.
 - [Portable workspaces](https://cursiv.us/portable-workspace): What travels with a Windows drive, host requirements and tests.
 
+## Detailed product references
+
+- [Local AI capabilities](https://cursiv.us/local-ai-reference): Models, document retrieval, memory, permissions and current limits.
+- [Notebook integrity and retrieval](https://cursiv.us/notebook-reference): Record identity, linked corrections, hashes, signed exports, calculations and source scope.
+- [Portable and offline AI](https://cursiv.us/portable-ai-reference): Complete Windows kits, host dependencies, storage, network behavior and recovery evidence.
+
 ## Evidence and limits
 
 - [Documentation and evidence](https://cursiv.us/documentation): Stable links to notebook integrity, retrieval, network behavior and recovery documentation.

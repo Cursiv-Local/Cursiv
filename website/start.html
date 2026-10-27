@@ -22,118 +22,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css?v=u103-1">
+
 <script defer src="/assets/download-stats.js?v=2"></script>
+
+<link rel="stylesheet" href="/assets/site.css?v=clear-copy-1">
 </head>
 <body>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a>
-    <nav class="nav-links" style="display:flex">
-      <a href="/">← Home</a>
-    </nav>
-  </div>
-</header>
-
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/local-ai">Local AI</a><a href="/compare">Compare</a><a href="/documentation">Guides</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
 <main>
-<section class="hero">
-  <div class="wrap grid2">
-    <div>
-      <span class="eyebrow">Download and setup</span>
-      <h1>Install Cursiv.</h1>
-      <p class="lede">About ten minutes, most of it downloading. You need internet once, for the downloads. After that, everyday use works without it.</p>
-      <div class="cta-row">
-        <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download Cursiv-Setup.exe</a>
-        <a class="btn btn-ghost" data-download-button="mac" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-3.14-U106-mac-arm64.dmg">Mac (early): Cursiv.dmg</a>
-        <a class="btn btn-ghost" href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a>
-      </div>
-      <p class="fine"><b>Mac (early):</b> Apple Silicon (M1 or newer), macOS 12+. Drag Cursiv into Applications. It isn't
-        signed by Apple yet, so the first time: try to open it, then System Settings → Privacy &amp; Security → Open Anyway.
-        Built and tested automatically on Apple hardware, but not yet used by anyone on their own Mac. The USB drive is Windows-only.</p>
-      <p class="fine">Current release: U106. Research actions in one window, confirmed observation and memory previews, and dated notebook retrieval. <a href="/ai-reliability-testing#u106">Test evidence and installer checks</a> · <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">GitHub Releases</a> · MIT license</p>
-      <p class="fine" id="code-signing">U106 has an <b>owner-signed release manifest</b>, verified by Cursiv’s pinned public key. This is separate from Windows certificate trust: the installer still has no Windows-trusted publisher signature. Cursiv is seeking open-source code-signing support from the <a href="https://signpath.org/" rel="noopener noreferrer">SignPath Foundation</a>.</p>
-      <details id="verify-download"><summary>Verify the download and owner identity</summary><p>Compare the installer’s SHA-256 with the value below. A checksum detects changed bytes; the signed manifest authenticates those bytes to clients that already trust the owner key. A checksum on the same compromised download page alone does not prove who published it.</p><p><b>Windows U106 SHA-256:</b><br><code id="windows-u106-sha256" style="overflow-wrap:anywhere">b69b2c834ab42dbf935b8784cbed63b6dae7dc8873f5230de21026469c74330a</code></p><p><b>Owner public-key SHA-256 fingerprint:</b><br><code style="overflow-wrap:anywhere">f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7</code></p><p><a href="/assets/cursiv-owner-release-key.json">Public owner key</a> · <a href="/assets/cursiv-owner-release-U106.json">Signed U106 manifest</a> · <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/OWNER-RELEASE-SIGNING.md">Verification and trust limits</a></p></details>
-      <p class="fine"><a href="/local-ai-hardware-requirements">Hardware requirements</a> · <a href="/open-source-offline-ai">Offline AI guide</a> · <a href="/ai-reliability-testing">Benchmark evidence</a> · <a href="/privacy/">Privacy Policy</a></p>
-    </div>
-    <dl class="facts" aria-label="Requirements">
-      <div><span class="k">System</span><span class="v">Windows 10 or 11, 64-bit; or a Mac with Apple Silicon, macOS 12+ (early)</span></div>
-      <div><span class="k">Memory</span><span class="v">8 GB RAM (16 GB recommended)</span></div>
-      <div><span class="k">Disk</span><span class="v">About 4–8 GB free for Ollama and one model; more for extra models</span></div>
-      <div><span class="k">Graphics</span><span class="v">Optional. A 4 GB+ NVIDIA or AMD card makes answers much faster.</span></div>
-    </dl>
-  </div>
-</section>
+<section class="hero"><div class="wrap stack"><span class="eyebrow">Download & setup</span><h1>Install Cursiv.</h1><p class="lede">Download the app, then let Setup install Ollama and a local model. Initial downloads need internet.</p><div class="cta-row"><a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download for Windows</a><a class="btn btn-ghost" data-download-button="mac" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-3.14-U106-mac-arm64.dmg">Mac · early build</a></div><p class="fine">Current release: U106. <a href="/ai-reliability-testing#u106">Test evidence and installer checks</a> · MIT license</p></div></section>
+<section><div class="wrap stack"><h2>From download to first answer.</h2><ol class="steps"><li><div><b>Install</b><span>Open <code>Cursiv-Setup-3.14-U106.exe</code>. Windows may show an unknown-publisher warning; review the signing details below before deciding to run it.</span></div></li><li><div><b>Create your local login</b><span>Choose your login and encryption passphrase. Keep your recovery information safe.</span></div></li><li><div><b>Let Setup prepare local AI</b><span>Install Ollama and the suggested model, qwen3:4b-instruct (about 2.5 GB).</span></div></li><li><div><b>Ask a question</b><span>Type <code>help</code> for tools or <code>offline on</code> to block Cursiv’s outside connections.</span></div></li></ol></div></section>
+<section><div class="wrap stack"><h2>Before you install</h2><ul class="short-list"><li><b>Windows:</b> 10/11, 64-bit. Start with 8 GB RAM; 16 GB recommended. Allow about 4–8 GB for runtime and one model.</li><li><b>Mac:</b> Apple Silicon, macOS 12+. Early build; not Apple-signed or notarized. Automated tests do not replace first-hand Mac use.</li><li><b>Portable drives:</b> Windows only. <a href="/portable-workspace">Read the short guide</a>.</li></ul><p><a href="/local-ai-hardware-requirements">Hardware and model guidance</a></p></div></section>
+<section><div class="wrap stack"><h2>Download checks</h2><p class="fine" id="code-signing">U106 has an <b>owner-signed release manifest</b>. Windows publisher signing and Mac notarization are still pending. Cursiv is seeking support from the <a href="https://signpath.org/" rel="noopener noreferrer">SignPath Foundation</a>.</p><details id="verify-download"><summary>Verify the download and owner identity</summary><p>Compare the SHA-256 below with your download. The signed manifest authenticates bytes only when you already trust the owner key; a checksum alone does not identify the publisher.</p><p><b>Windows U106 SHA-256:</b><br><code id="windows-u106-sha256" style="overflow-wrap:anywhere">b69b2c834ab42dbf935b8784cbed63b6dae7dc8873f5230de21026469c74330a</code></p><p><b>Owner public-key SHA-256 fingerprint:</b><br><code style="overflow-wrap:anywhere">f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7</code></p><p><a href="/assets/cursiv-owner-release-key.json">Public owner key</a> · <a href="/assets/cursiv-owner-release-U106.json">Signed U106 manifest</a> · <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/docs/OWNER-RELEASE-SIGNING.md">Verification and trust limits</a></p></details><details class="more"><summary>Check the Windows checksum</summary><p>In PowerShell, run <code>Get-FileHash .\Cursiv-Setup-3.14-U106.exe -Algorithm SHA256</code> and compare it with the value above.</p></details></div></section>
+<section><div class="wrap stack"><h2>Help when you need it</h2><div class="faq"><details><summary>Where is my data?</summary><p>Covered conversations, memories and notebook records are encrypted on a computer. Portable data and explicit exports have different limits. <a href="/privacy/">Read the storage policy</a>.</p></details><details><summary>How do I update or uninstall?</summary><p>Update from the Cursiv tray icon → Check for Updates. Uninstall through Windows Settings → Apps. Ollama and its models are separate.</p></details><details><summary>Can I use online AI?</summary><p>Optional providers and web search need internet and send the content needed for the request. Keep offline mode on when you want outside connections blocked.</p></details></div><p><a href="/testers">Send feedback</a> · <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">Release notes</a></p></div></section>
 
-<section id="steps">
-  <div class="wrap">
-    <div>
-      <div class="section-head"><span class="eyebrow">Steps</span><h2>From download to first answer.</h2></div>
-      <ol class="steps">
-        <li><div><b>Check the download (optional)</b><span>Every release lists the installer's SHA-256 checksum in <code>SHA256SUMS.txt</code> on its <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest">release page</a>. In PowerShell, <code>Get-FileHash .\Cursiv-Setup-3.14-U106.exe -Algorithm SHA256</code> must print the same value. The installer is built from the public <a href="https://github.com/Cursiv-Local/Cursiv">source code</a> at the release's tag.</span></div></li>
-        <li><div><b>Run the installer</b><span>Open <code>Cursiv-Setup-3.14-U106.exe</code>. It installs into your own user folder (no administrator rights), adds a Start menu entry, and nothing else: no services, drivers or browser changes. It has no Windows-trusted publisher signature, so Windows may say "Windows protected your PC": verify the owner manifest and checksum before deciding to run it. The first page of the installer says the same.</span></div></li>
-        <li><div><b>Create your login</b><span>Pick a username and password, and answer the security questions; they're how you reset a forgotten password. Both stay on this computer. Cursiv doesn't open without this login.</span></div></li>
-        <li><div><b>Let Setup install the local AI</b><span>The Setup window installs Ollama, the free engine that runs AI models on your computer, then downloads the model you pick (it suggests one for your graphics card). Progress bars show how far along it is.</span></div></li>
-        <li><div><b>Start asking</b><span>Type a question. Type <code>help</code> to see what Cursiv can do, and <code>offline on</code> if you want nothing to leave this computer.</span></div></li>
-      </ol>
-    </div>
-  </div>
-</section>
-
-<section id="models">
-  <div class="wrap">
-    <div class="section-head">
-      <span class="eyebrow">Which model</span>
-      <h2>Setup suggests the model that tested best.</h2>
-    </div>
-    <div class="table-wrap">
-      <table class="table">
-        <thead><tr><th>Model</th><th>Download</th><th>When</th></tr></thead>
-        <tbody>
-          <tr><td><b>qwen3 4B Instruct</b> (Apache 2.0)</td><td>2.5 GB</td><td>Current default recommendation. It passed 40 of 40 cases in a 40-case suite 1.2 model comparison (October 18, 2026), averaging 9.8 seconds per answer on that test computer. This is a small comparison sample, not a full benchmark; speed varies by computer. Without a graphics card, speed has not been measured. See the <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/bench/MODEL-COMPARISON.md">model comparison details</a>.</td></tr>
-          <tr><td><b>qwen2.5 1.5B</b> (Apache 2.0)</td><td>1 GB</td><td>Smaller alternative for systems that need a lighter model. Not yet tested in the published Cursiv model comparison.</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <p class="fine" style="margin-top:12px">Optional extras in Setup: a coding model and an image-reading model. Each model has its own license; see <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/MODELS.md">MODELS.md</a>.</p>
-  </div>
-</section>
-
-<section id="online">
-  <div class="wrap">
-    <div class="stack">
-      <span class="eyebrow">Optional online extras</span>
-      <h2>Off unless you turn them on.</h2>
-      <p class="lede">You can add your own AI keys in ⚙ Settings: free Google Gemini or Groq keys, or paid OpenAI, Claude or xAI keys. Keys are encrypted for your Windows account.</p>
-      <ul class="checks net">
-        <li><span>When the local model can't answer (or for images), your message goes to the provider of a key you added.</span></li>
-        <li><span>Cursiv Cloud, a free backup on this website, is off by default.</span></li>
-        <li><span>Web search runs only for messages starting with <code>search:</code>.</span></li>
-        <li><span>Updates: tray icon → <b>Check for Updates</b>, or turn on automatic checks in Settings.</span></li>
-      </ul>
-      <p>Free keys: <a href="https://aistudio.google.com/apikey">Google Gemini</a> · <a href="https://console.groq.com/keys">Groq</a></p>
-    </div>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="wrap">
-    <div class="section-head"><span class="eyebrow">Help</span><h2>Common questions.</h2></div>
-    <div class="faq">
-      <details><summary>Where is my data kept?</summary><p>In a <code>.cursiv</code> folder in your Windows user folder and in Cursiv's program folder: ordinary files. ⚙ Settings has an "Open folder" button. Saved AI keys are encrypted; conversations and memories aren't encrypted on disk.</p></details>
-      <details><summary>How do I update?</summary><p>Right-click the Cursiv icon in the Windows tray (by the clock) and choose <b>Check for Updates</b>. If a newer version exists, Cursiv downloads its installer from GitHub and runs it. Your data is kept.</p></details>
-      <details><summary>Can I run it from a USB drive?</summary><p>Yes: tray icon → <b>Make a Cursiv USB…</b> copies Cursiv, Ollama and your models to a 64 GB+ exFAT drive. Leave "Include my memories, keys and settings" unticked for a copy you give to someone else.</p></details>
-      <details><summary>How do I uninstall?</summary><p>Windows Settings → Apps → Cursiv → Uninstall. Ollama and its models are separate; uninstall Ollama the same way to remove them.</p></details>
-      <details><summary>Something went wrong.</summary><p>Use tray icon → <b>Send problem report…</b> (it shows you what will be sent before sending), or open an issue on <a href="https://github.com/Cursiv-Local/Cursiv/issues">GitHub</a>.</p></details>
-    </div>
-  </div>
-</section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <div class="copy" style="border-top:0;margin-top:0;padding-top:0"><span><a href="/">Cursiv</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a> · <a href="/vision">Direction</a> · <a href="/privacy/">Privacy Policy</a></span><span>MIT License</span></div>
-  </div>
-</footer>
-</body>
-</html>
+<footer><div class="wrap"><div class="copy"><span>Built by Joshua Winkler · Cursiv · MIT license</span><span><a href="/start">Setup</a> · <a href="/documentation">Guides &amp; reference</a> · <a href="/testers">Help test</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a></span></div></div></footer>
+<script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
+</body></html>

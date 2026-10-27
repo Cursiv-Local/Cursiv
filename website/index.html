@@ -28,7 +28,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/site.css?v=u92-testers-link-2">
+
 <script defer src="/assets/download-stats.js?v=2"></script>
 <script type="application/ld+json">
 {
@@ -62,155 +62,33 @@
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"SoftwareSourceCode","@id":"https://cursiv.us/#source","name":"Cursiv source code","codeRepository":"https://github.com/Cursiv-Local/Cursiv","license":"https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE","programmingLanguage":["Python","JavaScript"]}
 </script>
+
+<link rel="stylesheet" href="/assets/site.css?v=clear-copy-1">
 </head>
 <body>
-
-<header class="nav">
-  <div class="wrap">
-    <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a>
-    <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
-    <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-      <a href="/local-ai">Local AI</a>
-      <a href="/compare">Compare tools</a>
-      <a href="#capabilities">Features</a>
-      <a href="#testing">Testing</a>
-      <a href="#faq">Questions</a>
-      <a href="https://github.com/Cursiv-Local/Cursiv">GitHub</a>
-      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download</a>
-    </nav>
-  </div>
-</header>
-
+<header class="nav"><div class="wrap"><a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a><button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button><nav class="nav-links" id="navLinks" aria-label="Main navigation"><a href="/local-ai">Local AI</a><a href="/compare">Compare</a><a href="/documentation">Guides</a><a class="btn btn-gold" href="/start">Download</a></nav></div></header>
 <main>
-<section class="hero" id="today">
-  <div class="wrap grid2">
-    <div>
-      <span class="eyebrow">Free · Open source · Windows</span>
-      <h1>Local AI built for records you can verify.</h1>
-      <p class="lede">Cursiv is a free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable USB/SSD workspaces. Run AI on your Windows PC, preserve observation history and keep useful notes close. Built for researchers, technicians and independent workers who need detailed records. <a href="/local-ai">Explore local AI with Cursiv</a>.</p>
-      <div class="cta-row">
-        <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download the latest release</a>
-        <a class="btn btn-ghost" href="/start">Setup guide</a>
-      </div>
-      <p class="tester-invite">
-        <a class="tester-invite-link" href="/testers">
-          <span>Help test Cursiv</span><span class="tester-invite-arrow" aria-hidden="true">→</span>
-        </a>
-      </p>
-      <p class="fine">MIT license · Windows 10/11, 64-bit · Internet needed for initial downloads</p>
-    </div>
-    <dl class="facts" aria-label="Cursiv at a glance">
-      <div><dt>AI engine</dt><dd class="v" style="margin:0"><a href="https://ollama.com">Ollama</a>, running on your computer</dd></div>
-      <div><dt>Your work</dt><dd class="v" style="margin:0">Local conversations, memory and field notes</dd></div>
-      <div><dt>Offline mode</dt><dd class="v" style="margin:0">Blocks connections off the computer</dd></div>
-      <div><dt>Before you start</dt><dd class="v" style="margin:0">Install Ollama and a compatible model. <a href="/local-ai-hardware-requirements">Check hardware</a></dd></div>
-    </dl>
-  </div>
-</section>
-
-<section id="capabilities">
-  <div class="wrap" id="tour">
-    <div class="section-head">
-      <span class="eyebrow">Built for work beyond a connection</span>
-      <h2>Useful tools. On your computer.</h2>
-    </div>
-    <div class="cards two" id="uses">
-      <div class="card"><h3>Keep working without signal.</h3><p>Chat and use supported local tools with an installed model.</p></div>
-      <div class="card"><h3>Keep your work local.</h3><p>Save conversations and memories on your PC. Cloud services are optional.</p></div>
-      <div class="card"><h3>Keep detailed records.</h3><p>Record measurements, photos and observations, with corrections that preserve the original.</p></div>
-      <div class="card"><h3>Work from your evidence.</h3><p>Read imported documents by page and run supported field calculations in code.</p></div>
-    </div>
-    <a class="card" href="/team-drives" style="display:block;margin-top:16px;text-decoration:none"><span class="eyebrow">New in U103 · see it with real screens</span><h3 style="margin-top:8px">A team on field drives, one main computer.</h3><p>Each scientist records offline on a drive in their name. Back at base, one computer takes the drives one at a time, and every entry and photo arrives in the right name. A new drive can go out with only the work you choose. <span style="color:var(--gold)">See the demo →</span></p></a>
-    <a class="card" href="/field-station" style="display:block;margin-top:16px;text-decoration:none"><span class="eyebrow">Preview in U104 · not yet tested on a Pi</span><h3 style="margin-top:8px">Cursiv Field Station: a research server you can carry.</h3><p>An experimental local-server preview for using the notebook from phones, tablets and laptops over a local network. It has not yet been validated on a physical Raspberry Pi. <span style="color:var(--gold)">See the preview →</span></p></a>
-    <p class="fine" style="margin-top:18px"><a href="/compare">Compare local AI applications</a> · <a href="/open-source-offline-ai">What works offline</a> · <a href="/field-research">Field research</a> · <a href="/documentation">Documentation and evidence</a></p>
-  </div>
-</section>
-
-<section id="testing">
-  <div class="wrap grid2">
-    <div class="stack">
-      <span class="eyebrow">Public tests</span>
-      <h2>See how Cursiv is tested.</h2>
-      <p>The Cursiv Truth Benchmark has 158 versioned cases covering reasoning, numbers, memory and uncertainty. Published scores apply to specific models and test sets.</p>
-      <p><a href="/ai-reliability-testing">Results, methods and failures →</a></p>
-      <details class="more" id="results">
-        <summary>What does the published score cover?</summary>
-        <p style="padding-bottom:14px">U106 source passed 2,253 software regression tests on Windows, 15 skipped. See current release checks, the historical local-model benchmark and known failures on the <a href="/ai-reliability-testing#u106">test page</a>. Test scores describe specific checks, not a general accuracy rate.</p>
-      </details>
-    </div>
-    <div class="card stack" id="limitations">
-      <h3>AI can be confidently wrong.</h3>
-      <p>Cursiv checks selected numbers and source claims, but can still miss errors. Verify important answers.</p>
-      <p class="fine">Experimental software. Not certified for medical or safety-critical use.</p>
-    </div>
-  </div>
-</section>
-
-<section id="development-history">
-  <div class="wrap stack">
-    <span class="eyebrow">Public development history</span>
-    <h2>Built through continuous development.</h2>
-    <p>Cursiv’s publicly documented history dates back to at least May 2026. The <time datetime="2026-05-17">May 17, 2026</time> version 3 release described multi-model AI orchestration, persistent memory and a local workspace. That early environment coordinated cloud providers, with Ollama available for offline use.</p>
-    <p>Since then, Cursiv has evolved toward free, open-source local AI with tamper-evident notebooks, offline document retrieval, calculations checked in code and portable research workspaces. Its focus is researchers and independent workers who need detailed records and useful tools without relying on a cloud connection.</p>
-    <p><a href="https://github.com/joshua1993winkler-jpg/Cursiv/releases/tag/V3">View the original May 2026 release</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Explore current development</a></p>
-  </div>
-</section>
-
-<section id="faq">
-  <div class="wrap">
-    <div class="section-head"><span class="eyebrow">Before you download</span><h2>A few practical details.</h2></div>
-    <div class="faq">
-      <details><summary>What do I need to run it?</summary><p>Windows 10 or 11, 64-bit, with 8 GB RAM as a starting point; 16 GB is recommended. Allow space for Cursiv, Ollama and your model. A graphics card helps, but speed depends on the model and hardware. Setup can install Ollama and download a model. See the <a href="/local-ai-hardware-requirements">hardware guide</a> and <a href="/start">installation steps</a>.</p></details>
-      <details><summary>What works without internet?</summary><p>After setup, local chat, memory, saved conversations and supported local tools work with their required files installed. Offline mode blocks outside connections and stays on after a restart. Web search, cloud AI, the website phone companion, downloads and update checks need a connection. Optional online features send the content needed for their requests. <a href="/open-source-offline-ai">Read the offline guide</a>.</p></details>
-      <details id="privacy"><summary>Does local storage mean encryption?</summary><p>On a computer, yes: since U97 conversations, memories, the field notebook and its photos are encrypted on disk with your passphrase, and there's no way in without it. A Cursiv USB drive stays readable by design, so it works on any computer; use full-drive encryption if you carry sensitive records. Saved API keys use Windows account protection. If you use an online provider or the website phone companion, those services have separate data paths. The <a href="/privacy/">Privacy Policy</a> explains what is stored, what can leave the computer and the website's download analytics.</p></details>
-      <details id="architecture"><summary>How are answers checked?</summary><p>Ollama generates a local answer. Cursiv can supply relevant reference material, saved information and results from supported calculations, then check selected claims. These checks are limited and can miss mistakes. Some reference entries still lack published sources, and none has medical-professional review. The <a href="/ai-reliability-testing">testing guide</a> explains the evidence; <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/TECH.md">technical documentation</a> covers the architecture.</p></details>
-      <details><summary>Is it free? Which platforms are supported?</summary><p>Cursiv's source code is free under the MIT license. Models have their own licenses; review the terms of the model you choose. Windows is the main platform. An early Apple Silicon Mac build is on the <a href="/start">download page</a>; Linux is not yet supported. Portable USB/SSD operation is Windows-only, and broader field validation is still needed.</p></details>
-      <details><summary>Why does Windows show an unknown publisher?</summary><p>Windows publisher signing is pending; Release manifests are owner-signed with a separate pinned key. Cursiv is seeking open-source signing support from the SignPath Foundation. Review the source, release notes and published SHA-256 checksum before deciding to install. The <a href="/start#code-signing">download guide</a> explains signing status and setup. Public source code and a matching checksum identify a build; they do not guarantee it is free of defects.</p></details>
-      <details><summary>Can I see the app first?</summary>
-        <p>These are dated examples, recorded offline on October 18, 2026 from commit <code>ec0b105</code>, rather than screenshots of the latest release. The <a href="https://github.com/Cursiv-Local/Cursiv/blob/main/website/assets/shots/answers.json">recorded answers</a> provide context. The notebook image uses example entries. Features and broader validation status are described on the <a href="/vision#field">research page</a>.</p>
-        <figure class="shot" style="margin:0 0 18px"><a href="/assets/shots/dark.png" target="_blank" rel="noopener"><img src="/assets/shots/dark.png" alt="Dated offline Cursiv chat example in dark mode" width="1475" height="1025" loading="lazy"></a></figure>
-        <figure class="shot" style="margin:0 0 18px"><a href="/assets/shots/notebook.png" target="_blank" rel="noopener"><img src="/assets/shots/notebook.png" alt="Dated Field Notebook example showing observations and corrections" width="963" height="1037" loading="lazy"></a></figure>
-      </details>
-    </div>
-  </div>
-</section>
-
-<section id="source">
-  <div class="wrap stack">
-    <span class="eyebrow">Start locally</span>
-    <h2>Put Cursiv on your PC.</h2>
-    <p>Download the latest Windows release. Setup guides you through Ollama and a local model.</p>
-    <div class="cta-row">
-      <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download the latest release</a>
-      <a class="btn btn-ghost" href="/start">Installation help</a>
-    </div>
-    <p class="fine">Free · MIT license · Initial downloads need internet</p>
-  </div>
-</section>
+<section class="hero" id="today"><div class="wrap grid2"><div>
+<span class="eyebrow">Free · Open source · Windows</span><h1>Local AI built for records you can verify.</h1>
+<p class="lede">Ask your documents. Keep detailed notes. Preserve the original when records change. All with local AI on your computer.</p>
+<div class="cta-row"><a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download for Windows</a><a class="btn btn-ghost" href="/start">Setup guide</a></div>
+<p class="tester-invite"><a class="tester-invite-link" href="/testers"><span>Help test Cursiv</span><span class="tester-invite-arrow" aria-hidden="true">→</span></a></p>
+<p class="fine">Windows 10/11 · Ollama + a local model · Initial downloads need internet</p>
+</div><figure class="shot hero-shot"><img src="/assets/field-notebook-u102.webp" width="1000" height="937" alt="Cursiv Field Notebook with sample observations and measurements"><figcaption>Notebook example · U102 sample data</figcaption></figure></div></section>
+<section id="capabilities"><div class="wrap"><div class="section-head"><span class="eyebrow">Your work, close at hand</span><h2>Less friction. Better records.</h2></div><div class="cards two">
+<div class="card"><h3>Ask your files.</h3><p>Find passages in imported documents, with page references.</p></div>
+<div class="card"><h3>Keep the history.</h3><p>Tamper-evident notebooks preserve observations and linked corrections.</p></div>
+<div class="card"><h3>Work offline.</h3><p>Use installed models and supported local tools after setup.</p></div>
+<div class="card"><h3>Take it with you.</h3><p>Prepare a Windows USB or SSD workspace with chosen models and records.</p></div></div>
+<p class="fine" style="margin-top:18px"><a href="/local-ai">Explore local AI</a> · <a href="/field-research">See the notebook</a> · <a href="/compare">Compare tools</a></p></div></section>
+<section id="testing"><div class="wrap stack"><h2>Check the evidence.</h2><p>Cursiv checks selected calculations and source claims. AI can still be wrong; verify important answers.</p><p><a href="/ai-reliability-testing#u106">U106 tests and known limits</a></p><details class="more" id="results"><summary>Release checks</summary><p>U106 source passed 2,253 software regression tests on Windows, 15 skipped. These are software checks, not a general AI accuracy rate.</p></details></div></section>
+<section id="faq"><div class="wrap"><div class="section-head"><h2>A few useful answers.</h2></div><div class="faq">
+<details><summary>Is it free?</summary><p>Yes. Cursiv uses the MIT license. Ollama and each model have separate licenses. Windows is the main platform; the Mac build is early.</p></details>
+<details><summary>What works offline?</summary><p>Local chat, notebook records, imported documents and supported tools after setup. Web search, cloud AI and the Phone AI Companion need internet.</p></details>
+<details id="privacy"><summary>Where does my work stay?</summary><p>Local work stays on your computer. Covered app data is encrypted on a computer; portable data is readable by design. <a href="/privacy/">Storage and online-feature details</a>.</p></details>
+<details><summary>Why does Windows show an unknown publisher?</summary><p>Windows publisher signing is pending. Releases have a separate owner-signed manifest. <a href="/start#code-signing">Check the download and signing status</a>.</p></details>
+</div></div></section>
 </main>
-
-<footer>
-  <div class="wrap">
-    <div class="copy">
-      <span>Built by Joshua Winkler · Cursiv · MIT license</span>
-      <span><a href="/start">Setup</a> · <a href="/team-drives">Team drives demo</a> · <a href="/field-station">Field Station</a> · <a href="/privacy/">Privacy</a> · <a href="/vision">Direction</a> · <a href="/story">History</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source code</a></span>
-    </div>
-  </div>
-</footer>
-
-<script>
-'use strict';
-(() => {
-  const btn = document.getElementById('menuBtn'), links = document.getElementById('navLinks');
-  btn.addEventListener('click', () => {
-    const open = links.classList.toggle('open');
-    btn.setAttribute('aria-expanded', String(open));
-    btn.textContent = open ? 'Close' : 'Menu';
-  });
-  links.addEventListener('click', e => {
-    if (e.target.tagName === 'A') { links.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); btn.textContent = 'Menu'; }
-  });
-})();
-</script>
-</body>
-</html>
+<footer><div class="wrap"><div class="copy"><span>Built by Joshua Winkler · Cursiv · MIT license</span><span><a href="/start">Setup</a> · <a href="/documentation">Guides &amp; reference</a> · <a href="/testers">Help test</a> · <a href="/privacy/">Privacy</a> · <a href="https://github.com/Cursiv-Local/Cursiv">Source</a></span></div></div></footer>
+<script>'use strict';(()=>{const b=document.getElementById('menuBtn'),n=document.getElementById('navLinks');b.addEventListener('click',()=>{const o=n.classList.toggle('open');b.setAttribute('aria-expanded',String(o));b.textContent=o?'Close':'Menu';});n.addEventListener('click',e=>{if(e.target.tagName==='A'){n.classList.remove('open');b.setAttribute('aria-expanded','false');b.textContent='Menu';}});})();</script>
+</body></html>
