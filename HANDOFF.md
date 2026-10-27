@@ -4,15 +4,17 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U107 published — website update pending (Codex, 2026-10-27)
+## U107 released and website published (Codex, 2026-10-27)
 
 Published [v3.14-U107](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U107), immutable source
 `7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb` (source PR51). All push/PR/exact-main checks passed;
 Windows and native Mac frozen packages passed, including Windows portable-layout start. Existing
 owner identity signed8 platform assets; all11 public downloads/digests and8 signatures were verified.
-[U107 release evidence](docs/U107-RELEASE-VERIFICATION.md). Website links/manifest/copy are checked
-locally (31 website tests,6 consistency tests) and await their protected PR/merge/deployment.
-Live process identities and remaining work: [U107-HANDOFF](docs/U107-HANDOFF.md).
+[U107 release evidence](docs/U107-RELEASE-VERIFICATION.md). Website PR52 merged after all18 checks;
+Cloudflare deployment `edbccc5a-8eef-4a00-85bb-9523f507ffc4` passed18 live checks. Start changed
+U106→U107; page bytes, download links/hash, public signed manifest, favicon access, crawler probes,
+intentional robots exclusions and canonical www redirect verified. [Publication receipt](bench/results/U107-publication.json).
+Continuing state and historical checkpoints: [U107-HANDOFF](docs/U107-HANDOFF.md).
 
 Implementation branch `codex/u107-agent-reliability` was based on main `2a63932` (released U106 engine).
 Continuing state/processes: [U107-HANDOFF](docs/U107-HANDOFF.md). Owner review:
