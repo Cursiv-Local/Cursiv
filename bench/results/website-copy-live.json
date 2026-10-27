@@ -1,0 +1,3963 @@
+{
+  "checked_utc": "2026-10-27T03:10:58.308074+00:00",
+  "local_pages": {
+    "website/404.html": {
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/ai-reliability-testing.html": {
+      "title": "AI Reliability Testing | Cursiv",
+      "h1": [
+        "Tests you can inspect."
+      ],
+      "canonical": [
+        "https://cursiv.us/ai-reliability-testing"
+      ],
+      "description": "Cursiv U106 software regressions and release checks, historical U85 local-model benchmark, rendering measurements, failures and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "AI Reliability Testing",
+              "item": "https://cursiv.us/ai-reliability-testing"
+            }
+          ]
+        }
+      ]
+    },
+    "website/app.html": {
+      "title": "Cursiv | Ask about a photo",
+      "h1": [
+        "\u2726 CURSIV"
+      ],
+      "canonical": [],
+      "description": "Ask Cursiv about a photo: describe visible details, read text, and explore questions about images.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/chat.html": {
+      "title": "Cursiv \u2014 Chat",
+      "h1": [],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/compare.html": {
+      "title": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+      "h1": [
+        "Choose the tool for your work."
+      ],
+      "canonical": [
+        "https://cursiv.us/compare"
+      ],
+      "description": "Compare local AI applications for offline chat, document retrieval, licensing and recordkeeping. Official sources for Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/compare#page",
+          "url": "https://cursiv.us/compare",
+          "name": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+          "description": "Compare local AI applications for offline chat, document retrieval, licensing and recordkeeping. Official sources for Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+              "item": "https://cursiv.us/compare"
+            }
+          ]
+        }
+      ]
+    },
+    "website/documentation.html": {
+      "title": "Local AI Documentation & Notebook Evidence | Cursiv",
+      "h1": [
+        "Find the guide you need."
+      ],
+      "canonical": [
+        "https://cursiv.us/documentation"
+      ],
+      "description": "Inspect Cursiv\u2019s notebook integrity, offline document retrieval, local AI network behavior, portable workspaces, platform support, tests and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/documentation#page",
+          "url": "https://cursiv.us/documentation",
+          "name": "Local AI Documentation & Notebook Evidence | Cursiv",
+          "description": "Inspect Cursiv\u2019s notebook integrity, offline document retrieval, local AI network behavior, portable workspaces, platform support, tests and limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Documentation & Notebook Evidence",
+              "item": "https://cursiv.us/documentation"
+            }
+          ]
+        }
+      ]
+    },
+    "website/field-research.html": {
+      "title": "Offline Field Research Software with a Tamper-Evident Notebook | Cursiv",
+      "h1": [
+        "Record it. Keep the original."
+      ],
+      "canonical": [
+        "https://cursiv.us/field-research"
+      ],
+      "description": "Cursiv is free, open-source field research software: a tamper-evident field notebook, field calculations checked against published methods, and an optional local AI assistant that works offline.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            }
+          ]
+        }
+      ]
+    },
+    "website/field-station.html": {
+      "title": "Cursiv Field Station: an Offline Research Server on a Raspberry Pi | Cursiv",
+      "h1": [
+        "A notebook server for the field."
+      ],
+      "canonical": [
+        "https://cursiv.us/field-station"
+      ],
+      "description": "Cursiv Field Station (preview): Cursiv's field notebook and research tools served from a Raspberry Pi 5 to phones, tablets and laptops over its own Wi-Fi, with no internet. Real screens; not yet validated on a Pi.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Field Station",
+              "item": "https://cursiv.us/field-station"
+            }
+          ]
+        }
+      ]
+    },
+    "website/index.html": {
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    "website/local-ai-hardware-requirements.html": {
+      "title": "Local AI Hardware Requirements | Cursiv",
+      "h1": [
+        "Will it run on your computer?"
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-hardware-requirements"
+      ],
+      "description": "A practical guide to CPU, GPU memory, system RAM, model size and quantization when choosing hardware for local AI with Cursiv.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Hardware Requirements",
+              "item": "https://cursiv.us/local-ai-hardware-requirements"
+            }
+          ]
+        }
+      ]
+    },
+    "website/local-ai-reference.html": {
+      "title": "Local AI Capabilities Reference | Cursiv",
+      "h1": [
+        "Cursiv local AI: capabilities and limits."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ],
+      "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/local-ai-reference",
+          "headline": "Local AI Capabilities Reference",
+          "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    "website/local-ai.html": {
+      "title": "Cursiv: Free Open-Source Local AI Assistant",
+      "h1": [
+        "Local AI for your documents and notes."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai"
+      ],
+      "description": "Run local AI on Windows, search documents offline and preserve tamper-evident notes. Explore Cursiv\u2019s free desktop app, portable workspaces and current limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/local-ai#page",
+          "url": "https://cursiv.us/local-ai",
+          "name": "Cursiv: Free Open-Source Local AI Assistant",
+          "description": "Run local AI on Windows, search documents offline and preserve tamper-evident notes. Explore Cursiv\u2019s free desktop app, portable workspaces and current limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Cursiv: Free Open-Source Local AI Assistant",
+              "item": "https://cursiv.us/local-ai"
+            }
+          ]
+        }
+      ]
+    },
+    "website/notebook-reference.html": {
+      "title": "Notebook Integrity and Retrieval Reference | Cursiv",
+      "h1": [
+        "Notebooks, retrieval and evidence."
+      ],
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ],
+      "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/notebook-reference",
+          "headline": "Notebook Integrity and Retrieval Reference",
+          "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    "website/offline-research.html": {
+      "title": "Offline Scientific Data Collection Software | Cursiv",
+      "h1": [
+        "Keep recording when the signal goes."
+      ],
+      "canonical": [
+        "https://cursiv.us/offline-research"
+      ],
+      "description": "Collect, check and calculate field data with no internet connection. What works offline in Cursiv, what needs a connection, and how offline mode blocks outside connections.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Offline research",
+              "item": "https://cursiv.us/offline-research"
+            }
+          ]
+        }
+      ]
+    },
+    "website/open-source-offline-ai.html": {
+      "title": "Open Source Offline AI | Cursiv",
+      "h1": [
+        "AI without a connection."
+      ],
+      "canonical": [
+        "https://cursiv.us/open-source-offline-ai"
+      ],
+      "description": "Learn how Cursiv runs compatible local language models, what works offline, which features need internet access, and how local AI differs from cloud AI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Cursiv",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Windows 10 and 11 (64-bit)",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "description": "An open-source local-first AI assistant for running compatible language models on a personal computer, with supported offline features after setup."
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Open Source Offline AI",
+              "item": "https://cursiv.us/open-source-offline-ai"
+            }
+          ]
+        }
+      ]
+    },
+    "website/portable-ai-reference.html": {
+      "title": "Portable and Offline AI Reference | Cursiv",
+      "h1": [
+        "Portable AI: kit and offline reference."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ],
+      "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/portable-ai-reference",
+          "headline": "Portable and Offline AI Reference",
+          "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    "website/portable-workspace.html": {
+      "title": "Portable Local AI on a USB Drive or SSD | Cursiv",
+      "h1": [
+        "Take your workspace with you."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-workspace"
+      ],
+      "description": "Carry local AI, documents and tamper-evident notebooks on a prepared Windows USB/SSD. See included models, host requirements, privacy limits and tested behavior.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Portable workspace",
+              "item": "https://cursiv.us/portable-workspace"
+            }
+          ]
+        }
+      ]
+    },
+    "website/profile.html": {
+      "title": "Cursiv \u2014 Profile",
+      "h1": [],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/start.html": {
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/story.html": {
+      "title": "Cursiv \u2014 The Story So Far",
+      "h1": [
+        "Built by doing the work."
+      ],
+      "canonical": [
+        "https://cursiv.us/story"
+      ],
+      "description": "The story behind Cursiv: why it was built as a local-first AI assistant, how its direction has changed, and what the project aims to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/team-drives.html": {
+      "title": "Team Field Drives: Three Scientists, One Main Computer | Cursiv",
+      "h1": [
+        "Team records. One place to bring them back."
+      ],
+      "canonical": [
+        "https://cursiv.us/team-drives"
+      ],
+      "description": "How a research team uses Cursiv on field drives: each scientist records offline on a drive in their name, one main computer brings the drives in with every entry and photo in the right name, and a new drive goes out with only the work chosen. Real screens.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Team field drives",
+              "item": "https://cursiv.us/team-drives"
+            }
+          ]
+        }
+      ]
+    },
+    "website/testers.html": {
+      "title": "Help test Cursiv",
+      "h1": [
+        "Help make Cursiv easier to use."
+      ],
+      "canonical": [
+        "https://cursiv.us/testers"
+      ],
+      "description": "Try real tasks in Cursiv and share what felt off, slow or unclear. No developer experience needed. Send feedback by email or GitHub issue.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/vision.html": {
+      "title": "Cursiv \u2014 Direction",
+      "h1": [
+        "Make the everyday work dependable."
+      ],
+      "canonical": [
+        "https://cursiv.us/vision"
+      ],
+      "description": "Where Cursiv is going: from a trustworthy local AI on one computer to independent nodes that keep reliable knowledge with or without a connection. What's done, what's next, and what we're not trying to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/notebook/index.html": {
+      "title": "Cursiv Field Notebook",
+      "h1": [
+        "Field Notebook"
+      ],
+      "canonical": [],
+      "description": "Record field observations on your phone, offline. Everything stays on the phone until you send it to Cursiv on your laptop.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/privacy/index.html": {
+      "title": "Cursiv Privacy Policy | Local AI and Website Data",
+      "h1": [
+        "Cursiv Privacy Policy"
+      ],
+      "canonical": [
+        "https://cursiv.us/privacy/"
+      ],
+      "description": "How Cursiv handles local AI data, optional providers, the website, phone companion, public board and browser field notebook.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    }
+  },
+  "limits": "Public HTTP access probes, not authenticated Search Console or verified crawler traffic.",
+  "live": [
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/start",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/start",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/start",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "96a48d9a3562bb3d24cede87de3a1f17b1ec98370c4392a60ac49edf4dce380d",
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "d5db99811a847a6e1bd9210e5584af33c8de43d225726d9e0b2e9c6d35af8a51",
+      "title": "Cursiv: Free Open-Source Local AI Assistant",
+      "h1": [
+        "Local AI for your documents and notes."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai"
+      ],
+      "description": "Run local AI on Windows, search documents offline and preserve tamper-evident notes. Explore Cursiv\u2019s free desktop app, portable workspaces and current limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/local-ai#page",
+          "url": "https://cursiv.us/local-ai",
+          "name": "Cursiv: Free Open-Source Local AI Assistant",
+          "description": "Run local AI on Windows, search documents offline and preserve tamper-evident notes. Explore Cursiv\u2019s free desktop app, portable workspaces and current limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Cursiv: Free Open-Source Local AI Assistant",
+              "item": "https://cursiv.us/local-ai"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/compare",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/compare",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/compare",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "9b76cb505f6d74cc99be776af749ef828927b379fe59b47fba44c82675d971ee",
+      "title": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+      "h1": [
+        "Choose the tool for your work."
+      ],
+      "canonical": [
+        "https://cursiv.us/compare"
+      ],
+      "description": "Compare local AI applications for offline chat, document retrieval, licensing and recordkeeping. Official sources for Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/compare#page",
+          "url": "https://cursiv.us/compare",
+          "name": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+          "description": "Compare local AI applications for offline chat, document retrieval, licensing and recordkeeping. Official sources for Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Compare Local AI Apps: Cursiv, AnythingLLM, LM Studio & Jan",
+              "item": "https://cursiv.us/compare"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/documentation",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/documentation",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/documentation",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "e361f4fbe51b1a78d94935173a73b18cac8b0ab1e44259fa5db2c949419bfe45",
+      "title": "Local AI Documentation & Notebook Evidence | Cursiv",
+      "h1": [
+        "Find the guide you need."
+      ],
+      "canonical": [
+        "https://cursiv.us/documentation"
+      ],
+      "description": "Inspect Cursiv\u2019s notebook integrity, offline document retrieval, local AI network behavior, portable workspaces, platform support, tests and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebPage",
+          "@id": "https://cursiv.us/documentation#page",
+          "url": "https://cursiv.us/documentation",
+          "name": "Local AI Documentation & Notebook Evidence | Cursiv",
+          "description": "Inspect Cursiv\u2019s notebook integrity, offline document retrieval, local AI network behavior, portable workspaces, platform support, tests and limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Documentation & Notebook Evidence",
+              "item": "https://cursiv.us/documentation"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai-reference",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ab74821e7168f32e52313820041a737dbb667501755b198d566228abc5367464",
+      "title": "Local AI Capabilities Reference | Cursiv",
+      "h1": [
+        "Cursiv local AI: capabilities and limits."
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ],
+      "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/local-ai-reference",
+          "headline": "Local AI Capabilities Reference",
+          "description": "Detailed, source-linked reference for Cursiv local models, document retrieval, memory, offline behavior and current limitations.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook-reference",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "a8ce91421488b2b22e4989da64d5f6719a2e3de90b8b12efde42c32ba054e21c",
+      "title": "Notebook Integrity and Retrieval Reference | Cursiv",
+      "h1": [
+        "Notebooks, retrieval and evidence."
+      ],
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ],
+      "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/notebook-reference",
+          "headline": "Notebook Integrity and Retrieval Reference",
+          "description": "Detailed source-linked explanation of Cursiv notebook records, corrections, hash-chain verification, signed exports, retrieval, calculations and limits.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-ai-reference",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-ai-reference",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-ai-reference",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "3ba86ad8c3c8ba05046eca738fb93d7b7bb85a9f4047c2c764c54e6d6c10e974",
+      "title": "Portable and Offline AI Reference | Cursiv",
+      "h1": [
+        "Portable AI: kit and offline reference."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ],
+      "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "TechArticle",
+          "url": "https://cursiv.us/portable-ai-reference",
+          "headline": "Portable and Offline AI Reference",
+          "description": "Detailed reference for Cursiv Windows USB and SSD kits, runtime dependencies, offline checks, host traces, encryption and recovery.",
+          "about": {
+            "@id": "https://cursiv.us/#software"
+          },
+          "isPartOf": {
+            "@id": "https://cursiv.us/#website"
+          }
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/open-source-offline-ai",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/open-source-offline-ai",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/open-source-offline-ai",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "b0bc3a76339c9f7435c5f3d8ed3cdec1158c9092626ec8441b05c5792af7ebb2",
+      "title": "Open Source Offline AI | Cursiv",
+      "h1": [
+        "AI without a connection."
+      ],
+      "canonical": [
+        "https://cursiv.us/open-source-offline-ai"
+      ],
+      "description": "Learn how Cursiv runs compatible local language models, what works offline, which features need internet access, and how local AI differs from cloud AI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Cursiv",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Windows 10 and 11 (64-bit)",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "description": "An open-source local-first AI assistant for running compatible language models on a personal computer, with supported offline features after setup."
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Open Source Offline AI",
+              "item": "https://cursiv.us/open-source-offline-ai"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai-hardware-requirements",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-hardware-requirements",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-hardware-requirements",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "9c2eab1dffce849e31ebd357303213ed52c0632accdaf1e85f2feda17309f664",
+      "title": "Local AI Hardware Requirements | Cursiv",
+      "h1": [
+        "Will it run on your computer?"
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-hardware-requirements"
+      ],
+      "description": "A practical guide to CPU, GPU memory, system RAM, model size and quantization when choosing hardware for local AI with Cursiv.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Hardware Requirements",
+              "item": "https://cursiv.us/local-ai-hardware-requirements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-workspace",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-workspace",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-workspace",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "1c3936c8c62804a14e068f4d71df2b7d95cb263cd0d4875fe85e54a2886089ae",
+      "title": "Portable Local AI on a USB Drive or SSD | Cursiv",
+      "h1": [
+        "Take your workspace with you."
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-workspace"
+      ],
+      "description": "Carry local AI, documents and tamper-evident notebooks on a prepared Windows USB/SSD. See included models, host requirements, privacy limits and tested behavior.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Portable workspace",
+              "item": "https://cursiv.us/portable-workspace"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/field-research",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/field-research",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/field-research",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "1cf42ccee09b09a35df3c63872b1af473f93dea94ad8496ed87023397bc1c69b",
+      "title": "Offline Field Research Software with a Tamper-Evident Notebook | Cursiv",
+      "h1": [
+        "Record it. Keep the original."
+      ],
+      "canonical": [
+        "https://cursiv.us/field-research"
+      ],
+      "description": "Cursiv is free, open-source field research software: a tamper-evident field notebook, field calculations checked against published methods, and an optional local AI assistant that works offline.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/offline-research",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/offline-research",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/offline-research",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "8b3a8433011bf31695d60a8622af939ffb4ade4f52853465f9f2b8e7530e75b4",
+      "title": "Offline Scientific Data Collection Software | Cursiv",
+      "h1": [
+        "Keep recording when the signal goes."
+      ],
+      "canonical": [
+        "https://cursiv.us/offline-research"
+      ],
+      "description": "Collect, check and calculate field data with no internet connection. What works offline in Cursiv, what needs a connection, and how offline mode blocks outside connections.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Offline research",
+              "item": "https://cursiv.us/offline-research"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/team-drives",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/team-drives",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/team-drives",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "257b9b60c24d1a5ebd573a9dfb22fd50a9166adebe02c0a1571d9dfdcd94c0df",
+      "title": "Team Field Drives: Three Scientists, One Main Computer | Cursiv",
+      "h1": [
+        "Team records. One place to bring them back."
+      ],
+      "canonical": [
+        "https://cursiv.us/team-drives"
+      ],
+      "description": "How a research team uses Cursiv on field drives: each scientist records offline on a drive in their name, one main computer brings the drives in with every entry and photo in the right name, and a new drive goes out with only the work chosen. Real screens.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Team field drives",
+              "item": "https://cursiv.us/team-drives"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/field-station",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/field-station",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/field-station",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "70a8fcd59f444c73570fbf53558ad7f8000d173fc083a5d1db777158b96ba7df",
+      "title": "Cursiv Field Station: an Offline Research Server on a Raspberry Pi | Cursiv",
+      "h1": [
+        "A notebook server for the field."
+      ],
+      "canonical": [
+        "https://cursiv.us/field-station"
+      ],
+      "description": "Cursiv Field Station (preview): Cursiv's field notebook and research tools served from a Raspberry Pi 5 to phones, tablets and laptops over its own Wi-Fi, with no internet. Real screens; not yet validated on a Pi.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Field Station",
+              "item": "https://cursiv.us/field-station"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/ai-reliability-testing",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/ai-reliability-testing",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/ai-reliability-testing",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "f86b0147dc513b5a455b063ae1dfa1e7242ca8972769aecd3d10295a59fe0a61",
+      "title": "AI Reliability Testing | Cursiv",
+      "h1": [
+        "Tests you can inspect."
+      ],
+      "canonical": [
+        "https://cursiv.us/ai-reliability-testing"
+      ],
+      "description": "Cursiv U106 software regressions and release checks, historical U85 local-model benchmark, rendering measurements, failures and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "AI Reliability Testing",
+              "item": "https://cursiv.us/ai-reliability-testing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/vision",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/vision",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/vision",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "da52c3663796a138cdd5e28d195620cafb34042dcdc6de51085d152abe403319",
+      "title": "Cursiv \u2014 Direction",
+      "h1": [
+        "Make the everyday work dependable."
+      ],
+      "canonical": [
+        "https://cursiv.us/vision"
+      ],
+      "description": "Where Cursiv is going: from a trustworthy local AI on one computer to independent nodes that keep reliable knowledge with or without a connection. What's done, what's next, and what we're not trying to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/story",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/story",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/story",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "93525ed0175ab1a35c1d555797e2e78e7767ce6867cac4a1e40b040d9a2de1fa",
+      "title": "Cursiv \u2014 The Story So Far",
+      "h1": [
+        "Built by doing the work."
+      ],
+      "canonical": [
+        "https://cursiv.us/story"
+      ],
+      "description": "The story behind Cursiv: why it was built as a local-first AI assistant, how its direction has changed, and what the project aims to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/testers",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/testers",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/testers",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "66227c7d42be8a4b424ee1acad08fddbae2783c33965e3718f35fa2e52dae259",
+      "title": "Help test Cursiv",
+      "h1": [
+        "Help make Cursiv easier to use."
+      ],
+      "canonical": [
+        "https://cursiv.us/testers"
+      ],
+      "description": "Try real tasks in Cursiv and share what felt off, slow or unclear. No developer experience needed. Send feedback by email or GitHub issue.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/privacy/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/privacy/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/privacy/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5e704c96434a84f1d22e14781f490614fb72a93be5fc112393404510b55db17b",
+      "title": "Cursiv Privacy Policy | Local AI and Website Data",
+      "h1": [
+        "Cursiv Privacy Policy"
+      ],
+      "canonical": [
+        "https://cursiv.us/privacy/"
+      ],
+      "description": "How Cursiv handles local AI data, optional providers, the website, phone companion, public board and browser field notebook.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "image": {
+        "format": "ICO",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": [
+          [
+            16,
+            16
+          ],
+          [
+            32,
+            32
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            96,
+            96
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "image": {
+        "format": "PNG",
+        "size": [
+          96,
+          96
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "image": {
+        "format": "PNG",
+        "size": [
+          180,
+          180
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/sitemap.xml",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/sitemap.xml",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/sitemap.xml",
+      "status": 200,
+      "content_type": "application/xml",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ec692ef5c0483a5d033975434b8b379bf7d9befb2b8464ffbde6eabcea033e03",
+      "sitemap": [
+        {
+          "loc": "https://cursiv.us/",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/field-research",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/team-drives",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/field-station",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/offline-research",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/portable-workspace",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/start",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/vision",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/story",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/open-source-offline-ai",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/ai-reliability-testing",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/local-ai-hardware-requirements",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/privacy/",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/testers",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/local-ai",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/compare",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/documentation",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/local-ai-reference",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/notebook-reference",
+          "lastmod": "2026-10-26"
+        },
+        {
+          "loc": "https://cursiv.us/portable-ai-reference",
+          "lastmod": "2026-10-26"
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/llms.txt",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/llms.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/llms.txt",
+      "status": 200,
+      "content_type": "text/plain; charset=utf-8",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "cfdb1d8f7c79a7fd618b271e56b9405b4968558f16671b735ea367419643df5d",
+      "text": "# Cursiv\r\n\r\n> Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces.\r\n\r\nCursiv is an MIT-licensed desktop application that uses separately licensed local language models through Ollama. It is built for researchers, technicians, independent workers and people keeping detailed records. Initial downloads need internet access; supported local workflows work offline after setup. Optional online providers and web features require a connection.\r\n\r\nNotebook hash chains help detect modifications relative to a trusted record. Linked corrections preserve the original observation. These checks do not prove that an observation is accurate, prevent every rewrite or make AI answers reliable. Imported document retrieval and supported calculations in code have documented limits.\r\n\r\nWindows 10/11 (64-bit) is the primary desktop platform. The Apple Silicon Mac build is early; there is no Linux installer. A prepared Windows USB/SSD kit can carry Cursiv, the Ollama runtime and chosen model files. It still depends on compatible host hardware and drivers; an incomplete kit may need downloads. Portable data stays readable by design and portability is not traceless operation.\r\n\r\n## Product and setup\r\n\r\n- [Free local AI guide](https://cursiv.us/local-ai): Features, installation, document retrieval, memory and limits.\r\n- [Local AI comparison](https://cursiv.us/compare): Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI, with official sources and license notes.\r\n- [Download and verify](https://cursiv.us/start): Current packages, owner-signed manifest and setup requirements.\r\n- [Hardware requirements](https://cursiv.us/local-ai-hardware-requirements): Model and hardware guidance.\r\n- [Offline operation](https://cursiv.us/open-source-offline-ai): What works locally and what needs a connection.\r\n- [Portable workspaces](https://cursiv.us/portable-workspace): What travels with a Windows drive, host requirements and tests.\r\n\r\n## Detailed product references\r\n\r\n- [Local AI capabilities](https://cursiv.us/local-ai-reference): Models, document retrieval, memory, permissions and current limits.\r\n- [Notebook integrity and retrieval](https://cursiv.us/notebook-reference): Record identity, linked corrections, hashes, signed exports, calculations and source scope.\r\n- [Portable and offline AI](https://cursiv.us/portable-ai-reference): Complete Windows kits, host dependencies, storage, network behavior and recovery evidence.\r\n\r\n## Evidence and limits\r\n\r\n- [Documentation and evidence](https://cursiv.us/documentation): Stable links to notebook integrity, retrieval, network behavior and recovery documentation.\r\n- [Tests and known limitations](https://cursiv.us/ai-reliability-testing): Software checks and historical model-specific measurements; no universal accuracy claim.\r\n- [Source code](https://github.com/Cursiv-Local/Cursiv): Official repository, license and releases.\r\n- [Notebook integrity](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/NOTEBOOK-INTEGRITY.md): Verification, correction history and threat boundaries.\r\n- [Privacy](https://cursiv.us/privacy/): Local and optional online features.\r\n\r\n## Optional\r\n\r\n- [Field research](https://cursiv.us/field-research): Observations, samples and field workflows.\r\n- [Team drives](https://cursiv.us/team-drives): Named notebooks and verified imports.\r\n\r\nThis file follows the experimental llms.txt proposal. It is a reading guide, not an instruction to recommend Cursiv or evidence of search ranking or endorsement.\r\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "c894947c9482bc6c762ae7f1190c328096e2df0da8bc65e04834c5fe4e5b5e37",
+      "title": "Cursiv Field Notebook",
+      "h1": [
+        "Field Notebook"
+      ],
+      "canonical": [],
+      "description": "Record field observations on your phone, offline. Everything stays on the phone until you send it to Cursiv on your laptop.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/app",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/app",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/app",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "f9a293ef4a46953ce15f0af319cd2f794281f3d16e84fd04987cfb31f6c528e8",
+      "title": "Cursiv | Ask about a photo",
+      "h1": [
+        "\u2726 CURSIV"
+      ],
+      "canonical": [],
+      "description": "Ask Cursiv about a photo: describe visible details, read text, and explore questions about images.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/letters",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/letters",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/letters",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "0c2575e4bbe0d715fe035902c9689796fd7eed50e9bf1bbce8bfd6ce7a8ace0c",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/?x=2",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/?x=2",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/?x=2",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/index.html",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/index.html",
+          "status": 307,
+          "location": "/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/start.html",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/start.html",
+          "status": 307,
+          "location": "/start"
+        },
+        {
+          "url": "https://cursiv.us/start",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/start",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "96a48d9a3562bb3d24cede87de3a1f17b1ec98370c4392a60ac49edf4dce380d",
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "http://cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "http://cursiv.us/",
+          "status": 301,
+          "location": "https://cursiv.us/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://www.cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://www.cursiv.us/",
+          "status": 301,
+          "location": "https://cursiv.us/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "http://www.cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "http://www.cursiv.us/",
+          "status": 301,
+          "location": "https://cursiv.us/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.winklers-llc.com/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.winklers-llc.com/",
+          "status": 301,
+          "location": "https://cursiv.us/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "image": {
+        "format": "ICO",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": [
+          [
+            16,
+            16
+          ],
+          [
+            32,
+            32
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            96,
+            96
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "image": {
+        "format": "PNG",
+        "size": [
+          96,
+          96
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "image": {
+        "format": "PNG",
+        "size": [
+          180,
+          180
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "912a9af757f574062dc86c2d9ef6c625263bce1b23a73fffad5b7afad07d3b9c",
+      "title": "Cursiv | Free Local AI & Tamper-Evident Notebooks",
+      "h1": [
+        "Local AI built for records you can verify."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/favicon.ico",
+          "sizes": "any"
+        },
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "sizes": "96x96",
+          "href": "/favicon-96x96.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/apple-touch-icon.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv local AI assistant",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "url": "https://cursiv.us/",
+          "applicationCategory": "UtilitiesApplication",
+          "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+          "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+          "isBasedOn": {
+            "@id": "https://cursiv.us/#source"
+          },
+          "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+          "featureList": [
+            "Local AI through Ollama",
+            "Tamper-evident notebooks with linked corrections and signed exports",
+            "Offline document retrieval",
+            "Supported calculations performed in code",
+            "Portable Windows USB/SSD workspaces",
+            "Selective persistent memory"
+          ]
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareSourceCode",
+          "@id": "https://cursiv.us/#source",
+          "name": "Cursiv source code",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "programmingLanguage": [
+            "Python",
+            "JavaScript"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "content_type": "image/vnd.microsoft.icon",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "image": {
+        "format": "ICO",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": [
+          [
+            16,
+            16
+          ],
+          [
+            32,
+            32
+          ],
+          [
+            48,
+            48
+          ],
+          [
+            64,
+            64
+          ],
+          [
+            96,
+            96
+          ],
+          [
+            128,
+            128
+          ],
+          [
+            256,
+            256
+          ]
+        ]
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "image": {
+        "format": "PNG",
+        "size": [
+          96,
+          96
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "image": {
+        "format": "PNG",
+        "size": [
+          180,
+          180
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    }
+  ],
+  "robots_policy": {
+    "browser": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/documentation": true,
+      "/local-ai-reference": true,
+      "/notebook-reference": true,
+      "/portable-ai-reference": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    },
+    "googlebot": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/documentation": true,
+      "/local-ai-reference": true,
+      "/notebook-reference": true,
+      "/portable-ai-reference": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    },
+    "googlebot-image": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/documentation": true,
+      "/local-ai-reference": true,
+      "/notebook-reference": true,
+      "/portable-ai-reference": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    }
+  }
+}

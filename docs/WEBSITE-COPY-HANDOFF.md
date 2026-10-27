@@ -46,3 +46,26 @@ Source integration proceeds through normal commit/PR checks. Production verifica
 allowlisted public files are published. Preview server session87942 on loopback8768 is currently
 running and must stop after live proof. Applied one-off rewrite scripts in ignored reports/ must
 not be rerun. Existing U107 plans stay untracked and outside website commits.
+
+## Publication complete
+
+Source4cbb36dcf42112a4776979f228372334156e0649, Cloudflare version
+ae94cf83-ed22-44df-abdf-6ea8b5f4fd41. Commit USB gate45/45 passed before publishing.
+Production49 public probes:48 final200 and the intentional removed /letters404; zero failures.
+All20 canonical/indexable sitemap pages match deployed source bytes; source-history lastmod present.
+Nine additional reference probes (three pages x Googlebot/OpenAI-search/Claude-search user-agent
+strings) all returned200 and identical browser-content hashes. These are access tests, not proof of
+verified crawler identity, indexing or recommendations. No recommendation/ranking gain claimed.
+Icons, signed release metadata, private exclusions and U106 immutable tag remain unchanged.
+
+Public receipts: bench/results/website-copy-live.json and website-copy-publication.json.
+Actual live screenshot: bench/results/website-copy-live-home.jpg. Local preview sessions1516,
+91797 and87942 have stopped; no preview server remains. All publication commands finished.
+Normal source/website PR checks govern source integration; consult repository PR status before
+continuing. No further website implementation or deployment is required. U107 agent work remains
+unstarted beyond its untracked planning notes, per the owner's direction back to the website.
+
+This organization follows Google's ordinary crawlable-content/internal-link guidance. Detailed
+reference pages serve the same HTML to all readers; no hidden bot-only version is used:
+https://developers.google.com/search/docs/appearance/ai-features
+https://developers.google.com/search/docs/essentials/spam-policies
