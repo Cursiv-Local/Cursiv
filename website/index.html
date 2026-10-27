@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cursiv: Offline Field Research Software with a Tamper-Evident Notebook</title>
-<meta name="description" content="Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.">
+<title>Cursiv | Free Local AI &amp; Tamper-Evident Notebooks</title>
+<meta name="description" content="Free, open-source local AI for Windows with tamper-evident notebooks, offline document retrieval, calculations in code and portable USB/SSD workspaces.">
 <link rel="canonical" href="https://cursiv.us/">
-<meta property="og:title" content="Cursiv: Offline Field Research Software with a Tamper-Evident Notebook">
-<meta property="og:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
+<meta property="og:title" content="Cursiv | Free Local AI &amp; Tamper-Evident Notebooks">
+<meta property="og:description" content="Run AI on your computer, search local documents and preserve notebook history. Free, open-source software for researchers, technicians and independent workers.">
 <meta property="og:image" content="https://cursiv.us/assets/cursiv-social-preview-20261025.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -17,12 +17,14 @@
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Cursiv: Offline Field Research Software with a Tamper-Evident Notebook">
-<meta name="twitter:description" content="Open-source, local-first AI for Windows fieldwork and research. Supported features work offline after setup.">
+<meta name="twitter:title" content="Cursiv | Free Local AI &amp; Tamper-Evident Notebooks">
+<meta name="twitter:description" content="Run AI on your computer, search local documents and preserve notebook history. Free, open-source software for researchers, technicians and independent workers.">
 <meta name="twitter:image" content="https://cursiv.us/assets/cursiv-social-preview-20261025.png">
 <meta name="twitter:image:alt" content="Cursiv logo with the line: Research doesn't stop when the connection does. Offline-first, local models, field notebooks. cursiv.us">
 <meta name="theme-color" content="#07090e">
-<link rel="icon" type="image/png" href="/assets/cursiv-logo-256.png">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="96x96" href="/favicon-96x96.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -34,7 +36,7 @@
   "@type": "WebSite",
   "@id": "https://cursiv.us/#website",
   "name": "Cursiv",
-  "alternateName": "Cursiv field research software",
+  "alternateName": "Cursiv local AI assistant",
   "url": "https://cursiv.us/"
 }
 </script>
@@ -44,16 +46,21 @@
   "@type": "SoftwareApplication",
   "@id": "https://cursiv.us/#software",
   "name": "Cursiv",
-  "applicationCategory": "ScienceApplication",
-  "applicationSubCategory": "Field research notebook",
-  "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+  "url": "https://cursiv.us/",
+  "applicationCategory": "UtilitiesApplication",
+  "applicationSubCategory": "Local AI assistant and tamper-evident notebook",
+  "operatingSystem": "Windows 10 and Windows 11 (64-bit); macOS on Apple Silicon (early build)",
   "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
   "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
   "downloadUrl": "https://cursiv.us/start",
-  "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
-  "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
-  "featureList": ["Tamper-evident field notebook with signed exports", "Field calculations worked out by code", "Runs from a USB drive", "Works offline after setup", "Optional local AI assistant"]
+  "sameAs": "https://github.com/Cursiv-Local/Cursiv",
+  "isBasedOn": {"@id": "https://cursiv.us/#source"},
+  "description": "Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces. Local inference uses separately licensed models through Ollama.",
+  "featureList": ["Local AI through Ollama", "Tamper-evident notebooks with linked corrections and signed exports", "Offline document retrieval", "Supported calculations performed in code", "Portable Windows USB/SSD workspaces", "Selective persistent memory"]
 }
+</script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareSourceCode","@id":"https://cursiv.us/#source","name":"Cursiv source code","codeRepository":"https://github.com/Cursiv-Local/Cursiv","license":"https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE","programmingLanguage":["Python","JavaScript"]}
 </script>
 </head>
 <body>
@@ -63,7 +70,8 @@
     <a class="brand" href="/" aria-label="Cursiv home"><img src="/assets/cursiv-logo-256.png" alt=""> Cursiv</a>
     <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="navLinks">Menu</button>
     <nav class="nav-links" id="navLinks" aria-label="Main navigation">
-      <a href="/field-research">Field research</a>
+      <a href="/local-ai">Local AI</a>
+      <a href="/compare">Compare tools</a>
       <a href="#capabilities">Features</a>
       <a href="#testing">Testing</a>
       <a href="#faq">Questions</a>
@@ -78,8 +86,8 @@
   <div class="wrap grid2">
     <div>
       <span class="eyebrow">Free · Open source · Windows</span>
-      <h1>Offline field research software.</h1>
-      <p class="lede">A tamper-evident field notebook, field calculations checked against published methods, and a workspace that runs from a USB drive, with an optional local AI assistant. Works offline on your Windows PC after setup. <a href="/field-research">See how it works for field research</a>.</p>
+      <h1>Local AI built for records you can verify.</h1>
+      <p class="lede">Cursiv is a free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable USB/SSD workspaces. Run AI on your Windows PC, preserve observation history and keep useful notes close. Built for researchers, technicians and independent workers who need detailed records. <a href="/local-ai">Explore local AI with Cursiv</a>.</p>
       <div class="cta-row">
         <a class="btn btn-gold" data-download-button="windows" href="https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U106/Cursiv-Setup-3.14-U106.exe">Download the latest release</a>
         <a class="btn btn-ghost" href="/start">Setup guide</a>
@@ -109,12 +117,12 @@
     <div class="cards two" id="uses">
       <div class="card"><h3>Keep working without signal.</h3><p>Chat and use supported local tools with an installed model.</p></div>
       <div class="card"><h3>Keep your work local.</h3><p>Save conversations and memories on your PC. Cloud services are optional.</p></div>
-      <div class="card"><h3>Record fieldwork precisely.</h3><p>Keep measurements, photos and observations, with corrections that preserve the original.</p></div>
+      <div class="card"><h3>Keep detailed records.</h3><p>Record measurements, photos and observations, with corrections that preserve the original.</p></div>
       <div class="card"><h3>Work from your evidence.</h3><p>Read imported documents by page and run supported field calculations in code.</p></div>
     </div>
     <a class="card" href="/team-drives" style="display:block;margin-top:16px;text-decoration:none"><span class="eyebrow">New in U103 · see it with real screens</span><h3 style="margin-top:8px">A team on field drives, one main computer.</h3><p>Each scientist records offline on a drive in their name. Back at base, one computer takes the drives one at a time, and every entry and photo arrives in the right name. A new drive can go out with only the work you choose. <span style="color:var(--gold)">See the demo →</span></p></a>
-    <a class="card" href="/field-station" style="display:block;margin-top:16px;text-decoration:none"><span class="eyebrow">Preview in U104 · not yet tested on a Pi</span><h3 style="margin-top:8px">Cursiv Field Station: a research server you can carry.</h3><p>A Raspberry Pi runs Cursiv and its own Wi-Fi; phones, tablets and laptops are the screens. The notebook, integrity checks and honest hardware readings work with no internet. <span style="color:var(--gold)">See the preview →</span></p></a>
-    <p class="fine" style="margin-top:18px"><a href="/open-source-offline-ai">How local AI works</a> · <a href="/vision#field">Field notebook and research workflow</a></p>
+    <a class="card" href="/field-station" style="display:block;margin-top:16px;text-decoration:none"><span class="eyebrow">Preview in U104 · not yet tested on a Pi</span><h3 style="margin-top:8px">Cursiv Field Station: a research server you can carry.</h3><p>An experimental local-server preview for using the notebook from phones, tablets and laptops over a local network. It has not yet been validated on a physical Raspberry Pi. <span style="color:var(--gold)">See the preview →</span></p></a>
+    <p class="fine" style="margin-top:18px"><a href="/compare">Compare local AI applications</a> · <a href="/open-source-offline-ai">What works offline</a> · <a href="/field-research">Field research</a> · <a href="/documentation">Documentation and evidence</a></p>
   </div>
 </section>
 

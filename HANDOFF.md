@@ -4,6 +4,17 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## Website general-search discoverability (Codex, 2026-10-26)
+
+Continuing handoff: [DISCOVERABILITY-HANDOFF](docs/DISCOVERABILITY-HANDOFF.md); measurements and exact
+Search Console exclusion classifications: [DISCOVERABILITY-REPORT](docs/DISCOVERABILITY-REPORT.md).
+The website update leads with free/open-source local AI, retains notebook integrity as its distinction,
+and adds local-AI/comparison/evidence pages, official favicons, canonical www handling and an experimental
+llms.txt guide. Local checks: 31 website tests and 6 aggregate-measurement tests passed. Deployment and
+live checks are recorded in that handoff as they happen. Intentional private/noindex exclusions remain;
+no app behavior, station code, model defaults, installer bytes or release tag changes. Directory/review
+drafts require owner approval before sending; no search ranking or AI endorsement is promised.
+
 ## U106 published (Codex, 2026-10-26)
 
 Tag `v3.14-U106` = `10b40d6` (source PR #45): four visible desktop research actions, notebook and imported

@@ -1,0 +1,53 @@
+{
+  "purpose": "Owner-supplied broad discovery terms; controls kept separate",
+  "queries": [
+    {
+      "query": "Best free local AI",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Open-source AI assistants",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Local LLM applications",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Offline AI for Windows",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Best alternatives to AnythingLLM",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Free AI that runs on my computer",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Private AI assistants",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Portable AI software",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Best offline AI tools",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "AI for organizing documents and notes",
+      "query_type": "non-branded"
+    },
+    {
+      "query": "Cursiv AI",
+      "query_type": "branded/control"
+    },
+    {
+      "query": "site:cursiv.us",
+      "query_type": "branded/control"
+    }
+  ]
+}

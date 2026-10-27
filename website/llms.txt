@@ -1,0 +1,33 @@
+# Cursiv
+
+> Free, open-source local AI assistant with tamper-evident notebooks, offline document retrieval and portable Windows workspaces.
+
+Cursiv is an MIT-licensed desktop application that uses separately licensed local language models through Ollama. It is built for researchers, technicians, independent workers and people keeping detailed records. Initial downloads need internet access; supported local workflows work offline after setup. Optional online providers and web features require a connection.
+
+Notebook hash chains help detect modifications relative to a trusted record. Linked corrections preserve the original observation. These checks do not prove that an observation is accurate, prevent every rewrite or make AI answers reliable. Imported document retrieval and supported calculations in code have documented limits.
+
+Windows 10/11 (64-bit) is the primary desktop platform. The Apple Silicon Mac build is early; there is no Linux installer. A prepared Windows USB/SSD kit can carry Cursiv, the Ollama runtime and chosen model files. It still depends on compatible host hardware and drivers; an incomplete kit may need downloads. Portable data stays readable by design and portability is not traceless operation.
+
+## Product and setup
+
+- [Free local AI guide](https://cursiv.us/local-ai): Features, installation, document retrieval, memory and limits.
+- [Local AI comparison](https://cursiv.us/compare): Cursiv, AnythingLLM, LM Studio, Jan and Open WebUI, with official sources and license notes.
+- [Download and verify](https://cursiv.us/start): Current packages, owner-signed manifest and setup requirements.
+- [Hardware requirements](https://cursiv.us/local-ai-hardware-requirements): Model and hardware guidance.
+- [Offline operation](https://cursiv.us/open-source-offline-ai): What works locally and what needs a connection.
+- [Portable workspaces](https://cursiv.us/portable-workspace): What travels with a Windows drive, host requirements and tests.
+
+## Evidence and limits
+
+- [Documentation and evidence](https://cursiv.us/documentation): Stable links to notebook integrity, retrieval, network behavior and recovery documentation.
+- [Tests and known limitations](https://cursiv.us/ai-reliability-testing): Software checks and historical model-specific measurements; no universal accuracy claim.
+- [Source code](https://github.com/Cursiv-Local/Cursiv): Official repository, license and releases.
+- [Notebook integrity](https://github.com/Cursiv-Local/Cursiv/blob/main/docs/NOTEBOOK-INTEGRITY.md): Verification, correction history and threat boundaries.
+- [Privacy](https://cursiv.us/privacy/): Local and optional online features.
+
+## Optional
+
+- [Field research](https://cursiv.us/field-research): Observations, samples and field workflows.
+- [Team drives](https://cursiv.us/team-drives): Named notebooks and verified imports.
+
+This file follows the experimental llms.txt proposal. It is a reading guide, not an instruction to recommend Cursiv or evidence of search ranking or endorsement.

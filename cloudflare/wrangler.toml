@@ -7,6 +7,7 @@ compatibility_date = "2026-09-01"
 routes = [
   { pattern = "cursiv.winklers-llc.com", custom_domain = true },
   { pattern = "cursiv.us", custom_domain = true },
+  { pattern = "www.cursiv.us", custom_domain = true },
 ]
 
 [assets]
