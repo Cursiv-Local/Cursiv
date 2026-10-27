@@ -64,6 +64,8 @@ Actual live screenshot: bench/results/website-copy-live-home.jpg. Local preview 
 Normal source/website PR checks govern source integration; consult repository PR status before
 continuing. No further website implementation or deployment is required. U107 agent work remains
 unstarted beyond its untracked planning notes, per the owner's direction back to the website.
+Source review and CI: https://github.com/Cursiv-Local/Cursiv/pull/50 . The manual checklist now follows
+the expanded20-page sitemap rather than its historical17-page count.
 
 This organization follows Google's ordinary crawlable-content/internal-link guidance. Detailed
 reference pages serve the same HTML to all readers; no hidden bot-only version is used:

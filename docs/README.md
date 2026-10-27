@@ -28,6 +28,7 @@ link to them.
 
 - [General-search discoverability](DISCOVERABILITY-REPORT.md), [continuing handoff](DISCOVERABILITY-HANDOFF.md),
   [manual discovery checklist](DISCOVERY-MANUAL-CHECKLIST.md), [external submission drafts](DISCOVERY-SUBMISSIONS.md)
+- [Short website guides and detailed product references](WEBSITE-COPY-HANDOFF.md)
 
 - [Architecture plan](ARCHITECTURE-PLAN.md) (see also [ARCHITECTURE](../ARCHITECTURE.md)
   and [TECH](../TECH.md))
