@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="0.748" timestamp="2026-10-27T02:57:25.669856-04:00" hostname="Josh"><testcase classname="tests.test_agent_ui" name="test_changed_workspace_authorization_rejects_run_and_releases_controls" time="0.431"><failure message="assert (not True)&#10; +  where True = &lt;chat_panel.ChatPanel object at 0x00000203BE10F750&gt;._streaming">panel = &lt;chat_panel.ChatPanel object at 0x00000203BE10F750&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000203A7982780&gt;
+
+    def test_changed_workspace_authorization_rejects_run_and_releases_controls(panel,monkeypatch):
+        from types import SimpleNamespace
+        from cursiv_engine.agents import workflow
+        panel._begin_turn('Old workspace authorization')
+        target=panel._run_target()
+        run=SimpleNamespace(owner=workflow.identity())
+        monkeypatch.setattr(workflow,'identity',lambda: ('different authorized workspace',))
+        panel._on_run_event(target,dict(kind='done',history=[('assistant','old workspace answer')],run=run))
+        assert not panel._history and 'old workspace answer' not in panel._transcript.toPlainText()
+&gt;       assert not panel._streaming and panel._send_btn.isEnabled()
+E       assert (not True)
+E        +  where True = &lt;chat_panel.ChatPanel object at 0x00000203BE10F750&gt;._streaming
+
+tests\test_agent_ui.py:46: AssertionError</failure></testcase></testsuite></testsuites>

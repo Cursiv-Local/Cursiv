@@ -87,12 +87,15 @@ class Job:
                                      append='Optional review not run: another local review is still stopping. Code checks still ran.')
 
         def run():
+            from .activity import guard
             _MODEL_STATE.set(on_model_state)
             def ask(messages):
                 return '' if self.cancelled.is_set() else self.ask(messages, self.cancelled)
-            return verify.run_pass(self.question, self.draft, ask=ask, context=self.context,
-                                   sources=self.sources, assess=self.assess, mode=self.mode,
-                                   update_session=False)
+            # Review has its own immutable evidence/cancellation; the foreground turn has ended.
+            with guard(lambda: not self.cancelled.is_set()):
+                return verify.run_pass(self.question, self.draft, ask=ask, context=self.context,
+                                       sources=self.sources, assess=self.assess, mode=self.mode,
+                                       update_session=False, previous_failed=False)
         try:
             result = self.scope.copy().run(run)
         finally:

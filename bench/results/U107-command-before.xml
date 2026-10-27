@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="9" skipped="0" tests="12" time="1.025" timestamp="2026-10-26T23:53:33.438273-04:00" hostname="Josh"><testcase classname="tests.test_agent_workflows" name="test_public_agent_commands_execute_the_selected_role[agents ask Write a short invitation.]" time="0.334"><failure message="AssertionError: assert 'synthetic answer' in ''&#10; +  where '' = rendered(None)">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = 'agents ask Write a short invitation.'
+
+    @pytest.mark.parametrize('text', [
+        'agents ask Write a short invitation.', 'AGENTS\tASK Write a short invitation.',
+        'agent council Write a short invitation.', '@writer Write a short invitation.',
+    ])
+    def test_public_agent_commands_execute_the_selected_role(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert 'synthetic answer' in rendered(result)
+E       AssertionError: assert 'synthetic answer' in ''
+E        +  where '' = rendered(None)
+
+tests\test_agent_workflows.py:41: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_public_agent_commands_execute_the_selected_role[AGENTS\tASK Write a short invitation.]" time="0.005"><failure message="AssertionError: assert 'synthetic answer' in ''&#10; +  where '' = rendered(None)">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = 'AGENTS\tASK Write a short invitation.'
+
+    @pytest.mark.parametrize('text', [
+        'agents ask Write a short invitation.', 'AGENTS\tASK Write a short invitation.',
+        'agent council Write a short invitation.', '@writer Write a short invitation.',
+    ])
+    def test_public_agent_commands_execute_the_selected_role(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert 'synthetic answer' in rendered(result)
+E       AssertionError: assert 'synthetic answer' in ''
+E        +  where '' = rendered(None)
+
+tests\test_agent_workflows.py:41: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_public_agent_commands_execute_the_selected_role[agent council Write a short invitation.]" time="0.008"><failure message="assert 'synthetic answer' in &quot;Starter profiles (come with Cursiv; they read only what's listed and never change anything):\n- **@checker** — Data c...lk: @name &lt;message&gt; · Ask your own agents together: agents ask &lt;question&gt;\nManage: agent show/edit/teach/delete &lt;name&gt;&quot;&#10; +  where &quot;Starter profiles (come with Cursiv; they read only what's listed and never change anything):\n- **@checker** — Data c...lk: @name &lt;message&gt; · Ask your own agents together: agents ask &lt;question&gt;\nManage: agent show/edit/teach/delete &lt;name&gt;&quot; = rendered(&lt;cursiv_engine.core.command_api.TextResult object at 0x000001927E8DD2B0&gt;)">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = 'agent council Write a short invitation.'
+
+    @pytest.mark.parametrize('text', [
+        'agents ask Write a short invitation.', 'AGENTS\tASK Write a short invitation.',
+        'agent council Write a short invitation.', '@writer Write a short invitation.',
+    ])
+    def test_public_agent_commands_execute_the_selected_role(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert 'synthetic answer' in rendered(result)
+E       assert 'synthetic answer' in "Starter profiles (come with Cursiv; they read only what's listed and never change anything):\n- **@checker** — Data c...lk: @name &lt;message&gt; · Ask your own agents together: agents ask &lt;question&gt;\nManage: agent show/edit/teach/delete &lt;name&gt;"
+E        +  where "Starter profiles (come with Cursiv; they read only what's listed and never change anything):\n- **@checker** — Data c...lk: @name &lt;message&gt; · Ask your own agents together: agents ask &lt;question&gt;\nManage: agent show/edit/teach/delete &lt;name&gt;" = rendered(&lt;cursiv_engine.core.command_api.TextResult object at 0x000001927E8DD2B0&gt;)
+
+tests\test_agent_workflows.py:41: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_public_agent_commands_execute_the_selected_role[@writer Write a short invitation.]" time="0.313" /><testcase classname="tests.test_agent_workflows" name="test_malformed_commands_are_actionable_without_a_model[agents ask]" time="0.008"><failure message="assert None is not None">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = 'agents ask'
+
+    @pytest.mark.parametrize('text', ['agents ask', 'agent council', '@writer', '@missing',
+                                      'agents ask @missing: Write an invitation.'])
+    def test_malformed_commands_are_actionable_without_a_model(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert result is not None
+E       assert None is not None
+
+tests\test_agent_workflows.py:50: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_malformed_commands_are_actionable_without_a_model[agent council]" time="0.006" /><testcase classname="tests.test_agent_workflows" name="test_malformed_commands_are_actionable_without_a_model[@writer]" time="0.008"><failure message="assert None is not None">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = '@writer'
+
+    @pytest.mark.parametrize('text', ['agents ask', 'agent council', '@writer', '@missing',
+                                      'agents ask @missing: Write an invitation.'])
+    def test_malformed_commands_are_actionable_without_a_model(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert result is not None
+E       assert None is not None
+
+tests\test_agent_workflows.py:50: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_malformed_commands_are_actionable_without_a_model[@missing]" time="0.005"><failure message="assert None is not None">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = '@missing'
+
+    @pytest.mark.parametrize('text', ['agents ask', 'agent council', '@writer', '@missing',
+                                      'agents ask @missing: Write an invitation.'])
+    def test_malformed_commands_are_actionable_without_a_model(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert result is not None
+E       assert None is not None
+
+tests\test_agent_workflows.py:50: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_malformed_commands_are_actionable_without_a_model[agents ask @missing: Write an invitation.]" time="0.005"><failure message="assert None is not None">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+text = 'agents ask @missing: Write an invitation.'
+
+    @pytest.mark.parametrize('text', ['agents ask', 'agent council', '@writer', '@missing',
+                                      'agents ask @missing: Write an invitation.'])
+    def test_malformed_commands_are_actionable_without_a_model(agent_runtime, text):
+        cc, calls = agent_runtime
+        result = cc.handle_command(text, {}, [])
+&gt;       assert result is not None
+E       assert None is not None
+
+tests\test_agent_workflows.py:50: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_native_and_restricted_turn_boundaries_still_precede_agents" time="0.004" /><testcase classname="tests.test_agent_workflows" name="test_group_budget_never_silently_drops_an_explicit_role" time="0.004"><failure message="AssertionError: assert ('three' in '' or '3' in '')&#10; +  where '' = &lt;built-in method lower of str object at 0x00007FFAA4D1D6C0&gt;()&#10; +    where &lt;built-in method lower of str object at 0x00007FFAA4D1D6C0&gt; = ''.lower">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+
+    def test_group_budget_never_silently_drops_an_explicit_role(agent_runtime):
+        cc, calls = agent_runtime
+        result = cc.handle_command('agents ask @field,@checker,@protocol,@report: Review this.', {}, [])
+        text = rendered(result)
+&gt;       assert 'three' in text.lower() or '3' in text
+E       AssertionError: assert ('three' in '' or '3' in '')
+E        +  where '' = &lt;built-in method lower of str object at 0x00007FFAA4D1D6C0&gt;()
+E        +    where &lt;built-in method lower of str object at 0x00007FFAA4D1D6C0&gt; = ''.lower
+
+tests\test_agent_workflows.py:68: AssertionError</failure></testcase><testcase classname="tests.test_agent_workflows" name="test_group_checker_receives_notebook_findings_without_model_work" time="0.017"><failure message="AssertionError: assert ('d8177f1371df' in '')">agent_runtime = (&lt;module 'chat_commands' from 'C:\\Users\\joshu\\OneDrive\\Documents\\GitHub\\Cursiv-v3\\launcher\\chat_commands.py'&gt;, [])
+
+    def test_group_checker_receives_notebook_findings_without_model_work(agent_runtime):
+        cc, calls = agent_runtime
+        entry = fieldlog.add(site='Lake', sample_id='K-1', measurements=[{'name':'nitrate','value':'3.5','unit':''}])
+        text = rendered(cc.handle_command('agents ask Check my notebook for missing units.', {}, []))
+&gt;       assert entry['id'] in text and 'no unit' in text
+E       AssertionError: assert ('d8177f1371df' in '')
+
+tests\test_agent_workflows.py:77: AssertionError</failure></testcase></testsuite></testsuites>

@@ -1,0 +1,445 @@
+{
+  "source_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "created_utc": "2026-10-27T03:45:35.399500+00:00",
+  "question_set": "development",
+  "question_sha256": "ca078508a838eebfb2d0af035cb30af1206044339082bf76704f93f94b5bcffe",
+  "live": false,
+  "model": null,
+  "settings": {
+    "model": "qwen3:4b-instruct",
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "offline": true,
+    "review": "fast",
+    "provider_permissions": "local only; no downloads"
+  },
+  "hardware": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel"
+  },
+  "metrics_limit": "Token counts from real Ollama terminal events. Cache hits and peak process/server memory unavailable. No fake timing establishes speed. Synthetic records only.",
+  "rows": [
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.1749046000186354,
+      "first_display_seconds": 0.1730436000507325,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "A synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.048001799965277314,
+      "first_display_seconds": 0.007662500021979213,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 4,
+      "successful_calls": 4,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "\n**@field**\nA synthetic provider response.\n**@report**\nA synthetic provider response.\n**@writer**\nA synthetic provider response.\n\n---\n**Together**\nA synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-field",
+      "role": "field",
+      "path": "plural",
+      "handled": false,
+      "seconds": 0.00034930009860545397,
+      "first_display_seconds": null,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.010767500032670796,
+      "first_display_seconds": 0.008992600021883845,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "A synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.04373110004235059,
+      "first_display_seconds": 0.005431300029158592,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 4,
+      "successful_calls": 4,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "\n**@field**\nA synthetic provider response.\n**@report**\nA synthetic provider response.\n**@writer**\nA synthetic provider response.\n\n---\n**Together**\nA synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-checker",
+      "role": "checker",
+      "path": "plural",
+      "handled": false,
+      "seconds": 0.00034410005901008844,
+      "first_display_seconds": null,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.004565199953503907,
+      "first_display_seconds": 0.004561799927614629,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "Your imported documents don't cover that, so the Protocol helper won't answer from general knowledge (your protocol may differ).\n\n*[Sources: your documents (no AI model)]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.05933720001485199,
+      "first_display_seconds": 0.006445199949666858,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 4,
+      "successful_calls": 4,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "\n**@field**\nA synthetic provider response.\n**@report**\nA synthetic provider response.\n**@writer**\nA synthetic provider response.\n\n---\n**Together**\nA synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "plural",
+      "handled": false,
+      "seconds": 0.0003160000778734684,
+      "first_display_seconds": null,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.04150390007998794,
+      "first_display_seconds": 0.036019799998030066,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "A synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.05288190010469407,
+      "first_display_seconds": 0.006987500004470348,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 4,
+      "successful_calls": 4,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "\n**@field**\nA synthetic provider response.\n**@report**\nA synthetic provider response.\n**@writer**\nA synthetic provider response.\n\n---\n**Together**\nA synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-report",
+      "role": "report",
+      "path": "plural",
+      "handled": false,
+      "seconds": 0.00039220007602125406,
+      "first_display_seconds": null,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "individual",
+      "handled": true,
+      "seconds": 0.032476000022143126,
+      "first_display_seconds": 0.03246040001977235,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "A synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "group",
+      "handled": true,
+      "seconds": 0.05335589998867363,
+      "first_display_seconds": 0.005340800038538873,
+      "calls": [
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        },
+        {
+          "model": "fake",
+          "success": true,
+          "input_tokens": null,
+          "output_tokens": null,
+          "first_token_seconds": null
+        }
+      ],
+      "attempted_calls": 4,
+      "successful_calls": 4,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "\n**@field**\nA synthetic provider response.\n**@report**\nA synthetic provider response.\n**@writer**\nA synthetic provider response.\n\n---\n**Together**\nA synthetic provider response.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-writer",
+      "role": "writer",
+      "path": "plural",
+      "handled": false,
+      "seconds": 0.0006824999582022429,
+      "first_display_seconds": null,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": null,
+      "output_tokens": null,
+      "response": "",
+      "error": null,
+      "legacy_group_comparable": false
+    }
+  ],
+  "handled": 10,
+  "model_switches": null,
+  "median_seconds": 0.04586645000381395,
+  "evaluation_answers_for_tuning": false
+}

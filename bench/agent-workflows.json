@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "fixture": "Synthetic notebook: 84 numbered temperature records (80 Pond, 4 Hill) plus two Pond records creating duplicate sample IDs, one missing unit and one nonnumeric measurement. Procedures.txt has calibration on page 1 and holding times on page 2.",
+  "development": [
+    {"id":"dev-field","role":"field","question":"Explain how to label a field sample in two sentences."},
+    {"id":"dev-checker","role":"checker","question":"Check my notebook for missing units and duplicate sample IDs."},
+    {"id":"dev-protocol","role":"protocol","question":"What do my documents say about calibration?"},
+    {"id":"dev-report","role":"report","question":"Draft a brief report of the recorded Pond temperature readings, including their mean and range."},
+    {"id":"dev-writer","role":"writer","question":"Write a two-sentence invitation to help clean a creek. Leave missing details as placeholders."}
+  ],
+  "evaluation": [
+    {"id":"eval-field","role":"field","question":"Give three short practical tips for keeping clear field notes.","legacy_group_comparable":true},
+    {"id":"eval-writer-notice","role":"writer","question":"Write a friendly two-sentence notice inviting volunteers to a river cleanup; use placeholders for date and location.","legacy_group_comparable":true},
+    {"id":"eval-writer-rewrite","role":"writer","question":"Rewrite this in two clear sentences: We need volunteers to bring gloves and help us collect litter near the stream. The date and meeting place are still undecided.","legacy_group_comparable":true},
+    {"id":"eval-checker","role":"checker","question":"Check the notebook for duplicate sample identifiers, missing measurement units and nonnumeric values.","legacy_group_comparable":false},
+    {"id":"eval-protocol","role":"protocol","question":"What holding times do Procedures.txt passages give for preserved and unpreserved samples? Keep their conditions and cite pages.","legacy_group_comparable":false},
+    {"id":"eval-report","role":"report","question":"Write a short report of all Pond temperature records with their exact count, mean and range, preserving units and noting missing values.","legacy_group_comparable":false}
+  ]
+}

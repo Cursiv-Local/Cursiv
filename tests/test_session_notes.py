@@ -64,3 +64,22 @@ def test_notes_are_encrypted_like_conversations():
     from pathlib import Path
     from cursiv_engine.core import vault
     assert vault.covered(Path("session_notes/abc.md"))
+
+
+def test_owner_invalidation_during_summary_does_not_save(notes):
+    valid=[True]
+    def ask(messages):
+        valid[0]=False
+        return MODEL
+    assert sn.update('cancelled','Survey',HISTORY,ask,force=True,valid=lambda:valid[0])==''
+    assert not sn.DIR.exists()
+
+
+def test_summary_keeps_its_original_storage_destination(notes,monkeypatch):
+    original=sn.DIR
+    def ask(messages):
+        monkeypatch.setattr(sn,'DIR',notes/'different-destination')
+        return MODEL
+    note=sn.update('captured','Survey',HISTORY,ask,force=True)
+    assert sn.load('captured',folder=original)==note
+    assert not sn.DIR.exists()

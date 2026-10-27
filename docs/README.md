@@ -13,6 +13,7 @@ link to them.
 - [Field notebook integration](FIELD-NOTEBOOK-INTEGRATION.md),
   [phone notebook](PHONE-NOTEBOOK.md), [field network](FIELD-NETWORK.md)
 - [Hardware](HARDWARE.md)
+- [Research profiles and deferred tasks](U107-AGENTS.md) (U107 implementation, not released)
 
 ## Contributing
 

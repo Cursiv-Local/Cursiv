@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
+from .activity import serialized_turn
 
 def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip: bool, person: str | None, event_id: str) -> None:
     """Save lasting facts from this exchange (memory/semantic.py), off the UI thread.
@@ -51,6 +52,7 @@ def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip
             _cb.learn_from_exchange(text, reply, runtime._memory_llm, person)
     _formation.submit(work, event_id)
 
+@serialized_turn
 def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key: str, files: list | None, file_access: bool, root_path: str, openai_key: str, confirm_writes: bool, anthropic_key: str, force_provider: str, replace_draft: bool, on_stage: Callable[[str], None] | None, notebook_scope: str, on_action, on_review=None, review_mode=None) -> Generator[str, None, None]:
     """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
 

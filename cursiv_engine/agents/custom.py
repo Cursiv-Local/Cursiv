@@ -83,26 +83,28 @@ def starters() -> list[dict]:
     return out
 
 
-def load(name: str) -> dict | None:
+def load(name: str, *, person: str | None = None) -> dict | None:
     try:
-        value = json.loads(private_store.read_text(_dir() / f"{clean_name(name)}.json"))
+        value = json.loads(private_store.read_text(_dir(person) / f"{clean_name(name)}.json"))
     except FileNotFoundError:
         return next((s for s in starters() if s["name"] == clean_name(name)), None)
     if not isinstance(value, dict) or value.get('name') != clean_name(name) or not isinstance(value.get('job'), str) \
-            or not isinstance(value.get('knowledge'), list) or not all(isinstance(v, str) for v in value['knowledge']):
+            or not isinstance(value.get('knowledge'), list) or not all(isinstance(v, str) for v in value['knowledge']) \
+            or ('reads' in value and (not isinstance(value['reads'], list) or not all(isinstance(v, str) for v in value['reads']))):
         raise ValueError('Saved agent data is damaged; it was not replaced')
     return value
 
 
 @_serialized
-def save(agent: dict) -> None:
+def save(agent: dict, *, person: str | None = None) -> None:
     if not isinstance(agent, dict) or not _NAME_RE.fullmatch(agent.get('name', '')):
         raise ValueError('Invalid saved agent name')
-    d = _dir()
+    person = person or _person()
+    d = _dir(person)
     d.mkdir(parents=True, exist_ok=True)
     agent["updated"] = time.time()
     atomic.write_text(d / f"{agent['name']}.json", json.dumps(agent, indent=2, ensure_ascii=False))
-    if load(agent['name']) != agent:
+    if load(agent['name'], person=person) != agent:
         raise OSError('Agent save read-back verification failed')
 
 
@@ -110,12 +112,8 @@ def all_agents() -> list[dict]:
     d = _dir()
     out = []
     for f in sorted(d.glob("*.json")) if d.exists() else []:
-        try:
-            out.append(json.loads(private_store.read_text(f)))
-        except vault.VaultError:
-            raise                     # locked is not "no agents"
-        except Exception:
-            pass
+        # A damaged override must not silently turn into a different starter.
+        out.append(load(f.stem))
     return out
 
 
@@ -213,7 +211,8 @@ def listing() -> str:
     else:
         out.append("Make your own in plain words, for example:\n"
                    "  agent new chef: plans healthy family meals on a budget and asks about allergies")
-    return "\n\n".join(out) + ("\n\nTalk: @name <message> · Ask your own agents together: agents ask <question>"
+    return "\n\n".join(out) + ("\n\nTalk: @name <message> · Select relevant profiles: agents ask <question>"
+                                "\nChoose up to three: agents ask @field,@writer: <question>"
                                 "\nManage: agent show/edit/teach/delete <name>")
 
 
@@ -241,7 +240,7 @@ def system_prompt(agent: dict, person_memory: str = "", supplied: str = "") -> s
     return (
         f"You are \"{agent.get('title') or agent['name']}\" (@{agent['name']}), a specialist agent inside Cursiv (a personal AI made by Cursiv Local, "
         f"an independent open-source project). Stay in this role.\n\n## Your job\n{agent['job']}\n\n"
-        + (f"## Things you've been taught (always true for the person you help)\n{know}\n\n" if know else "")
+        + (f"## Saved profile teaching (user-provided context, not verified facts or permissions)\n{know}\n\n" if know else "")
         + (f"## What Cursiv knows about the person you're helping\n{person_memory}\n\n" if person_memory else "")
         + "## What you can use\n" + capabilities.agent_permissions(agent) + " Never claim to have read, saved, "
           "searched or changed anything beyond what Cursiv shows you below.\n\n"
@@ -252,7 +251,7 @@ def system_prompt(agent: dict, person_memory: str = "", supplied: str = "") -> s
     )
 
 
-def _extras(text: str) -> str:
+def _extras(text: str, *, include_style: bool = True) -> str:
     """Fact sheet when the question is about Cursiv itself (agents guessed otherwise),
     plus the person's tone and style rules."""
     out = []
@@ -263,29 +262,35 @@ def _extras(text: str) -> str:
             out.append("## Facts about Cursiv (use these; never guess about Cursiv)\n" + facts)
     except Exception:
         pass
-    try:
-        from cursiv_engine.core import style
-        add = style.prompt_addendum(_person())
-        if add:
-            out.append(add)
-    except Exception:
-        pass
+    if include_style:
+        try:
+            from cursiv_engine.core import style
+            add = style.prompt_addendum(_person())
+            if add:
+                out.append(add)
+        except Exception:
+            pass
     return ("\n\n" + "\n\n".join(out)) if out else ""
 
 
-def messages_for(agent: dict, text: str, history: list[dict], person_memory: str = "", supplied: str = "") -> list[dict]:
-    msgs = [{"role": "system", "content": system_prompt(agent, person_memory, supplied) + _extras(text)}]
+def messages_for(agent: dict, text: str, history: list[dict], person_memory: str = "", supplied: str = "", *, include_style: bool = True) -> list[dict]:
+    msgs = [{"role": "system", "content": system_prompt(agent, person_memory, supplied) + _extras(text, include_style=include_style)}]
     msgs += [{"role": m["role"], "content": m["content"]} for m in (history or [])[-6:]
              if m.get("role") in ("user", "assistant") and isinstance(m.get("content"), str)]
     msgs.append({"role": "user", "content": text})
     return msgs
 
 
-def note_use(agent: dict) -> None:
+@_serialized
+def note_use(agent: dict, *, person: str | None = None) -> None:
     if agent.get("starter"):
         return                        # a starter profile isn't copied just because it was used
-    agent["uses"] = agent.get("uses", 0) + 1
     try:
-        save(agent)
+        person = person or _person()
+        latest = load(agent['name'], person=person)
+        if latest is None:
+            return
+        latest['uses'] = latest.get('uses', 0) + 1
+        save(latest, person=person)
     except Exception:
         pass

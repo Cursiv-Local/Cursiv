@@ -430,11 +430,13 @@ _HELP_TOPICS = {
   plugins                     plugin show / on / off / remove <name>
   projects                    running summaries of projects (project show / forget <name>)
   agents                      agent new <name>: <job>, then @name <message>
-  agents ask <question>       ask all your agents, then combine their views
+  agents ask <question>       select the smallest relevant profile set
+  agents ask @field,@writer: <question>   choose up to three read-only profiles
   postal setup <name> / my key / add user <n> <k> / contacts / rotate
   note export / note import <file>
   ref <question>              answer from the local reference data
-  queue list / queue add <task>
+  queue list / queue add <task> / queue flush   bounded local read-only tasks
+  queue cancel <ID> / queue retry <ID> [--reconciled]
   obsidian on / off / path / export / status"""),
 }
 _BUILDER_TOPICS = {"builder"}

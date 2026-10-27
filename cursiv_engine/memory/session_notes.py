@@ -44,9 +44,9 @@ Next: <the next step, one line>
 No other text."""
 
 
-def path(conv_id: str) -> Path:
+def path(conv_id: str, *, folder: Path | None = None) -> Path:
     safe = re.sub(r"[^A-Za-z0-9_-]", "_", conv_id or "")[:64]
-    return DIR / f"{safe}.md"
+    return (DIR if folder is None else folder) / f"{safe}.md"
 
 
 def done_lines(history: list[dict]) -> list[str]:
@@ -116,29 +116,30 @@ def render(title: str, done: list[str], summary: dict) -> str:
     return "\n".join(rows).rstrip() + "\n"
 
 
-def load(conv_id: str) -> str:
+def load(conv_id: str, *, folder: Path | None = None) -> str:
     if not conv_id:
         return ""
     from cursiv_engine.core import private_store
     try:
-        return private_store.read_text(path(conv_id))
+        return private_store.read_text(path(conv_id, folder=folder))
     except FileNotFoundError:
         return ""
 
 
-def save(conv_id: str, text: str) -> None:
+def save(conv_id: str, text: str, *, folder: Path | None = None) -> None:
     from cursiv_engine.core import atomic
-    atomic.write_bytes(path(conv_id), text.encode("utf-8"))
+    atomic.write_bytes(path(conv_id, folder=folder), text.encode("utf-8"))
 
 
 def update(conv_id: str, title: str, history: list[dict], ask: Callable[[list[dict]], str] | None = None,
-           *, force: bool = False) -> str:
+           *, force: bool = False, folder: Path | None = None, valid: Callable[[], bool] = lambda: True) -> str:
     """Rebuild the note. The model summary is refreshed every EVERY exchanges (or when forced);
     otherwise the previous summary lines are kept and only Done is recomputed."""
-    if not conv_id or not history:
+    if not conv_id or not history or not valid():
         return ""
+    folder = DIR if folder is None else folder
     exchanges = sum(m.get("role") == "user" for m in history)
-    previous = load(conv_id)
+    previous = load(conv_id, folder=folder)
     summary = {k: v for k, v in (
         (k, (re.search(rf"(?m)^{k}: (.+)$", previous) or [None, None])[1]) for k in ("Goal", "Next")) if v}
     for key in ("Decided", "Open"):
@@ -146,11 +147,15 @@ def update(conv_id: str, title: str, history: list[dict], ask: Callable[[list[di
         if block:
             summary[key] = "; ".join(ln[2:].strip() for ln in block.group(1).splitlines() if ln.startswith("- "))
     if ask is not None and (force or exchanges % EVERY == 0 or not summary):
+        if not valid():
+            return ""
         fresh = _summary(history, ask)
         if fresh:
             summary = fresh
     note = render(title, done_lines(history), summary)
-    save(conv_id, note)
+    if not valid():
+        return ""
+    save(conv_id, note, folder=folder)
     return note
 
 

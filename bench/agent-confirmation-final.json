@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fixture": "Same synthetic 86-record notebook and Procedures.txt as the original benchmark. Second fresh confirmation, frozen after the first confirmation exposed scope/retrieval defects; not used for implementation tuning.",
+  "confirmation2": [
+    {"id":"fresh-field","role":"field","question":"List three habits that make a field notebook useful to someone revisiting a site."},
+    {"id":"fresh-writer","role":"writer","question":"Write a warm two-sentence announcement asking for help collecting litter at the lake. Use [date], [time], and [meeting point]; those details are undecided."},
+    {"id":"fresh-checker","role":"checker","question":"Inspect the notebook for duplicate sample IDs, unit omissions, and readings that are not numeric."},
+    {"id":"fresh-protocol","role":"protocol","question":"In Procedures.txt, what are the holding times for unpreserved samples versus preserved samples? Cite the relevant page."},
+    {"id":"fresh-report","role":"report","question":"Summarize all current Pond temperature data numerically: number of records, usable measurement count, average, minimum, maximum, and omitted data with units."}
+  ]
+}

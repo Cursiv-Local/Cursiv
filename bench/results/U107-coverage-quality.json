@@ -1,0 +1,348 @@
+{
+  "labeler": "Codex manual inspection of all 33 synthetic profile answers; not independent human review",
+  "rubric": [
+    "Preserve requested sentence/tip count and stated uncertainty.",
+    "Distinguish 82 Pond records before measurement filtering, 81 matching temperature records, 80 usable numeric temperatures; mean 12 C and range 10..14 C.",
+    "Preserve duplicate sample IDs, missing nitrate unit and nonnumeric temperature findings.",
+    "Bind unpreserved 48 hours and preserved 28 days to supplied Procedures.txt page 2.",
+    "Label unsupported prose embellishments; passing does not certify all semantics."
+  ],
+  "summary": {
+    "original_profile_retest": "18/18 substance met",
+    "previously_seen_holdout_retest": "15/15 substance met",
+    "blind_evaluation": false,
+    "ordinary_control": "Measured separately; not graded in this label file"
+  },
+  "labels": [
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-field",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-field",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-field",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-notice",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences and requested date/location placeholders. Adds unrequested \"gather early\" wording; stylistic/scheduling judgment still needs owner review."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-notice",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences and requested date/location placeholders. Adds unrequested \"gather early\" wording; stylistic/scheduling judgment still needs owner review."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-notice",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences and requested date/location placeholders. Adds unrequested \"gather early\" wording; stylistic/scheduling judgment still needs owner review."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-rewrite",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences; current schedule remains undecided. Adds unrequested \"soon\" timing rhetoric; not a concrete supplied date."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-rewrite",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences; current schedule remains undecided. Adds unrequested \"soon\" timing rhetoric; not a concrete supplied date."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-writer-rewrite",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Two sentences; current schedule remains undecided. Adds unrequested \"soon\" timing rhetoric; not a concrete supplied date."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-checker",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-checker",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-checker",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-protocol",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-protocol",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-protocol",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-report",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-report",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "regression",
+      "artifact": "U107-coverage-live.json",
+      "case": "eval-report",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-field",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-field",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-field",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-writer",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-writer",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-writer",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-checker",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-checker",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-checker",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-protocol",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-protocol",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-protocol",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-report",
+      "path": "individual",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-report",
+      "path": "group",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    },
+    {
+      "phase": "previously_seen_holdout_retest",
+      "artifact": "U107-coverage-holdout.json",
+      "case": "holdout-report",
+      "path": "plural",
+      "execution_status": "succeeded",
+      "task_substance_met": true,
+      "detected_fabricated_source_or_execution_claim": false,
+      "note": "Requested substance, findings, scoped calculations and supplied citations preserved."
+    }
+  ]
+}

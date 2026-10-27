@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fixture": "Identical synthetic stores. Frozen before viewing any results for these five final-source prompts; small targeted confirmation, not an independent human or broad language study.",
+  "holdout": [
+    {"id":"holdout-field","role":"field","question":"List two concise habits for keeping clear field notes."},
+    {"id":"holdout-writer","role":"writer","question":"Rewrite in two sentences using only these facts: People should bring gloves to pick up litter next to the river. We have not chosen the date or meeting spot."},
+    {"id":"holdout-checker","role":"checker","question":"Check my field notebook for duplicate sample IDs and missing units, including values written as words instead of numbers."},
+    {"id":"holdout-protocol","role":"protocol","question":"List the holding time for preserved and unpreserved samples from Procedures.txt. Cite its page."},
+    {"id":"holdout-report","role":"report","question":"For Pond temperature readings, give record counts, numeric count, average, minimum-to-maximum range, units and excluded entries."}
+  ]
+}

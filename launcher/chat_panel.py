@@ -101,6 +101,9 @@ def _iter_cancellable(gen, cancel_event: threading.Event):
             chunk = next(gen)
         except StopIteration:
             return
+        if cancel_event.is_set():
+            gen.close()
+            return
         yield chunk
 
 
@@ -112,6 +115,7 @@ def _is_ollama_installed() -> bool:
 
 
 class _ChatSignals(QObject):
+    run_event = pyqtSignal(object, object)  # immutable turn target, application-owned UI event
     chunk = pyqtSignal(str)             # one streamed text fragment
     replace = pyqtSignal(str)           # the whole reply so far is replaced (a revised draft)
     done  = pyqtSignal()                # generation finished cleanly
@@ -159,6 +163,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._cancel_event: Optional[threading.Event] = None
         self._signals = _ChatSignals()
         self._signals.chunk.connect(self._on_chunk)
+        self._signals.run_event.connect(self._on_run_event)
         self._signals.replace.connect(self._on_replace)
         self._signals.done.connect(self._on_done)
         self._signals.error.connect(self._on_error)
@@ -311,6 +316,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def new_conversation(self) -> None:
         self._cancel_review()
+        self._last_research_run = None
+        if self._cancel_event is not None:
+            self._cancel_event.set()
+        if self._streaming:
+            self._pending_history_append = None
+            self._on_cancelled()
         self._intents = {}
         self._pending_intent = None
         self._reset_rendering()
@@ -420,6 +431,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         data = conversations.load(conv_id)
         if not data:
             return False
+        self._last_research_run = None
+        if self._cancel_event is not None:
+            self._cancel_event.set()
+        if self._streaming:
+            self._pending_history_append = None
+            self._on_cancelled()
         self._cancel_review()
         self._intents = {}
         self._pending_intent = None
@@ -539,7 +556,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         # once we know if this resolved to a command or a plain chat call.
         history_snapshot = list(self._history)
         thread = threading.Thread(
-            target=self._run_turn, args=(text, history_snapshot), daemon=True,
+            target=self._run_turn, args=(text, history_snapshot),
+            kwargs={'turn_target': self._run_target()}, daemon=True,
         )
         thread.start()
 
@@ -569,7 +587,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._stop_btn.setEnabled(False)
         self._status.setText("Stopping…")
 
-    def _run_turn(self, text: str, history: list[dict], propose: bool = True) -> None:
+    def _run_turn(self, text: str, history: list[dict], propose: bool = True, turn_target=None) -> None:
+        target = turn_target or self._run_target()
+        if not self._current_run_target(target):
+            return
         try:
             force_provider, stripped = cc.hey_prefix(text)
             # A provider prefix never transfers notebook execution to the model.
@@ -607,7 +628,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 result = cc.handle_command(text, self._cfg, history)
 
             if result is not None:
-                self._deliver_result(result, history, text)
+                self._deliver_result(result, history, text, turn_target=target)
                 return
 
             # U99: said in plain words? The local model may turn it into one of
@@ -632,6 +653,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             # turn itself -- with nothing to trim off the end.
             workspace = self._cfg.get("workspace", '')
             review_key, review_cancel = self._review_generation, self._cancel_event
+            if not self._current_run_target(target):
+                return
             gen = _cursiv_chat(
                 stripped, history,
                 api_key=self._cfg.get("api_key", ""), files=None,
@@ -650,6 +673,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             self._reply_is_chat = True          # streamed Markdown; commands stay plain
             cancel_event = self._cancel_event
             full = ""
+            from cursiv_engine.chat.activity import guarded
+            gen = guarded(gen, lambda: self._current_run_target(target) and not target[1].is_set())
             for chunk in _iter_cancellable(gen, cancel_event):
                 if not chunk:
                     continue
@@ -669,21 +694,18 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                              # approval dialog resolves on the main thread
                 if chunk.startswith(cc.REPLACE_SENTINEL):
                     full = chunk[len(cc.REPLACE_SENTINEL):]   # history keeps only the final answer
-                    self._signals.replace.emit(full)
+                    self._signals.run_event.emit(target, dict(kind='replace', text=full))
                     continue
                 full += chunk
-                self._signals.chunk.emit(chunk)
+                self._signals.run_event.emit(target, dict(kind='chunk', text=chunk))
             if cancel_event.is_set():
-                self._pending_history_append = (
-                    [("user", stripped), ("assistant", full)] if full else None
-                )
-                self._signals.cancelled.emit()
+                self._signals.run_event.emit(target, dict(kind='cancelled', history=
+                    [("user", stripped), ("assistant", full)] if full else None))
                 return
-            self._pending_history_append = [("user", stripped), ("assistant", full)]
-            self._last_exchange = (stripped, full) if full.strip() else None
-            self._signals.done.emit()
+            self._signals.run_event.emit(target, dict(kind='done', history=[('user', stripped), ('assistant', full)],
+                                                     exchange=(stripped, full) if full.strip() else None))
         except Exception as e:
-            self._signals.error.emit(str(e))
+            self._signals.run_event.emit(target, dict(kind='error', text=str(e)))
 
     # ── Cross-check: a second AI reviews the last answer, only on request (core/crosscheck.py) ──
     def _cross_check(self) -> None:
@@ -724,8 +746,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._status.setText("")
         self._cc_btn.setEnabled(bool(getattr(self, "_last_exchange", None)) and not self._streaming)
 
-    def _deliver_result(self, result, history: list[dict], text: str = "") -> None:
+    def _deliver_result(self, result, history: list[dict], text: str = "", turn_target=None) -> None:
         """Runs on the background thread -- streams a command's TextResult/StreamResult."""
+        if getattr(result, 'run', None) is not None:
+            return self._deliver_run(result, text, turn_target or self._run_target())
         self._signals.state_changed.emit()
         if isinstance(result, cc.NotebookResult):
             self._pending_history_append = [("user", cc.hey_prefix(text)[1]), ("assistant", result.text)]
@@ -748,58 +772,15 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             self._signals.done.emit()
             return
         if isinstance(result, cc.TextResult):
+            target = turn_target or self._run_target()
             if result.text:
-                self._signals.chunk.emit(result.text)
+                self._signals.run_event.emit(target, dict(kind='chunk', text=result.text))
             if result.image_path:
-                self._signals.image.emit(result.image_path)
-            self._signals.done.emit()
-            self._pending_history_append = None   # commands don't pollute chat history
+                self._signals.run_event.emit(target, dict(kind='image', text=result.image_path))
+            self._signals.run_event.emit(target, dict(kind='done', history=None))
             return
 
-        # StreamResult
-        self._signals.chunk.emit(result.intro + "\n\n")
-        cancel_event = self._cancel_event
-        full = ""
-        rate_limited = False
-        try:
-            for chunk in _iter_cancellable(result.generator, cancel_event):
-                if chunk == _RATE_SENTINEL:
-                    rate_limited = True
-                    continue
-                if chunk:
-                    full += chunk
-                    self._signals.chunk.emit(chunk)
-        except Exception as e:
-            self._signals.error.emit(str(e))
-            return
-        if cancel_event.is_set():
-            self._pending_history_append = None
-            self._signals.cancelled.emit()
-            return
-        if not full:
-            # The generator produced nothing displayable -- e.g. an
-            # invalid/rejected API key, a real rate limit, or a network
-            # failure that the provider call swallowed into an empty
-            # response instead of raising. Previously this looked
-            # identical to the intro line just... never getting an
-            # answer, with no way to tell a real failure from something
-            # being broken in the UI itself.
-            self._signals.chunk.emit(
-                "[Rate limited or no response — wait a moment and try again, "
-                "or check that the API key is valid.]" if rate_limited else
-                "[No response received from the provider.]"
-            )
-        # Streamed command answers (codex, council, search, babel, …) join the
-        # conversation, so a follow-up like "done" or "now add a gripper" has context.
-        if full.strip() and text:
-            self._pending_history_append = [("user", text), ("assistant", full[-6000:])]
-        if result.on_complete:
-            try:
-                result.on_complete(full)
-            except Exception:
-                pass
-        self._signals.done.emit()
-        self._pending_history_append = None
+        return self._deliver_command_stream(result, text, turn_target or self._run_target())
 
     def _open_saved_notes(self, category: str = '', query: str = '') -> None:
         try:

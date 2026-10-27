@@ -1,0 +1,784 @@
+{
+  "source_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "runtime_source_sha256": {
+    "cursiv_engine/agents/custom.py": "148880b73c3ea838240b20d337b12de2bc6973063ec0ead52fa879126846990e",
+    "cursiv_engine/agents/draft_rules.py": "22184065c8eee4285748685c7177208a783b30c628c3b62d9386bc11759a0261",
+    "cursiv_engine/agents/evidence.py": "c9ea1bbc8a1a446fcfecf8c29feb038821f0dfca7f24c10a7b474d7240f9ce16",
+    "cursiv_engine/agents/offline_queue.py": "df3c3373289808cf8708fff5fad5e7eaa455c901265b60b1d29536acf4b94a09",
+    "cursiv_engine/agents/queue_executor.py": "7b2c4cc4891150376551c5a7dc70a598c6582683e58200a2459f76d8da93108e",
+    "cursiv_engine/agents/workflow.py": "72bf50bcc19a0c8ce7badddcf824a1bf19edc5861ae44cd1ac9dcde19bd2b2ee",
+    "cursiv_engine/chat/activity.py": "38585c1a4bdaa42de0820a00eec6bfd9a7907d93d9514cbc47da087dc1cefc63",
+    "cursiv_engine/chat/cloud_providers.py": "e28091fd0775e2a147d0ef5ee8ca05dfcfea91c73e8d890b3954cf8f48827fde",
+    "cursiv_engine/chat/completion.py": "cda45f29e9d728876ef9de30dcbf2042d84f93a31c1c8a6d5741f9fb01927871",
+    "cursiv_engine/chat/context.py": "3b47585a6361f5dcca3c9cbb45f30b035412adaeba6fa7924b0629e752c1e92b",
+    "cursiv_engine/chat/local_provider.py": "5d1b1dabf1a3d494a49a1b9ab876d53148eeed1610d3c07ad5ce547d121a0cbf",
+    "cursiv_engine/chat/request_budget.py": "50d057b078384793eb2ee6c81b5f427f4d1ff8d59975149a30252b7b2fdf4c8f",
+    "cursiv_engine/chat/review.py": "0b6c2928260b2e3c69100cf64e6d0d92c698ca8fa8a3e1293aa15161cf268726",
+    "cursiv_engine/chat/routing.py": "dcc6458e09468b18db0c426d3d3d934717db1b7ab0b5b9c4e6d594882126ddef",
+    "cursiv_engine/core/capabilities.py": "71f6acf1604c0abf888b20a30e4544a577dd191485f652db884d7dfc6faa3d13",
+    "cursiv_engine/core/command_api.py": "44b3777fb428392f4cf8f93b223b94a76b4c2c4485ea6df359e071a9eed1b472",
+    "cursiv_engine/core/documents.py": "4954bc444ee4ee83d96b420c5bd190dc65b9b3a3465e2dbb90cb8879cb86f545",
+    "cursiv_engine/core/field_recall.py": "4aec10321624a38dc5f880bc746f84ac6d67513b433b2d53beadc03641a716ec",
+    "cursiv_engine/core/verify.py": "73d0d694e3dd118f10f7def945d2600923e924b463f3578e54d8c0d3484a81b3",
+    "cursiv_engine/memory/semantic.py": "69ab738c5f427327bc69d0e715912da58d59f073a0f74132cfba5a7be816a13b",
+    "launcher/chat_commands.py": "8f4ef2e7e9b3a329fab476d931edbe23819621d536d2387e1766b9be87bdd40f",
+    "launcher/chat_panel.py": "439c8b7a5a5cae10a3830137d4b08d4f4e3bb8af93fca83025c634f174ad974a",
+    "launcher/chat_review.py": "e84376c5092417a7721b25b835d9a9b33e877e94ec9e6f1f91ddde540ad269ca",
+    "launcher/command_agents.py": "872d6a975dd00db249960a9894ce9eaa855e0b743ccf5142c0a3139d943979e8",
+    "launcher/commands_extensions.py": "0a84c0b05a779c6222d86fbf1fb4887be60e1207923b14ead82d8e6675a24eb3",
+    "launcher/commands_notes.py": "263d45c47915207aaffc6bbe7d1f8239b36589579a1ded2d2fa17fbad615aacd"
+  },
+  "created_utc": "2026-10-27T05:16:11.197978+00:00",
+  "question_set": "acceptance",
+  "question_sha256": "3db84cbfa853cb4c55263dbaf225b43e7ec49571a07a4aeda833105904f800c6",
+  "live": true,
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "settings": {
+    "model": "qwen3:4b-instruct",
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "offline": true,
+    "review": "fast",
+    "provider_permissions": "local only; no downloads"
+  },
+  "hardware": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "gpu": "NVIDIA GeForce RTX 2050, 4096 MiB"
+  },
+  "metrics_limit": "Token counts from real Ollama terminal events. Cache hits and peak process/server memory unavailable. No fake timing establishes speed. Synthetic records only.",
+  "rows": [
+    {
+      "id": "accept-field",
+      "role": "field",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 4.6564479999942705,
+      "first_display_seconds": 3.125264500034973,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1931,
+          "output_tokens": 51,
+          "first_token_seconds": 0.6977672000648454,
+          "load_nanoseconds": 37251600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1931,
+      "output_tokens": 51,
+      "response": "1. Record observations as they happen\u2014don\u2019t wait to recall them.  \n2. Use clear, simple language so you can read it back later without confusion.  \n3. Include dates, times, and locations so entries are grounded in reality.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-field",
+      "role": "field",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "field"
+        ],
+        "completed": [
+          "field"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.06688699999358505,
+      "first_display_seconds": 0.06685910001397133,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "1. Include the date, time, site and a clear sample ID with each observation.\n2. Keep each reading exactly as observed, with its unit; mark missing details as not recorded.\n3. Write observations while you work, keeping interpretations separate from what you directly observed.\n\n*[Profiles completed: @field; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-field",
+      "role": "field",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "field"
+        ],
+        "completed": [
+          "field"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.03751010005362332,
+      "first_display_seconds": 0.037471999996341765,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "1. Include the date, time, site and a clear sample ID with each observation.\n2. Keep each reading exactly as observed, with its unit; mark missing details as not recorded.\n3. Write observations while you work, keeping interpretations separate from what you directly observed.\n\n*[Profiles completed: @field; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-field",
+      "role": "field",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "field"
+        ],
+        "completed": [
+          "field"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.03596450004260987,
+      "first_display_seconds": 0.03593210002873093,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "1. Include the date, time, site and a clear sample ID with each observation.\n2. Keep each reading exactly as observed, with its unit; mark missing details as not recorded.\n3. Write observations while you work, keeping interpretations separate from what you directly observed.\n\n*[Profiles completed: @field; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-writer",
+      "role": "writer",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 2.855315100052394,
+      "first_display_seconds": 2.0792438000207767,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1951,
+          "output_tokens": 26,
+          "first_token_seconds": 0.5211432999931276,
+          "load_nanoseconds": 35036600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1951,
+      "output_tokens": 26,
+      "response": "Volunteers need gloves to collect rubbish beside the river. The schedule and meeting location for the cleanup have not yet been set.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-writer",
+      "role": "writer",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "writer"
+        ],
+        "completed": [
+          "writer"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 2313,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 497,
+            "output_tokens": 22,
+            "first_token_seconds": 0.24322800000663847,
+            "seconds": 0.828635900048539
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 2.050006400095299,
+      "first_display_seconds": 2.049968200037256,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 497,
+          "output_tokens": 22,
+          "first_token_seconds": 0.2430451000109315,
+          "load_nanoseconds": 39612900
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 497,
+      "output_tokens": 22,
+      "response": "Volunteers need gloves to collect rubbish beside the river. The schedule and meeting location are not yet set.\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-writer",
+      "role": "writer",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "writer"
+        ],
+        "completed": [
+          "writer"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 2313,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 497,
+            "output_tokens": 22,
+            "first_token_seconds": 0.09338459989521652,
+            "seconds": 0.675311699975282
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 1.8545146000105888,
+      "first_display_seconds": 1.854466799995862,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 497,
+          "output_tokens": 22,
+          "first_token_seconds": 0.09318240010179579,
+          "load_nanoseconds": 39107200
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 497,
+      "output_tokens": 22,
+      "response": "Volunteers need gloves to collect rubbish beside the river. The schedule and meeting location are not yet set.\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-writer",
+      "role": "writer",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "writer"
+        ],
+        "completed": [
+          "writer"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 2313,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 497,
+            "output_tokens": 22,
+            "first_token_seconds": 0.09609230002388358,
+            "seconds": 0.6829377999529243
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 0,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 1.9265807999763638,
+      "first_display_seconds": 1.926529899938032,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 497,
+          "output_tokens": 22,
+          "first_token_seconds": 0.09585450007580221,
+          "load_nanoseconds": 36928300
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 497,
+      "output_tokens": 22,
+      "response": "Volunteers need gloves to collect rubbish beside the river. The schedule and meeting location are not yet set.\n\n*[Profiles completed: @writer; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-checker",
+      "role": "checker",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 5.070336000062525,
+      "first_display_seconds": 2.1271936000557616,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1939,
+          "output_tokens": 100,
+          "first_token_seconds": 0.5824653999879956,
+          "load_nanoseconds": 37398300
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1939,
+      "output_tokens": 100,
+      "response": "I can't review saved notebook records because file access is currently off.  \n\nThe app does not have permission to read files on this computer, and no notebook records are accessible in the current session.  \n\nIf you'd like, I can help you:  \n- Create a checklist to manually scan your notes for missing units, duplicate identifiers, or nonnumeric measurements.  \n- Draft a script or template to use in a spreadsheet or text file.  \n\nWould you like me to do either of those?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-checker",
+      "role": "checker",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "checker"
+        ],
+        "completed": [
+          "checker"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.14509870007168502,
+      "first_display_seconds": 0.14503670006524771,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [1b4f3f2de41f], [63e4240eea48].\nSample ID S-001 is used by 2 current records: [fa8ba45ccd42], [13af178aa902].\n[63e4240eea48] nitrate 2.5 has no unit.\n[13af178aa902] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-checker",
+      "role": "checker",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "checker"
+        ],
+        "completed": [
+          "checker"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.08429749996867031,
+      "first_display_seconds": 0.08416640001814812,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [1b4f3f2de41f], [63e4240eea48].\nSample ID S-001 is used by 2 current records: [fa8ba45ccd42], [13af178aa902].\n[63e4240eea48] nitrate 2.5 has no unit.\n[13af178aa902] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-checker",
+      "role": "checker",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "checker"
+        ],
+        "completed": [
+          "checker"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.06299490004312247,
+      "first_display_seconds": 0.0628858000272885,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Scope: current records after corrections; all sites; recorded dates earliest to latest.\nChecked all 86 current matching records.\nSample ID S-000 is used by 2 current records: [1b4f3f2de41f], [63e4240eea48].\nSample ID S-001 is used by 2 current records: [fa8ba45ccd42], [13af178aa902].\n[63e4240eea48] nitrate 2.5 has no unit.\n[13af178aa902] temperature is \"cloudy\", not a number, so it can't be used in calculations.\n\n*[Profiles completed: @checker; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-protocol",
+      "role": "protocol",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 0.0307090999558568,
+      "first_display_seconds": 0.029463700018823147,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "File access is off. Choose workspace <folder>, then files on. No file was accessed.\n\n*[Sources: Cursiv file execution result (no AI model)]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-protocol",
+      "role": "protocol",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "failed",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 3144,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 694,
+            "output_tokens": 51,
+            "first_token_seconds": 0.5104344999417663,
+            "seconds": 1.8928790999343619
+          }
+        ],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 3.0293179999571294,
+      "first_display_seconds": 3.029271599953063,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 694,
+          "output_tokens": 51,
+          "first_token_seconds": 0.5102847000816837,
+          "load_nanoseconds": 45428000
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 694,
+      "output_tokens": 51,
+      "response": "@protocol draft withdrawn after Cursiv\u2019s code checks:\n- Citation (Citations: Procedures.txt, p. 2) was not supplied to this profile.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-protocol",
+      "role": "protocol",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "failed",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 3144,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 694,
+            "output_tokens": 51,
+            "first_token_seconds": 0.09216750005725771,
+            "seconds": 1.4734874999849126
+          }
+        ],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 2.5780853000469506,
+      "first_display_seconds": 2.578014999977313,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 694,
+          "output_tokens": 51,
+          "first_token_seconds": 0.0919707000721246,
+          "load_nanoseconds": 35473300
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 694,
+      "output_tokens": 51,
+      "response": "@protocol draft withdrawn after Cursiv\u2019s code checks:\n- Citation (Citations: Procedures.txt, p. 2) was not supplied to this profile.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-protocol",
+      "role": "protocol",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "failed",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "stage": "generation",
+            "input_upper_bound": 3144,
+            "output_reserved": 1100,
+            "transport": true,
+            "success": true,
+            "received_text": true,
+            "input_tokens": 694,
+            "output_tokens": 51,
+            "first_token_seconds": 0.09202049998566508,
+            "seconds": 1.474137399927713
+          }
+        ],
+        "review_status": "not requested",
+        "retrievals": 1,
+        "calculations": 0,
+        "optional_review_seconds": 0
+      },
+      "seconds": 2.612390000023879,
+      "first_display_seconds": 2.6123469000449404,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 694,
+          "output_tokens": 51,
+          "first_token_seconds": 0.0918461000546813,
+          "load_nanoseconds": 35768600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 694,
+      "output_tokens": 51,
+      "response": "@protocol draft withdrawn after Cursiv\u2019s code checks:\n- Citation (Citations: Procedures.txt, p. 2) was not supplied to this profile.\nLater profiles and synthesis did not run.",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-report",
+      "role": "report",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 5.813333800062537,
+      "first_display_seconds": 2.765848300070502,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 1943,
+          "output_tokens": 104,
+          "first_token_seconds": 1.2444162999745458,
+          "load_nanoseconds": 39345600
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 1943,
+      "output_tokens": 104,
+      "response": "I don\u2019t have access to any pond temperature records or data files.  \n\nFile access is currently off, and no data has been uploaded or provided.  \n\nSo I cannot calculate the mean, range, or any statistics from pond temperature records.  \n\nIf you have a file with temperature records (e.g., a CSV or text file), you can share it, and I can help analyze it \u2014 just let me know the file path or content.  \n\nUntil then, no records exist in the system to work with.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-report",
+      "role": "report",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "report"
+        ],
+        "completed": [
+          "report"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 2,
+        "calculations": 1,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.07256820006296039,
+      "first_display_seconds": 0.07255329994950444,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Notebook report\nScope: current records after corrections; site Pond; recorded dates earliest to latest.\n82 current matching records (all used for the record count).\ntemperature: 81 measurements; 80 numeric with recorded/optional units; omitted 0 missing-unit and 1 non-numeric measurements.\n1 matching records have no temperature measurement.\nCalculated from 80 measurements: mean 12 C; median 12 C; range 10 to 14 C.\n\n*[Profiles completed: @report; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-report",
+      "role": "report",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "report"
+        ],
+        "completed": [
+          "report"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 2,
+        "calculations": 1,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.05021899996791035,
+      "first_display_seconds": 0.050089500029571354,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Notebook report\nScope: current records after corrections; site Pond; recorded dates earliest to latest.\n82 current matching records (all used for the record count).\ntemperature: 81 measurements; 80 numeric with recorded/optional units; omitted 0 missing-unit and 1 non-numeric measurements.\n1 matching records have no temperature measurement.\nCalculated from 80 measurements: mean 12 C; median 12 C; range 10 to 14 C.\n\n*[Profiles completed: @report; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "accept-report",
+      "role": "report",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "report"
+        ],
+        "completed": [
+          "report"
+        ],
+        "request_counters": [],
+        "review_status": "not requested",
+        "retrievals": 2,
+        "calculations": 1,
+        "optional_review_seconds": 0
+      },
+      "seconds": 0.05137730005662888,
+      "first_display_seconds": 0.051254100049845874,
+      "calls": [],
+      "attempted_calls": 0,
+      "successful_calls": 0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "response": "Notebook report\nScope: current records after corrections; site Pond; recorded dates earliest to latest.\n82 current matching records (all used for the record count).\ntemperature: 81 measurements; 80 numeric with recorded/optional units; omitted 0 missing-unit and 1 non-numeric measurements.\n1 matching records have no temperature measurement.\nCalculated from 80 measurements: mean 12 C; median 12 C; range 10 to 14 C.\n\n*[Profiles completed: @report; code only, no AI model]*",
+      "error": null,
+      "legacy_group_comparable": false
+    }
+  ],
+  "handled": 20,
+  "model_switches": 0,
+  "median_seconds": 0.9998066500411369,
+  "evaluation_answers_for_tuning": false
+}

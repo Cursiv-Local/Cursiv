@@ -1,0 +1,226 @@
+{
+  "source_commit": "2a639325f60bb3a6b911c83ebb99502339227970",
+  "created_utc": "2026-10-27T04:17:15.133507+00:00",
+  "question_set": "development",
+  "question_sha256": "ca078508a838eebfb2d0af035cb30af1206044339082bf76704f93f94b5bcffe",
+  "live": true,
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "settings": {
+    "model": "qwen3:4b-instruct",
+    "temperature": 0,
+    "seed": 42,
+    "num_ctx": 8192,
+    "offline": true,
+    "review": "fast",
+    "provider_permissions": "local only; no downloads"
+  },
+  "hardware": {
+    "platform": "Windows-11-10.0.26200-SP0",
+    "processor": "Intel64 Family 6 Model 151 Stepping 2, GenuineIntel",
+    "gpu": "NVIDIA GeForce RTX 2050, 4096 MiB"
+  },
+  "metrics_limit": "Token counts from real Ollama terminal events. Cache hits and peak process/server memory unavailable. No fake timing establishes speed. Synthetic records only.",
+  "rows": [
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "ordinary",
+      "handled": true,
+      "run": null,
+      "seconds": 2.6295022999402136,
+      "first_display_seconds": 2.5784639000194147,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 423,
+          "output_tokens": 15,
+          "first_token_seconds": 0.39610030001495034,
+          "load_nanoseconds": 21781100
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 423,
+      "output_tokens": 15,
+      "response": "*(Searched your documents (Procedures.txt): no matching passage found.)*\n\nNo matching passage was found. I cannot establish that from the imported documents.\n\n*[Sources: your documents searched; no matching passage found. Written by Cursiv, no AI model]*\n\n*(Cursiv's check: this answer sounds more certain (\"No matching passage was found.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "individual",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [
+          "protocol"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "input_upper_bound": 3028,
+            "output_reserved": 1100,
+            "success": true,
+            "input_tokens": 665,
+            "output_tokens": 29,
+            "first_token_seconds": 0.3040831000544131,
+            "seconds": 1.0859514999901876
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 1,
+        "calculations": 0
+      },
+      "seconds": 1.6841943999752402,
+      "first_display_seconds": 1.6841560000320897,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 665,
+          "output_tokens": 29,
+          "first_token_seconds": 0.3039018999552354,
+          "load_nanoseconds": 14737200
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 665,
+      "output_tokens": 29,
+      "response": "My documents say: Calibration: compare the meter against its labelled reference before recording a batch. (Procedures.txt, p. 1)\n\n*[Profiles completed: @protocol; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "group",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [
+          "protocol"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "input_upper_bound": 3028,
+            "output_reserved": 1100,
+            "success": true,
+            "input_tokens": 665,
+            "output_tokens": 31,
+            "first_token_seconds": 0.08027699997182935,
+            "seconds": 0.9113217999693006
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 1,
+        "calculations": 0
+      },
+      "seconds": 2.051789000048302,
+      "first_display_seconds": 2.0517448000609875,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 665,
+          "output_tokens": 31,
+          "first_token_seconds": 0.08011610002722591,
+          "load_nanoseconds": 21080400
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 665,
+      "output_tokens": 31,
+      "response": "Your documents say: \"Calibration: compare the meter against its labelled reference before recording a batch.\" (Procedures.txt, p. 1)\n\n*[Profiles completed: @protocol; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    },
+    {
+      "id": "dev-protocol",
+      "role": "protocol",
+      "path": "plural",
+      "handled": true,
+      "run": {
+        "status": "succeeded",
+        "selected": [
+          "protocol"
+        ],
+        "completed": [
+          "protocol"
+        ],
+        "request_counters": [
+          {
+            "provider": "qwen3:4b-instruct",
+            "input_upper_bound": 3028,
+            "output_reserved": 1100,
+            "success": true,
+            "input_tokens": 665,
+            "output_tokens": 31,
+            "first_token_seconds": 0.07221389992628247,
+            "seconds": 0.902532699983567
+          }
+        ],
+        "review_status": "skipped",
+        "retrievals": 1,
+        "calculations": 0
+      },
+      "seconds": 1.5650556000182405,
+      "first_display_seconds": 1.565017000073567,
+      "calls": [
+        {
+          "model": "qwen3:4b-instruct",
+          "success": true,
+          "input_tokens": 665,
+          "output_tokens": 31,
+          "first_token_seconds": 0.07206989999394864,
+          "load_nanoseconds": 18825800
+        }
+      ],
+      "attempted_calls": 1,
+      "successful_calls": 1,
+      "input_tokens": 665,
+      "output_tokens": 31,
+      "response": "Your documents say: \"Calibration: compare the meter against its labelled reference before recording a batch.\" (Procedures.txt, p. 1)\n\n*[Profiles completed: @protocol; AI draft with code checks]*",
+      "error": null,
+      "legacy_group_comparable": false
+    }
+  ],
+  "handled": 4,
+  "model_switches": 0,
+  "median_seconds": 1.8679917000117712,
+  "evaluation_answers_for_tuning": false
+}

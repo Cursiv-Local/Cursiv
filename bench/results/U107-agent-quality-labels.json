@@ -1,0 +1,693 @@
+{
+  "labeler": "Codex manual inspection of synthetic answers; not independent human/professional review",
+  "rubric": [
+    "Fulfill requested substance, including writing sentence count in the composed final answer.",
+    "Preserve actual duplicate/unit/non-numeric findings; distinguish 82 Pond records, 81 temperature measurements, 80 usable numeric readings, mean12 C and range10..14 C.",
+    "Keep preserved28-day and unpreserved48-hour conditions separate and cite supplied page2.",
+    "Displayed intermediate fabricated citations/data count as failures even if synthesis later expresses doubt.",
+    "Task-substance labels do not certify every stylistic/semantic claim; minor writing embellishments are noted explicitly."
+  ],
+  "labels": [
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-field",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-field",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-field",
+      "path": "group",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": true,
+      "execution_status": null,
+      "note": "Displayed unsupported record/page references, invented data or false capability claims; group supplied no profile evidence."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-field",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-notice",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-notice",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-notice",
+      "path": "group",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Final composed notice used three sentences instead of two."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-notice",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-rewrite",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-rewrite",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-rewrite",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-writer-rewrite",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-checker",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary path did not retrieve the requested notebook records."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-checker",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Findings correct; unnecessary illustrative value/removal advice remains a baseline limitation."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-checker",
+      "path": "group",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": true,
+      "execution_status": null,
+      "note": "Displayed unsupported record/page references, invented data or false capability claims; group supplied no profile evidence."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-checker",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-protocol",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-protocol",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-protocol",
+      "path": "group",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": true,
+      "execution_status": null,
+      "note": "Displayed unsupported record/page references, invented data or false capability claims; group supplied no profile evidence."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-protocol",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-report",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary path did not retrieve the requested notebook records."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-report",
+      "path": "individual",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": true,
+      "execution_status": null,
+      "note": "Recent-record slice was presented as all Pond data; incorrect count and unfinished arithmetic."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-report",
+      "path": "group",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": true,
+      "execution_status": null,
+      "note": "Displayed unsupported record/page references, invented data or false capability claims; group supplied no profile evidence."
+    },
+    {
+      "phase": "baseline",
+      "artifact": "U107-agent-live-before.json",
+      "case": "eval-report",
+      "path": "plural",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Advertised command was unhandled; no workflow ran."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-field",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-field",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-field",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-field",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-notice",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-notice",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-notice",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-notice",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-rewrite",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-rewrite",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Undecided status retained, but model adds the unrequested word soon. Minor writing embellishment; not a claimed event date. Final untouched rewrite preserved uncertainty without that addition."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-rewrite",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Undecided status retained, but model adds the unrequested word soon. Minor writing embellishment; not a claimed event date. Final untouched rewrite preserved uncertainty without that addition."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-writer-rewrite",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Undecided status retained, but model adds the unrequested word soon. Minor writing embellishment; not a claimed event date. Final untouched rewrite preserved uncertainty without that addition."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-checker",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary routing did not fulfill this profile-specific request; unchanged baseline limitation, separate from the repaired profile commands."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-checker",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-checker",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-checker",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-protocol",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-protocol",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-protocol",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-protocol",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-report",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary routing did not fulfill this profile-specific request; unchanged baseline limitation, separate from the repaired profile commands."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-report",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-report",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "final_regression",
+      "artifact": "U107-agent-live-final-validated.json",
+      "case": "eval-report",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-field",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-field",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-field",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-field",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-writer",
+      "path": "ordinary",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-writer",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-writer",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-writer",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-checker",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary routing did not fulfill this profile-specific request; unchanged baseline limitation, separate from the repaired profile commands."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-checker",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-checker",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-checker",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-protocol",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary routing did not fulfill this profile-specific request; unchanged baseline limitation, separate from the repaired profile commands."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-protocol",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-protocol",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-protocol",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-report",
+      "path": "ordinary",
+      "task_substance_met": false,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": null,
+      "note": "Ordinary routing did not fulfill this profile-specific request; unchanged baseline limitation, separate from the repaired profile commands."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-report",
+      "path": "individual",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-report",
+      "path": "group",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    },
+    {
+      "phase": "untouched_holdout",
+      "artifact": "U107-agent-live-holdout-final-validated.json",
+      "case": "holdout-report",
+      "path": "plural",
+      "task_substance_met": true,
+      "displayed_source_or_action_claim_issue": false,
+      "execution_status": "succeeded",
+      "note": "Requested substance and source/coverage requirements satisfied."
+    }
+  ],
+  "earlier_trials": "Earlier confirmation files intentionally retain wrong scope, retrieval misses, citation over-rejection and withdrawn field drafts; they are not relabelled as final passes."
+}

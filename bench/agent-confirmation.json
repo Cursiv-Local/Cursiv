@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "fixture": "Identical synthetic stores to agent-workflows.json; fresh confirmation questions frozen after the first evaluation-informed corrections, before their results.",
+  "confirmation": [
+    {"id":"confirm-field","role":"field","question":"Give exactly two concise tips for making field observations easy to revisit later.","legacy_group_comparable":true},
+    {"id":"confirm-writer","role":"writer","question":"Draft a two-sentence invitation for neighbors to help clean a lakeshore. Put the undecided time and meeting point in brackets.","legacy_group_comparable":true},
+    {"id":"confirm-checker","role":"checker","question":"Review the saved notebook for reused sample codes, readings without a recorded unit, and values that cannot be calculated.","legacy_group_comparable":false},
+    {"id":"confirm-protocol","role":"protocol","question":"According to Procedures.txt, how do the preserved-sample and unpreserved-sample holding conditions differ? Include a page citation for each.","legacy_group_comparable":false},
+    {"id":"confirm-report","role":"report","question":"Prepare a compact numerical report for Pond: count current records and temperature measurements, show the mean and minimum-to-maximum range, and list omissions with reasons and units.","legacy_group_comparable":false}
+  ]
+}

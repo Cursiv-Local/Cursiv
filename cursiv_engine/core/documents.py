@@ -180,13 +180,17 @@ def _stem(word: str) -> str:
     return word
 
 
-def search(question: str, limit: int = 3, min_cover: float = 0.4, *, stem: bool = False) -> list[Passage]:
+def search(question: str, limit: int = 3, min_cover: float = 0.4, *, stem: bool = False,
+           min_matches: int = 2) -> list[Passage]:
     """The best passages for the question (BM25 order), or [] when nothing matches well.
     A passage counts only if it has at least two of the question's words and at least
     min_cover of them; BM25 scores on their own are too small to compare with a
     library of one or two documents. stem=True (starter profiles, U101) lets word endings
     differ: "how long can I hold a nitrate sample" matched no "holding time for nitrate samples"."""
-    words = (lambda t: [_stem(w) for w in _words(t)]) if stem else _words
+    # Match "preserved-sample" with "preserved samples" without changing exact search.
+    # A final silent-e normalization also joins sample/samples (the suffix stripper yields sampl).
+    words = (lambda t: [_stem(w).removesuffix('e') for w in _words(
+        re.sub(r'(?<=[A-Za-z])-(?=[A-Za-z])', ' ', t))]) if stem else _words
     q = set(words(question))
     passages = _passages()
     if not q or not passages:
@@ -210,7 +214,7 @@ def search(question: str, limit: int = 3, min_cover: float = 0.4, *, stem: bool 
             idf = math.log(1 + (n - df[w] + 0.5) / (df[w] + 0.5))
             score += idf * tf * 2.2 / (tf + 1.2 * (0.25 + 0.75 * len(words) / avg))
         cover = len(counts) / len(q)
-        if len(counts) < 2 or cover < min_cover:
+        if len(counts) < max(1, min_matches) or cover < min_cover:
             continue
         scored.append((score * cover, p))
     scored.sort(key=lambda t: t[0], reverse=True)
@@ -284,7 +288,7 @@ def note_line(found: list[Passage]) -> str:
 NOT_IN_DOCS = ("That isn't in your documents. (Documents-only mode is on, so I don't answer from general knowledge. "
                "Turn it off in Settings → How Cursiv answers, or import the document that covers this.)")
 
-_CITE = re.compile(r"\(([^()]{1,120}?),\s*p(?:age|\.)?\s*(\d{1,4})\)", re.I)
+_CITE = re.compile(r"[\[(]([^()[\]]{1,120}?),\s*p(?:age|\.)?\s*(\d{1,4})[\])]", re.I)
 
 
 def cited_pages_problems(answer: str, found: list[Passage]) -> list[str]:

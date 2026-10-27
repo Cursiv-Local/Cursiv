@@ -48,10 +48,12 @@ class StreamResult:
         intro: str,
         generator: Generator[str, None, None],
         on_complete: Optional[Callable[[str], None]] = None,
+        run=None,
     ):
         self.intro = intro
         self.generator = generator
         self.on_complete = on_complete
+        self.run = run
 
 
 class CommandRuntime(Protocol):

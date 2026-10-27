@@ -153,10 +153,59 @@ These exceptions are flagged rather than asserting launcher is already UI-only.
 No dead personal backend was identified with enough evidence to delete safely;
 existing letter/vault integrity tests are active.
 
-The facade still owns mutable per-turn records, and verification retains its
-session ledger/previous-failure state. The desktop serializes its active turns;
-this extraction does not establish safe concurrent chats in a future server.
-Gradually replacing those records with an explicit per-turn state object is
-separate work. External plugins execute trusted Python with process privileges.
+The facade still owns mutable per-turn records. `chat/activity.py` serializes whole
+ordinary turns, one-shot command cascades, research runs and model transports with
+one reentrant slot. Ordinary turns rebuild verification ledgers from their explicitly
+supplied history; research/background review does not inherit another turn's failure
+state. This is serialization, not parallel inference or a concurrent server framework.
+External plugins execute trusted Python with process privileges.
 See the [threat model](docs/THREAT-MODEL.md) and
 [maintenance report](docs/MAINTENANCE-HARDENING.md).
+
+## Bounded research runs (U107 implementation)
+
+`agents/workflow.py` owns selected/requested profiles, stages, status, cancellation,
+provider request counters and the final answer. `agents/evidence.py` captures one
+bounded verified notebook snapshot (including corrections), matching passages and
+code calculations. Per-role views enforce declared reads; source truth and stage
+receipts never come from model prose. Failed checks withdraw a draft and stop later
+stages. Known missing/failed evidence for any selected role is checked before any model stage.
+Explicit requests above three profiles are rejected with split guidance.
+Deterministic checks/statistics/no-result responses skip inference, and a single
+effective profile skips synthesis. No cross-run evidence cache exists.
+Generated replies receive application-owned excerpt/document coverage. Full-scope code statistics
+remain separate from the bounded AI excerpts; narrative requests beyond that scope ask for narrowing.
+Detected document instructions withhold saved teaching/history/style across the run and are excluded
+from factual quantity/condition validation. Statistical claims bind to code results and methods.
+
+`chat/request_budget.py` enforces ceilings at actual HTTP generation calls, including
+transport retries/fallbacks and final review. It retains counts/usage/provider/stage
+and timing, never raw prompts or keys. Input uses a labelled conservative UTF-8-byte
+bound plus reserved output against installed context. Research runs cannot download
+a model or switch their pinned local model incidentally. The desktop binds cancellation
+and conversation/workspace generation to the run; person/profile changes are checked
+before subsequent stages and accepted output. Stop may wait for the current transport
+to yield or time out, but late output cannot establish success.
+
+`agents/offline_queue.py` uses atomic private-store writes, OS byte locks and durable
+execution claims. Inference runs outside the persistence lock, allowing enqueue/cancel
+without duplicate dispatch. Explicit outcomes determine success; leases and legacy
+fired records require reconciliation after uncertainty. `agents/queue_executor.py`
+executes at most five authorized local read-only profile tasks per deliberate flush.
+It never dispatches queued native commands or grants network/tool permissions. History
+is retained; damaged state blocks execution and failed persistence leaves recoverable
+claims. Exactly-once external effects are not claimed. Optional Hermes/Codex bridges,
+the removed general council, coding review pair and Fleet device view remain distinct.
+
+`launcher/chat_review.py` also publishes owned foreground results. Worker events carry
+their original generation, cancellation event, conversation, workspace settings and
+person revision; Qt slots validate those before inserting text or history. Plain replies,
+research runs, ordinary chat and legacy one-shot streams use that acceptance boundary.
+The foreground transport guard is context-local; background review installs its own
+cancellation guard after the draft finishes. Profile-use metadata writes specify the
+captured person and reload the current profile before updating counters.
+
+Delayed session-note workers also capture their conversation, person/workspace and storage destination.
+They share the model slot and stop before summarizing or saving when ownership is stale. Updates use
+the captured destination rather than a later global directory. Profile/native-command completion
+updates these metadata notes without an extra, unbudgeted model summary.
