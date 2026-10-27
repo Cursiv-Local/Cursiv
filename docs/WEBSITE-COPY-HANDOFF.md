@@ -71,3 +71,20 @@ This organization follows Google's ordinary crawlable-content/internal-link guid
 reference pages serve the same HTML to all readers; no hidden bot-only version is used:
 https://developers.google.com/search/docs/appearance/ai-features
 https://developers.google.com/search/docs/essentials/spam-policies
+
+## Owner-directed CI scope
+
+Owner requested no full application suite for a website publication. Cancelled the active full-suite
+workflows for this PR (Windows/Mac cancelled, not passed; Linux had already finished). A one-time
+admin merge was attempted but GitHub also enforces the required checks for admins; no rules changed.
+
+The source workflow now keeps USB, workspace, security and ARM checks, and runs full application
+suites only for app-related/unknown changes. scripts/ci_change_scope.py classifies static marketing
+pages, publishing/tests and documentation; engine, launcher, dependencies, application tests, worker
+API, browser notebook/private-app changes and unknown executable paths keep full suites. Git diffs
+expand renames; missing history/manual runs fail closed to full validation. A failed scope job cannot
+silently skip app testing. Five focused regression tests cover a real app-to-website Git
+rename and unknown/manual inputs. The application suite was not run for this CI adjustment locally.
+
+Normal PR merge will follow the scoped checks; no administrator bypass or protection change is used.
+This scope policy applies to future website publications as well as this cleanup.

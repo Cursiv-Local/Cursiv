@@ -7,6 +7,22 @@ on:
   workflow_dispatch:
 
 jobs:
+  change-scope:
+    runs-on: ubuntu-latest
+    outputs:
+      website_only: ${{ steps.scope.outputs.website_only }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Verify fail-closed change selection
+        run: python tests/test_ci_change_scope.py
+      - id: scope
+        name: Select application test scope
+        run: python scripts/ci_change_scope.py
   workspace-files:
     strategy:
       fail-fast: false
@@ -25,6 +41,8 @@ jobs:
       - name: Required native workspace checks (no model or GUI)
         run: python scripts/check_workspace_files.py
   test:
+    needs: change-scope
+    if: ${{ !cancelled() }}
     strategy:
       fail-fast: false
       matrix:
@@ -48,16 +66,19 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -m usb -v
       - name: Test
+        if: needs.change-scope.outputs.website_only != 'true'
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -q --junitxml=test-results-${{ matrix.os }}.xml
       - name: Keep the machine-readable results (U102)
-        if: always()
+        if: always() && needs.change-scope.outputs.website_only != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: test-results-${{ matrix.os }}
           path: test-results-${{ matrix.os }}.xml
   test-linux:
+    needs: change-scope
+    if: ${{ !cancelled() }}
     # Linux (U101): the same suite on Ubuntu, so a Linux build has something to stand on. Not yet a
     # required check; it becomes one once it has passed on main for a while.
     runs-on: ubuntu-latest
@@ -79,11 +100,12 @@ jobs:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -m usb -v
       - name: Test
+        if: needs.change-scope.outputs.website_only != 'true'
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -q --junitxml=test-results-ubuntu-latest.xml
       - name: Keep the machine-readable results (U102)
-        if: always()
+        if: always() && needs.change-scope.outputs.website_only != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: test-results-ubuntu-latest
