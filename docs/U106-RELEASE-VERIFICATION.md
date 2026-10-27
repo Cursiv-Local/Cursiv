@@ -1,7 +1,6 @@
 # U106 release verification — October 26, 2026
 
-The tagged packages are published. Website publication follows the evidence PR and remains pending until
-the deployment and live checks below are recorded.
+The tagged packages and website are published. The final live check and deployment receipt are recorded below.
 
 ## Immutable source and gates
 
@@ -108,8 +107,15 @@ has been independently reviewed. See [THREAT-MODEL](THREAT-MODEL.md) and [RECOVE
 
 ## Website publication evidence
 
-- Evidence PR and merge: pending.
+- Evidence PR: https://github.com/Cursiv-Local/Cursiv/pull/46, merged at
+  `105d13243925f3f4035e9731a60d1ead3e771e4d`. All seven jobs passed on both push and PR runs;
+  PR CI: https://github.com/Cursiv-Local/Cursiv/actions/runs/40427182009.
 - Website build: successful, 18 allowlisted pages plus assets, notebook and privacy folders.
 - Website tests: **22 passed, zero failed**. Final release/version consistency checks: **6 passed**.
-- Website deployment: pending.
-- Live `https://cursiv.us/start` installer version/hash check: pending deployment and inspection.
+- Deployment succeeded for `cursiv.us` and `cursiv.winklers-llc.com`; Cloudflare version
+  `f8e91825-6b9f-4db6-aadf-7cd97388c438`.
+- Live `https://cursiv.us/start` changed from U105 before deployment to U106 afterward. At
+  `2026-10-27T00:45:50Z` (October 26 in the owner's timezone), it returned HTTP 200 and matched the
+  published source bytes. Both versioned installer links and the exact Windows hash above were present.
+  The live owner manifest returned HTTP 200 and matched the independently verified signed manifest.
+- Machine-readable [publication receipt](../bench/results/U106-publication.json).

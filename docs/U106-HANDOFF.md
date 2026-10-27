@@ -2,16 +2,17 @@
 
 Updated 2026-10-26. Owner: Joshua Winkler. Owner explicitly authorized **commit, push, release and publish** after approving the preview. Earlier no-commit/review notes below are historical.
 
-## U106 released; website publication in progress
+## U106 released and website published
 
-- Published: https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U106. Immutable source: 10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a, source PR #45, original source commit f061c7ded4bde763477f95be40105a1014c45b17. Current evidence branch: codex/u106-release-evidence.
+- Published: https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U106 and https://cursiv.us/start. Immutable source: 10b40d6d9bcce73102e22d5bcd3d0fca8ba60a4a, source PR #45, original source commit f061c7ded4bde763477f95be40105a1014c45b17. Evidence PR #46 merged at 105d13243925f3f4035e9731a60d1ead3e771e4d after all push/PR checks passed.
 - Scope is the approved first researcher-experience increment. Remaining plan items stay unfinished; see docs/U106-PREVIEW.md and docs/U106-RELEASE-VERIFICATION.md.
 - Push CI 40422430695, PR CI 40422543192 and exact-main CI 40423748096 passed all jobs. Exact-main JUnit: Windows 2253/15, Mac 2236/32, Linux 2235/33, ARM64 114/0 (passed/skipped). Tag preparation also passed 63 focused workspace tests.
 - Separate detached-tag Windows suite: **2253 passed, 15 skipped in 393.73 seconds**, session 27769 exit 0; bench/results/U106-tag-tests.xml. Release USB gate: 45/45; source commit hook: 45/45.
 - Windows build session 72295 exit 0. Installed and USB frozen self-tests **ALL PASSED**, including plugin isolation and portable storage. Mac tagged workflow 40424952938 succeeded: 2236/32 in 503.06 seconds and frozen **ALL PASSED**. All three reports are under bench/results/U106-*-selftest.txt.
 - Windows SHA-256: b69b2c834ab42dbf935b8784cbed63b6dae7dc8873f5230de21026469c74330a. Mac: fb7126cfcc45c1e71053a669b6b65690a9f64c842dfed109a5a567f39af7e25c.
 - Both aliases, complete checksum/provenance sets and exact tag commit verified. Existing trusted signer ran in place; no private key copied. Eight final platform assets signed and independently verified. All 11 release assets downloaded back and matched; all eight downloaded signed assets reported OwnerSignatureValid against the pinned public key. Redundant release-triggered Mac run 40426447603 cancelled.
-- Website prepared and built locally; **22 website tests passed**, final release/version checks **6 passed**. Next: commit the named evidence files, PR with passing CI, merge, deploy and inspect live cursiv.us/start. No build or tag-test commands remain running.
+- Website built and deployed successfully; **22 website tests passed**, final release/version checks **6 passed**. Cloudflare version f8e91825-6b9f-4db6-aadf-7cd97388c438. Live Start page changed U105 to U106, returned HTTP 200 and matched the published source bytes. Windows/Mac links, Windows hash and live signed manifest verified. Machine-readable receipt: bench/results/U106-publication.json; details: docs/U106-RELEASE-VERIFICATION.md.
+- All build, tag-test and deploy commands completed. Final receipt branch codex/u106-publication-receipt records only completed publication facts through normal PR checks; the release tag and package bytes stay unchanged. Temporary tag-test checkout removed after retaining reports. Any later automatic source CI runs are separate from the completed tagged release checks.
 - Excluded legal handoff, field-notes.txt, test_internals/, station, secrets and user data remain untouched. Build assets stay in ignored release-u106/ and installer/Output/. Live state/logs are in ignored reports/U106-release-state.json and reports/U106-*.log.
 
 ## Reviewed implementation preview (historical pre-release notes)
