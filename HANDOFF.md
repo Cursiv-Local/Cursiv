@@ -4,9 +4,17 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U107 agents — release authorized, preparation underway (Codex, 2026-10-27)
+## U107 published — website update pending (Codex, 2026-10-27)
 
-Branch `codex/u107-agent-reliability`, based on main `2a63932`; the published application remains U106.
+Published [v3.14-U107](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U107), immutable source
+`7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb` (source PR51). All push/PR/exact-main checks passed;
+Windows and native Mac frozen packages passed, including Windows portable-layout start. Existing
+owner identity signed8 platform assets; all11 public downloads/digests and8 signatures were verified.
+[U107 release evidence](docs/U107-RELEASE-VERIFICATION.md). Website links/manifest/copy are checked
+locally (31 website tests,6 consistency tests) and await their protected PR/merge/deployment.
+Live process identities and remaining work: [U107-HANDOFF](docs/U107-HANDOFF.md).
+
+Implementation branch `codex/u107-agent-reliability` was based on main `2a63932` (released U106 engine).
 Continuing state/processes: [U107-HANDOFF](docs/U107-HANDOFF.md). Owner review:
 [U107-PREVIEW](docs/U107-PREVIEW.md); defect matrix, raw evidence and limits:
 [U107-VALIDATION](docs/U107-VALIDATION.md). Public command routing, shared scoped evidence, code
@@ -16,7 +24,7 @@ in539.19s and dedicated automated USB45/45 in87.10s. Real installed
 Qwen routine sample n3 measured81.13% fewer group tokens and83.41% lower median completion time.
 Final profile-route retests18/18 original and15/15 previously seen holdout met requested substance;
 writing timing embellishments remain disclosed. Owner then authorized commit, push, release and
-publication. Version preparation is underway; tagged builds/publication remain pending until verified.
+publication. The later session-note race was repaired; final versioned suite2389/15/19 subtests passed.
 Preserve the U106 release and owner exclusions recorded in the U107 handoff.
 
 ## Website general-search discoverability (Codex, 2026-10-26)
