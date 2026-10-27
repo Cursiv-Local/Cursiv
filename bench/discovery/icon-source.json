@@ -1,0 +1,5 @@
+{
+  "source": "launcher/resources/icons/cursiv-logo-source.png",
+  "sha256": "3b2c3fd27c4dd7715b178dc688e10396cb33f19f2a336bd32720a015cff8ec35",
+  "method": "Existing official artwork resized by scripts/generate_web_icons.py; no new logo"
+}

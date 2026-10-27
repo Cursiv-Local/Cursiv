@@ -26,6 +26,9 @@ link to them.
 
 ## Design and plans
 
+- [General-search discoverability](DISCOVERABILITY-REPORT.md), [continuing handoff](DISCOVERABILITY-HANDOFF.md),
+  [external submission drafts](DISCOVERY-SUBMISSIONS.md)
+
 - [Architecture plan](ARCHITECTURE-PLAN.md) (see also [ARCHITECTURE](../ARCHITECTURE.md)
   and [TECH](../TECH.md))
 - [Research roadmap](RESEARCH-ROADMAP.md), [mobile plan](MOBILE-PLAN.md),

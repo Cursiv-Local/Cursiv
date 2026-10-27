@@ -1,0 +1,15 @@
+{
+  "method": "Observed browser layout and mobile menu checks; not a human usability study",
+  "desktop": {
+    "viewport": 1280,
+    "page_scroll_width": 1265
+  },
+  "mobile": {
+    "viewport": 390,
+    "page_scroll_width": 375,
+    "comparison_table_width": 760,
+    "comparison_wrapper_width": 335.2,
+    "table_scrollable": true,
+    "menu_open_close_verified": true
+  }
+}

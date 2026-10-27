@@ -211,3 +211,12 @@ footer { border-top: 1px solid var(--line); padding: 44px 0 32px; color: var(--m
 .more[open] > summary::after { content: "Hide"; }
 .tour figure { margin: 0; }
 .tour .shot a { display: block; }
+
+/* Wide comparison data remains scrollable inside the existing page layout. */
+.comparison-scroll { overflow-x: auto; max-width: 100%; border: 1px solid var(--line); border-radius: 12px; }
+.comparison-scroll:focus { outline: 2px solid var(--gold); outline-offset: 3px; }
+.comparison-scroll table { width: 100%; min-width: 760px; border-collapse: collapse; text-align: left; }
+.comparison-scroll caption { text-align: left; padding: 16px; color: var(--muted); }
+.comparison-scroll th, .comparison-scroll td { padding: 16px; border-top: 1px solid var(--line); vertical-align: top; }
+.comparison-scroll thead { background: var(--card); }
+.comparison-scroll td { color: var(--muted); }

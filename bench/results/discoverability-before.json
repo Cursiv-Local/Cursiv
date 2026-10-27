@@ -1,0 +1,2521 @@
+{
+  "checked_utc": "2026-10-27T01:05:22.181619+00:00",
+  "local_pages": {
+    "website/404.html": {
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/ai-reliability-testing.html": {
+      "title": "AI Reliability Testing | Cursiv",
+      "h1": [
+        "How We Test an Offline AI Assistant"
+      ],
+      "canonical": [
+        "https://cursiv.us/ai-reliability-testing"
+      ],
+      "description": "Cursiv U106 software regressions and release checks, historical U85 local-model benchmark, rendering measurements, failures and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "AI Reliability Testing",
+              "item": "https://cursiv.us/ai-reliability-testing"
+            }
+          ]
+        }
+      ]
+    },
+    "website/app.html": {
+      "title": "Cursiv | Ask about a photo",
+      "h1": [
+        "\u2726 CURSIV"
+      ],
+      "canonical": [],
+      "description": "Ask Cursiv about a photo: describe visible details, read text, and explore questions about images.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/assets/cursiv-logo-256.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/chat.html": {
+      "title": "Cursiv \u2014 Chat",
+      "h1": [],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/field-research.html": {
+      "title": "Offline Field Research Software with a Tamper-Evident Notebook | Cursiv",
+      "h1": [
+        "Field research software that keeps working when the signal doesn't"
+      ],
+      "canonical": [
+        "https://cursiv.us/field-research"
+      ],
+      "description": "Cursiv is free, open-source field research software: a tamper-evident field notebook, field calculations checked against published methods, and an optional local AI assistant that works offline.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            }
+          ]
+        }
+      ]
+    },
+    "website/field-station.html": {
+      "title": "Cursiv Field Station: an Offline Research Server on a Raspberry Pi | Cursiv",
+      "h1": [
+        "Cursiv Field Station"
+      ],
+      "canonical": [
+        "https://cursiv.us/field-station"
+      ],
+      "description": "Cursiv Field Station (preview): Cursiv's field notebook and research tools served from a Raspberry Pi 5 to phones, tablets and laptops over its own Wi-Fi, with no internet. Real screens; not yet validated on a Pi.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Field Station",
+              "item": "https://cursiv.us/field-station"
+            }
+          ]
+        }
+      ]
+    },
+    "website/index.html": {
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    "website/local-ai-hardware-requirements.html": {
+      "title": "Local AI Hardware Requirements | Cursiv",
+      "h1": [
+        "What Hardware Do You Need to Run Local AI?"
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-hardware-requirements"
+      ],
+      "description": "A practical guide to CPU, GPU memory, system RAM, model size and quantization when choosing hardware for local AI with Cursiv.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Hardware Requirements",
+              "item": "https://cursiv.us/local-ai-hardware-requirements"
+            }
+          ]
+        }
+      ]
+    },
+    "website/offline-research.html": {
+      "title": "Offline Scientific Data Collection Software | Cursiv",
+      "h1": [
+        "Offline scientific data collection"
+      ],
+      "canonical": [
+        "https://cursiv.us/offline-research"
+      ],
+      "description": "Collect, check and calculate field data with no internet connection. What works offline in Cursiv, what needs a connection, and how offline mode blocks outside connections.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Offline research",
+              "item": "https://cursiv.us/offline-research"
+            }
+          ]
+        }
+      ]
+    },
+    "website/open-source-offline-ai.html": {
+      "title": "Open Source Offline AI | Cursiv",
+      "h1": [
+        "Open Source Offline AI That Works Without the Internet"
+      ],
+      "canonical": [
+        "https://cursiv.us/open-source-offline-ai"
+      ],
+      "description": "Learn how Cursiv runs compatible local language models, what works offline, which features need internet access, and how local AI differs from cloud AI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Cursiv",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Windows 10 and 11 (64-bit)",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "description": "An open-source local-first AI assistant for running compatible language models on a personal computer, with supported offline features after setup."
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Open Source Offline AI",
+              "item": "https://cursiv.us/open-source-offline-ai"
+            }
+          ]
+        }
+      ]
+    },
+    "website/portable-workspace.html": {
+      "title": "Portable Research Notebook on a USB Drive | Cursiv",
+      "h1": [
+        "A portable research notebook that runs from a USB drive"
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-workspace"
+      ],
+      "description": "Run Cursiv and your field notebook from a USB drive or external SSD, move between computers, and bring your records back. How it works, what's encrypted, and what's tested.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Portable workspace",
+              "item": "https://cursiv.us/portable-workspace"
+            }
+          ]
+        }
+      ]
+    },
+    "website/profile.html": {
+      "title": "Cursiv \u2014 Profile",
+      "h1": [],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/start.html": {
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/story.html": {
+      "title": "Cursiv \u2014 The Story So Far",
+      "h1": [
+        "How Cursiv Got Here"
+      ],
+      "canonical": [
+        "https://cursiv.us/story"
+      ],
+      "description": "The story behind Cursiv: why it was built as a local-first AI assistant, how its direction has changed, and what the project aims to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/team-drives.html": {
+      "title": "Team Field Drives: Three Scientists, One Main Computer | Cursiv",
+      "h1": [
+        "Three field drives, one main computer"
+      ],
+      "canonical": [
+        "https://cursiv.us/team-drives"
+      ],
+      "description": "How a research team uses Cursiv on field drives: each scientist records offline on a drive in their name, one main computer brings the drives in with every entry and photo in the right name, and a new drive goes out with only the work chosen. Real screens.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Team field drives",
+              "item": "https://cursiv.us/team-drives"
+            }
+          ]
+        }
+      ]
+    },
+    "website/testers.html": {
+      "title": "Help test Cursiv",
+      "h1": [
+        "Help test Cursiv"
+      ],
+      "canonical": [
+        "https://cursiv.us/testers"
+      ],
+      "description": "Try real tasks in Cursiv and share what felt off, slow or unclear. No developer experience needed. Send feedback by email or GitHub issue.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/vision.html": {
+      "title": "Cursiv \u2014 Direction",
+      "h1": [
+        "Trustworthy first. Then bigger."
+      ],
+      "canonical": [
+        "https://cursiv.us/vision"
+      ],
+      "description": "Where Cursiv is going: from a trustworthy local AI on one computer to independent nodes that keep reliable knowledge with or without a connection. What's done, what's next, and what we're not trying to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/notebook/index.html": {
+      "title": "Cursiv Field Notebook",
+      "h1": [
+        "Field Notebook"
+      ],
+      "canonical": [],
+      "description": "Record field observations on your phone, offline. Everything stays on the phone until you send it to Cursiv on your laptop.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/assets/cursiv-logo-256.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    "website/privacy/index.html": {
+      "title": "Cursiv Privacy Policy | Local AI and Website Data",
+      "h1": [
+        "Cursiv Privacy Policy"
+      ],
+      "canonical": [
+        "https://cursiv.us/privacy/"
+      ],
+      "description": "How Cursiv handles local AI data, optional providers, the website, phone companion, public board and browser field notebook.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    }
+  },
+  "limits": "Public HTTP access probes, not authenticated Search Console or verified crawler traffic.",
+  "live": [
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/start",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/start",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/start",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "65e2974cc8871a610bf560c94e32674c20fbf6eecf3f7f0dadaf8072a2aee37e",
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/compare",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/compare",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/compare",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/open-source-offline-ai",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/open-source-offline-ai",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/open-source-offline-ai",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "7ead4c5164216ce727c7552118925b3da2e546a3291fb914af5a94b1c6c84f38",
+      "title": "Open Source Offline AI | Cursiv",
+      "h1": [
+        "Open Source Offline AI That Works Without the Internet"
+      ],
+      "canonical": [
+        "https://cursiv.us/open-source-offline-ai"
+      ],
+      "description": "Learn how Cursiv runs compatible local language models, what works offline, which features need internet access, and how local AI differs from cloud AI.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "Cursiv",
+          "applicationCategory": "UtilitiesApplication",
+          "operatingSystem": "Windows 10 and 11 (64-bit)",
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "description": "An open-source local-first AI assistant for running compatible language models on a personal computer, with supported offline features after setup."
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Open Source Offline AI",
+              "item": "https://cursiv.us/open-source-offline-ai"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/local-ai-hardware-requirements",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/local-ai-hardware-requirements",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/local-ai-hardware-requirements",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "4dbf6926a8c89a1011e07d0a38b9b4ae0042dfa22136ba4aa4e9ec7954d4b37d",
+      "title": "Local AI Hardware Requirements | Cursiv",
+      "h1": [
+        "What Hardware Do You Need to Run Local AI?"
+      ],
+      "canonical": [
+        "https://cursiv.us/local-ai-hardware-requirements"
+      ],
+      "description": "A practical guide to CPU, GPU memory, system RAM, model size and quantization when choosing hardware for local AI with Cursiv.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Local AI Hardware Requirements",
+              "item": "https://cursiv.us/local-ai-hardware-requirements"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/portable-workspace",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/portable-workspace",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/portable-workspace",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "56cddf89dfc5a96ed9404fc78a0fa88c284cf6fd49d5fee2cb6e95dcd850fdb9",
+      "title": "Portable Research Notebook on a USB Drive | Cursiv",
+      "h1": [
+        "A portable research notebook that runs from a USB drive"
+      ],
+      "canonical": [
+        "https://cursiv.us/portable-workspace"
+      ],
+      "description": "Run Cursiv and your field notebook from a USB drive or external SSD, move between computers, and bring your records back. How it works, what's encrypted, and what's tested.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Portable workspace",
+              "item": "https://cursiv.us/portable-workspace"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/field-research",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/field-research",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/field-research",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "f4d3de4d4de6a097980e46bb754c30009d9ffd6cbb78cb97a84bba9db096d0d9",
+      "title": "Offline Field Research Software with a Tamper-Evident Notebook | Cursiv",
+      "h1": [
+        "Field research software that keeps working when the signal doesn't"
+      ],
+      "canonical": [
+        "https://cursiv.us/field-research"
+      ],
+      "description": "Cursiv is free, open-source field research software: a tamper-evident field notebook, field calculations checked against published methods, and an optional local AI assistant that works offline.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/offline-research",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/offline-research",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/offline-research",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "401834222b2499be8c7766526875768ec9e38e52a3eaf906dbcbd31db6b240eb",
+      "title": "Offline Scientific Data Collection Software | Cursiv",
+      "h1": [
+        "Offline scientific data collection"
+      ],
+      "canonical": [
+        "https://cursiv.us/offline-research"
+      ],
+      "description": "Collect, check and calculate field data with no internet connection. What works offline in Cursiv, what needs a connection, and how offline mode blocks outside connections.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Offline research",
+              "item": "https://cursiv.us/offline-research"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/team-drives",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/team-drives",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/team-drives",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "ce870c40b4d089a3f1ed881628a6a0d1dd3949d796945d2e450bcd2c5637f045",
+      "title": "Team Field Drives: Three Scientists, One Main Computer | Cursiv",
+      "h1": [
+        "Three field drives, one main computer"
+      ],
+      "canonical": [
+        "https://cursiv.us/team-drives"
+      ],
+      "description": "How a research team uses Cursiv on field drives: each scientist records offline on a drive in their name, one main computer brings the drives in with every entry and photo in the right name, and a new drive goes out with only the work chosen. Real screens.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Team field drives",
+              "item": "https://cursiv.us/team-drives"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/field-station",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/field-station",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/field-station",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "fddaae7d39a470128730592509f154f2b6482c684f1867ff7ac49f4709507930",
+      "title": "Cursiv Field Station: an Offline Research Server on a Raspberry Pi | Cursiv",
+      "h1": [
+        "Cursiv Field Station"
+      ],
+      "canonical": [
+        "https://cursiv.us/field-station"
+      ],
+      "description": "Cursiv Field Station (preview): Cursiv's field notebook and research tools served from a Raspberry Pi 5 to phones, tablets and laptops over its own Wi-Fi, with no internet. Real screens; not yet validated on a Pi.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "Field research",
+              "item": "https://cursiv.us/field-research"
+            },
+            {
+              "@type": "ListItem",
+              "position": 3,
+              "name": "Field Station",
+              "item": "https://cursiv.us/field-station"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/ai-reliability-testing",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/ai-reliability-testing",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/ai-reliability-testing",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "48b552456542aa119e88eb97d0353cdd0f549cbf39e877887279a956eef91ca9",
+      "title": "AI Reliability Testing | Cursiv",
+      "h1": [
+        "How We Test an Offline AI Assistant"
+      ],
+      "canonical": [
+        "https://cursiv.us/ai-reliability-testing"
+      ],
+      "description": "Cursiv U106 software regressions and release checks, historical U85 local-model benchmark, rendering measurements, failures and limitations.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            {
+              "@type": "ListItem",
+              "position": 1,
+              "name": "Home",
+              "item": "https://cursiv.us/"
+            },
+            {
+              "@type": "ListItem",
+              "position": 2,
+              "name": "AI Reliability Testing",
+              "item": "https://cursiv.us/ai-reliability-testing"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/vision",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/vision",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/vision",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "33795c70c72f97a404d5fc77f45446597f32ffd1d77f033cc8642269dbe63483",
+      "title": "Cursiv \u2014 Direction",
+      "h1": [
+        "Trustworthy first. Then bigger."
+      ],
+      "canonical": [
+        "https://cursiv.us/vision"
+      ],
+      "description": "Where Cursiv is going: from a trustworthy local AI on one computer to independent nodes that keep reliable knowledge with or without a connection. What's done, what's next, and what we're not trying to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/story",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/story",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/story",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "b3e6e3342190027b8b4287618b88204fb7264afce4a82f6a190af0d39e9ebf3e",
+      "title": "Cursiv \u2014 The Story So Far",
+      "h1": [
+        "How Cursiv Got Here"
+      ],
+      "canonical": [
+        "https://cursiv.us/story"
+      ],
+      "description": "The story behind Cursiv: why it was built as a local-first AI assistant, how its direction has changed, and what the project aims to do.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/testers",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/testers",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/testers",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "84ce141eb306b1ba47f03a947e60f70f7269d0152c989022029c81d2416eff9e",
+      "title": "Help test Cursiv",
+      "h1": [
+        "Help test Cursiv"
+      ],
+      "canonical": [
+        "https://cursiv.us/testers"
+      ],
+      "description": "Try real tasks in Cursiv and share what felt off, slow or unclear. No developer experience needed. Send feedback by email or GitHub issue.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/privacy/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/privacy/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/privacy/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "5be84434fff9391399125eca3c11fbb8cf359a347c9de1159bb4620ae822af82",
+      "title": "Cursiv Privacy Policy | Local AI and Website Data",
+      "h1": [
+        "Cursiv Privacy Policy"
+      ],
+      "canonical": [
+        "https://cursiv.us/privacy/"
+      ],
+      "description": "How Cursiv handles local AI data, optional providers, the website, phone companion, public board and browser field notebook.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/sitemap.xml",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/sitemap.xml",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/sitemap.xml",
+      "status": 200,
+      "content_type": "application/xml",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "07f00da737954d5e8f100808feaa9621e4400be5b7a8682a1b95e1850a766be0",
+      "sitemap": [
+        {
+          "loc": "https://cursiv.us/"
+        },
+        {
+          "loc": "https://cursiv.us/field-research"
+        },
+        {
+          "loc": "https://cursiv.us/team-drives"
+        },
+        {
+          "loc": "https://cursiv.us/field-station"
+        },
+        {
+          "loc": "https://cursiv.us/offline-research"
+        },
+        {
+          "loc": "https://cursiv.us/portable-workspace"
+        },
+        {
+          "loc": "https://cursiv.us/start"
+        },
+        {
+          "loc": "https://cursiv.us/vision"
+        },
+        {
+          "loc": "https://cursiv.us/story"
+        },
+        {
+          "loc": "https://cursiv.us/open-source-offline-ai"
+        },
+        {
+          "loc": "https://cursiv.us/ai-reliability-testing"
+        },
+        {
+          "loc": "https://cursiv.us/local-ai-hardware-requirements"
+        },
+        {
+          "loc": "https://cursiv.us/privacy/"
+        },
+        {
+          "loc": "https://cursiv.us/testers"
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/llms.txt",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/llms.txt",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/llms.txt",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [],
+      "text": "<!DOCTYPE html>\r\n<html lang=\"en\">\r\n<head>\r\n  <meta charset=\"UTF-8\">\r\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n  <meta name=\"robots\" content=\"noindex\">\r\n  <meta name=\"theme-color\" content=\"#07090e\">\r\n  <title>Off the map \u00b7 Cursiv</title>\r\n  <link rel=\"icon\" type=\"image/png\" href=\"/assets/cursiv-logo-256.png\">\r\n  <link rel=\"stylesheet\" href=\"/assets/site.css?v=u91-testers-1\">\r\n  <link rel=\"stylesheet\" href=\"/assets/off-the-map.css?v=3\">\r\n</head>\r\n<body class=\"off-map\">\r\n  <header class=\"map-header\">\r\n    <a class=\"brand\" href=\"/\" aria-label=\"Cursiv home\"><img src=\"/assets/cursiv-logo-256.png\" alt=\"\"> Cursiv</a>\r\n    <span class=\"map-reference\">FIELD GUIDE / 404</span>\r\n  </header>\r\n\r\n  <main class=\"lost-layout\">\r\n    <div class=\"lost-copy\">\r\n      <p class=\"map-eyebrow\"><span aria-hidden=\"true\">\u2197</span> A little off the map</p>\r\n      <h1>This trail doesn\u2019t<br>lead to a page.</h1>\r\n      <p class=\"lost-description\">The address may have changed, or the trail was never here. Let\u2019s get you somewhere useful.</p>\r\n      <nav class=\"lost-destinations\" aria-label=\"Find your way back\">\r\n        <a class=\"homeward\" href=\"/\">Back to Cursiv <span aria-hidden=\"true\">\u2197</span></a>\r\n        <a href=\"/start\">Download Cursiv <span aria-hidden=\"true\">\u2197</span></a>\r\n        <a href=\"/testers\">Help test Cursiv <span aria-hidden=\"true\">\u2197</span></a>\r\n      </nav>\r\n      <p class=\"margin-note\">Even a wrong turn is an observation.</p>\r\n    </div>\r\n\r\n    <figure class=\"terrain\" aria-labelledby=\"terrain-caption\">\r\n      <svg viewBox=\"0 0 640 680\" preserveAspectRatio=\"xMidYMid meet\" role=\"img\" aria-labelledby=\"map-title map-description\">\r\n        <title id=\"map-title\">A trail beyond the edge of the map</title>\r\n        <desc id=\"map-description\">A mint trail winds across contour lines on a paper map and leaves its edge, ending at a marker labeled You are somewhere.</desc>\r\n        <defs>\r\n          <pattern id=\"grid\" width=\"64\" height=\"64\" patternUnits=\"userSpaceOnUse\">\r\n            <path d=\"M64 0H0V64\" fill=\"none\" stroke=\"#c1b79f\" stroke-opacity=\".13\"/>\r\n          </pattern>\r\n          <clipPath id=\"paper-edge\"><path d=\"M42 64 508 39 518 123 505 191 527 272 508 345 530 430 512 512 531 580 64 616Z\"/></clipPath>\r\n        </defs>\r\n        <g transform=\"rotate(-6 300 340)\">\r\n          <path d=\"M42 64 508 39 518 123 505 191 527 272 508 345 530 430 512 512 531 580 64 616Z\" fill=\"#d9cdb1\"/>\r\n          <g clip-path=\"url(#paper-edge)\">\r\n            <path d=\"M0 0H640V680H0Z\" fill=\"url(#grid)\"/>\r\n            <g fill=\"none\" stroke=\"#777c61\" stroke-width=\"1.4\" opacity=\".5\">\r\n              <path d=\"M-45 141C73 22 190 66 215 179S395 317 415 157 588 12 662 122\"/>\r\n              <path d=\"M-45 163C67 40 174 83 194 191S405 350 436 166 595 39 662 145\"/>\r\n              <path d=\"M-45 185C63 64 155 100 173 204S412 379 456 176 602 63 662 170\"/>\r\n              <path d=\"M-45 207C58 89 135 117 153 218S422 409 475 187 610 86 662 194\"/>\r\n              <path d=\"M-45 230C51 113 118 139 134 232S433 437 494 200 619 111 662 218\"/>\r\n              <path d=\"M-45 254C39 138 99 159 116 246S443 465 513 216 630 136 662 242\"/>\r\n              <path d=\"M-45 279C28 165 79 183 99 262S451 493 533 235 640 164 662 267\"/>\r\n              <path d=\"M-30 452C77 341 168 350 182 444S319 626 361 503 524 374 663 455\"/>\r\n              <path d=\"M-30 478C74 369 148 371 161 459S320 655 382 515 531 399 663 479\"/>\r\n              <path d=\"M-30 505C69 399 130 394 140 474S323 680 404 529 540 425 663 504\"/>\r\n              <path d=\"M-30 532C65 427 109 417 119 490S329 706 426 544 549 452 663 530\"/>\r\n              <path d=\"M-30 559C60 457 89 441 98 507S335 731 448 560 558 480 663 556\"/>\r\n              <path d=\"M-30 586C57 486 70 466 77 525S340 755 470 578 568 509 663 583\"/>\r\n            </g>\r\n            <path d=\"M274 25C243 140 302 170 278 247S239 363 281 401 320 493 292 645\" fill=\"none\" stroke=\"#728d90\" stroke-width=\"9\" opacity=\".35\"/>\r\n            <path d=\"M284 25C253 140 312 170 288 247S249 363 291 401 330 493 302 645\" fill=\"none\" stroke=\"#d9cdb1\" stroke-width=\"2\"/>\r\n            <path d=\"M70 66 89 614M286 51 306 601\" stroke=\"#6f6b59\" stroke-opacity=\".12\" stroke-width=\"2\"/>\r\n            <text x=\"103\" y=\"335\" fill=\"#686b53\" font-size=\"11\" letter-spacing=\"3\" font-family=\"monospace\">KNOWN TERRAIN</text>\r\n            <text x=\"353\" y=\"114\" fill=\"#686b53\" font-size=\"10\" letter-spacing=\"2\" font-family=\"monospace\">RIDGE 04</text>\r\n            <text x=\"100\" y=\"566\" fill=\"#686b53\" font-size=\"10\" letter-spacing=\"2\" font-family=\"monospace\">CURSIV / FIELD NOTES</text>\r\n            <g transform=\"translate(142 183) rotate(-9)\" role=\"img\" aria-label=\"Cursiv Eye of Horus expedition stamp\">\r\n              <circle r=\"50\" fill=\"#0b101b\"/>\r\n              <circle r=\"44\" fill=\"none\" stroke=\"#4976e8\" stroke-width=\"2\"/>\r\n              <circle r=\"39\" fill=\"none\" stroke=\"#4976e8\" stroke-width=\".7\" stroke-dasharray=\"1 5\" opacity=\".6\"/>\r\n              <g fill=\"none\" stroke=\"#e9c453\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\r\n                <path d=\"M-29-12Q-8-32 16-18L29-12\"/>\r\n                <path d=\"M-29-4Q-8-24 14-9L29-4Q-2 7-29-4Z\"/>\r\n                <circle cx=\"-7\" cy=\"-6\" r=\"8\"/>\r\n                <path d=\"M-7 3-10 16-3 29-4 5M3 5Q13 25 25 24C36 23 31 12 25 15\"/>\r\n                <path d=\"M-22 1-31 7\"/>\r\n              </g>\r\n              <text y=\"69\" text-anchor=\"middle\" fill=\"#102c2a\" font-size=\"12\" font-weight=\"700\" letter-spacing=\"4\" font-family=\"monospace\">CURSIV</text>\r\n            </g>\r\n          </g>\r\n          <path d=\"M117 494C179 491 147 415 213 405S368 423 354 351 302 303 355 267 461 300 489 253 537 228 569 205\" fill=\"none\" stroke=\"#102c2a\" stroke-width=\"9\" stroke-linecap=\"round\" opacity=\".7\"/>\r\n          <path class=\"drawn-trail\" pathLength=\"1\" d=\"M117 494C179 491 147 415 213 405S368 423 354 351 302 303 355 267 461 300 489 253 537 228 569 205\" fill=\"none\" stroke=\"#81ead0\" stroke-width=\"4\" stroke-linecap=\"round\"/>\r\n          <circle cx=\"117\" cy=\"494\" r=\"6\" fill=\"#102c2a\" stroke=\"#81ead0\" stroke-width=\"3\"/>\r\n          <circle cx=\"569\" cy=\"205\" r=\"17\" fill=\"#81ead0\" fill-opacity=\".12\" stroke=\"#81ead0\" stroke-opacity=\".45\"/>\r\n          <circle cx=\"569\" cy=\"205\" r=\"6\" fill=\"#81ead0\"/>\r\n        </g>\r\n        <path d=\"M555 190 555 146 430 146\" fill=\"none\" stroke=\"#81ead0\" stroke-opacity=\".7\"/>\r\n        <rect x=\"236\" y=\"110\" width=\"200\" height=\"39\" rx=\"4\" fill=\"#0c1519\"/>\r\n        <text x=\"421\" y=\"135\" text-anchor=\"end\" fill=\"#a7f0db\" font-size=\"17\" font-family=\"system-ui, sans-serif\">You are somewhere.</text>\r\n        <g transform=\"translate(560 500)\" stroke=\"#aaa797\" fill=\"none\">\r\n          <circle r=\"26\" stroke-opacity=\".4\"/><path d=\"M0-19V19M-19 0H19\" stroke-opacity=\".4\"/>\r\n          <path d=\"M0-20-6 8 0 3 6 8Z\" fill=\"#81ead0\" stroke=\"none\"/>\r\n          <text y=\"-36\" text-anchor=\"middle\" fill=\"#aaa797\" stroke=\"none\" font-size=\"11\" font-family=\"monospace\">N</text>\r\n        </g>\r\n      </svg>\r\n      <figcaption id=\"terrain-caption\"><span>FIG. 404 \u2014 UNCHARTED TERRITORY</span><span>Not all paths are pages.</span></figcaption>\r\n    </figure>\r\n  </main>\r\n  <footer class=\"map-footer\"><span>Local-first. Still exploring.</span><span>404 \u00b7 Page not found</span></footer>\r\n</body>\r\n</html>\r\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/notebook/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/notebook/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/notebook/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "059936d44a9d71565fe04eda06d2931ef524a496d70bbf8ef2de58efea4fe251",
+      "title": "Cursiv Field Notebook",
+      "h1": [
+        "Field Notebook"
+      ],
+      "canonical": [],
+      "description": "Record field observations on your phone, offline. Everything stays on the phone until you send it to Cursiv on your laptop.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/assets/cursiv-logo-256.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/app",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/app",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/app",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "8b65924ffe361378d92807c42507757b485511b706a22f935d4bc8487c93b040",
+      "title": "Cursiv | Ask about a photo",
+      "h1": [
+        "\u2726 CURSIV"
+      ],
+      "canonical": [],
+      "description": "Ask Cursiv about a photo: describe visible details, read text, and explore questions about images.",
+      "robots": "noindex,follow",
+      "icons": [
+        {
+          "rel": "icon",
+          "href": "/assets/cursiv-logo-256.png"
+        },
+        {
+          "rel": "apple-touch-icon",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/letters",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/letters",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/letters",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/?x=2",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/?x=2",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/?x=2",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/index.html",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/index.html",
+          "status": 307,
+          "location": "/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/start.html",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/start.html",
+          "status": 307,
+          "location": "/start"
+        },
+        {
+          "url": "https://cursiv.us/start",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/start",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "65e2974cc8871a610bf560c94e32674c20fbf6eecf3f7f0dadaf8072a2aee37e",
+      "title": "Cursiv \u2014 Download and setup",
+      "h1": [
+        "Install Cursiv."
+      ],
+      "canonical": [
+        "https://cursiv.us/start"
+      ],
+      "description": "Download Cursiv for Windows and set it up: install, create a local login, and let the Setup window install Ollama and a local AI model.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "http://cursiv.us/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "http://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "http://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://www.cursiv.us/",
+      "user_agent": "browser",
+      "hops": [],
+      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+    },
+    {
+      "requested_url": "http://www.cursiv.us/",
+      "user_agent": "browser",
+      "hops": [],
+      "error": "URLError: <urlopen error [Errno 11001] getaddrinfo failed>"
+    },
+    {
+      "requested_url": "https://cursiv.winklers-llc.com/",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.winklers-llc.com/",
+          "status": 301,
+          "location": "https://cursiv.us/"
+        },
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "googlebot",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/",
+      "status": 200,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "35dfabe3ff935ad86a7d685e409bf642b864cdc0ad7d001e218ea7c771bbd276",
+      "title": "Cursiv: Offline Field Research Software with a Tamper-Evident Notebook",
+      "h1": [
+        "Offline field research software."
+      ],
+      "canonical": [
+        "https://cursiv.us/"
+      ],
+      "description": "Free, open-source field research software for Windows: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant. Works offline after setup.",
+      "robots": null,
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": [
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://cursiv.us/#website",
+          "name": "Cursiv",
+          "alternateName": "Cursiv field research software",
+          "url": "https://cursiv.us/"
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "@id": "https://cursiv.us/#software",
+          "name": "Cursiv",
+          "applicationCategory": "ScienceApplication",
+          "applicationSubCategory": "Field research notebook",
+          "operatingSystem": "Windows 10, Windows 11 (64-bit); macOS 13+ on Apple Silicon (early)",
+          "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+          },
+          "license": "https://github.com/Cursiv-Local/Cursiv/blob/main/LICENSE",
+          "downloadUrl": "https://cursiv.us/start",
+          "codeRepository": "https://github.com/Cursiv-Local/Cursiv",
+          "description": "Offline field research software: a tamper-evident field notebook, field calculations checked against published methods, a portable USB workspace and an optional local AI assistant.",
+          "featureList": [
+            "Tamper-evident field notebook with signed exports",
+            "Field calculations worked out by code",
+            "Runs from a USB drive",
+            "Works offline after setup",
+            "Optional local AI assistant"
+          ]
+        }
+      ]
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon.ico",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon.ico",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon.ico",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/favicon-96x96.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/favicon-96x96.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/apple-touch-icon.png",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    },
+    {
+      "requested_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/assets/cursiv-logo-256.png",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/assets/cursiv-logo-256.png",
+      "status": 200,
+      "content_type": "image/png",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "59d079fd045f208e7ae305d7fccbd7bfbbad7f97fb38bb49f6b4e68a5f7d3dfe",
+      "image": {
+        "format": "PNG",
+        "size": [
+          256,
+          256
+        ],
+        "ico_sizes": []
+      }
+    },
+    {
+      "requested_url": "https://cursiv.us/robots.txt",
+      "user_agent": "googlebot-image",
+      "hops": [
+        {
+          "url": "https://cursiv.us/robots.txt",
+          "status": 200,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "content_type": "text/plain",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "text": "User-agent: *\nDisallow: /api/\nDisallow: /remote/\nDisallow: /admin/\nSitemap: https://cursiv.us/sitemap.xml\n"
+    },
+    {
+      "requested_url": "https://cursiv.us/documentation",
+      "user_agent": "browser",
+      "hops": [
+        {
+          "url": "https://cursiv.us/documentation",
+          "status": 404,
+          "location": null
+        }
+      ],
+      "final_url": "https://cursiv.us/documentation",
+      "status": 404,
+      "content_type": "text/html",
+      "x_robots_tag": null,
+      "challenge": null,
+      "sha256": "42a590f69191e8c9b78c3efaa3b687daae62a74c23a5a57dfe1cc1f13eb2ad0e",
+      "title": "A trail beyond the edge of the map",
+      "h1": [
+        "This trail doesn\u2019tlead to a page."
+      ],
+      "canonical": [],
+      "description": null,
+      "robots": "noindex",
+      "icons": [
+        {
+          "rel": "icon",
+          "type": "image/png",
+          "href": "/assets/cursiv-logo-256.png"
+        }
+      ],
+      "structured_data": []
+    }
+  ],
+  "robots_policy": {
+    "browser": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    },
+    "googlebot": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    },
+    "googlebot-image": {
+      "/": true,
+      "/start": true,
+      "/local-ai": true,
+      "/compare": true,
+      "/open-source-offline-ai": true,
+      "/local-ai-hardware-requirements": true,
+      "/portable-workspace": true,
+      "/field-research": true,
+      "/offline-research": true,
+      "/team-drives": true,
+      "/field-station": true,
+      "/ai-reliability-testing": true,
+      "/vision": true,
+      "/story": true,
+      "/testers": true,
+      "/privacy/": true,
+      "/favicon.ico": true,
+      "/favicon-96x96.png": true,
+      "/apple-touch-icon.png": true,
+      "/assets/cursiv-logo-256.png": true,
+      "/api/space/ask": false,
+      "/api/space/join": false,
+      "/api/space/messages?since=": false,
+      "/api/space/create": false,
+      "/api/space/image/": false,
+      "/api/space/pair-code": false
+    }
+  },
+  "baseline_supplement": {
+    "reason": "Documentation page coverage added after authoring the local draft but before deployment; existing baseline entries unchanged",
+    "checked_utc": "2026-10-27T01:33:13.884465+00:00"
+  }
+}

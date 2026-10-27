@@ -834,16 +834,21 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const isApi = url.pathname === "/health" || url.pathname.startsWith("/api/") || url.pathname.startsWith("/remote/");
-    if (url.hostname === "cursiv.winklers-llc.com" && !isApi) {
+    if ((url.hostname === "cursiv.winklers-llc.com" && !isApi) || url.hostname === "www.cursiv.us") {
       // Move website URLs permanently while keeping the legacy API hostname working
       // for existing desktop clients that still call it directly.
       const target = new URL(url);
       target.protocol = "https:";
       target.hostname = "cursiv.us";
       target.port = "";
-      if (target.pathname === "/index.html") target.pathname = "/";
-      else if (target.pathname.endsWith(".html")) target.pathname = target.pathname.slice(0, -5);
-      return Response.redirect(target.toString(), 301);
+      if (!isApi) {
+        if (target.pathname === "/index.html") target.pathname = "/";
+        else if (target.pathname.endsWith("/index.html")) target.pathname = target.pathname.slice(0, -10);
+        else if (target.pathname.endsWith(".html")) target.pathname = target.pathname.slice(0, -5);
+      }
+      // www is only a canonical redirect, not an additional API hostname. Preserve
+      // methods/bodies for API redirects; the existing legacy API host stays intact.
+      return Response.redirect(target.toString(), isApi ? 308 : 301);
     }
     const analytics = await handleDownloadAnalytics(request, env);
     if (analytics) return request.method === 'HEAD' ? new Response(null, { status: analytics.status, headers: analytics.headers }) : analytics;

@@ -1,0 +1,33 @@
+name: website
+
+on:
+  push:
+    branches: ["**"]
+    paths: ["website/**", "cloudflare/**", "scripts/discoverability_audit.py", "scripts/generate_web_icons.py", "scripts/search_discovery_report.py", "tests/test_discovery_measurement.py", "bench/discovery/**", ".github/workflows/website.yml"]
+  pull_request:
+    paths: ["website/**", "cloudflare/**", "scripts/discoverability_audit.py", "scripts/generate_web_icons.py", "scripts/search_discovery_report.py", "tests/test_discovery_measurement.py", "bench/discovery/**", ".github/workflows/website.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  public-website:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: Build allowlisted public website
+        run: node cloudflare/publish.mjs --build-only
+      - name: Verify public discovery, icons, exclusions and existing functionality
+        run: node --test cloudflare/tests/*.test.mjs
+      - name: Verify aggregate search measurement
+        run: python tests/test_discovery_measurement.py

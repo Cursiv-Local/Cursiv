@@ -1,6 +1,14 @@
 # Cursiv
 
-Cursiv is an open-source AI assistant for Windows, built for field notes, documents and practical calculations. It runs local AI models on your own PC through Ollama, so supported local features work offline after setup.
+Cursiv is a **free, open-source local AI assistant with tamper-evident notebooks**, offline document
+retrieval and portable Windows USB/SSD workspaces. Its SHA-256 record chain and linked corrections help
+preserve observation history and detect changes against a trusted record; they do not prove an observation
+was true. Built for researchers, technicians, independent workers and anyone keeping detailed records.
+
+Local language models run on your PC through Ollama. Cursiv is an application, not a new language model;
+model licenses are separate from its MIT license. Supported local features work offline after setup.
+[Local AI guide](https://cursiv.us/local-ai) · [Compare local AI tools](https://cursiv.us/compare) ·
+[Documentation and evidence](https://cursiv.us/documentation)
 
 <p align="center">
   <a href="https://github.com/Cursiv-Local/Cursiv/releases/latest/download/Cursiv-Setup-latest.exe">
@@ -12,7 +20,7 @@ Cursiv is an open-source AI assistant for Windows, built for field notes, docume
 
 ## What you can do
 
-- **Keep field notes:** Record observations, photos and sample IDs. Keep original entries and record corrections separately.
+- **Keep tamper-evident notes:** Record observations, photos and sample IDs. Verify the record chain and add corrections that preserve original entries. See [notebook integrity and its limits](docs/NOTEBOOK-INTEGRITY.md).
 - **Work with documents:** Import protocols and field guides, then ask questions about them with page references where available.
 - **Check calculations:** Convert units, work out distances and times, and calculate dilutions or statistics.
 - **Work with workspace files:** Create, read, append and search using plain requests inside a folder you authorize.
@@ -39,7 +47,7 @@ To explore without using your own records, type `demo`. Type `demo off` to retur
 
 - **[Phone notebook](https://cursiv.us/notebook):** Open it online once, then capture observations without signal. Export the file and import it into Cursiv. Export regularly—browser storage can be cleared.
 - **[Phone photo chat](https://cursiv.us/app):** A separate online page for questions about photos. It needs internet access.
-- **Portable Windows copy:** Choose **Make a Cursiv USB…** from the tray menu. Basic USB operation has been tried; memory persistence across PCs still needs physical testing.
+- **Portable Windows kit:** Choose **Make a Cursiv USB…** from the tray menu to include the app, Ollama runtime and selected model files. The host still needs compatible Windows hardware and drivers. See [what travels, privacy limits and physical-test boundaries](https://cursiv.us/portable-workspace).
 
 See [phone and portable setup](TECH.md#phone-and-portable-use) for instructions and limits. The Mac build is early; there is no Linux installer.
 
