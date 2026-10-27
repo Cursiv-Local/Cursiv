@@ -4,6 +4,17 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U106 published (Codex, 2026-10-26)
+
+Tag `v3.14-U106` = `10b40d6` (source PR #45): four visible desktop research actions, notebook and imported
+library in the main window, confirmed observation/memory previews, receipt-backed linked corrections and
+verified dated notebook retrieval. Evidence: [U106-RELEASE-VERIFICATION](docs/U106-RELEASE-VERIFICATION.md);
+continuing handoff: [U106-HANDOFF](docs/U106-HANDOFF.md). Tagged Windows suite: 2253 passed / 15 skipped;
+Mac: 2236 / 32. Both frozen packages and Windows USB start passed; eight public assets signed with the
+existing owner identity. This is the approved first researcher-experience increment. Project isolation,
+broader report comparisons/exports, aggregate-date statistics and human usability studies remain open;
+science/overconfidence logic and experimental Field Station code are unchanged.
+
 ## U100 (on `claude/u100`, built on U99): memory you can see and steer
 
 - Session notes, suggested memories, the readable memory folder and guidance files:
