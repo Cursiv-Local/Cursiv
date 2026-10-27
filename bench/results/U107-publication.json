@@ -1,0 +1,142 @@
+{
+  "version": "3.14-U107",
+  "source_commit": "7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/51",
+  "website_pr": "https://github.com/Cursiv-Local/Cursiv/pull/52",
+  "website_commit": "cdb6f03ceae8bffdb83626facf926265d9ae6116",
+  "deployment_version": "edbccc5a-8eef-4a00-85bb-9523f507ffc4",
+  "checked_utc": "2026-10-27T17:01:05.771189+00:00",
+  "before_version": "U106",
+  "after_version": "U107",
+  "checks": [
+    {
+      "url": "https://cursiv.us/",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "ed6e0f2599fa2da8717b9e39c6d5b84f0e0f9c4998595e44a1b0c288a844f948",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/start",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "4deab8f808001379e487bf37d0e1187be3aadb29f21134b5d77b704a6ac37959",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/ai-reliability-testing",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "00dde4087c9e7a54b3f28c78f9bc435b12c2ba2ce268328e062ea67c357dbc83",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "9b5ee94df8735b1366f16c313ad97b61c2a6af1f920bef4f885bbd5bd31a9ee4",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "3a704f26e320886ea066d0b4a50c30546e845250430bee5bb3e0b708c92d2045",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "content_type": "text/plain",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/sitemap.xml",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "5cf1fef41b25386d33a107d75ed49e585154d0d1c0aaa807dc943059e7e80195",
+      "content_type": "application/xml",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "content_type": "image/vnd.microsoft.icon",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "content_type": "image/png",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "content_type": "image/png",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/assets/cursiv-owner-release-U107.json",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "28e2ec91b5d4b9ae2ef3edb84e20e2e9d7e10c92705cffa64d0816aede7601b9",
+      "content_type": "application/json",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://www.cursiv.us/start",
+      "status": 301,
+      "location": "https://cursiv.us/start"
+    }
+  ],
+  "installer_links_verified": true,
+  "windows_sha256": "b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9",
+  "mac_sha256": "59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101",
+  "release_assets_downloaded_back": 11,
+  "signed_assets_downloaded_and_verified": 8,
+  "website_tests_passed": 31
+}

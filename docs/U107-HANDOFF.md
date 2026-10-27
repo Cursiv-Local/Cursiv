@@ -33,38 +33,30 @@ real bounded execution; isolation/cancellation and budgets; real-Qwen comparison
 
 ## Current status
 
-Owner approved release after reviewing the implementation. Source commit
-`0afe4ca51b7152d4056b2869aa6cd8925eeee0ea` (123 allowlisted files) is pushed on
-`codex/u107-agent-reliability`; source PR https://github.com/Cursiv-Local/Cursiv/pull/51.
-Final local versioned suite:2389 passed/15 skipped/19 subtests in496.51s. Workspace63/63;
-commit USB hook45/45 in99.24s. The post-review session-note race is repaired and covered;
-original failure/audit proof is retained, with the native restricted-turn guard unchanged.
+U107 is published on GitHub and cursiv.us. Immutable tagv3.14-U107 points to
+7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb (sourcePR51); source push/PR/exact-main checks passed.
+Final versioned Windows2389 passed/15 skipped/19 subtests; hosted Mac2372/32/19 subtests.
+Both tagged frozen packages passed, including Windows portable layout. Existing trusted owner
+identity signed8 final platform assets;11/11 draft and anonymous public downloads,8/8 signatures
+and11/11 REST digests verified. No authenticated bytes or U106 tag were changed.
 
-Source push CI40535846906 and PR CI40535882296 passed all16 checks. PR51 merged normally at
-`7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb`; exact-main CI40537766999 passed all8 jobs.
-The guarded preparation helper passed workspace63/63 and created/pushed immutable tagv3.14-U107
-at that merge. U106 tag remains unchanged. Exact-main JUnit artifacts are in
-reports/U107-main-ci-artifacts; Mac console summary2372 passed/32 skipped/19 subtests in519.44s.
+Website/evidence PR52 merged atcdb6f03ceae8bffdb83626facf926265d9ae6116 after all18 checks.
+Cloudflare versionedbccc5a-8eef-4a00-85bb-9523f507ffc4 deployed from that clean merged source.
+Eighteen live checks passed: StartU106→U107, exact page/robots/sitemap/icon/manifest bytes,
+no-transform headers, installer URLs/hash, Googlebot user-agent access and canonicalwww redirect.
+The31 website,6 release consistency and63 workspace checks passed; publication commitUSB45/45.
+[Release verification](U107-RELEASE-VERIFICATION.md) and
+[publication receipt](../bench/results/U107-publication.json) contain completed evidence/limits.
 
-Current phase: GitHub published, website/evidence preparation. Native Windows and Mac builds/frozen
-checks passed. Source Windows2389/15/19 subtests, tagged Mac2372/32/19 subtests. Final8 platform assets
-passed source/lock/alias/checksum/provenance checks and existing owner signatures. Draft11/11 and
-anonymous public11/11 downloads matched;8/8 signatures and11/11 REST digests verified. Published
-https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U107 is latest. Redundant release-triggered
-Mac run40542462834 was cancelled; successful native build40539718907 and bytes remain unchanged.
-
-Website release links/hash/manifest and concise evidence/reference updates are prepared locally.
-Build23 HTML pages;31 website tests,6 release/version checks and63 workspace checks passed.
-Next scoped website/evidence commit with USB hook, protected PR/checks/merge, deploy from merged
-main, verify live HTML/headers/URLs/public manifest and record the final publication receipt.
-State/logs: reports/U107-release-state.json, U107-website-tests.log, U107-public-downloads.json.
-Evidence branchcodex/u107-publication is based on the immutable tagged commit. Only the saved
-progress handoff was restored from stashec3b7fbc754b4755f18f75313f131e71fa82ef08; excluded untracked
-owner files were never stashed. Locked interpreter (do not modify):
+Release/build/signing/publication/live-verification work is complete. This four-file final receipt
+is bookkeeping through a normal scoped commit with USB hook and protected PR/merge; no application
+change or further release build, inference, deployment, signing or download work is required. Full workflow/source identities are in reports/U107-release-state.json.
+Prior progress stashes were single-path handoff snapshots only; excluded owner files were never
+stashed, read or staged. No recurring monitor was created. Locked interpreter (do not modify):
 `C:/Users/joshu/AppData/Local/Temp/cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8/Scripts/python.exe`.
-All test stores are redirected before imports. No owner queue/data or excluded file is used.
-Earlier implementation checkpoints below are historical; the current authorization supersedes their
-old no-commit/release stopping notes.
+Historical checkpoints below retain earlier failures and pre-authorization stopping notes; current
+owner authorization and published state supersede them. Physical-drive/new-user/minimum-OS and
+independent-review results are not claimed. Windows CA signing/Apple notarization remain absent.
 
 ## Completion evidence required
 
@@ -331,3 +323,7 @@ Source push CI40535846906 and PR CI40535882296 run the actual123-file commit0afe
 PR51 merged normally at7d6ae616dd8c8f4b15e1b3078208ab7c78ca05bb. Exact-main CI40537766999 passed all8 jobs. Required prepare_release helper workspace63 passed in3.34s, then created and pushed immutable tag v3.14-U107 at that merge. U106 tag remains10b40d6 unchanged. Windows tagged build running session50594, reports/U107-windows-build.log. Native Mac tagged workflow40539718907 running (upload=false); reports/U107-mac-build-watch.log. Main JUnit artifacts downloading to reports/U107-main-ci-artifacts. Evidence branch codex/u107-publication created from unchanged tag source, and only the saved progress handoff restored from stash ec3b7fbc754b4755f18f75313f131e71fa82ef08. No package/signature/release publication claims yet; next inspect builds and frozen checks, stage exact final assets, verify hashes/provenance, use existing trusted signer, create and verify draft, publish then update website.
 
 Both tagged native packages passed frozen self-tests; Windows installed and portable reports ALL PASSED, native Mac workflow40539718907 successful and frozen ALL PASSED (tagged Mac source2372/32/19 subtests in492.45s). Final8 platform assets passed alias, checksum, provenance, lock/source checks. WindowsSHA b56819d957fadd77ef454b4eefe95a32375792d4c55cc4fb1c1afcc2473f6cf9; MacSHA59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101. Existing hash-verified installed signer signed8 assets and the independent repo verifier returned OwnerSignatureValid for all8; no private key copied. Draft11/11 downloaded back with identical hashes/sizes and8/8 signature checks. Published v3.14-U107 as latest on GitHub. Anonymous public verification is running; website still on U106 until the checked publication update. No asset bytes may change after signing.
+
+Published U107 public11/11 anonymous downloads and all11 REST digests matched;8/8 owner signatures valid. GitHub latest API confirmsv3.14-U107; redundant Mac run40542462834 is completed/cancelled. Website/evidence commit8d065f6326abf933b47c4a245ed0ac97ec513bb6 changes20 explicit static/docs/proof files only; no engine/launcher/installer/scripts/tests diff from the tag. Local build23HTML, website31, consistency6, workspace63 passed; commitUSB45 passed in82.04s. Pushed codex/u107-publication; protected PR https://github.com/Cursiv-Local/Cursiv/pull/52 (attached). Checks log reports/U107-evidence-pr-checks.log. No full app suite rerun locally for these website-only edits; hosted protected checks run as configured. Website remainsoldU106 until this PR passes/merges and CLI deployment is verified.
+
+Website/evidence PR52 passed all18 push/PR checks and merged cdb6f03 normally. Cloudflare deploy exited0, version edbccc5a-8eef-4a00-85bb-9523f507ffc4 on cursiv.us/www/legacy host. Actual production Start beforeU106 afterU107. All18 live checks passed with exact deployed bytes and no-transform; installerlinks/hash and owner manifest matched, bots/favicon accessed and www redirected. bench/results/U107-publication.json records completed checks. Final receipt branchcodex/u107-publication-receipt restores only the saved progress handoff; four metadata/proof files are to be committed. All application code remains identical to the immutable release tag. No manual full-suite rerun is needed for receipt-only changes; ordinary protected CI and USB hook remain required.

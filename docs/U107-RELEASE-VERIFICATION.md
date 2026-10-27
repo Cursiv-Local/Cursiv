@@ -1,7 +1,7 @@
 # U107 release verification — October 27, 2026
 
-The Windows and Mac packages are published and anonymously downloadable. Website publication is
-pending the checked website/evidence PR and deployment; that final receipt will be added below.
+The Windows and Mac packages are published, anonymously downloadable, and linked from the verified
+production website. Source, packages, owner signatures and publication checks are recorded below.
 
 ## Immutable source and completed gates
 
@@ -94,10 +94,24 @@ Mac SHA-256: `59bda04a779651327fcc04921bffc184b1b3e8547ca4e9258b869ab177b94101`.
 
 ## Website and remaining limits
 
-The publication update retains concise public pages, current branding, historical results, canonical
-domains, favicons, discovery files and intentional private exclusions. U107 download links, checksum,
-public signed manifest and references are being checked before deployment. No new ranking or AI
-recommendation is promised. The owner uses a manual discovery checklist; no automation was created.
+Website/evidence [PR52](https://github.com/Cursiv-Local/Cursiv/pull/52) merged normally at
+`cdb6f03ceae8bffdb83626facf926265d9ae6116` after all18 push/PR checks passed. Local allowlisted build
+produced23 HTML pages;31 website checks,6 release/version consistency tests and63 workspace checks
+passed. The commit USB hook passed45/45 in82.04s. No full app suite was rerun locally for these
+static website edits; hosted protected checks ran as configured.
+
+Cloudflare deployment succeeded for cursiv.us, www.cursiv.us and cursiv.winklers-llc.com, version
+`edbccc5a-8eef-4a00-85bb-9523f507ffc4`. Eighteen live checks passed: Start changedU106→U107;
+homepage/Start/evidence/references/robots/sitemap/icons/manifest returned200 with exact deployed
+bytes and no-transform headers; U107 installer URLs and Windows hash matched; the public signed
+manifest matched the verified release. Browser, Googlebot and Googlebot-Image user-agent probes
+returned200 for homepage/favicon paths; the www Start URL redirected to the canonical apex.
+Intentional /api/, /remote/ and /admin/ robots exclusions remain. A user-agent probe does not certify
+Google's indexing or ranking. [Machine-readable publication receipt](../bench/results/U107-publication.json).
+
+The publication retains concise public pages, current branding, historical results, discovery files
+and private exclusions. No new ranking or AI recommendation is promised. The owner uses a manual
+discovery checklist; no automation was created.
 
 All results are project-owned testing. Source/offscreen Qt, hosted native Mac, frozen installed/portable
 layouts and automated USB checks do not establish first-time human usability, minimum-OS support,
