@@ -1,11 +1,14 @@
 # U108 reliability implementation and evidence
 
-Uncommitted review candidate based on published U107/main `2f1118bbafec7dea3b7671687d3b7cec4b95719e`.
-No U108 release, package, signature, deployment or publication is claimed.
+Implementation based on published U107/main `2f1118bbafec7dea3b7671687d3b7cec4b95719e`.
+Immutable U108 source is `a63a4cfb16dbd47c5baae5bbddf6aa08909d537b`, merged through PR54.
+[Release verification](U108-RELEASE-VERIFICATION.md) records completed source/package gates and
+owner authentication; the [publication receipt](../bench/results/U108-publication.json) separately
+records the deployed website. Earlier candidate checkpoints below remain historical evidence.
 
 ## Confirmed causes and repairs
 
-| Area | Reproduced cause | Candidate repair and practical limit |
+| Area | Reproduced cause | Repair and practical limit |
 |---|---|---|
 | File permissions | Saved workspace authorization remained enabled. Per-turn negation consumed a later affirmative `read` after `;` or `:`, setting inspection false. | End the negative clause at explicit delimiters; parse the remaining task after enforcing policy. `files off`, read-only, talk-only and protected paths retain their checks. This does not prove every paraphrase parses correctly. |
 | Source versus records | Notebook keyword matching accepted implementation questions; other investigation requests fell through to a model without source evidence. | Source intent precedes notebook/memory dispatch. Bounded workspace discovery, reads, optional declaration-window search and static parsing return citations without model generation or execution. |

@@ -1,0 +1,52 @@
+{
+  "source_commit": "a63a4cfb16dbd47c5baae5bbddf6aa08909d537b",
+  "run": 40730845919,
+  "workflow": "tests",
+  "conclusion": "success",
+  "jobs": {
+    "windows": {
+      "tests": 2555,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 15,
+      "passed_including_subtests": 2540,
+      "junit_seconds": 333.818,
+      "junit_sha256": "11662ec014c2554bf3f48a8e76fe38b7cdc755b90d23919679c33b79341bf4b0",
+      "regular_passed": 2521,
+      "subtests_passed": 19
+    },
+    "mac": {
+      "tests": 2555,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 32,
+      "passed_including_subtests": 2523,
+      "junit_seconds": 534.05,
+      "junit_sha256": "77e9ffef6a04b0f4c10894b00d15c3c22ae9f8e08bd849f2af6a557e4071edbb",
+      "regular_passed": 2504,
+      "subtests_passed": 19
+    },
+    "linux": {
+      "tests": 2555,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 33,
+      "passed_including_subtests": 2522,
+      "junit_seconds": 136.732,
+      "junit_sha256": "84bd52801e63fc289472f67fb93299d1ce3befb2461c351c03bda146a65f6fd7",
+      "regular_passed": 2503,
+      "subtests_passed": 19
+    },
+    "arm64": {
+      "tests": 114,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed_including_subtests": 114,
+      "junit_seconds": 32.401,
+      "junit_sha256": "1babf6198f1e867c16176db7819a8f8985d29d1d0d211eef0866c42bf83bc806",
+      "regular_passed": 114,
+      "subtests_passed": 0
+    }
+  }
+}
