@@ -13,7 +13,7 @@ link to them.
 - [Field notebook integration](FIELD-NOTEBOOK-INTEGRATION.md),
   [phone notebook](PHONE-NOTEBOOK.md), [field network](FIELD-NETWORK.md)
 - [Hardware](HARDWARE.md)
-- [Research profiles and deferred tasks](U107-AGENTS.md) (U107 implementation, not released)
+- [Research profiles and deferred tasks](U107-AGENTS.md) (released in U107)
 
 ## Contributing
 
@@ -67,6 +67,7 @@ U83 and U88 were candidates rejected before publication; their reports say why.
 | Release | Notes | Verification |
 |---|---|---|
 | U105 | [RELEASE-U105](RELEASE-U105.md) | [U105](U105-RELEASE-VERIFICATION.md) |
+| U108 | [RELEASE-U108](RELEASE-U108.md) | [U108](U108-RELEASE-VERIFICATION.md) |
 | U107 | [RELEASE-U107](RELEASE-U107.md) | [U107](U107-RELEASE-VERIFICATION.md) |
 | U106 | [RELEASE-U106](RELEASE-U106.md) | [U106](U106-RELEASE-VERIFICATION.md) |
 | U104 | [RELEASE-U104](RELEASE-U104.md) | [U104](U104-RELEASE-VERIFICATION.md) |

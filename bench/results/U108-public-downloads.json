@@ -1,0 +1,74 @@
+{
+  "tag": "v3.14-U108",
+  "source_commit": "a63a4cfb16dbd47c5baae5bbddf6aa08909d537b",
+  "anonymous_public": true,
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U108-mac-arm64.dmg",
+      "size": 71705560,
+      "sha256": "5cc0ddad3c30dd49ecb2b7ee1004e42f7a13175a24b56895d6678d7eb275e07d",
+      "github_digest": "sha256:5cc0ddad3c30dd49ecb2b7ee1004e42f7a13175a24b56895d6678d7eb275e07d"
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 71705560,
+      "sha256": "5cc0ddad3c30dd49ecb2b7ee1004e42f7a13175a24b56895d6678d7eb275e07d",
+      "github_digest": "sha256:5cc0ddad3c30dd49ecb2b7ee1004e42f7a13175a24b56895d6678d7eb275e07d"
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "github_digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U108.exe",
+      "size": 57443687,
+      "sha256": "e1b43566ed7aee0650431455d598752d51c69a478819d5a0e0f8a64118fa6db7",
+      "github_digest": "sha256:e1b43566ed7aee0650431455d598752d51c69a478819d5a0e0f8a64118fa6db7"
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 57443687,
+      "sha256": "e1b43566ed7aee0650431455d598752d51c69a478819d5a0e0f8a64118fa6db7",
+      "github_digest": "sha256:e1b43566ed7aee0650431455d598752d51c69a478819d5a0e0f8a64118fa6db7"
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "sha256": "3d73b4061c8d110469dd4d4a67a3b1e5e65efe4fc5d51669077e1de98f181797",
+      "github_digest": "sha256:3d73b4061c8d110469dd4d4a67a3b1e5e65efe4fc5d51669077e1de98f181797"
+    },
+    {
+      "name": "provenance-3.14-U108.json",
+      "size": 1798,
+      "sha256": "a1390421a54bc91952617689725e71e24eff1d0b13d6a7b33e74b0650686a63d",
+      "github_digest": "sha256:a1390421a54bc91952617689725e71e24eff1d0b13d6a7b33e74b0650686a63d"
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1759,
+      "sha256": "acb2fa53d70424d3b5d680a059b4382001e1861f5ee1cde3e58970d7454e92f3",
+      "github_digest": "sha256:acb2fa53d70424d3b5d680a059b4382001e1861f5ee1cde3e58970d7454e92f3"
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "sha256": "f46a3c998175c643ec3d96d1fb04c6f0f317b69579c8d5f4197a4b9e821cb16f",
+      "github_digest": "sha256:f46a3c998175c643ec3d96d1fb04c6f0f317b69579c8d5f4197a4b9e821cb16f"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "sha256": "356fcd0b22217c25bc62dabac904df6fcea01ac65dd2b2b05c60d4839022bd11",
+      "github_digest": "sha256:356fcd0b22217c25bc62dabac904df6fcea01ac65dd2b2b05c60d4839022bd11"
+    },
+    {
+      "name": "u108-release-verification.json",
+      "size": 4397,
+      "sha256": "46d21927dce8a4674eb97df6890d0f3f81909ae0c7a5d0a4814d9b5be63b0829",
+      "github_digest": "sha256:46d21927dce8a4674eb97df6890d0f3f81909ae0c7a5d0a4814d9b5be63b0829"
+    }
+  ],
+  "owner_signatures_verified": 8
+}

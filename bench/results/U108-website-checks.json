@@ -1,0 +1,24 @@
+{
+  "website_tests_passed": 31,
+  "html_pages": 23,
+  "workspace_tests_passed": 63,
+  "measurement_tests_passed": 6,
+  "source_index_snapshot": "dfd7d294e5f6b41c274fc1ffb1ad206f20c88140a9442eb99cc1c17bd90b9fa1",
+  "python_source_inventory_unchanged_from_tag": true,
+  "checks": {
+    "focused": {
+      "tests": 69,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    },
+    "final_metadata": {
+      "tests": 46,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0
+    }
+  },
+  "local_full_app_suite_rerun": false,
+  "initial_website_failure": "Exact disclaimer wording assertion; restored wording and added explicit measured hosted Windows count; tests unchanged"
+}

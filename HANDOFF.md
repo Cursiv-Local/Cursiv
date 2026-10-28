@@ -4,16 +4,19 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U108 implementation candidate (Codex, 2026-10-28; uncommitted)
+## U108 released (Codex, 2026-10-28)
 
 Continuing state: [U108-HANDOFF](docs/U108-HANDOFF.md). Root causes, measured before/after cases,
 real installed Qwen replies and limits: [U108-VALIDATION](docs/U108-VALIDATION.md). Repairs cover
 read-only capability parsing, source/notebook routing, requested notebook confirmation and ID lookup,
 available-history recall and native dimensional refusals. Source inspection is bounded/static and
 keeps protected-content restrictions. Tone is partial: explicit feedback works, but the initial
-banter probe remains too literal. The owner subsequently authorized commit/push/release/publication on
-October28. U108 release preparation is in progress; do not claim publication before the recorded gates
-and asset checks finish. User-data migration and station changes remain outside scope.
+banter probe remains too literal. The owner authorized commit/push/release/publication on
+October28. [U108](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U108) is published from
+immutable source `a63a4cfb16dbd47c5baae5bbddf6aa08909d537b`: all exact-main gates, both tagged packages,
+11 public downloads/digests and8 owner signatures passed. [Release verification](docs/U108-RELEASE-VERIFICATION.md).
+The [publication receipt](bench/results/U108-publication.json) separately establishes the website
+deployment; a missing receipt means it has not been verified. User-data migration and station work remain outside scope.
 
 The owner-authorized extension automatically supplies checked public application source for natural
 implementation questions and current-chat follow-ups. It uses a versioned inventory and local inference,

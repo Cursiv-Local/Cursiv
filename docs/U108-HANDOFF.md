@@ -15,35 +15,42 @@ Never read/change/stage excluded owner files: `docs/CURSIV-LEGAL-HANDOFF.md`, ro
 Tests/benchmarks establish disposable HOME, USERPROFILE and CURSIV_APP_DATA before application imports.
 Use the existing locked Python 3.13 interpreter from U107; do not install into it.
 
-## Latest release-preparation status (October28)
+## Latest release status (October28)
 
-Owner authorized commit, push, release and publication after continued repairs. Branch:
-`codex/u108-core-reliability`, based on main `2f1118b`. Version preparation now3.14-U108;
-no release/publication is claimed before the required gates, builds and asset checks.
+[U108 is published](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U108) from immutable tag
+`v3.14-U108` at `a63a4cfb16dbd47c5baae5bbddf6aa08909d537b`. Source PR54 merged normally after all16
+Actions checks plus GitGuardian; exact-main run40730845919 passed all8 jobs. The guarded tag helper
+passed63 workspace checks in3.09s. Main's tree matched reviewed4908a2351a0c1ace1ec2bcf5e2cd86fcf8ffa164.
+A Mac hosted-runner acquisition failure was retried unchanged and passed; no gate was bypassed.
 
-Latest complete Windows gate before version preparation: **2,508 passed, 15 skipped,
-19 subtests in409.55s** (`U108-continuation-full.xml`), with runtime/index frozen.
-Affected checks284 passed; final native/source/routing check114 passed. Earlier complete
-2,484/15/19 and USB45/45 receipts remain historical; the commit hook reruns USB.
+Exact-main regular results: Windows2521 passed/15 skipped/19 subtests in334.21s;
+Mac2504/32/19 in534.36s; Linux2503/33/19; hosted ARM64 source114/0. Public JUnit and machine-summary
+receipts are `bench/results/U108-main-*`. All three source commits passed the enabled45-case USB hook.
+Tagged Windows clean build completed exit0; installed and portable frozen tests both ALL PASSED.
+Tagged native Mac40734335453 passed2504/32/19 in542.36s and frozen ALL PASSED. Both packages verify
+own-source reads and all3 critical-rule witnesses. Hosted ARM64 is not physical Raspberry Pi testing.
 
-Critical confirmation/correction/fallback explanations now use app-owned rules conditional
-on hash-checked AST witnesses. Missing/changed witnesses fail closed. Four new unseen
-questions passed natively with zero model calls (`U108-native-live-unseen.json`), distinct
-from Qwen accuracy. General explanations use bounded ordered control sections; model
-interpretations remain fallible and full universal code understanding is not claimed.
-Git LF/CRLF differences are normalized in source fingerprints; semantic edits still fail.
+The three installed signer-tool public hashes matched immediately before use. The existing owner
+identity signed8 platform assets in place; no private key was copied and no new identity created.
+All11 draft downloads matched, then all11 anonymous public downloads/digests and8 owner signatures
+verified again. Redundant release-triggered Mac40736832987 was cancelled without replacing assets.
+[Full release verification](U108-RELEASE-VERIFICATION.md) links raw receipts and hashes.
 
-Explicit brief banter now skips unrelated vault/session/memory/document/plugin and coding
-context (baseline5 failed; repaired checks pass). Live replies are brief; first joke still
-literal, so humor remains partial. New three-question banter corpus is retained unedited.
+Website/public documentation uses `codex/u108-publication`; its review URL, deployed commit, deployment
+ID and live checks are recorded separately in [U108-publication.json](../bench/results/U108-publication.json).
+A missing publication receipt means deployment has not yet been verified. This document alone does
+not establish production website state. The final receipt is added after actual deployment and live
+checks; it does not change indexed application source. Dynamic command/review progress remains in
+`reports/U108-release-state.json` (ignored). The exact-path handoff progress stash was restored after
+tag creation; older chronological checkpoints below describe the state at their recorded time.
 
-Validation: [U108-VALIDATION](U108-VALIDATION.md), [automatic source inspection](U108-SELF-INSPECTION.md).
-All local live/full commands completed. Next: stage only explicit public U108 files, regenerate
-the index after staged public docs enter Git's inventory, run versioned workspace/release gates,
-commit with USB hook, protected source PR/main CI, immutable tag, native packages, signing,
-download-back verification, publication and website. No excluded owner files, secrets, user
-stores, unrelated profiles or station changes. Local CLI is owner `Cursiv-Local`; connected
-GitHub plugin is read-only, so CLI performs authorized mutations. No bypasses or tag moves.
+Critical source explanations use native rules gated by inspected AST witnesses; general local-model
+interpretation and humor remain fallible. Four new critical questions passed natively without model
+calls. No universal code understanding or scientific calibration improvement is claimed. Physical USB,
+independent human review, broader reports/exports and project isolation remain outstanding.
+Station code, owner exclusions, secrets, user stores and unrelated profiles are unchanged.
+No additional agents were introduced. The connected GitHub plugin is read-only; the CLI performed
+owner-authorized mutations. No administrator bypass or tag replacement was used.
 
 ## Investigation map
 

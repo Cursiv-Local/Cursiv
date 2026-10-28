@@ -1,8 +1,9 @@
 # U108 automatic own-source inspection
 
-U108 source candidate, based on U107/main `2f1118b`. The owner subsequently authorized
-release preparation. The handoff records actual publication; this report alone does not
-establish that U108 has shipped. Earlier iterations below remain historical evidence.
+U108 implementation, based on U107/main `2f1118b`; immutable source is
+`a63a4cfb16dbd47c5baae5bbddf6aa08909d537b`. [Release verification](U108-RELEASE-VERIFICATION.md)
+records source and frozen package completion. This report distinguishes source access from
+model understanding; earlier iterations below remain historical evidence.
 
 ## Behavior
 
@@ -128,7 +129,9 @@ Known limits include dynamic dispatch, sparse excerpts, implicit questions outsi
 the recognized topics, and small-model interpretation errors. The index is a
 maintained source lookup, not universal working understanding. Initial casual
 banter from the original U108 brief also remains only partly resolved. Native
-Mac/Linux, physical USB and independent human review remain outstanding.
+Mac/Linux testing was outstanding at that checkpoint. Completed native source and package
+checks are recorded in the release verification; physical USB and independent human review
+remain outstanding.
 
 ## Reproduction and maintenance
 
