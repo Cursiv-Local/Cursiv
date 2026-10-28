@@ -44,3 +44,11 @@ def test_changed_source_witness_does_not_fall_back_to_a_model(monkeypatch,questi
         assert changed and 'unavailable' in out and 'model guess' in out
     finally:
         self_inspection._active.reset(token)
+
+
+def test_packaged_selftest_exercises_own_source_without_a_model(monkeypatch):
+    import selftest
+    from cursiv_engine.core import fieldlog
+    monkeypatch.setattr(fieldlog,'entries',lambda:pytest.fail('No private notebook access'))
+    result=dict(selftest._checks())['own source']()
+    assert 'critical-rule witnesses pass' in result

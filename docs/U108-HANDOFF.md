@@ -293,3 +293,14 @@ Staging uses reports/U108-stage-files.txt with explicit public paths only; owner
 untracked. Raw failed JUnit receipts retain their measured trailing whitespace; source diff checks
 exclude those raw data files rather than rewriting their evidence. Source and release code pass
 whitespace checks. Next: commit through the enabled USB hook, then protected PR/main CI.
+
+Source commit2cdd7fd created with enabled USB hook45/45 in76.06s, isolated locked interpreter.
+Before pushing, installed PyInstaller's macOS bundler code confirmed DATA is rooted in Resources
+and cross-linked into Frameworks. Current own-source link rejection would break that layout.
+Synthetic baseline1 failed (`U108-mac-source-before.xml`). Root lookup now selects real Resources
+only for the standard macOS bundle shape with its index present; strict linked-path rejection stays.
+The actual frozen self-test now checks own-source reads and all3 native critical contracts, without
+an Ollama call or notebook data read. This follow-up must pass before CI/tag/package publication.
+Mac Resources-root repair and actual own-source self-test:71 focused checks passed in6.08s
+(`U108-packaging-source-final.xml`). New frozen check verifies source version reads and critical
+source witnesses without model/notebook access; Windows root behavior and link restrictions remain.

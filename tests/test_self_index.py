@@ -95,6 +95,26 @@ def test_packaged_root_uses_bundle_not_workspace(bundle,monkeypatch):
     assert 'test-version' in where and 'helper(sample)' in body
 
 
+def test_mac_resources_hold_owned_source_without_following_framework_links(bundle,monkeypatch):
+    import sys
+    root,value=bundle
+    contents=root/'Cursiv.app'/'Contents'
+    resources=contents/'Resources'
+    frameworks=contents/'Frameworks'
+    frameworks.mkdir(parents=True)
+    for name in (*value['files'],index.NAME):
+        target=resources/name
+        target.parent.mkdir(parents=True,exist_ok=True)
+        target.write_bytes((root/name).read_bytes())
+    monkeypatch.setattr(self_source,'root',ROOT_FUNCTION)
+    monkeypatch.setattr(sys,'frozen',True,raising=False)
+    monkeypatch.setattr(sys,'_MEIPASS',str(frameworks),raising=False)
+    monkeypatch.setattr(sys,'platform','darwin')
+    assert self_source.root()==resources
+    _,body=self_source.read('cursiv_engine/core/sample.py')
+    assert 'helper(sample)' in body
+
+
 def test_read_only_self_commands_still_honor_no_tools(bundle):
     with turn_policy.scope('No tools. Explain your code.'):
         assert self_source.files()==[]

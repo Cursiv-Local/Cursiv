@@ -28,7 +28,14 @@ MAX_SCAN = 25_000_000         # characters scanned by one search
 
 def root() -> Path:
     if getattr(sys, "frozen", False):
-        return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
+        bundle=Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
+        # PyInstaller places DATA under Resources on macOS, cross-linking it
+        # into Frameworks. Read the real data root; keep rejecting linked files.
+        if sys.platform=='darwin' and bundle.name=='Frameworks' and bundle.parent.name=='Contents':
+            resources=bundle.parent/'Resources'
+            if (resources/'cursiv_engine/core/own_source_index.json').is_file():
+                return resources
+        return bundle
     return Path(__file__).resolve().parent.parent.parent
 
 
