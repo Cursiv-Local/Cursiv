@@ -1,0 +1,97 @@
+{
+  "created_utc": "2026-10-28T12:26:51.264907+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "entrypoint",
+      "question": "When I press Send, which parts of Cursiv handle my question?",
+      "response": "When you press Send, the `ChatPanel._send` method in `launcher/chat_panel.py` initiates the process by launching a thread that calls `self._run_turn`. This method checks if a proposal is made (via `propose`), and if so, it recursively invokes `self._run_turn` with the proposal\u2019s command instead of the original message. The flow then passes through `_chat_stream`, which ultimately delegates to `_chat_inner`, and finally to `_call_ollama_raw` in `cursiv_engine/chat/local_provider.py`, where the actual local Ollama model generates the response.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 7 checked excerpts and 4 AST observations: launcher/chat_panel.py:522 (ChatPanel._send); launcher/chat_panel.py:590 (ChatPanel._run_turn); cursiv_engine/ui/chat_app.py:892 (chat); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 6.384188299998641,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1668,
+          "output_tokens": 126,
+          "load_ns": 52323100
+        }
+      ]
+    },
+    {
+      "id": "correction_history",
+      "question": "Do you replace my original notebook reading when I correct it? Explain how your implementation preserves history.",
+      "response": "Yes, when you correct an entry, the original notebook reading is replaced, but the history is preserved. The `correct` function replaces an entry by calling `add` with `corrects=entry_id` and `reason=reason`, appending a new entry that marks the correction. The `current()` function filters out entries that have been corrected, showing only uncorrected ones. Original entries remain in the log file, and their presence is tracked via `corrects`, ensuring the full history\u2014both original and corrected versions\u2014is maintained in the log.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 5 checked excerpts and 4 AST observations: cursiv_engine/core/fieldlog.py:475 (correct); cursiv_engine/core/fieldlog.py:490 (current); cursiv_engine/core/fieldlog.py:331 (add); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.698144500027411,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1445,
+          "output_tokens": 112,
+          "load_ns": 59009400
+        }
+      ]
+    },
+    {
+      "id": "lookup_followup",
+      "question": "Which function actually reads those records?",
+      "response": "The notebook finds a saved sample via the `command` function in `cursiv_engine/core/notebook_tools.py`, which parses intent payloads to extract sample IDs using regex. It then passes the sample to the `query` function in `cursiv_engine/core/field_recall.py`, which filters records by sample_id. The actual record reading occurs in `field_recall.py`'s `query` function, where it filters `rows` using `r.get('sample_id', '').casefold() == sample.casefold()`. This filtering is conditional on a non-empty `sample` parameter.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 3 checked excerpts and 2 AST observations: cursiv_engine/core/field_recall.py:13 (query); cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/fieldlog.py:303 (entries); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.0144319999963045,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 954,
+          "output_tokens": 122,
+          "load_ns": 34458100
+        }
+      ]
+    },
+    {
+      "id": "permission_followup",
+      "question": "And what prevents a path from escaping that folder?",
+      "response": "The folder is kept authorized by `resolve` checking if the resolved path is relative to the base workspace using `not resolved.is_relative_to(base)`. If true, a `PermissionError` is raised, preventing escape. This condition is enforced in `file_access.py` at line 110 within the `resolve` function. Path traversal (e.g., `..`) is also blocked earlier in the same function, preventing navigation outside the authorized workspace.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 4 checked excerpts and 1 AST observations: cursiv_engine/core/file_access.py:99 (resolve); cursiv_engine/core/turn_policy.py:155 (effective); cursiv_engine/core/file_access.py:168 (execute_result); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 3.971091700019315,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1043,
+          "output_tokens": 93,
+          "load_ns": 32371900
+        }
+      ]
+    }
+  ]
+}

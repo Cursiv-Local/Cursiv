@@ -38,6 +38,47 @@ _CORRECTION = re.compile(
     r"(?P<new>" + _NUM + r")\s*(?P<new_unit>" + _UNIT + r")(?P<rest>.*)$")
 
 
+def confirmation(text: str) -> Proposal | None:
+    """Explicit preview requests cannot fall through to the immediate structured writer.
+
+    Only delimited procedural clauses outside quotes are removed. The resulting
+    command is displayed for approval; creating this proposal performs no write.
+    """
+    from .turn_policy import instruction_text
+    from . import file_requests
+    if file_requests.recognizes(text):
+        return None
+    text = re.sub(r'(?i)^\s*(?:prepare|draft)\s+(?:(?:a|an)\s+)?field observation\b',
+                  'Record field observation', text)
+    if not _RECORD.match(text):
+        return None
+    visible = instruction_text(text)
+    cue = re.search(r"(?i)\b(?:request|ask(?: me)?(?: for)?|require|wait for)\s+confirmation\s+before\s+sav(?:e|ing)\b|"
+                    r"\bask me before sav(?:e|ing)\b|\b(?:preview|show me the parsed record)\b", visible)
+    if not cue:
+        return None
+    # Match clause boundaries in the original string, preserving quoted data.
+    boundary = re.search(r'(?i)(?:[;.\n]\s*|\s+and\s+)(?=(?:show me the parsed record|'
+                         r'(?:request|ask|require|wait for|preview)\b))', visible)
+    if not boundary:
+        return Proposal(LOG, {'details': ''}, '', ['Separate the observation from its preview instructions with a semicolon.'])
+    # instruction_text removes quoted spans, so its offsets cannot locate the payload.
+    # Locate the same literal delimiter/clause in the original, outside quoted spans.
+    mask = list(text)
+    for match in re.finditer(r'"[^"\n]*"|(?<![A-Za-z])\x27[^\x27\n]*\x27', text):
+        mask[match.start():match.end()] = ' ' * (match.end()-match.start())
+    match = re.search(r'(?i)(?:[;.\n]\s*|\s+and\s+)(?=(?:show me the parsed record|'
+                      r'(?:request|ask|require|wait for|preview)\b))', ''.join(mask))
+    if not match:
+        return Proposal(LOG, {'details': ''}, '', ['Supply observation details before the confirmation instruction.'])
+    said = text[:match.start()].strip()
+    proposal = record(said)
+    if proposal is None:
+        return Proposal(LOG, {'details': ''}, '', ['State a field observation, sample ID or measurement before requesting its preview.'])
+    proposal.edit_text = text
+    return proposal
+
+
 def _details(fields: dict) -> str:
     parts = []
     for key, label in (("project", "project"), ("sample_id", "sample"), ("site", "site")):

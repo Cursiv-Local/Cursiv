@@ -1,0 +1,9 @@
+{
+  "kind": "synthetic packaging-plan and frozen-layout probe; no app build",
+  "public_files": 5,
+  "packaged_files": 6,
+  "private_untracked_excluded": true,
+  "generated_manifest": true,
+  "frozen_hash_checked_read": true,
+  "version": "package-test"
+}

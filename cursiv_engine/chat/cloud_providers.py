@@ -38,9 +38,15 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
     from cursiv_engine.core import speed
     from cursiv_engine.core.style import PROMPT_HEADING
     from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
+    from .response_style import GUIDANCE_HEADING
     text = runtime._text_messages(messages)
     styles = [m for m in text if m.get('role') == 'system' and m.get('content', '').startswith(PROMPT_HEADING)]
     protected = [dict(role='system', content=INSTRUCTIONS)]
+    # Fixed application rules derived from tone/format flags; no copied user history.
+    response_rules = [m for m in text if m.get('role') == 'system' and
+                      m.get('content', '').startswith(GUIDANCE_HEADING)]
+    if response_rules:
+        protected.append(dict(role='system', content=response_rules[-1]['content'][:min(2000, budget//5)]))
     if styles:
         # Current tone/guidance precedes older standing rules. Keep complete
         # lines within a bounded share; preferences cannot exhaust state/history.
@@ -53,7 +59,8 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
         if len(lines) > 1:
             protected.append(dict(role='system', content='\n'.join(lines)))
     source = [m for m in text if not (m.get('role') == 'system' and
-              (m.get('content') == INSTRUCTIONS or m.get('content', '').startswith(PROMPT_HEADING)))]
+              (m.get('content') == INSTRUCTIONS or m.get('content', '').startswith(PROMPT_HEADING)
+               or m.get('content', '').startswith(GUIDANCE_HEADING)))]
     reserve = sum(len(m['content']) for m in protected)
     result = speed.slim_messages(source, max(0, budget - reserve),
                                  runtime._FULL_PERSONA, speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))

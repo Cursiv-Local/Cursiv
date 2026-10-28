@@ -98,6 +98,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/file_context.py` — "that file" references from receipts.
 - `core/workspace.py` — the chosen workspace folder.
 - `core/workspace_search.py` — bounded search inside it.
+- `core/source_inspection.py` — bounded authorized source discovery, text reads, static symbols/calls and evidence citations; no execution.
 - `core/export_paths.py` — inspecting an export folder safely.
 
 ### Memory and self-knowledge (`memory/` and `core/`)
@@ -119,6 +120,9 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/claim_evidence.py` — verification claims need a record; rechecks of earlier claims; privacy-promise and fiction notes.
 - `core/selfknow.py` — answers about Cursiv itself (capability records + live report + `cursiv_facts.md` context).
 - `core/self_source.py` — `self source` / `self read`: Cursiv's own code and docs.
+- `core/self_index.py` — versioned public own-source inventory, AST symbols/calls and fingerprint-checked bundle reads.
+- `core/self_inspection.py` — automatic implementation context and current-thread follow-ups; owned read-only source evidence and citation checks.
+- `core/self_contracts.py` — native explanations of critical confirmation, correction and fallback rules, conditional on hash-checked AST witnesses.
 - `core/self_stores.py` — `self stores`: what is saved and where.
 - `core/last_turn.py` — `self prompt`: what was sent for the last answer.
 - `core/memory.py` — older temporal-memory helper (one remaining user).

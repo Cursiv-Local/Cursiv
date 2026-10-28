@@ -1,0 +1,127 @@
+{
+  "created_utc": "2026-10-28T11:51:55.071070+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "When you type a message in the chat box, it is passed to `ChatPanel._send`, which launches a thread calling `ChatPanel._run_turn` with your input and history. This method determines if the input is a command or a chat message, then routes it to `_chat_inner` via `chat` in `chat_app.py`. `_chat_inner` invokes `_call_ollama_raw` in `local_provider.py`, which streams a response from the local Ollama model using the system prompt. The final reply is generated and yielded step-by-step, with each chunk sent to the UI via `_signals.chunk.emit`.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 7 checked excerpts and 4 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 6.926711600041017,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1455,
+          "output_tokens": 129,
+          "load_ns": 45069000
+        }
+      ]
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "When you send a message, it is processed in sequence: first checked for local model readiness via `_local_model_ready()` in `conversation.py`. If the local model is ready and no images or file writing are needed, `_local_tried` is set to `True`, indicating the local model was attempted. The actual model call occurs in `_call_ollama_raw` in `local_provider.py`, which sends a JSON request to the Ollama server via `urllib.request` when the local model is active. This function is invoked only if the local model is ready and no external providers are used.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 3 checked excerpts and 4 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.435900199925527,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1171,
+          "output_tokens": 124,
+          "load_ns": 45311100
+        }
+      ]
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "The notebook finds a saved sample by parsing user input for keywords like \"sample\" or \"sample id\" using regex. It extracts the sample ID from the input text, then uses that ID to filter relevant records in the database. This filtering occurs in `field_recall.py` at line 78, where it matches `sample_id` in stored entries. The process is triggered when a command includes a sample reference, as defined in `notebook_tools.py` at line 349.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 3 checked excerpts and 4 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.616945099900477,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1029,
+          "output_tokens": 101,
+          "load_ns": 34955400
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "Confirmation is enforced in `notebook_proposals.py` at lines 56 and 61, where regex patterns detect requests for confirmation before saving or previewing. Specifically, it checks for phrases like \"ask me before saving\" or \"request confirmation before saving\" in user input. This logic triggers a preview instead of immediate saving. The enforcement occurs during input parsing, not at the save step, and is part of the `confirmation()` function that returns a proposal if such a request is found.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 4 checked excerpts and 6 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.06622639996931,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1371,
+          "output_tokens": 102,
+          "load_ns": 51245500
+        }
+      ]
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "You keep files inside your authorized folder by ensuring all file paths are resolved within the workspace root using `resolve()`. The system enforces this by checking if the resolved path is `is_relative_to(base)`\u2014if not, it raises a `PermissionError`. Additionally, paths containing protected patterns (via `DENY.search`) are blocked. This ensures only authorized, non-traversed paths within your selected workspace are allowed.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 4 checked excerpts and 2 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.373977100010961,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1014,
+          "output_tokens": 86,
+          "load_ns": 38727300
+        }
+      ]
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "If the local model fails (i.e., is not ready or cannot respond), the system checks if it was attempted. If `_local_tried` is true (indicating the local model was tried), it yields a message stating that the local model didn't answer.This behavior is governed by conditions in `_chat_inner` and `_fallback_chain`.\n\n*[Sources: installed source 3.14-U107, snapshot 441f6f181476, 3 checked excerpts and 4 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.711123900022358,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1153,
+          "output_tokens": 102,
+          "load_ns": 84448300
+        }
+      ]
+    }
+  ]
+}

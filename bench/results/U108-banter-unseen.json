@@ -1,0 +1,82 @@
+{
+  "created_utc": "2026-10-28T15:21:43.779858+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "calendar",
+      "question": "My calendar has declared a work stoppage. One short reply, no advice.",
+      "response": "Your calendar has marked a work stoppage\u2014short reply: it\u2019s noted.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.018627600045875,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 2041,
+          "output_tokens": 17,
+          "load_ns": 82690600
+        }
+      ]
+    },
+    {
+      "id": "coffee",
+      "question": "My coffee asked for a performance review. One playful line.",
+      "response": "\"Did you just pull a caffeine-powered miracle or are you still in the early stages of brewing?\"\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 3.563194499933161,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 2001,
+          "output_tokens": 21,
+          "load_ns": 63110900
+        }
+      ]
+    },
+    {
+      "id": "light_feedback",
+      "question": "That was a joke. Keep it light, under 15 words, no pep talk.",
+      "response": "Oh right, I misread the vibe.\n\n*[Source: model knowledge (not checked against a source)]*\n\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 2.1473211999982595,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 2055,
+          "output_tokens": 12,
+          "load_ns": 52295100
+        }
+      ]
+    }
+  ]
+}

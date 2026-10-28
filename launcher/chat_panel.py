@@ -601,7 +601,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             workspace_request = file_requests.recognizes(stripped)
             if propose and unrestricted and not workspace_request:
                 from cursiv_engine.core import notebook_proposals
-                preview = (self._memory_confirmation(stripped, history)
+                preview = (notebook_proposals.confirmation(stripped)
+                           or self._memory_confirmation(stripped, history)
                            or notebook_proposals.context_correction(stripped, history))
                 if preview is not None:
                     self._pending_intent = preview

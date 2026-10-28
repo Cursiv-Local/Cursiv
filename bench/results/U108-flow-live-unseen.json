@@ -1,0 +1,90 @@
+{
+  "created_utc": "2026-10-28T15:01:32.818535+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "proposal_wait",
+      "question": "Does every Cursiv action proposal run immediately, or can it wait for my approval? Explain the code.",
+      "response": "Cursiv actions do not run immediately\u2014they wait for user approval. The code shows that proposals (e.g., `confirmation`) are created with a `preview` phase, which displays the observation and its details without saving anything. Only when the user selects \"save\" (or \"approve\") is the action executed via `_begin_turn` and a background thread starts the actual execution. If \"edit\" or \"cancel\" is chosen, no action runs. This is enforced in `ChatActionsMixin._answer_intent`, where `save` is only processed if `proposal.ok` is true and the action is valid. Thus, approval is required before any action runs.\n\n*[Sources: installed source 3.14-U107, snapshot b2155d4b5f8d, 4 checked excerpts and 8 AST observations: cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/notebook_proposals.py:41 (confirmation); launcher/chat_panel.py:590 (ChatPanel._run_turn); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 6.771335299941711,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1279,
+          "output_tokens": 135,
+          "load_ns": 66986300
+        }
+      ]
+    },
+    {
+      "id": "free_before_stop",
+      "question": "Does Cursiv try saved free-provider keys before the local_tried stop in its fallback code?",
+      "response": "Cursiv does **not** try saved free-provider keys before the `local_tried` stop in its fallback code.  \n\nThe control flow in `routing.py` at line 176 shows that it iterates over providers like Groq and Gemini, checking `runtime._saved_key(field)` only if `runtime.netgate.allowed()`. However, this check occurs **before** the `local_tried` flag is set. The `local_tried` flag is only set when the local model (via Ollama) is used.  \n\nThus, free-provider keys are evaluated **independently** of `local_tried`, but the `local_tried` condition (which stops further fallbacks) is only triggered **after** the local model is attempted. The fallback chain does not defer to saved keys after `local_tried` is true.  \n\nEvidence:  \n- `path: cursiv_engine/chat/routing.py`, line 176: `key = runtime._saved_key(field) if runtime.netgate.allowed() else ''`  \n- `path: cursiv_engine/chat/conversation.py`, line 15: `local_tried = False` is set only when Ollama is used.\n\n*[Sources: installed source 3.14-U107, snapshot b2155d4b5f8d, 3 checked excerpts and 4 AST observations: cursiv_engine/chat/local_provider.py:16 (_call_ollama_raw); cursiv_engine/chat/routing.py:176 (_fallback_chain); cursiv_engine/chat/conversation.py:15 (_chat_inner); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 9.502470499952324,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1215,
+          "output_tokens": 251,
+          "load_ns": 76136000
+        }
+      ]
+    },
+    {
+      "id": "stored_or_view",
+      "question": "Does correcting a Cursiv notebook entry remove its old value from the stored log or just the current view?",
+      "response": "Correcting a Cursiv notebook entry does **not** remove its old value from the stored log. The `correct()` function (line 475) preserves the original entry by fetching it via `entries()` and storing it in `base`, then updates it with new fields and a `corrects` field. The old value remains in the log, and the correction is recorded as a modification with a `reason`. The stored log maintains historical entries, including prior values, ensuring data integrity and traceability. This behavior is explicitly defined in `fieldlog.py`, lines 475\u2013490.\n\n*[Sources: installed source 3.14-U107, snapshot b2155d4b5f8d, 5 checked excerpts and 5 AST observations: cursiv_engine/core/fieldlog.py:475 (correct); cursiv_engine/core/fieldlog.py:490 (current); cursiv_engine/core/fieldlog.py:331 (add); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.321676900028251,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1316,
+          "output_tokens": 126,
+          "load_ns": 38155300
+        }
+      ]
+    },
+    {
+      "id": "preview_boundary",
+      "question": "Where does Cursiv enforce approval after showing a notebook preview?",
+      "response": "No verified built-in answer covers that Cursiv workflow. Use help topics or name the specific feature. No operation was performed; invented model instructions would not establish that the feature exists.\n\n*[Sources: Cursiv built-in feature guidance (no AI model)]*",
+      "error": null,
+      "seconds": 0.050351199926808476,
+      "calls": []
+    }
+  ]
+}

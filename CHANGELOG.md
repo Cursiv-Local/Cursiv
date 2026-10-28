@@ -1,5 +1,20 @@
 # Changelog
 
+## 3.14-U108 — Core reliability and automatic source inspection (2026-10-28)
+
+- Preserve permitted reads alongside read-only restrictions; route source investigations separately
+  from notebook operations and keep workspace reads within their existing authorization boundary.
+- Repair notebook sample/record-ID lookup and explicit confirmation previews; procedural instructions
+  stay out of saved observations, and linked corrections retain their original history.
+- Automatically inspect versioned public application source for implementation questions and current-chat
+  follow-ups. Check fingerprints across Windows/Unix newlines and keep source explanations/reviews local.
+  Critical confirmation/correction/fallback rules use native explanations conditional on inspected source
+  witnesses; changed witnesses fail closed. General model interpretations remain fallible.
+- Quote available conversation history, handle incompatible units natively, and isolate explicit brief
+  banter from unrelated memories, documents, plugins and workspace coding instructions.
+- Before version preparation, Windows2508 tests/15 skips/19 subtests passed. Evidence, retained failures
+  and tone limits: docs/U108-VALIDATION.md and docs/U108-HANDOFF.md.
+
 ## 3.14-U107 — Dependable research profiles (2026-10-27)
 
 - Repair advertised plural agent commands; use shipped and personal profiles through one bounded,

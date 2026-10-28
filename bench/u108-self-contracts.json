@@ -1,0 +1,8 @@
+{
+  "heldout": [
+    {"id":"invalid_save","question":"Can Cursiv execute an invalid proposal if I press Save? Explain its confirmation code.","history":[]},
+    {"id":"offline_free_keys","question":"Does Cursiv try online free providers when offline and its local model fails?","history":[]},
+    {"id":"view_and_log","question":"How does Cursiv code distinguish the current notebook view from its complete correction log?","history":[]},
+    {"id":"flag_vs_loop","question":"Does local_tried mean the free-provider loop in Cursiv never runs? Explain the fallback implementation.","history":[]}
+  ]
+}

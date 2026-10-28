@@ -35,15 +35,24 @@ block_cipher = None
 datas = [
     # Icons
     (str(LAUNCHER / "resources" / "icons"), "launcher/resources/icons"),
-    # cursiv_engine package (everything — models, prompts, templates)
-    (str(CURSIV), "cursiv_engine"),
 ]
 # Cursiv's own launcher code and documentation as plain text, so it can read how it
 # works (core/self_source.py: "self source", "self read"). Read-only; never imported.
-datas += [(str(f), "launcher") for f in sorted(LAUNCHER.glob("*.py"))]
-datas += [(str(ROOT / "docs"), "docs")]
-datas += [(str(ROOT / name), ".") for name in ("README.md", "TECH.md", "ARCHITECTURE.md", "CHANGELOG.md",
-                                               "MODELS.md", "PRIVACY.md", "OFFLINE-DEMO.md") if (ROOT / name).exists()]
+sys.path.insert(0, str(ROOT))
+from cursiv_engine.core import self_index
+import json
+import subprocess
+_tracked = subprocess.check_output(['git', 'ls-files', '-z'], cwd=ROOT).decode('utf-8').split('\0')
+_source = self_index.build(ROOT, VERSION)
+_index_file = ROOT / 'build' / 'own-source' / 'own_source_index.json'
+_index_file.parent.mkdir(parents=True, exist_ok=True)
+_index_file.write_text(json.dumps(_source, separators=(',', ':')) + '\n', encoding='utf-8')
+# Preserve tracked engine assets, while excluding incidental user/local files.
+_bundle = set(p for p in _tracked if p.startswith('cursiv_engine/') and p != self_index.NAME)
+_bundle.update(self_index.ADDITIONS)
+_bundle.update(_source['files'])
+datas += [(str(ROOT / p), str(Path(p).parent)) for p in sorted(_bundle) if (ROOT / p).is_file()]
+datas.append((str(_index_file), 'cursiv_engine/core'))
 
 
 # ── Hidden imports that PyInstaller static analysis misses ───────────────────

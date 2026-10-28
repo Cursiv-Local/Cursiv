@@ -47,6 +47,7 @@ class FileResult:
     error: str = ''
     truncated: bool = False
     matched_files: int = 0
+    start_line: int = 1
 
     def receipt(self) -> dict:
         data = asdict(self)
@@ -178,11 +179,15 @@ def execute_result(name: str, args: dict, root: Path | None, *, confirmed: bool 
             raw = p.read_bytes()
             content = _decode_text(raw)
             limit = args.get('max_lines')
+            first = args.get('start_line', 1)
+            if type(first) is not int or first < 1 or first > 100000:
+                raise ValueError('Start line must be from 1 to 100000')
             if limit is not None and (type(limit) is not int or not 1 <= limit <= 200):
                 raise ValueError('Line count must be from 1 to 200')
-            shown = ''.join(content.splitlines(keepends=True)[:limit]) if limit is not None else content
+            shown = ''.join(content.splitlines(keepends=True)[first-1:][:limit])
             return FileResult(name, str(p), content=shown[:12000], byte_count=len(raw),
-                              sha256=hashlib.sha256(raw).hexdigest(), truncated=shown != content or len(shown) > 12000)
+                              sha256=hashlib.sha256(raw).hexdigest(), truncated=shown != content or len(shown) > 12000,
+                              start_line=first)
         if name == 'list_directory':
             rows = []
             for child in sorted(p.iterdir(), key=lambda x: x.name.lower()):
@@ -413,6 +418,9 @@ class Reply:
 
 def command(text: str, history: list[dict], root: Path | None) -> Reply | None:
     from . import file_requests, command_sequence
+    from . import source_inspection
+    if source_inspection.is_request(text):
+        return source_inspection.investigate(text, root)
     first, rest = command_sequence.split(text)
     if rest:
         from .turn_policy import scope

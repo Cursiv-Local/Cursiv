@@ -39,6 +39,8 @@ def assess(question: str, answer: str, *, titles=(), searched: bool | None = Non
                                       for step in answer_check.contradictions(answer, list(titles))])
     collect('DOSE_MISMATCH', answer_check.dose_problems(answer, list(titles)))
     collect('SMALL_SAMPLE_INFERENCE', small_sample_problems(question, answer))
+    from . import self_inspection
+    collect('OWN_SOURCE_REFERENCE', self_inspection.problems(answer))
     if searched is not None:
         collect('UNEXECUTED_LOOKUP', answer_check.unsupported_actions(answer, searched))
     if evidence is not None:

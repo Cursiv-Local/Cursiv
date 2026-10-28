@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="5" skipped="0" tests="5" time="0.978" timestamp="2026-10-28T11:10:20.077520-04:00" hostname="Josh"><testcase classname="tests.test_u108_banter_context" name="test_explicit_brief_banter_excludes_personal_context" time="0.122"><failure message="AssertionError: assert not True&#10; +  where True = &lt;function personal_context_allowed at 0x000001D3CD293B00&gt;('My to-do list just filed a complaint against me. One short reply, no advice.')&#10; +    where &lt;function personal_context_allowed at 0x000001D3CD293B00&gt; = conversation_kind.personal_context_allowed">tests\test_u108_banter_context.py:11: in test_explicit_brief_banter_excludes_personal_context
+    assert not conversation_kind.personal_context_allowed(QUESTION)
+E   AssertionError: assert not True
+E    +  where True = &lt;function personal_context_allowed at 0x000001D3CD293B00&gt;('My to-do list just filed a complaint against me. One short reply, no advice.')
+E    +    where &lt;function personal_context_allowed at 0x000001D3CD293B00&gt; = conversation_kind.personal_context_allowed</failure></testcase><testcase classname="tests.test_u108_banter_context" name="test_brief_banter_does_not_read_unrelated_context[load_vault_context]" time="0.272"><failure message="Failed: No unrelated context for explicit brief banter">tests\test_u108_banter_context.py:17: in test_brief_banter_does_not_read_unrelated_context
+    assert final_reply(pipeline,QUESTION,[],review_mode='off')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\self_inspection.py:56: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\completion.py:226: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+cursiv_engine\chat\streaming.py:132: in _chat_stream
+    for chunk in runtime._drop_fake_tool_lines(runtime._friendly(_sk, runtime._time_boxed(runtime._chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\streaming.py:42: in _drop_fake_tool_lines
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:148: in _friendly
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:88: in _time_boxed
+    yield from gen          # no time limit
+    ^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\conversation.py:82: in _chat_inner
+    system_text += runtime.load_vault_context()
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u108_banter_context.py:16: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline,service,lambda *a,**k:pytest.fail('No unrelated context for explicit brief banter'))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unrelated context for explicit brief banter</failure></testcase><testcase classname="tests.test_u108_banter_context" name="test_brief_banter_does_not_read_unrelated_context[_load_session_ctx]" time="0.012"><failure message="Failed: No unrelated context for explicit brief banter">tests\test_u108_banter_context.py:17: in test_brief_banter_does_not_read_unrelated_context
+    assert final_reply(pipeline,QUESTION,[],review_mode='off')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\self_inspection.py:56: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\completion.py:226: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+cursiv_engine\chat\streaming.py:132: in _chat_stream
+    for chunk in runtime._drop_fake_tool_lines(runtime._friendly(_sk, runtime._time_boxed(runtime._chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\streaming.py:42: in _drop_fake_tool_lines
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:148: in _friendly
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:88: in _time_boxed
+    yield from gen          # no time limit
+    ^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\conversation.py:97: in _chat_inner
+    _ctx = runtime._load_session_ctx()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u108_banter_context.py:16: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline,service,lambda *a,**k:pytest.fail('No unrelated context for explicit brief banter'))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unrelated context for explicit brief banter</failure></testcase><testcase classname="tests.test_u108_banter_context" name="test_brief_banter_does_not_read_unrelated_context[_build_strand_context]" time="0.009"><failure message="Failed: No unrelated context for explicit brief banter">tests\test_u108_banter_context.py:17: in test_brief_banter_does_not_read_unrelated_context
+    assert final_reply(pipeline,QUESTION,[],review_mode='off')
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\self_inspection.py:56: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\completion.py:226: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+cursiv_engine\chat\streaming.py:132: in _chat_stream
+    for chunk in runtime._drop_fake_tool_lines(runtime._friendly(_sk, runtime._time_boxed(runtime._chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\streaming.py:42: in _drop_fake_tool_lines
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:148: in _friendly
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:88: in _time_boxed
+    yield from gen          # no time limit
+    ^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\conversation.py:186: in _chat_inner
+    _ph = _phases.run(user_text, memory_fn=runtime._build_strand_context if _use_memory else None,
+cursiv_engine\core\phases.py:269: in run
+    _grounding(text, r, memory_fn)
+cursiv_engine\core\phases.py:138: in _grounding
+    mem = memory_fn(text) or ""
+          ^^^^^^^^^^^^^^^
+tests\test_u108_banter_context.py:16: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline,service,lambda *a,**k:pytest.fail('No unrelated context for explicit brief banter'))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unrelated context for explicit brief banter</failure></testcase><testcase classname="tests.test_u108_banter_context" name="test_brief_banter_does_not_get_workspace_coding_instructions" time="0.080"><failure message="assert not True&#10; +  where True = any(&lt;generator object test_brief_banter_does_not_get_workspace_coding_instructions.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001D3E4B6F970&gt;)">tests\test_u108_banter_context.py:24: in test_brief_banter_does_not_get_workspace_coding_instructions
+    assert not any('CODING PROTOCOL' in str(m.get('content','')) for m in sent)
+E   assert not True
+E    +  where True = any(&lt;generator object test_brief_banter_does_not_get_workspace_coding_instructions.&lt;locals&gt;.&lt;genexpr&gt; at 0x000001D3E4B6F970&gt;)</failure></testcase></testsuite></testsuites>

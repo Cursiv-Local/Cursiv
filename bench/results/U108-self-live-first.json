@@ -1,0 +1,127 @@
+{
+  "created_utc": "2026-10-28T11:37:46.724258+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "When you type a message in the chat box and send it, here's how Cursiv processes it\u2014based on the available source code evidence:\n\n1. **Message Entry**  \n   The user input is passed to the `chat` function in `cursiv_engine/ui/chat_app.py` (line 892), which acts as a compatibility entry point. This function routes the message to the actual implementation in `chat.completion.py`.\n\n2. **Chat Execution Flow**  \n   The main execution begins in `chat.completion.py` (line 60), where the `chat` function is called with the message, history, and other parameters. It initializes a `ChatRuntime` object and retrieves the current turn policy via:\n   ```python\n   policy = runtime.turn_policy.current()\n   ```\n   This policy determines whether the system should confirm actions, inspect prior answers, or allow unrestricted operations.\n\n3. **Turn Policy Enforcement**  \n   The turn policy is used to evaluate whether the message should trigger a self-inspection or if it's safe to proceed. For example:\n   - If the message is something like *\"What sources did you use for the bleach answer?\"*, the system checks:\n     ```python\n     q = turn_policy.task_text(text).lower().strip().rstrip('.?!')\n     if not re.fullmatch(r'what sources did you use for the bleach answer', q):\n         return None\n     ```\n     This is in `answer_evidence.py` (line 24), meaning only specific queries will trigger source evidence retrieval.\n\n4. **Self-Inspection and Evidence Retrieval**  \n   If the message triggers a self-inspection (e.g., asking about sources), the system checks whether the turn policy has enabled inspection:\n   ```python\n   if not turn_policy.effective(text).inspect:\n       return 'Prior answer evidence was not inspected: source lookup is disabled this turn.'\n   ```\n   This is in `answer_evidence.py` (line 26). If inspection is disabled, the system returns a message indicating that source lookup is off.\n\n5. **Local Model Inference**  \n   The actual response generation happens via the local Ollama model. The message is passed to `_call_ollama_raw` in `cursiv_engine/chat/local_provider.py` (line 16), which streams the response from the local model using a full system prompt. This ensures no external API calls are made\u2014everything runs locally on your machine.\n\n6. **Streaming and Output**  \n   The response is streamed via `_chat_stream` in `cursiv_engine/chat/streaming.py` (line 117), which resets grounding states (like retrieved documents or search results) before each turn. This ensures clean, isolated responses per interaction.\n\n7. **Final Output**  \n   The final reply is yielded through the conversation flow, possibly including self-inspection if enabled, and only if the turn\n\n*[Sources: installed source 3.14-U107, snapshot ce4d96bdede1, 8 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 20.89520959998481,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1500,
+          "output_tokens": 600,
+          "load_ns": 47900500
+        }
+      ]
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "Let me explain how messages are processed and where the model is actually called \u2014 based on the actual source code I have access to.\n\n---\n\n### \u2705 How messages are processed (from chat box to reply)\n\nWhen you type a message in the chat box:\n\n1. **Message is received**  \n   The input (your text) is passed into the `_chat_inner` function in `cursiv_engine/chat/conversation.py` (line 15).  \n   This is the main streaming chat handler.\n\n2. **File access check**  \n   On line 48, it calls `_files.command(user_text, history, runtime.Path(root_path)...)` \u2014 this checks if the message involves file operations (e.g., \"read file\", \"create file\").  \n   If so, it handles file access locally before sending the message to the model.\n\n3. **Message is routed**  \n   The message (along with history) is then passed through a **routing chain** in `cursiv_engine/chat/routing.py`.  \n   This chain tries different providers in order:\n   - First: Paid cloud models (like OpenAI, Anthropic, Groq)\n   - Then: Your local models (via Ollama)\n\n4. **Final model call**  \n   If no cloud provider works, it falls back to **local Ollama** via `_fallback_chain`.\n\n---\n\n### \u2705 Where does the model actually get called?\n\nThe actual model call happens in:\n\n- **`_call_ollama_raw`** in `cursiv_engine/chat/local_provider.py`  \n  This function is called when the system decides to use a local Ollama model.\n\n- **Location**:  \n  Line 16\u201327 of `local_provider.py`  \n  It takes:\n  - `runtime: ChatRuntime`\n  - `messages: list[dict]` (the conversation history)\n  - `max_tokens: int`\n  - `standard: bool`\n\n- **What it does**:\n  - It uses the Ollama API to stream responses.\n  - It applies a **slimmed version** of the conversation history (via `_slim`) to avoid memory issues.\n    - If the GPU is small: limits to 14,000 tokens.\n    - If the GPU is larger: limits to 48,000 tokens.\n  - This ensures the model runs efficiently on your local machine.\n\n> \ud83d\udd0d Note: The function is labeled with a comment:  \n> `\"Stream from local Ollama with full system prompt injection.\"`  \n> This means the full system prompt (including instructions and personality) is injected into the prompt \u2014 so the model behaves as intended.\n\n---\n\n### \ud83d\udd0d Summary\n\n| Step | Where |\n|------|-------|\n| Message received | `_chat_inner` in `conversation.py` |\n| File handling | `_files.command` (line 48) |\n\n\n*[Sources: installed source 3.14-U107, snapshot ce4d96bdede1, 3 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 18.696632099919952,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 819,
+          "output_tokens": 600,
+          "load_ns": 33517400
+        }
+      ]
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "Cursiv does not \"find\" a saved sample in the way a search engine finds files \u2014 it doesn't scan or index your files like a traditional search tool.\n\nInstead, your notebook **uses a structured, authorized access system** to retrieve content based on explicit input. When you ask a question like \"How does your notebook find a sample I saved?\", Cursiv interprets that as a query and uses its **field recall mechanism** to locate relevant entries.\n\nSpecifically, the `query` function in `cursiv_engine/core/field_recall.py` (lines 13\u201318) is responsible for reading one authorized notebook and verifying the input chain. It accepts parameters like `sample`, `entry`, `start`, `end`, and `site`, which define what to look for.\n\nIf you provided a `sample` string (e.g., \"sample data from 2024\"), the system would scan your notebook entries for any field that matches that sample \u2014 not by searching files, but by **matching stored field values** in a structured, authorized data flow.\n\nSo, to answer your question directly:\n\n> **Cursiv doesn't \"find\" saved samples by scanning files. Instead, it uses a field-based recall system that matches input (like a sample string) against stored fields in your authorized notebook entries.**\n\nThis is governed by the `query` function (line 13\u201318), which validates input and then reads the appropriate notebook section \u2014 only if the input is authorized and within bounds.\n\n\u26a0\ufe0f **Note**: The actual implementation of how \"sample\" is matched or stored is not visible in the provided source excerpts. There is no explicit code showing how the `sample` parameter is used to locate or retrieve a saved entry. That gap means we cannot confirm the exact matching logic \u2014 only that such a mechanism exists in the design.\n\n\u27a1\ufe0f **Inference**: The system likely stores samples as field values in notebook entries, and `query` uses those fields to retrieve content when a `sample` is provided.\n\n\u2705 **Conclusion**: Cursiv finds saved samples via a field-based recall system, not file scanning. The `query` function (line 13\u201318) handles input validation and retrieval, but the exact matching logic for `sample` is not present in the provided source.\n\n*[Sources: installed source 3.14-U107, snapshot ce4d96bdede1, 3 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 14.995200200006366,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 686,
+          "output_tokens": 476,
+          "load_ns": 42223700
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "The notebook saves observations through a chain of functions that route user input to specific actions, with **confirmation** acting as a filter to prevent unintended or malformed requests from being processed.\n\n### 1. How does your notebook save observations?\n\nObservations are saved via the `command` function in `notebook_tools.py`, which routes user input through intent detection and then executes a corresponding operation (like `CREATE`, `READ`, or `VERIFY`).\n\n- **Key function**: `command(text: str, history: list[dict], *, observer: str = '', scope: str = '') -> Result | None`\n  - Located at: `cursiv_engine/core/notebook_tools.py:313`\n- **Flow**:\n  1. Input text is passed to `task_text(text)` to extract intent.\n  2. The intent is evaluated via `_request(task_text(text), history)`.\n  3. If intent is valid, it is mapped to an operation (`CREATE`, `READ`, or `VERIFY`) using:\n     ```python\n     operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)\n     ```\n  4. This operation is then executed \u2014 for example, `CREATE` would trigger saving a new observation.\n\nThus, **observations are saved when the intent is recognized as a \"create\" action**, and the operation is executed in the notebook context.\n\n> \u2705 This means that only inputs that are properly interpreted as creating a new observation (e.g., \"record field observation\") will trigger saving.\n\n---\n\n### 2. Where exactly is confirmation enforced?\n\nConfirmation is enforced in **two places**, both acting as guards against invalid or ambiguous requests.\n\n#### \u2705 First: In `notebook_proposals.py` \u2014 `confirmation(text)`\n- **Function**: `confirmation(text: str) -> Proposal | None`\n- **Location**: `cursiv_engine/core/notebook_proposals.py:41\u201354`\n- **Purpose**: To detect and filter out requests that should not be passed to the model or that are malformed.\n\n**Key logic**:\n```python\nif file_requests.recognizes(text):\n    return None  # Skip if it's a file request\n```\n\u2192 Prevents file-related requests from being processed as observations.\n\n```python\ntext = re.sub(r'(?i)^\\\\s*(?:prepare|draft)\\\\s+(?:(?:a|an)\\\\s+)?field observation\\\\b',\n              'Record field observation', text)\n```\n\u2192 Normalizes phrases like \"prepare a field observation\" into \"Record field observation\", making them consistent.\n\n```python\nif not _RECORD.match(text):\n    return None\n```\n\u2192 Only allows text that matches the pattern of a *recorded* observation to proceed.\n\n\u27a1\ufe0f **This is the primary confirmation step**: It ensures that only valid, structured observation requests are passed forward.\n\n#### \u2705 Second\n\n*[Sources: installed source 3.14-U107, snapshot ce4d96bdede1, 5 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 19.05676239996683,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1135,
+          "output_tokens": 600,
+          "load_ns": 16813200
+        }
+      ]
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "Source explanation withheld: file_access.py:110 was not supplied in the inspected excerpts; file_access.py:178 was not supplied in the inspected excerpts; file_access.py:176 was not supplied in the inspected excerpts. These references were not established by the inspected code.\n\ncursiv_engine/core/plugin_runner.py:52 \u2014 _sandbox.inside\ncursiv_engine/core/self_source.py:53 \u2014 files\ncursiv_engine/core/file_access.py:99 \u2014 resolve\ncursiv_engine/core/turn_policy.py:155 \u2014 effective\ncursiv_engine/core/file_access.py:168 \u2014 execute_result\ncursiv_engine/core/workspace.py:33 \u2014 load",
+      "error": null,
+      "seconds": 19.039774699951522,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1137,
+          "output_tokens": 600,
+          "load_ns": 36121700
+        }
+      ]
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "If your local model fails \u2014 for example, if no usable Ollama model is available on your machine \u2014 Cursiv falls back to the next available option in its chain of providers.\n\nHere\u2019s what happens, based on the source code:\n\n- In `cursiv_engine/chat/routing.py`, the `_fallback_chain` function (lines 176\u2013213) handles the final fallback after trying paid cloud providers (like OpenAI or Anthropic).\n- If the local Ollama model is not ready or not found (`runtime._local_model_ready()` returns `False`), the system will **not** fail immediately.\n- Instead, it will **attempt to use the user\u2019s own free Gemini or Groq keys** (if available), and only if those fail, it will **try local Ollama again** \u2014 but only if a model is present on disk.\n\nSpecifically:\n- Line 196 checks:  \n  ```python\n  if runtime.cloud_enabled() and not runtime._local_model_ready():\n      tried.append(\"Cursiv Cloud\")\n  ```\n  This means: if cloud services are enabled and the local model is not ready, it logs that it tried \"Cursiv Cloud\" \u2014 but this doesn\u2019t mean it actually connects to a cloud service. It just records the attempt.\n\n- Line 61 in `local_provider.py` shows a fallback:  \n  ```python\n  if model is None and runtime._models_on_disk():\n      # once (progress shown in the reply) instead of failing with a 404.\n  ```\n\ud83d\udc49 **Conclusion**:  \nIf your local Ollama model fails to load or is unavailable, Cursiv **does not crash**. It **falls back** to the next available provider in its chain \u2014 first trying user-provided free keys (Gemini/Groq), and only if those fail, it may still attempt to use a local model from disk. If all fail, the system will return a response indicating the failure, but it will not stop the conversation entirely.\n\nThis behavior is designed to ensure continuity and avoid abrupt failures.\n\n*[Sources: installed source 3.14-U107, snapshot ce4d96bdede1, 4 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 15.314886400010437,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 861,
+          "output_tokens": 481,
+          "load_ns": 19005900
+        }
+      ]
+    }
+  ]
+}

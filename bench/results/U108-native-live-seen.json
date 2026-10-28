@@ -1,0 +1,69 @@
+{
+  "created_utc": "2026-10-28T15:21:08.002029+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "proposal_wait",
+      "question": "Does every Cursiv action proposal run immediately, or can it wait for my approval? Explain the code.",
+      "response": "Some valid read-only proposals run immediately; proposals needing confirmation wait for you. `notebook_tools.command()` returns a preview before writing when confirmation is requested. In the desktop, `_answer_intent()` stops unless you choose Save and the proposal is valid; Edit or Cancel does not execute it. Explicit native log commands retain their direct-save behavior. These source checks did not save an observation.\n\n*[Sources: installed source 3.14-U107, snapshot 8199d4893e36, 4 checked excerpts and 8 AST observations: cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/notebook_proposals.py:41 (confirmation); launcher/chat_panel.py:590 (ChatPanel._run_turn); static source evidence, not a runtime trace. Written by Cursiv, no AI model]*",
+      "error": null,
+      "seconds": 0.2601503999903798,
+      "calls": []
+    },
+    {
+      "id": "free_before_stop",
+      "question": "Does Cursiv try saved free-provider keys before the local_tried stop in its fallback code?",
+      "response": "In `_fallback_chain()`, the Groq/Gemini saved-key loop comes before the `local_tried` return. That flag prevents retrying an already attempted local model; it does not block the earlier free-provider loop. Online attempts still require the network gate and usable configuration; normal chat reports unavailability when offline after local failure. Cursiv Cloud has a separate enabled-and-no-local-model condition. Forced-provider commands and this local-only source explanation use separate paths; no provider was tested here.\n\n*[Sources: installed source 3.14-U107, snapshot 8199d4893e36, 3 checked excerpts and 4 AST observations: cursiv_engine/chat/local_provider.py:16 (_call_ollama_raw); cursiv_engine/chat/routing.py:176 (_fallback_chain); cursiv_engine/chat/conversation.py:15 (_chat_inner); static source evidence, not a runtime trace. Written by Cursiv, no AI model]*",
+      "error": null,
+      "seconds": 0.08523070008959621,
+      "calls": []
+    },
+    {
+      "id": "stored_or_view",
+      "question": "Does correcting a Cursiv notebook entry remove its old value from the stored log or just the current view?",
+      "response": "A correction appends a new record linked to the original by `corrects`, with a reason. The original stays in the stored log; `current()` hides superseded entries in the current view. `correct()` calls `add()`, which calls `_append()`; storage retains the old text plus the new line. These are checked implementation rules; your notebook records were not opened.\n\n*[Sources: installed source 3.14-U107, snapshot 8199d4893e36, 5 checked excerpts and 5 AST observations: cursiv_engine/core/fieldlog.py:475 (correct); cursiv_engine/core/fieldlog.py:490 (current); cursiv_engine/core/fieldlog.py:331 (add); static source evidence, not a runtime trace. Written by Cursiv, no AI model]*",
+      "error": null,
+      "seconds": 0.08549599989783019,
+      "calls": []
+    },
+    {
+      "id": "preview_boundary",
+      "question": "Where does Cursiv enforce approval after showing a notebook preview?",
+      "response": "Some valid read-only proposals run immediately; proposals needing confirmation wait for you. `notebook_tools.command()` returns a preview before writing when confirmation is requested. In the desktop, `_answer_intent()` stops unless you choose Save and the proposal is valid; Edit or Cancel does not execute it. Explicit native log commands retain their direct-save behavior. These source checks did not save an observation.\n\n*[Sources: installed source 3.14-U107, snapshot 8199d4893e36, 4 checked excerpts and 8 AST observations: cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/notebook_proposals.py:41 (confirmation); launcher/chat_panel.py:590 (ChatPanel._run_turn); static source evidence, not a runtime trace. Written by Cursiv, no AI model]*",
+      "error": null,
+      "seconds": 0.09258170006796718,
+      "calls": []
+    }
+  ]
+}

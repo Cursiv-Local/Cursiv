@@ -155,7 +155,8 @@ def parse(text):
 
 def recognizes(text):
     t = clean(text)
-    return bool(parse(t) or re.match(r'(?i)^(?:search (?:(?:the|my) )?(?:workspace|repo)\b|find files\b|'
+    from . import source_inspection
+    return bool(source_inspection.is_request(t) or parse(t) or re.match(r'(?i)^(?:search (?:(?:the|my) )?(?:workspace|repo)\b|find files\b|'
                                     r'(?:list|find|search) under\b|create a file\b|write a file\b|append the line\b)', t))
 
 

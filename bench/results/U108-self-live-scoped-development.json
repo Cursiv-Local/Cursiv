@@ -1,0 +1,127 @@
+{
+  "created_utc": "2026-10-28T12:26:28.287338+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "When you type a message in the chat box, it is passed to `ChatPanel._send`, which launches a thread to execute `_run_turn`. This method first checks if a proposal (e.g., a command or chat action) is valid; if so, it recursively calls `_run_turn` with the proposal\u2019s command. If no proposal is made, the message is sent to `_chat_inner`, which streams text via `_call_ollama_raw` using a local Ollama model. The response is then yielded step-by-step and displayed in the UI.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 7 checked excerpts and 4 AST observations: launcher/chat_panel.py:522 (ChatPanel._send); launcher/chat_panel.py:590 (ChatPanel._run_turn); cursiv_engine/ui/chat_app.py:892 (chat); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 7.395256099989638,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1668,
+          "output_tokens": 115,
+          "load_ns": 34817500
+        }
+      ]
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "Your messages are processed by the `_call_ollama` function, which yields from `_call_ollama_raw`. The model is called via `_call_ollama_raw`, which constructs an HTTP request to the Ollama server at `runtime.OLLAMA_URL` using `urllib.request.urlopen`. The actual model execution occurs in this HTTP request, where JSON payload (containing messages) is sent and streamed responses are returned line by line.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 2 checked excerpts and 0 AST observations: cursiv_engine/chat/local_provider.py:16 (_call_ollama_raw); cursiv_engine/chat/local_provider.py:115 (_call_ollama); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 3.8759962000185624,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 708,
+          "output_tokens": 92,
+          "load_ns": 22810500
+        }
+      ]
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "The notebook finds a saved sample by parsing user input for keywords like \"sample\" followed by an ID, using regex to extract the sample ID. This matches the `sample` parameter in `command`, which then triggers a filter in `query` to retrieve only entries with matching `sample_id`. The filter uses case-insensitive comparison (`casefold()`) to ensure accurate matches regardless of capitalization. This flow is defined in `notebook_tools.py` and `field_recall.py`.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 3 checked excerpts and 2 AST observations: cursiv_engine/core/field_recall.py:13 (query); cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/fieldlog.py:303 (entries); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.253953400067985,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 945,
+          "output_tokens": 98,
+          "load_ns": 47848700
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "Confirmation is enforced in `notebook_proposals.confirmation(text)` when the intent kind is `'create'`, `'card'`, or `'clarification'`, as specified in `notebook_tools.py` line 324. This function checks if the input matches known file requests (via `file_requests.recognizes`) and transforms field observation phrases (e.g., \"prepare a field observation\") into standardized commands. It returns a `Proposal` only if the text passes these checks, preventing unstructured or invalid inputs from proceeding. The enforcement occurs at the proposal stage before any saving, ensuring only valid, structured observations are processed.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 4 checked excerpts and 4 AST observations: cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/notebook_proposals.py:41 (confirmation); launcher/chat_panel.py:590 (ChatPanel._run_turn); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.646885799942538,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1373,
+          "output_tokens": 129,
+          "load_ns": 45391700
+        }
+      ]
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "The system enforces that files must remain within the authorized workspace by validating paths during resolution. Specifically, in `file_access.py` at line 110, the `resolve` function checks if the resolved path is relative to the base workspace (`not resolved.is_relative_to(base)`). If it isn't, a `PermissionError` is raised, preventing access to paths outside the authorized folder. This ensures all file operations stay within the user-authorized workspace.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 4 checked excerpts and 1 AST observations: cursiv_engine/core/file_access.py:99 (resolve); cursiv_engine/core/turn_policy.py:155 (effective); cursiv_engine/core/file_access.py:168 (execute_result); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.362060299958102,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1031,
+          "output_tokens": 94,
+          "load_ns": 45502200
+        }
+      ]
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "If the local model fails (i.e., `not runtime._local_model_ready()`), the system skips using it and returns early in the conversation flow. In `conversation.py`, if `_local_tried` is true or the local model is not ready, the function returns without proceeding. This prevents further cloud or local attempts. The fallback chain in `routing.py` then tries cloud providers only if the local model was not tried or failed. Thus, failure triggers early exit and fallback to cloud providers.\n\n*[Sources: installed source 3.14-U107, snapshot bf648063ce5a, 2 checked excerpts and 4 AST observations: cursiv_engine/chat/routing.py:176 (_fallback_chain); cursiv_engine/chat/conversation.py:15 (_chat_inner); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.616433300077915,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1075,
+          "output_tokens": 102,
+          "load_ns": 47079900
+        }
+      ]
+    }
+  ]
+}

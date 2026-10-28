@@ -1,0 +1,8 @@
+{
+  "heldout": [
+    {"id":"proposal_wait","question":"Does every Cursiv action proposal run immediately, or can it wait for my approval? Explain the code.","history":[]},
+    {"id":"free_before_stop","question":"Does Cursiv try saved free-provider keys before the local_tried stop in its fallback code?","history":[]},
+    {"id":"stored_or_view","question":"Does correcting a Cursiv notebook entry remove its old value from the stored log or just the current view?","history":[]},
+    {"id":"preview_boundary","question":"Where does Cursiv enforce approval after showing a notebook preview?","history":[]}
+  ]
+}
