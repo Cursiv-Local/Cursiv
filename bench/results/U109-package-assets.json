@@ -1,0 +1,43 @@
+{
+  "tag": "v3.14-U109",
+  "source_commit": "bdf2737446f77a81e14a19f774c99c12a4bb3bcf",
+  "lock_sha256_allowed": [
+    "38f95b43706863866d5e02725dbcf4b16f192e005d1b7c0a86b5d65c73105079",
+    "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9"
+  ],
+  "lock_checkout_policy": "Exact Git lock bytes or only full LF/CRLF conversion; dependency content unchanged",
+  "assets": {
+    "Cursiv-Setup-3.14-U109.exe": {
+      "size": 57527713,
+      "sha256": "d678d03beb0647a48de4737f45df4263d05f6a7d979f38cc639492c7d2e64c4e"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 57527713,
+      "sha256": "d678d03beb0647a48de4737f45df4263d05f6a7d979f38cc639492c7d2e64c4e"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "d2f672a8a8bdcf21b7fa7b27e75c5d56a9d5460214562d182ac651edafad4e9e"
+    },
+    "provenance-3.14-U109.json": {
+      "size": 1798,
+      "sha256": "61d5141ed6d50a6b299b2250225cf2c0ce34efcbfefcdc74177838caabe28af2"
+    },
+    "Cursiv-3.14-U109-mac-arm64.dmg": {
+      "size": 70596372,
+      "sha256": "ddd23f27bf2f02fef4ca8e67e89fd023eddceeef3aad5ee3706d64b05906c60b"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 70596372,
+      "sha256": "ddd23f27bf2f02fef4ca8e67e89fd023eddceeef3aad5ee3706d64b05906c60b"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "511987c748a99f0dd32fbd046335210c84d8b399ac5b77887a5ad5ec188e4f13"
+    },
+    "provenance-mac.json": {
+      "size": 1759,
+      "sha256": "8260331047538bb12df3bf5f565cdcc665ee1af3adc0476a2c9418f6a8863a1b"
+    }
+  }
+}

@@ -1,0 +1,49 @@
+{
+  "source_commit": "bdf2737446f77a81e14a19f774c99c12a4bb3bcf",
+  "workflow_run": 40773195207,
+  "all8_jobs_passed": true,
+  "archive_digests_verified": true,
+  "counting": "Regular passes from actual testcase elements; additional passing subtests from JUnit totals minus testcase count",
+  "jobs": {
+    "windows": {
+      "tests": 2618,
+      "skipped": 15,
+      "failures": 0,
+      "errors": 0,
+      "regular_passed": 2584,
+      "passing_subtests": 19,
+      "seconds": 441.627,
+      "receipt": "U109-main-windows.xml"
+    },
+    "mac": {
+      "tests": 2618,
+      "skipped": 32,
+      "failures": 0,
+      "errors": 0,
+      "regular_passed": 2567,
+      "passing_subtests": 19,
+      "seconds": 527.021,
+      "receipt": "U109-main-mac.xml"
+    },
+    "linux": {
+      "tests": 2618,
+      "skipped": 33,
+      "failures": 0,
+      "errors": 0,
+      "regular_passed": 2566,
+      "passing_subtests": 19,
+      "seconds": 123.672,
+      "receipt": "U109-main-linux.xml"
+    },
+    "arm64": {
+      "tests": 114,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "regular_passed": 114,
+      "passing_subtests": 0,
+      "seconds": 31.162,
+      "receipt": "U109-main-arm64.xml"
+    }
+  }
+}

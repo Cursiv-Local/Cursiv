@@ -1,8 +1,9 @@
 # Cursiv v3.14-U109 — reliable installed-source inspection
 
 U109 improves how Cursiv finds its own implementation and distinguishes checked
-source from a model's interpretation. Development starts from published U108;
-this document does not establish a release, package build or website deployment.
+source from a model's interpretation. Development starts from published U108. [Release verification](U109-RELEASE-VERIFICATION.md)
+records the completed tagged packages and public downloads; website deployment is
+established separately by its publication receipt.
 
 - Natural implementation questions reach bounded installed-source inspection
   before notebook, saved-memory and research-workspace actions. Those ordinary

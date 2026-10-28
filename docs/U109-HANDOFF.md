@@ -205,3 +205,63 @@ run the enabled45-case USB hook with isolated stores and the existing locked int
 Then push codex/u109-reliable-self-inspection, create the protected source PR, require all
 push/PR and exact-main gates, and invoke scripts/prepare_release.py v3.14-U109 from clean main.
 Do not treat this as native package completion; exact-tag build/frozen/signature checks follow.
+
+## Release source and immutable tag
+
+Source commit53b878be9c3aa759c3c69bcc6905c6359f658df3 ran the enabled USB hook:
+45 passed/2,554 deselected in81.00s.58 exact staged public blobs passed Gitleaks with zero
+findings; the public scan receipt was then committed as file59. GitGuardian independently passed.
+PR57 https://github.com/Cursiv-Local/Cursiv/pull/57 merged normally after all latest push/PR
+checks passed. Mac workspace jobs initially failed to acquire hosted runners (zero steps/tests);
+the PR retry passed on attempt2 and the push retry on attempt3, without source or gate changes.
+Both full Mac suites had already passed. Failed acquisition attempts remain in Actions history.
+PR test XML/summary/digest-checked archives are U109-source-pr-*.xml / U109-source-pr-ci-summary.json.
+
+Reviewed source tree exactly equals merged main bdf2737446f77a81e14a19f774c99c12a4bb3bcf.
+Exact-main run40773195207 passed all8 jobs. The guarded scripts/prepare_release.py reran
+63 workspace checks in2.90s and created immutable v3.14-U109; tag pushed without replacement.
+Windows pre-tag package from source53b878b passed installed and portable frozen checks, including
+U109 startup/all ten features/regex source reads; these are preflight reports, not release bytes.
+
+Now running: tagged Windows build via reports/U109-release-windows-build.py (exec session87269,
+log reports/U109-release-windows-build.log) with all build/self-test stores isolated outside
+OneDrive; native Apple Silicon tagged build40774780284 (upload=false). State:
+reports/U109-release-state.json. No published U109 release or website update yet.
+Next: archive exact-main XML, require both tagged native frozen checks (Windows installed+portable),
+stage8 exact-tag assets, verify aliases/sums/provenance/lock, recheck all3 installed trusted signer
+hashes and use the existing owner signer in place. Never copy or initialize a private key.
+Then independently verify8 signatures, draft/download-back verify all11 release assets, publish
+and verify anonymous downloads, followed by the approved static website/evidence update and
+production receipt. No additional local full suite is needed for website-only publication;
+focused website/source-inventory/workspace checks and hosted protections remain required.
+
+
+## Tagged packages published; website/evidence phase
+
+Both exact-tag native packages passed U109 source and general frozen checks. Windows also
+passed portable startup; native Mac build40774780284 passed and its archive digest was checked.
+Windows d678d03beb0647a48de4737f45df4263d05f6a7d979f38cc639492c7d2e64c4e;
+Mac ddd23f27bf2f02fef4ca8e67e89fd023eddceeef3aad5ee3706d64b05906c60b.
+All8 aliases/checksums/provenance assets passed, existing installed trusted signer hashes
+matched immediately before isolated invocation, and8 owner signatures independently verified.
+No private key copied or new identity created. All11 draft downloads matched; U109 published
+as latest and all11 anonymous public downloads/digests plus8 signatures reverified. Redundant
+release-triggered Mac run40776837732 cancelled; final bytes immutable.
+
+Local branch codex/u109-publication now prepares the authorized website/evidence update.
+Public manifest and raw source/package/download receipts are present. Preserve short human
+pages and existing metadata/style; update technical references with source-scope limits.
+A draft-only UTF-8 punctuation error in index/vision was caught and reversed before publication.
+Next: stage explicit public evidence/website paths only, refresh public source inventory, run
+focused website/source/release/workspace checks, scan staged bytes and commit through the
+USB hook. Push/create protected website PR; merge only passing checks, deploy merged main via
+cloudflare/publish.mjs and record live bytes, download/signature, favicon/robots/canonical probes.
+Then commit the production receipt through the normal evidence path. No recurring automation.
+
+Website pre-commit validation:31 browser/worker tests passed;58 focused discovery/source-index/
+release-document/version/code-map/packaged-root tests passed in7.24s; native workspace63 passed
+in1.52s. Public release downloads are fully verified. Source index is refreshed for current
+public documentation (386 files); Python runtime code remains identical to the binary tag.
+Next commit the explicit website/evidence paths through the USB hook after staged-byte scanning,
+push codex/u109-publication, create its normal protected PR, merge the reviewed tree after checks,
+deploy from merged main and verify production before writing U109-publication.json.

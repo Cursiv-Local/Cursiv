@@ -1,0 +1,49 @@
+{
+  "source_head": "53b878be9c3aa759c3c69bcc6905c6359f658df3",
+  "pr": 57,
+  "workflow_run": 40768248447,
+  "scope": "Completed full source suites; separate required Mac workspace runner acquisition remains pending",
+  "archive_digests_verified": true,
+  "jobs": {
+    "windows": {
+      "tests": 2618,
+      "skipped": 15,
+      "failures": 0,
+      "errors": 0,
+      "passing_subtests": 19,
+      "regular_passed": 2584,
+      "receipt": "U109-source-pr-windows.xml",
+      "counting": "Regular passes from actual testcase elements; additional passing subtests from JUnit tests minus testcase count; no failures/errors"
+    },
+    "mac": {
+      "tests": 2618,
+      "skipped": 32,
+      "failures": 0,
+      "errors": 0,
+      "passing_subtests": 19,
+      "regular_passed": 2567,
+      "receipt": "U109-source-pr-mac.xml",
+      "counting": "Regular passes from actual testcase elements; additional passing subtests from JUnit tests minus testcase count; no failures/errors"
+    },
+    "linux": {
+      "tests": 2618,
+      "skipped": 33,
+      "failures": 0,
+      "errors": 0,
+      "passing_subtests": 19,
+      "regular_passed": 2566,
+      "receipt": "U109-source-pr-linux.xml",
+      "counting": "Regular passes from actual testcase elements; additional passing subtests from JUnit tests minus testcase count; no failures/errors"
+    },
+    "arm64": {
+      "tests": 114,
+      "skipped": 0,
+      "failures": 0,
+      "errors": 0,
+      "passing_subtests": 0,
+      "regular_passed": 114,
+      "receipt": "U109-source-pr-arm64.xml",
+      "counting": "Regular passes from actual testcase elements; additional passing subtests from JUnit tests minus testcase count; no failures/errors"
+    }
+  }
+}

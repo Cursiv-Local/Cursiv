@@ -1,0 +1,18 @@
+{
+  "scope": "Static website/release evidence; no local full application rerun",
+  "browser_worker": {
+    "passed": 31,
+    "failed": 0,
+    "log": "reports/U109-release-website-tests.log"
+  },
+  "focused_python": {
+    "passed": 58,
+    "seconds": 7.24,
+    "receipt": "U109-website-focused.xml"
+  },
+  "workspace": {
+    "passed": 63,
+    "seconds": 1.52
+  },
+  "runtime_unchanged_from_tag": true
+}

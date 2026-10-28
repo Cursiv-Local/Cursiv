@@ -1,9 +1,12 @@
 # U109 installed-source inspection validation
 
-Unreleased working candidate on main `efc2f961049b767f0fe49e38304e9e70f25a6955`.
-The application version remains U108 during comparison. Receipts identify the
-candidate using working source hashes and a source inventory snapshot, not a
-U109 release tag. No commit, push, signing, release or website deployment occurred.
+Measurements below began on main `efc2f961049b767f0fe49e38304e9e70f25a6955`.
+The application remained U108 during those comparisons, identified by working
+source hashes and snapshots. The owner subsequently authorized release.
+Published U109 uses immutable source `bdf2737446f77a81e14a19f774c99c12a4bb3bcf`;
+[release verification](U109-RELEASE-VERIFICATION.md) records its protected checks,
+native packages, existing owner signatures and verified public downloads. Website
+publication is established separately by the publication receipt linked there.
 
 ## Reproduction and evidence
 
@@ -139,7 +142,7 @@ claiming a general model-speed improvement.
 Gitleaks8.30.1 found **zero findings in45 changed public files** at the first final
 scan (`U109-public-secret-scan.json`); excluded owner files were filtered before
 reads. The earlier U108 audit separately covered available Git history. This
-candidate has no new commits. No private signing keys, API credentials or user-store data
+pre-commit candidate had no new commits. No private signing keys, API credentials or user-store data
 is included in these test receipts.
 The final changed-file scan and exact public-file hashes are in
 `U109-public-secret-scan-final.json`; excluded owner files are omitted before
@@ -152,12 +155,11 @@ Final Windows suite: **2,584 passed, 15 skipped, 19 subtests passed in448.75 sec
 Dedicated USB: **45 passed, 2,554 deselected in76.91 seconds** (`U109-usb-final.xml`).
 Native workspace gate: **63 passed in1.99 seconds**, with exit0 recorded in
 `U109-final-gates.json`. Each gate used a separate disposable local home.
-No native U109 binary has been built.
+Tagged native Windows and Apple Silicon Mac binaries subsequently passed their frozen checks; see the release verification report.
 
-All local source gates pass; no source-test blocker remains. Remaining work before
-distribution is owner review/authorization, versioned release preparation, hosted
-platform CI and tagged native Windows/Mac package/signature checks. General model
-prose remains partial as recorded above. Do not claim every U109 acceptance
+All local source gates pass. The later authorized release completed hosted exact-main
+CI, tagged native package checks, existing owner signatures and anonymous public
+download verification. General model prose remains partial as recorded above. Do not claim every U109 acceptance
 criterion or complete runtime/codebase understanding has been independently proven.
 
 ## Scope and limitations
