@@ -20,7 +20,8 @@ SUFFIXES = {'.py', '.md', '.json', '.txt', '.spec', '.iss', '.toml', '.js', '.mj
 DENIED = {'station', '.cursiv', '.git', '.ssh', '__pycache__', 'private', 'test_internals',
           'licenses', 'family', 'tests', 'CURSIV-LEGAL-HANDOFF.md', 'field-notes.txt'}
 ADDITIONS = ('cursiv_engine/core/self_index.py', 'cursiv_engine/core/self_inspection.py',
-             'cursiv_engine/core/source_inspection.py', 'cursiv_engine/core/self_contracts.py')
+             'cursiv_engine/core/source_inspection.py', 'cursiv_engine/core/self_contracts.py',
+             'cursiv_engine/core/source_analysis.py')
 MAX_FILE = 600000
 _lock = threading.RLock()
 _cache = {}
@@ -72,10 +73,10 @@ def _module(rel):
     return '.'.join(parts[1:] if parts[0] == 'launcher' else parts)
 
 
-def _parse(rel, text):
+def _parse(rel, text, *, tree=None):
     module, bindings, symbols = _module(rel), {}, []
     try:
-        tree = ast.parse(text)
+        tree = ast.parse(text) if tree is None else tree
     except (SyntaxError, ValueError, RecursionError):
         return module, symbols
     package = module.split('.')[:-1]
@@ -88,8 +89,40 @@ def _parse(rel, text):
             origin = prefix + (node.module.split('.') if node.module else [])
             for alias in node.names:
                 values[alias.asname or alias.name] = '.'.join(origin+[alias.name])
-    for node in tree.body:
-        bind(node,bindings)
+    def module_imports(nodes):
+        for node in nodes:
+            if isinstance(node,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)):
+                continue
+            found={}
+            bind(node,found)
+            for name,target in found.items():
+                bindings[name]=target if name not in bindings or bindings[name]==target else ''
+            module_imports(list(ast.iter_child_nodes(node)))
+    module_imports(tree.body)  # try/if imports are module bindings too; never enter function scope
+    conditional=set()
+    # Lazy desktop backend setup assigns imported services to declared globals.
+    # These are possible conditional bindings, never proof setup actually ran.
+    for fn in ast.walk(tree):
+        if not isinstance(fn,(ast.FunctionDef,ast.AsyncFunctionDef)):continue
+        items=[];pending=list(fn.body)
+        while pending:
+            item=pending.pop()
+            if isinstance(item,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)):continue
+            items.append(item);pending.extend(ast.iter_child_nodes(item))
+        declared={name for n in items if isinstance(n,ast.Global) for name in n.names}
+        if not declared:continue
+        local=dict(bindings)
+        for item in sorted(items,key=lambda n:getattr(n,'lineno',0)):
+            bind(item,local)
+            if isinstance(item,ast.Assign) and len(item.targets)==1 and isinstance(item.targets[0],ast.Name):
+                expression=ast.unparse(item.value)
+                head,_,tail=expression.partition('.')
+                if re.fullmatch(r'[A-Za-z_][\w.]*',expression) and local.get(head):
+                    name=item.targets[0].id;target=local[head]+('.'+tail if tail else '')
+                    local[name]=target
+                    if name in declared:
+                        bindings[name]=target if name not in bindings or bindings[name]==target else ''
+                        conditional.add(name)
     def visit(nodes, parents=()):
         for node in nodes:
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -98,10 +131,11 @@ def _parse(rel, text):
                 if not isinstance(node, ast.ClassDef):
                     local = dict(bindings)
                     # Function-local imports may differ even when their bare names match.
-                    body_nodes, pending = [], list(node.body)
+                    body_nodes, pending, local_defs = [], list(node.body), {}
                     while pending:
                         item = pending.pop()
                         if isinstance(item,(ast.FunctionDef,ast.AsyncFunctionDef,ast.ClassDef)):
+                            local_defs[item.name]=module+'.'+name+'.'+item.name
                             continue
                         body_nodes.append(item)
                         pending.extend(ast.iter_child_nodes(item))
@@ -111,8 +145,13 @@ def _parse(rel, text):
                     shadowed.update(item.id for item in body_nodes if isinstance(item,ast.Name) and isinstance(item.ctx,ast.Store))
                     for shadow_name in shadowed:
                         local.pop(shadow_name,None)
+                    imports={}
                     for item in body_nodes:
-                        bind(item,local)
+                        found={};bind(item,found)
+                        for alias,target in found.items():
+                            imports[alias]=target if alias not in imports or imports[alias]==target else ''
+                    local.update(imports)
+                    local.update(local_defs)
                     # Walk this function's statements; nested defs are separate symbols.
                     stack = list(node.body)
                     while stack:
@@ -123,16 +162,20 @@ def _parse(rel, text):
                             called = ast.unparse(item.func)
                             if re.fullmatch(r'[A-Za-z_][\w.]*', called):
                                 head, _, tail = called.partition('.')
-                                target = local[head]+('.'+tail if tail else '') if head in local else ''
+                                target = local[head]+('.'+tail if tail else '') if local.get(head) else ''
                                 if head == 'self' and parents:
                                     target = module+'.'+parents[0]+'.'+tail
                                 elif not tail and head not in local and head not in shadowed:
                                     target = module+'.'+head
-                                calls.append(dict(name=called, line=item.lineno, target=target))
+                                call=dict(name=called,line=item.lineno,target=target)
+                                if head in conditional and head not in shadowed and head not in imports:
+                                    call['binding']='conditional global assignment'
+                                calls.append(call)
                         stack.extend(ast.iter_child_nodes(item))
                 doc = (ast.get_docstring(node) or '').splitlines()
                 symbols.append(dict(name=name, line=node.lineno, end=node.end_lineno,
-                                    doc=doc[0][:140] if doc else '', calls=sorted(calls,key=lambda c:c['line'])[:100]))
+                                    doc=doc[0][:140] if doc else '', calls=sorted(calls,key=lambda c:c['line'])[:256],
+                                    calls_total=len(calls),calls_truncated=len(calls)>256))
                 visit(node.body, (*parents,node.name))
             elif not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
                 visit(list(ast.iter_child_nodes(node)), parents)

@@ -51,9 +51,26 @@ def _checks():
                 result=self_contracts.answer(packet,question)
                 if not result or result.startswith('The critical behavior explanation is unavailable'):
                     raise RuntimeError(result or 'Critical source rule missing')
+            for question in (
+                'What is your actual desktop application startup entry point? Inspect the code.',
+                'Trace your Field Notebook creation, correction and verification code.',
+                'Locate your SHA-256 notebook hash-chain implementation.',
+                'Find the code that stores and retrieves your persistent memory.',
+                'Locate the PDF importer in your installed code.',
+                'Trace your document search implementation.',
+                'Trace how your code enforces offline network restrictions.',
+                'What happens in your implementation if Ollama times out?',
+                'Inspect your Field Copy implementation for copying portable workspaces to an external SSD.',
+                'Find the code that verifies your responses.',
+                'Trace your implementation of file access restrictions.',
+                'In your code, does the regex `[a-z_]{3,}` match `page`? Check rather than guess.',
+            ):
+                packet=self_inspection.prepare(question)
+                if packet is None or packet.error or not packet.coverage.get('successful_reads'):
+                    raise RuntimeError('Installed U109 source evidence unavailable: '+str(getattr(packet,'error','missing packet')))
         finally:
             self_inspection._active.reset(token)
-        return 'versioned source read and critical-rule witnesses pass; no model or notebook data read'
+        return 'versioned source read and critical-rule witnesses pass; U109 startup/ten-feature/regex source reads pass; no model or notebook data read'
 
     def portable_storage():
         """Run from a Cursiv USB, everything must be on that drive (launcher/portable.py)."""

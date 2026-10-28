@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.14-U109 — Reliable installed-source inspection (2026-10-28)
+
+- Route implementation questions to bounded, hash-checked installed source before workspace,
+  notebook and saved-memory actions; preserve per-turn restrictions and separate evidence scopes.
+- Trace actual build/startup, UI, facade, backend, local-model, verification and rendering roles
+  using parsed declarations, conditional imports, lazy bindings and static callback/call evidence.
+- Distinguish verified syntax from inferred explanations, missing matches, denied access and stale
+  source. Fix Python source line references after Unicode separators inside string literals.
+- Use current AST witnesses for reviewed startup, regex, timeout, memory, portable-copy, notebook,
+  document-scoring and response-check explanations. Audit output stays a read-only hypothesis.
+- Before version preparation: Windows2584 passed/15 skips/19 subtests; USB45 and workspace63 passed.
+  Fifteen development probes include five real Qwen requests and ten native outcomes; four general
+  narratives remain partial. Evidence and limits: docs/U109-VALIDATION.md and docs/U109-HANDOFF.md.
+
 ## 3.14-U108 — Core reliability and automatic source inspection (2026-10-28)
 
 - Preserve permitted reads alongside read-only restrictions; route source investigations separately
