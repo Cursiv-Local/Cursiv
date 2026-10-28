@@ -598,7 +598,8 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             from cursiv_engine.memory import intents, semantic
             from cursiv_engine.core import turn_policy
             unrestricted = turn_policy.effective(stripped) == turn_policy.Policy()
-            workspace_request = file_requests.recognizes(stripped)
+            from cursiv_engine.core import self_inspection
+            workspace_request = file_requests.recognizes(stripped) or bool(self_inspection.resolve(stripped,history))
             if propose and unrestricted and not workspace_request:
                 from cursiv_engine.core import notebook_proposals
                 preview = (notebook_proposals.confirmation(stripped)

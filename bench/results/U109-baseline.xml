@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="20" skipped="0" tests="27" time="1.793" timestamp="2026-10-28T15:15:41.616664-04:00" hostname="Josh"><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[startup]" time="0.252"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[pipeline]" time="0.005"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[pdf]" time="0.004"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[documents]" time="0.218"><failure message="AssertionError: assert 'cursiv_engine/core/documents.py' in {'cursiv_engine/core/field_recall.py', 'cursiv_engine/core/fieldlog.py', 'cursiv_engine/core/notebook_tools.py'}">tests\test_u109_self_inspection.py:17: in test_recognizable_own_requests_read_installed_source
+    if 'path' in case:assert case['path'] in {s.path for s in packet.snippets}
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 'cursiv_engine/core/documents.py' in {'cursiv_engine/core/field_recall.py', 'cursiv_engine/core/fieldlog.py', 'cursiv_engine/core/notebook_tools.py'}</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[memory]" time="0.005"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[portable]" time="0.174"><failure message="AssertionError: assert 'launcher/usb_ops.py' in {'cursiv_engine/core/fieldsync.py', 'cursiv_engine/core/self_index.py', 'cursiv_engine/core/self_inspection.py', 'launcher/field_notebook.py', 'launcher/portable.py'}">tests\test_u109_self_inspection.py:17: in test_recognizable_own_requests_read_installed_source
+    if 'path' in case:assert case['path'] in {s.path for s in packet.snippets}
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert 'launcher/usb_ops.py' in {'cursiv_engine/core/fieldsync.py', 'cursiv_engine/core/self_index.py', 'cursiv_engine/core/self_inspection.py', 'launcher/field_notebook.py', 'launcher/portable.py'}</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[offline]" time="0.112" /><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[notebook]" time="0.041" /><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[chain]" time="0.007"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[ollama]" time="0.201" /><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[verification]" time="0.012"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[permissions]" time="0.132" /><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[audit]" time="0.010"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[regex]" time="0.008"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_recognizable_own_requests_read_installed_source[missing]" time="0.010"><failure message="AssertionError: Own-source dispatch did not start&#10;assert None is not None">tests\test_u109_self_inspection.py:14: in test_recognizable_own_requests_read_installed_source
+    assert packet is not None,'Own-source dispatch did not start'
+E   AssertionError: Own-source dispatch did not start
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_startup_is_not_a_same_named_review_or_prompt_helper" time="0.007"><failure message="assert (None is not None)">tests\test_u109_self_inspection.py:21: in test_startup_is_not_a_same_named_review_or_prompt_helper
+    assert p is not None and not p.error
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_coverage_counts_real_reads_not_whole_index" time="0.007"><failure message="assert (None is not None)">tests\test_u109_self_inspection.py:29: in test_coverage_counts_real_reads_not_whole_index
+    assert p is not None and not p.error
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_missing_search_is_not_absence_of_functionality" time="0.006"><failure message="assert None is not None">tests\test_u109_self_inspection.py:36: in test_missing_search_is_not_absence_of_functionality
+    assert p is not None
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_unsupported_conclusions_are_not_accepted[Cursiv cannot process PDFs.]" time="0.006"><failure message="AssertionError: assert []&#10; +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('Cursiv cannot process PDFs.')&#10; +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems">tests\test_u109_self_inspection.py:48: in test_unsupported_conclusions_are_not_accepted
+    try:assert own.problems(answer)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert []
+E    +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('Cursiv cannot process PDFs.')
+E    +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_unsupported_conclusions_are_not_accepted[There is no persistent memory implementation.]" time="0.009"><failure message="AssertionError: assert []&#10; +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('There is no persistent memory implementation.')&#10; +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems">tests\test_u109_self_inspection.py:48: in test_unsupported_conclusions_are_not_accepted
+    try:assert own.problems(answer)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert []
+E    +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('There is no persistent memory implementation.')
+E    +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_unsupported_conclusions_are_not_accepted[Cursiv does not support copying portable workspaces to an external SSD.]" time="0.008"><failure message="AssertionError: assert []&#10; +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('Cursiv does not support copying portable workspaces to an external SSD.')&#10; +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems">tests\test_u109_self_inspection.py:48: in test_unsupported_conclusions_are_not_accepted
+    try:assert own.problems(answer)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert []
+E    +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('Cursiv does not support copying portable workspaces to an external SSD.')
+E    +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_unsupported_conclusions_are_not_accepted[The desktop entry point is cursiv_engine/chat/review.py::prepare.]" time="0.007"><failure message="AssertionError: assert []&#10; +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('The desktop entry point is cursiv_engine/chat/review.py::prepare.')&#10; +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems">tests\test_u109_self_inspection.py:48: in test_unsupported_conclusions_are_not_accepted
+    try:assert own.problems(answer)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AssertionError: assert []
+E    +  where [] = &lt;function problems at 0x00000254DA969DA0&gt;('The desktop entry point is cursiv_engine/chat/review.py::prepare.')
+E    +    where &lt;function problems at 0x00000254DA969DA0&gt; = own.problems</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_regex_claim_is_checked_deterministically" time="0.007"><failure message="assert (None is not None)">tests\test_u109_self_inspection.py:53: in test_regex_claim_is_checked_deterministically
+    assert p is not None and not p.error
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_empty_explicit_workspace_inspection_is_actionable" time="0.012"><failure message="AssertionError: assert 'NOT FOUND IN SEARCHED SCOPE' in 'Source inspection — read-only static evidence from the authorized workspace.\nRead attempts: 0/24; tool calls: 0/48; ...ot prove runtime behavior.\n\n*[Sources: authorized workspace text and static parser (no AI model; no code executed)]*'">tests\test_u109_self_inspection.py:58: in test_empty_explicit_workspace_inspection_is_actionable
+    assert 'NOT FOUND IN SEARCHED SCOPE' in out
+E   AssertionError: assert 'NOT FOUND IN SEARCHED SCOPE' in 'Source inspection — read-only static evidence from the authorized workspace.\nRead attempts: 0/24; tool calls: 0/48; ...ot prove runtime behavior.\n\n*[Sources: authorized workspace text and static parser (no AI model; no code executed)]*'</failure></testcase><testcase classname="tests.test_u109_self_inspection" name="test_no_tools_does_not_load_index" time="0.008" /><testcase classname="tests.test_u109_self_inspection" name="test_ordinary_chat_does_not_load_index" time="0.010" /><testcase classname="tests.test_u109_self_inspection" name="test_explicit_other_repository_keeps_workspace_boundary" time="0.011" /></testsuite></testsuites>

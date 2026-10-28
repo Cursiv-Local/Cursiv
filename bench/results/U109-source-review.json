@@ -1,0 +1,126 @@
+{
+  "reviewer": "Codex source review, not independent human labels",
+  "scope": "Frozen synthetic development corpus; limited functional claims, not general semantic accuracy",
+  "snapshot": "43d70247e6c7693b308c9654ffc0d99153b3918acd4ce0f822d48bba69eccceb",
+  "receipt": "U109-live-semantic-development.json",
+  "rows": [
+    {
+      "id": "startup",
+      "grade": "pass",
+      "reason": "Actual build script and __main__ guard identify launcher/main.py::main; no runtime startup claim.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "pipeline",
+      "grade": "partial",
+      "reason": "Finds checked UI/facade/completion/streaming/model/rendering components; narrative omits verification/native-tool branch detail. Eight roles and conditional edges are separately covered by deterministic tests.",
+      "model_requests": 1,
+      "error": null
+    },
+    {
+      "id": "pdf",
+      "grade": "pass",
+      "reason": "Actual documents._pages and pypdf branch found; does not deny installed PDF functionality.",
+      "model_requests": 1,
+      "error": null
+    },
+    {
+      "id": "documents",
+      "grade": "pass",
+      "reason": "Reviewed AST witnesses describe BM25-style scoring and coverage/sort limits; no imported content read.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "memory",
+      "grade": "pass",
+      "reason": "Reviewed source rules identify add/write/find, read-before-backup and readback; no facts/configuration read.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "portable",
+      "grade": "pass",
+      "reason": "Reviewed copy/flush/replace/verify and conditional include_private rules; no transfer claim.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "offline",
+      "grade": "partial",
+      "reason": "Correct netgate source and socket hook located. Narrative about config timing/runtime enforcement is broader than this static inspection establishes.",
+      "model_requests": 1,
+      "error": null
+    },
+    {
+      "id": "notebook",
+      "grade": "pass",
+      "reason": "Reviewed append/correction/current-view/hash-link/sequence rules; integrity does not prove observation truth.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "chain",
+      "grade": "partial",
+      "reason": "Correct hash function, canonical JSON/excluded hash field and checks; concise narrative does not explain all previous-hash linking details.",
+      "model_requests": 1,
+      "error": null
+    },
+    {
+      "id": "ollama",
+      "grade": "pass",
+      "reason": "Actual request timeout/retry/exception AST witnesses; no simulated failure or fallback-provider claim.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "verification",
+      "grade": "pass",
+      "reason": "Reviewed coordinator/evaluation/error/checker rules explicitly deny universal factual certainty.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "permissions",
+      "grade": "partial",
+      "reason": "Correct restrictions/resolve/workspace source located. Broad security assurance is not independently established by a static prose answer.",
+      "model_requests": 1,
+      "error": null
+    },
+    {
+      "id": "audit",
+      "grade": "pass",
+      "reason": "Actual broad silent handler, patchable reproduction target, conditional minimal fix and regression plan; hypothesis only.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "regex",
+      "grade": "pass",
+      "reason": "Native bounded re fullmatch/search returns True for page and makes no application-execution claim.",
+      "model_requests": 0,
+      "error": null
+    },
+    {
+      "id": "missing",
+      "grade": "pass",
+      "reason": "Scoped NOT FOUND with no capability-absence claim; no source body was read and the output says so.",
+      "model_requests": 0,
+      "error": null
+    }
+  ],
+  "summary": {
+    "pass_count": 11,
+    "partial_count": 4
+  },
+  "heldout": {
+    "first_receipt": "U109-live-heldout.json",
+    "first_routes": 4,
+    "total": 5,
+    "issue": "Regex answer mathematically correct but bypassed deterministic inspection",
+    "seen_receipt": "U109-live-semantic-seen-heldout.json",
+    "seen_routes": 5,
+    "note": "Seen regression retest after repair, not a fresh independent held-out score"
+  }
+}

@@ -227,6 +227,13 @@ def investigate(question, root, *, limits=None):
             # Keep task relevance ahead of incidental imports of storage/helpers.
             pending = sorted(set(follow+pending), key=lambda item: score(item[0]))
     limited |= bool(pending)
+    if not documents:
+        return fs.Reply('NOT FOUND IN SEARCHED SCOPE: No source files were read from the authorized workspace. '
+            f'Read attempts: {len(reads)}/{limits.files}; tool calls: {calls}/{limits.calls}. '
+            'The workspace may be empty, contain no supported source, or have inaccessible files. '
+            'Choose the intended repository or narrow the request. Missing workspace evidence does not '
+            'establish missing installed Cursiv functionality. '+
+            (f'{len(failures)} reads failed.' if failures else ''))
     out = ['Source inspection — read-only static evidence from the authorized workspace.',
            f'Read attempts: {len(reads)}/{limits.files}; tool calls: {calls}/{limits.calls}; '
            f'text supplied: {used}/{limits.characters} characters; import depth: at most {limits.depth}.',

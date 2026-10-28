@@ -1,0 +1,39 @@
+{
+  "status": "passed; uncommitted candidate only",
+  "source_snapshot": "43d70247e6c7693b308c9654ffc0d99153b3918acd4ce0f822d48bba69eccceb",
+  "base_commit": "efc2f961049b767f0fe49e38304e9e70f25a6955",
+  "full": {
+    "passed": 2584,
+    "skipped": 15,
+    "subtests_passed": 19,
+    "seconds": 448.75,
+    "exit_code": 0,
+    "receipt": "U109-full-final.xml"
+  },
+  "usb": {
+    "passed": 45,
+    "deselected": 2554,
+    "seconds": 76.91,
+    "exit_code": 0,
+    "receipt": "U109-usb-final.xml"
+  },
+  "workspace": {
+    "passed": 63,
+    "seconds": 1.99,
+    "exit_code": 0,
+    "log": "reports/U109-final-workspace.log"
+  },
+  "targeted": {
+    "passed": 128,
+    "seconds": 29.21,
+    "receipt": "U109-semantic-targeted.xml"
+  },
+  "boundaries": {
+    "staged_files": 0,
+    "head_unchanged": true,
+    "station_unchanged": true,
+    "owner_exclusions": "Not read, changed or staged; existing untracked files retained",
+    "native_binary_built": false,
+    "published": false
+  }
+}

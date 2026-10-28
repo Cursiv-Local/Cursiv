@@ -39,6 +39,9 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     if pair is not None:
         return runtime.TextResult(pair)
     from cursiv_engine.core import file_requests
+    from cursiv_engine.core import self_inspection
+    if self_inspection.resolve(text,history):
+        return None  # installed source precedes notebook/memory/workspace actions; no reads here
     if file_requests.recognizes(text):
         return None  # local source/search intent must precede notebook and memory keywords
     from cursiv_engine.core import profile

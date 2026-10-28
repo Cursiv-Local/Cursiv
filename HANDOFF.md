@@ -4,6 +4,16 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U109 release preparation (Codex, 2026-10-28)
+
+Continue from [U109-HANDOFF](docs/U109-HANDOFF.md). Bounded installed-source analysis
+now separates source evidence, conditional relationships, model interpretation and
+uninspected runtime/user scopes. Current measurements and retained failures belong in
+[U109-VALIDATION](docs/U109-VALIDATION.md); [release notes](docs/RELEASE-U109.md) are a draft.
+The owner authorized commit, push and release on October28. Version is prepared as U109;
+pre-version comparison receipts retain their actual U108 version and source snapshots. Keep excluded owner files, user stores and Field Station unchanged.
+Do not confuse a source snapshot or synthetic bundle-root test with a published binary.
+
 ## U108 released (Codex, 2026-10-28)
 
 Continuing state: [U108-HANDOFF](docs/U108-HANDOFF.md). Root causes, measured before/after cases,

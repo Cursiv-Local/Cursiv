@@ -122,6 +122,7 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/self_source.py` — `self source` / `self read`: Cursiv's own code and docs.
 - `core/self_index.py` — versioned public own-source inventory, AST symbols/calls and fingerprint-checked bundle reads.
 - `core/self_inspection.py` — automatic implementation context and current-thread follow-ups; owned read-only source evidence and citation checks.
+- `core/source_analysis.py` — bounded installed-source AST evidence, static call/callback relationships, feature discovery, source roles, technical checks and coverage states; no execution.
 - `core/self_contracts.py` — native explanations of critical confirmation, correction and fallback rules, conditional on hash-checked AST witnesses.
 - `core/self_stores.py` — `self stores`: what is saved and where.
 - `core/last_turn.py` — `self prompt`: what was sent for the last answer.

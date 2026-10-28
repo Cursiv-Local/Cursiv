@@ -26,6 +26,11 @@ MAX_LINES = 120               # lines returned by one read
 MAX_SCAN = 25_000_000         # characters scanned by one search
 
 
+def source_lines(text: str) -> list[str]:
+    """Python/editor lines: Unicode separators inside literals are not newlines."""
+    return text.replace('\r\n', '\n').replace('\r', '\n').split('\n')
+
+
 def root() -> Path:
     if getattr(sys, "frozen", False):
         bundle=Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
@@ -97,7 +102,7 @@ def search(query: str, limit: int = 8, *, kind: str = "") -> list[dict]:
         if scanned > MAX_SCAN:
             break
         name_bonus = sum(w in rel.lower() for w in words)
-        for n, line in enumerate(text.splitlines(), 1):
+        for n, line in enumerate(source_lines(text), 1):
             low = line.lower()
             score = sum(w in low for w in words)
             if score:
@@ -127,7 +132,7 @@ def read(rel: str, first: int = 1, count: int = MAX_LINES) -> tuple[str, str]:
     if not _allowed(path, base):
         raise ValueError(f"{rel or '(no path)'} isn't one of Cursiv's own source or documentation files.")
     from . import self_index
-    lines = self_index.text(base,self_index.load(base,version()),rel)[:MAX_FILE].splitlines()
+    lines = source_lines(self_index.text(base,self_index.load(base,version()),rel)[:MAX_FILE])
     first = max(1, int(first))
     chunk = lines[first - 1: first - 1 + max(1, min(count, MAX_LINES))]
     last = first + len(chunk) - 1

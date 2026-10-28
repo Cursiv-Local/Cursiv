@@ -1,0 +1,615 @@
+{
+  "mode": "deterministic preparation;5 repetitions per case",
+  "rows": [
+    {
+      "id": "startup",
+      "handled": true,
+      "error": "",
+      "snippets": 44,
+      "paths": [
+        "cursiv_engine/chat/completion.py",
+        "cursiv_engine/chat/conversation.py",
+        "cursiv_engine/chat/local_provider.py",
+        "cursiv_engine/chat/streaming.py",
+        "cursiv_engine/core/data_lease.py",
+        "cursiv_engine/core/vault.py",
+        "cursiv_engine/core/verify.py",
+        "cursiv_engine/ui/chat_app.py",
+        "launcher/chat_commands.py",
+        "launcher/chat_panel.py",
+        "launcher/chat_review.py",
+        "launcher/chat_transcript.py",
+        "launcher/command_dispatch.py",
+        "launcher/cursiv_launcher.py",
+        "launcher/main.py",
+        "launcher/selftest.py",
+        "launcher/theme.py"
+      ],
+      "median_ms": 794.3107,
+      "prompt_bytes": 4862,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 24,
+        "read_attempts": 24,
+        "tool_calls": 24,
+        "characters_read": 440353,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "pipeline",
+      "handled": true,
+      "error": "",
+      "snippets": 44,
+      "paths": [
+        "cursiv_engine/chat/completion.py",
+        "cursiv_engine/chat/conversation.py",
+        "cursiv_engine/chat/local_provider.py",
+        "cursiv_engine/chat/streaming.py",
+        "cursiv_engine/core/data_lease.py",
+        "cursiv_engine/core/vault.py",
+        "cursiv_engine/core/verify.py",
+        "cursiv_engine/ui/chat_app.py",
+        "launcher/chat_commands.py",
+        "launcher/chat_panel.py",
+        "launcher/chat_review.py",
+        "launcher/chat_transcript.py",
+        "launcher/command_dispatch.py",
+        "launcher/cursiv_launcher.py",
+        "launcher/main.py",
+        "launcher/selftest.py",
+        "launcher/theme.py"
+      ],
+      "median_ms": 619.7695,
+      "prompt_bytes": 4890,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 24,
+        "read_attempts": 24,
+        "tool_calls": 24,
+        "characters_read": 440353,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "pdf",
+      "handled": true,
+      "error": "",
+      "snippets": 12,
+      "paths": [
+        "cursiv_engine/core/atomic.py",
+        "cursiv_engine/core/documents.py",
+        "cursiv_engine/core/paths.py",
+        "cursiv_engine/core/vault.py"
+      ],
+      "median_ms": 18.7815,
+      "prompt_bytes": 4783,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 4,
+        "read_attempts": 4,
+        "tool_calls": 4,
+        "characters_read": 28015,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "documents",
+      "handled": true,
+      "error": "",
+      "snippets": 9,
+      "paths": [
+        "cursiv_engine/core/documents.py"
+      ],
+      "median_ms": 14.1571,
+      "prompt_bytes": 4821,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 1,
+        "read_attempts": 1,
+        "tool_calls": 1,
+        "characters_read": 15000,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "memory",
+      "handled": true,
+      "error": "",
+      "snippets": 31,
+      "paths": [
+        "cursiv_engine/core/atomic.py",
+        "cursiv_engine/core/private_store.py",
+        "cursiv_engine/core/turn_policy.py",
+        "cursiv_engine/memory/semantic.py"
+      ],
+      "median_ms": 52.5603,
+      "prompt_bytes": 4858,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 4,
+        "read_attempts": 4,
+        "tool_calls": 4,
+        "characters_read": 55776,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "portable",
+      "handled": true,
+      "error": "",
+      "snippets": 32,
+      "paths": [
+        "cursiv_engine/core/atomic.py",
+        "cursiv_engine/core/fieldlog.py",
+        "cursiv_engine/core/keystore.py",
+        "cursiv_engine/core/private_store.py",
+        "cursiv_engine/core/vault.py",
+        "launcher/portable.py",
+        "launcher/usb_ops.py",
+        "launcher/usb_sync.py"
+      ],
+      "median_ms": 51.9178,
+      "prompt_bytes": 4869,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 9,
+        "read_attempts": 9,
+        "tool_calls": 9,
+        "characters_read": 176851,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "offline",
+      "handled": true,
+      "error": "",
+      "snippets": 10,
+      "paths": [
+        "cursiv_engine/core/netgate.py"
+      ],
+      "median_ms": 13.1696,
+      "prompt_bytes": 4728,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 1,
+        "read_attempts": 1,
+        "tool_calls": 1,
+        "characters_read": 5440,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "notebook",
+      "handled": true,
+      "error": "",
+      "snippets": 24,
+      "paths": [
+        "cursiv_engine/core/fieldlog.py",
+        "cursiv_engine/core/file_requests.py",
+        "cursiv_engine/core/intent.py",
+        "cursiv_engine/core/notebook_proposals.py",
+        "cursiv_engine/core/notebook_tools.py",
+        "cursiv_engine/core/turn_policy.py"
+      ],
+      "median_ms": 43.8683,
+      "prompt_bytes": 4804,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 6,
+        "read_attempts": 6,
+        "tool_calls": 6,
+        "characters_read": 135598,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "chain",
+      "handled": true,
+      "error": "",
+      "snippets": 28,
+      "paths": [
+        "cursiv_engine/core/atomic.py",
+        "cursiv_engine/core/demo.py",
+        "cursiv_engine/core/fieldlog.py",
+        "cursiv_engine/core/private_store.py",
+        "cursiv_engine/core/vault.py"
+      ],
+      "median_ms": 52.4372,
+      "prompt_bytes": 4687,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 5,
+        "read_attempts": 5,
+        "tool_calls": 5,
+        "characters_read": 82663,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "ollama",
+      "handled": true,
+      "error": "",
+      "snippets": 38,
+      "paths": [
+        "cursiv_engine/chat/cloud_providers.py",
+        "cursiv_engine/chat/local_provider.py",
+        "cursiv_engine/chat/request_budget.py",
+        "cursiv_engine/chat/routing.py",
+        "cursiv_engine/core/last_turn.py",
+        "cursiv_engine/core/ollama_host.py",
+        "cursiv_engine/core/paths.py",
+        "cursiv_engine/core/speed.py",
+        "cursiv_engine/ui/chat_app.py"
+      ],
+      "median_ms": 41.1269,
+      "prompt_bytes": 4840,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 9,
+        "read_attempts": 9,
+        "tool_calls": 9,
+        "characters_read": 135873,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "verification",
+      "handled": true,
+      "error": "",
+      "snippets": 27,
+      "paths": [
+        "cursiv_engine/chat/review.py",
+        "cursiv_engine/core/answer_assessment.py",
+        "cursiv_engine/core/problems.py",
+        "cursiv_engine/core/review_policy.py",
+        "cursiv_engine/core/verify.py"
+      ],
+      "median_ms": 38.6426,
+      "prompt_bytes": 4802,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 6,
+        "read_attempts": 6,
+        "tool_calls": 6,
+        "characters_read": 87152,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "permissions",
+      "handled": true,
+      "error": "",
+      "snippets": 16,
+      "paths": [
+        "cursiv_engine/core/file_access.py",
+        "cursiv_engine/core/turn_policy.py",
+        "cursiv_engine/core/workspace_search.py",
+        "cursiv_engine/guardian/protected.py"
+      ],
+      "median_ms": 33.4987,
+      "prompt_bytes": 4683,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 4,
+        "read_attempts": 4,
+        "tool_calls": 4,
+        "characters_read": 42356,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "audit",
+      "handled": true,
+      "error": "",
+      "snippets": 44,
+      "paths": [
+        "cursiv_engine/chat/completion.py",
+        "cursiv_engine/chat/conversation.py",
+        "cursiv_engine/chat/local_provider.py",
+        "cursiv_engine/chat/streaming.py",
+        "cursiv_engine/core/data_lease.py",
+        "cursiv_engine/core/vault.py",
+        "cursiv_engine/core/verify.py",
+        "cursiv_engine/ui/chat_app.py",
+        "launcher/chat_commands.py",
+        "launcher/chat_panel.py",
+        "launcher/chat_review.py",
+        "launcher/chat_transcript.py",
+        "launcher/command_dispatch.py",
+        "launcher/cursiv_launcher.py",
+        "launcher/main.py",
+        "launcher/selftest.py",
+        "launcher/theme.py"
+      ],
+      "median_ms": 606.6255,
+      "prompt_bytes": 4776,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 24,
+        "read_attempts": 24,
+        "tool_calls": 24,
+        "characters_read": 440353,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": true,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "regex",
+      "handled": true,
+      "error": "",
+      "snippets": 32,
+      "paths": [
+        "cursiv_engine/core/self_index.py",
+        "cursiv_engine/core/self_inspection.py",
+        "cursiv_engine/core/self_source.py",
+        "cursiv_engine/core/source_analysis.py",
+        "cursiv_engine/core/turn_policy.py"
+      ],
+      "median_ms": 101.102,
+      "prompt_bytes": 4735,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 5,
+        "read_attempts": 5,
+        "tool_calls": 5,
+        "characters_read": 100800,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    },
+    {
+      "id": "missing",
+      "handled": true,
+      "error": "NOT FOUND IN SEARCHED SCOPE: No matching implementation was established in the installed source scope. This does not establish that the feature is missing. Narrow the feature or supply a function name; only symbol metadata was exhausted.",
+      "snippets": 0,
+      "paths": [],
+      "median_ms": 8.2103,
+      "prompt_bytes": 0,
+      "coverage": {
+        "scope": "installed_application",
+        "metadata_files_searched": 382,
+        "successful_reads": 0,
+        "read_attempts": 0,
+        "tool_calls": 0,
+        "characters_read": 0,
+        "limits": {
+          "files": 24,
+          "calls": 48,
+          "characters": 1200000,
+          "depth": 3
+        },
+        "limits_reached": false,
+        "unavailable": [],
+        "unread_scopes": [
+          "authorized_workspace",
+          "imported_documents",
+          "external_field_copy",
+          "runtime_configuration"
+        ],
+        "completeness": "Selected source only; full symbol metadata searched, not every file body or runtime path"
+      }
+    }
+  ],
+  "ordinary_chat_median_ms": 0.0049,
+  "ordinary_chat_index_loads": 0,
+  "base_commit": "efc2f961049b767f0fe49e38304e9e70f25a6955",
+  "corpus_sha256": "e6f6cc0d175abeb0fb94bdf122930e5713596f971a54bf4ec923cd9c2b27eda1",
+  "working_source_sha256": {
+    "cursiv_engine/core/self_index.py": "e9e282181505750e52ca01a381bf38223b817a9fd6294e46fbe9916615b38662",
+    "cursiv_engine/core/self_inspection.py": "38db796b1dfff3c4d84365bd4983a5d7f4924d831082dd1a8bf8b47d8168169b",
+    "cursiv_engine/core/self_source.py": "ab86f2fb9d7acc8bb465b66d4ae79988ba7da1b28ba7ea36eeb497b486f54b41",
+    "cursiv_engine/core/source_analysis.py": "f6096fae3bf0dbdee06458da93179df714e92985badc45529acfea3a7e0ae066",
+    "cursiv_engine/core/source_inspection.py": "2fe674f2ead1783e6191c643699cfca553dc734514a8cc520846c911eb81e294",
+    "cursiv_engine/core/own_source_index.json": "71e4089546943beb13913f843cc2bcbcfe33b04033020049d2de12e7551b9e64"
+  },
+  "set": "development"
+}

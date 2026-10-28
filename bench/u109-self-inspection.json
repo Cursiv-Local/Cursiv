@@ -1,0 +1,26 @@
+{
+  "development": [
+    {"id":"startup","question":"What is your actual desktop application startup entry point? Inspect the code."},
+    {"id":"pipeline","question":"Trace what happens when I submit a message in Cursiv."},
+    {"id":"pdf","question":"Locate the PDF importer in your installed code.","path":"cursiv_engine/core/documents.py"},
+    {"id":"documents","question":"Trace your document search and retrieval implementation.","path":"cursiv_engine/core/documents.py"},
+    {"id":"memory","question":"Find the code that stores and retrieves your persistent memory.","path":"cursiv_engine/memory/semantic.py"},
+    {"id":"portable","question":"Inspect your Field Copy implementation for copying portable workspaces to an external SSD.","path":"launcher/usb_ops.py"},
+    {"id":"offline","question":"Trace how your code enforces offline network restrictions.","path":"cursiv_engine/core/netgate.py"},
+    {"id":"notebook","question":"Trace your Field Notebook creation, correction and verification code.","path":"cursiv_engine/core/fieldlog.py"},
+    {"id":"chain","question":"Locate your SHA-256 notebook hash-chain implementation.","path":"cursiv_engine/core/fieldlog.py"},
+    {"id":"ollama","question":"What happens in your implementation if Ollama times out?","path":"cursiv_engine/chat/local_provider.py"},
+    {"id":"verification","question":"Find the code that verifies your responses.","path":"cursiv_engine/core/verify.py"},
+    {"id":"permissions","question":"Trace your implementation of file access restrictions.","path":"cursiv_engine/core/file_access.py"},
+    {"id":"audit","question":"Perform a read-only self-audit of your response pipeline."},
+    {"id":"regex","question":"In your code, does the regex `[a-z_]{3,}` match `page`? Check rather than guess."},
+    {"id":"missing","question":"Find your implementation of the nonexistent frobnicator engine."}
+  ],
+  "heldout": [
+    {"id":"launch-v-review","question":"Inspect your code: is review.prepare the desktop startup function or an answer-review helper?"},
+    {"id":"pdf-no-workspace","question":"My research folder is empty. Inspect your installed application to check whether PDF import exists."},
+    {"id":"field-copy-transfer","question":"Find how Cursiv's Field Copy transfers a workspace onto a removable drive without rewriting its source."},
+    {"id":"audit-possible","question":"Identify one possible reliability issue in your response pipeline, with evidence, a reproduction and a regression test. Do not change code."},
+    {"id":"regex-unseen","question":"Inspect your regex logic: does `[A-Z_]{2,5}` fully match `page`, and does it fully match `PAGE`?"}
+  ]
+}
