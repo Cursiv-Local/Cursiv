@@ -265,3 +265,38 @@ public documentation (386 files); Python runtime code remains identical to the b
 Next commit the explicit website/evidence paths through the USB hook after staged-byte scanning,
 push codex/u109-publication, create its normal protected PR, merge the reviewed tree after checks,
 deploy from merged main and verify production before writing U109-publication.json.
+
+
+## Production completed — final receipt
+
+Website/evidence commit6597774e86f7c561238474154a0ead6d68098677 ran its enabled USB hook:
+45 passed in84.65s.39 exact staged public blobs scanned with zero Gitleaks findings; the
+metadata scan receipt was committed as file40. No Python runtime changed after the binary tag.
+Website PR58 https://github.com/Cursiv-Local/Cursiv/pull/58 passed all19 listed checks and
+merged normally as67b79ef247b648ac18be427565a7bea94e0e9bea with an identical reviewed tree.
+
+Cloudflare deployment d7630911-8a21-44a7-9d54-ab7286f364ce completed from merged main.
+Production changed from U108 to U109. U109-publication.json records40 successful read-only
+checks:20 public pages/canonical/indexability and exact deployed bytes, official icons/types,
+robots/sitemap, matching signed manifest and installer links/hash,8 owner signatures,
+Googlebot/Googlebot-Image probes, retained notebook/app noindex and www/legacy redirects.
+The initial checker used a generic urllib agent for www and received403. Explicit browser,
+Googlebot and Googlebot-Image returned301 to the canonical host; correcting checker headers
+needed no deployed-file or security-rule change. User-agent probes do not establish verified
+Googlebot IP/WAF policy. No private API endpoint was queried and no automation was created.
+
+Only final production-receipt/handoff commit/PR remains. Refresh the public source inventory
+for these documentation bytes; run focused source/release/workspace checks, scan exact staged
+public bytes and retain enabled USB hooks. Use a protected PR and passing checks, then confirm
+main includes the receipt and the immutable tag/release files remain unchanged. Do not rebuild
+or replace the already authenticated release assets. The release and production site are live;
+all functional publication checks passed. Four general model narratives remain partial.
+No owner exclusions, secrets, private stores, station code or unrelated profiles were changed.
+
+Final receipt checks:58 focused source/release tests passed in7.38s; native workspace63
+passed in2.76s. This is the final publication record: once this receipt commit is present
+on main, U109's approved implementation/release/website work is complete. No app/model/build/
+deploy command remains running; only the normal final Git/CI merge is pending at authorship.
+The immutable tag and authenticated bytes must not be rebuilt or replaced. Next recommended
+action after merge is the owner's normal use/review and the existing manual discovery checklist,
+or a separately requested follow-up for the recorded partial model narratives. No recurring task.

@@ -1,0 +1,483 @@
+{
+  "version": "3.14-U109",
+  "source_commit": "bdf2737446f77a81e14a19f774c99c12a4bb3bcf",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/57",
+  "website_pr": "https://github.com/Cursiv-Local/Cursiv/pull/58",
+  "website_commit": "67b79ef247b648ac18be427565a7bea94e0e9bea",
+  "deployment_version": "d7630911-8a21-44a7-9d54-ab7286f364ce",
+  "checked_utc": "2026-10-28T22:30:27.871978+00:00",
+  "before_version": "U108",
+  "after_version": "U109",
+  "checks": [
+    {
+      "url": "https://cursiv.us/",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "2eaf37d63e63f01487f99b1b4f4f2e27640ccd251f924a2eeb827ac1380db288",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/start",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "cba0e2fda8ebf46e86562c65926581ce98c82ffcdd6804a136158ab65e61ea04",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/start"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/local-ai",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "d5db99811a847a6e1bd9210e5584af33c8de43d225726d9e0b2e9c6d35af8a51",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/local-ai"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/compare",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "9b76cb505f6d74cc99be776af749ef828927b379fe59b47fba44c82675d971ee",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/compare"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/documentation",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "e361f4fbe51b1a78d94935173a73b18cac8b0ab1e44259fa5db2c949419bfe45",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/documentation"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/local-ai-reference",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "ecd97003c8869d8b6814baa07c71853921b1402ca6eccf660024ebfb0cd69620",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/local-ai-reference"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/notebook-reference",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "502c2bef9133af8b2aa722d7bac75660967dad4e116b993151ea4b98d96a9e3d",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/notebook-reference"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/portable-ai-reference",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "3ba86ad8c3c8ba05046eca738fb93d7b7bb85a9f4047c2c764c54e6d6c10e974",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/portable-ai-reference"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/open-source-offline-ai",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "b0bc3a76339c9f7435c5f3d8ed3cdec1158c9092626ec8441b05c5792af7ebb2",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/open-source-offline-ai"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/local-ai-hardware-requirements",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "9c2eab1dffce849e31ebd357303213ed52c0632accdaf1e85f2feda17309f664",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/local-ai-hardware-requirements"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/portable-workspace",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "1c3936c8c62804a14e068f4d71df2b7d95cb263cd0d4875fe85e54a2886089ae",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/portable-workspace"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/field-research",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "1cf42ccee09b09a35df3c63872b1af473f93dea94ad8496ed87023397bc1c69b",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/field-research"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/offline-research",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "8b3a8433011bf31695d60a8622af939ffb4ade4f52853465f9f2b8e7530e75b4",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/offline-research"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/team-drives",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "257b9b60c24d1a5ebd573a9dfb22fd50a9166adebe02c0a1571d9dfdcd94c0df",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/team-drives"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/field-station",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "70a8fcd59f444c73570fbf53558ad7f8000d173fc083a5d1db777158b96ba7df",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/field-station"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/ai-reliability-testing",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "29c750f7de53e2154467a1d6f6533128c47a3a9c420f43b5980fae0ecb705c70",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/ai-reliability-testing"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/vision",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "b00d3410bb619633d52d73d4a10b403778bb71bbb5af7c832bdb5a47b89222e8",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/vision"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/story",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "93525ed0175ab1a35c1d555797e2e78e7767ce6867cac4a1e40b040d9a2de1fa",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/story"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/testers",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "f2150cc5896f259b0af7dab7e14ac9136ebb823d65bbe096ec93726b063e28b5",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/testers"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/privacy/",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "5e704c96434a84f1d22e14781f490614fb72a93be5fc112393404510b55db17b",
+      "content_type": "text/html",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical": [
+        "https://cursiv.us/privacy/"
+      ]
+    },
+    {
+      "url": "https://cursiv.us/robots.txt",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "6a5ed7d7e3e287646ec2e4f55b01a7ff3c6ed483992d9417dfd6087737a09204",
+      "content_type": "text/plain",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/sitemap.xml",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "15de7f9cc438629f57cef524db529b43ccaf71204f21b70a5c2f572d2506cff7",
+      "content_type": "application/xml",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform",
+      "canonical_urls": 20
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "13f950442b35a308e8d0dbea9e96ca8447aaa77fcb077662cdf8388f22475abb",
+      "content_type": "image/vnd.microsoft.icon",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "5c2fc87a2aec11eb0b2ba04cb48577a2af9a60b058525aada1a8508d275c8315",
+      "content_type": "image/png",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/apple-touch-icon.png",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "993b621fd695cafb5e3498e26fd55aa62351a40b7378ad7c5b11addb2fc4fa8b",
+      "content_type": "image/png",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/assets/cursiv-owner-release-U109.json",
+      "status": 200,
+      "source_bytes_match": true,
+      "sha256": "6e37654b60545d3746471c33c1a917cd0d563f43504848d4e575ad572a3f9928",
+      "content_type": "application/json",
+      "cache_control": "public, max-age=0, must-revalidate, no-transform"
+    },
+    {
+      "url": "https://cursiv.us/",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "Googlebot",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon.ico",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/favicon-96x96.png",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/apple-touch-icon.png",
+      "user_agent": "Googlebot-Image",
+      "status": 200
+    },
+    {
+      "url": "https://cursiv.us/notebook/",
+      "status": 200,
+      "intentional_noindex_retained": true
+    },
+    {
+      "url": "https://cursiv.us/app",
+      "status": 200,
+      "intentional_noindex_retained": true
+    },
+    {
+      "url": "https://www.cursiv.us/start",
+      "status": 301,
+      "location": "https://cursiv.us/start"
+    },
+    {
+      "url": "https://cursiv.winklers-llc.com/start",
+      "status": 200,
+      "final_url": "https://cursiv.us/start",
+      "source_bytes_match": true
+    },
+    {
+      "url": "https://www.cursiv.us/start",
+      "user_agent": "Googlebot",
+      "status": 301,
+      "location": "https://cursiv.us/start"
+    },
+    {
+      "url": "https://www.cursiv.us/start",
+      "user_agent": "Googlebot-Image",
+      "status": 301,
+      "location": "https://cursiv.us/start"
+    }
+  ],
+  "public_html_pages_verified": 20,
+  "installer_links_verified": true,
+  "windows_sha256": "d678d03beb0647a48de4737f45df4263d05f6a7d979f38cc639492c7d2e64c4e",
+  "mac_sha256": "ddd23f27bf2f02fef4ca8e67e89fd023eddceeef3aad5ee3706d64b05906c60b",
+  "release_assets_downloaded_back": 11,
+  "signed_assets_downloaded_and_verified": 8,
+  "website_tests_passed": 31,
+  "local_checks": {
+    "scope": "Static website/release evidence; no local full application rerun",
+    "browser_worker": {
+      "passed": 31,
+      "failed": 0,
+      "log": "reports/U109-release-website-tests.log"
+    },
+    "focused_python": {
+      "passed": 58,
+      "seconds": 7.24,
+      "receipt": "U109-website-focused.xml"
+    },
+    "workspace": {
+      "passed": 63,
+      "seconds": 1.52
+    },
+    "runtime_unchanged_from_tag": true
+  },
+  "protected_website_checks": [
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133751545",
+      "name": "test-linux"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133751317",
+      "name": "test (windows-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133751407",
+      "name": "test (macos-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133704619",
+      "name": "test (macos-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133704533",
+      "name": "test-linux"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133704613",
+      "name": "test (windows-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133652991",
+      "name": "station-arm64"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133652854",
+      "name": "workspace-files (windows-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133652888",
+      "name": "workspace-files (macos-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133652635",
+      "name": "change-scope"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433802/job/123133653005",
+      "name": "security"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778433925/job/123133653213",
+      "name": "public-website"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133620954",
+      "name": "station-arm64"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133621292",
+      "name": "workspace-files (windows-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133621341",
+      "name": "workspace-files (macos-latest)"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133621295",
+      "name": "security"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424102/job/123133620827",
+      "name": "public-website"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/40778424157/job/123133621334",
+      "name": "change-scope"
+    },
+    {
+      "bucket": "pass",
+      "link": "https://dashboard.gitguardian.com",
+      "name": "GitGuardian Security Checks"
+    }
+  ],
+  "website_commit_usb_hook": "45 passed in84.65s",
+  "actual_googlebot_verification_limit": "User-agent probes are not verified Google requests and do not reveal dashboard WAF settings",
+  "private_api_endpoints_queried": false,
+  "manual_discovery_checklist_only": true,
+  "automation_created": false,
+  "validator_note": "Initial default urllib-agent www request received403; the checker was corrected to use explicit browser headers. Browser, Googlebot and Googlebot-Image redirects pass; no additional deployment or security-rule change was needed."
+}
