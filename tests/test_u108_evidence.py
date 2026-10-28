@@ -14,6 +14,40 @@ from test_u108_reliability import source, SOURCE_QUESTIONS
 from test_chat_feedback import panel, _APP
 
 
+@pytest.mark.parametrize('question',[
+    'read ARCHITECTURE.md.',
+    'Read-only: read ARCHITECTURE.md.',
+    'read ARCHITECTURE.md?',
+    'Show the contents of ARCHITECTURE.md.',
+])
+def test_read_sentence_punctuation_is_not_part_of_the_filename(question):
+    from cursiv_engine.core import file_requests
+    assert file_requests.parse(question).path=='ARCHITECTURE.md'
+
+
+@pytest.mark.parametrize('question',[
+    'read "literal.txt."',
+    "read 'literal.txt.'",
+    'read "literal.txt.".',
+])
+def test_quoted_read_target_preserves_literal_trailing_dot(question):
+    from cursiv_engine.core import file_requests
+    assert file_requests.parse(question).path=='literal.txt.'
+
+
+def test_explicit_file_command_keeps_literal_trailing_dot():
+    assert fs._parse('file read literal.txt.',[])[1]=='literal.txt.'
+
+
+@pytest.mark.parametrize('question',[
+    'Read "source.py".',
+    'Read "implementation.md"',
+    'file read source.py',
+])
+def test_literal_code_filename_read_is_not_a_repository_investigation(question):
+    assert not si.is_request(question)
+
+
 @pytest.mark.parametrize('question', SOURCE_QUESTIONS)
 def test_citations_refer_to_real_lines_and_declared_names(source, question):
     out = fs.command(question, [], source)

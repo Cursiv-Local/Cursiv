@@ -41,6 +41,11 @@ def is_request(text: str) -> bool:
     subject = re.search(r'(?i)\b(?:repo(?:sitory)?|codebase|source(?: code)?|implementation|'
                         r'retrieval code|message[- ]processing pipeline|function calls?|'
                         r'(?:a )?user sends (?:a )?message)\b', q)
+    if action and action[0].casefold()=='read':
+        from .file_requests import parse
+        literal=parse(q)
+        if literal is not None and literal.operation in ('read','denied'):
+            return False  # filename reads and credential refusals retain their native route
     # Explicit simple file reads keep their existing literal-content interface.
     if re.match(r'(?i)^read\s+(?:the file\s+)?[\w./\\-]+\.[a-z0-9]+[.!?]?$', q):
         return False

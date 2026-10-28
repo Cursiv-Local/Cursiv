@@ -26,6 +26,17 @@ def _unquote(text):
     return text
 
 
+def _read_target(text):
+    """Sentence punctuation is syntax; quoted and explicit-command paths stay literal."""
+    value=text.strip()
+    if value.endswith(('.', '?', '!')) and _unquote(value[:-1])!=value[:-1]:
+        return _unquote(value[:-1])
+    literal=_unquote(value)
+    if literal!=value:
+        return literal
+    return re.sub(r'(\.[A-Za-z0-9]{1,8})[.!?]$',r'\1',value).rstrip('?')
+
+
 def reference(text):
     return bool(re.fullmatch(r'(?i)(?:(?:that|this|the) file|(?:(?:the|my) )?(?:field[- ]?)?notes?(?: file)?'
                              r'(?: we just (?:made|created|opened))?)', text.strip().rstrip('?.')))
@@ -125,8 +136,8 @@ def parse(text):
     m = re.fullmatch(r'(?is)(?:show(?: me)? (?:the )?contents of|show(?: me)? what(?:[’\x27]s| is) in|open|what(?:[’\x27]s| is) in)\s+(.+?)[?]?', t)
     if m and m[1].casefold().rstrip('.?!') in ('notes', 'my notes', 'the notes'):
         return None  # the existing saved-notes viewer owns these unqualified requests
-    if m and (reference(m[1]) or re.search(r'[\\/]|\.[a-z0-9]{1,8}$', _unquote(m[1]), re.I)):
-        return Request('read', _unquote(m[1]))
+    if m and (reference(m[1]) or re.search(r'[\\/]|\.[a-z0-9]{1,8}$', _read_target(m[1]), re.I)):
+        return Request('read', _read_target(m[1]))
     m = re.fullmatch(r'(?is)read (?:the file\s+)?(["\x27])(.+?)\1'
                      r'(?:\s+and\s+(confirm|summari[sz]e|list|show|tell|give|explain|describe)\b(.*))?', t)
     if m:
@@ -134,7 +145,7 @@ def parse(text):
     m = re.fullmatch(r'(?is)read (?:a file outside the workspace:\s*|the file\s+)?'
                      r'(.+?)(?:\s+and\s+(confirm|summari[sz]e|list|show|tell|give|explain|describe)\b(.*))?', t)
     if m:
-        path = _unquote(m[1]).rstrip('?')
+        path = _read_target(m[1])
         if re.match(r'(?i)(?:a |the )?file (?:that|which)\b', path):
             return Request('usage')
         if re.search(r'(?i)\b(?:that contains|and |then )', path):

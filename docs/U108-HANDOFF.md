@@ -304,3 +304,25 @@ an Ollama call or notebook data read. This follow-up must pass before CI/tag/pac
 Mac Resources-root repair and actual own-source self-test:71 focused checks passed in6.08s
 (`U108-packaging-source-final.xml`). New frozen check verifies source version reads and critical
 source witnesses without model/notebook access; Windows root behavior and link restrictions remain.
+
+Protected source CI found3 real POSIX read failures in both Linux and Mac: the natural sentence
+`read ARCHITECTURE.md.` retained its final full stop. Windows silently accepts that spelling,
+so its local/native suite masked it. Pure parser baseline2 failed/3 passed reproduces this on
+Windows too (`U108-sentence-baseline.xml`); an earlier test used pytest's reserved request name
+and ran no valid tests (`U108-sentence-before.xml`). Natural read-target punctuation now separates
+an extension's sentence terminator, preserving quoted literal names and explicit file commands.
+The source guards and workspace authorization remain unchanged. Hosted failures remain public
+in runs40720528091/40720536895; no merge/tag/release bypass performed.
+Windows pre-tag package preflight fromaf39d8a passed installed+portable frozen checks, including
+own-source contracts; reports copied to bench/results/U108-preflight-windows-*.txt. Mac dispatch
+40721354798 failed at checkout because a short ref was treated as a branch; corrected full-hash
+preflight40721773981 is running, upload=false. These preflights are not release artifacts.
+The same parser audit reproduced2 quoted code-filename routing failures: source.py and implementation.md
+were treated as repository subjects. Explicit reads now defer to the existing pure file parser before
+source investigation; denied credential reads keep their refusal route. Source-analysis positives and
+workspace boundaries remain covered. A new pure parser test protects Unix semantics even on Windows.
+POSIX/read-routing repairs:207 focused tests passed in9.18s (`U108-posix-final.xml`), including
+original source/read/confirmation cases, quoted and explicit literal names, native workspace
+release gates, source contracts and per-turn restrictions. The obsolete Mac full-hash preflight
+had already finished its source-test failure when cancellation was attempted; no running check
+was bypassed. It will be rerun from the repaired commit after push.

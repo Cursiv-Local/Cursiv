@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="3" time="0.459" timestamp="2026-10-28T12:09:34.988712-04:00" hostname="Josh"><testcase classname="tests.test_u108_evidence" name="test_literal_code_filename_read_is_not_a_repository_investigation[Read &quot;source.py&quot;.]" time="0.071"><failure message="assert not True&#10; +  where True = &lt;function is_request at 0x000001B04A27CAE0&gt;('Read &quot;source.py&quot;.')&#10; +    where &lt;function is_request at 0x000001B04A27CAE0&gt; = si.is_request">tests\test_u108_evidence.py:48: in test_literal_code_filename_read_is_not_a_repository_investigation
+    assert not si.is_request(question)
+E   assert not True
+E    +  where True = &lt;function is_request at 0x000001B04A27CAE0&gt;('Read "source.py".')
+E    +    where &lt;function is_request at 0x000001B04A27CAE0&gt; = si.is_request</failure></testcase><testcase classname="tests.test_u108_evidence" name="test_literal_code_filename_read_is_not_a_repository_investigation[Read &quot;implementation.md&quot;]" time="0.005"><failure message="assert not True&#10; +  where True = &lt;function is_request at 0x000001B04A27CAE0&gt;('Read &quot;implementation.md&quot;')&#10; +    where &lt;function is_request at 0x000001B04A27CAE0&gt; = si.is_request">tests\test_u108_evidence.py:48: in test_literal_code_filename_read_is_not_a_repository_investigation
+    assert not si.is_request(question)
+E   assert not True
+E    +  where True = &lt;function is_request at 0x000001B04A27CAE0&gt;('Read "implementation.md"')
+E    +    where &lt;function is_request at 0x000001B04A27CAE0&gt; = si.is_request</failure></testcase><testcase classname="tests.test_u108_evidence" name="test_literal_code_filename_read_is_not_a_repository_investigation[file read source.py]" time="0.004" /></testsuite></testsuites>
