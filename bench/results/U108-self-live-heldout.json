@@ -1,0 +1,97 @@
+{
+  "created_utc": "2026-10-28T12:09:15.969647+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "entrypoint",
+      "question": "When I press Send, which parts of Cursiv handle my question?",
+      "response": "When you press Send, the `ChatPanel._send` method in `launcher/chat_panel.py` initiates the process by launching a thread that calls `ChatPanel._run_turn`. This method determines whether the input is a command or a chat message, then passes the appropriate content to `_run_turn`, which ultimately routes the input to `_chat_inner` in `cursiv_engine/chat/conversation.py`. There, the message is streamed via `_call_ollama_raw` in `cursiv_engine/chat/local_provider.py`, which invokes the local Ollama model to generate a response.\n\n*[Sources: installed source 3.14-U107, snapshot 4cc73c6b03f1, 7 checked excerpts and 3 AST observations: launcher/chat_panel.py:522 (ChatPanel._send); launcher/chat_panel.py:590 (ChatPanel._run_turn); cursiv_engine/ui/chat_app.py:892 (chat); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 7.778353199944831,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1409,
+          "output_tokens": 121,
+          "load_ns": 50563800
+        }
+      ]
+    },
+    {
+      "id": "correction_history",
+      "question": "Do you replace my original notebook reading when I correct it? Explain how your implementation preserves history.",
+      "response": "Yes, when you correct a notebook entry, the original reading is replaced, but its history is preserved. The `correct` function updates the entry with a new `corrects` field pointing to the original `id`, storing the correction reason. The `current()` function filters out entries that have been corrected, returning only uncorrected ones. This ensures the original entry remains in the history via `corrects`, maintaining a record of revisions without deleting past data.\n\n*[Sources: installed source 3.14-U107, snapshot 4cc73c6b03f1, 3 checked excerpts and 2 AST observations: cursiv_engine/core/fieldlog.py:475 (correct); cursiv_engine/core/fieldlog.py:490 (current); cursiv_engine/core/fieldlog.py:502 (verify); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*\n\n*(Cursiv's check: this answer sounds more certain (\"Yes, when you correct a notebook entry, the original reading is replaced, but its\u2026\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+      "error": null,
+      "seconds": 4.414539399906062,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 843,
+          "output_tokens": 94,
+          "load_ns": 39615100
+        }
+      ]
+    },
+    {
+      "id": "lookup_followup",
+      "question": "Which function actually reads those records?",
+      "response": "The notebook finds a saved sample via the `query` function in `cursiv_engine/core/field_recall.py`, specifically at line 78, where it filters rows by `sample_id` using a case-insensitive match. This function processes records and filters them based on the provided `sample` parameter. No other function is observed to directly read records; `entries()` in `fieldlog.py` returns logs but does not retrieve sample data. Thus, `query` is the only function identified as reading and filtering sample records.\n\n*[Sources: installed source 3.14-U107, snapshot 4cc73c6b03f1, 3 checked excerpts and 2 AST observations: cursiv_engine/core/field_recall.py:13 (query); cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/fieldlog.py:303 (entries); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.993079700041562,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 924,
+          "output_tokens": 109,
+          "load_ns": 92942800
+        }
+      ]
+    },
+    {
+      "id": "permission_followup",
+      "question": "And what prevents a path from escaping that folder?",
+      "response": "The authorized folder is enforced via `resolve` in `file_access.py`, line 110. If `resolved.is_relative_to(base)` is false, a `PermissionError` is raised, blocking paths outside the authorized workspace. This check prevents escape by validating that every resolved path remains within the base workspace root. The condition is evaluated during path resolution, ensuring no traversal or external access occurs.\n\n*[Sources: installed source 3.14-U107, snapshot 4cc73c6b03f1, 4 checked excerpts and 1 AST observations: cursiv_engine/core/file_access.py:99 (resolve); cursiv_engine/core/turn_policy.py:155 (effective); cursiv_engine/core/file_access.py:168 (execute_result); static source evidence, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.175124100060202,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 999,
+          "output_tokens": 81,
+          "load_ns": 48339700
+        }
+      ]
+    }
+  ]
+}

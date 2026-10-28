@@ -1,0 +1,1483 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="19" failures="0" skipped="0" tests="19" time="6.371" timestamp="2026-10-27T20:42:35.741686-04:00" hostname="Josh"><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Read-only: read ARCHITECTURE.md.]" time="0.037"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Do not modify any files; read ARCHITECTURE.md.]" time="0.032"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Inspect but do not modify: read ARCHITECTURE.md.]" time="0.029"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Examine the repository and identify its architecture.]" time="0.026"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Trace the message-processing pipeline.]" time="0.024"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Find the implementation of the Field Notebook.]" time="0.041"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Inspect Field Notebook retrieval code.]" time="0.064"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_feature_discussion_is_not_observation" time="0.029"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Find sample WB-107 in my notebook.]" time="0.060"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Find the Field Notebook record for sample WB-107.]" time="0.033"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Retrieve my notebook observation for sample WB-107.]" time="0.025"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_record_id_is_exact_not_unfiltered_listing" time="0.051"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_explicit_confirmation_prevents_native_write[Log site: Willow Basin; sample: WB-107; temp 18.6 C; Show me the parsed record and request confirmation before saving.]" time="0.035"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_explicit_confirmation_prevents_native_write[Record field observation: site: Willow Basin; sample: WB-107; temp 18.6 C. Ask me before saving.]" time="0.025"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_first_available_message_is_not_claimed_as_complete_history" time="0.052"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_original_concern_is_answered_from_user_history" time="0.026"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_calculator_decline_cannot_become_model_verified[Convert 5 meters to kilograms.]" time="0.037"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_calculator_decline_cannot_become_model_verified[What is 2 m + 3 kg?]" time="0.041"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase><testcase classname="tests.test_u108_reliability" name="test_enabled_workspace_persists_across_turns" time="0.027"><error message="failed on setup with &quot;OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries&quot;">..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:361: in from_call
+    result: TResult | None = func()
+                             ^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:250: in &lt;lambda&gt;
+    lambda: runtest_hook(item=item, **kwds),
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\logging.py:858: in pytest_runtest_setup
+    yield
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\capture.py:895: in pytest_runtest_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:170: in pytest_runtest_setup
+    item.session._setupstate.setup(item)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\runner.py:536: in setup
+    col.setup()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\python.py:1710: in setup
+    self._request._fillfixtures()
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:806: in _fillfixtures
+    item.funcargs[argname] = self.getfixturevalue(argname)
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:630: in getfixturevalue
+    fixturedef = self._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1181: in execute
+    fixturedef = request._get_active_fixturedef(argname)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:726: in _get_active_fixturedef
+    fixturedef.execute(request=subrequest)
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1232: in execute
+    result: FixtureValue = ihook.pytest_fixture_setup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_caller.py:197: in __call__
+    return self._hookexec(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_manager.py:183: in _hookexec
+    return self._inner_hookexec(hook_name, methods, kwargs, firstresult)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:64: in run_old_style_hookwrapper
+    return result.get_result()
+           ^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\pluggy\_execution.py:49: in run_old_style_hookwrapper
+    res = yield
+          ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\setuponly.py:36: in pytest_fixture_setup
+    return (yield)
+            ^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:1328: in pytest_fixture_setup
+    result = call_fixture_func(fixturefunc, request, kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\fixtures.py:998: in call_fixture_func
+    fixture_result = next(generator)
+                     ^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:300: in tmp_path
+    path = _mk_tmp(request, tmp_path_factory)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:287: in _mk_tmp
+    return factory.mktemp(name, numbered=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:136: in mktemp
+    basename = self._ensure_relative_to_basetemp(basename)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:117: in _ensure_relative_to_basetemp
+    if (self.getbasetemp() / basename).resolve().parent != self.getbasetemp():
+        ^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\tmpdir.py:213: in getbasetemp
+    basetemp = make_numbered_dir_with_cleanup(
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:420: in make_numbered_dir_with_cleanup
+    raise e
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:401: in make_numbered_dir_with_cleanup
+    p = make_numbered_dir(root, prefix, mode)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+..\..\..\..\AppData\Local\Temp\cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8\Lib\site-packages\_pytest\pathlib.py:239: in make_numbered_dir
+    raise OSError(
+E   OSError: could not create numbered dir with prefix pytest- in C:\Users\joshu\AppData\Local\Packages\sandbox.{e79da090-6554-4625-91b2-f4abcc8e5cd2}\AC\Temp\pytest-of-joshu after 10 tries</error></testcase></testsuite></testsuites>

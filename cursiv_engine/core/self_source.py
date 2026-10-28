@@ -28,7 +28,14 @@ MAX_SCAN = 25_000_000         # characters scanned by one search
 
 def root() -> Path:
     if getattr(sys, "frozen", False):
-        return Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
+        bundle=Path(getattr(sys, "_MEIPASS", Path(sys.executable).parent / "_internal"))
+        # PyInstaller places DATA under Resources on macOS, cross-linking it
+        # into Frameworks. Read the real data root; keep rejecting linked files.
+        if sys.platform=='darwin' and bundle.name=='Frameworks' and bundle.parent.name=='Contents':
+            resources=bundle.parent/'Resources'
+            if (resources/'cursiv_engine/core/own_source_index.json').is_file():
+                return resources
+        return bundle
     return Path(__file__).resolve().parent.parent.parent
 
 
@@ -38,28 +45,26 @@ def version() -> str:
 
 
 def _allowed(path: Path, base: Path) -> bool:
+    from . import self_index, turn_policy
+    if not turn_policy.current().inspect:
+        return False
     try:
-        rel = path.resolve().relative_to(base.resolve())
-    except ValueError:
+        rel = path.absolute().relative_to(base.absolute()).as_posix()
+        index = self_index.load(base,version())
+        self_index.checked(base,rel)
+    except (OSError,ValueError,TypeError,KeyError):
         return False
-    if not rel.parts or rel.parts[0] not in TOP or SKIP_PARTS & set(rel.parts):
-        return False
-    return path.suffix.lower() in SUFFIXES and path.is_file() and not path.is_symlink()
+    return rel in index['files']
 
 
 def files() -> list[str]:
-    base = root()
-    out = []
-    for top in TOP:
-        p = base / top
-        if p.is_file():
-            candidates = [p]
-        elif p.is_dir():
-            candidates = sorted(p.rglob("*"))
-        else:
-            continue
-        out += [c.relative_to(base).as_posix() for c in candidates if _allowed(c, base)]
-    return out
+    from . import self_index, turn_policy
+    if not turn_policy.current().inspect:
+        return []
+    try:
+        return sorted(self_index.load(root(),version())['files'])
+    except (OSError,ValueError,TypeError,KeyError):
+        return []
 
 
 def label(rel: str, first: int, last: int) -> str:
@@ -78,10 +83,15 @@ def search(query: str, limit: int = 8, *, kind: str = "") -> list[dict]:
     if not words:
         return []
     base, hits, scanned = root(), [], 0
+    from . import self_index
+    try:
+        inventory=self_index.load(base,version())
+    except (OSError,ValueError,TypeError,KeyError):
+        return []
     for rel in files():
         try:
-            text = (base / rel).read_text(encoding="utf-8", errors="replace")[:MAX_FILE]
-        except OSError:
+            text = self_index.text(base,inventory,rel)[:MAX_FILE]
+        except (OSError,ValueError,TypeError,KeyError):
             continue
         scanned += len(text)
         if scanned > MAX_SCAN:
@@ -116,7 +126,8 @@ def read(rel: str, first: int = 1, count: int = MAX_LINES) -> tuple[str, str]:
     path = base / rel
     if not _allowed(path, base):
         raise ValueError(f"{rel or '(no path)'} isn't one of Cursiv's own source or documentation files.")
-    lines = path.read_text(encoding="utf-8", errors="replace")[:MAX_FILE].splitlines()
+    from . import self_index
+    lines = self_index.text(base,self_index.load(base,version()),rel)[:MAX_FILE].splitlines()
     first = max(1, int(first))
     chunk = lines[first - 1: first - 1 + max(1, min(count, MAX_LINES))]
     last = first + len(chunk) - 1
@@ -155,8 +166,11 @@ def map_lines(query: str = "") -> list[str]:
     """Lines of the code map (every module, one line each, by job) that match the words;
     with no words, the section headings. The map is kept complete by tests/test_code_map.py."""
     try:
-        text = (root() / MAP).read_text(encoding="utf-8")
-    except OSError:
+        from . import self_index, turn_policy
+        if not turn_policy.current().inspect:
+            return []
+        text = self_index.text(root(),self_index.load(root(),version()),MAP)
+    except (OSError,ValueError,TypeError,KeyError):
         return []
     if not query.strip():
         return [ln.lstrip("# ").strip() for ln in text.splitlines() if ln.startswith(("## ", "### "))]

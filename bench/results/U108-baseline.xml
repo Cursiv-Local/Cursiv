@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="16" skipped="0" tests="19" time="4.238" timestamp="2026-10-27T20:43:11.155408-04:00" hostname="Josh"><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Read-only: read ARCHITECTURE.md.]" time="2.640" /><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Do not modify any files; read ARCHITECTURE.md.]" time="0.021"><failure message="assert (False)&#10; +  where False = Policy(inspect=False, change=False, memory_write=False, automatic_memory=False).inspect">tests\test_u108_reliability.py:38: in test_read_only_permission_does_not_disable_inspection
+    assert policy.inspect and not policy.change
+E   assert (False)
+E    +  where False = Policy(inspect=False, change=False, memory_write=False, automatic_memory=False).inspect</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_read_only_permission_does_not_disable_inspection[Inspect but do not modify: read ARCHITECTURE.md.]" time="0.016"><failure message="assert (False)&#10; +  where False = Policy(inspect=False, change=False, memory_write=False, automatic_memory=False).inspect">tests\test_u108_reliability.py:38: in test_read_only_permission_does_not_disable_inspection
+    assert policy.inspect and not policy.change
+E   assert (False)
+E    +  where False = Policy(inspect=False, change=False, memory_write=False, automatic_memory=False).inspect</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Examine the repository and identify its architecture.]" time="0.039"><failure message="Failed: No unsupported model source analysis">tests\test_u108_reliability.py:47: in test_analysis_uses_real_source_not_notebook
+    out = final_reply(pipeline, question, file_access=True, root_path=str(source))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:218: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+tests\test_u108_reliability.py:46: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No unsupported model source analysis'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unsupported model source analysis</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Trace the message-processing pipeline.]" time="0.012"><failure message="Failed: No unsupported model source analysis">tests\test_u108_reliability.py:47: in test_analysis_uses_real_source_not_notebook
+    out = final_reply(pipeline, question, file_access=True, root_path=str(source))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:218: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+tests\test_u108_reliability.py:46: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No unsupported model source analysis'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unsupported model source analysis</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Find the implementation of the Field Notebook.]" time="0.022"><failure message="Failed: No notebook lookup for implementation">tests\test_u108_reliability.py:47: in test_analysis_uses_real_source_not_notebook
+    out = final_reply(pipeline, question, file_access=True, root_path=str(source))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:164: in chat
+    _notebook = (notebook_tools.command(_field_text, history, observer=_notebook_person().title(), scope=notebook_scope)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\notebook_tools.py:340: in command
+    return execute(READ, args, observer=observer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u108_reliability.py:45: in &lt;lambda&gt;
+    monkeypatch.setattr(nt, 'execute', lambda *a, **k: pytest.fail('No notebook lookup for implementation'))
+                                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No notebook lookup for implementation</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_analysis_uses_real_source_not_notebook[Inspect Field Notebook retrieval code.]" time="0.019"><failure message="Failed: No unsupported model source analysis">tests\test_u108_reliability.py:47: in test_analysis_uses_real_source_not_notebook
+    out = final_reply(pipeline, question, file_access=True, root_path=str(source))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:218: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+tests\test_u108_reliability.py:46: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No unsupported model source analysis'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No unsupported model source analysis</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_feature_discussion_is_not_observation" time="0.009"><failure message="AssertionError: assert _Intent(kind='clarification', payload='', reference=False) is None&#10; +  where _Intent(kind='clarification', payload='', reference=False) = &lt;function _request at 0x000001F649033F60&gt;('How does the Field Notebook save a record?', [])&#10; +    where &lt;function _request at 0x000001F649033F60&gt; = nt._request">tests\test_u108_reliability.py:54: in test_feature_discussion_is_not_observation
+    assert nt._request('How does the Field Notebook save a record?', []) is None
+E   AssertionError: assert _Intent(kind='clarification', payload='', reference=False) is None
+E    +  where _Intent(kind='clarification', payload='', reference=False) = &lt;function _request at 0x000001F649033F60&gt;('How does the Field Notebook save a record?', [])
+E    +    where &lt;function _request at 0x000001F649033F60&gt; = nt._request</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Find sample WB-107 in my notebook.]" time="0.023"><failure message="assert (None)">tests\test_u108_reliability.py:67: in test_lookup_sample_does_not_search_the_instruction_words
+    assert result and result.ok and [r['id'] for r in result.records] == [row['id']]
+E   assert (None)</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Find the Field Notebook record for sample WB-107.]" time="0.079" /><testcase classname="tests.test_u108_reliability" name="test_lookup_sample_does_not_search_the_instruction_words[Retrieve my notebook observation for sample WB-107.]" time="0.037"><failure message="assert (None)">tests\test_u108_reliability.py:67: in test_lookup_sample_does_not_search_the_instruction_words
+    assert result and result.ok and [r['id'] for r in result.records] == [row['id']]
+E   assert (None)</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_record_id_is_exact_not_unfiltered_listing" time="0.106"><failure message="AssertionError: assert (Result(tool='notebook_read_entries', status='read', records=[{'schema': 1, 'id': 'e4c49de71d73', 'seq': 2, 'recorded_u...count=2, scope={}, filters={'words': '', 'sample': '', 'start': '', 'end': '', 'entry': '', 'site': '', 'measure': ''}) and True and ['e4c49de71d7...78566303d374'] == ['78566303d374']&#10; +  where True = Result(tool='notebook_read_entries', status='read', records=[{'schema': 1, 'id': 'e4c49de71d73', 'seq': 2, 'recorded_u...count=2, scope={}, filters={'words': '', 'sample': '', 'start': '', 'end': '', 'entry': '', 'site': '', 'measure': ''}).ok&#10;  &#10;  At index 0 diff: 'e4c49de71d73' != '78566303d374'&#10;  Left contains one more item: '78566303d374'&#10;  Use -v to get more diff)">tests\test_u108_reliability.py:74: in test_record_id_is_exact_not_unfiltered_listing
+    assert result and result.ok and [r['id'] for r in result.records] == [wanted['id']]
+E   AssertionError: assert (Result(tool='notebook_read_entries', status='read', records=[{'schema': 1, 'id': 'e4c49de71d73', 'seq': 2, 'recorded_u...count=2, scope={}, filters={'words': '', 'sample': '', 'start': '', 'end': '', 'entry': '', 'site': '', 'measure': ''}) and True and ['e4c49de71d7...78566303d374'] == ['78566303d374']
+E    +  where True = Result(tool='notebook_read_entries', status='read', records=[{'schema': 1, 'id': 'e4c49de71d73', 'seq': 2, 'recorded_u...count=2, scope={}, filters={'words': '', 'sample': '', 'start': '', 'end': '', 'entry': '', 'site': '', 'measure': ''}).ok
+E     
+E     At index 0 diff: 'e4c49de71d73' != '78566303d374'
+E     Left contains one more item: '78566303d374'
+E     Use -v to get more diff)</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_explicit_confirmation_prevents_native_write[Log site: Willow Basin; sample: WB-107; temp 18.6 C; Show me the parsed record and request confirmation before saving.]" time="0.048"><failure message="AssertionError: No append before explicit confirmation&#10;assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre0/memory/fieldlog/observations.jsonl').exists&#10; +      where WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre0/memory/fieldlog/observations.jsonl') = &lt;function log_file at 0x000001F649030C20&gt;()&#10; +        where &lt;function log_file at 0x000001F649030C20&gt; = fieldlog.log_file">tests\test_u108_reliability.py:83: in test_explicit_confirmation_prevents_native_write
+    assert not fieldlog.log_file().exists(), 'No append before explicit confirmation'
+E   AssertionError: No append before explicit confirmation
+E   assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre0/memory/fieldlog/observations.jsonl').exists
+E    +      where WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre0/memory/fieldlog/observations.jsonl') = &lt;function log_file at 0x000001F649030C20&gt;()
+E    +        where &lt;function log_file at 0x000001F649030C20&gt; = fieldlog.log_file</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_explicit_confirmation_prevents_native_write[Record field observation: site: Willow Basin; sample: WB-107; temp 18.6 C. Ask me before saving.]" time="0.068"><failure message="AssertionError: No append before explicit confirmation&#10;assert not True&#10; +  where True = exists()&#10; +    where exists = WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre1/memory/fieldlog/observations.jsonl').exists&#10; +      where WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre1/memory/fieldlog/observations.jsonl') = &lt;function log_file at 0x000001F649030C20&gt;()&#10; +        where &lt;function log_file at 0x000001F649030C20&gt; = fieldlog.log_file">tests\test_u108_reliability.py:83: in test_explicit_confirmation_prevents_native_write
+    assert not fieldlog.log_file().exists(), 'No append before explicit confirmation'
+E   AssertionError: No append before explicit confirmation
+E   assert not True
+E    +  where True = exists()
+E    +    where exists = WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre1/memory/fieldlog/observations.jsonl').exists
+E    +      where WindowsPath('C:/Users/joshu/OneDrive/Documents/GitHub/Cursiv-v3/reports/u108-baseline-0edfc3cea40a4de1b921b1e4fc9156ae/pytest/test_explicit_confirmation_pre1/memory/fieldlog/observations.jsonl') = &lt;function log_file at 0x000001F649030C20&gt;()
+E    +        where &lt;function log_file at 0x000001F649030C20&gt; = fieldlog.log_file</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_first_available_message_is_not_claimed_as_complete_history" time="0.013"><failure message="assert 'available' in &quot;your first message in this conversation: “later context”\n\n*[sources: this conversation's stored messages (no ai model)]*&quot;&#10; +  where &quot;your first message in this conversation: “later context”\n\n*[sources: this conversation's stored messages (no ai model)]*&quot; = &lt;built-in method lower of str object at 0x000001F66098D330&gt;()&#10; +    where &lt;built-in method lower of str object at 0x000001F66098D330&gt; = &quot;Your first message in this conversation: “Later context”\n\n*[Sources: this conversation's stored messages (no AI model)]*&quot;.lower">tests\test_u108_reliability.py:90: in test_first_available_message_is_not_claimed_as_complete_history
+    assert 'available' in out.lower()
+E   assert 'available' in "your first message in this conversation: “later context”\n\n*[sources: this conversation's stored messages (no ai model)]*"
+E    +  where "your first message in this conversation: “later context”\n\n*[sources: this conversation's stored messages (no ai model)]*" = &lt;built-in method lower of str object at 0x000001F66098D330&gt;()
+E    +    where &lt;built-in method lower of str object at 0x000001F66098D330&gt; = "Your first message in this conversation: “Later context”\n\n*[Sources: this conversation's stored messages (no AI model)]*".lower</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_original_concern_is_answered_from_user_history" time="0.010"><failure message="assert (None)">tests\test_u108_reliability.py:99: in test_original_concern_is_answered_from_user_history
+    assert out and 'project is good enough' in out
+E   assert (None)</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_calculator_decline_cannot_become_model_verified[Convert 5 meters to kilograms.]" time="0.020"><failure message="Failed: No model substitutes for refused arithmetic">tests\test_u108_reliability.py:106: in test_calculator_decline_cannot_become_model_verified
+    out = final_reply(pipeline, question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:218: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+tests\test_u108_reliability.py:105: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No model substitutes for refused arithmetic'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No model substitutes for refused arithmetic</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_calculator_decline_cannot_become_model_verified[What is 2 m + 3 kg?]" time="0.012"><failure message="Failed: No model substitutes for refused arithmetic">tests\test_u108_reliability.py:106: in test_calculator_decline_cannot_become_model_verified
+    out = final_reply(pipeline, question)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_live_test_followup.py:22: in final_reply
+    for part in ca.chat(question, history or [], '', None, replace_draft=True, **kwargs):
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:177: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:218: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+tests\test_u108_reliability.py:105: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline, '_chat_stream', lambda *a, **k: pytest.fail('No model substitutes for refused arithmetic'))
+                                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: No model substitutes for refused arithmetic</failure></testcase><testcase classname="tests.test_u108_reliability" name="test_enabled_workspace_persists_across_turns" time="0.111" /></testsuite></testsuites>

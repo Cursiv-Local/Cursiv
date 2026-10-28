@@ -108,6 +108,8 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
     """Capture evidence now; the worker never reads legacy mutable chat records."""
     if runtime.turn_policy.current().inspect:
         verify.store_ledger_from(question, draft)  # foreground only; workers never mutate session ledgers
+    from cursiv_engine.core import self_inspection
+    own_source = self_inspection.current() is not None
     evidence = deepcopy(runtime._evidence(question, history))
     assess = partial(answer_assessment.assess, question, titles=tuple(runtime._REF_SHOWN),
                      searched=runtime._WEB_SEARCHED, evidence=evidence,
@@ -144,7 +146,7 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
 
     def ask(messages, cancelled):
         budget = REWRITE_TOKENS if messages[0]['content'].startswith('Rewrite') else TOKENS
-        if not background:
+        if not background and not own_source:
             with model_activity():
                 return router(messages, max_tokens=budget)
         if cancelled.is_set() or not running():

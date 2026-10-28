@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="5" time="0.587" timestamp="2026-10-28T12:04:24.701869-04:00" hostname="Josh"><testcase classname="tests.test_u108_evidence" name="test_read_sentence_punctuation_is_not_part_of_the_filename[read ARCHITECTURE.md.]" time="0.092"><failure message="AssertionError: assert 'ARCHITECTURE.md.' == 'ARCHITECTURE.md'&#10;  &#10;  - ARCHITECTURE.md&#10;  + ARCHITECTURE.md.&#10;  ?                +">tests\test_u108_evidence.py:24: in test_read_sentence_punctuation_is_not_part_of_the_filename
+    assert file_requests.parse(question).path=='ARCHITECTURE.md'
+E   AssertionError: assert 'ARCHITECTURE.md.' == 'ARCHITECTURE.md'
+E     
+E     - ARCHITECTURE.md
+E     + ARCHITECTURE.md.
+E     ?                +</failure></testcase><testcase classname="tests.test_u108_evidence" name="test_read_sentence_punctuation_is_not_part_of_the_filename[Read-only: read ARCHITECTURE.md.]" time="0.005"><failure message="AssertionError: assert 'ARCHITECTURE.md.' == 'ARCHITECTURE.md'&#10;  &#10;  - ARCHITECTURE.md&#10;  + ARCHITECTURE.md.&#10;  ?                +">tests\test_u108_evidence.py:24: in test_read_sentence_punctuation_is_not_part_of_the_filename
+    assert file_requests.parse(question).path=='ARCHITECTURE.md'
+E   AssertionError: assert 'ARCHITECTURE.md.' == 'ARCHITECTURE.md'
+E     
+E     - ARCHITECTURE.md
+E     + ARCHITECTURE.md.
+E     ?                +</failure></testcase><testcase classname="tests.test_u108_evidence" name="test_read_sentence_punctuation_is_not_part_of_the_filename[read ARCHITECTURE.md?]" time="0.004" /><testcase classname="tests.test_u108_evidence" name="test_quoted_read_target_preserves_literal_trailing_dot[read &quot;literal.txt.&quot;]" time="0.004" /><testcase classname="tests.test_u108_evidence" name="test_quoted_read_target_preserves_literal_trailing_dot[read 'literal.txt.']" time="0.005" /></testsuite></testsuites>

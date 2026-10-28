@@ -1,0 +1,7 @@
+{
+  "heldout": [
+    {"id":"calendar","question":"My calendar has declared a work stoppage. One short reply, no advice.","history":[]},
+    {"id":"coffee","question":"My coffee asked for a performance review. One playful line.","history":[]},
+    {"id":"light_feedback","question":"That was a joke. Keep it light, under 15 words, no pep talk.","history":["My calendar has declared a work stoppage."]}
+  ]
+}

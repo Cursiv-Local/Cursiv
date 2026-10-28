@@ -17,10 +17,11 @@ def refusal(text: str, history=()) -> str | None:
     if blocked:
         return blocked
     if file_access.is_request(task, list(history)):
+        from . import source_inspection
         parsed = file_access._parse(task, list(history))
         operation = {'read': 'read_file', 'list': 'list_directory', 'verify': 'read_file',
                      'search': 'search_files', 'denied': 'read_file'}.get(
-            parsed[0] if parsed else '', 'write_file')
+            parsed[0] if parsed else '', 'read_file' if source_inspection.is_request(task) else 'write_file')
         if policy.blocks(operation):
             return turn_policy.DENIED
     from cursiv_engine.memory.intents import requested_operations

@@ -35,6 +35,26 @@ def _checks():
             out.append(str(d))
         return "writable: " + ", ".join(out)
 
+    def own_source():
+        from cursiv_engine.core import self_source, self_index, self_inspection, self_contracts
+        self_index.load(self_source.root(),self_source.version())
+        _,source=self_source.read('cursiv_engine/core/selfknow.py',1,24)
+        assert self_source.version() in source
+        token=self_inspection._active.set(None)
+        try:
+            for question in ('Where does your code enforce confirmation?',
+                             'Do you replace my original notebook reading when I correct it?',
+                             'What happens if your local model fails?'):
+                packet=self_inspection.prepare(question)
+                if packet is None or packet.error:
+                    raise RuntimeError('Own-source lookup unavailable: '+str(getattr(packet,'error','missing packet')))
+                result=self_contracts.answer(packet,question)
+                if not result or result.startswith('The critical behavior explanation is unavailable'):
+                    raise RuntimeError(result or 'Critical source rule missing')
+        finally:
+            self_inspection._active.reset(token)
+        return 'versioned source read and critical-rule witnesses pass; no model or notebook data read'
+
     def portable_storage():
         """Run from a Cursiv USB, everything must be on that drive (launcher/portable.py)."""
         if os.environ.get("CURSIV_PORTABLE") != "1":
@@ -128,7 +148,7 @@ def _checks():
             raise RuntimeError("a plugin could import socket")
         return "a plugin ran in its own process; network access was refused"
 
-    return [("imports", imports), ("owner release identity", owner_identity), ("plugin isolation", plugin_isolation),
+    return [("imports", imports), ("own source", own_source), ("owner release identity", owner_identity), ("plugin isolation", plugin_isolation),
             ("data folders", data_folders),
             ("portable storage", portable_storage), ("offline reference", reference),
             ("calculations", calculations), ("field notebook", field_notebook), ("documents", documents),

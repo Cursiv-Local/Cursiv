@@ -1,0 +1,92 @@
+{
+  "created_utc": "2026-10-28T11:50:06.714895+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "Own-source inspection unavailable: The installed source index has no matching implementation symbols. No source-grounded explanation is confirmed.",
+      "error": null,
+      "seconds": 0.24714690004475415,
+      "calls": []
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "Own-source inspection unavailable: The installed source index has no matching implementation symbols. No source-grounded explanation is confirmed.",
+      "error": null,
+      "seconds": 0.01003040000796318,
+      "calls": []
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "Cursiv does not search for saved samples in a notebook. The provided source excerpt from `cursiv_engine/core/fieldlog.py` shows a function `_read()` that reads log file lines, not notebook content. No evidence exists in the given code for notebook sample retrieval, file search, or storage logic. The function processes log entries line by line, but there is no indication of searching or locating user-saved samples in notebooks.\n\n*[Sources: installed source 3.14-U107, snapshot 0996963661bf, 1 checked excerpts and 0 AST observations; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.822282500099391,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 472,
+          "output_tokens": 90,
+          "load_ns": 48352300
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "Own-source inspection unavailable: The installed source index has no matching implementation symbols. No source-grounded explanation is confirmed.",
+      "error": null,
+      "seconds": 0.01616460003424436,
+      "calls": []
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "Own-source inspection unavailable: The installed source index has no matching implementation symbols. No source-grounded explanation is confirmed.",
+      "error": null,
+      "seconds": 0.015537500032223761,
+      "calls": []
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "Own-source inspection unavailable: The installed source index has no matching implementation symbols. No source-grounded explanation is confirmed.",
+      "error": null,
+      "seconds": 0.015000700019299984,
+      "calls": []
+    }
+  ]
+}

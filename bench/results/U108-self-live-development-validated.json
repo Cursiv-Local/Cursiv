@@ -1,0 +1,127 @@
+{
+  "created_utc": "2026-10-28T11:59:40.869164+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "Source explanation withheld: chat.completion._chat_inner does not name the inspected implementation module. These references were not established by the inspected code.\n\nlauncher/chat_panel.py:522 \u2014 ChatPanel._send\nlauncher/chat_panel.py:590 \u2014 ChatPanel._run_turn\ncursiv_engine/ui/chat_app.py:892 \u2014 chat\ncursiv_engine/chat/completion.py:60 \u2014 chat\ncursiv_engine/chat/streaming.py:117 \u2014 _chat_stream\ncursiv_engine/chat/conversation.py:15 \u2014 _chat_inner\ncursiv_engine/chat/local_provider.py:16 \u2014 _call_ollama_raw",
+      "error": null,
+      "seconds": 6.702087800018489,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1390,
+          "output_tokens": 114,
+          "load_ns": 46433100
+        }
+      ]
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "Your messages are processed by the `_call_ollama` function, which yields from `_call_ollama_raw`. The model is called via `_call_ollama_raw`, which constructs an HTTP request to the OLLAMA_URL using `urllib.request.Request`. This request sends JSON payload with messages and parameters to the local OLLAMA server, where the actual model inference occurs. The model is not embedded in Cursiv; it runs locally on your machine via OLLAMA.\n\n*[Sources: installed source 3.14-U107, snapshot ebfa8ed94f08, 2 checked excerpts and 0 AST observations: cursiv_engine/chat/local_provider.py:16 (_call_ollama_raw); cursiv_engine/chat/local_provider.py:115 (_call_ollama); model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.785189099959098,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 648,
+          "output_tokens": 100,
+          "load_ns": 51700700
+        }
+      ]
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "The notebook finds a saved sample by matching the `sample_id` in user queries against stored records. In `field_recall.py`, line 78, the function filters rows using `r.get('sample_id', '').casefold() == sample.casefold()`, comparing the sample ID from input with stored entries. This conditional filtering ensures only matching samples are retrieved. If no match is found, the query proceeds to a fallback, but no error is raised\u2014only a filtered result is returned.\n\n*[Sources: installed source 3.14-U107, snapshot ebfa8ed94f08, 3 checked excerpts and 2 AST observations: cursiv_engine/core/field_recall.py:13 (query); cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/fieldlog.py:303 (entries); model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.718170999898575,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 896,
+          "output_tokens": 100,
+          "load_ns": 50683500
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "Confirmation is enforced in `notebook_proposals.py` at line 56, where `confirmation` checks for cues like \"ask me before saving\" or \"request confirmation before saving\" in the text. If such cues are found, it triggers a preview instead of saving. This logic is called during `command` execution in `notebook_tools.py` at line 324, when `intent.kind` is 'create', 'card', or 'clarification'. The actual saving is deferred until confirmation is explicitly given, preventing unsaved changes. The enforcement occurs before any save action, in the proposal phase.\n\n*[Sources: installed source 3.14-U107, snapshot ebfa8ed94f08, 4 checked excerpts and 4 AST observations: cursiv_engine/core/notebook_tools.py:313 (command); cursiv_engine/core/notebook_proposals.py:41 (confirmation); launcher/chat_panel.py:590 (ChatPanel._run_turn); model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.731226700008847,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1249,
+          "output_tokens": 126,
+          "load_ns": 52953200
+        }
+      ]
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "You keep files inside the authorized folder by ensuring all file paths are resolved relative to the workspace root. The `resolve` function enforces this by raising a `PermissionError` if the path is outside the authorized workspace (`not resolved.is_relative_to(base)`). This means only paths within the authorized folder\u2014like those under `workspace_root`\u2014are permitted. Any attempt to access or modify files outside this scope is blocked.\n\n*[Sources: installed source 3.14-U107, snapshot ebfa8ed94f08, 4 checked excerpts and 1 AST observations: cursiv_engine/core/file_access.py:99 (resolve); cursiv_engine/core/turn_policy.py:155 (effective); cursiv_engine/core/file_access.py:168 (execute_result); model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.336457400000654,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 968,
+          "output_tokens": 86,
+          "load_ns": 42594200
+        }
+      ]
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "If the local model fails (i.e., `not runtime._local_model_ready()`), the system skips using it and proceeds to the fallback chain. The `_fallback_chain` function iterates over providers like Groq and Gemini, skipping any with invalid or missing keys. If all fallback providers fail or are skipped, and `_local_tried` is true (indicating the local model was attempted), the function returns early. This ensures no further attempts are made, preventing execution of a failed local model.\n\n*[Sources: installed source 3.14-U107, snapshot ebfa8ed94f08, 2 checked excerpts and 4 AST observations: cursiv_engine/chat/routing.py:176 (_fallback_chain); cursiv_engine/chat/conversation.py:15 (_chat_inner); model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.033889099955559,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 980,
+          "output_tokens": 102,
+          "load_ns": 48984700
+        }
+      ]
+    }
+  ]
+}

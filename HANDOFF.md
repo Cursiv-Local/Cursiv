@@ -4,6 +4,23 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U108 implementation candidate (Codex, 2026-10-28; uncommitted)
+
+Continuing state: [U108-HANDOFF](docs/U108-HANDOFF.md). Root causes, measured before/after cases,
+real installed Qwen replies and limits: [U108-VALIDATION](docs/U108-VALIDATION.md). Repairs cover
+read-only capability parsing, source/notebook routing, requested notebook confirmation and ID lookup,
+available-history recall and native dimensional refusals. Source inspection is bounded/static and
+keeps protected-content restrictions. Tone is partial: explicit feedback works, but the initial
+banter probe remains too literal. The owner subsequently authorized commit/push/release/publication on
+October28. U108 release preparation is in progress; do not claim publication before the recorded gates
+and asset checks finish. User-data migration and station changes remain outside scope.
+
+The owner-authorized extension automatically supplies checked public application source for natural
+implementation questions and current-chat follow-ups. It uses a versioned inventory and local inference,
+independent of workspace access; no-tools still denies reads. It creates no additional agents.
+[Automatic self-inspection evidence](docs/U108-SELF-INSPECTION.md) distinguishes retrieval/citation checks
+from model interpretation. Rebuild the development inventory after indexed source changes.
+
 ## U107 released and website published (Codex, 2026-10-27)
 
 Published [v3.14-U107](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U107), immutable source

@@ -1,0 +1,127 @@
+{
+  "created_utc": "2026-10-28T11:42:00.058141+00:00",
+  "commit": "2f1118bbafec7dea3b7671687d3b7cec4b95719e",
+  "script_sha256": "12eb9c0e01f1b090660f07310076e43b3221bc05fca0d197205920d93b2d6b1e",
+  "model": {
+    "name": "qwen3:4b-instruct",
+    "model": "qwen3:4b-instruct",
+    "modified_at": "2026-10-17T17:18:48.5710116-04:00",
+    "size": 2497293803,
+    "digest": "0edcdef34593eac1aa2be9c7d06c432dcf81945adca5eca2f27662c18f168ba0",
+    "details": {
+      "parent_model": "",
+      "format": "gguf",
+      "family": "qwen3",
+      "families": [
+        "qwen3"
+      ],
+      "parameter_size": "4.0B",
+      "quantization_level": "Q4_K_M",
+      "context_length": 262144,
+      "embedding_length": 2560,
+      "runner": "ggml"
+    },
+    "capabilities": [
+      "tools",
+      "thinking",
+      "completion"
+    ]
+  },
+  "temperature": 0,
+  "seed": 42,
+  "num_ctx": 8192,
+  "local_only": true,
+  "review": "off (deterministic checks remain)",
+  "rows": [
+    {
+      "id": "message_flow",
+      "question": "How do you process my messages, from the chat box to your reply?",
+      "response": "When you type a message in the chat box, it is passed to `ChatPanel._send`, which triggers `_run_turn` with the message and history. `_run_turn` determines if the input is a command or chat, then routes it via `chat` to `_chat_inner`, which prepares messages for Ollama via `_call_ollama_raw`. The model generates a response in real-time, streamed through `yield from`, and is returned to the UI for display.\n\n*[Sources: installed source 3.14-U107, snapshot e05221d76e85, 7 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 6.985663700033911,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1379,
+          "output_tokens": 98,
+          "load_ns": 45225500
+        }
+      ]
+    },
+    {
+      "id": "model_followup",
+      "question": "And where does the model actually get called?",
+      "response": "Messages are processed in `_chat_inner` (line 15), which routes them through a cascade of providers via `_fallback_chain` (line 176). The model is called via `_call_ollama_raw` (line 90) in `local_provider.py` when the local Ollama model is active, using a raw HTTP request to the Ollama endpoint. If local model fails, fallbacks try Groq or Gemini via `_call_groq_direct` or `_call_gemini_direct`. The actual model call occurs only if `runtime._local_model_ready()` is true and no online provider is used.\n\n*[Sources: installed source 3.14-U107, snapshot e05221d76e85, 3 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.571958599961363,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1073,
+          "output_tokens": 131,
+          "load_ns": 42754400
+        }
+      ]
+    },
+    {
+      "id": "notebook_lookup",
+      "question": "How does your notebook find a sample I saved?",
+      "response": "Source explanation withheld: fieldrecall.py:17 was not supplied in the inspected excerpts; fieldlog.py:305 was not supplied in the inspected excerpts; notebook_tools.py:356 was not supplied in the inspected excerpts. These references were not established by the inspected code.\n\ncursiv_engine/core/field_recall.py:13 \u2014 query\ncursiv_engine/core/notebook_tools.py:313 \u2014 command\ncursiv_engine/core/fieldlog.py:303 \u2014 entries",
+      "error": null,
+      "seconds": 4.869078800082207,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 745,
+          "output_tokens": 118,
+          "load_ns": 44701000
+        }
+      ]
+    },
+    {
+      "id": "confirmation_followup",
+      "question": "Where exactly is confirmation enforced?",
+      "response": "Confirmation is enforced in `notebook_proposals.confirmation(text)` when the intent is to create, card, or clarify, as seen at lines 41\u201353 in `notebook_proposals.py`. This function checks for file requests and applies a preview if the text matches a field observation pattern. The preview is then returned and used in `command` (line 323\u2013329) to show a preview before saving, ensuring user intent is confirmed before any action. No direct save occurs\u2014only a preview is generated and presented to the user.\n\n*[Sources: installed source 3.14-U107, snapshot e05221d76e85, 4 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 5.561151200090535,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1102,
+          "output_tokens": 117,
+          "load_ns": 60346900
+        }
+      ]
+    },
+    {
+      "id": "workspace_boundary",
+      "question": "How do you keep files inside the folder I authorized?",
+      "response": "Files are kept within the authorized folder by enforcing path validation and workspace boundaries. The `resolve` function in `file_access.py` checks for path traversal and ensures the path is inside the authorized workspace using `is_relative_to(base)`. Additionally, `execute_result` in `file_access.py` prevents deletion and requires confirmation for modifying existing files, ensuring only authorized operations occur within the root folder. No external or unauthorized access is permitted.\n\n*[Sources: installed source 3.14-U107, snapshot e05221d76e85, 4 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.530308299930766,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 974,
+          "output_tokens": 88,
+          "load_ns": 38482400
+        }
+      ]
+    },
+    {
+      "id": "local_failure",
+      "question": "What happens if your local model fails?",
+      "response": "If the local model fails (e.g., not ready or unavailable), the system falls back to other providers in sequence: first Groq, then Gemini, then Cursiv Cloud if enabled. This fallback chain is managed by `_fallback_chain` in routing.py. If all fallbacks fail and `local_tried` is true, the chain ends without response. The local model readiness is checked via `runtime._local_model_ready()` in routing.py.\n\n*[Sources: installed source 3.14-U107, snapshot e05221d76e85, 3 checked excerpts; model explanation, not a runtime trace. Wording by the AI model]*\n*[Answered by Ollama \u00b7 qwen3:4b-instruct]*",
+      "error": null,
+      "seconds": 4.241031900048256,
+      "calls": [
+        {
+          "done": true,
+          "input_tokens": 1055,
+          "output_tokens": 92,
+          "load_ns": 48085700
+        }
+      ]
+    }
+  ]
+}

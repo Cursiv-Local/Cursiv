@@ -95,7 +95,7 @@ def for_text(text: str) -> Policy:
                              r"(?:ever\s+)?([^.!?\n]{1,260})", body):
         if re.search(r'(?i)\b(?:I|you|we|they|he|she|it)\s*$', body[:match.start()]):
             continue
-        clause = re.split(r'(?i)\b(?:but|however|instead|then)\b', match[1], maxsplit=1)[0]
+        clause = re.split(r'(?i)[;:]|\b(?:but|however|instead|then)\b', match[1], maxsplit=1)[0]
         if match[0].lower().startswith('without'):
             # "Without asking me any questions, write the post": the clause ends at the comma (U99).
             clause = clause.split(',', 1)[0]
@@ -135,7 +135,7 @@ def task_text(text: str) -> str:
         remaining = re.sub(
             r"(?ix)^\s*(?:read[- ]only|inspect\s+but\s+do\s+not\s+modify|"
             r"(?:just|only)\s+(?:talk|chat)|conversation\s+only|no\s+(?:tools?|tool\s+calls|actions)|"
-            r"(?:do\s+not|don't|don’t)\s+(?:change|modify|inspect|read|save|store|retain|remember|learn)\s+(?:anything|this|that))"
+            r"(?:do\s+not|don't|don’t)\s+(?:change|modify|inspect|read|save|store|retain|remember|learn)\s+(?:anything|this|that|(?:any\s+)?files?))"
             r"\s*(?:[—–:;.,]|\s+-\s+)\s*", '', task, count=1)
         if remaining == task:
             break

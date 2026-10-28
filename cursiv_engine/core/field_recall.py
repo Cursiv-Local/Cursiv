@@ -122,7 +122,9 @@ _DATE_SUFFIX = (r'\s+(?:yesterday|today|last\s+(?:week|' + '|'.join(_WEEKDAYS) +
 def _outside_notebook(text: str) -> bool:
     """Do not reinterpret a file, saved-note, memory, hypothetical or negated request."""
     from . import file_requests
+    from .notebook_tools import discussion
     return bool(file_requests.recognizes(text)
+                or discussion(text)
                 or re.match(r"(?i)^\s*(?:do not|don't|never|remember|forget)\b", text)
                 or re.search(r'(?i)\b(?:saved notes|memories|story|poem|hypothetical|imagine|tomorrow)\b', text)
                 or re.search(r'(?i)\b[\w-]+\.(?:txt|md|csv|json|pdf|docx)\b', text))
@@ -185,10 +187,10 @@ def filters_for_request(text: str) -> dict:
     elif (re.search(r'(?i)\b(?:last month|last year|this week|this month|next week)\b', text)
           or (re.search(r'(?i)\bon\s+(?:' + '|'.join(_WEEKDAYS) + r')\b', text) and not weekday)):
         return {'clarification': 'Which date or date range should I search? Use a calendar date, yesterday, or last Tuesday.'}
-    sample = re.search(r'(?i)\bsample\s+([\w.-]+)', text)
+    sample = re.search(r'(?i)\bsample\s+(?:id\s*[:=]?\s*)?([\w.-]+)', text)
     if sample:
         filters['sample'] = sample[1].rstrip('.?')
-    entry = re.search(r'(?i)\bentry\s+([0-9a-f]{12}|#?\d+)\b', text)
+    entry = re.search(r'(?i)\b(?:entry|record(?: id)?)\s+([0-9a-f]{12}|#?\d+)\b', text)
     if entry:
         filters['entry'] = entry[1]
     count = re.search(r'(?i)\b(?:last|latest|recent)\s+(ten|\d+)\b', text)

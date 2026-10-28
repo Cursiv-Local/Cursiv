@@ -78,6 +78,14 @@ def answer(text: str) -> str | None:
                 'chains. Imported team logs flag the same sample ID on different devices; records are '
                 'not silently merged, renamed or deleted. There is no live check between disconnected '
                 'laptops. Inspect sample history and use an append-only correction for a mistaken label.')
+    elif (re.search(r'\b(?:field notebook|field log)\b', q) and re.search(r'\b(?:memory|memories)\b', q)
+          and re.search(r'\b(?:difference|compare|explain|differ)\b', q)):
+        body = ('Conversation history contains the available turns in this chat. Persistent conversational memory '
+                'stores selected facts for later retrieval; it is selective and does not retrain model weights. '
+                'The Field Notebook stores explicit observations, sample IDs and measurements in an append-only '
+                'record chain. Notebook searches read those records; memory recall searches saved facts. '
+                'Corrections append a linked record rather than overwriting an observation. '
+                'This explanation did not read or save either store.')
     elif re.search(r'\b(?:field notebook|field log|observations?)\b', q):
         body = ('Use log site: North Creek; sample ID: NC-001; observation: clear water; temp 14.2 C. '
                 'Notes and measurements are saved through the native Field Notebook, not field_log.txt. '

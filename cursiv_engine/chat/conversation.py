@@ -34,7 +34,14 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     if not user_text and not uploaded:
         yield "Please type a message or upload a file."
         return
-    from cursiv_engine.core.conversation_kind import personal_context_allowed, reflective
+    from cursiv_engine.core import self_inspection
+    own = self_inspection.current()
+    if own is not None and not own.error:
+        yield from self_inspection.stream(runtime, own, user_text, history, api_key, openai_key,
+                                          anthropic_key, force_provider)
+        return
+    from cursiv_engine.core.conversation_kind import personal_context_allowed, reflective, light_banter
+    _banter=light_banter(user_text) and not uploaded
     _use_memory = runtime.turn_policy.current().inspect and personal_context_allowed(user_text)
 
     # Deterministic file dispatch works with every model, including no model.
@@ -71,8 +78,9 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
         yield _files.VerifiedText(_source.status_line() + '\n\n', _source)
 
     # ── Build system prompt ─────────────────────────────────────────────
-    system_text = runtime.load_system_prompt()
-    if runtime.turn_policy.current().inspect:
+    from .response_style import BANTER_SYSTEM
+    system_text = BANTER_SYSTEM if _banter else runtime.load_system_prompt()
+    if runtime.turn_policy.current().inspect and not _banter:
         system_text += runtime.load_vault_context()
         try:
             from cursiv_engine.memory import session_notes as _notes   # U100: where this conversation left off
@@ -96,7 +104,7 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     runtime._FULL_PERSONA = system_text      # free/local providers swap this for the compact persona
     if file_context:
         system_text += f"\n\n## Uploaded Content\n{file_context}"
-    if file_access and runtime.turn_policy.current() == runtime.turn_policy.Policy():
+    if file_access and runtime.turn_policy.current() == runtime.turn_policy.Policy() and not _banter:
         system_text += """
 
 ## CODING PROTOCOL (file access active)
@@ -135,7 +143,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # user explicitly types "search: <query>".  Results are injected into
     # the system prompt so every provider gets the same live context.
     # Skipped entirely when offline — _is_online() is already called below.
-    _search_q = user_text
+    _search_q = '' if _banter else user_text
     for _pfx in ("search:", "search "):
         if _search_q.lower().startswith(_pfx):
             _search_q = _search_q[len(_pfx):].strip()
@@ -179,9 +187,11 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         from cursiv_engine.core import phases as _phases
         _ph = _phases.run(user_text, memory_fn=runtime._build_strand_context if _use_memory else None,
                           online_fn=(lambda: runtime._connectivity_probe(api_key, openai_key, anthropic_key))
-                              if runtime.turn_policy.current().inspect else None,
+                              if runtime.turn_policy.current().inspect and not _banter else None,
                           local_fn=(lambda: runtime._ollama_running() and runtime._resolve_ollama_model() is not None)
-                              if runtime.turn_policy.current().inspect else None)
+                              if runtime.turn_policy.current().inspect and not _banter else None)
+        if _ph.emergency:
+            _banter=False  # existing emergency handling always takes precedence
         _addendum = _ph.system_addendum()
         if _ph.emergency and _ph.emergency_kind != "medical":
             # A crisis gets a short, focused prompt -- buried at the end of Cursiv's long
@@ -194,9 +204,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
                 "say you're here to keep talking. Never lecture, never refuse, never say you can't help, and don't "
                 "list many resources -- the help lines are already shown.\n\n" + (_ph.memory or "")
             )
-        elif _addendum:
+        elif _addendum and not _banter:
             messages[0]["content"] += "\n\n" + _addendum + "\n"
-        runtime._PHASE_AFTER = _ph.after_reply
+        runtime._PHASE_AFTER = '' if _banter else _ph.after_reply
         runtime._EMERGENCY_TURN = bool(_ph.emergency)
         if _ph.before_reply:
             yield _ph.before_reply
@@ -214,7 +224,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     _self_turn = False
     try:
         from cursiv_engine.core import selfknow as _sk
-        if not reflective(user_text) and not runtime.turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
+        if not _banter and not reflective(user_text) and not runtime.turn_policy.current().blocks('full_self_report') and not (locals().get("_ph") and _ph.emergency) and _sk.is_self_question(user_text):
             messages[0]["content"] = _sk.system_prompt(observed=_observed, question=user_text)
             _self_turn = True
     except Exception:
@@ -222,7 +232,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
 
     runtime._CODING_TURN = False
     try:
-        if _self_turn or not runtime.turn_policy.current().inspect:
+        if _self_turn or _banter or not runtime.turn_policy.current().inspect:
             raise RuntimeError("self question")      # skip the coding brain
         from cursiv_engine.coding import brain as _cb
         _emergency = bool(locals().get("_ph") and _ph.emergency)
@@ -264,7 +274,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         pass
 
     # ── Project memory, plugin context, and tools (U52) ──────────────────────
-    if not (locals().get("_ph") and _ph.emergency):
+    if not _banter and not (locals().get("_ph") and _ph.emergency):
         try:
             from cursiv_engine.memory import projects as _proj
             from cursiv_engine.memory import semantic as _sem3
@@ -324,7 +334,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # Clock times and plain sums are worked out in code (core/calc.py); the model
     # gets the result, and chat() checks the answer used it.
     try:
-        if runtime.turn_policy.current().inspect and not (_self_turn or runtime._CODING_TURN):
+        if runtime.turn_policy.current().inspect and not (_self_turn or runtime._CODING_TURN or _banter):
             from cursiv_engine.core import calc as _calc
             runtime._WORKED = _calc.work_out_for_turn(user_text, history)
             if runtime._WORKED:
@@ -357,7 +367,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # question goes into the prompt with an ID to cite, and the person sees which.
     try:
         _crisis = bool(locals().get("_ph") and _ph.emergency and _ph.emergency_kind != "medical")
-        if runtime.turn_policy.current().inspect and not (_self_turn or runtime._CODING_TURN or _crisis):
+        if runtime.turn_policy.current().inspect and not (_self_turn or runtime._CODING_TURN or _crisis or _banter):
             from cursiv_engine.core import reference as _ref_data
             _found = _ref_data.lookup(user_text)
             if _found:
@@ -376,7 +386,7 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # Documents-only mode: with documents imported and nothing matching, Cursiv says so
     # itself, except in an emergency, where safety comes first.
     try:
-        if not (_self_turn or runtime._CODING_TURN):
+        if not (_self_turn or runtime._CODING_TURN or _banter):
             from cursiv_engine.core import documents as _docs
             if runtime.turn_policy.current().inspect and _docs.library():
                 _passages_found = _docs.search(user_text)
@@ -454,14 +464,24 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # Constructed here, never parsed out of user/model text. Compact providers
     # retain this block separately from the long replaceable persona.
     from cursiv_engine.core.feedback import VOICE
-    from .response_style import guidance
+    from .response_style import guidance, GUIDANCE_HEADING
+    if _banter:
+        messages[0]['content']=BANTER_SYSTEM
     messages.insert(1, dict(role='system', content=(
-        (_runtime or presence.CAPABILITIES) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context()
-        + ('\n' + VOICE + guidance(user_text) if not runtime._EMERGENCY_TURN else ''))))
+        ('' if _banter else (_runtime or presence.CAPABILITIES)) + runtime.turn_policy.current().note() + '\n' + runtime.grounding.source_context()
+        + ('\n' + VOICE if not runtime._EMERGENCY_TURN else ''))))
+    response_guidance = guidance(user_text, history) if not runtime._EMERGENCY_TURN else ''
+    if response_guidance:
+        messages.append(dict(role='system', content=GUIDANCE_HEADING + response_guidance))
     # Keep this independent of persona/coding prompt replacements. Paid and
     # local providers receive the same policy; _slim preserves it in full.
     from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
     messages.insert(2, dict(role='system', content=INSTRUCTIONS))
+    messages.insert(3, dict(role='system', content=(
+        'Conversation history scope: current-thread context is bounded and may omit earlier messages. '
+        'Persistent memory and other session summaries are separate from this conversation. '
+        'If earlier turns are unavailable, say so; do not invent quotations, chronology or the original concern. '
+        'Follow later user corrections over earlier statements.')))
     if _style_addendum:
         # Separate from the replaceable persona so compaction and tool prompts
         # retain the current preference, including a change made this session.

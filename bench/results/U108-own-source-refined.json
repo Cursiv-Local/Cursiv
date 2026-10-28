@@ -1,0 +1,28 @@
+{
+  "rows": [
+    {
+      "question": "Trace what happens when a user sends a message.",
+      "answer": "Source inspection \u2014 read-only static evidence from the authorized workspace.\nRead attempts: 4/24; tool calls: 7/48; text supplied: 36000/120000 characters; import depth: at most 4.\nDirect evidence (relative paths and line numbers):\n\ncursiv_engine/chat/completion.py (partial excerpt)\n- cursiv_engine/chat/completion.py:56 \u2014 declaration `chat`.\n- cursiv_engine/chat/completion.py:16 \u2014 declaration `_learn_later`.\n- cursiv_engine/chat/completion.py:43 \u2014 declaration `work`.\n- cursiv_engine/chat/completion.py:1 \u2014 \"\"\"Chat completion.\n- cursiv_engine/chat/completion.py:3 \u2014 Functions receive the explicit ChatRuntime services from the compatibility\n- cursiv_engine/chat/completion.py:7 \u2014 Entry points: _learn_later, chat.\n\ncursiv_engine/chat/local_provider.py (partial excerpt)\n- cursiv_engine/chat/local_provider.py:16 \u2014 declaration `_call_ollama_raw`.\n- cursiv_engine/chat/local_provider.py:115 \u2014 declaration `_call_ollama`.\n- cursiv_engine/chat/local_provider.py:118 \u2014 declaration `_ollama_running`.\n- cursiv_engine/chat/local_provider.py:125 \u2014 declaration `_ensure_ollama`.\n- cursiv_engine/chat/local_provider.py:1 \u2014 \"\"\"Chat local provider.\n- cursiv_engine/chat/local_provider.py:3 \u2014 Functions receive the explicit ChatRuntime services from the compatibility\n- cursiv_engine/chat/local_provider.py:14 \u2014 from .runtime import ChatRuntime\n\ncursiv_engine/chat/routing.py (partial excerpt)\n- cursiv_engine/chat/routing.py:107 \u2014 declaration `_classify_message`.\n- cursiv_engine/chat/routing.py:16 \u2014 declaration `cascade_stream`.\n- cursiv_engine/chat/routing.py:56 \u2014 declaration `_gen`.\n- cursiv_engine/chat/routing.py:128 \u2014 declaration `_is_online`.\n- cursiv_engine/chat/routing.py:1 \u2014 \"\"\"Chat routing.\n- cursiv_engine/chat/routing.py:3 \u2014 Functions receive the explicit ChatRuntime services from the compatibility\n- cursiv_engine/chat/routing.py:7 \u2014 Entry points: cascade_stream, _classify_message, _is_online, _cloud_configured, _connectivity_probe, _local_stream, _fallback_chain, _router_llm, warm_up_local.\n\n1 read(s) unavailable; failed reads were not used as evidence.\n\nNot verified: runtime dispatch, dynamic calls, behavior of code not read, or completeness of this architecture.\nInspection limits reached; narrow the question or choose a smaller workspace.\n\n*[Sources: authorized workspace text and static parser (no AI model; no code executed)]*",
+      "file_references": 20,
+      "valid_file_references": 20,
+      "declarations": 11,
+      "valid_declarations": 11,
+      "read_receipts": 3,
+      "model_requests": 0,
+      "code_execution": false,
+      "limitation": "Static excerpts, bounded discovery; no claim of complete runtime control flow."
+    },
+    {
+      "question": "Inspect Field Notebook retrieval code.",
+      "answer": "Source inspection \u2014 read-only static evidence from the authorized workspace.\nRead attempts: 0/24; tool calls: 0/48; text supplied: 0/120000 characters; import depth: at most 4.\nDirect evidence (relative paths and line numbers):\n\nNot verified: runtime dispatch, dynamic calls, behavior of code not read, or completeness of this architecture.\nInspection limits reached; narrow the question or choose a smaller workspace.\n\n*[Sources: authorized workspace text and static parser (no AI model; no code executed)]*",
+      "file_references": 0,
+      "valid_file_references": 0,
+      "declarations": 0,
+      "valid_declarations": 0,
+      "read_receipts": 0,
+      "model_requests": 0,
+      "code_execution": false,
+      "limitation": "Static excerpts, bounded discovery; no claim of complete runtime control flow."
+    }
+  ]
+}

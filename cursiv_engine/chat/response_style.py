@@ -5,6 +5,12 @@ import re
 from cursiv_engine.core import turn_policy
 from cursiv_engine.core.conversation_kind import casual, reflective, requested_followup
 
+GUIDANCE_HEADING = 'Current response guidance (application rules):\n'
+BANTER_SYSTEM = ('You are Cursiv. This turn is light conversation. Respond to the actual joke or '
+                 'figurative remark in one brief natural line. Treat obvious personification as figurative. '
+                 'No analysis, advice, pep talk, generic reassurance or follow-up offer. '
+                 'Do not invent personal experiences or facts about the person. Follow their tone and limits.')
+
 
 def concise_turn(question: str) -> bool:
     q = turn_policy.task_text(question)
@@ -16,7 +22,7 @@ def concise_turn(question: str) -> bool:
                           r"is \d+|calculate|convert)\b", q)))
 
 
-def guidance(question: str) -> str:
+def guidance(question: str, history=()) -> str:
     notes = []
     if concise_turn(question):
         notes.append('Answer the question and stop. '
@@ -26,6 +32,16 @@ def guidance(question: str) -> str:
         notes.append('Match a restrained, practical conversational register. Avoid padded reassurance '
                      'and repeated “I’m here to help/listen” framing; keep warmth when the person seeks it. '
                      'Do not volunteer saved personal facts unrelated to the topic the person mentioned.')
+    from cursiv_engine.core.conversation_kind import safety_or_technical
+    recent_user = [m.get('content', '') for m in history[-8:] if m.get('role') == 'user'
+                   and isinstance(m.get('content'), str)]
+    tone = re.compile(r'(?i)\b(?:joke|banter|keep it light|no pep talk|no advice|one short reply|stop (?:the )?lectur\w*)\b')
+    if not safety_or_technical(question) and (tone.search(question) or any(tone.search(t) for t in recent_user[-3:])):
+        notes.append('Match the current conversational tone. Playful personification can be a joke, not a literal claim '
+                     'to correct. Use one brief natural reply unless more detail is requested. Do not turn banter into '
+                     'productivity advice, a pep talk, a psychological interpretation, or a speech about feelings. '
+                     'Respect explicit brevity and tone feedback. Do not invent personal experiences or knowledge '
+                     'about the person. Cursiv is an assistant for local research, records and everyday questions.')
     if reflective(question) and not re.search(r'(?i)\b(?:detailed|in.depth|long|essay|at least)\b|\d+\s+(?:words|paragraphs)', question):
         notes.append('Answer this specific philosophical framing in 1–3 short paragraphs, roughly '
                      '100–180 words or fewer. Address the actual contrast/question; do not repeat a '

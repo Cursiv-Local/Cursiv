@@ -1,0 +1,16 @@
+{
+  "development": [
+    {"id":"message_flow","question":"How do you process my messages, from the chat box to your reply?","history":[]},
+    {"id":"model_followup","question":"And where does the model actually get called?","history":["How do you process my messages, from the chat box to your reply?"]},
+    {"id":"notebook_lookup","question":"How does your notebook find a sample I saved?","history":[]},
+    {"id":"confirmation_followup","question":"Where exactly is confirmation enforced?","history":["How does your notebook save observations?"]},
+    {"id":"workspace_boundary","question":"How do you keep files inside the folder I authorized?","history":[]},
+    {"id":"local_failure","question":"What happens if your local model fails?","history":[]}
+  ],
+  "heldout": [
+    {"id":"entrypoint","question":"When I press Send, which parts of Cursiv handle my question?","history":[]},
+    {"id":"correction_history","question":"Do you replace my original notebook reading when I correct it? Explain how your implementation preserves history.","history":[]},
+    {"id":"lookup_followup","question":"Which function actually reads those records?","history":["How does your notebook find a sample I saved?"]},
+    {"id":"permission_followup","question":"And what prevents a path from escaping that folder?","history":["How do you keep files inside the folder I authorized?"]}
+  ]
+}

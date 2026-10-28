@@ -141,6 +141,10 @@ def quote_problem(text, answer):
         return ''
     normalize = lambda s: re.sub(r'\s+', ' ', s).strip()
     sources = [normalize(excerpt(r)[0]) for r in _reads.get()]
+    from . import self_inspection
+    own = self_inspection.current()
+    if own is not None and not own.error:
+        sources += [normalize(re.sub(r'(?m)^\d+: ', '', s.text)) for s in own.snippets]
     if any(not any(normalize(q) in source for source in sources) for q in quotes):
         return ('Source quotation not verified: the quoted text was not found in this turn’s verified excerpts. '
                 'The draft is withheld to avoid presenting invented source as evidence. '

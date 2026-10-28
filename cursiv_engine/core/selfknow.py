@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U107"
+VERSION = "3.14-U108"
 FACTS_FILE = Path(__file__).with_name("cursiv_facts.md")
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 

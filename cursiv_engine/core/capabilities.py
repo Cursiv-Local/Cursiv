@@ -215,8 +215,8 @@ CAPABILITIES: tuple[Capability, ...] = (
                "Reads, lists, searches, creates and (with your approval) changes text files in one folder you choose "
                "and turn file access on for. It never deletes files.",
                "local only", ("files", "file access", "workspace", "read a file", "write a file", "folder"),
-               ("cursiv_engine/core/file_access.py", "cursiv_engine/core/workspace.py"),
-               ("tests/test_file_access.py", "tests/test_file_claims.py"),
+               ("cursiv_engine/core/file_access.py", "cursiv_engine/core/workspace.py", "cursiv_engine/core/source_inspection.py"),
+               ("tests/test_file_access.py", "tests/test_file_claims.py", "tests/test_u108_evidence.py"),
                "only inside the chosen workspace; never Cursiv's own data or keys", None),
     Capability("agents", "Custom agents", SUPPORTED,
                "Specialists you create with a name and a job (agent new …, @name, agents ask). Today an agent can only "
@@ -262,12 +262,15 @@ CAPABILITIES: tuple[Capability, ...] = (
                ("tests/test_usb_sync.py", "tests/test_usb_end_to_end.py"),
                "a drive stays readable; use drive encryption if it could be lost", _read(_portable)),
     Capability("self_inspection", "Looking at itself", SUPPORTED,
-               "self map / self source / self read show Cursiv's own code and docs; self prompt shows what was sent for "
-               "the last answer; self stores shows what is saved and where.",
+               "Implementation questions and current-chat follow-ups automatically select hash-checked public source. "
+               "Critical app rules use source-checked native explanations; other questions use the local model. "
+               "self map / self source / self read show that source directly; self prompt shows "
+               "what was sent for the last answer; self stores shows what is saved and where.",
                "local", ("self source", "source code", "own code", "self prompt", "self stores", "self map"),
-               ("cursiv_engine/core/self_source.py", "cursiv_engine/core/last_turn.py", "cursiv_engine/core/self_stores.py"),
-               ("tests/test_self_awareness.py",),
-               "seeing code doesn't prove a feature ran", None),
+               ("cursiv_engine/core/self_source.py", "cursiv_engine/core/self_inspection.py", "cursiv_engine/core/self_index.py",
+                "cursiv_engine/core/self_contracts.py", "cursiv_engine/core/last_turn.py", "cursiv_engine/core/self_stores.py"),
+               ("tests/test_self_awareness.py", "tests/test_self_index.py", "tests/test_automatic_self_inspection.py", "tests/test_self_contracts.py"),
+               "static source is not runtime proof; model interpretations can be wrong; no tools disables inspection", None),
     Capability("training", "Local fine-tuning", OPTIONAL,
                "An optional manual tool trains a small adapter on examples you collected (installs extra packages).",
                "installing packages needs the internet", ("train", "training", "fine-tune", "fine tune", "lora"),

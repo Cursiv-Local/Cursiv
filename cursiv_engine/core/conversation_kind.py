@@ -35,11 +35,25 @@ def casual(text: str) -> bool:
     q = task_text(text).strip()
     if safety_or_technical(q) or len(q.split()) > 100:
         return False
-    return (reflective(q) or bool(re.search(
+    return (light_banter(q) or reflective(q) or bool(re.search(
         r"(?i)^(?:hey|hi\b|hello\b|cool\b|thanks\b|that makes sense\b)|"
         r"\b(?:how['’]s it going|how are you|switch off|wind(?:ing)? down|"
         r"pretty wiped|just (?:talk|chat)|talk (?:for a bit|with me)|"
         r"tell me (?:something|a (?:fun|small|mildly interesting) fact))\b", q)))
+
+
+def light_banter(text: str) -> bool:
+    """Explicit playful/brief conversation; never a tool or safety request."""
+    q=task_text(text)
+    if len(q.split())>70 or safety_or_technical(q) or re.search(
+            r'(?i)\b(?:calculate|convert|record|save|remember|forget|file|code|workspace|search|'
+            r'danger|emergency|symptoms?|pain|protocol|inspect|execute|summari[sz]e|documents?|'
+            r'reports?|articles?|translate|rewrite|draft|emails?|letters?|research|memories|memory|'
+            r'saved|notes|records?)\b',q):
+        return False
+    return bool(re.search(r'(?i)\b(?:that was a joke|just (?:joking|banter)|keep it light|no pep talk|'
+                         r'one playful (?:line|reply))\b',q) or
+                (re.search(r'(?i)\bone short reply\b',q) and re.search(r'(?i)\bno advice\b',q)))
 
 
 def personal_context_allowed(text: str) -> bool:

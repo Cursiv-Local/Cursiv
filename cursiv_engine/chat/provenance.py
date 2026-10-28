@@ -14,6 +14,10 @@ def capture_memory(runtime: ChatRuntime, messages: list[dict]) -> None:
 def sources_line(runtime: ChatRuntime) -> str:
     """Describe supplied evidence, not a claim that the model used or verified it."""
     parts = []
+    from cursiv_engine.core import self_inspection
+    own = self_inspection.current()
+    if own is not None and not own.error:
+        parts.append(own.footer())
     if runtime._REF_SHOWN:
         ev = runtime._ref_evidence()
         sourced = {m['title'] for m in ev.values() if m['sourced']}

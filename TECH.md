@@ -243,6 +243,36 @@ are distinguished rather than treated as interchangeable positions.
 
 #### Workspace files (U91)
 
+The uncommitted U108 candidate adds bounded source investigation using the same workspace grant:
+“Examine the repository and identify its architecture”, “Inspect Field Notebook retrieval code”,
+or “Trace what happens when a user sends a message”. Results contain relative paths, line numbers,
+declarations and possible static links backed by inspected imports. No code executes and no model
+generates these findings. Limits default to 24 reads, 48 tool calls, 120,000 characters, import depth 4
+and 15 seconds; reaching a limit is reported. Protected-content refusals remain enforced. Documentation
+paths guide discovery but do not prove runtime behavior. Dynamic dispatch and complete self-tracing
+remain unverified. [U108 validation and limitations](docs/U108-VALIDATION.md).
+
+Natural questions about Cursiv's implementation also select its own installed public source
+automatically, including follow-ups in the current chat. This is independent of workspace access.
+A build-time inventory indexes tracked public source, declarations and possible static call targets;
+each selected file is reread and SHA-256 checked, normalizing Git's LF/CRLF representation.
+Version mismatch or altered source fails closed.
+Untracked owner documents, private stores and station code are excluded from this inventory. `No tools`
+also disables own-source reads. Critical confirmation/correction/fallback explanations are native,
+conditional on inspected AST witnesses; changed witnesses fail closed. Other implementation questions
+use bounded ordered source sections with the installed local model, without
+saved personal context, plugins, workspace tools, model downloads or online fallback. Source citations
+are checked; code interpretation can still be wrong and does not establish a runtime trace. Packaging
+generates the inventory from current source. Development checkouts must run
+`python scripts/build_self_index.py` after source edits. Details and measured limits:
+[automatic self-inspection](docs/U108-SELF-INSPECTION.md).
+
+“Do not modify any files; read ARCHITECTURE.md” preserves inspection while denying changes.
+Mentioning notebook implementation routes to source inspection; discussing memory versus the notebook
+does not request a save. A structured notebook request ending “Ask me before saving” returns a preview
+without writing; the desktop uses its existing Save/Edit/Cancel card. Preview instructions are kept
+out of the approved observation. Explicit native log commands retain their existing direct-save behavior.
+
 Choose `workspace <folder>` and enable `files on` once. Natural commands use the
 same verified local tools in local and cloud model modes, without model inference:
 

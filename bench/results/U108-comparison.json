@@ -1,0 +1,105 @@
+{
+  "metrics": {
+    "intent_routing": {
+      "cases": 9,
+      "before": 1,
+      "after": 9
+    },
+    "permitted_file_reads": {
+      "cases": 3,
+      "before": 1,
+      "after": 3
+    },
+    "notebook_sample_read_after_write": {
+      "cases": 3,
+      "before": 1,
+      "after": 3
+    },
+    "notebook_record_id_lookup": {
+      "cases": 1,
+      "before": 0,
+      "after": 1
+    },
+    "confirmation_compliance": {
+      "cases": 2,
+      "before": 0,
+      "after": 2
+    },
+    "history_recall_and_scope": {
+      "cases": 2,
+      "before": 0,
+      "after": 2
+    },
+    "native_calculator_refusal": {
+      "cases": 2,
+      "before": 0,
+      "after": 2
+    },
+    "workspace_state_persistence": {
+      "cases": 1,
+      "before": 1,
+      "after": 1
+    }
+  },
+  "live": {
+    "before": {
+      "cases": 10,
+      "attempted_generation_requests": 10,
+      "successful_generation_requests": 10,
+      "input_tokens": 19547,
+      "output_tokens": 2324,
+      "median_seconds": 6.457138049998321,
+      "errors": []
+    },
+    "after": {
+      "cases": 10,
+      "attempted_generation_requests": 3,
+      "successful_generation_requests": 3,
+      "input_tokens": 5915,
+      "output_tokens": 141,
+      "median_seconds": 0.02788925002096221,
+      "errors": []
+    }
+  },
+  "source": [
+    {
+      "question": "Trace what happens when a user sends a message.",
+      "file_references": 61,
+      "valid_file_references": 61,
+      "declarations": 31,
+      "valid_declarations": 31,
+      "read_receipts": 12,
+      "model_requests": 0,
+      "code_execution": false,
+      "limitation": "Static excerpts, bounded discovery; no claim of complete runtime control flow."
+    },
+    {
+      "question": "Inspect Field Notebook retrieval code.",
+      "file_references": 67,
+      "valid_file_references": 67,
+      "declarations": 38,
+      "valid_declarations": 38,
+      "read_receipts": 14,
+      "model_requests": 0,
+      "code_execution": false,
+      "limitation": "Static excerpts, bounded discovery; no claim of complete runtime control flow."
+    }
+  ],
+  "review": {
+    "author": "Codex; independent human review pending",
+    "initial_humor": "fails before and after; remains partial",
+    "explicit_tone_feedback": "passes both samples; small regression set",
+    "scientific_single_reading": "calibrated before and after; no calibration algorithm change",
+    "original_history": "baseline adds unsupported motivations; candidate quotes available user message",
+    "source_pipeline": "baseline claims verification without inspection; candidate static evidence is limited",
+    "unit_refusals": "baseline model correctly declined; candidate refusal is application-owned"
+  },
+  "limitations": [
+    "Selected regression cases, not population accuracy.",
+    "Source citation accuracy has no meaningful baseline denominator.",
+    "Source limits/protected-content refusals prevent a complete self-trace.",
+    "Repeated model prompts are regression retests, not blind holdouts.",
+    "Timing includes cold loads/machine activity; no general speed claim.",
+    "Original owner transcript, independent human grading, installed-app and Mac/Linux execution unavailable."
+  ]
+}

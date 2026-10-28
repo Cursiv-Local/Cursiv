@@ -113,6 +113,10 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
     # A plain conversion or speed × time question is answered by the calculator
     # itself; the model added "verified" and "from your field log" claims to these.
     from .fieldcalc import _NUM, _U
+    if calculations and turn_policy.effective(text).inspect:
+        refusal = _unit_limitation(q)
+        if refusal is not None:
+            return refusal + '\n\n*[Sources: Cursiv calculator limitation (no numerical result; no AI model)]*'
     conversion = re.fullmatch(rf"(?i)(?:please\s+)?(?:(?:convert|what(?:'s| is))\s+)?{_NUM}\s*{_U}\s+(?:to|in|into)\s+{_U}"
                               rf"(?:\s+(?:exactly|without rounding))?|(?:please\s+)?how many\s+{_U}\s+(?:are\s+)?(?:in|is)\s+{_NUM}\s*{_U}",
                               q.rstrip('?.! '))
@@ -156,6 +160,29 @@ def answer(text: str, *, calculations: bool = True) -> str | None:
 
 def _help(text: str) -> str:
     return text + '\n\n*[Sources: Cursiv built-in notebook guidance (no AI model)]*'
+
+
+def _unit_limitation(question: str) -> str | None:
+    """Pure, narrow dimensional checks. Declined arithmetic never becomes verified prose."""
+    from . import fieldcalc as fc
+    q = question.strip().rstrip('.?!')
+    match = re.fullmatch(rf'(?i)(?:please\s+)?(?:convert|what is|what\x27s)\s+{fc._NUM}\s*'
+                         r'([A-Za-z°µ/][A-Za-z°µ/ -]{0,30}?)\s+(?:to|in|into)\s+([A-Za-z°µ/][A-Za-z°µ/ -]{0,30})', q)
+    if match:
+        src, dst = match[2].strip(), match[3].strip()
+        if not fc._kind(src) or not fc._kind(dst):
+            return 'This unit conversion is not supported by Cursiv’s calculator. No numerical result was calculated.'
+        if fc._kind(src) != fc._kind(dst):
+            return f'Cannot convert {src} to {dst}: they measure incompatible quantities. No numerical result was calculated.'
+    addition = re.fullmatch(rf'(?i)(?:(?:what is|what\x27s|calculate|add)\s+)?{fc._NUM}\s*{fc._U}\s*'
+                            rf'(?:\+|plus|and)\s*{fc._NUM}\s*{fc._U}', q)
+    if addition:
+        src, dst = addition[2], addition[4]
+        if fc._kind(src) != fc._kind(dst):
+            return f'Cannot add {src} and {dst}: they measure incompatible quantities. No numerical result was calculated.'
+        if src.lower() != dst.lower():
+            return 'Mixed-unit addition is not supported here. Convert both values to one unit first; no sum was calculated.'
+    return None
 
 
 def model_answer(text: str, recorded_label: str) -> str | None:

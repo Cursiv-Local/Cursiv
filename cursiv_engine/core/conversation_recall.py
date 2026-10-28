@@ -45,13 +45,16 @@ def answer(question: str, history: list[dict]) -> str | None:
                     "*[Sources: this conversation's stored messages (no AI model)]*")
         return (f"{lead}, you wrote: {_quote(mine[-n])}\n\n"
                 "*[Sources: this conversation's stored messages (no AI model)]*")
+    original = bool(re.fullmatch(r'(?i)(?:what was my original concern|what (?:did i|was i) '
+                                r'(?:originally|initially) (?:ask|say|asking about)|'
+                                r'what did i (?:start|begin) (?:by asking|with))[?.!]*', q))
     m = _EDGE.match(q)
-    if m:
-        which = (m.group(1) or m.group(2) or "").lower()
+    if m or original:
+        which = 'first' if original else (m.group(1) or m.group(2) or "").lower()
         if not mine:
-            return ("This is your first message in this conversation.\n\n"
+            return ("No earlier user messages are available in this conversation context. I cannot establish what you said first.\n\n"
                     "*[Sources: this conversation's stored messages (no AI model)]*")
-        text, label = (mine[0], "Your first message in this conversation") if which == "first" else \
+        text, label = (mine[0], "From the conversation context currently available, your earliest message") if which == "first" else \
             (mine[-1], "Your message before this one")
         return f"{label}: {_quote(text)}\n\n*[Sources: this conversation's stored messages (no AI model)]*"
     return None

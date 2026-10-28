@@ -12,6 +12,7 @@ from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
 from .activity import serialized_turn
+from cursiv_engine.core import self_inspection
 
 def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip: bool, person: str | None, event_id: str) -> None:
     """Save lasting facts from this exchange (memory/semantic.py), off the UI thread.
@@ -19,6 +20,8 @@ def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip
     User facts are never extracted from the assistant's draft. A failed answer
     check permits only directly matched user statements; origins stay inferred.
     """
+    if self_inspection.current() is not None:
+        return  # source reasoning is not a personal fact to learn
     if origin not in ("inferred", "verified"):
         origin = "inferred"
     text = message.get("text", "") if isinstance(message, dict) else str(message or "")
@@ -53,6 +56,7 @@ def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip
     _formation.submit(work, event_id)
 
 @serialized_turn
+@self_inspection.scoped
 def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key: str, files: list | None, file_access: bool, root_path: str, openai_key: str, confirm_writes: bool, anthropic_key: str, force_provider: str, replace_draft: bool, on_stage: Callable[[str], None] | None, notebook_scope: str, on_action, on_review=None, review_mode=None) -> Generator[str, None, None]:
     """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
 
@@ -113,7 +117,11 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     if _claim_check is not None:          # "have you inspected your source?" / "what did I ask three messages ago?"
         yield _file_ops.VerifiedText(_claim_check)
         return
-    _native = native_answers.answer(_field_text, calculations=policy.inspect)
+    _own = self_inspection.prepare(_field_text, history) if not files and not (isinstance(message,dict) and message.get('files')) else None
+    if _own is not None and _own.error:
+        yield _file_ops.VerifiedText(_own.error)
+        return
+    _native = native_answers.answer(_field_text, calculations=policy.inspect) if _own is None else None
     if _native is not None:
         from cursiv_engine.core.conversation_kind import relayed_thread_question
         _requested_provider = (force_provider or '').lower().strip()
@@ -149,7 +157,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from cursiv_engine.memory.semantic import current_person as _notebook_person
     from cursiv_engine.core import presence
     from . import status as _net_status
-    _workspace_request = _file_ops.is_request(_field_text, history)
+    _workspace_request = _own is not None or _file_ops.is_request(_field_text, history)
     if not _workspace_request and _net_status.answers_network_question(_field_text) and not presence.short_state_question(_field_text):
         yield _file_ops.VerifiedText(_net_status.network_answer(_field_text))
         yield '\n\n*[Sources: Cursiv application state (no AI model)]*'
@@ -175,7 +183,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         yield _memory_action.render()
         return
     _file_reply = (_file_ops.command(_field_text, history, root_path if file_access else None)
-                   if policy.inspect else None)
+                   if policy.inspect and _own is None else None)
     if _file_reply is not None:
         if on_action:
             for receipt in _file_reply.receipts:
@@ -187,8 +195,8 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield _file_ops.VerifiedText(_file_reply.text)
             yield '\n\n*[Sources: Cursiv file execution result (no AI model)]*'
         return
-    runtime.grounding.set_state(presence.snapshot(root_path, file_access))
-    _field_reply = field_recall.command(_field_text) if runtime.turn_policy.current().inspect else None
+    runtime.grounding.set_state(presence.snapshot(root_path, file_access) if _own is None else {})
+    _field_reply = field_recall.command(_field_text) if runtime.turn_policy.current().inspect and _own is None else None
     if _field_reply is not None:
         yield _field_reply
         return
@@ -197,7 +205,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from cursiv_engine.core.paths import save_reference
     _journal_scope = save_reference(root_path) if file_access and root_path else 'general'
     _journal_reply = (curiosity_engine.command(_field_text, _journal_sem.current_person(), _journal_scope)
-                      if runtime.turn_policy.current() == runtime.turn_policy.Policy() else None)
+                      if runtime.turn_policy.current() == runtime.turn_policy.Policy() and _own is None else None)
     if _journal_reply is not None:
         yield _journal_reply
         return
@@ -228,9 +236,19 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             on_stage("Checking the answer…")
         from cursiv_engine.core import file_access as _files
         _user = message.get('text', '') if isinstance(message, dict) else str(message or '')
-        if _files.is_request(_user):
+        if _files.is_request(_user) and _own is None:
             return                 # actual file results need no AI check or automatic learning
         draft = runtime._strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        _own_problems = self_inspection.problems(draft)
+        if _own_problems:
+            runtime._CURSIV_REPLY = True
+            runtime._set_answered('')
+            final = ('Source explanation withheld: ' + '; '.join(_own_problems[:3]) +
+                     '. These references were not established by the inspected code.\n\n' +
+                     '\n'.join(f'{s.path}:{s.lines[0]} — {s.symbol}' for s in _own.snippets))
+            reply[:] = [final]
+            yield (_replace_prefix if replace_draft else '\n\n') + final
+            return
         from cursiv_engine.core import deterministic_overrides as _overrides
         _conflict = _overrides.conflicting_doses(_field_text, runtime._DOCS_SHOWN)
         if _conflict:
@@ -277,7 +295,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
         for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text),
                       _science.do_note(draft), _science.simulated_note(_field_text, draft),
-                      _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft)):
+                      _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft) if _own is None else None):
             if _note:
                 reply.append('\n\n' + _note)
                 yield '\n\n' + _note

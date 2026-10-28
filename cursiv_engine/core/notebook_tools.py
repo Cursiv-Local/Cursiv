@@ -153,10 +153,17 @@ def _intent(text: str) -> _Intent | None:
     from . import file_requests
     if file_requests.recognizes(text):
         return None  # explicit workspace source/file intent precedes notebook keywords
+    if discussion(text):
+        return None
+    if re.match(r'(?i)^(?:prepare|draft)\s+(?:(?:a|an)\s+)?field observation\b', text):
+        return _Intent('card', text)
     if re.match(r"(?i)^(?:please\s+)?(?:do not|don't|never)\b", text):
         return None
     text = re.sub(r'(?i)^(?:(?:no|actually|instead|i meant)[,:]?\s+)*(?:please\s+)?', '', text)
     text = re.sub(r'(?i)^(?:(?:can|could|would) you\s+|i (?:want|need) you to\s+)(?:please\s+)?', '', text)
+    if re.match(r'(?i)^(?:find|show|list|retrieve|search|look up)\b', text) and re.search(
+            r'(?i)\b(?:my notebook|the notebook|field notebook|field log)\b', text):
+        return _Intent('read', text)
     # Existing exports/imports/reports retain their separate, explicit commands.
     if re.match(r'(?i)^field\s*(?:log|notebook)\s+(?:export|import|share|report|correct|verify\s+\S)', text):
         return None
@@ -207,6 +214,12 @@ def _explicit(payload: str) -> bool:
     Plain sentences go to a confirm card instead (W-001 was saved as "ORION = -742")."""
     return bool(';' in payload or re.search(
         r'(?i)(?:^|[;,]\s*)(?:site|sample(?: id)?|project|note|observation)\s*:', payload))
+
+
+def discussion(text: str) -> bool:
+    """Talking about notebook mechanics never requests a notebook operation."""
+    return bool(re.match(r'(?i)^\s*(?:explain|describe|compare|how (?:do|does)|what is the difference)\b', text)
+                and re.search(r'(?i)\b(?:notebook|memory|implementation|retrieval)\b', text))
 
 
 def _detail(text: str) -> str:
@@ -260,6 +273,8 @@ def _request(text: str, history: list[dict]) -> _Intent | None:
         elif re.fullmatch(r'(?i)(?:read it back|did you (?:save|record) it\??|where did you save it\??)', text.strip()):
             intent = _Intent('read', reference=True)
     if intent is None:
+        if discussion(text):
+            return None
         # Mentioning the notebook inside explicit file/memory content does not
         # change the destination selected by the person.
         if re.match(r'(?i)^(?:file\s+|remember\s+|save (?:this )?(?:record|memory)\s*:)', text.strip()):
@@ -305,6 +320,13 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
     operation = {'read': READ, 'verify': VERIFY}.get(intent.kind, CREATE)
     if effective(text).blocks(operation):
         return Result(operation, 'failed', error=blocked_message(text, history) or DENIED)
+    from . import notebook_proposals
+    preview = notebook_proposals.confirmation(text) if intent.kind in ('create', 'card', 'clarification') else None
+    if preview is not None:
+        details = '\n'.join(preview.card_lines())
+        return Result(CREATE, 'preview', error='Preview only; nothing has been saved.\n' + details +
+                      ('\n' + '\n'.join(preview.problems) if preview.problems else
+                       '\nAfter reviewing, approve by sending: ' + preview.command))
     if intent.kind == 'card':
         return None          # allowed: the chat shows a confirm card (core/notebook_proposals.py)
     if intent.kind == 'clarification':
@@ -323,8 +345,8 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
         return result
     if intent.kind == 'read' and not intent.reference:
         from . import field_recall
-        entry = re.search(r'(?i)\bentry\s+([0-9a-f]{12}|#?\d+)\b', intent.payload)
-        sample = re.search(r'(?i)\bsample\s+([\w.-]+)', intent.payload)
+        entry = re.search(r'(?i)\b(?:entry|record(?: id)?)\s+([0-9a-f]{12}|#?\d+)\b', intent.payload)
+        sample = re.search(r'(?i)\bsample\s+(?:id\s*[:=]?\s*)?([\w.-]+)', intent.payload)
         words = re.search(r'(?i)\bfor\s+(.+?)[.?]?$', intent.payload)
         args = field_recall.filters_for_request(intent.payload)
         if 'clarification' in args:
