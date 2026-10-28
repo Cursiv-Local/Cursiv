@@ -4,15 +4,20 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U109 release preparation (Codex, 2026-10-28)
+## U109 released (Codex, 2026-10-28)
 
-Continue from [U109-HANDOFF](docs/U109-HANDOFF.md). Bounded installed-source analysis
-now separates source evidence, conditional relationships, model interpretation and
-uninspected runtime/user scopes. Current measurements and retained failures belong in
-[U109-VALIDATION](docs/U109-VALIDATION.md); [release notes](docs/RELEASE-U109.md) are a draft.
-The owner authorized commit, push and release on October28. Version is prepared as U109;
-pre-version comparison receipts retain their actual U108 version and source snapshots. Keep excluded owner files, user stores and Field Station unchanged.
-Do not confuse a source snapshot or synthetic bundle-root test with a published binary.
+[U109](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U109) is published from
+immutable source `bdf2737446f77a81e14a19f774c99c12a4bb3bcf` (source PR57). All exact-main
+source gates passed; Windows2584/15 skips, Mac2567/32, Linux2566/33 plus19 passing subtests
+each. Both tagged packages passed startup/ten-feature/regex source checks; Windows also
+passed portable startup. All11 anonymous downloads/digests and8 existing-owner signatures
+verified. [Release evidence](docs/U109-RELEASE-VERIFICATION.md); [continuing handoff](docs/U109-HANDOFF.md).
+Source inspection separates installed code from user scopes and keeps critical explanations
+conditional on checked source witnesses. General model narratives remain partial; this is
+not full codebase understanding or a new AI accuracy score. [Validation](docs/U109-VALIDATION.md).
+Website publication is established separately by [its receipt](bench/results/U109-publication.json);
+a missing receipt means production deployment has not yet been verified. Preserve all owner
+exclusions, station code, private stores, Qwen defaults and unrelated profiles.
 
 ## U108 released (Codex, 2026-10-28)
 
