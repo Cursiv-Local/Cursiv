@@ -118,7 +118,11 @@ The website/evidence update preserves design and concise public pages, updates c
 downloads/hash/manifest and software counts, archives U108's evidence and refreshes
 technical source-scope references. Production revision/deployment/live-byte, crawler,
 favicon and canonical probes are established by the separate publication receipt
-linked at the top. No indexing, ranking or AI recommendation is promised; discovery
+linked at the top. PR58 merged `67b79ef247b648ac18be427565a7bea94e0e9bea`; deployment
+`d7630911-8a21-44a7-9d54-ab7286f364ce` passed40 live checks covering20 public pages.
+An initial generic urllib-agent www request received403; explicit browser and both
+search-agent redirects passed301 after correcting the checker headers, with no
+additional deployment or security-rule change. No indexing, ranking or AI recommendation is promised; discovery
 checks remain manual. Public docs and their generated development source inventory
 live on later commits than the immutable binary tag; Python runtime code remains tagged.
 Website-only local validation uses focused tests, not a repeated full application suite;

@@ -16,8 +16,11 @@ Source inspection separates installed code from user scopes and keeps critical e
 conditional on checked source witnesses. General model narratives remain partial; this is
 not full codebase understanding or a new AI accuracy score. [Validation](docs/U109-VALIDATION.md).
 Website publication is established separately by [its receipt](bench/results/U109-publication.json);
-a missing receipt means production deployment has not yet been verified. Preserve all owner
-exclusions, station code, private stores, Qwen defaults and unrelated profiles.
+a missing receipt means production deployment has not yet been verified. Website PR58 merged
+`67b79ef247b648ac18be427565a7bea94e0e9bea`; deployment `d7630911-8a21-44a7-9d54-ab7286f364ce`
+passed40 live checks over20 public pages, release links/signatures, icons, crawler probes and
+canonical redirects. Intentional exclusions and manual discovery checks remain. Preserve all
+owner exclusions, station code, private stores, Qwen defaults and unrelated profiles.
 
 ## U108 released (Codex, 2026-10-28)
 
