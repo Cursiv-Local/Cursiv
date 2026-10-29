@@ -2,8 +2,8 @@
 
 U110 starts from published U109. It fixes how Cursiv recognizes plain-language
 requests to inspect its own code, and ships the U109 post-release reliability
-repairs. [Release verification](U110-RELEASE-VERIFICATION.md) is written after the
-tagged packages are built.
+repairs. [Release verification](U110-RELEASE-VERIFICATION.md)
+records the tagged packages, owner signatures and published downloads.
 
 - A self-inspection request still routes when it follows an instruction or a
   sentence of conversation. Safety wording, user repositories and workspaces,
