@@ -12,7 +12,7 @@ MAX_ROWS = 100000
 
 def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
           entry: str = '', corrections: bool = False, limit: int | None = 10, offset: int = 0,
-          site: str = '', measure: str = '') -> dict:
+          site: str = '', measure: str = '', project: str = '') -> dict:
     """Read one authorized notebook, verifying chain while scanning bounded input."""
     path = state_store.checked(fieldlog.log_file())
     if not path.parent.exists():
@@ -36,7 +36,7 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
         stream = io.BytesIO(private_store.read_bytes(path))       # encrypted on a computer (U98)
     except FileNotFoundError:
         return dict(records=[], total=0, offset=offset, more=False, warnings=[], source='field log',
-                    filters=dict(words=words, sample=sample, start=start, end=end, entry=entry, site=site, measure=measure))
+                    filters=dict(words=words, sample=sample, project=project, start=start, end=end, entry=entry, site=site, measure=measure))
     with stream:
         for n in range(1, MAX_ROWS + 2):
             line = stream.readline(1024 * 1024 + 1)
@@ -80,6 +80,9 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
             # No record has that sample ID; say which ones only mention it (U100 audit: W-003 was in a note).
             mentions = [r for r in everything if sample.casefold() in ' '.join(
                 str(r.get(k, '')) for k in ('site', 'project', 'note', 'measurements')).casefold()]
+    if project:
+        rows = [r for r in rows if r.get('project', '').casefold() == project.casefold()]
+        mentions = [r for r in mentions if r.get('project', '').casefold() == project.casefold()]
     if start:
         rows = [r for r in rows if r['recorded_local'][:10] >= start]
         mentions = [r for r in mentions if r['recorded_local'][:10] >= start]
@@ -109,7 +112,7 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
     selected = list(reversed(rows))[offset:offset + limit]
     return dict(records=selected, total=total, offset=offset, more=offset + limit < total,
                 warnings=warnings[:20], source='field log', mentions=list(reversed(mentions[-10:])), sample=sample,
-                filters=dict(words=words, sample=sample, start=start, end=end, entry=entry, site=site, measure=measure))
+                filters=dict(words=words, sample=sample, project=project, start=start, end=end, entry=entry, site=site, measure=measure))
 
 
 _MEASURE_TOPIC = (r'(?:(?:water|soil|air)\s+)?(?:temperature|temp)|'
@@ -154,6 +157,21 @@ def is_request(text: str) -> bool:
         r'what corrections have I made)', text))
 
 
+def identity_filters(text: str) -> dict:
+    """Shared interpretation of explicit notebook identity labels, never model text."""
+    filters = {}
+    sample = re.search(r'(?i)\bsample(?:\s+id)?(?:\s*[:=]\s*|\s+)([\w.-]+)', text)
+    if sample:
+        filters['sample'] = sample[1].rstrip('.?')
+    project = re.search(r'(?i)\bproject(?:\s+id)?(?:\s*[:=]\s*|\s+)(' + fieldlog.ID.pattern + r')\b', text)
+    code = re.search(r'(?i)\bfor\s+(' + fieldlog.ID.pattern + r')[?.!]*$', text.strip())
+    if project:
+        filters['project'] = project[1]
+    elif code and not sample:
+        filters['words'] = code[1]
+    return filters
+
+
 def filters_for_request(text: str) -> dict:
     """One pure filter parser for both native notebook read routes.
 
@@ -163,7 +181,7 @@ def filters_for_request(text: str) -> dict:
     low = text.lower()
     if 'last field session' in low:
         return {'clarification': 'Field records have no session identifier. Choose a date range or sample ID.'}
-    filters = {}
+    filters = identity_filters(text)
     today = date.today()
     if 'yesterday' in low:
         filters.update(start=str(today - timedelta(days=1)), end=str(today - timedelta(days=1)))
@@ -187,9 +205,7 @@ def filters_for_request(text: str) -> dict:
     elif (re.search(r'(?i)\b(?:last month|last year|this week|this month|next week)\b', text)
           or (re.search(r'(?i)\bon\s+(?:' + '|'.join(_WEEKDAYS) + r')\b', text) and not weekday)):
         return {'clarification': 'Which date or date range should I search? Use a calendar date, yesterday, or last Tuesday.'}
-    sample = re.search(r'(?i)\bsample\s+(?:id\s*[:=]?\s*)?([\w.-]+)', text)
-    if sample:
-        filters['sample'] = sample[1].rstrip('.?')
+    sample = filters.get('sample')
     entry = re.search(r'(?i)\b(?:entry|record(?: id)?)\s+([0-9a-f]{12}|#?\d+)\b', text)
     if entry:
         filters['entry'] = entry[1]
@@ -202,7 +218,7 @@ def filters_for_request(text: str) -> dict:
     if 'correction' in low and not entry:
         filters['corrections'] = True
     terms = re.search(r'(?i)(?:mentioning|about|search)\s+(.+?)[?.!]*$', text)
-    if terms and not sample:
+    if terms and not sample and 'project' not in filters:
         filters['words'] = re.sub(_DATE_SUFFIX, '', terms[1], flags=re.I).strip(' .?!"\'')
     site = re.search(r'(?i)\bat\s+(.+?)(?=\s+(?:yesterday|today|last\s+\w+|for\s+sample|'
                      r'(?:on|since|from|between)\s+\d{4}-\d{2}-\d{2})\b|[?.!]|$)', text)
@@ -234,7 +250,7 @@ def render(result: dict, *, summarize: bool = False) -> str:
     scope = []
     if filters.get('start') or filters.get('end'):
         scope.append('recorded ' + (filters.get('start') or 'earlier') + ' to ' + (filters.get('end') or 'now'))
-    for key, label in (('site', 'site'), ('sample', 'sample'), ('measure', 'measurement'), ('words', 'containing')):
+    for key, label in (('site', 'site'), ('sample', 'sample'), ('project', 'project'), ('measure', 'measurement'), ('words', 'containing')):
         if filters.get(key):
             scope.append(label + ': ' + filters[key])
     if scope:

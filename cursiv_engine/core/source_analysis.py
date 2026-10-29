@@ -32,6 +32,7 @@ FEATURES={
  'verification': [('cursiv_engine/core/verify.py','run_pass'),('cursiv_engine/core/answer_assessment.py','assess'),('cursiv_engine/chat/review.py','prepare')],
  'permissions': [('cursiv_engine/core/file_access.py','resolve'),('cursiv_engine/core/file_access.py','perform'),('cursiv_engine/core/turn_policy.py','effective')],
  'regex': [('cursiv_engine/core/self_inspection.py','prepare'),('cursiv_engine/core/self_source.py','_words')],
+ 'introspection': [('cursiv_engine/core/self_inspection.py','resolve'),('cursiv_engine/core/self_inspection.py','prepare'),('cursiv_engine/core/self_inspection.py','_topic'),('cursiv_engine/chat/conversation.py','_chat_inner')],
 }
 PIPELINE=[('launcher/main.py','main'),('launcher/cursiv_launcher.py','CursivLauncher.__init__'),('launcher/cursiv_launcher.py','CursivLauncher._build_ui'),
  ('launcher/chat_panel.py','ChatPanel.__init__'),('launcher/chat_panel.py','ChatPanel._send'),
@@ -447,7 +448,8 @@ def _memory_contract(session):
 
 def _feature_rules(session,topic):
     """Small reviewed rules for critical semantics, not general program proofs."""
-    path={'notebook':'cursiv_engine/core/fieldlog.py','documents':'cursiv_engine/core/documents.py',
+    path={'notebook':'cursiv_engine/core/fieldlog.py','chain':'cursiv_engine/core/fieldlog.py',
+          'pdf':'cursiv_engine/core/documents.py','documents':'cursiv_engine/core/documents.py',
           'verification':'cursiv_engine/core/verify.py'}.get(topic)
     if not path or path not in session.syntax:return None
     nodes=session.syntax[path][1]
@@ -461,6 +463,19 @@ def _feature_rules(session,topic):
             has('current',"{e['corrects'] for e in all_entries if e.get('corrects')}"),
             has('verify',"e.get('prev') != prev"),has('verify',"_fingerprint(e) != e.get('hash')"),has('verify',"e.get('seq') != seq + 1")]
         names=('add','correct','current','verify','_append')
+    elif topic=='chain':
+        checks=[has('_fingerprint', "{k: v for k, v in entry.items() if k != 'hash'}"),
+            has('_fingerprint', "hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=False, separators=(',', ':')).encode('utf-8')).hexdigest()"),
+            has('_append', "entry['hash'] = _fingerprint(entry)"),
+            has('verify', "e.get('prev') != prev"), has('verify', "_fingerprint(e) != e.get('hash')"),
+            has('verify', "e.get('seq') != seq + 1")]
+        names=('_fingerprint','_append','verify')
+    elif topic=='pdf':
+        checks=[has('_pages', 'from pypdf import PdfReader'), has('_pages', "suffix == '.pdf'"),
+            has('_pages', 'reader = PdfReader(str(path))'),
+            has('_pages', "[page.extract_text() or '' for page in reader.pages]"),
+            has('add', 'pages = _pages(path)'), has('add', 'any((p.strip() for p in pages))')]
+        names=('_pages','add')
     elif topic=='documents':
         checks=[has('search','_passages()'),has('search','math.log(1 + (n - df[w] + 0.5) / (df[w] + 0.5))'),
             has('search','score += idf * tf * 2.2 / (tf + 1.2 * (0.25 + 0.75 * len(words) / avg))'),
@@ -483,10 +498,14 @@ def collect(question,topic,*,limits=None):
     session=Session(base,index,limits or Limits())
     seeds=PIPELINE if topic in ('pipeline','startup','audit','source') else FEATURES.get(topic,[])
     # Unknown feature names must not turn generic source hints into a feature finding.
-    specific=topic=='source' and bool(re.search(r'(?i)\b(?:find|locate)\b.*\bimplementation\b',question))
+    specific=topic=='source' and bool(re.search(r'(?i)\b(?:find|locate)\b.*\bimplementation\b|'
+        r'\b(?:identify|which|what)\b.{0,40}\b(?:function|method)s?\b',question))
     if specific:
-        words=set(re.findall('[a-z_]{4,}',question.lower()))-{'find','locate','your','implementation','code','source','engine','function','responsible'}
-        scored=[(sum(w in (p+' '+s['name']).lower() for w in words),p,s['name']) for p,r in index['files'].items() for s in r['symbols']]
+        # A named declaration outranks a word that merely appears in its file path;
+        # five-letter stems let "builder" find build() without fuzzy guessing.
+        words={w[:5] for w in re.findall('[a-z_]{4,}',question.lower())}-{w[:5] for w in ('find','locate','your','implementation','code','source',
+            'engine','function','responsible','identify','which','what','that','does','with','this','cursiv','actual','inspect','method')}
+        scored=[(sum(2*(w in s['name'].lower())+(w in p.lower()) for w in words),p,s['name']) for p,r in index['files'].items() for s in r['symbols']]
         seeds=[(p,n) for score,p,n in sorted(scored,reverse=True)[:4] if score]
     if topic=='startup' and re.search(r'\breview[./]prepare\b',question):seeds=seeds+[('cursiv_engine/chat/review.py','prepare')]
     if topic in ('pipeline','startup','audit','source') and seeds:session.read('launcher/build.spec')
@@ -508,7 +527,7 @@ def collect(question,topic,*,limits=None):
         edges=session.edges,roles=roles,coverage=session.coverage(),technical=technical(question,session.texts))
     if topic=='portable':result['portable_contract']=_portable_contract(session)
     if topic=='memory':result['memory_contract']=_memory_contract(session)
-    if topic in ('notebook','documents','verification'):result['feature_rules']=_feature_rules(session,topic)
+    if topic in ('notebook','chain','pdf','documents','verification'):result['feature_rules']=_feature_rules(session,topic)
     if topic=='models':
         path='cursiv_engine/chat/local_provider.py'
         node=session.syntax.get(path,({}, {}, {}, ''))[1].get('_call_ollama_raw')
@@ -532,11 +551,24 @@ def collect(question,topic,*,limits=None):
     return result
 
 def native(analysis,topic):
-    if topic in ('notebook','documents','verification'):
+    def unknown(message):
+        records=analysis.get('evidence', [])
+        paths=', '.join(dict.fromkeys(r['path'] for r in records)) or 'no successfully read source files'
+        refs='; '.join(f"`{r['path']}:{r['line']}` (`{r['symbol']}`)" for r in records[:8])
+        return 'UNKNOWN: '+message+'\nSearched installed source: '+paths+'.'+(
+            '\nInspected declarations: '+refs if refs else '')
+    if topic in ('notebook','chain','pdf','documents','verification'):
         rule=analysis.get('feature_rules')
-        if not rule:return 'UNKNOWN: The reviewed feature explanation no longer matches the selected source witnesses. Inspect its listed functions; no operation was executed.'
+        if not rule:return unknown('The reviewed feature explanation no longer matches the selected source witnesses. No operation was executed; this does not establish feature absence.')
         references='; '.join(f"`{rule['path']}:{line}` (`{name}`)" for name,line in rule['functions'].items())
         text={
+            'pdf':('PDF import uses `pypdf.PdfReader` in `_pages`, extracts text from each page and passes those pages to `add`. '
+                'An image-only/scanned PDF with no extracted text is rejected with a text-recognition explanation. '
+                'This establishes the installed text-PDF import path, not that a particular PDF was opened or analyzed. No user document was read.'),
+            'chain':('`_fingerprint` computes SHA-256 over canonical JSON with the `hash` field excluded. '
+                '`_append` records that fingerprint; `verify` checks previous-hash links, recomputed fingerprints and sequence numbers. '
+                'This is tamper evidence, not proof that observations are true or that a complete notebook was never rebuilt. '
+                'No notebook data was read or verified by this static inspection.'),
             'notebook':('`add` calls `_append`. `correct` passes a linked correction to `add`, retaining the stored original; '
                 '`current` hides superseded entries in the current view. `verify` checks previous-hash links, recomputed fingerprints and sequence numbers. '
                 'Integrity verification is separate from notebook lookup and does not prove observations are true or that an entire notebook was never rebuilt. No notebook records were opened.'),
@@ -549,14 +581,14 @@ def native(analysis,topic):
         return references+'.\n\n'+text+'\n\nThese are reviewed static rules conditional on the current source witnesses.'
     if topic=='memory':
         t=analysis.get('memory_contract')
-        if not t:return 'UNKNOWN: The reviewed memory storage explanation no longer matches its selected source witnesses. No saved memories were opened.'
+        if not t:return unknown('The reviewed memory storage explanation no longer matches its selected source witnesses. No saved memories were opened.')
         return (f"Persistent-memory code is in `{t['path']}`: `add_fact` at line {t['add_line']}, `_write_facts` at line {t['write_line']}, and `find` at line {t['find_line']}. "
             'The checked write path reads the existing facts before backing them up, calls the atomic writer, and compares the stored text against the intended payload. '
             '`add_fact` calls `_write_facts`; `find` retrieves candidates through `list_facts`. '
             'These are reviewed static storage rules, not proof that your current memory file is readable, encrypted or intact. No saved facts or runtime configuration were read.')
     if topic=='portable':
         t=analysis.get('portable_contract')
-        if not t:return 'UNKNOWN: The reviewed Field Copy explanation no longer matches the selected source witnesses. No copy was attempted; inspect the listed functions before drawing conclusions.'
+        if not t:return unknown('The reviewed Field Copy explanation no longer matches the selected source witnesses. No copy was attempted; feature absence is not established.')
         return (f"The Field Copy/portable-workspace implementation is in `{t['path']}:{t['make_line']}` (`make_usb`). "
             f"Its checked calls copy the program files and then verify the copy. `copy_files` at line {t['copy_line']} writes a temporary file, flushes it to disk and replaces the destination; "
             f"`verify_usb` at line {t['verify_line']} checks destination existence and calls `_needs_copy` for differences. "
@@ -589,13 +621,16 @@ def native(analysis,topic):
             return (f"VERIFIED static startup: `{r['path']}:{r['line']}` — `{r['symbol']}` is called by the module's `__main__` guard at line {r['witness_line']}. "
                 f"The inspected build entry list is `{r['build_path']}:{r['build_line']}`. "
                 'This is the desktop startup entry, not a review helper or prompt-compaction function. UI input, routing and model calls are separate responsibilities; runtime startup was not executed by inspection.')
+        return unknown('No unique startup role was established by the inspected guard/build witnesses. No application startup was executed.')
     return None
 
 def claim_issues(analysis,answer):
     issues=[]
     if re.search(r'(?im)^\s*(?:\*\*)?VERIFIED\b',answer):issues.append('A model explanation cannot assign itself VERIFIED status')
-    negative=re.search(r"(?i)(?:(?:cannot|can't|does not|doesn't)\s+(?:process|import|support|implement|copy|transfer)|no\s+(?:PDF importer|persistent memory|portable workspace|implementation)|not implemented)\b",answer)
-    if negative and not re.search(r'(?i)not found in (?:the )?searched scope|unverified|unknown|insufficient evidence',answer):
+    negative=re.search(r"(?i)(?:(?:cannot|can't|does not|doesn't)\s+(?:process|import|support|implement|copy|transfer|have|use|provide)|"
+        r"no\s+(?:PDF importer|persistent memory|portable workspace|implementation|hash(?:ing)?|hash.chain|notebook verification)|"
+        r"not implemented|(?:feature|hashing|verification|Field Copy)\s+(?:does not|doesn't) exist)\b",answer)
+    if negative:
         issues.append('NOT FOUND IN SEARCHED SCOPE or incomplete excerpts cannot establish missing application functionality')
     if re.search(r'(?i)(?:entry point|entrypoint|startup)\b[^\n]{0,80}(?:review\.py|_compact_system_for_tools)',answer):
         issues.append('CONTRADICTED: a review/prompt helper is not the inspected startup guard target')

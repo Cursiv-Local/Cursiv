@@ -142,6 +142,21 @@ def describe(person: str) -> str:
 def prompt_addendum(person: str, question: str = '') -> str:
     data = load(person)
     parts = [r["text"] for r in data.get("rules", [])]
+    # A confirmed user-stated presentation preference should apply on later
+    # turns even when semantic recall has no topic overlap with today's question.
+    # Read active records only, without creating a second style source of truth.
+    from cursiv_engine.memory import semantic
+    try:
+        saved = semantic.list_facts(person, repair=False)
+    except (OSError, ValueError):
+        saved = []  # best-effort: unavailable memory must not discard explicit style rules
+    for fact in saved:
+        text = fact.get('text', '')
+        if (fact.get('origin') == 'user_said' and
+                re.search(r'(?i)\b(?:I prefer|I like|please keep)\b', text) and
+                re.search(r'(?i)\b(?:replies|answers|tone|talk|conversation|casual|formal)\b', text) and
+                not semantic.preference_overrides_safety(text) and text not in parts):
+            parts.append(text)
     if not parts:
         return ""
     if question:

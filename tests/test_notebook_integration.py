@@ -306,6 +306,12 @@ def test_gui_receipt_history_persists_and_provider_prefix_cannot_bypass_route(lo
     window._begin_turn()
     window._run_turn('hey ollama record a field observation: ' + DETAILS, [])
     app.processEvents()
+    assert log.entries() == []  # even a provider-prefixed structured observation waits for confirmation
+    preview = next(iter(window._intents.values()))
+    assert preview.action.name == 'notebook.log'
+    window._begin_turn(preview.command)
+    window._run_turn(preview.command, [], propose=False)
+    app.processEvents()
     assert len(log.entries()) == 1 and len(window._history) == 2
     assert window._history[-1]['notebook_receipt']['ok']
     conv_id = conversations.save(window._conv_id, window._history, '')

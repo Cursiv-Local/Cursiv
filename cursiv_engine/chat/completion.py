@@ -239,6 +239,13 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         if _files.is_request(_user) and _own is None:
             return                 # actual file results need no AI check or automatic learning
         draft = runtime._strip_status_lines("".join(reply))      # the model's words, not Cursiv's notes
+        denial_repair = self_inspection.repair_capability_denial(_field_text, draft) if _own is None else None
+        if denial_repair is not None:
+            runtime._CURSIV_REPLY = True
+            runtime._set_answered('')
+            reply[:] = [denial_repair]
+            yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + denial_repair
+            return
         _own_problems = self_inspection.problems(draft)
         if _own_problems:
             runtime._CURSIV_REPLY = True
@@ -295,7 +302,9 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
         for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text),
                       _science.do_note(draft), _science.simulated_note(_field_text, draft),
-                      _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft) if _own is None else None):
+                      _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft,
+                          authored=('native' if runtime._CURSIV_REPLY else 'calculation'
+                              if runtime._WORKED and runtime._WORKED.ok else 'model')) if _own is None else None):
             if _note:
                 reply.append('\n\n' + _note)
                 yield '\n\n' + _note

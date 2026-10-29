@@ -61,6 +61,17 @@ class ChatActionsMixin:
             if not any(row['id'] == proposal.slots.get('entry') for row in fieldlog.current()):
                 self._append_system('This observation has changed since the preview. Review its current entry before correcting it.')
                 return
+        if proposal.action.name == 'memory.correct':
+            from cursiv_engine.memory import semantic
+            try:
+                current = next((r for r in semantic.list_facts(semantic.current_person())
+                                if r['id'] == proposal.slots.get('record')), None)
+            except (OSError, ValueError):
+                self._append_system('Saved memory is unavailable. No correction was attempted; the previous record is preserved.')
+                return
+            if current is None or current['text'] != proposal.slots.get('original'):
+                self._append_system('This memory changed since the preview. Review the current record before correcting it.')
+                return
         self._begin_turn(proposal.command)
         history_snapshot = list(self._history)
         threading.Thread(target=self._run_turn, args=(proposal.command, history_snapshot, False),
@@ -186,6 +197,9 @@ class ChatActionsMixin:
         LOCAL model only (never an online one), checked by core/intent.py."""
         try:
             from cursiv_engine.core import intent, notebook_proposals
+            exported = notebook_proposals.export_request(text)
+            if exported is not None:
+                return exported
             # Notebook corrections never need the model: Cursiv finds the record and checks the old value.
             fixed = notebook_proposals.correction(text)
             if fixed is not None:
@@ -196,8 +210,8 @@ class ChatActionsMixin:
             if not intent.might_be_action(text):
                 return None
             parsed = notebook_proposals.record(text)
-            if notebook_proposals.understood(parsed):
-                return parsed                      # Cursiv's parser read all of it; no model rewording
+            if parsed is not None:
+                return parsed                      # preserve parsed identity and verbatim notes on the card
             from cursiv_engine.ui import chat_app as _ca
             proposal = None
             if _ca._local_model_ready():

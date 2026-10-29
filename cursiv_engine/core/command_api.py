@@ -32,6 +32,7 @@ class MemoryResult(TextResult):
         super().__init__(result.render())
         self.receipt = result.receipt()
         self.save_preview = result.save_preview
+        self.update_preview = result.update_preview
 
 
 class NotesResult(TextResult):

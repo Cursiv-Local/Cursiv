@@ -21,7 +21,7 @@ TOOLS = frozenset((CREATE, READ, VERIFY))
 _lock = threading.RLock()
 _FIELDS = {'observer', 'site', 'lat', 'lon', 'location_source', 'location_accuracy_m',
            'location_fix_utc', 'measurements', 'note', 'sample_id', 'project'}
-_TARGET = r'(?:field\s+(?:notebook(?:\s+section)?|log)|notebook\s+section)'
+_TARGET = r'(?:field\s+(?:notebook(?:\s+section)?|log)|notebook(?:\s+section)?)'
 _REF = re.compile(r'(?i)^(?:it|this|that|this observation|that observation|the observation|the above|those details)$')
 
 
@@ -51,6 +51,8 @@ class Result:
             from .feedback import logged_receipt
             return logged_receipt(self.records[0], duplicate=self.status == 'already_recorded')
         if self.status == 'verified':
+            if not self.count:
+                return 'Field Notebook: no entries were found in this notebook. No saved chain was verified.'
             lines = [f'Field Notebook: all {self.count} entries are intact and in order (SHA-256 chain verified). '
                      + fieldlog.CHECK_MEANS]
             # A scoped check says which records it found; none found is never "verified" (U100 audit).
@@ -75,7 +77,7 @@ def execute(tool: str, args: dict, *, observer: str = '') -> Result:
             raise ValueError('unsupported notebook operation')
         if not isinstance(args, dict):
             raise ValueError('notebook arguments must be an object')
-        allowed = {CREATE: {'fields', 'request_id'}, READ: {'words', 'entry', 'sample', 'limit', 'offset', 'start', 'end', 'site', 'measure'}, VERIFY: set()}[tool]
+        allowed = {CREATE: {'fields', 'request_id'}, READ: {'words', 'entry', 'sample', 'project', 'corrections', 'limit', 'offset', 'start', 'end', 'site', 'measure'}, VERIFY: set()}[tool]
         if args.keys() - allowed:
             raise ValueError('unsupported notebook arguments (file paths and permissions are not notebook tools)')
         with _lock:
@@ -164,9 +166,21 @@ def _intent(text: str) -> _Intent | None:
     if re.match(r'(?i)^(?:find|show|list|retrieve|search|look up)\b', text) and re.search(
             r'(?i)\b(?:my notebook|the notebook|field notebook|field log)\b', text):
         return _Intent('read', text)
+    # A labelled sample or project is a notebook lookup, even without the word
+    # "notebook". Do not ask a model to guess whether a just-saved record exists.
+    if re.match(r'(?i)^(?:find|show|list|retrieve|search|look up|what did i record)\b', text):
+        from . import field_recall
+        if field_recall.identity_filters(text) and not re.search(r'(?i)\bhistory\b', text):
+            return _Intent('read', text)
+    if re.match(r'(?i)^(?:what about|where (?:is|are)|do you have|have you recorded|did you save|is there)\b', text):
+        from . import field_recall
+        if field_recall.identity_filters(text):
+            return _Intent('read', text)
     # Existing exports/imports/reports retain their separate, explicit commands.
     if re.match(r'(?i)^field\s*(?:log|notebook)\s+(?:export|import|share|report|correct|verify\s+\S)', text):
         return None
+    if re.match(r'(?i)^export\s+(?:the |my )?(?:field\s+)?notebook\b', text):
+        return _Intent('export', text)
     if re.fullmatch(r'(?i)(?:field\s*log check|check field log)', text) or re.search(
             rf'(?i)^(?:verify|check|validate)\b.*\b{_TARGET}\b', text) or re.search(
             r'(?i)^(?:verify|check|validate|confirm)\b.*\b(?:integrity|(?:field\s+)?observations?|field records?|'
@@ -264,6 +278,8 @@ def _source(history: list[dict]) -> list[tuple[int, str]]:
 
 
 def _request(text: str, history: list[dict]) -> _Intent | None:
+    if text.lstrip().startswith(('@', '/')) or re.match(r'(?i)^agents?\s+', text.strip()):
+        return None  # explicit profile/agent commands own their notebook scope and evidence budget
     intent = _intent(text)
     users = [m for m in history if m.get('role') == 'user' and isinstance(m.get('content'), str)]
     previous = _intent(users[-1]['content']) if users else None
@@ -321,6 +337,11 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
     if effective(text).blocks(operation):
         return Result(operation, 'failed', error=blocked_message(text, history) or DENIED)
     from . import notebook_proposals
+    if intent.kind == 'export':
+        preview = notebook_proposals.export_request(intent.payload)
+        return Result(CREATE, 'preview', error='Export preview only; no files were written.\n' +
+            '\n'.join(preview.card_lines()) + ('\n' + '\n'.join(preview.problems) if preview.problems else
+                '\nAfter reviewing, approve by sending: ' + preview.command))
     preview = notebook_proposals.confirmation(text) if intent.kind in ('create', 'card', 'clarification') else None
     if preview is not None:
         details = '\n'.join(preview.card_lines())
@@ -340,22 +361,20 @@ def command(text: str, history: list[dict], *, observer: str = '', scope: str = 
         codes = list(dict.fromkeys(m.group(0) for m in fieldlog.ID.finditer(intent.payload or '')))
         if result.ok and codes:
             from . import field_recall
+            identities = field_recall.identity_filters(intent.payload)
             for code in codes[:5]:
-                result.scope[code] = field_recall.query(words=code, limit=50)['records']
+                result.scope[code] = field_recall.query(**(identities or {'words': code}), limit=50)['records']
         return result
     if intent.kind == 'read' and not intent.reference:
         from . import field_recall
         entry = re.search(r'(?i)\b(?:entry|record(?: id)?)\s+([0-9a-f]{12}|#?\d+)\b', intent.payload)
-        sample = re.search(r'(?i)\bsample\s+(?:id\s*[:=]?\s*)?([\w.-]+)', intent.payload)
         words = re.search(r'(?i)\bfor\s+(.+?)[.?]?$', intent.payload)
         args = field_recall.filters_for_request(intent.payload)
         if 'clarification' in args:
             return Result(READ, 'clarification', error=args['clarification'])
         if entry:
             args['entry'] = entry[1]
-        elif sample:
-            args['sample'] = sample[1].rstrip('.?')
-        elif words and 'words' not in args:
+        elif words and not any(k in args for k in ('words', 'sample', 'project')):
             args['words'] = words[1]
         if re.search(r'(?i)\bentry\s+\S+', intent.payload) and not entry:
             return Result(READ, 'failed', error='Supply an actual notebook record identifier or entry number.')

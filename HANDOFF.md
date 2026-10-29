@@ -4,7 +4,21 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U110 in release (Claude, 2026-10-29)
+
+Natural-language self-inspection routing (`self_inspection._focus`, the `introspection`
+topic and its seeds in `source_analysis.FEATURES`) plus the U109 post-release repairs
+below. Tests: `tests/test_u110_self_inspection_routing.py`. The owner authorized commit,
+push and GitHub release on October 29, 2026, with no website change in this pass.
+[Release notes](docs/RELEASE-U110.md).
+
 ## U109 released (Codex, 2026-10-28)
+
+Post-release worksheet repairs are in progress locally on
+`codex/u109-postrelease-reliability`: [continuing record](docs/U109-POSTRELEASE-HANDOFF.md).
+These changes are not part of the published U109 binaries. Keep notebook identity,
+linked corrections and source evidence ahead of general model prose; preserve all
+release/user-data/station boundaries recorded below.
 
 [U109](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U109) is published from
 immutable source `bdf2737446f77a81e14a19f774c99c12a4bb3bcf` (source PR57). All exact-main
