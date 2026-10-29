@@ -1,0 +1,145 @@
+{
+  "kind": "reconstructed worksheet; no original full transcript supplied",
+  "record_prompt": "Record field observation: project ORION-742, sample CM-743, site Cedar Marsh, temperature 18.6 C, note: water clear",
+  "parsed": {
+    "site": "Cedar Marsh",
+    "observer": "",
+    "lat": null,
+    "lon": null,
+    "measurements": [
+      {
+        "name": "temperature",
+        "value": "18.6",
+        "unit": "C"
+      }
+    ],
+    "note": "water clear",
+    "sample_id": "CM-743",
+    "project": "ORION-742"
+  },
+  "saved": {
+    "tool": "notebook_create_observation",
+    "status": "saved",
+    "records": [
+      {
+        "schema": 1,
+        "id": "79f4da0f4f0a",
+        "seq": 1,
+        "recorded_utc": "2026-10-29T01:27:55Z",
+        "recorded_local": "2026-10-28T21:27:55-04:00",
+        "observer": "Synthetic",
+        "sample_id": "CM-743",
+        "site": "Cedar Marsh",
+        "lat": null,
+        "lon": null,
+        "location_source": "",
+        "location_accuracy_m": null,
+        "location_fix_utc": "",
+        "measurements": [
+          {
+            "name": "temperature",
+            "value": "18.6",
+            "number": 18.6,
+            "unit": "C"
+          }
+        ],
+        "note": "water clear",
+        "photos": [],
+        "corrects": null,
+        "reason": "",
+        "device": "233986fe5870",
+        "app_version": "",
+        "prev": "genesis",
+        "project": "ORION-742",
+        "chat_request_id": "cc0376fc916a6f881c7189b81cb3aecf78d863f1d6168a3a61b66df9c00df8f1",
+        "hash": "7009c4939ed370f5d19cbae0bac759e775f2b5f292f1c5b590a862b11cef2cb9"
+      }
+    ],
+    "error": "",
+    "problems": [],
+    "count": 1,
+    "scope": {},
+    "filters": {},
+    "ok": true
+  },
+  "lookups": [
+    {
+      "question": "Show the record for sample CM-743.",
+      "native": null,
+      "source_topic": ""
+    },
+    {
+      "question": "Find sample CM-743.",
+      "native": null,
+      "source_topic": ""
+    },
+    {
+      "question": "Show my notebook entries for sample ID: CM-743.",
+      "native": "Field Notebook: 1 matching record(s).\nSearched this field notebook \u2014 sample: CM-743. Dates use saved local record timestamps.\n[79f4da0f4f0a] #1 \u00b7 2026-10-28 21:27:55-04:00 \u00b7 project ORION-742 \u00b7 sample CM-743 \u00b7 Cedar Marsh \u2014 temperature 18.6 C \u2014 water clear",
+      "source_topic": ""
+    },
+    {
+      "question": "Verify the notebook chain for project ORION-742.",
+      "native": null,
+      "source_topic": ""
+    },
+    {
+      "question": "Export the notebook for project ORION-742.",
+      "native": null,
+      "source_topic": ""
+    }
+  ],
+  "correction": {
+    "question": "Correct sample CM-743 temperature from 18.6 C to 18.9 C because I transcribed the reading incorrectly.",
+    "command": "field log correct 79f4da0f4f0a temperature 18.9 C :: Correct sample CM-743 temperature from 18.6 C to 18.9 C because I transcribed the reading incorrectly.",
+    "problems": []
+  },
+  "memory_correction": null,
+  "feature_routing": [
+    {
+      "question": "Can you import and analyze PDFs?",
+      "topic": ""
+    },
+    {
+      "question": "Do you have Field Copy?",
+      "topic": ""
+    },
+    {
+      "question": "Can you copy yourself to a USB drive?",
+      "topic": ""
+    },
+    {
+      "question": "Does your notebook use hashing or a chain?",
+      "topic": ""
+    },
+    {
+      "question": "Where are my saved memories stored?",
+      "topic": ""
+    },
+    {
+      "question": "Show me the code path for PDF import in Cursiv.",
+      "topic": ""
+    },
+    {
+      "question": "How does your notebook hash chain work?",
+      "topic": ""
+    }
+  ],
+  "warning_controls": [
+    {
+      "question": "Is my sample safe?",
+      "draft": "No evidence found in the notebook.",
+      "warning": "*(Cursiv's check: this answer sounds more certain (\"No evidence found in the notebook.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*"
+    },
+    {
+      "question": "Can you verify my sample?",
+      "draft": "No matching Field Notebook entries.",
+      "warning": "*(Cursiv's check: this answer sounds more certain (\"No matching Field Notebook entries.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+    },
+    {
+      "question": "What is the average of my sample readings 2, 4, 6?",
+      "draft": "Yes, the mean is 4 (calculated by code).",
+      "warning": "*(Cursiv's check: this answer sounds more certain (\"Yes, the mean is 4 (calculated by code).\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+    }
+  ]
+}

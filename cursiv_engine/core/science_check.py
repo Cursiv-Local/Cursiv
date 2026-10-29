@@ -143,6 +143,11 @@ _OWN_EVIDENCE = re.compile(r"(?i)\b(?:my|our|i (?:got|measured|found|read|have|o
 _READING = re.compile(r"(?i)\d(?:[\d.,]*)\s*(?:mg\s*/\s*L|µS\s*/\s*cm|uS\s*/\s*cm|NTU|ppm|ppb|ppt|°\s*[CF]\b|CFU|colonies)")
 _JUDGEMENT = re.compile(r"(?i)\b(?:normal|safe|prove|confirm|sign of|problem|good|bad|fine|healthy|polluting|toxic|"
                         r"contaminated|broken|error|legal|law)\b")
+_CALC_WORDS = frozenset(('yes no the your our a an arithmetic mean average median mode sum product ratio total '
+    'result answer value conversion converted of these those sample samples reading readings numbers values '
+    'is are was equals equal exactly definitely certainly approximately about and '
+    'cm mm km m mg g kg ml l s sec seconds minute minutes hour hours c f celsius fahrenheit degrees '
+    'per percent ms us ntu ppm').split())
 
 
 def _verdict_lines(draft: str) -> list[str]:
@@ -156,18 +161,28 @@ def _verdict_lines(draft: str) -> list[str]:
     return [first] + [ln for ln in lines[1:] if _VERDICT.match(ln)]
 
 
-def overconfidence_note(question: str, draft: str) -> str:
+def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -> str:
     """A line when the verdict on the person's own reading or sample is stated as settled.
 
     Only for questions resting on the person's own limited evidence (a reading, a look, one sample).
     A "No" to "does that prove / mean ...?" is the careful answer and passes; so does "Yes, that's
     normal" to "is that normal?" when the answer gives the range it's judged against."""
     q, draft = question or "", draft or ""
+    # Provenance is supplied by application control flow, never inferred from
+    # words such as "calculated by code" in a model's answer.
+    if authored == 'native':
+        return ''
     if not (_OWN_EVIDENCE.search(q) or (_READING.search(q) and _JUDGEMENT.search(q))):
         return ""
     asks_normal = bool(re.search(r"(?i)\bnormal\b", q)) and bool(_RANGE.search(draft))
     for line in _verdict_lines(draft):
+        if (authored == 'calculation' and re.search(r'\d', line)
+                and set(re.findall(r'[a-z]+', line.casefold())) <= _CALC_WORDS):
+            continue  # only a numeric/math statement backed by a real calculator record
         if _LEAD_HEDGE.search(line):
+            continue
+        if (re.match(r'(?i)^no (?:matching\b|evidence\b|records?\b|entries\b|results?\b)', line)
+                and not (_SAFE.search(line) or _NORMAL.search(line) or _PROOF.search(line))):
             continue
         verdict = _VERDICT.match(line)
         if verdict:

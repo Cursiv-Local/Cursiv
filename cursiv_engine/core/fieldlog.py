@@ -1182,9 +1182,9 @@ def command(text: str, observer: str = "") -> str | None:
         n = len(entries())
         return (f"All {n} entries are intact and in order. " + CHECK_MEANS if not problems else
                 "The field log has problems:\n" + "\n".join(f"- {p}" for p in problems))
-    if low in ("field log export", "fieldlog export", "export field log"):
+    if low in ("field log export", "fieldlog export", "export field log", "field log export history"):
         try:
-            paths = export()
+            paths = export(include_corrected=low.endswith(' history'))
         except (OSError, ValueError) as exc:
             return f"Not exported: {exc}. Nothing was changed."
         return ("Exported (signed: check it any time with  field log verify <folder>):\n"

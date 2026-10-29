@@ -69,6 +69,8 @@ ACTIONS: dict[str, Action] = {a.name: a for a in (
     Action("notebook.average", False, "Work out from your notebook",
            "What was the {kind} {measure} in my {scope} samples?", ("kind", "measure", "scope")),
     Action("memory.save", True, "Remember this?", "remember {fact}", ("fact",)),
+    Action("memory.correct", True, "Correct this saved memory? (history stays)",
+           "correct memory {record} to {fact}", ("record", "fact", "original")),
     Action("memory.forget", True, "Forget this?", "forget {words}", ("words",)),
     Action("file.read", False, "Read a file", "file read {path}", ("path",)),
     Action("file.list", False, "List your workspace", "file list", ()),

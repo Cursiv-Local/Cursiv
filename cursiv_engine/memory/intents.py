@@ -31,6 +31,8 @@ class Action:
     reference: bool = False
     form: str = 'remember'
     period: str = ''
+    replace_fragment: bool = False
+    fragment: str = ''
 
 
 @dataclass
@@ -47,6 +49,7 @@ class Result:
     outcomes: list[Outcome] = field(default_factory=list)
     clarification: str = ''
     save_preview: list[str] = field(default_factory=list)
+    update_preview: dict = field(default_factory=dict)
 
     @property
     def ok(self):
@@ -110,8 +113,9 @@ def _parse(text: str) -> list[Action] | None:
     # "Correction: ORION-742's primary site is Willow Basin, not Cedar Basin." (U100 audit: this went
     # to the model, which said nothing changed and then answered as if it had.)
     m = re.fullmatch(r'(?is)(?:correction|actually|update|fix)\s*[:,\-–]\s*(.+?)\s*,?\s+(?:not|instead of)\s+(.+?)[.!]?$', t)
-    if m and len(m[1].split()) >= 3:
-        return [Action(UPDATE, content=_clean(m[1].strip().rstrip(',')), query=m[2].strip().rstrip('.!'))]
+    if m:
+        return [Action(UPDATE, content=_clean(m[1].strip().rstrip(',')), query=m[2].strip().rstrip('.!'),
+                       replace_fragment=len(m[1].split()) < 3)]
     m = re.fullmatch(r'(?is)(?:update|correct|change)\s+(?:the |my )?(?:saved )?memory\s+(.+?)\s+(?:to|with|:)\s*(.+)', t)
     if m:
         return [Action(UPDATE, content=_clean(m[2]), query=m[1].strip())]
@@ -219,12 +223,18 @@ def _context_candidates(history: list[dict], reference: str) -> list[str]:
     return candidates
 
 
-def _targets(query: str, person: str, *, forget: bool = False) -> list[dict]:
+def _value_pattern(value: str):
+    """A complete old value, allowing sentence punctuation but not a longer ID."""
+    return re.compile(r'(?<![\w.-])' + re.escape(value) + r'(?![\w-]|\.\w)', re.I)
+
+
+def _targets(query: str, person: str, *, forget: bool = False, whole_value: bool = False) -> list[dict]:
     from . import semantic
-    query = query.strip().lower().rstrip('.!?')
+    query = re.sub(r'(?i)^id(?:\s*[:=]\s*|\s+)', '', query.strip()).strip('\"\x27').lower().rstrip('.!?')
     visible = semantic.list_facts(person)
     by_id = [f for f in visible if f.get('id') == query]
-    exact = by_id or [f for f in visible if query and query in f['text'].lower()]
+    exact = by_id or [f for f in visible if query and (
+        _value_pattern(query).search(f['text']) if whole_value else query in f['text'].lower())]
     if exact or not forget:
         return exact
     # Only strip conversational wrappers, then require every meaningful token.
@@ -235,6 +245,22 @@ def _targets(query: str, person: str, *, forget: bool = False) -> list[dict]:
     if len(tokens) < 2:
         return []
     return [f for f in visible if tokens <= set(re.findall(r'\w+', f['text'].lower()))]
+
+
+def correction_details(action: Action, person: str) -> tuple[dict, str]:
+    """Resolve one current record and preserve its sentence for a fragment edit."""
+    targets = _targets(action.query, person, whole_value=action.replace_fragment)
+    if len(targets) != 1:
+        choices = '\n'.join('[' + r['id'] + '] ' + r['text'] for r in targets[:10])
+        raise ValueError('Choose one saved memory by ID or matching contents.' + ('\n' + choices if choices else
+            ' No current memory matches: ' + action.query))
+    target, content = targets[0], action.content
+    if action.replace_fragment:
+        expression = _value_pattern(action.fragment or action.query)
+        if len(expression.findall(target['text'])) != 1:
+            raise ValueError('The old value must occur exactly once. Correct the memory by ID with the complete new sentence.')
+        content = expression.sub(lambda _: action.content, target['text'], count=1)
+    return target, content
 
 
 def execute(action: Action, *, person: str) -> Outcome:
@@ -290,10 +316,8 @@ def execute(action: Action, *, person: str) -> Outcome:
             if not 4 <= len(content) <= sem.MAX_FACT:
                 raise ValueError(f"it's {len(content)} characters; one saved memory needs 4..{sem.MAX_FACT} characters; save longer information in shorter parts")
             if op == UPDATE:
-                targets = _targets(action.query, person)
-                if len(targets) != 1:
-                    raise ValueError('choose one actual saved memory to correct')
-                saved = sem.update_fact(targets[0]['id'], content, person=person)
+                target, content = correction_details(action, person)
+                saved = sem.update_fact(target['id'], content, person=person)
                 duplicate = False
             else:
                 saved = sem.add_fact(content, person=person, source='manual', exact=True)
@@ -433,14 +457,22 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
                         result.clarification = 'Quote the exact detail to remember or forget. Assistant prose and save claims are not user memory evidence.'
                     break
             if action.operation in (UPDATE, FORGET):
-                targets = _targets(action.query, person)
+                targets = _targets(action.query, person, whole_value=action.replace_fragment)
                 if len(targets) > 1:
                     choices = [r['id'] for r in targets]
+                    if action.replace_fragment:
+                        action.fragment = action.query
                     _pending[key] = (action, choices)
                     result.clarification = 'Choose one saved memory by number or ID:\n' + '\n'.join(
                         f"{i + 1}. {r['id']}: {r['text']}" for i, r in enumerate(targets))
                     break
-            if preview_saves and action.operation == SAVE:
+            if preview_saves and action.operation == UPDATE:
+                try:
+                    target, content = correction_details(action, person)
+                    result.update_preview = dict(record=target['id'], fact=content, original=target['text'])
+                except ValueError as exc:
+                    result.clarification = str(exc)
+            elif preview_saves and action.operation == SAVE:
                 result.save_preview.append(action.content)
             else:
                 result.outcomes.append(execute(action, person=person))

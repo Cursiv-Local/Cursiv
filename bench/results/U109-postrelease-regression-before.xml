@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="23" skipped="0" tests="30" time="2.953" timestamp="2026-10-28T21:29:46.249140-04:00" hostname="Josh"><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[Show the record for sample CM-743.]" time="0.156"><failure message="AssertionError: The natural request fell through to a model&#10;assert None is not None">tests\test_u109_postrelease.py:31: in test_saved_identity_is_immediately_findable
+    assert lookup is not None, 'The natural request fell through to a model'
+E   AssertionError: The natural request fell through to a model
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[Find sample CM-743.]" time="0.057"><failure message="AssertionError: The natural request fell through to a model&#10;assert None is not None">tests\test_u109_postrelease.py:31: in test_saved_identity_is_immediately_findable
+    assert lookup is not None, 'The natural request fell through to a model'
+E   AssertionError: The natural request fell through to a model
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[Show my notebook entries for sample ID: CM-743.]" time="0.105" /><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[Show sample: CM-743.]" time="0.067"><failure message="AssertionError: The natural request fell through to a model&#10;assert None is not None">tests\test_u109_postrelease.py:31: in test_saved_identity_is_immediately_findable
+    assert lookup is not None, 'The natural request fell through to a model'
+E   AssertionError: The natural request fell through to a model
+E   assert None is not None</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[What did I record for CM-743?]" time="0.107"><failure message="AssertionError: assert ['017e6779681...0015ea55fbd8'] == ['0015ea55fbd8']&#10;  &#10;  At index 0 diff: '017e67796814' != '0015ea55fbd8'&#10;  Left contains one more item: '0015ea55fbd8'&#10;  Use -v to get more diff">tests\test_u109_postrelease.py:32: in test_saved_identity_is_immediately_findable
+    assert [r['id'] for r in lookup] == [row['id']]
+E   AssertionError: assert ['017e6779681...0015ea55fbd8'] == ['0015ea55fbd8']
+E     
+E     At index 0 diff: '017e67796814' != '0015ea55fbd8'
+E     Left contains one more item: '0015ea55fbd8'
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_saved_identity_is_immediately_findable[Find the notebook records for project ORION-742.]" time="0.122"><failure message="AssertionError: assert [] == ['44ce7c928a5e']&#10;  &#10;  Right contains one more item: '44ce7c928a5e'&#10;  Use -v to get more diff">tests\test_u109_postrelease.py:32: in test_saved_identity_is_immediately_findable
+    assert [r['id'] for r in lookup] == [row['id']]
+E   AssertionError: assert [] == ['44ce7c928a5e']
+E     
+E     Right contains one more item: '44ce7c928a5e'
+E     Use -v to get more diff</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_confirmation_keeps_all_identity_and_note_fields_without_model_rewording" time="0.611"><failure message="Failed: A parsed observation must not be reworded">tests\test_u109_postrelease.py:39: in test_confirmation_keeps_all_identity_and_note_fields_without_model_rewording
+    proposal = panel._propose_action(RECORD)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+launcher\chat_actions.py:203: in _propose_action
+    if _ca._local_model_ready():
+       ^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u109_postrelease.py:38: in &lt;lambda&gt;
+    monkeypatch.setattr(chat_app, '_local_model_ready', lambda: pytest.fail('A parsed observation must not be reworded'))
+                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: A parsed observation must not be reworded</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_correction_links_original_and_is_queryable[Correct sample CM-743 temperature from 18.6 C to 18.9 C because I transcribed it incorrectly.]" time="0.112" /><testcase classname="tests.test_u109_postrelease" name="test_correction_links_original_and_is_queryable[Correct sample CM-743 temperature to 18.9 C; reason: transcription error.]" time="0.061"><failure message="assert (None is not None)">tests\test_u109_postrelease.py:53: in test_correction_links_original_and_is_queryable
+    assert proposal is not None and proposal.ok
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_correction_links_original_and_is_queryable[Correct CM-743 temperature: it should be 18.9 C; reason: transcription error.]" time="0.062"><failure message="assert (None is not None)">tests\test_u109_postrelease.py:53: in test_correction_links_original_and_is_queryable
+    assert proposal is not None and proposal.ok
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_project_chain_verification_cannot_be_invented_or_confused_with_source" time="0.064"><failure message="assert (None is not None)">tests\test_u109_postrelease.py:69: in test_project_chain_verification_cannot_be_invented_or_confused_with_source
+    assert result is not None and result.ok
+E   assert (None is not None)</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_export_preview_preserves_original_and_correction" time="0.085"><failure message="AttributeError: module 'cursiv_engine.core.notebook_proposals' has no attribute 'export_request'">tests\test_u109_postrelease.py:77: in test_export_preview_preserves_original_and_correction
+    proposal = notebook_proposals.export_request('Export the notebook for project ORION-742.')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   AttributeError: module 'cursiv_engine.core.notebook_proposals' has no attribute 'export_request'</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Can you import and analyze PDFs?-pdf-pypdf]" time="0.038"><failure message="AssertionError: assert '' == 'pdf'&#10;  &#10;  - pdf">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'pdf'
+E     
+E     - pdf</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Do you have Field Copy?-portable-make_usb]" time="0.016"><failure message="AssertionError: assert '' == 'portable'&#10;  &#10;  - portable">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'portable'
+E     
+E     - portable</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Can you copy yourself to a USB drive?-portable-verify_usb]" time="0.018"><failure message="AssertionError: assert '' == 'portable'&#10;  &#10;  - portable">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'portable'
+E     
+E     - portable</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Does your notebook use hashing or a chain?-chain-_fingerprint]" time="0.018"><failure message="AssertionError: assert '' == 'chain'&#10;  &#10;  - chain">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'chain'
+E     
+E     - chain</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[How does your notebook hash chain work?-chain-SHA-256]" time="0.014"><failure message="AssertionError: assert '' == 'chain'&#10;  &#10;  - chain">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'chain'
+E     
+E     - chain</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Where are my saved memories stored?-memory-_write_facts]" time="0.011"><failure message="AssertionError: assert '' == 'memory'&#10;  &#10;  - memory">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'memory'
+E     
+E     - memory</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[Show me the code path for PDF import in Cursiv.-pdf-PdfReader]" time="0.007"><failure message="AssertionError: assert '' == 'pdf'&#10;  &#10;  - pdf">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'pdf'
+E     
+E     - pdf</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_feature_answers_reach_checked_source_and_do_not_deny_witnesses[What about your notebook hashing?-chain-_fingerprint]" time="0.006"><failure message="AssertionError: assert '' == 'chain'&#10;  &#10;  - chain">tests\test_u109_postrelease.py:103: in test_feature_answers_reach_checked_source_and_do_not_deny_witnesses
+    assert own.resolve(question) == topic
+E   AssertionError: assert '' == 'chain'
+E     
+E     - chain</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_record_operations_are_not_own_source_inspections[Show my notebook entries for sample CM-743.]" time="0.006" /><testcase classname="tests.test_u109_postrelease" name="test_record_operations_are_not_own_source_inspections[Recall my test project.]" time="0.006" /><testcase classname="tests.test_u109_postrelease" name="test_record_operations_are_not_own_source_inspections[Correct sample CM-743 temperature to 18.9 C.]" time="0.006" /><testcase classname="tests.test_u109_postrelease" name="test_record_operations_are_not_own_source_inspections[Verify the notebook chain for project ORION-742.]" time="0.005" /><testcase classname="tests.test_u109_postrelease" name="test_short_memory_replacement_preserves_full_saved_fact" time="0.133"><failure message="assert (None)">tests\test_u109_postrelease.py:120: in test_short_memory_replacement_preserves_full_saved_fact
+    assert result and result.ok
+E   assert (None)</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_clean_uncertainty_or_empty_reads_are_not_overconfidence[No evidence found in the notebook.]" time="0.009"><failure message="assert &quot;*(Cursiv's c...it is safe.)*&quot; == ''&#10;  &#10;  + *(Cursiv's check: this answer sounds more certain (&quot;No evidence found in the notebook.&quot;) than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*">tests\test_u109_postrelease.py:132: in test_clean_uncertainty_or_empty_reads_are_not_overconfidence
+    assert science_check.overconfidence_note('Is my sample safe?', draft) == ''
+E   assert "*(Cursiv's c...it is safe.)*" == ''
+E     
+E     + *(Cursiv's check: this answer sounds more certain ("No evidence found in the notebook.") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_clean_uncertainty_or_empty_reads_are_not_overconfidence[No matching Field Notebook entries.]" time="0.007"><failure message="assert &quot;*(Cursiv's c...it is safe.)*&quot; == ''&#10;  &#10;  + *(Cursiv's check: this answer sounds more certain (&quot;No matching Field Notebook entries.&quot;) than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*">tests\test_u109_postrelease.py:132: in test_clean_uncertainty_or_empty_reads_are_not_overconfidence
+    assert science_check.overconfidence_note('Is my sample safe?', draft) == ''
+E   assert "*(Cursiv's c...it is safe.)*" == ''
+E     
+E     + *(Cursiv's check: this answer sounds more certain ("No matching Field Notebook entries.") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_clean_uncertainty_or_empty_reads_are_not_overconfidence[I cannot determine that from the available records.]" time="0.005" /><testcase classname="tests.test_u109_postrelease" name="test_native_provenance_skips_observation_warning_but_model_self_labels_do_not" time="0.006"><failure message="TypeError: overconfidence_note() got an unexpected keyword argument 'authored'">tests\test_u109_postrelease.py:138: in test_native_provenance_skips_observation_warning_but_model_self_labels_do_not
+    assert not science_check.overconfidence_note(q, 'Yes, the arithmetic mean is 4.', authored='native')
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: overconfidence_note() got an unexpected keyword argument 'authored'</failure></testcase><testcase classname="tests.test_u109_postrelease" name="test_saved_casual_preference_reaches_existing_style_rules" time="0.092"><failure message="AssertionError: assert 'two researchers having coffee' in ''">tests\test_u109_postrelease.py:145: in test_saved_casual_preference_reaches_existing_style_rules
+    assert 'two researchers having coffee' in text
+E   AssertionError: assert 'two researchers having coffee' in ''</failure></testcase></testsuite></testsuites>

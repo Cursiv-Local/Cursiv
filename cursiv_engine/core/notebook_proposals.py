@@ -26,6 +26,8 @@ LOG = Action("notebook.log", True, "Save to your field notebook?", "log {details
 CORRECT = Action("notebook.correct", True, "Correct this observation? (the original stays)",
                  "field log correct {entry} {measure} {value} {unit} :: {reason}",
                  ("record", "change", "entry", "measure", "value", "unit", "reason"))
+EXPORT = Action("notebook.export", True, "Export the complete notebook, including correction history?",
+                "field log export history", ("scope",))
 
 _RECORD = re.compile(r"(?i)^(?:please\s+)?(?:record|log|save|add)\s+(?:(?:a|an|the|this|my|new)\s+)?"
                      r"(?:field\s+)?(?:observation|reading|sample|measurement|entry)?\s*[:,-]?\s*(.+)$")
@@ -36,6 +38,29 @@ _CORRECTION = re.compile(
     r"(?P<id>" + fieldlog.ID.pattern + r"|[0-9a-f]{12})(?:'s)?\s+(?P<name>[a-z][a-z .]{0,30}?)\s+"
     r"(?:reading\s+|value\s+)?from\s+(?P<old>" + _NUM + r")\s*(?P<old_unit>" + _UNIT + r")\s+to\s+"
     r"(?P<new>" + _NUM + r")\s*(?P<new_unit>" + _UNIT + r")(?P<rest>.*)$")
+_CORRECTION_CURRENT = re.compile(
+    r"(?i)^(?:please\s+)?(?:correct|fix|change|amend|update)\s+(?:sample\s+|record\s+|entry\s+)?"
+    r"(?P<id>" + fieldlog.ID.pattern + r"|[0-9a-f]{12})(?:'s)?\s+(?P<name>[a-z][a-z .]{0,30}?)"
+    r"(?:\s+(?:reading\s+|value\s+)?to\s+|:\s*(?:it\s+)?should be\s+)"
+    r"(?P<new>" + _NUM + r")\s*(?P<new_unit>°?\s?[CF]|mg/L|NTU|cm|mm|m|%)?\s*(?P<rest>.*)$")
+
+
+def export_request(text: str) -> Proposal | None:
+    """Natural export previews the existing full-chain export, without writing files.
+
+    A project is a selection check, not a promise to remove the rest of a signed
+    chain. The confirmation explicitly discloses the complete notebook scope.
+    """
+    if not re.match(r'(?i)^(?:please\s+)?export\s+(?:the |my )?(?:field\s+)?notebook\b', text.strip()):
+        return None
+    from . import field_recall
+    filters = field_recall.identity_filters(text)
+    result = field_recall.query(**filters, limit=1)
+    scope = 'Complete notebook, including all projects and original/correction records'
+    problems = list(result['warnings'])
+    if not result['total']:
+        problems.append('No matching notebook records were found for this request; nothing will be exported.')
+    return Proposal(EXPORT, {'scope': scope}, EXPORT.template, problems, edit_text=text)
 
 
 def confirmation(text: str) -> Proposal | None:
@@ -187,11 +212,13 @@ def _same_measure(name: str, wanted: str) -> bool:
 def correction(text: str) -> Proposal | None:
     m = _CORRECTION.match((text or "").strip())
     if not m:
+        m = _CORRECTION_CURRENT.match((text or '').strip())
+    if not m:
         return None
     code, name = m.group("id"), m.group("name").strip()
-    old, new = m.group("old"), m.group("new")
-    unit = (m.group("new_unit") or m.group("old_unit") or "").replace(" ", "")
-    rows = [r for r in fieldlog.current() if code in (r.get("id"), r.get("sample_id"))]
+    old, new = m.groupdict().get('old'), m.group("new")
+    unit = (m.group("new_unit") or m.groupdict().get("old_unit") or "").replace(" ", "")
+    rows = [r for r in fieldlog.current() if code.casefold() in (r.get("id", '').casefold(), r.get("sample_id", '').casefold())]
     # The reason kept with the correction is the person's own request, word for word.
     slots = {"record": code, "change": f"{name}: {old} → {new} {unit}".strip(), "entry": "", "measure": name,
              "value": new, "unit": unit, "reason": re.sub(r"\s+", " ", text.strip())[:200].replace("::", ":")}
@@ -205,7 +232,7 @@ def correction(text: str) -> Proposal | None:
         have = ", ".join(x["name"] for x in row.get("measurements") or []) or "no measurements"
         return Proposal(CORRECT, slots, "", [f"{code} has no {name} reading ({have})"])
     current = match[0]
-    if current.get("number") is None or abs(float(current["number"]) - float(old)) > 1e-9:
+    if old is not None and (current.get("number") is None or abs(float(current["number"]) - float(old)) > 1e-9):
         return Proposal(CORRECT, slots, "", [f"{code}'s {current['name']} is {current['value']}, not {old}"])
     slots.update(entry=row["id"], measure=current["name"], unit=unit or current.get("unit", ""))
     slots["change"] = f"{current['name']}: {current['value']} → {new} {slots['unit']}".strip()

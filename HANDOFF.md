@@ -6,6 +6,12 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 
 ## U109 released (Codex, 2026-10-28)
 
+Post-release worksheet repairs are in progress locally on
+`codex/u109-postrelease-reliability`: [continuing record](docs/U109-POSTRELEASE-HANDOFF.md).
+These changes are not part of the published U109 binaries. Keep notebook identity,
+linked corrections and source evidence ahead of general model prose; preserve all
+release/user-data/station boundaries recorded below.
+
 [U109](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U109) is published from
 immutable source `bdf2737446f77a81e14a19f774c99c12a4bb3bcf` (source PR57). All exact-main
 source gates passed; Windows2584/15 skips, Mac2567/32, Linux2566/33 plus19 passing subtests

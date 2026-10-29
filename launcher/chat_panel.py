@@ -603,8 +603,11 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             if propose and unrestricted and not workspace_request:
                 from cursiv_engine.core import notebook_proposals
                 preview = (notebook_proposals.confirmation(stripped)
+                           or notebook_proposals.export_request(stripped)
+                           or notebook_proposals.correction(stripped)
                            or self._memory_confirmation(stripped, history)
-                           or notebook_proposals.context_correction(stripped, history))
+                           or notebook_proposals.context_correction(stripped, history)
+                           or (notebook_proposals.record(stripped) if not intents.requested_operations(stripped) else None))
                 if preview is not None:
                     self._pending_intent = preview
                     self._pending_history_append = None
@@ -618,6 +621,14 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted and not workspace_request else None
             if result is None and unrestricted and not workspace_request:
                 result = cc.memory_command(stripped, history, scope=self._conv_id or '', preview_saves=propose)
+                if result is not None and result.update_preview:
+                    from cursiv_engine.core.intent import ACTIONS, Proposal
+                    slots = result.update_preview
+                    action = ACTIONS['memory.correct']
+                    self._pending_intent = Proposal(action, slots, action.template.format(**slots), [], edit_text=stripped)
+                    self._pending_history_append = None
+                    self._signals.done.emit()
+                    return
                 if result is not None and result.save_preview:
                     from cursiv_engine.core.intent import ACTIONS, Proposal
                     facts = result.save_preview

@@ -139,7 +139,7 @@ def choose(choice: str) -> None:
 # The model said "I am completely offline right now" as fact (benchmark gen-020, U65).
 
 _NET_QUESTION = re.compile(
-    r"(?i)\b(are you|is cursiv|is this|am i)\b[^?.]{0,40}\b(offline|online|connected|"
+    r"(?i)\bis offline mode (?:on|off|enabled|disabled)\b|\b(are you|is cursiv|is this|am i)\b[^?.]{0,40}\b(offline|online|connected|"
     r"on the internet|using the internet|sending)\b|\bprove (?:it|you'?re) (?:is )?offline\b"
     # Privacy questions: "does anything I type leave my computer?", "is my data private?"
     r"|\b(?:does|do|will|would|could|can)\b[^?.]{0,50}\b(?:leave|leaves|sent|send|sends|upload\w*)\b[^?.]{0,30}"

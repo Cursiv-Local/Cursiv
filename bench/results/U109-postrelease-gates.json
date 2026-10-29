@@ -1,0 +1,46 @@
+{
+  "base_commit": "26e3e5e909dfc266a8f736f5108f3a56673c5fcd",
+  "branch": "codex/u109-postrelease-reliability",
+  "gates": [
+    {
+      "gate": "full-proof",
+      "exit_code": 0,
+      "summary": "2639 passed, 15 skipped, 19 subtests passed in 614.35s (0:10:14)"
+    },
+    {
+      "gate": "usb-proof",
+      "exit_code": 0,
+      "summary": "45 passed, 2609 deselected in 95.84s (0:01:35)"
+    },
+    {
+      "gate": "workspace-proof",
+      "exit_code": 0,
+      "summary": "63 passed in 2.59s"
+    }
+  ],
+  "working_files_sha256": {
+    "cursiv_engine/chat/completion.py": "27dc1b2b4ed54e70c31c105308e8375f1dc5fc7f3f75e2fd99cca7c3314998d9",
+    "cursiv_engine/chat/status.py": "b2212918fb06fc2a823839febf3a68f8e950ebc3174aed9b7a9a0b122f84b84c",
+    "cursiv_engine/core/command_api.py": "cd969f2113ce9f1254e64f5930583e4bb3a16e2bc95b573168c8a23c0d0b3792",
+    "cursiv_engine/core/field_recall.py": "4786420097e704dbfc2b9d68bec0179a603ab486ffe9cb9fa56b456d8e22909b",
+    "cursiv_engine/core/fieldlog.py": "8437a09d6023600f88840df7285c5215a80c5542541961312cd4da67dd80c9c7",
+    "cursiv_engine/core/intent.py": "b1d488e2069b17ff41c32fcffb75cd0776e2e34f4d73fde96d2cfed346e7ac6b",
+    "cursiv_engine/core/notebook_proposals.py": "d50f9b62e6da8f447db1dac6342ef46b38677645a9b03141973cc1ee76eea774",
+    "cursiv_engine/core/notebook_tools.py": "2e0652399c3b39c2c8356a6c2f6905b413d02254c6e2252faf68135dcc238767",
+    "cursiv_engine/core/own_source_index.json": "8b5225b0a1023231795758f224893a78daf0812970c7f11ffe2a0fcb82cbb20d",
+    "cursiv_engine/core/science_check.py": "cc4eecfb56dd3e0eff0aafbefb167615ff0106bd05360af4ea11f2bf758c57bf",
+    "cursiv_engine/core/self_inspection.py": "93fb78a3a82c619d2ed8f32da903ff5c80a621fcbd666bca018b17d5239ff124",
+    "cursiv_engine/core/source_analysis.py": "adffa4bdfad5332a784e964c41739c6c55ab3fc7a96ccee9a4ceb1f9c38d35bf",
+    "cursiv_engine/core/style.py": "00ea2e8d882269f58769330e13a3a11a9bf4120dc3b56881eddebfb258a7a7eb",
+    "cursiv_engine/memory/intents.py": "a098cc6dd0057ecbba2c0b5903f0acbfad292631e587c9236fda9db0436065d7",
+    "launcher/chat_actions.py": "cc8bd10d72d1c04c06e29284faa022ab44e618ea8138be0993985399012a5956",
+    "launcher/chat_panel.py": "06979ec691a7ddbbdff61d88017465c5422842740ebb9a2fab9f9b404fb9b461",
+    "scripts/u109_postrelease_bench.py": "50565779bedf00cfdbe84e33282e11bf86917e978643816841b8baac0ebbbd75",
+    "tests/test_notebook_integration.py": "7e87ea65fa9e40763f0905fb5bef995a4b0871463696f64ebd4bfcde8fe2c64f",
+    "tests/test_u109_postrelease.py": "3c5b61cbaabdfa2ef4edcf3197aa4864efcee9a00c8129a48c0bb0eba0b5cf5e"
+  },
+  "isolated_stores": true,
+  "staged_files": 0,
+  "station_changed": false,
+  "published": false
+}
