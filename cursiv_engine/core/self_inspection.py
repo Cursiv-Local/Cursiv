@@ -62,13 +62,15 @@ def scoped(function):
 def _topic(text):
     q = text.lower()
     if re.search(r'\b(?:self.audit|reliability issue|weakness|potential bug)\b',q):return 'audit'
+    # Asking about self-inspection itself outranks incidental words such as "model".
+    if re.search(r'\bself.inspect\w*|\bsource.inspection\b|\binspect (?:its|your|cursiv\W?s) own (?:source|code)\b',q):return 'introspection'
     if re.search(r'\b(?:regex|regular expression)\b',q):return 'regex'
     if re.search(r'\b(?:entry ?point|startup|launch(?:er|ing)?)\b',q):return 'startup'
-    if re.search(r'\b(?:field copy|portable|external ssd|removable drive|cross.device.*transfer)\b',q):return 'portable'
+    if re.search(r'\b(?:field copy|portable|external ssd|removable drive|usb(?: drive)?|cross.device.*transfer)\b',q):return 'portable'
     if re.search(r'\b(?:pdf|pdfs)\b',q):return 'pdf'
     if re.search(r'\b(?:document|documents)\b',q):return 'documents'
     if re.search(r'\b(?:offline|network enforcement|network restrictions)\b',q):return 'offline'
-    if re.search(r'\b(?:sha.256|hash.chain)\b',q):return 'chain'
+    if re.search(r'\b(?:sha.256|hash(?:ing|es)?|fingerprints?|tamper.evident|notebook.{0,35}chain)\b',q):return 'chain'
     if re.search(r'\b(?:persistent memory|conversational memory|memories)\b',q):return 'memory'
     if re.search(r'\b(?:submit|architecture|pipeline)\b',q):return 'pipeline'
     if 'notebook' in q and all(w in q for w in ('creation','correction','verification')):return 'notebook'
@@ -80,30 +82,70 @@ def _topic(text):
     if re.search(r'\b(?:notebook|observations?|measurements?|records?)\b', q): return 'notebook'
     if re.search(r'\b(?:memory|memories|remember|conversation history)\b', q): return 'memory'
     if re.search(r'\b(?:verif\w*|checker|check.*answer)\b', q): return 'verification'
+    if re.search(r'\brout\w* function\b', q) and re.search(r'\b(?:source|code)\b', q): return 'introspection'
     if re.search(r'\b(?:messages?|reply|send|chat box|pipeline|architecture)\b', q): return 'pipeline'
     if re.search(r'\b(?:own code|own source|codebase|implementation|internals)\b', q): return 'source'
     return ''
 
 
+_OPENER = r'(?i)^(?:how|what|where|why|when|which|is|do|does|explain|describe|trace|inspect|find|show|locate|perform|identify|analy[sz]e|can|and|but|so|in)\b'
+
+
+def _focus(q):
+    """Set aside leading instructions or chat ("Do not recommend features. Inspect...").
+
+    Only a later sentence that opens like a question or inspection request and
+    names code is used; everything else keeps the whole message unchanged.
+    """
+    if re.match(_OPENER, q) and not re.match(r'(?i)^(?:do not|don\x27t|do n\x27t)\b', q):
+        return q
+    for gap in re.finditer(r'(?<=[.!?])\s+(?=\S)', q):
+        rest = q[gap.end():]
+        if re.match(_OPENER, rest) and re.search(r'(?i)\b(?:source|code|implementation|internals|functions?)\b', rest):
+            return rest
+    return q
+
+
 def resolve(question, history=()):
     """Pure self-intent resolution. Explicit user projects/files retain workspace routing."""
     q = turn_policy.task_text(question).strip()
-    for _ in range(2):q=re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+)','',q)
+    for _ in range(2):q=re.sub(r'(?i)^please\s+','',q)
+    q=re.sub(r'(?i)^(?:could|would) you\s+', 'Can you ', q)
+    if (re.match(r'(?i)^can you (?:verify|check|validate|export|correct|amend)\b', q)
+            and not re.search(r'(?i)\b(?:source|code|implementation|internals)\b', q)):
+        return ''  # polite execution requests check actual records, not application syntax
     if len(q) > 2000 or q.startswith(('@','/')) or re.match(r'(?i)^(?:self |file |log |remember |forget |agents? |queue )',q):
         return ''
     if re.search(r'(?i)\b(?:suicid\w*|self.harm|kill myself|want to die|overdos\w*|insulin|chest pain)\b',q):
         return ''  # the existing safety/emergency paths retain precedence
+    if re.search(r'(?i)\b(?:my|this|the selected|authorized) (?:repository|repo|codebase|workspace)|'
+                 r'\bin (?:the |my )?workspace\b|\b(?:poem|story|fiction|pretend|joke)\b|'
+                 r'(?:[A-Za-z]:[\\/]|\.\.[\\/])', q):
+        return ''  # checked on the whole message, before any leading sentence is set aside
+    q = _focus(q)
     if re.fullmatch(r'(?i)(?:what(?:\x27s| is) your (?:current )?model|which model are you (?:using|running))[?.!]*',q):
         return ''  # actual model identity uses application state, not source analysis
     if re.match(r'(?i)^(?:and\s+)?how (?:do|can|should) i\b',q):
         return ''  # user workflow guidance, not implementation inspection
-    if not re.match(r'(?i)^(?:how|what|where|why|when|which|do|does|explain|describe|trace|inspect|find|locate|perform|identify|analy[sz]e|can|and|but|so|in)\b',q) and not re.search(r'(?i)inspect your installed',q):
+    if not re.match(_OPENER,q) and not re.search(r'(?i)inspect your installed',q):
         return ''  # ordinary conversation does not scan feature patterns or load the inventory
-    if re.search(r'(?i)\b(?:my|this|the selected|authorized) (?:repository|repo|codebase|workspace)|'
-                 r'\bin (?:the |my )?workspace\b|\b(?:poem|story|fiction|pretend|joke)\b|'
-                 r'(?:[A-Za-z]:[\\/]|\.\.[\\/])', q):
-        return ''
     topic = _topic(q)
+    # These core feature questions need checked source even without the literal
+    # word "implementation". Record operations and user-file requests retain
+    # their separate routes; saying "show me the code path" is not a file read.
+    feature_question = re.search(r'(?i)^(?:can (?:you|cursiv)|do you|does (?:cursiv|your)|is your|'
+        r'how (?:do|does)|where (?:is|are|do|does)|what about your|show\b)', q)
+    feature_mechanics = re.search(r'(?i)\b(?:import|analy[sz]e|field copy|copy|hash(?:ing)?|chain|'
+        r'stor(?:e|ed|age)|persist\w*|code|source|support|tamper.evident|work)\b', q)
+    if topic == 'memory' and not re.search(r'(?i)\b(?:stor\w*|persist\w*|code|source|internals|implementation)\b', q):
+        feature_mechanics = None  # general memory help retains its existing native inventory answer
+    if topic == 'portable' and not re.search(r'(?i)\b(?:copy|code|source|implementation|internals|functions?|verify)\b', q):
+        feature_mechanics = None  # general USB operation help stays with native workflow guidance
+    user_file = re.search(r'(?i)\b(?:my|this|that|attached|selected) (?:pdf|document|file)\b|'
+                         r'\b[\w-]+\.(?:pdf|txt|md|csv|docx)\b', q)
+    if feature_question and topic in ('pdf', 'portable', 'chain', 'memory') and not user_file:
+        if feature_mechanics and (re.search(r'(?i)\b(?:you|your|cursiv|my saved memories)\b', q)):
+            return topic
     # Broad feature help, saved-memory recall and current-state questions have
     # authoritative native routes. Own-source retrieval requires implementation
     # mechanics, rather than merely mentioning Cursiv or saying "your memory".
@@ -113,7 +155,7 @@ def resolve(question, history=()):
                           r'find.*sample|notebook.*sav\w*|keep.*inside|prevent\w*.*(?:path|escap))\b',q)
     own = re.search(r'(?i)\b(?:your|cursiv|you)\b|\b(?:i press send|i click send|your implementation|self.audit)\b|\bi (?:submit|send) (?:a |my |the )?message\b',q)
     if re.search(r'(?i)\bollama\b.*\b(?:fails?|times? out|timeout|unavailable)\b',q):own=True
-    action = re.search(r'(?i)^(?:in your code|how|what|where|why|when|which|do you|does|explain|describe|trace|inspect|find|locate|perform|identify|analy[sz]e|can you explain|can cursiv)\b',q)
+    action = re.search(r'(?i)^(?:in your code|how|what|where|why|when|which|do you|does|explain|describe|trace|inspect|find|show|locate|perform|identify|analy[sz]e|can you explain|can cursiv)\b',q)
     if re.search(r'(?i)\binspect your installed (?:application|source|code)\b',q):
         return topic or 'source'
     if not own and action and re.search(r'(?i)^(?:find|locate) (?:the )?PDF importer\b',q):
@@ -222,7 +264,7 @@ def prepare(question, history=()):
         return None
     if not turn_policy.effective(question).inspect:
         return Packet(topic,'','',error='ACCESS DENIED: Source lookup is disabled for this turn. No application code was inspected.',status='ACCESS DENIED')
-    if topic in ('pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
+    if topic in ('pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source','introspection') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
         from . import source_analysis
         try:
             data=source_analysis.collect(question,topic)
@@ -400,6 +442,7 @@ def _flow(path,symbol,lines,topic,limit):
         'notebook':('preview','corrects','_append','return'),
         'offline':('is_offline','NetworkBlocked','_original','return'),
         'verification':('evaluate','issues','mode','assess','return'),
+        'introspection':('_topic(','_focus(','resolve(','return topic','return ','own','mechanics'),
     }.get(topic,('return','context'))
     blocks=[]
     def collect(nodes):
@@ -544,6 +587,54 @@ def stream(runtime, packet, question, history, api_key, openai_key, anthropic_ke
         runtime._CURSIV_REPLY = True
         runtime._set_answered('')
         yield 'Source explanation incomplete: '+str(exc)
+
+
+def repair_capability_denial(question, answer):
+    """Catch core-feature denials even when an unusual question missed pre-dispatch.
+
+    Only current installed-source witnesses can replace a model's denial. Failed
+    or forbidden reads yield UNKNOWN. This never executes the described feature.
+    """
+    if re.search(r'(?i)\b(?:fiction|story|poem|pretend|hypothetical)\b', question):
+        return None
+    topic = ''
+    for line in re.split(r'[\n]|(?<=[.!?])\s+', answer.replace('’', "'")):
+        if re.search(r'(?i)\b(?:scanned|image.only|private|your file|this file|your document)\b', line):
+            continue  # a scoped document/access limitation is not application-wide absence
+        denial = re.search(r"(?i)(?:(?:\bCursiv|\bI|\bthis app|\bthe application)\s+(?:does not|doesn't|cannot|can't|has no|lacks|don't (?:have|import|support|process|use))|"
+                         r"\bthere is no\b|\bno\s+(?:PDF importer|persistent memory|portable workspace|hashing|hash.chain))", line)
+        if not denial:
+            continue
+        line = re.split(r'(?i)\bbut\b|;|,\s*(?:while|although|however)\b', line[denial.start():], maxsplit=1)[0]
+        if re.search(r'(?i)\bPDFs?\b', line): topic = 'pdf'
+        elif re.search(r'(?i)\b(?:Field Copy|USB|portable workspace)\b', line): topic = 'portable'
+        elif re.search(r'(?i)\b(?:hash(?:ing)?|SHA.256|notebook verification|hash.chain)\b', line): topic = 'chain'
+        elif re.search(r'(?i)\b(?:persistent memory|memory storage|saved memories)\b', line): topic = 'memory'
+        if topic:
+            break
+    if not topic:
+        return None
+    if not turn_policy.current().inspect:
+        return 'UNKNOWN: The capability-denial claim is unverified. Installed-source inspection is disabled this turn; no source was read.'
+    canonical = {'pdf': 'Show the code path for PDF import in Cursiv.',
+        'portable': 'Do you have Field Copy?', 'chain': 'How does your notebook hash chain work?',
+        'memory': 'Where are my saved memories stored?'}[topic]
+    packet = prepare(canonical)
+    if packet is None:
+        return 'UNKNOWN: No installed-source inspection was established for that capability. Feature absence is not established.'
+    if packet.error:
+        return packet.error
+    from . import source_analysis, evidence_log
+    native = source_analysis.native(packet.analysis, topic)
+    if native is None:
+        return 'UNKNOWN: No reviewed explanation matches the searched installed source. Feature absence is not established.'
+    packet = replace(packet, authoritative=True)
+    _active.set(packet)
+    for snippet in packet.snippets:
+        evidence_log.record(evidence_log.SOURCE_READ, 'installed public application source', path=snippet.path,
+            lines=','.join(map(str, snippet.lines)), operation='capability-denial recheck', scope='static source, not runtime execution')
+    return ('The draft made an unsupported capability-denial claim. Checked installed source:\n\n' + native +
+            '\n\n*[Sources: ' + packet.footer() + '. Written by Cursiv; replaces an AI-generated draft.]*')
 
 
 def problems(answer):
