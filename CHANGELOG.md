@@ -1,5 +1,19 @@
 # Changelog
 
+## 3.14-U110 — Natural-language self-inspection and notebook reliability (2026-10-29)
+
+- Self-inspection requests preceded by instructions or conversation ("Do not recommend features.
+  Inspect your source...") now reach installed-source inspection; safety, workspace, fiction and
+  per-turn permission checks still read the whole message.
+- Questions about self-inspection itself select `self_inspection.resolve`, `prepare` and the
+  `_chat_inner` handoff as evidence instead of the startup pipeline; "identify/which function"
+  lookups rank declaration names above file-path words. The evidence checker is unchanged.
+- Includes the U109 post-release repairs: natural notebook read/verify/export wordings, linked
+  measurement corrections, memory fragment resolution with edit previews, saved style preferences
+  in the style block, calculator provenance for overconfidence notes, and witness-gated PDF and
+  hash-chain explanations. Evidence: docs/U109-POSTRELEASE-VALIDATION.md.
+- Before tagging: full Windows suite 2,664 passed/15 skips/19 subtests; USB gate 45 passed.
+
 ## 3.14-U109 — Reliable installed-source inspection (2026-10-28)
 
 - Route implementation questions to bounded, hash-checked installed source before workspace,
