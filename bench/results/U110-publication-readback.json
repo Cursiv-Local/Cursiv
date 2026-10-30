@@ -1,0 +1,26 @@
+{
+  "checked_utc": "2026-10-30T00:10:17.172794+00:00",
+  "rows": [
+    {
+      "path": "/",
+      "status": 200,
+      "content_type": "text/html",
+      "final_url": "https://cursiv.us/",
+      "mentions_u110": true
+    },
+    {
+      "path": "/start",
+      "status": 200,
+      "content_type": "text/html",
+      "final_url": "https://cursiv.us/start",
+      "mentions_u110": true
+    },
+    {
+      "path": "/assets/cursiv-owner-release-U110.json",
+      "status": 200,
+      "content_type": "application/json",
+      "final_url": "https://cursiv.us/assets/cursiv-owner-release-U110.json",
+      "mentions_u110": true
+    }
+  ]
+}

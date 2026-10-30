@@ -1,7 +1,48 @@
 # U109 post-release reliability worksheet
 
 Base: main `26e3e5e909dfc266a8f736f5108f3a56673c5fcd`, released U109.
-Branch: `codex/u109-postrelease-reliability`. Changes remain local for review.
+Original implementation branch: `codex/u109-postrelease-reliability`.
+
+## Current status — October29,2026
+
+Implementation is complete and was incorporated into U110 by the separate
+owner-authorized release workflow: commit `d0f5caa`, PR60, immutable tag
+`c3ca2c083622bd231dd2053d07ee394845fca08f`. On resumption, main was already
+`070c5e4` after publication PR61. This continuation uses local branch
+`codex/u110-worksheet-receipts` to correct stale records; it does not repeat
+publication or overwrite either release.
+
+Final worksheet gates completed:2644 passed/15 skips/19 passing subtests
+in676.13s; USB45 passed/2614 deselected in94.34s; workspace63 passed in1.89s.
+All original15 development/5 seen-heldout,13 worksheet/control and1 forced-Yes
+calculation live cases completed. The last real calculation probe returned the
+same correct mean6 with the false warning removed. U110 subsequently added20
+routing tests and recorded2664 Windows passes plus native package checks in
+[its release verification](U110-RELEASE-VERIFICATION.md).
+
+GitHub read-only verification confirms U110 published with11 assets. Production
+`/`, `/start` and `/assets/cursiv-owner-release-U110.json` returned200 and identified
+U110. Remaining interpretation/tone limits are unchanged. All earlier failed and
+intermediate receipts below are historical, not the current status.
+
+Current-U110 reconciliation checks:128 passed in20.28s, covering the worksheet,
+U110 routing, source inventory, release docs and code map. Closure-only metadata
+checks are recorded in `U109-postrelease-receipt-metadata.xml`; the committed-range
+and current-public-byte secret audit is recorded in `U109-postrelease-secret-scan.json`.
+Both are linked from [validation](U109-POSTRELEASE-VALIDATION.md). Runtime repairs
+are already released. The owner subsequently authorized committing, pushing and
+publishing all remaining records. This receipt update completes that closeout
+when present on main after its protected PR, with U110 release notes linking the
+final validation. Existing immutable tags and package assets remain the release
+source of truth. The historical implementation/test/model commands have finished.
+
+Publication process logs/state live under ignored `reports/U110-worksheet-publish-*`.
+Use only explicit public paths, staged-byte secret checks and the enabled USB hook;
+merge only the reviewed head with passing required checks. Add the validation links
+to the existing U110 release body after merge and verify its11 asset identities and
+digests are unchanged. This is a receipt publication, not a new software version.
+
+## Historical worksheet work log
 
 Order: notebook identity/write-read-correction-verify-export; own-source routing
 and evidence-to-answer consistency; linked memory corrections and confirmation;
@@ -13,7 +54,9 @@ Preserve confirmation, offline and workspace boundaries, existing source and
 memory provenance, Qwen defaults, owner exclusions and all station code. All
 tests/model probes use temporary stores outside OneDrive, with every home/data
 environment redirected before imports. No real notebook/memory/config reads,
-model downloads, dependency installs, commits, publication or tag changes.
+model downloads or dependency installs. At the original worksheet stage, no
+commit, publication or tag changes were authorized; the subsequent separate
+release workflow is recorded in the current status above.
 
 Initial inspection: natural reads/verification recognize only some notebook
 wordings; plain-language observation cards can pass through model extraction
