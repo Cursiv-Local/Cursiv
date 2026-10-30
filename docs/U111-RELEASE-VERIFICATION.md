@@ -30,3 +30,7 @@ No live cloud-account inference was tested. Website promotion is recorded separa
 with U112; the existing U110 homepage remains until that deployment succeeds.
 
 All eleven anonymous downloads and eight owner signatures were independently verified: [readback receipt](../bench/results/U111-public-downloads.json). Dependency-lock and provenance checks are recorded in [the paired receipt](../bench/results/U111-U112-lock-verification.json).
+
+## Verified website publication
+
+Website/evidence PR66 merged as `2cc8039632805dfb69c27f22856c26aef9ff1d92`. Cloudflare deployment `720a9dd4-69f1-4bab-8255-33a7a6eb5433` moved the public site from U110 to U112. All41 checks passed over20 public pages, release links/hashes, both signed manifests, icons, crawler user-agent probes, exclusions and canonicals: [production readback](../bench/results/U111-U112-publication.json). Manual discovery checks remain manual. User-agent probes do not establish verified Google-IP traffic or dashboard WAF policy. No private API endpoint was queried.

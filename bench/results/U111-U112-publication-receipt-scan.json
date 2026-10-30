@@ -1,0 +1,27 @@
+{
+  "scope": "Only the public live readback and three release/handoff docs",
+  "raw_findings": 0,
+  "credential_findings": 0,
+  "files": [
+    {
+      "path": "HANDOFF.md",
+      "sha256": "ca0144f014aed799643366aadefc364268bc002bd7357c2f575ee601c58b4c6b",
+      "bytes": 33256
+    },
+    {
+      "path": "bench/results/U111-U112-publication.json",
+      "sha256": "6db964c4c72edcc5e130193a27991c8cb4c75f74471b3078744d4688e840b2e8",
+      "bytes": 9283
+    },
+    {
+      "path": "docs/U111-RELEASE-VERIFICATION.md",
+      "sha256": "416c371ae8783caf732f0909a7e25fc135ba77653db83756d870f14e1bf30b0a",
+      "bytes": 2691
+    },
+    {
+      "path": "docs/U112-RELEASE-VERIFICATION.md",
+      "sha256": "17f35f85436bc80ab9035b0d4abf8641e78f4b8165b6e0ef8d57078e9b8603f3",
+      "bytes": 3986
+    }
+  ]
+}

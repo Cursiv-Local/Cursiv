@@ -14,7 +14,7 @@ each release; eleven anonymous downloads and eight owner signatures verified per
 [provider handoff](docs/PROVIDER-MANAGER-HANDOFF.md), [AI Providers guide](docs/AI-PROVIDERS.md).
 Preserve the separately opted-in readable USB key export. Later self-inspection
 worksheet repairs are isolated, uncommitted review work and are not in these binaries.
-Website publication is established separately by its receipt.
+Website publication is verified by [41 live checks](bench/results/U111-U112-publication.json) across20 public pages; deployed U112 from PR66, version `720a9dd4-69f1-4bab-8255-33a7a6eb5433`.
 
 ## U110 released (Claude, 2026-10-29)
 
