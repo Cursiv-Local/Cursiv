@@ -78,6 +78,17 @@ def get() -> dict:
         return dict(_state)
 
 
+def record_response(provider: str, requested_model: str, actual_model: str) -> None:
+    """Transport-owned identity, including artifact-only replies without a footer.
+
+    This records the responding backend, not a claim that cloud prompt text was
+    inspected or that a source was verified. No key or new disk store is involved.
+    """
+    with _lock:
+        _state.update(provider=provider,model=actual_model,requested_model=requested_model,
+            response=dict(provider=provider,requested_model=requested_model,actual_model=actual_model))
+
+
 def clear() -> None:
     with _lock:
         _state.clear()

@@ -130,6 +130,10 @@ def hey_prefix(runtime: CommandRuntime, raw: str) -> tuple[str, str]:
     when there's nothing trailing, so it can't collide with this.
     Returns (force_provider, stripped_text)."""
     lower = raw.lower()
+    import re
+    selected = re.fullmatch(r'(?is)model\s+(ollama|openai|claude|grok|groq|gemini)\s+(\S+)\s+::\s+(.+)',raw.strip())
+    if selected:
+        return selected[1].lower()+'::'+selected[2], selected[3].strip()
     for prefix, fp in (
         ("hey grok ", "grok"), ("hey claude ", "claude"),
         ("hey chat ", "openai"), ("hey openai ", "openai"), ("hey gpt ", "openai"),

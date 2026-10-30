@@ -38,7 +38,7 @@ def refusal(text: str, history=()) -> str | None:
     operation = names.get(token[0].casefold()) if token else None
     if operation and policy.blocks(operation):
         return turn_policy.DENIED
-    mutation = re.match(r'(?i)^(?:create|write|append|replace|delete|remove|edit|correct|amend|'
+    mutation = None if turn_policy.creative_request(t) and turn_policy.notebook_task(t) is None else re.match(r'(?i)^(?:create|write|append|replace|delete|remove|edit|correct|amend|'
                         r'save|store|remember|record|add|import|export|share|install|execute|run)\b', t)
     command = re.match(r'(?i)^(?:field\s*(?:log|notebook)\s+(?:import|export|share)|'
                        r'demo(?:\s+(?:on|off))?$|(?:files|offline)\s+(?:on|off)$|workspace\s+\S)', t)

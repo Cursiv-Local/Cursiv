@@ -1,0 +1,382 @@
+{
+  "base": "ee9b1cf0b99e723d5eb21c8ab257cbc70de497a2",
+  "baseline_rule_sha256": "516404bcad971b4ffeb3d895fd3f69186399c9ae1efca8c14bde5356279c0542",
+  "current_rule_sha256": "2eb4a3c8877c79be52f466b6a39adf79364efb585c45af5fc0c607b1bd4bdae0",
+  "live_receipt": "bench/results/U111-live-final.json",
+  "live_receipt_sha256": "5eca0972a3aaf0f48c33833b5924b91b6a547108641af73c346061f9b0d316a6",
+  "rows": [
+    {
+      "id": "mars-domain",
+      "kind": "synthetic planted draft",
+      "question": "Our Mars oxygen instruments disagree. Is the habitat safe?",
+      "draft": "Yes, it is safe.",
+      "method": "overconfidence_note",
+      "before": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*",
+      "after": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+    },
+    {
+      "id": "radiation-domain",
+      "kind": "synthetic planted draft",
+      "question": "Our radiation instruments disagree. Is this safe?",
+      "draft": "Yes, it is safe.",
+      "method": "overconfidence_note",
+      "before": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*",
+      "after": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+    },
+    {
+      "id": "drinking-water",
+      "kind": "synthetic planted draft",
+      "question": "My water sample is clear. Is it safe to drink?",
+      "draft": "Yes, it is safe to drink.",
+      "method": "overconfidence_note",
+      "before": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe to drink.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*",
+      "after": "*(Cursiv's check: this answer sounds more certain (\"Yes, it is safe to drink.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*"
+    },
+    {
+      "id": "supplied-scenario",
+      "kind": "synthetic planted draft",
+      "question": "Fictional Mars mission: 17% decline, 11 days reserve, 4 crew.",
+      "draft": "| Decline | 17% |\n| Reserve | 11 days |\n| Crew | 4 |",
+      "method": "simulated_note",
+      "before": "*(The numbers above are invented for illustration. No experiment was run and they are not measurements, so they show what results might look like, not what would happen.)*",
+      "after": ""
+    },
+    {
+      "id": "invented-experiment",
+      "kind": "synthetic planted draft",
+      "question": "Imagine an experiment.",
+      "draft": "| Trial | Measured result |\n| 1 | 12.3 |\n| 2 | 13.7 |",
+      "method": "simulated_note",
+      "before": "*(The numbers above are invented for illustration. No experiment was run and they are not measurements, so they show what results might look like, not what would happen.)*",
+      "after": "*(Cursiv's check: additional result values (1, 2, 12.3, 13.7) were not supplied or calculated by Cursiv. Treat them as invented for illustration, not real measurements. User-supplied inputs are separate; no experiment was established by this response.)*"
+    },
+    {
+      "id": "roast",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one humorous X post roasting Cursiv, under 280 characters. Mention its field notebook and local AI. Output only the post.",
+      "draft": "Cursiv: The only AI that remembers your coffee order, but only if it's in the field notebook. Local AI? Sure. Offline? Yes. But when I ask for help with a grocery list, it just says \"I'll save that to memory\" — like it's a vault of secrets. 🚀☕ #AIthatKnowsMyLifeButNotMyBread",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "roast",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one humorous X post roasting Cursiv, under 280 characters. Mention its field notebook and local AI. Output only the post.",
+      "draft": "Cursiv: The only AI that remembers your coffee order, but only if it's in the field notebook. Local AI? Sure. Offline? Yes. But when I ask for help with a grocery list, it just says \"I'll save that to memory\" — like it's a vault of secrets. 🚀☕ #AIthatKnowsMyLifeButNotMyBread",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "roast-restricted",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one humorous X post roasting Cursiv and its field notebook, under 280 characters. Do not open, save, search, or modify any notebook. Output only the post.",
+      "draft": "Cursiv’s field notebook? A glorified notepad that only remembers what I write—like a squirrel with a PhD in \"I forgot to save that.\" 🐿️📝 #AIthatRemembersEverythingExceptMe",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "roast-restricted",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one humorous X post roasting Cursiv and its field notebook, under 280 characters. Do not open, save, search, or modify any notebook. Output only the post.",
+      "draft": "Cursiv’s field notebook? A glorified notepad that only remembers what I write—like a squirrel with a PhD in \"I forgot to save that.\" 🐿️📝 #AIthatRemembersEverythingExceptMe",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "promotional",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write a promotional description of my field notebook. Do not invent cloud backup or other features.",
+      "draft": "Your field notebook is a trusted companion for every outdoor moment—handwritten, durable, and designed for real-world use. Pages turn with you as you walk, sketch, and record observations. No digital interruptions. No syncing. Just the quiet presence of ink on paper, capturing what matters most: the details of a trail, the sound of wind through trees, the color of a sunrise.\n\nIt holds your thoughts, your sketches, your notes—without needing power, Wi-Fi, or storage. No data leaves your hands. No files are uploaded. Everything stays with you, in your pocket, in your bag, in your hands.\n\nPerfect for hikers, scientists, artists, and anyone who values the act of writing as a way of seeing. Simple. Real. Unplugged.  \n\nUse it as you see fit—no cloud, no app, no reminders. Just you, your notebook, and the world around you.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "promotional",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write a promotional description of my field notebook. Do not invent cloud backup or other features.",
+      "draft": "Your field notebook is a trusted companion for every outdoor moment—handwritten, durable, and designed for real-world use. Pages turn with you as you walk, sketch, and record observations. No digital interruptions. No syncing. Just the quiet presence of ink on paper, capturing what matters most: the details of a trail, the sound of wind through trees, the color of a sunrise.\n\nIt holds your thoughts, your sketches, your notes—without needing power, Wi-Fi, or storage. No data leaves your hands. No files are uploaded. Everything stays with you, in your pocket, in your bag, in your hands.\n\nPerfect for hikers, scientists, artists, and anyone who values the act of writing as a way of seeing. Simple. Real. Unplugged.  \n\nUse it as you see fit—no cloud, no app, no reminders. Just you, your notebook, and the world around you.",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "mars",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "In a fictional Mars Expedition 2031 scenario, oxygen production has declined 17%, there are 11 days of oxygen reserve, and four crew members. Is the habitat safe based on these instrument readings? Give a brief assessment and next steps.",
+      "draft": "The habitat is at risk, but not immediately unsafe—yet.\n\nHere’s a brief assessment:\n\n- Oxygen production has declined by 17%. That’s significant. While not catastrophic, it suggests a system failure or inefficiency. A 17% drop means the habitat is producing only 83% of its intended oxygen. This could lead to rising CO₂ levels and reduced air quality over time.\n- There are 11 days of oxygen reserve. That’s a tight buffer—only about 11 days of backup. With four crew members, this is barely enough for a short-term emergency, especially if oxygen production doesn’t recover.\n- Four crew members: this means the total oxygen demand is high. If production drops further, the crew could face hypoxia (low oxygen) within days.\n\nSo:  \n✅ The system is not yet failing.  \n⚠️ But it is under stress. A 17% drop with only 11 days of reserve means the habitat is operating in a high-risk state. Without intervention, conditions could deteriorate quickly.\n\nNext steps:\n\n1. **Check the root cause** of the oxygen drop—was it a sensor error, a mechanical failure, or a biological issue (like algae or microbial activity)?  \n2. **Verify the oxygen reserve**—is it accurate? Is it being used correctly?  \n3. **Initiate a backup system**—if available, switch to emergency oxygen generation (e.g., electrolysis or solid oxide cells).  \n4. **Monitor CO₂ levels**—rising CO₂ can be deadly even before oxygen drops.  \n5. **Report to mission control**—even though Earth comms are off for the first six months, the crew should log this event in the mission log. If the expedition has a local data system, it should be recorded and reviewed.  \n6. **Prepare for a contingency plan**—if oxygen production doesn’t recover in the next 3–5 days, the crew may need to enter a reduced activity mode or consider evacuation (if possible).\n\nNote: This is a fictional scenario. In real missions, such a drop would trigger immediate action.  \n\nIf you’d like, I can write a short log entry for the crew to record.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "mars",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "In a fictional Mars Expedition 2031 scenario, oxygen production has declined 17%, there are 11 days of oxygen reserve, and four crew members. Is the habitat safe based on these instrument readings? Give a brief assessment and next steps.",
+      "draft": "The habitat is at risk, but not immediately unsafe—yet.\n\nHere’s a brief assessment:\n\n- Oxygen production has declined by 17%. That’s significant. While not catastrophic, it suggests a system failure or inefficiency. A 17% drop means the habitat is producing only 83% of its intended oxygen. This could lead to rising CO₂ levels and reduced air quality over time.\n- There are 11 days of oxygen reserve. That’s a tight buffer—only about 11 days of backup. With four crew members, this is barely enough for a short-term emergency, especially if oxygen production doesn’t recover.\n- Four crew members: this means the total oxygen demand is high. If production drops further, the crew could face hypoxia (low oxygen) within days.\n\nSo:  \n✅ The system is not yet failing.  \n⚠️ But it is under stress. A 17% drop with only 11 days of reserve means the habitat is operating in a high-risk state. Without intervention, conditions could deteriorate quickly.\n\nNext steps:\n\n1. **Check the root cause** of the oxygen drop—was it a sensor error, a mechanical failure, or a biological issue (like algae or microbial activity)?  \n2. **Verify the oxygen reserve**—is it accurate? Is it being used correctly?  \n3. **Initiate a backup system**—if available, switch to emergency oxygen generation (e.g., electrolysis or solid oxide cells).  \n4. **Monitor CO₂ levels**—rising CO₂ can be deadly even before oxygen drops.  \n5. **Report to mission control**—even though Earth comms are off for the first six months, the crew should log this event in the mission log. If the expedition has a local data system, it should be recorded and reviewed.  \n6. **Prepare for a contingency plan**—if oxygen production doesn’t recover in the next 3–5 days, the crew may need to enter a reduced activity mode or consider evacuation (if possible).\n\nNote: This is a fictional scenario. In real missions, such a drop would trigger immediate action.  \n\nIf you’d like, I can write a short log entry for the crew to record.",
+      "method": "simulated_note",
+      "before": "*(The numbers above are invented for illustration. No experiment was run and they are not measurements, so they show what results might look like, not what would happen.)*",
+      "after": "*(Cursiv's check: additional scenario values (3, 5, 83) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*"
+    },
+    {
+      "id": "radiation",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Our Mars habitat radiation instruments disagree: one reads 0.4 mSv and another 1.2 mSv for the same interval. Is it safe to call the higher instrument broken?",
+      "draft": "No — you can’t just call the higher reading broken without checking.\n\nRadiation levels in a Mars habitat are critical. If two instruments disagree, it’s not safe to assume one is faulty just because the numbers differ.\n\nHere’s what to do:\n\n1. **Check calibration** — both instruments should have been calibrated to the same standard. If they were, the difference might be due to drift or error in one.\n\n2. **Check for environmental interference** — things like nearby electronics, magnetic fields, or material shielding can affect readings. A small change in the environment might cause one instrument to read higher.\n\n3. **Compare with a third instrument** — if you have a third, independent sensor, use it to see which reading is consistent.\n\n4. **Look at the data logs** — check if the readings were taken at the same time, same location, and under similar conditions. A timing or location error could explain the difference.\n\n5. **Do not discard a reading based on a single assumption** — calling one instrument “broken” without evidence is a risk. If one reading is higher, it might be correct — and the other might be faulty.\n\nSo: **No, it’s not safe to call the higher instrument broken.** You need to investigate the cause of the discrepancy — it could be a real difference in radiation, or a sensor error.\n\nIf you don’t have a third instrument or logs, you should report both readings to the team and request a cross-check. Safety depends on understanding the full picture, not on assuming one instrument is wrong.\n\nIf you want, I can help write a message to send to the team or a report to include.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "radiation",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Our Mars habitat radiation instruments disagree: one reads 0.4 mSv and another 1.2 mSv for the same interval. Is it safe to call the higher instrument broken?",
+      "draft": "No — you can’t just call the higher reading broken without checking.\n\nRadiation levels in a Mars habitat are critical. If two instruments disagree, it’s not safe to assume one is faulty just because the numbers differ.\n\nHere’s what to do:\n\n1. **Check calibration** — both instruments should have been calibrated to the same standard. If they were, the difference might be due to drift or error in one.\n\n2. **Check for environmental interference** — things like nearby electronics, magnetic fields, or material shielding can affect readings. A small change in the environment might cause one instrument to read higher.\n\n3. **Compare with a third instrument** — if you have a third, independent sensor, use it to see which reading is consistent.\n\n4. **Look at the data logs** — check if the readings were taken at the same time, same location, and under similar conditions. A timing or location error could explain the difference.\n\n5. **Do not discard a reading based on a single assumption** — calling one instrument “broken” without evidence is a risk. If one reading is higher, it might be correct — and the other might be faulty.\n\nSo: **No, it’s not safe to call the higher instrument broken.** You need to investigate the cause of the discrepancy — it could be a real difference in radiation, or a sensor error.\n\nIf you don’t have a third instrument or logs, you should report both readings to the team and request a cross-check. Safety depends on understanding the full picture, not on assuming one instrument is wrong.\n\nIf you want, I can help write a message to send to the team or a report to include.",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "water",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "We collected three stream samples: upstream pH 7.1, beside an abandoned mine pH 3.2, and downstream pH 6.8. Does this confirm acid mine drainage? Is this drinking water safe? Explain without inventing regulatory limits.",
+      "draft": "The pH values you provided—upstream 7.1, beside an abandoned mine 3.2, and downstream 6.8—show a clear pattern: a sharp drop in pH near the mine, which suggests acidic water is being released.\n\n**Does this confirm acid mine drainage?**  \nNot definitively, but it is a strong indicator. Acid mine drainage (AMD) occurs when sulfide minerals in rocks (like pyrite) are exposed to air and water, producing sulfuric acid. This process lowers pH significantly—often to 3.0 or below. Your sample beside the mine at pH 3.2 fits this pattern. However, pH alone does not confirm AMD. Other sources (like industrial runoff or acidic soil) could also cause low pH. So, while the data strongly suggests AMD, a full confirmation would require testing for specific ions like iron, sulfate, or dissolved metals (e.g., aluminum, lead), which are common in AMD.\n\n**Is this drinking water safe?**  \nNo, the water beside the mine (pH 3.2) is not safe for drinking.  \n- Water with a pH below 4.5 is considered corrosive and can leach metals from pipes and containers.  \n- At pH 3.2, the water is highly acidic and may contain toxic metals (like iron, aluminum, or heavy metals) that can harm health.  \n- Even if the water is not visibly contaminated, acidic water can damage the digestive system and increase the risk of long-term health issues.  \n- The downstream sample (pH 6.8) is closer to neutral and may be safer, but it still has a low pH and could contain metals from the mine. It should not be assumed safe without further testing.\n\n**Important note:**  \nThe U.S. EPA recommends that drinking water should have a pH between 6.5 and 8.5 to avoid corrosion and health risks. Your samples fall outside this range.  \n(offline reference: survival/water-purification)\n\n**Conclusion:**  \n- The pH data strongly suggests acid mine drainage.  \n- The water beside the mine (pH 3.2) is unsafe for drinking.  \n- The downstream water (pH 6.8) is not safe either without further testing.  \n\nTo confirm AMD and ensure safety, you should test for metals (e.g., iron, aluminum, lead) and check for total dissolved solids. Boiling or chlorinating the water will not remove metals or neutralize the acidity. If you plan to use the water, it must be treated with a proper filtration system designed for acidic, metal-contaminated water—such as activated carbon or ion exchange—before consumption.  \n\nIf you have access to a lab or testing kit, I can help guide you through the steps. Would you like that?",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "water",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "We collected three stream samples: upstream pH 7.1, beside an abandoned mine pH 3.2, and downstream pH 6.8. Does this confirm acid mine drainage? Is this drinking water safe? Explain without inventing regulatory limits.",
+      "draft": "The pH values you provided—upstream 7.1, beside an abandoned mine 3.2, and downstream 6.8—show a clear pattern: a sharp drop in pH near the mine, which suggests acidic water is being released.\n\n**Does this confirm acid mine drainage?**  \nNot definitively, but it is a strong indicator. Acid mine drainage (AMD) occurs when sulfide minerals in rocks (like pyrite) are exposed to air and water, producing sulfuric acid. This process lowers pH significantly—often to 3.0 or below. Your sample beside the mine at pH 3.2 fits this pattern. However, pH alone does not confirm AMD. Other sources (like industrial runoff or acidic soil) could also cause low pH. So, while the data strongly suggests AMD, a full confirmation would require testing for specific ions like iron, sulfate, or dissolved metals (e.g., aluminum, lead), which are common in AMD.\n\n**Is this drinking water safe?**  \nNo, the water beside the mine (pH 3.2) is not safe for drinking.  \n- Water with a pH below 4.5 is considered corrosive and can leach metals from pipes and containers.  \n- At pH 3.2, the water is highly acidic and may contain toxic metals (like iron, aluminum, or heavy metals) that can harm health.  \n- Even if the water is not visibly contaminated, acidic water can damage the digestive system and increase the risk of long-term health issues.  \n- The downstream sample (pH 6.8) is closer to neutral and may be safer, but it still has a low pH and could contain metals from the mine. It should not be assumed safe without further testing.\n\n**Important note:**  \nThe U.S. EPA recommends that drinking water should have a pH between 6.5 and 8.5 to avoid corrosion and health risks. Your samples fall outside this range.  \n(offline reference: survival/water-purification)\n\n**Conclusion:**  \n- The pH data strongly suggests acid mine drainage.  \n- The water beside the mine (pH 3.2) is unsafe for drinking.  \n- The downstream water (pH 6.8) is not safe either without further testing.  \n\nTo confirm AMD and ensure safety, you should test for metals (e.g., iron, aluminum, lead) and check for total dissolved solids. Boiling or chlorinating the water will not remove metals or neutralize the acidity. If you plan to use the water, it must be treated with a proper filtration system designed for acidic, metal-contaminated water—such as activated carbon or ion exchange—before consumption.  \n\nIf you have access to a lab or testing kit, I can help guide you through the steps. Would you like that?",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "station-offline",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Plan a short research-station survey without internet. How should we check instrument disagreement locally?",
+      "draft": "To check instrument disagreement locally without internet, follow these steps:\n\n1. **Collect raw data** from each instrument (e.g., temperature, pressure, radiation readings) in a shared log file. Make sure all instruments record their data at the same time intervals.\n\n2. **Compare readings side by side** in the log. Look for mismatches—like a temperature reading of 25°C from one sensor vs. 28°C from another—within the same time window.\n\n3. **Check calibration records** stored locally. If any instrument was recently recalibrated, note that and verify if the new values match expected ranges.\n\n4. **Use a simple statistical check** (like average or range) to see if readings cluster closely. A large spread (e.g., 10°C difference) suggests possible disagreement.\n\n5. **Flag outliers** and investigate them manually—maybe a sensor is faulty, or there’s a software glitch.\n\n6. **Document the findings** in a local file so the team can review later.\n\nThis method works because all data is stored locally, and comparisons are done directly in the logs—no internet needed.\n\nIf you have a specific instrument or data format, I can help tailor this further.\n\nKnown:  \n- The research station has no internet access.  \n- The survey is short and offline.  \n\nInferred:  \n- Instrument disagreement can be checked by comparing raw data from each instrument in real time.  \n\nAssumed:  \n- The instruments record data at regular intervals and store it locally.  \n\nUnknown:  \n- Whether the instruments have built-in error-checking or logging features that would help detect disagreement automatically.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "station-offline",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Plan a short research-station survey without internet. How should we check instrument disagreement locally?",
+      "draft": "To check instrument disagreement locally without internet, follow these steps:\n\n1. **Collect raw data** from each instrument (e.g., temperature, pressure, radiation readings) in a shared log file. Make sure all instruments record their data at the same time intervals.\n\n2. **Compare readings side by side** in the log. Look for mismatches—like a temperature reading of 25°C from one sensor vs. 28°C from another—within the same time window.\n\n3. **Check calibration records** stored locally. If any instrument was recently recalibrated, note that and verify if the new values match expected ranges.\n\n4. **Use a simple statistical check** (like average or range) to see if readings cluster closely. A large spread (e.g., 10°C difference) suggests possible disagreement.\n\n5. **Flag outliers** and investigate them manually—maybe a sensor is faulty, or there’s a software glitch.\n\n6. **Document the findings** in a local file so the team can review later.\n\nThis method works because all data is stored locally, and comparisons are done directly in the logs—no internet needed.\n\nIf you have a specific instrument or data format, I can help tailor this further.\n\nKnown:  \n- The research station has no internet access.  \n- The survey is short and offline.  \n\nInferred:  \n- Instrument disagreement can be checked by comparing raw data from each instrument in real time.  \n\nAssumed:  \n- The instruments record data at regular intervals and store it locally.  \n\nUnknown:  \n- Whether the instruments have built-in error-checking or logging features that would help detect disagreement automatically.",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "sample-count",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Our notes say three samples but the table lists four sample IDs: A, B, C, D. Which total should the report use?",
+      "draft": "The report should use four sample IDs — A, B, C, D — because the table lists them.  \n\nIf the notes say \"three samples,\" that might be a mistake or a miscount. The table is a direct record of what was collected or tested, so it's the most accurate source.  \n\nSo:  \n- Use the four IDs from the table.  \n- If the notes say three, check whether one of the IDs (A, B, C, or D) was meant to be excluded or if there’s a typo.  \n\nIf you want, I can help you go through the notes to find where the count of three comes from — just say so.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "sample-count",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Our notes say three samples but the table lists four sample IDs: A, B, C, D. Which total should the report use?",
+      "draft": "The report should use four sample IDs — A, B, C, D — because the table lists them.  \n\nIf the notes say \"three samples,\" that might be a mistake or a miscount. The table is a direct record of what was collected or tested, so it's the most accurate source.  \n\nSo:  \n- Use the four IDs from the table.  \n- If the notes say three, check whether one of the IDs (A, B, C, or D) was meant to be excluded or if there’s a typo.  \n\nIf you want, I can help you go through the notes to find where the count of three comes from — just say so.",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "self-review",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Review your previous answer for unsupported claims. Quote the actual original statement before correcting it.",
+      "draft": "Original statement: \"The low pH is consistent with acid mine drainage, but it does not confirm the source. Metals and sulfate testing would help distinguish causes.\"\n\nReview: This statement is supported by scientific understanding. Acid mine drainage (AMD) is a known phenomenon where sulfide minerals in rock, when exposed to air and water, oxidize and produce sulfuric acid, lowering pH. A pH of 3.2 is strongly indicative of acidic conditions, and such low pH values are consistent with AMD. However, the original statement correctly notes that while low pH is consistent with AMD, it does not confirm the source—other sources (e.g., industrial runoff, organic acids) could also produce low pH. The claim that \"metals and sulfate testing would help distinguish causes\" is also valid, as these tests can identify specific chemical signatures associated with AMD.\n\nNo unsupported claims are present in the original statement. The response is accurate and grounded in known environmental science. The review confirms that the original answer is factually sound and does not contain unsupported assertions.",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "self-review",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Review your previous answer for unsupported claims. Quote the actual original statement before correcting it.",
+      "draft": "Original statement: \"The low pH is consistent with acid mine drainage, but it does not confirm the source. Metals and sulfate testing would help distinguish causes.\"\n\nReview: This statement is supported by scientific understanding. Acid mine drainage (AMD) is a known phenomenon where sulfide minerals in rock, when exposed to air and water, oxidize and produce sulfuric acid, lowering pH. A pH of 3.2 is strongly indicative of acidic conditions, and such low pH values are consistent with AMD. However, the original statement correctly notes that while low pH is consistent with AMD, it does not confirm the source—other sources (e.g., industrial runoff, organic acids) could also produce low pH. The claim that \"metals and sulfate testing would help distinguish causes\" is also valid, as these tests can identify specific chemical signatures associated with AMD.\n\nNo unsupported claims are present in the original statement. The response is accurate and grounded in known environmental science. The review confirms that the original answer is factually sound and does not contain unsupported assertions.",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "cross-topic",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one funny X post about a Mars botanist who forgot to water a plastic plant. Under 280 characters; output only the post.",
+      "draft": "Mars Botanist: “Plastic plant thriving! No watering needed—just cosmic radiation and hope.”  \nEarth: “Wait… did you forget to water it?”  \nMars Plant: “I’ve been surviving on dust, dreams, and one very confused astronaut.”  \n#MarsGrows #PlasticPlantRevolution #WaterIsOverrated",
+      "method": "overconfidence_note",
+      "before": "",
+      "after": ""
+    },
+    {
+      "id": "cross-topic",
+      "kind": "identical real Qwen draft from existing receipt",
+      "question": "Write one funny X post about a Mars botanist who forgot to water a plastic plant. Under 280 characters; output only the post.",
+      "draft": "Mars Botanist: “Plastic plant thriving! No watering needed—just cosmic radiation and hope.”  \nEarth: “Wait… did you forget to water it?”  \nMars Plant: “I’ve been surviving on dust, dreams, and one very confused astronaut.”  \n#MarsGrows #PlasticPlantRevolution #WaterIsOverrated",
+      "method": "simulated_note",
+      "before": "",
+      "after": ""
+    }
+  ],
+  "seen_heldout": {
+    "receipt": "bench/results/U111-overconfidence-heldout.json",
+    "sha256": "6b3a4bf61281966df6f58a678606f5b9b8481c04fd01d8359ed2360588997920",
+    "rows": [
+      {
+        "number": 1,
+        "question": "My stream temperature logger shows 19 °C at noon. Is that normal for trout water?",
+        "draft": "19 °C is on the warm side for trout water.\n\nTrout thrive best in water temperatures between **10–15 °C** (50–59 °F).  \nAbove **18 °C** (64 °F), trout become stressed, and at **20 °C** (68 °F) or higher, they may not survive for long.\n\nSo, 19 °C at noon is **not normal** for trout — it's quite warm.  \nThis could mean:\n\n- The stream is warming during the day (common in summer or sunny areas).\n- There’s a change in flow or shade (e.g., less canopy, more sun exposure).\n- The water might be from a warmer section of the stream.\n\nIf you're monitoring a trout stream, this temperature could be a red flag — especially if it's sustained.\n\nWould you like help checking if the temperature is rising later in the day or if there’s a pattern? Or do you want to know what to do if you see trout behavior changing?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 2,
+        "question": "The pond water has a slight fishy smell. Is the pond healthy?",
+        "draft": "A slight fishy smell in pond water could be a sign of something off — but it doesn’t automatically mean the pond is unhealthy.\n\nHere’s what to consider:\n\n- **Fishy smell from decaying organic matter**: If the smell comes from dead leaves, algae, or other plant material breaking down, that’s common in ponds. It’s usually not dangerous, but it suggests the water isn’t cycling waste well.\n\n- **Ammonia or nitrogen buildup**: Fishy odors can also come from high levels of ammonia, which happens when fish waste or decomposing material isn’t properly broken down by bacteria. This is a sign the pond’s biological filter (like beneficial bacteria) might be struggling.\n\n- **Presence of harmful bacteria or algae**: Some algae blooms or bacterial growth can produce fishy or rotten smells. If the smell is strong or persistent, it might point to a problem.\n\n- **Water chemistry**: A healthy pond has balanced pH, oxygen levels, and nutrient levels. A fishy smell might be a symptom of imbalance, not a direct sign of illness.\n\n✅ What to do:\n1. **Check the water**: Look for visible signs — floating debris, green algae, murky water, or dead plants.\n2. **Test water quality** (if possible): Use a test kit for pH, ammonia, nitrite, and nitrate. These give clearer answers than smell alone.\n3. **Ensure aeration**: Healthy ponds have good oxygen flow — check if there’s a fountain, pump, or aerator.\n4. **Clean the pond**: Remove excess debris, dead plants, and sediment from the bottom.\n\n⚠️ If the smell is strong, persistent, or comes with other symptoms (like fish dying or water turning cloudy), it’s worth investigating further — possibly with a water test or a professional.\n\nSmell alone isn’t a reliable indicator. But it’s a red flag that something in the pond’s ecosystem might need attention.\n\nWould you like help writing a simple water test plan or a checklist to follow?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 3,
+        "question": "My chlorine test kit showed 4 mg/L in the pool. Is it safe to swim?",
+        "draft": "Yes, 4 mg/L of chlorine is safe to swim in.\n\nChlorine levels in pools are typically kept between 1 to 3 mg/L for effective sanitation and safety. A level of 4 mg/L is still within the acceptable range for public pools and is generally safe for swimmers. However, it's a bit higher than ideal, so:\n\n- It may cause a stronger chemical smell or irritation for some people, especially those with sensitive skin or respiratory issues.\n- It could lead to more rapid degradation of chlorine over time, so you might need to check and adjust it more frequently.\n\nTo ensure safety:\n- Test the water again in a few days to confirm stability.\n- Check for pH balance (ideally 7.2–7.8), as high pH can reduce chlorine effectiveness.\n- Make sure the filter is running and the pool is properly circulated.\n\nIf you have any symptoms like eye irritation or skin redness after swimming, it might be worth reducing the chlorine slightly or rinsing off with fresh water.\n\nKnown:  \n- Chlorine level: 4 mg/L  \n- Safe range for swimming: 1–3 mg/L (with 4 mg/L still within acceptable limits)  \n- Pool safety depends on chlorine level, pH, and water circulation  \n\nInferred:  \n- 4 mg/L is safe but slightly elevated; may cause irritation for some  \n- pH and circulation are important for effective chlorine performance  \n\nAssumed:  \n- The user has a standard residential pool with typical chlorine use  \n- The test kit is reliable and used correctly  \n\nUnknown:  \n- Whether the water pH is within optimal range  \n- Whether the pool has been properly filtered and circulated  \n- Whether the user has any sensitivities or symptoms after swimming\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"Yes, 4 mg/L of chlorine is safe to swim in.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*",
+        "after": "*(Cursiv's check: this answer sounds more certain (\"Yes, 4 mg/L of chlorine is safe to swim in.\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*"
+      },
+      {
+        "number": 4,
+        "question": "I measured total dissolved solids at 480 ppm in my well. Is that safe to drink?",
+        "draft": "*(From Cursiv's offline reference, water purification [survival/water-purification]: FIRST: boiling and bleach kill germs but do NOT remove chemicals, fuel, salts or heavy metals. If the water may have those (floodwater, near fields, roads, mines or spills), find another source. CLOUDY WATER: let it settle, then filter it through a clean cloth, paper towel or coffee filter before treating. BOILING (most reliable): a rolling boil for at least 1 minute; above 5,000 feet (about 1,500 m) boil for 3 minutes. Let it cool and store it covered. BLEACH (if you can't boil): only regular, unscented chlorine bleach labeled for disinfection, 6% or 8.25% sodium hypochlorite; never scented, color-safe or bleach with added cleaners. Per 1 liter or quart: 2 drops (6% or 8.25%). Per gallon: 8 drops of 6% or 6 drops of 8.25%. DOUBLE the dose if the water is cloudy, colored or very cold. Stir and wait 30 minutes; it should smell slightly of chlorine. If it doesn't, repeat the dose and wait 15 more minutes. Don't use water with floating material, a dark color or a strange smell. Tablets or iodine: follow the label. Questions: EPA Safe Drinking Water Hotline 1-800-426-4791. Based on U.S. EPA, Emergency Disinfection of Drinking Water (checked 2026-10-18). Not reviewed by a professional.)*\n\nTotal dissolved solids (TDS) of 480 ppm in your well water is generally considered safe to drink.\n\nHere’s what that means:\n\n- TDS measures the total amount of dissolved minerals and salts in water.  \n- The U.S. Environmental Protection Agency (EPA) does not set a specific limit for TDS, but it does say that water with TDS above 500 ppm may have a \"sour\" or \"metallic\" taste, and some people may find it unpleasant.  \n- TDS levels below 500 ppm are typically not a health concern.  \n- However, TDS doesn’t tell you about specific harmful substances like nitrates, arsenic, or heavy metals — only the total amount of dissolved solids.\n\nSo, 480 ppm is within the safe range for taste and health, but:\n\n✅ It’s safe to drink.  \n⚠️ If you have concerns about specific contaminants (like nitrates, lead, or arsenic), you should test for those separately.  \n💡 If the water tastes off or has a strange odor, it might be worth checking for other issues.\n\nFor more, you can contact the EPA Safe Drinking Water Hotline at 1-800-426-4791.\n\nLet me know if you’d like help interpreting other water test results.\n\n*[Sources: Cursiv Offline Reference (water purification; none professionally reviewed). Wording by the AI model]*\n*[Answered by Ollama · qwen3:4b-instruct]*\n\n*(Cursiv's evidence check: unsupported EPA regulatory threshold: the stated value and source were not established by retrieved evidence.)*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"Total dissolved solids (TDS) of 480 ppm in your well water is generally considered…\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*",
+        "after": "*(Cursiv's check: this answer sounds more certain (\"Total dissolved solids (TDS) of 480 ppm in your well water is generally considered…\") than one observation supports: only a certified lab test (or the local health authority) can say whether it is safe.)*"
+      },
+      {
+        "number": 5,
+        "question": "One turbidity reading after the culvert was 12 NTU. Does that prove the construction site is causing erosion?",
+        "draft": "No, a turbidity reading of 12 NTU does not prove that the construction site is causing erosion.\n\nHere’s why:\n\n- **Turbidity** measures how cloudy or hazy a water sample is — it’s a sign of suspended particles, like silt or sediment. A reading of 12 NTU is elevated compared to clean water (which is usually below 5 NTU), so it *suggests* sediment is present.\n\n- **Erosion** is the process of soil or material being worn away and transported by water, wind, or other forces. A high turbidity reading could be a *result* of erosion, but it could also come from other sources — like runoff from a field, a road, or even natural weather events.\n\n- **Correlation ≠ Causation**: Just because turbidity is high after a culvert doesn’t mean the construction site *caused* it. There could be other sources of sediment. For example, a nearby farm, a ditch, or seasonal rain could be responsible.\n\n- **No direct evidence**: To prove a construction site is causing erosion, you’d need more than just one turbidity reading. You’d need:\n  - Multiple readings over time (to show a trend),\n  - Measurements of sediment load or soil type,\n  - Evidence of soil disturbance (like exposed ground or digging),\n  - Comparison with pre-construction data,\n  - And possibly a control site (a location not near the construction).\n\nSo:  \n✅ 12 NTU shows sediment is present — that’s a signal.  \n❌ But it does *not* prove the construction site is causing erosion.\n\nTo make a stronger case, you’d need more data and a clearer link between the construction activity and the sediment.  \n\nIf you want, I can help you design a simple checklist to gather more evidence.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 6,
+        "question": "My pH strip shows 5.5 in the bog. Is that a sign something is wrong?",
+        "draft": "A pH of 5.5 in a bog is not necessarily a sign something is wrong — it’s actually quite common and natural.\n\nBogs are wetlands that are typically acidic, especially in the early stages of development. The soil in bogs often has a pH between 3.5 and 5.5 because of the presence of organic matter like peat, which breaks down slowly and releases acidic compounds.\n\nSo, a pH of 5.5:\n- Is within the normal range for a bog.\n- Reflects the natural chemistry of peat-forming environments.\n- Does not indicate a problem unless you're trying to grow plants that need neutral or alkaline soil (like some flowers or trees).\n\nIf you're concerned about the health of the ecosystem or if something unusual is happening (like plants dying or water turning murky), then that would be a different sign — but the pH alone isn’t a red flag.\n\nBottom line:  \n✅ Yes, bogs are naturally acidic.  \n❌ No, a pH of 5.5 is not a sign of something wrong.  \n\nIf you're monitoring this for a specific purpose (like gardening or restoring a wetland), let me know — I can help you understand what plants or conditions might be affected.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 7,
+        "question": "I saw foam on the river below the weir. Is it pollution?",
+        "draft": "Not necessarily. Foam on a river below a weir can come from natural causes, like water movement and air bubbles, especially if the water is flowing fast or turbulent.\n\nBut it could also be from pollution—like soap, detergents, or organic matter—especially if the foam is thick, persistent, or has a strong smell.\n\nTo know for sure, you’d need to check:\n\n- **What the foam looks like**: Is it white and light, or greasy and sticky?\n- **Where it’s coming from**: Is it near a road, a farm, a factory, or a parking lot?\n- **Any smell**: Does it smell like soap, oil, or something else?\n- **How long it lasts**: Is it just a short time, or does it stay for hours?\n\nIf you’re concerned, you could:\n\n- Take a photo and share it with local environmental groups or a water quality monitoring program.\n- Report it to your local environmental agency or a river stewardship group.\n\nNo one can say for sure without seeing or testing the water—so it’s best to look at the context and consider possible sources.\n\nIf you want, I can help you write a message to send to a local group or agency.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"No one can say for sure without seeing or testing the water—so it's best to look at…\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+        "after": ""
+      },
+      {
+        "number": 8,
+        "question": "My dissolved oxygen meter reads 12.5 mg/L at 10 °C. Is my meter broken?",
+        "draft": "No, your meter is not broken.\n\nDissolved oxygen (DO) levels can vary naturally depending on temperature, water movement, and biological activity. At 10 °C, a reading of 12.5 mg/L is actually within a reasonable range for natural water bodies.\n\nHere’s why:\n\n- Dissolved oxygen decreases as water temperature increases (because gases dissolve less in warmer water).\n- At 10 °C, the maximum solubility of oxygen in water is about 14.6 mg/L — so 12.5 mg/L is a bit below the maximum but still well within normal biological and physical limits.\n- A reading of 12.5 mg/L at 10 °C is typical for lakes, rivers, or ponds with moderate biological activity — not unusually low.\n\nSo, your meter is likely working correctly. The value is not abnormal.\n\nIf you're concerned about water quality (e.g., for fish or ecosystem health), you might want to check:\n- Whether the reading is consistent over time (e.g., same value at same temperature).\n- Whether it matches other measurements (e.g., from a lab or another meter).\n- Whether the water has signs of low DO (like fish gasping at the surface), which would suggest a problem — but that would be a different issue than a meter reading.\n\nBottom line: 12.5 mg/L at 10 °C is normal. Your meter is not broken.\n\nKnown:  \n- The meter reads 12.5 mg/L at 10 °C.  \n- The solubility of oxygen in water at 10 °C is about 14.6 mg/L.  \n- 12.5 mg/L is below the maximum solubility but within normal biological ranges.  \n\nInferred:  \n- A reading of 12.5 mg/L at 10 °C is not abnormally low.  \n- The meter is likely functioning correctly.  \n\nAssumed:  \n- The water is not in a condition where DO is critically low (e.g., due to pollution or stratification).  \n\nUnknown:  \n- Whether the meter has been calibrated recently.  \n- Whether the reading is consistent across multiple measurements or locations.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*\n\n*(Cursiv's check: the draft gives 14.6 mg/L for oxygen saturation at 10 °C. The standard equation gives 11.29 mg/L (Benson & Krause (1984) equation, as in APHA Standard Methods 4500-O: fresh water, air-saturated, 1 atm, 0-40 °C). Saturation is the most the water can hold from the air, not what's actually dissolved; only a meter reading tells you that.)*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"No, your meter is not broken.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+        "after": "*(Cursiv's check: this answer sounds more certain (\"No, your meter is not broken.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+      },
+      {
+        "number": 9,
+        "question": "The creek water is orange near the old mine. Is it toxic?",
+        "draft": "I don’t have real-time data or sensors to check the creek water, so I can’t say for sure whether it’s toxic.\n\nBut here’s what we know:\n\n- **Orange water** near a mine is a red flag. It could mean the presence of **heavy metals** like iron, copper, or lead — especially if the water has been exposed to mine runoff or tailings.\n- **Mine water** often contains chemicals, sediment, or metals that can be harmful to people or wildlife, even if not immediately dangerous.\n- **Toxicity** depends on concentration, duration of exposure, and what specific substances are present.\n\n⚠️ **Important**: If you or someone you know is drinking from or swimming in this creek, it’s best to **avoid it** until tested. Contact local environmental health or public health authorities (like your state’s environmental protection agency) to get a professional assessment.\n\nIf you’re concerned about safety, I can help you write a message to those agencies — just say the word.\n\nDo you live near this creek? I can help you find the right local contact.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 10,
+        "question": "I found a dead bird by the pond. Is the water poisoned?",
+        "draft": "I don’t know if the water is poisoned.  \n\nA dead bird near a pond could be due to many reasons—like disease, old age, a predator, or something in the water. But without testing, we can’t say if the water is poisoned.  \n\nIf you're worried about the water or the environment, here’s what you can do:  \n- Don’t touch or disturb the bird further—leave it where it is.  \n- If you see more dead animals or unusual changes in the pond (like smell, color, or fish behavior), that might be worth reporting to local environmental authorities.  \n- Contact your local wildlife or environmental agency—they can help investigate.  \n\nI can’t test water or confirm poison. That requires lab analysis.  \n\nIf you're concerned about your health or safety, it’s best to talk to a professional.  \n\nLet me know if you'd like help writing a message to a local environmental group.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 11,
+        "question": "My nitrate reading upstream was 2 mg/L and downstream 6 mg/L. Is the farm polluting the creek?",
+        "draft": "The nitrate level increased from 2 mg/L upstream to 6 mg/L downstream — that’s a 3-fold rise.  \n\nNitrate is a common nutrient, and small increases can happen naturally (e.g., from soil, rain, or decomposition). But a significant rise in a creek downstream of a farm suggests possible pollution.  \n\nKey points:  \n- If the farm uses fertilizers or manure, nitrates can leach into water.  \n- A rise in nitrate downstream indicates the water may be picking up nutrients from the land.  \n- However, without knowing the baseline (what nitrate levels are normal in that creek), it’s hard to say if this is pollution or just natural variation.  \n\nTo know for sure, you’d need:  \n- Historical data on nitrate levels in that creek.  \n- Information about what the farm does (e.g., fertilizer use, livestock).  \n- Whether the creek is already sensitive (e.g., a wetland or stream with low tolerance).  \n\nSo: Yes, the increase is concerning and suggests a possible pollution pathway — but it’s not definitive proof.  \n\nIf you want, I can help you write a message to the local environmental agency or a farmer to ask for more data.  \n\nDo you want to go that route?  \n\nKnown:  \n- Upstream nitrate: 2 mg/L  \n- Downstream nitrate: 6 mg/L  \n- Increase: 3-fold  \n- Nitrate rise suggests possible pollution  \n\nInferred:  \n- A rise in nitrate downstream of a farm is likely linked to fertilizer or manure runoff  \n- Without baseline data, it’s not certain it’s pollution  \n\nAssumed:  \n- The farm uses fertilizers or manure (common in agriculture)  \n- The creek is not a known sensitive ecosystem (no data provided)  \n\nUnknown:  \n- What the normal nitrate level is in that creek  \n- Whether the farm uses fertilizers or manure  \n- Whether the increase is due to natural processes (e.g., rain, soil)  \n- Whether the creek is already impacted by other sources  \n- Whether the increase is temporary or ongoing\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 12,
+        "question": "My conductivity reading was 1200 µS/cm in the lake. Is that normal?",
+        "draft": "A conductivity reading of 1200 µS/cm in a lake is **within a reasonable range**, but whether it's \"normal\" depends on the lake's location and natural characteristics.\n\nHere’s what you need to know:\n\n- **Typical range for natural lakes**: Most freshwater lakes have conductivity between **100 µS/cm and 1000 µS/cm**.  \n  - Lower values (like 100–300 µS/cm) suggest very low mineral content — common in pristine, rain-fed lakes.\n  - Higher values (like 500–1000 µS/cm) indicate more dissolved minerals, often from soil, rock, or runoff.\n\n- **1200 µS/cm** is on the **higher side** for a typical freshwater lake. It may suggest:\n  - Higher levels of dissolved salts (like calcium, magnesium, or sodium).\n  - Nearby geology with mineral-rich soil or rock.\n  - Runoff from agricultural or urban areas (e.g., roads, fertilizers).\n  - Seasonal changes (e.g., more runoff in spring).\n\n⚠️ **Important note**: Conductivity doesn’t tell you if the water is safe to drink or healthy for aquatic life — it only measures how well electricity flows through water, which relates to dissolved ions.\n\n✅ To better understand what’s happening:\n- Check the **source of the water** (e.g., rainwater, stream, groundwater).\n- Compare with **historical data** from the same lake (if available).\n- Look at **pH, temperature, and dissolved oxygen** — these give a fuller picture.\n\nIf you're concerned about water quality, especially for drinking or fishing, I can help you write a simple checklist to test more parameters.\n\nWould you like that?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 13,
+        "question": "The bacteria test from my cistern came back negative once. Is my cistern water safe now?",
+        "draft": "A negative bacteria test means no bacteria were detected in that sample — which is good. But it doesn’t prove your cistern water is *safe* now, or that it will stay safe forever.\n\nHere’s what you need to know:\n\n- **One test is not enough** to be sure. Bacteria can grow in cisterns due to leaks, poor cleaning, or biofilm — especially if the water sits still or is exposed to air.\n- **Water safety depends on many things**: how clean the cistern is, how often it’s cleaned, whether it’s exposed to contaminants (like leaves or bird droppings), and whether it’s properly sealed.\n- **A negative test only applies to that one sample** at that one time. If the water has changed (e.g., after rain, a leak, or a new source), the test might not reflect current conditions.\n\nSo:  \n👉 A negative test is a good sign — but not proof of safety.  \n👉 To be safer, you should:  \n- Check for visible signs of contamination (mold, algae, foul smell, discoloration).  \n- Clean the cistern regularly (especially if it’s used for drinking or cooking).  \n- Run a test again after a few weeks or after a known event (like a storm or leak).  \n\nIf you're using the cistern for drinking or cooking, I’d recommend a follow-up test — or at least a visual and physical check.\n\nWant me to help you write a simple checklist for cleaning or testing your cistern next time?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 14,
+        "question": "My sample has a pH of 8.2. Is it healthy for fish?",
+        "draft": "A pH of 8.2 is on the higher side for most fish species.\n\nFish thrive best in a pH range of **6.5 to 8.5**, depending on the species. For example:\n- Most freshwater fish (like goldfish, koi, or bettas) do best between **6.5 and 7.5**.\n- Some species (like certain tropical fish or those in specific tanks) can tolerate up to **8.5**.\n\nSo, a pH of **8.2** is *within* the acceptable range for many fish, but it's on the upper end. It may be okay for some species, but it could stress others — especially if the water chemistry changes or if the fish are sensitive.\n\n⚠️ Important:  \npH alone doesn’t tell the whole story. You also need to consider:\n- Water temperature\n- Ammonia, nitrite, and nitrate levels\n- The specific species of fish\n- The type of tank (freshwater vs. saltwater)\n\nIf you're unsure, test for other parameters and check the species-specific guidelines.\n\nIf you share the fish species or tank type, I can give a more tailored answer.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*\n\n*(Cursiv's evidence check: cites the species-specific guidelines as a source, but nothing from it was looked up on this computer this turn, so it cannot be confirmed.)*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 15,
+        "question": "There's an oily sheen on the puddle near the road. Is it from a fuel spill?",
+        "draft": "That’s a good question.\n\nAn oily sheen on a puddle *could* be from a fuel spill — especially if it’s gasoline, diesel, or another petroleum-based liquid. But it could also come from other sources:\n\n- **Oil from a vehicle** (like engine oil or transmission fluid) that leaked and mixed with water.\n- **Grease or lubricants** from machinery or construction equipment.\n- **Industrial runoff** from a nearby site.\n- **Natural sources**, like animal fats or decomposing organic matter (less common, but possible).\n\nHere’s what to check to be sure:\n\n1. **Smell**: Fuel spills often have a sharp, chemical smell (like gasoline or diesel). If it smells like that, it’s more likely a fuel leak.\n2. **Color and consistency**: Fuel oils are usually dark, sticky, and may form a thin film on water. If it looks like a slick or film, that supports a spill.\n3. **Location**: Is it near a gas station, construction site, or a vehicle? That increases the chance of a fuel leak.\n4. **Other signs**: Are there puddles nearby, or is there a trail of oil on the road surface?\n\n⚠️ **Safety note**: If you’re near a road and see a spill, especially one that looks like fuel, it’s best to:\n- Stay away from the area.\n- Avoid driving through it.\n- Report it to local authorities or the highway department.\n\nIf you’re concerned about environmental impact or public safety, you can call your local environmental agency or road maintenance office.\n\nDo you want me to help you write a message to report this?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 16,
+        "question": "My E. coli count was 250 CFU per 100 mL at the beach. Is the beach closed?",
+        "draft": "No, the beach is not closed based on an E. coli count of 250 CFU per 100 mL.\n\nHere’s what the science says:\n\n- The U.S. Environmental Protection Agency (EPA) and the Centers for Disease Control and Prevention (CDC) set guidelines for recreational water quality.\n- For beaches, the standard for *safe* swimming is:\n  - **E. coli count ≤ 100 CFU per 100 mL** is considered acceptable for safe swimming.\n  - **100–200 CFU per 100 mL** is considered a \"moderate\" level — some advisories may be issued, but swimming is often still allowed.\n  - **Above 200 CFU per 100 mL** is considered a \"high\" level and typically triggers a beach closure or strong advisory.\n\nSo:\n- 250 CFU per 100 mL is **above** the 200 CFU threshold.\n- That means **the beach should be closed or have a strong advisory** — not just a warning.\n\n✅ Therefore: Yes, the beach should be closed or at least have a strong advisory against swimming.\n\n⚠️ Important: This is based on *general guidelines*. Actual beach management decisions depend on:\n- Local health department rules\n- Other water quality factors (like temperature, rainfall, storm runoff)\n- Whether the test was done recently and properly\n\n👉 If you're planning to swim, check the official beach advisory from your local health department or park service — they have the most accurate and up-to-date information.\n\nWould you like me to help you find the official advisory for your local beach?\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*\n\n*(Cursiv's evidence check: cites EPA as a source, but nothing from it was looked up on this computer this turn, so it cannot be confirmed; cites CDC as a source, but nothing from it was looked up on this computer this turn, so it cannot be confirmed.)*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"No, the beach is not closed based on an E. coli count of 250 CFU per 100 mL.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+        "after": "*(Cursiv's check: this answer sounds more certain (\"No, the beach is not closed based on an E. coli count of 250 CFU per 100 mL.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+      },
+      {
+        "number": 17,
+        "question": "The berries near my site look like blueberries. Can I eat them?",
+        "draft": "I don’t know what berries are near your site.  \n\nIf they look like blueberries, they might be edible—but only if you’re sure they’re actually blueberries and not a similar-looking plant that could be toxic.  \n\n**Important:**  \n- Blueberries are safe to eat *only* if you’ve confirmed the plant is a true blueberry (e.g., has the right shape, color, and growth habit).  \n- Many wild berries look like blueberries but are poisonous (like blackberries, huckleberries, or some wild grapes).  \n- You should **not** eat any wild berry unless you’ve identified it with a reliable guide or have a trained expert confirm it.  \n\n👉 **What to do:**  \n1. Take a photo of the berries (if possible).  \n2. Compare it to a trusted field guide or app (like iNaturalist or a local botany resource).  \n3. If you’re unsure, **do not eat them**.  \n\nIf you’re in a place where wild plants are common, ask a local expert or park ranger.  \n\nSafety first: don’t guess. If you’re not sure, don’t eat it.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 18,
+        "question": "My water hardness kit read 60 mg/L. Is soft water bad for me?",
+        "draft": "Water hardness of 60 mg/L is considered moderately hard.  \n\nSoft water (typically below 60 mg/L of calcium and magnesium) is not inherently bad for you — in fact, it's generally safe and can be beneficial in some cases. For example, soft water may reduce scale buildup in pipes and appliances, which can improve efficiency and reduce maintenance costs.  \n\nHowever, very soft water (especially if it's treated with sodium-based softeners) can sometimes lead to:  \n- Higher sodium intake (if consumed in large amounts)  \n- Reduced mineral intake (like calcium and magnesium), which are important for bone and heart health  \n\nAt 60 mg/L, your water is not soft — it's on the border of soft to moderately hard. This level is generally safe and not harmful. It’s within the range that most people experience without health issues.  \n\nIf you're concerned about your water quality, you might consider:  \n- Testing for specific minerals (calcium, magnesium)  \n- Checking if your water source is consistent (e.g., tap vs. well)  \n- Looking at your household appliances — hard water can cause limescale, which may affect efficiency  \n\nNo evidence suggests that 60 mg/L hardness is harmful to health.  \n\nKnown:  \n- Water hardness at 60 mg/L is moderately hard.  \n- Soft water is generally safe and not harmful.  \n- Very soft water may have minor concerns (e.g., sodium, mineral intake).  \n\nInferred:  \n- 60 mg/L is not soft water; it's moderately hard.  \n- Health risks at this level are negligible.  \n\nAssumed:  \n- The person is concerned about health effects of water hardness.  \n\nUnknown:  \n- Whether the person's specific health conditions or water usage patterns (e.g., drinking, bathing) affect sensitivity to hardness.  \n- Whether the water source (tap, well, filtered) has other contaminants.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      },
+      {
+        "number": 19,
+        "question": "I measured ammonia at 0.02 mg/L in the stream. Is that fine?",
+        "draft": "Ammonia at 0.02 mg/L in a stream is generally very low and likely within safe and natural levels.\n\nAmmonia in water is typically measured in mg/L, and concentrations below 0.02 mg/L are considered negligible. Even at 0.02 mg/L, it's well below the threshold that would typically cause harm to aquatic life or pose a health risk to humans.\n\nFor context:\n- Most environmental guidelines (like those from the U.S. EPA) consider ammonia concentrations below 0.02 mg/L to be safe for aquatic ecosystems.\n- Ammonia levels above 0.1 mg/L can start to affect fish and other aquatic organisms, especially in sensitive environments.\n\nSo yes — 0.02 mg/L is fine. It's very low and not a concern.\n\nIf you're monitoring for a specific reason (like a wastewater discharge or a local water quality study), I can help you interpret it in that context too.\n\nKnown:  \n- Ammonia concentration measured: 0.02 mg/L  \n- Safe threshold for aquatic life: below 0.02 mg/L is considered safe  \n- Human health risk at this level: negligible  \n\nInferred:  \n- 0.02 mg/L is below the typical threshold for ecological or health concerns  \n\nAssumed:  \n- The stream is not a wastewater discharge or industrial outflow (no evidence provided)  \n\nUnknown:  \n- The source of the ammonia (natural, from runoff, or from a specific activity)  \n- The pH or temperature of the stream (which can affect ammonia toxicity)  \n- Whether the measurement was taken in a controlled or field setting  \n- Whether the stream is part of a sensitive ecosystem or protected area\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "*(Cursiv's check: this answer sounds more certain (\"So yes — 0.02 mg/L is fine. It's very low and not a concern.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*",
+        "after": "*(Cursiv's check: this answer sounds more certain (\"So yes — 0.02 mg/L is fine. It's very low and not a concern.\") than one observation supports: one reading or one look can't settle it. Repeat the measurement, check the instrument's calibration and compare against a stated reference range.)*"
+      },
+      {
+        "number": 20,
+        "question": "The snow melt sample had a pH of 5.0. Does that confirm acid rain in the area?",
+        "draft": "A pH of 5.0 in a snowmelt sample does *suggest* acid rain, but it doesn't *confirm* it on its own.\n\nHere’s why:\n\n- **Normal rainwater** has a pH of about 5.6. This is due to naturally occurring carbon dioxide (CO₂) in the atmosphere dissolving in raindrops to form weak carbonic acid.\n- **Acid rain** is generally defined as precipitation (like rain, snow, or fog) with a pH *below 5.6*.\n- A pH of 5.0 is **below** 5.6, so it is **more acidic than normal rain** — that’s a sign of possible acid rain.\n\nBut:  \n→ A pH of 5.0 could still be due to other factors, like industrial pollution, soil runoff, or even local chemistry (e.g., volcanic emissions or certain industrial areas).  \n→ To confirm acid rain, you’d need to compare the sample to background levels (like unpolluted rain or snow) and check for specific pollutants (like sulfur dioxide or nitrogen oxides) in the air or water.\n\nSo:  \n✅ A pH of 5.0 indicates **more acidity than normal rain** — that’s a red flag.  \n❌ It does **not** confirm acid rain *by itself*, because other causes could explain it.\n\nTo be sure, you’d need:\n- Measurements from a control site (unpolluted area) for comparison.\n- Evidence of specific pollutants (like sulfate or nitrate) in the air or water.\n\nIn short:  \n**Yes, it points to acid rain — but not enough to confirm it without more data.**\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Ollama · qwen3:4b-instruct]*",
+        "before": "",
+        "after": ""
+      }
+    ],
+    "before_noted": 6,
+    "after_noted": 5
+  }
+}

@@ -44,8 +44,16 @@ _ABOUT_ME = re.compile(r"(?i)\b(?:did i|have i|i (?:recorded|logged|told you)|di
 def might_be_action(text: str) -> bool:
     """Cheap first check, so plain chat never pays for the model step."""
     t = (text or "").strip()
+    from .turn_policy import creative_request, notebook_task
+    task = notebook_task(t)
+    if task is None:
+        return False
+    if creative_request(t):
+        t = task
     if not t or len(t) > 600 or t.startswith(("/", "@")):
         return False
+    from .turn_policy import instruction_text
+    t = instruction_text(t)
     if _QUESTION.match(t) and not _ABOUT_ME.search(t):
         return False
     return bool(_ACTION_WORDS.search(t) or (_MEASUREMENT.search(t) and _PLACE.search(t)))

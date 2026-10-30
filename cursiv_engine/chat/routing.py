@@ -200,7 +200,7 @@ def _fallback_chain(runtime: ChatRuntime, text_msgs: list[dict], user_text: str,
         if first is not None and not first.lstrip().startswith("[Cursiv Cloud error"):
             if len(tried) > 1:
                 yield f"*[{' → '.join(tried[:-1])} unavailable — Cursiv Cloud]*\n\n"
-            runtime._set_answered("Cursiv Cloud")
+            runtime._set_answered(runtime._ANSWERED_BY if runtime._ANSWERED_BY.startswith('Cursiv Cloud ·') else 'Cursiv Cloud · model not reported')
             yield first
             yield from gen
             return

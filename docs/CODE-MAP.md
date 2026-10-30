@@ -30,6 +30,8 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `chat/review.py` — the optional follow-up review of an answer.
 - `chat/response_style.py` — trims closers, drops false refusals and self-certification.
 - `chat/provenance.py` — source labels from application records.
+- `chat/model_selection.py` — per-turn exact provider/model selection, installed-local checks, transport provenance and no-fallback dispatch.
+- `core/reasoning_context.py` — bounded explicit mission/connectivity constraints, conditional timing and exact prior-answer excerpts/checks; no store writes or inference calls.
 - `chat/status.py` — the network pill and "what can go online" answers.
 - `chat/keys.py` — saved settings and AI keys in config.json.
 - `chat/optional.py` — optional parts with fallbacks.

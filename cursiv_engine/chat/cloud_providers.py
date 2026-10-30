@@ -8,6 +8,7 @@ Entry points: _text_messages, _post_json, _slim, _call_gemini_direct, check_free
 """
 from __future__ import annotations
 from . import request_budget
+from . import model_selection
 
 from typing import Callable, Generator
 from pathlib import Path
@@ -42,6 +43,10 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
     text = runtime._text_messages(messages)
     styles = [m for m in text if m.get('role') == 'system' and m.get('content', '').startswith(PROMPT_HEADING)]
     protected = [dict(role='system', content=INSTRUCTIONS)]
+    from cursiv_engine.core.reasoning_context import HEADING as REASONING_HEADING
+    reasoning = [m for m in text if m.get('role') == 'system' and m.get('content','').startswith(REASONING_HEADING)]
+    if reasoning:
+        protected.append(dict(role='system',content=reasoning[-1]['content'][:min(3800,budget//3)]))
     # Fixed application rules derived from tone/format flags; no copied user history.
     response_rules = [m for m in text if m.get('role') == 'system' and
                       m.get('content', '').startswith(GUIDANCE_HEADING)]
@@ -60,7 +65,8 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
             protected.append(dict(role='system', content='\n'.join(lines)))
     source = [m for m in text if not (m.get('role') == 'system' and
               (m.get('content') == INSTRUCTIONS or m.get('content', '').startswith(PROMPT_HEADING)
-               or m.get('content', '').startswith(GUIDANCE_HEADING)))]
+               or m.get('content', '').startswith(GUIDANCE_HEADING)
+               or m.get('content', '').startswith(REASONING_HEADING)))]
     reserve = sum(len(m['content']) for m in protected)
     result = speed.slim_messages(source, max(0, budget - reserve),
                                  runtime._FULL_PERSONA, speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))
@@ -79,7 +85,8 @@ def _call_gemini_direct(runtime: ChatRuntime, messages: list[dict], key: str, ma
     last_err = ""
     import time as _t
     now = _t.time()
-    order = [m for m in runtime.GEMINI_MODELS if runtime._GEMINI_DOWN.get(m, 0) < now] or list(runtime.GEMINI_MODELS[-1:])
+    order = ([model_selection.current().model] if model_selection.current() and model_selection.current().provider == 'gemini'
+        else [m for m in runtime.GEMINI_MODELS if runtime._GEMINI_DOWN.get(m, 0) < now] or list(runtime.GEMINI_MODELS[-1:]))
     for model in order:
         url = runtime.GEMINI_URL.format(model=model)
         body = payload
@@ -94,6 +101,7 @@ def _call_gemini_direct(runtime: ChatRuntime, messages: list[dict], key: str, ma
                 cand = (data.get("candidates") or [{}])[0]
                 text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
                 if text.strip():
+                    model_selection.record(runtime,'gemini',model,data.get('modelVersion'))
                     yield text
                     return
                 last_err = f"empty reply ({cand.get('finishReason', 'no text')})"
@@ -157,7 +165,7 @@ def _call_groq_direct(runtime: ChatRuntime, messages: list[dict], key: str, max_
     """Groq: very fast. Free-tier limits are per model, so on "too large" (413) or
     "rate limited" (429) try a smaller prompt, then the next model."""
     last = ""
-    for model in runtime.GROQ_MODELS:
+    for model in ([model_selection.current().model] if model_selection.current() and model_selection.current().provider == 'groq' else runtime.GROQ_MODELS):
         for budget, cap in ((runtime.GROQ_BUDGET, max_tokens), (runtime.GROQ_BUDGET // 2, min(max_tokens, 2048))):
             try:
                 data = runtime._post_json(runtime.GROQ_URL, {"model": model, "messages": runtime._slim(messages, budget),
@@ -165,6 +173,7 @@ def _call_groq_direct(runtime: ChatRuntime, messages: list[dict], key: str, max_
                                   {"Authorization": f"Bearer {key}"}, 60)
                 text = data["choices"][0]["message"].get("content") or ""
                 if text.strip():
+                    model_selection.record(runtime,'groq',model,data.get('model'))
                     yield text
                     return
                 last = "empty reply"
@@ -223,6 +232,7 @@ def _call_cursiv_cloud(runtime: ChatRuntime, messages: list[dict], max_tokens: i
         if not text.strip():
             yield "\n[Cursiv Cloud error: empty reply]"
             return
+        runtime._set_answered('Cursiv Cloud · '+str(data.get('model') or 'model not reported'))
         if not settings.get("notice_shown"):
             settings["notice_shown"] = True
             runtime._save_cloud_settings(settings)
@@ -323,7 +333,7 @@ def _local_model_ready(runtime: ChatRuntime) -> bool:
 
 def _call_xai_stream(runtime: ChatRuntime, messages: list[dict], api_key: str, has_images: bool, max_tokens: int) -> Generator[str, None, None]:
     """Stream from xAI Grok. Handles text and vision."""
-    model = runtime.XAI_MODEL_VIS if has_images else runtime.XAI_MODEL
+    model = model_selection.model('grok',runtime.XAI_MODEL_VIS if has_images else runtime.XAI_MODEL)
     payload = runtime.json.dumps({
         "model":       model,
         "messages":    messages,
@@ -351,6 +361,7 @@ def _call_xai_stream(runtime: ChatRuntime, messages: list[dict], api_key: str, h
                         delta   = chunk["choices"][0]["delta"]
                         content = delta.get("content", "")
                         if content:
+                            model_selection.record(runtime,'grok',model,chunk.get('model'))
                             yield content
                     except Exception:
                         pass
@@ -426,8 +437,9 @@ def _call_claude_direct(runtime: ChatRuntime, messages: list[dict], anthropic_ke
     chat_msgs  = [m for m in messages if m["role"] != "system"]
     # Keep last 12 turns to limit input token cost
     chat_msgs  = chat_msgs[-24:]
+    model = model_selection.model('claude',runtime.ANTHROPIC_CODE_MODEL)
     payload = runtime.json.dumps({
-        "model":      runtime.ANTHROPIC_CODE_MODEL,
+        "model":      model,
         "max_tokens": max_tokens,
         "system":     "\n\n".join(sys_parts),
         "messages":   chat_msgs,
@@ -454,6 +466,8 @@ def _call_claude_direct(runtime: ChatRuntime, messages: list[dict], anthropic_ke
                 if actual:
                     runtime._rate_limiter.record_actual(actual)
             content = (data.get("content") or [{}])[0].get("text", "") or ""
+            if content:
+                model_selection.record(runtime,'claude',model,data.get('model'))
             for word in content.split(" "):
                 yield word + " "
             return
@@ -475,8 +489,9 @@ def _call_claude_direct(runtime: ChatRuntime, messages: list[dict], anthropic_ke
 
 def _call_openai_direct(runtime: ChatRuntime, messages: list[dict], openai_key: str, max_tokens: int | None = None) -> Generator[str, None, None]:
     """Route a chat message directly to GPT-4.1 — no tool loop."""
+    model = model_selection.model('openai',runtime.OPENAI_CODE_MODEL)
     payload = runtime.json.dumps({
-        "model":    runtime.OPENAI_CODE_MODEL,
+        "model":    model,
         "messages": messages,
         **({"max_tokens": max_tokens} if max_tokens is not None else {}),
     }).encode()
@@ -491,6 +506,8 @@ def _call_openai_direct(runtime: ChatRuntime, messages: list[dict], openai_key: 
         with request_budget.open_request(runtime.urllib.request.urlopen, req, timeout=120) as resp:
             data = runtime.json.loads(resp.read().decode())
         content = data["choices"][0]["message"]["content"] or ""
+        if content:
+            model_selection.record(runtime,'openai',model,data.get('model'))
         for word in content.split(" "):
             yield word + " "
     except runtime.urllib.error.HTTPError as e:

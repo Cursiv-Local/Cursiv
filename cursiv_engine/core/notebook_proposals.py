@@ -134,10 +134,18 @@ def fix_details(details: str, said: str) -> str:
 
 def record(text: str) -> Proposal | None:
     """A card for a plain-words record, from the notebook's own parser (no model)."""
+    from .turn_policy import notebook_task
+    text = notebook_task(text)
+    if text is None:
+        return None
     m = _RECORD.match((text or "").strip())
     if not m:
         return None
     payload = m.group(1).strip()
+    natural = observation(payload)
+    if natural is not None:
+        natural.edit_text = text
+        return natural
     fields = fieldlog.parse(payload)
     if not (fields["measurements"] or fields["sample_id"] or fields["project"] or fieldlog.ID.search(payload)):
         return None                       # no reading or code: not clearly an observation

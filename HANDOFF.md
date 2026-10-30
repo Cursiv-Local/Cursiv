@@ -6,6 +6,14 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 
 ## U110 released (Claude, 2026-10-29)
 
+U111 reliability work is **unreleased and uncommitted** on
+`codex/u111-reliability`, based on main `ee9b1cf`. Continue from
+[U111-HANDOFF](docs/U111-HANDOFF.md): reconstructed notebook/writing incidents,
+claim-specific science checks, conditional mission constraints, self-review excerpts,
+exact provider/model selection and real-Qwen regression receipts. Isolated Windows
+source:2736 passed/15 skipped/19 passing subtests; dedicated USB45 passed. Validation
+and remaining limits are recorded there. No U111 release/publication is authorized.
+
 Natural-language self-inspection routing (`self_inspection._focus`, the `introspection`
 topic and its seeds in `source_analysis.FEATURES`) plus the U109 post-release repairs
 below. Tests: `tests/test_u110_self_inspection_routing.py`. The owner authorized commit,
