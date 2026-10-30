@@ -128,16 +128,17 @@ CAPABILITIES: tuple[Capability, ...] = (
                ("tests/test_ui_redesign.py",),
                "a 4B model can be wrong; check answers that matter", _read(_local_model)),
     Capability("online_ai", "Optional online AI providers", OPTIONAL,
-               "Can use OpenAI, Claude, xAI Grok, Google Gemini or Groq when you add a key. Automatic mode tries local AI "
-               "first; exact provider/model selection uses only the chosen backend, without fallback. Exact cloud selection is text-only.",
+               "Provider selection includes OpenAI, Claude, xAI, Google Gemini, Groq and OpenRouter, plus local Ollama, LM Studio "
+               "and custom compatible endpoints. Automatic is local only; Cloud Automatic needs explicit opt-in. Manual selection never falls back. "
+               "Providers stay visible without keys. Managed generation is text-only; native research tools keep their own permissions.",
                "goes online only through a key you added, and never in offline mode",
                ("online ai", "cloud ai", "online model", "openai", "claude", "gemini", "groq", "grok", "online provider",
                 "online services", "online service", "api key", "cloud provider", "chatgpt"),
-               ("cursiv_engine/chat/cloud_providers.py", "cursiv_engine/chat/routing.py", "cursiv_engine/chat/keys.py", "cursiv_engine/chat/model_selection.py"),
-               ("tests/test_answer_check.py", "tests/test_u111_models.py"),
+               ("cursiv_engine/chat/provider_registry.py", "cursiv_engine/chat/provider_manager.py", "cursiv_engine/chat/provider_adapters.py", "cursiv_engine/chat/model_selection.py"),
+               ("tests/test_provider_manager.py", "tests/test_provider_desktop.py", "tests/test_u111_models.py"),
                "what you send to a provider is handled under that provider's terms", _read(_keys)),
     Capability("cloud_backup", "Cursiv Cloud AI fallback", OPTIONAL,
-               "A fallback AI used only when no local model is ready, if you turn it on; not a notebook or file backup service.",
+               "Legacy cloud helper retained separately; unified model routing does not use implicit cloud fallback. Not a notebook or file backup service.",
                "online when on; off by default", ("cursiv cloud", "cloud backup"),
                ("cursiv_engine/chat/cloud_providers.py",), (), "", _read(_cloud)),
     Capability("web_search", "Web search", OPTIONAL,
@@ -242,8 +243,9 @@ CAPABILITIES: tuple[Capability, ...] = (
     Capability("translation", "Translation", SUPPORTED, "translate <text> into <language>.", "local model",
                ("translate", "translation", "babel"), ("cursiv_engine/agents/babel_agent.py",), (), "", None),
     Capability("images", "Pictures", OPTIONAL,
-               "Reads pasted pictures with an online key or the local gemma3 vision model; making new images needs an "
-               "online key.", "reading can be local; making images is online",
+               "Reads pasted pictures through the selected provider/model when that model supports vision. "
+               "Image creation uses an exact image-model selection on OpenAI or a compatible custom endpoint; other capabilities fail without choosing another model.",
+               "reading can be local; cloud reading requires explicit research authorization",
                ("image", "images", "picture", "photo", "vision"), ("launcher/command_media.py",), (), "", None),
     Capability("voice", "Voice input", OPTIONAL, "Speech to text on this computer (faster-whisper, installed on demand).",
                "local", ("voice", "speech", "microphone", "dictate"), ("cursiv_engine/agents/voice_agent.py",), (),

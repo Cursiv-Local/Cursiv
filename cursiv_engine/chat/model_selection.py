@@ -6,13 +6,19 @@ from functools import wraps
 import inspect
 import re
 
-PROVIDERS = ('ollama','openai','claude','grok','groq','gemini')
-LABELS = dict(ollama='Ollama',openai='OpenAI',claude='Anthropic',grok='xAI',groq='Groq',gemini='Gemini')
+from .provider_registry import providers
+PROVIDERS = tuple(item.id for item in providers())
+class _Labels(dict):
+    def __missing__(self, provider):
+        from .provider_registry import get
+        return get(provider).name
+LABELS = _Labels({item.id:item.name for item in providers()})
 
 @dataclass(frozen=True)
 class Selection:
     provider: str
     model: str
+    managed: bool = False
 
 _active = ContextVar('cursiv_explicit_model',default=None)
 _response = ContextVar('cursiv_responding_model',default=None)
@@ -46,11 +52,13 @@ def label_for(label):
     return label
 
 def parse(value: str) -> Selection | None:
+    managed = value.startswith('manager:')
+    if managed: value = value.removeprefix('manager:')
     if '::' not in (value or ''): return None
     provider,model = value.split('::',1)
-    if provider not in PROVIDERS or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:/@+-]{0,180}',model):
+    if provider not in {p.id for p in providers()} or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.:/@+-]{0,180}',model):
         raise ValueError('Choose a supported provider and an exact model ID')
-    return Selection(provider,model)
+    return Selection(provider,model,managed)
 
 def current(): return _active.get()
 
@@ -99,10 +107,20 @@ def stream(runtime, choice: Selection, messages, *, api_key='',openai_key='',ant
     new provider ID. The provider validates cloud IDs when the request is made.
     """
     runtime._set_answered('')
+    if choice.managed or choice.provider in ('openrouter','lmstudio','custom'):
+        from .provider_manager import dispatch
+        yield from dispatch(runtime,choice.provider,choice.model,messages,max_tokens=max_tokens)
+        return
     if choice.provider != 'ollama' and not runtime.netgate.allowed():
         fail(runtime,f'{LABELS[choice.provider]} / {choice.model} unavailable: offline mode blocks this provider. No fallback was used.')
         yield failed()
         return
+    if choice.provider != 'ollama':
+        from .provider_manager import research_authorized
+        if not research_authorized():
+            fail(runtime,f'{LABELS[choice.provider]} request failed: Permission denied. Authorize research-data sharing before using cloud AI.')
+            yield failed()
+            return
     with use(choice):
         if choice.provider == 'ollama':
             installed = runtime._ollama_pulled_models()
@@ -138,7 +156,9 @@ def stream(runtime, choice: Selection, messages, *, api_key='',openai_key='',ant
 def writing_revision(runtime,messages,*,api_key='',openai_key='',anthropic_key='',max_tokens=500):
     """One writing revision uses the same responding backend, never a hidden local substitute."""
     choice,actual=current(),response()
-    if choice is None and actual: choice=Selection(actual[0],actual[1])
+    if choice is None and actual:
+        from .provider_manager import outcome
+        choice=Selection(actual[0],actual[1],managed=outcome() is not None)
     if choice:
         return ''.join(stream(runtime,choice,messages,api_key=api_key,openai_key=openai_key,
             anthropic_key=anthropic_key,max_tokens=max_tokens)).strip()

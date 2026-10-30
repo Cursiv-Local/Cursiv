@@ -113,13 +113,23 @@ def test_style_rule_is_current_and_survives_compaction(pipeline, monkeypatch, pr
     monkeypatch.setattr(netgate, 'is_offline', lambda: False)
     monkeypatch.setattr(pipeline, '_build_strand_context', lambda *a, **k: '')
     monkeypatch.setattr(pipeline, method, lambda messages, *a, **k: seen.extend(messages) or iter(['A short answer.']))
+    from cursiv_engine.chat import provider_adapters, provider_manager, provider_settings
+    def normalized_model(request, result, credential):
+        seen.extend(request.messages)
+        result.text='A short answer.'
+        result.responding_provider=request.provider
+        result.finish_reason='stop'
+        yield result.text
+    monkeypatch.setattr(provider_adapters,'stream',normalized_model)
+    monkeypatch.setattr(provider_settings,'key',lambda p:'synthetic-credential')
     person = semantic.current_person()
     style.add_rule(person, 'Answer in about 60 words, with no examples.', 'manual')
-    options = dict(force_provider=provider, openai_key='fake-key', anthropic_key='fake-key')
+    options = dict(force_provider=provider, openai_key='fixture', anthropic_key='fixture')
     # The helper supplies an empty xAI key; use the public chat call for that provider.
     def ask():
-        return ''.join(pipeline.chat('Explain the difference between an observation and an inference.',
-                                    [], 'fake-key', None, **options))
+        with provider_manager.turn_options(research_authorized=True):
+            return ''.join(pipeline.chat('Explain the difference between an observation and an inference.',
+                                        [], 'fixture', None, **options))
     ask()
     blocks = [m for m in seen if m.get('role') == 'system' and m.get('content', '').startswith('## Current answer style')]
     assert len(blocks) == 1 and '60 words' in blocks[0]['content'] and 'overrides these preferences' in blocks[0]['content']

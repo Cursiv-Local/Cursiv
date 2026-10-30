@@ -397,15 +397,14 @@ def make_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_privat
             (root / runtime.PRIVATE_MARKER).parent.mkdir(parents=True, exist_ok=True)
             (root / runtime.PRIVATE_MARKER).write_text(
                 "This drive holds private Cursiv data. Program updates preserve it.\n", encoding="utf-8")
-            # AI keys are personal. They are copied only with the separate opt-in, and
-            # then readable (the USB runs on other PCs, where this account's encryption
-            # can't be undone). Without it the drive keeps exactly the keys it had.
-            if any(it["rel"] == runtime.Path("config.json") for it in usb_sync.todo(data_items)):
-                if include_keys:
-                    from cursiv_engine.core import keystore
-                    keystore.export_readable(config)
-                else:
-                    usb_sync.keep_drive_keys(config, previous)
+            # Owner requirement: retain separate, explicit readable-key USB export.
+            if include_keys:
+                from cursiv_engine.core import keystore
+                if not config.exists():
+                    config.write_text('{}', encoding='utf-8')
+                keystore.export_readable(config)
+            elif any(it["rel"] == runtime.Path("config.json") for it in usb_sync.todo(data_items)):
+                usb_sync.keep_drive_keys(config, previous)
             data_note += (" Your AI keys were copied and are readable on this drive." if include_keys
                           else " Your AI keys were not copied.")
 
@@ -502,7 +501,9 @@ def check_usb(runtime: UsbRuntime, root: Path, models: list[dict], include_priva
     else:
         lines.append("Your data: not checked (tick \"Include my memories…\" to compare it).")
     up_to_date = (made and not todo and not stale and not missing_models and osrc is not None
-                  and bat_ok and not pending_migration and not data_todo)
+                  and bat_ok and not pending_migration and not data_todo and not include_keys)
+    if include_keys:
+        lines.append('Private key export selected: Update USB also refreshes device-stored AI keys.')
     lines.append("Nothing to update." if up_to_date else "Click Update USB to bring the drive up to date.")
     return up_to_date, "\n".join(lines)
 

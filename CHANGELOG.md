@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U112 — Unified AI provider and model manager (2026-10-30)
+
+Always-visible providers and known/manual model IDs; explicit local/cloud automatic modes; exact manual routing; secure device credentials; offline and research-data authorization; owned failure recovery and provider/model provenance. The separate private USB key-export opt-in is preserved.
+
 ## 3.14-U111 — Reliability, routing and model transparency (2026-10-30)
 
 Native notebook routing and confirmation preservation; claim-specific science checks; conditional research constraints; exact provider/model selection and transport provenance. Reconstructed Qwen checks and validation limits are documented in U111-VALIDATION.md.

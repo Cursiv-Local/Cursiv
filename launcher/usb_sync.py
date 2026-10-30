@@ -37,7 +37,7 @@ MTIME_SLACK = 2.0                      # FAT-family drives store times in 2-seco
 # The live process lease, and each computer's own encryption configuration: a
 # computer's data is always encrypted (U97), a drive's stays readable, so stores
 # are decrypted on the way to a drive and encrypted again on the way back.
-SKIP_NAMES = {".vault-lease", "data-vault.json"}
+SKIP_NAMES = {".vault-lease", "data-vault.json", "provider-credentials.json", "provider_manager.json"}
 SKIP_TOP = {"backups", "import-pending"}  # each side keeps its own recovery copies and staging
 
 
@@ -112,7 +112,7 @@ def _same_config(a: Path, b: Path, keys: bool = True) -> bool:
         if not isinstance(x, dict) or not isinstance(y, dict):
             return False
         if not keys:
-            x, y = ({k: v for k, v in d.items() if k not in keystore.SECRET_FIELDS} for d in (x, y))
+            x, y = ({k: v for k, v in d.items() if k not in keystore.secret_fields()} for d in (x, y))
         return keystore.reveal_all(x) == keystore.reveal_all(y)
     except Exception:
         return False
@@ -128,7 +128,7 @@ def keep_drive_keys(config: Path, previous: bytes | None) -> None:
         old = json.loads(previous.decode("utf-8")) if previous else {}
     except ValueError:
         old = {}
-    for field in keystore.SECRET_FIELDS:
+    for field in keystore.secret_fields():
         data.pop(field, None)
         if isinstance(old, dict) and field in old:
             data[field] = old[field]

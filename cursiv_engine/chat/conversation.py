@@ -20,6 +20,7 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
     history: list of {"role": ..., "content": ...} dicts (Gradio 6 format).
     """
 
+    runtime._CURSIV_REPLY = False  # direct compatibility callers also start a new provenance turn
     # ── Unpack multimodal input ─────────────────────────────────────────
     if isinstance(message, dict):
         user_text    = message.get("text", "").strip()
@@ -513,18 +514,45 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     fp         = (force_provider or "").lower().strip()
     from . import model_selection
     _selected = model_selection.current()
+    if fp in ('manager:local_auto', 'manager:cloud_auto'):
+        from .provider_manager import automatic
+        yield from automatic(runtime,fp.removeprefix('manager:') or 'local_auto',messages)
+        return
     if _selected:
-        if image_parts:
+        if image_parts and not _selected.managed:
             yield 'Exact-model image input is not supported in this path. No fallback was used.'
             return
         yield from model_selection.stream(runtime,_selected,messages,api_key=key,openai_key=oai,anthropic_key=ant)
+        return
+    if not fp:
+        # Compatibility callers keep the established local model optimizations,
+        # but saved cloud keys can no longer turn Automatic into cloud fallback.
+        if not image_parts and runtime._local_model_ready():
+            label, stream = runtime._local_stream(messages, user_text)
+            runtime._set_answered(runtime._ollama_label(label))
+            yield from stream
+        else:
+            yield from runtime._without_model()
+        return
+    if fp in ('openai', 'claude', 'grok', 'groq', 'gemini', 'openrouter', 'lmstudio', 'custom'):
+        from .provider_manager import dispatch
+        from .provider_registry import get
+        from .provider_settings import endpoint
+        known = get(fp).catalog
+        exact = endpoint(fp).get('model') or (known[0] if known else '')
+        yield from dispatch(runtime,fp,exact,messages)
+        return
+    if fp != 'ollama':
+        model_selection.fail(runtime,'Model selection error: unsupported provider. No model was called.')
+        yield model_selection.failed()
         return
     if not runtime.netgate.allowed():
         # Offline mode: saved keys stay saved but aren't used; the local model answers.
         key = oai = ant = ""
         if fp in ("grok", "claude", "openai"):
-            yield f"*[{fp.title()} skipped. {runtime.netgate.OFFLINE_MESSAGE} Answering with the local model.]*\n\n"
-            fp = "ollama"
+            model_selection.fail(runtime,f'{model_selection.LABELS[fp]} request blocked: Cursiv is operating in offline mode. Cloud requests are disabled.')
+            yield model_selection.failed()
+            return
 
     def _workspace() -> Path:
         return _files.workspace_root(root_path)
@@ -561,6 +589,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             yield "[No OpenAI key set — type: openai sk-xxxxx]"
         return
     elif fp == "ollama":
+        if not runtime._local_model_ready():
+            model_selection.fail(runtime,'Ollama request failed: no installed local model is available. Use Setup to approve a download.')
+            yield model_selection.failed()
+            return
         text_msgs = [
             {"role": m["role"],
              "content": m["content"] if isinstance(m["content"], str)

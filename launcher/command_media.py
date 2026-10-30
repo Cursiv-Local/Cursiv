@@ -72,40 +72,12 @@ def delete_training_entry(runtime: CommandRuntime, line_index: int) -> tuple[boo
     return True, "Deleted."
 
 def _run_llm_once(runtime: CommandRuntime, messages: list[dict], cfg: dict) -> str:
-    """Collect one full (non-streaming) response, offline-first: Ollama
-    before any cloud provider, matching Cursiv's always-works-air-gapped
-    default -- cloud keys are only ever a fallback, never a requirement."""
-    try:
-        text = "".join(c for c in runtime._call_ollama(messages) if c and c != runtime.RATE_SENTINEL)
-        if text.strip():
-            return text
-    except Exception:
-        pass
-    xai_key = cfg.get("api_key", "")
-    if xai_key:
-        try:
-            text = "".join(c for c in runtime._call_xai_stream(messages, xai_key) if c and c != runtime.RATE_SENTINEL)
-            if text.strip():
-                return text
-        except Exception:
-            pass
-    ant_key = cfg.get("anthropic_key", "")
-    if ant_key:
-        try:
-            text = "".join(c for c in runtime._call_claude_direct(messages, ant_key) if c and c != runtime.RATE_SENTINEL)
-            if text.strip():
-                return text
-        except Exception:
-            pass
-    oai_key = cfg.get("openai_key", "")
-    if oai_key:
-        try:
-            text = "".join(c for c in runtime._call_openai_direct(messages, oai_key) if c and c != runtime.RATE_SENTINEL)
-            if text.strip():
-                return text
-        except Exception:
-            pass
-    return ""
+    """Training-note conversion obeys the selected destination and consent."""
+    from cursiv_engine.chat import provider_manager as manager
+    text=''.join(manager.selected_infer(messages,cfg=cfg))
+    result=manager.outcome()
+    return '' if not result or result.error else text
+
 
 def text_to_training_entry(runtime: CommandRuntime, notes: str, cfg: dict) -> tuple[bool, str, Optional[dict]]:
     """Ask whatever model is available to turn free-form notes into a
@@ -125,6 +97,10 @@ def text_to_training_entry(runtime: CommandRuntime, notes: str, cfg: dict) -> tu
         [{"role": "system", "content": sys_prompt}, {"role": "user", "content": notes}], cfg
     )
     if not raw.strip():
+        from cursiv_engine.chat import provider_manager as manager
+        result=manager.outcome()
+        if result and result.error:
+            return False,result.error_message,None
         return False, ("No model available to translate notes — start Ollama, "
                         "or set a cloud API key."), None
 
@@ -209,80 +185,16 @@ def _ollama_vision_model(runtime: CommandRuntime) -> str:
     return ""
 
 def _vision_describe(runtime: CommandRuntime, img_b64: str, mime: str, prompt_text: str, cfg: dict) -> tuple[str, str]:
-    import urllib.request
-    from cursiv_engine.ui.chat_app import _saved_key, GEMINI_URL, GEMINI_MODELS
-    # Local first (a photo stays on this computer when the image model is installed);
-    # online keys only when nothing local can read it and the internet isn't blocked.
-    model = runtime._ollama_vision_model()
-    if model:
-        try:
-            body = runtime.json.dumps({"model": model, "prompt": prompt_text,
-                               "images": [img_b64], "stream": False}).encode()
-            req = urllib.request.Request("http://127.0.0.1:11434/api/generate", data=body,
-                                         headers={"Content-Type": "application/json"})
-            with urllib.request.urlopen(req, timeout=600) as r:
-                text = runtime.json.loads(r.read()).get("response", "")
-            if text.strip():
-                return text, f"{model} (local)"
-        except Exception:
-            pass
-    try:
-        from cursiv_engine.core import netgate as _ng
-        if not _ng.allowed():
-            return "", ""
-    except Exception:
-        return "", ""
-    ant_key, oai_key = cfg.get("anthropic_key", ""), cfg.get("openai_key", "")
-    gem_key = cfg.get("gemini_key", "") or _saved_key("gemini_key")
+    """Vision uses the selected model and the same privacy/offline boundary; no fallback."""
+    from cursiv_engine.chat import provider_manager as manager
+    messages=[dict(role='user',content=[dict(type='text',text=prompt_text),
+        dict(type='image_url',image_url={'url':'data:'+mime+';base64,'+img_b64})])]
+    list(manager.selected_infer(messages,cfg=cfg,capability='vision'))
+    result=manager.outcome()
+    if result.error:
+        return '',result.error_message
+    return result.text,result.label()+(' (local)' if result.local else '')
 
-    if ant_key:
-        try:
-            import anthropic as _anth_v
-            resp = _anth_v.Anthropic(api_key=ant_key).messages.create(
-                model="claude-sonnet-4-6", max_tokens=600,
-                messages=[{"role": "user", "content": [
-                    {"type": "image", "source": {"type": "base64", "media_type": mime, "data": img_b64}},
-                    {"type": "text", "text": prompt_text},
-                ]}],
-            )
-            return resp.content[0].text, "Claude"
-        except Exception:
-            pass
-
-    if oai_key:
-        try:
-            import openai as _oai_v
-            resp2 = _oai_v.OpenAI(api_key=oai_key).chat.completions.create(
-                model="gpt-4o", max_tokens=600,
-                messages=[{"role": "user", "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:{mime};base64,{img_b64}"}},
-                    {"type": "text", "text": prompt_text},
-                ]}],
-            )
-            return resp2.choices[0].message.content, "GPT-4o"
-        except Exception:
-            pass
-
-    if gem_key:
-        body = runtime.json.dumps({"contents": [{"role": "user", "parts": [
-            {"inline_data": {"mime_type": mime, "data": img_b64}},
-            {"text": prompt_text},
-        ]}]}).encode()
-        for model in GEMINI_MODELS:
-            try:
-                req = urllib.request.Request(
-                    GEMINI_URL.format(model=model), data=body,
-                    headers={"Content-Type": "application/json", "x-goog-api-key": gem_key})
-                with urllib.request.urlopen(req, timeout=60) as r:
-                    data = runtime.json.loads(r.read())
-                cand = (data.get("candidates") or [{}])[0]
-                text = "".join(p.get("text", "") for p in cand.get("content", {}).get("parts", []))
-                if text.strip():
-                    return text, "Gemini"
-            except Exception:
-                continue
-
-    return "", ""
 
 def image_to_training_entry(runtime: CommandRuntime, image_bytes: bytes, cfg: dict, ext: str) -> tuple[bool, str, Optional[dict]]:
     """Run vision analysis on an uploaded image and store the description
@@ -339,12 +251,7 @@ def describe_photo(runtime: CommandRuntime, path: str, question: str, cfg: dict)
               "(species, exact size, chemistry), say so instead of guessing.")
     text, provider = runtime._vision_describe(_b64p.b64encode(data).decode(), mime, prompt, cfg)
     if not text:
-        try:
-            from cursiv_engine.core import netgate as _ng
-            offline = not _ng.allowed()
-        except Exception:
-            offline = True
-        return runtime.TextResult(runtime._NO_LOCAL_VISION if offline or not runtime._ollama_vision_model() else runtime._NO_VISION_HELP)
+        return runtime.TextResult(provider or runtime._NO_VISION_HELP)
     local = provider.endswith("(local)")
     where = (f"read by {provider[:-8]} on this computer" if local
              else f"sent to {provider} online: this photo left this computer")
@@ -366,7 +273,9 @@ def analyze_pasted_image(runtime: CommandRuntime, png_bytes: bytes, cfg: dict, w
         "Describe what you see in this image. Be specific and useful. "
         "Flag anything relevant to code, design, architecture, or ongoing work.", cfg)
 
-    if runtime._STRAND_OK:
+    from cursiv_engine.chat import provider_manager as manager
+    outcome=manager.outcome()
+    if runtime._STRAND_OK and not (outcome and outcome.error):
         body = vision_result or f"Image pasted: {img_path} ({width}x{height}px)"
         runtime._strand_save(f"paste: image {img_path.stem}", body, tags=["image", "paste", "vision"],
                      score=0.72, territory_tag="worldmodel", source="paste", model=vision_provider or "none")

@@ -92,11 +92,12 @@ def open_request(open_fn, req, timeout):
                     raise Stopped('Research run refused an unrequested local-model switch.')
                 budget.local_model = body['model']
             options = body.get('options') or {}
-            output = options.get('num_predict', body.get('max_tokens',
-                     (body.get('generationConfig') or {}).get('maxOutputTokens', 512)))
+            output = options.get('num_predict', body.get('max_completion_tokens',body.get('max_tokens',
+                     (body.get('generationConfig') or {}).get('maxOutputTokens', 512))))
             # Include the actual injected system instructions and selected history/evidence.
             content = {k: v for k, v in body.items() if k not in ('options', 'model', 'stream', 'keep_alive')}
-            row = attempt(body.get('model') or host, content, int(output), transport=True)
+            row = attempt(getattr(req,'cursiv_provider',None) or body.get('model') or host, content, int(output), transport=True)
+            row['requested_model']=getattr(req,'cursiv_model',None) or body.get('model')
             timeout = min(timeout, budget.remaining_seconds)
         try:
             with open_fn(req, timeout=timeout) as response:
@@ -125,10 +126,11 @@ class _Response:
             data = json.loads(value.decode().removeprefix('data: ').strip())
         except (ValueError, UnicodeError):
             return value
-        usage = data.get('usage') or data.get('usageMetadata') or {}
-        self.row['input_tokens'] = data.get('prompt_eval_count', usage.get('prompt_tokens', usage.get('promptTokenCount', self.row['input_tokens'])))
-        self.row['output_tokens'] = data.get('eval_count', usage.get('completion_tokens', usage.get('candidatesTokenCount', self.row['output_tokens'])))
-        text = data.get('response') or data.get('choices') or data.get('candidates') or data.get('content')
+        usage = data.get('usage') or data.get('usageMetadata') or (data.get('x_groq') or {}).get('usage') or (data.get('message') or {}).get('usage') or {}
+        self.row['input_tokens'] = data.get('prompt_eval_count', usage.get('input_tokens', usage.get('prompt_tokens', usage.get('promptTokenCount', self.row['input_tokens']))))
+        self.row['output_tokens'] = data.get('eval_count', usage.get('output_tokens', usage.get('completion_tokens', usage.get('candidatesTokenCount', self.row['output_tokens']))))
+        text = (data.get('response') or data.get('choices') or data.get('candidates') or data.get('content')
+                or (data.get('message') or {}).get('content') or (data.get('delta') or {}).get('text'))
         if text:
             self.row['received_text'] = True
             if self.row['first_token_seconds'] is None:
@@ -146,3 +148,7 @@ class _Response:
     def read(self, *args):
         self.budget.check()
         return self.observe(self.raw.read(*args))
+
+    def readline(self,*args):
+        self.budget.check()
+        return self.observe(self.raw.readline(*args))

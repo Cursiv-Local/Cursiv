@@ -39,6 +39,7 @@ from chat_transcript import ChatTranscriptMixin
 from chat_review import ChatReviewMixin
 from chat_feedback import ChatFeedbackMixin
 from chat_actions import ChatActionsMixin
+from provider_controls import ProviderControlsMixin, provider_turn, load_saved_keys as _load_saved_keys
 
 
 _HERE = Path(__file__).parent
@@ -64,17 +65,6 @@ _CHAT_ROOT = _ROOT
 _RATE_SENTINEL = object()
 
 # ── Palette (matches cursiv_launcher.py exactly) ────────────────────────────
-
-
-def _load_saved_keys() -> dict:
-    import json
-    try:
-        from cursiv_engine.chat.keys import KEYS_FILE as keys_file     # the one settings file
-        from cursiv_engine.core import keystore
-        data = keystore.reveal_all(json.loads(keys_file.read_text(encoding="utf-8")))
-        return {k: v for k, v in data.items() if isinstance(v, str)}
-    except Exception:
-        return {}
 
 
 def autosave_enabled() -> bool:
@@ -115,6 +105,7 @@ def _is_ollama_installed() -> bool:
 
 
 class _ChatSignals(QObject):
+    provider_models = pyqtSignal(str, object, str)
     run_event = pyqtSignal(object, object)  # immutable turn target, application-owned UI event
     chunk = pyqtSignal(str)             # one streamed text fragment
     replace = pyqtSignal(str)           # the whole reply so far is replaced (a revised draft)
@@ -139,7 +130,7 @@ class _ChatSignals(QObject):
 
 
 
-class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, ChatActionsMixin, QWidget):
+class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, ChatActionsMixin, QWidget):
     conversation_changed = pyqtSignal()     # saved / opened / new / renamed -> sidebar refresh
     """
     Self-contained chat view: transcript + input box, wired to the real
@@ -227,7 +218,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             _CHAT_ROOT = cc._CHAT_ROOT
             _RATE_SENTINEL = cc.RATE_SENTINEL
 
+            selection_cfg = {k:v for k,v in self._cfg.items() if k.startswith('selected_')}
             self._cfg = cc._default_cfg()
+            self._cfg.update(selection_cfg)
             keys = _load_saved_keys()
             self._cfg["api_key"] = keys.get("api_key", "")
             self._cfg["openai_key"] = keys.get("openai_key", "")
@@ -545,6 +538,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             self._input.clear()
             return
 
+        self._provider_turn_authorized = self._authorize_provider_text(text)
         self._input.clear()
         self._append_user(text)
         self._begin_turn(cc.hey_prefix(text)[1])
@@ -574,6 +568,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._send_btn.setEnabled(False)
         self._voice_btn.setEnabled(False)
         self._stop_btn.setEnabled(True)
+        self._provider_box.setEnabled(False)
+        self._cloud_model_box.setEnabled(False)
+        self._model_box.setEnabled(False)
+        self._retry_provider_btn.setVisible(False)
         self._cc_btn.setEnabled(False)
         self._last_exchange = None           # a new turn: nothing finished to cross-check yet
         self._status.setText("Preparing answer…")
@@ -587,19 +585,22 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._stop_btn.setEnabled(False)
         self._status.setText("Stopping…")
 
+    @provider_turn
     def _run_turn(self, text: str, history: list[dict], propose: bool = True, turn_target=None) -> None:
         target = turn_target or self._run_target()
         if not self._current_run_target(target):
             return
         try:
-            force_provider, stripped = cc.hey_prefix(text)
+            force_provider, stripped = self._managed_prefix(text)
             selection_error = ''
             if not force_provider and self._cfg.get('selected_provider'):
                 selected_model = self._cfg.get('selected_model','')
-                if not selected_model:
+                if self._cfg['selected_provider'] == 'cloud_auto':
+                    force_provider = 'manager:cloud_auto'
+                elif not selected_model:
                     selection_error='Choose an exact model ID for the selected provider before requesting a model answer.'
                 else:
-                    force_provider = self._cfg['selected_provider']+'::'+selected_model
+                    force_provider = 'manager:'+self._cfg['selected_provider']+'::'+selected_model
             # A provider prefix never transfers notebook execution to the model.
             from cursiv_engine.core import notebook_tools, file_requests
             from cursiv_engine.memory import intents, semantic
@@ -644,7 +645,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                     self._pending_history_append = None
                     self._signals.done.emit()
                     return
-            if result is None and not force_provider:
+            if result is None and (not force_provider or (force_provider.startswith('manager:') and self._native_image_command(stripped))):
                 result = cc.handle_command(text, self._cfg, history)
 
             if result is not None:
@@ -673,12 +674,17 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             # turn itself -- with nothing to trim off the end.
             workspace = self._cfg.get("workspace", '')
             if selection_error:
-                self._signals.chunk.emit(selection_error)
-                self._signals.done.emit()
+                from cursiv_engine.chat import provider_manager as manager
+                from cursiv_engine.chat.provider_types import Request
+                list(manager.infer(Request(self._cfg['selected_provider'],'', [{'role':'user','content':stripped}])))
+                self._signals.run_event.emit(target,dict(kind='provider_failure',text=selection_error,
+                    request=manager.snapshot(),prompt=stripped,provenance=manager.outcome().metadata()))
                 return  # native operations above remain independent of model configuration
             review_key, review_cancel = self._review_generation, self._cancel_event
             if not self._current_run_target(target):
                 return
+            if not force_provider:
+                force_provider = 'manager:local_auto'
             gen = _cursiv_chat(
                 stripped, history,
                 api_key=self._cfg.get("api_key", ""), files=None,
@@ -698,6 +704,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             cancel_event = self._cancel_event
             full = ""
             from cursiv_engine.chat.activity import guarded
+            from cursiv_engine.chat import provider_manager as manager
+            def owned_provider_stream(source):
+                with manager.turn_options(research_authorized=getattr(self, '_provider_turn_authorized', False),
+                        local_only=bool(self._cfg.get('project_local_only')), workspace=workspace, cancel=cancel_event,destination=getattr(self,'_provider_turn_destination',None)):
+                    yield from source
+            gen = owned_provider_stream(gen)
             gen = guarded(gen, lambda: self._current_run_target(target) and not target[1].is_set())
             for chunk in _iter_cancellable(gen, cancel_event):
                 if not chunk:
@@ -723,11 +735,23 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 full += chunk
                 self._signals.run_event.emit(target, dict(kind='chunk', text=chunk))
             if cancel_event.is_set():
+                from cursiv_engine.chat import provider_manager as manager
+                result = manager.outcome()
+                if result is not None and manager.snapshot() is not None:
+                    self._signals.run_event.emit(target, dict(kind='provider_failure', text=result.error_message or 'Request canceled.',
+                        request=manager.snapshot(), prompt=stripped, provenance=result.metadata()))
+                    return
                 self._signals.run_event.emit(target, dict(kind='cancelled', history=
                     [("user", stripped), ("assistant", full)] if full else None))
                 return
+            result = manager.outcome()
+            if result is not None and result.error:
+                self._signals.run_event.emit(target, dict(kind='provider_failure', text=result.error_message,
+                    request=manager.snapshot(), prompt=stripped, provenance=result.metadata()))
+                return
             self._signals.run_event.emit(target, dict(kind='done', history=[('user', stripped), ('assistant', full)],
-                                                     exchange=(stripped, full) if full.strip() else None))
+                    exchange=(stripped, full) if full.strip() else None,
+                    provenance=result.metadata() if result else None))
         except Exception as e:
             self._signals.run_event.emit(target, dict(kind='error', text=str(e)))
 
@@ -772,6 +796,12 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
 
     def _deliver_result(self, result, history: list[dict], text: str = "", turn_target=None) -> None:
         """Runs on the background thread -- streams a command's TextResult/StreamResult."""
+        from cursiv_engine.chat import provider_manager as manager
+        outcome=manager.outcome()
+        if outcome and outcome.error:
+            self._signals.run_event.emit(turn_target or self._run_target(),dict(kind='provider_failure',text=outcome.error_message,
+                request=manager.snapshot(),prompt=text,provenance=outcome.metadata()))
+            return
         if getattr(result, 'run', None) is not None:
             return self._deliver_run(result, text, turn_target or self._run_target())
         self._signals.state_changed.emit()
@@ -801,7 +831,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
                 self._signals.run_event.emit(target, dict(kind='chunk', text=result.text))
             if result.image_path:
                 self._signals.run_event.emit(target, dict(kind='image', text=result.image_path))
-            self._signals.run_event.emit(target, dict(kind='done', history=None))
+            self._signals.run_event.emit(target, dict(kind='done',
+                history=[('user',text),('assistant',result.text)] if outcome and text else None,
+                provenance=outcome.metadata() if outcome else None))
             return
 
         return self._deliver_command_stream(result, text, turn_target or self._run_target())
@@ -889,6 +921,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._refresh_status_pill()      # "offline on", a new key, ... change it
         for role, content in (getattr(self, "_pending_history_append", None) or []):
             self._history.append({"role": role, "content": content})
+        if getattr(self, '_pending_provider_provenance', None) and self._history:
+            self._history[-1]['provider_provenance'] = self._pending_provider_provenance
+        self._pending_provider_provenance = None
         if self._pending_notebook_receipt is not None and self._history:
             self._history[-1]['notebook_receipt'] = self._pending_notebook_receipt
             self._pending_notebook_receipt = None
@@ -906,6 +941,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._after_turn()
         self._streaming = False
         self._send_btn.setEnabled(True)
+        self._retry_provider_btn.setVisible(self._has_current_provider_retry())
+        self._provider_box.setEnabled(True)
+        self._cloud_model_box.setEnabled(True)
+        self._model_box.setEnabled(True)
         self._voice_btn.setEnabled(True)
         self._stop_btn.setEnabled(False)
         self._cc_btn.setEnabled(bool(getattr(self, "_last_exchange", None)))
@@ -914,6 +953,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._start_review()
 
     def _on_cancelled(self) -> None:
+        self._provider_box.setEnabled(True)
+        self._cloud_model_box.setEnabled(True)
+        self._model_box.setEnabled(True)
         self._cancel_review()
         self._flush_reply_chunks(format_blocks=False)
         self._chunk_timer.stop()
@@ -933,6 +975,9 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         self._input.setFocus()
 
     def _on_error(self, message: str) -> None:
+        self._provider_box.setEnabled(True)
+        self._cloud_model_box.setEnabled(True)
+        self._model_box.setEnabled(True)
         self._cancel_review()
         self._flush_reply_chunks(format_blocks=False)
         self._chunk_timer.stop()
@@ -1142,18 +1187,11 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
         png_bytes = bytes(buf)
         width, height = qimage.width(), qimage.height()
 
+        self._provider_turn_authorized = self._authorize_provider_turn()
         self._append_user("[pasted image]")
         self._begin_turn()
         threading.Thread(
             target=self._run_paste_analysis, args=(png_bytes, width, height), daemon=True,
+            kwargs={'turn_target':self._run_target(),'cfg_snapshot':dict(self._cfg)},
         ).start()
 
-    def _run_paste_analysis(self, png_bytes: bytes, width: int, height: int) -> None:
-        try:
-            result = cc.analyze_pasted_image(png_bytes, self._cfg, width, height)
-            self._signals.chunk.emit(result.text)
-            if result.image_path:
-                self._signals.image.emit(result.image_path)
-            self._signals.done.emit()
-        except Exception as e:
-            self._signals.error.emit(str(e))

@@ -60,18 +60,24 @@ class ChatControlsMixin:
         header_row = QHBoxLayout()
         header_row.setSpacing(8)
         self._provider_box = QComboBox()
-        for label,provider in [('Automatic',''),('Ollama (exact model)','ollama'),('OpenAI','openai'),
-                               ('Anthropic','claude'),('xAI','grok'),('Groq','groq'),('Gemini','gemini')]:
+        from cursiv_engine.chat import provider_registry, provider_settings
+        for label,provider in [('Automatic · local only',''),('Cloud Automatic · opt-in','cloud_auto')] + [
+                (p.name,p.id) for p in provider_registry.providers()]:
             self._provider_box.addItem(label,provider)
         self._provider_box.setToolTip('An explicit provider/model never falls back. Cloud providers need your configured key and online access.')
         self._provider_box.activated.connect(self._on_provider_chosen)
         header_row.addWidget(self._provider_box)
-        self._exact_model = QLineEdit()
+        self._cloud_model_box = QComboBox()
+        self._cloud_model_box.setEditable(True)
+        self._cloud_model_box.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self._exact_model = self._cloud_model_box.lineEdit()
         self._exact_model.setPlaceholderText('Exact model ID from your provider')
         self._exact_model.setToolTip('Use an ID available to your account. The provider validates it when you send; no model ID is assumed.')
-        self._exact_model.textChanged.connect(lambda value:self._cfg.update(selected_model=value.strip()))
-        self._exact_model.setVisible(False)
-        header_row.addWidget(self._exact_model)
+        self._exact_model.textChanged.connect(self._provider_model_text)
+        self._cloud_model_box.activated.connect(self._pick_provider_model)
+        self._cloud_model_box.setVisible(False)
+        self._cloud_model_box.setMinimumWidth(230)
+        header_row.addWidget(self._cloud_model_box)
         # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
         self._model_box = QComboBox()
         self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
@@ -82,6 +88,10 @@ class ChatControlsMixin:
         self._model_box.setEnabled(False)
         self._model_box.activated.connect(self._on_model_chosen)
         header_row.addWidget(self._model_box)
+        self._provider_refresh = QPushButton('↻')
+        self._provider_refresh.setToolTip('Refresh this provider’s models; never downloads a model')
+        self._provider_refresh.clicked.connect(self._refresh_provider_models)
+        header_row.addWidget(self._provider_refresh)
         header_row.addStretch(1)
         # Status pill: what can go online right now (core/netgate.py + keys + Cloud).
         self._net_pill = QPushButton("")
@@ -122,10 +132,21 @@ class ChatControlsMixin:
         header_row.addWidget(more)
         lay.addLayout(header_row)
         self._signals.models.connect(self._on_models)
+        self._signals.provider_models.connect(self._provider_models_ready)
         self._signals.crosscheck.connect(self._on_cross_check)
         self._build_feedback(lay)
         self._refresh_status_pill()
         self._load_models()
+        saved = provider_settings.load()
+        selected = saved['provider'] if saved['mode'] == 'manual' else 'cloud_auto' if saved['mode'] == 'cloud_auto' else ''
+        self._provider_box.setCurrentIndex(max(0,self._provider_box.findData(selected)))
+        self._on_provider_chosen(self._provider_box.currentIndex())
+        self._cfg['selected_model'] = saved['model'] if selected not in ('','cloud_auto') else ''
+        if selected not in ('','cloud_auto','ollama'):
+            self._populate_provider_models(selected)
+        elif selected == 'ollama':
+            self._on_models(getattr(self,'_installed_models',None))
+        self._save_provider_selection()
         self._pill_timer = QTimer(self)
         self._pill_timer.timeout.connect(self._refresh_status_pill)
         self._pill_timer.start(15_000)
@@ -209,6 +230,17 @@ class ChatControlsMixin:
 
         lay.addLayout(row)
 
+        recovery = QHBoxLayout()
+        self._retry_provider_btn = QPushButton('Retry preserved request')
+        self._retry_provider_btn.clicked.connect(self._retry_provider_request)
+        self._retry_provider_btn.setVisible(False)
+        self._provider_settings_btn = QPushButton('AI Providers…')
+        self._provider_settings_btn.clicked.connect(self._open_provider_settings)
+        recovery.addWidget(self._retry_provider_btn)
+        recovery.addWidget(self._provider_settings_btn)
+        recovery.addStretch(1)
+        lay.addLayout(recovery)
+
         self._status = QLabel("")
         self._status.setStyleSheet(f"color: {theme.FAINT}; font-size: 12px;")
         self._build_check_progress(lay)
@@ -220,6 +252,16 @@ class ChatControlsMixin:
              "online": (theme.AMBER, "rgba(232,180,90,0.10)")}
 
     def _refresh_status_pill(self) -> None:
+        from cursiv_engine.chat import provider_manager, provider_registry
+        for provider in provider_registry.providers():
+            index = self._provider_box.findData(provider.id)
+            status = provider_manager.status(provider.id)
+            compact = ('Offline' if 'offline mode' in status else 'Key missing' if 'No API key' in status
+                else 'Key rejected' if 'rejected the API key' in status else 'Not configured' if 'endpoint' in status.lower()
+                else 'Last check OK' if 'Last connection check passed' in status else 'Not tested' if 'not tested' in status
+                else 'Check settings')
+            self._provider_box.setItemText(index, provider.name+' · '+compact)
+            self._provider_box.setItemData(index,status,Qt.ItemDataRole.ToolTipRole)
         try:
             from cursiv_engine.chat import status as _st
             st = _st.network_status()
@@ -294,11 +336,27 @@ class ChatControlsMixin:
         from cursiv_engine.chat import status as _st
         box = self._model_box
         self._installed_models = models
+        if models:
+            from cursiv_engine.chat import provider_settings
+            cache = provider_settings.load().get('models',{})
+            cache['ollama'] = [dict(id=model,provider='ollama',source='live',verified=True) for model in models]
+            provider_settings.update(models=cache)
+        if self._provider_box.currentData() not in ('','ollama'):
+            return
         box.clear()
         if not models:
-            box.addItem("No local model yet — open Setup" if models == [] else
-                        "The AI engine didn't start: type status for the reason", "")
-            box.setEnabled(False)
+            from cursiv_engine.chat import provider_manager
+            known, _ = provider_manager.models('ollama')
+            for item in known:
+                box.addItem(item.id+' · availability not verified', 'model:'+item.id)
+            chosen = self._cfg.get('selected_model','')
+            if chosen and box.findData('model:'+chosen) < 0:
+                box.addItem(chosen+' · unavailable', 'model:'+chosen)
+            if chosen:
+                box.setCurrentIndex(max(0,box.findData('model:'+chosen)))
+            if self._provider_box.currentData() == 'ollama' and not chosen and box.count():
+                self._cfg['selected_model'] = box.itemData(0).removeprefix('model:')
+            box.setEnabled(True)
             return
         choices = [(m,'model:'+m,True) for m in models] if self._provider_box.currentData() == 'ollama' else _st.menu_choices(models)
         for label, choice, enabled in choices:
@@ -316,18 +374,22 @@ class ChatControlsMixin:
     def _on_provider_chosen(self, index: int) -> None:
         provider = self._provider_box.itemData(index) or ''
         self._cfg.update(selected_provider=provider,selected_model='')
-        cloud = provider not in ('','ollama')
+        cloud = provider not in ('','ollama','cloud_auto')
         self._model_box.setVisible(not cloud)
-        self._exact_model.setVisible(cloud)
+        self._cloud_model_box.setVisible(cloud)
+        self._model_box.setVisible(provider in ('','ollama'))
         if cloud:
             self._exact_model.clear()
+            self._populate_provider_models(provider)
             self._exact_model.setFocus()
-        else:
+        elif provider != 'cloud_auto':
             self._on_models(getattr(self,'_installed_models',None))
+        self._save_provider_selection()
 
     def _on_model_chosen(self, index: int) -> None:
         if self._provider_box.currentData() == 'ollama':
             self._cfg['selected_model'] = (self._model_box.itemData(index) or '').removeprefix('model:')
+            self._save_provider_selection()
             return
         choice = self._model_box.itemData(index) or 'standard'
         if choice.startswith('model:'):
@@ -336,6 +398,7 @@ class ChatControlsMixin:
             self._on_provider_chosen(self._provider_box.currentIndex())
             self._model_box.setCurrentIndex(self._model_box.findData(choice))
             self._cfg.update(selected_provider='ollama',selected_model=chosen)
+            self._save_provider_selection()
             return
         from cursiv_engine.chat import status as _st
         _st.choose(self._model_box.itemData(index) or "standard")
