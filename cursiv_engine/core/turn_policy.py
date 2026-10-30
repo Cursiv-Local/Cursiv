@@ -156,6 +156,10 @@ def for_text(text: str) -> Policy:
     private_prefix = re.match(
         r"(?i)^\s*(?:please\s+)?(?:do not|don't|dont|never)\s+"
         r"(?:save|store|retain|remember|learn)\b", body)
+    if inspect and private_prefix and not memory:
+        from . import self_inspection
+        if self_inspection.resolve(text):
+            return Policy(True, False, False, False)
     if not inspect or (private_prefix and not memory):
         return Policy(False, False, False, False)
     return Policy(inspect, change, memory, automatic)

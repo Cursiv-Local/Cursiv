@@ -1,0 +1,42 @@
+[
+  {
+    "text": "AI claims must be supported by evidence before we trust them.",
+    "expected": false,
+    "actual": true
+  },
+  {
+    "text": "A claim that is not supported by evidence should be rejected.",
+    "expected": false,
+    "actual": true
+  },
+  {
+    "text": "Answers grounded in evidence are easier to evaluate than unsupported claims.",
+    "expected": false,
+    "actual": true
+  },
+  {
+    "text": "An AI needs to be grounded in evidence to evaluate a claim.",
+    "expected": false,
+    "actual": true
+  },
+  {
+    "text": "This answer is based on the offline references.",
+    "expected": true,
+    "actual": true
+  },
+  {
+    "text": "The advice here is evidence-based and professionally reviewed.",
+    "expected": true,
+    "actual": true
+  },
+  {
+    "text": "These references were vetted by experts.",
+    "expected": true,
+    "actual": true
+  },
+  {
+    "text": "This guidance is not professionally reviewed.",
+    "expected": false,
+    "actual": true
+  }
+]

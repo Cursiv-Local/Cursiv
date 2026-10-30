@@ -189,7 +189,7 @@ class ToolOutcome:
 
 
 def run(calls: list[dict], *, root: Path | None = None, policy=None) -> list[ToolOutcome]:
-    from .turn_policy import current, Policy
+    from .turn_policy import current, Policy, DENIED
     policy = policy or current()
     tools = None
     out = []
@@ -241,6 +241,13 @@ def run(calls: list[dict], *, root: Path | None = None, policy=None) -> list[Too
         label = c["tool"] + (" " + ", ".join(str(v) for v in args.values())[:80] if isinstance(args, dict) and args else "")
         output = str(res)[:MAX_READ + 500]
         out.append(ToolOutcome(label, output, ok=c['tool'] == 'system_info' and not output.startswith('Tool error:')))
+    from . import last_turn
+    for result in out:
+        status=('denied' if result.output==DENIED else 'unsupported' if result.label=='unsupported tool'
+                else 'succeeded' if result.ok else 'failed')
+        tool=result.label.split(' ',1)[0]
+        last_turn.diagnostic_event('tool_result',tool=tool if tool in BUILTIN else 'other tool',
+            status=status,attempted=status not in ('denied','unsupported'))
     return out
 
 

@@ -47,6 +47,8 @@ def record(kind: str, source: str, *, path: str = "", lines: str = "", operation
     with _lock:
         _records.append(Record(kind, source, path, lines, f"Cursiv {VERSION}", operation, time.time(), scope))
         del _records[:-200]
+    from . import last_turn
+    last_turn.diagnostic_event('evidence_returned',status=kind,path=path,lines=lines)
 
 
 def begin_turn() -> None:

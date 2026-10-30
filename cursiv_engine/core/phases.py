@@ -105,11 +105,25 @@ DANGER_TEXT = ("**If you're in danger, call 911.** The National Domestic Violenc
                "(or text **START** to **88788**).")
 
 
+def _medical_text(text: str) -> str:
+    """Disambiguate software metaphors; human emergency reports retain priority."""
+    software=r'\b(?:AI|model|Cursiv|software|application|server|process|computer|chatbot)\b'
+    human=r"\b(?:I|I'm|my (?:partner|child|friend|wife|husband|mother|father)|someone|a person|the patient|he|she)\b.{0,45}\b(?:is|are|am|was|has|have|can't|cannot|not breathing)\b"
+    def clause(match):
+        part=match.group(0)
+        if re.search(software,part,re.I) and not re.search(human,part,re.I):
+            return re.sub(r'\b(?:unconscious|unresponsive|choking|drowning)\b','[software state]',part,flags=re.I)
+        return part
+    return re.sub(r'[^.!?\n]+',clause,text)
+
+
 def _emergency(text: str, r: PhaseResult) -> None:
     for patterns, notice, kind in ((_CRISIS, CRISIS_TEXT, "possible crisis"), (_MEDICAL, MEDICAL_TEXT, "possible medical emergency"),
                                    (_DANGER, DANGER_TEXT, "possible danger")):
-        hit = _has(text, patterns)
+        hit = _has(_medical_text(text) if kind == 'possible medical emergency' else text, patterns)
         if hit:
+            from . import last_turn
+            last_turn.diagnostic_event('guardian',check='emergency',triggered=True,reason=kind)
             r.emergency = True
             r.emergency_kind = {"possible crisis": "crisis", "possible medical emergency": "medical"}.get(kind, "danger")
             r.before_reply = notice + "\n\n"
@@ -127,6 +141,8 @@ def _emergency(text: str, r: PhaseResult) -> None:
                                          "Don't lecture, don't change the subject, don't give clinical detail.")
             r.trace.append(("Emergency", f"{kind} (\"{hit}\") -> help lines shown first, care-first reply"))
             return
+    from . import last_turn
+    last_turn.diagnostic_event('guardian',check='emergency',triggered=False)
     r.trace.append(("Emergency", "none"))
 
 

@@ -69,9 +69,28 @@ _ABSOLUTE = re.compile(
 _CURSIV = re.compile(r"(?i)\bcursiv\b|\b(?:i|my|me)\b.{0,40}\b(?:run|runs|running|local|computer|machine)\b")
 
 
+def _privacy_assertion(answer: str) -> bool:
+    for match in _ABSOLUTE.finditer(answer or ''):
+        start=max(answer.rfind(mark,0,match.start()) for mark in ('.','!','?',';','\n'))+1
+        before=answer[start:match.start()]
+        if re.search(r"(?i)\b(?:not|isn't|aren't|cannot guarantee|can't guarantee|cannot promise|can't promise|not necessarily)\s+(?:\w+\s+){0,3}$",before):
+            continue
+        after=answer[match.end():match.end()+60]
+        if match.group().lower()=='no cloud':
+            if re.match(r'(?i)\s+(?:API\s+)?(?:key|credential|provider)\b',after):
+                continue
+            if re.search(r'(?i)\b(?:when|while|if|with)\b.{0,45}\boffline (?:mode|switch)\b.{0,20}\b(?:on|enabled|active)\b',before):
+                continue
+        return True
+    return False
+
+
 def privacy_overclaim(answer: str, question: str = "") -> str:
     """A correction when an answer about Cursiv makes an absolute privacy promise."""
-    if not _ABSOLUTE.search(answer or "") or not (_CURSIV.search(answer or "") or _CURSIV.search(question or "")):
+    from . import last_turn
+    triggered=_privacy_assertion(answer) and bool(_CURSIV.search(answer or '') or _CURSIV.search(question or ''))
+    last_turn.diagnostic_event('guardian',check='privacy_overclaim',triggered=triggered)
+    if not triggered:
         return ""
     try:
         from . import netgate

@@ -53,6 +53,8 @@ def execution(issues, evidence=None) -> str | None:
                 p.code in ('UNEXECUTED_LOOKUP', 'UNCONFIRMED_STATE_CHANGE')]
     if not failures:
         return None
+    from . import last_turn
+    last_turn.diagnostic_event('response_modification',check=','.join(sorted({p.code for p in issues})),modified=True,reason='execution_claim_withdrawn')
     # Do not copy the disputed model claim back into the primary answer.
     details = []
     codes = {p.code for p in issues}

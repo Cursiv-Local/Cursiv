@@ -75,6 +75,10 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
         _hint = guidance.command(text)
         if _hint is not None:
             return runtime.TextResult(_hint)
+    if cmd in ('self diagnostics','self diagnostics show','self diagnostics on','self diagnostics off'):
+        from cursiv_engine.core import last_turn
+        if cmd.endswith((' on',' off')):last_turn.diagnostics(cmd.endswith(' on'))
+        return runtime.TextResult(last_turn.diagnostic_summary())
     if cmd in ("self prompt", "self prompt full"):
         from cursiv_engine.core import last_turn
         return runtime.TextResult(last_turn.summary(full=cmd.endswith("full")))

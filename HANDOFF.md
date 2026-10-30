@@ -4,6 +4,15 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U113 — owner-authorized release preparation
+
+The owner authorized commit, push and release of the reviewed self-inspection repairs.
+Continue [the implementation and measurement handoff](docs/SELF-INSPECTION-REVIEW.md).
+Reviewed Windows source: 2,871 passed / 15 skipped / 19 passing subtests; real offline
+Qwen probes and before/after boundaries are recorded there. Native packaging, exact-main
+CI, owner signatures and production readback remain release gates, not completed claims.
+Preserve U111/U112 publication evidence and opted-in USB key export.
+
 ## U112 and U111 released — October 30, 2026
 
 The owner authorized both releases after completion. U111 is tagged at `932d95d`
@@ -12,8 +21,8 @@ each release; eleven anonymous downloads and eight owner signatures verified per
 [U111 verification](docs/U111-RELEASE-VERIFICATION.md),
 [U112 verification](docs/U112-RELEASE-VERIFICATION.md),
 [provider handoff](docs/PROVIDER-MANAGER-HANDOFF.md), [AI Providers guide](docs/AI-PROVIDERS.md).
-Preserve the separately opted-in readable USB key export. Later self-inspection
-worksheet repairs are isolated, uncommitted review work and are not in these binaries.
+Preserve the separately opted-in readable USB key export. The later self-inspection
+repairs are prepared separately for U113 and are not in U111/U112 binaries.
 Website publication is verified by [41 live checks](bench/results/U111-U112-publication.json) across20 public pages; deployed U112 from PR66, version `720a9dd4-69f1-4bab-8255-33a7a6eb5433`.
 
 ## U110 released (Claude, 2026-10-29)
