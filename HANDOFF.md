@@ -6,7 +6,7 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 
 ## U113 released — October 30, 2026
 
-Owner-authorized [U113](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U113) is published from `bd11f925df7007e1641fd3b35ffd0ce9dad0a22d` (PR68). Exact-main CI and both native packages passed. Eleven anonymous downloads and eight owner signatures verified. [Release evidence](docs/U113-RELEASE-VERIFICATION.md); [implementation and measurements](docs/SELF-INSPECTION-REVIEW.md). Website promotion is prepared separately; its production receipt establishes deployment. Preserve existing provider privacy, notebook confirmation and opted-in USB key export.
+Owner-authorized [U113](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U113) is published from `bd11f925df7007e1641fd3b35ffd0ce9dad0a22d` (PR68). Exact-main CI and both native packages passed. Eleven anonymous downloads and eight owner signatures verified. [Release evidence](docs/U113-RELEASE-VERIFICATION.md); [implementation and measurements](docs/SELF-INSPECTION-REVIEW.md). Website PR69 is merged and deployment `7946b4d2-7cc0-418b-833c-6a730f62930b` passed [41 live checks across20 public pages](bench/results/U113-publication.json). Preserve existing provider privacy, notebook confirmation and opted-in USB key export.
 
 ## U112 and U111 released — October 30, 2026
 
