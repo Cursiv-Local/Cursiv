@@ -4,14 +4,9 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U113 — owner-authorized release preparation
+## U113 released — October 30, 2026
 
-The owner authorized commit, push and release of the reviewed self-inspection repairs.
-Continue [the implementation and measurement handoff](docs/SELF-INSPECTION-REVIEW.md).
-Reviewed Windows source: 2,871 passed / 15 skipped / 19 passing subtests; real offline
-Qwen probes and before/after boundaries are recorded there. Native packaging, exact-main
-CI, owner signatures and production readback remain release gates, not completed claims.
-Preserve U111/U112 publication evidence and opted-in USB key export.
+Owner-authorized [U113](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U113) is published from `bd11f925df7007e1641fd3b35ffd0ce9dad0a22d` (PR68). Exact-main CI and both native packages passed. Eleven anonymous downloads and eight owner signatures verified. [Release evidence](docs/U113-RELEASE-VERIFICATION.md); [implementation and measurements](docs/SELF-INSPECTION-REVIEW.md). Website promotion is prepared separately; its production receipt establishes deployment. Preserve existing provider privacy, notebook confirmation and opted-in USB key export.
 
 ## U112 and U111 released — October 30, 2026
 
@@ -22,7 +17,7 @@ each release; eleven anonymous downloads and eight owner signatures verified per
 [U112 verification](docs/U112-RELEASE-VERIFICATION.md),
 [provider handoff](docs/PROVIDER-MANAGER-HANDOFF.md), [AI Providers guide](docs/AI-PROVIDERS.md).
 Preserve the separately opted-in readable USB key export. The later self-inspection
-repairs are prepared separately for U113 and are not in U111/U112 binaries.
+repairs are published separately in U113 and are not in U111/U112 binaries.
 Website publication is verified by [41 live checks](bench/results/U111-U112-publication.json) across20 public pages; deployed U112 from PR66, version `720a9dd4-69f1-4bab-8255-33a7a6eb5433`.
 
 ## U110 released (Claude, 2026-10-29)

@@ -100,4 +100,5 @@ Older releases are described in the [CHANGELOG](../CHANGELOG.md) and on
 [GitHub Releases](https://github.com/Cursiv-Local/Cursiv/releases).
 
 - [U111](U111-RELEASE-VERIFICATION.md) — published routing and verification checks.
+- [U113](U113-RELEASE-VERIFICATION.md) — reliable self-inspection and scoped verification; source, native packages and signatures.
 - [U112](U112-RELEASE-VERIFICATION.md) — published unified AI provider manager and native package evidence.

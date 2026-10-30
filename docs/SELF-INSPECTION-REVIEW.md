@@ -93,16 +93,16 @@ but its draft misread a regex/route; it is preserved as a limitation, not counte
 as successful source understanding.
 
 OpenAI parity and privacy/error paths use synthetic adapters. No live OpenAI
-account/key was supplied or used, and no live cloud success is claimed. These
-additional repairs have not been packaged or run on native Mac/Linux. Qwen's
+account/key was supplied or used, and no live cloud success is claimed. At the original review checkpoint, native packaging and Mac/Linux runs were pending;
+U113 native and hosted results are now recorded in the release verification. Qwen's
 broader philosophical narration remains variable; passing bounded checks is not
 a guarantee every generated statement is true. No station, model-weight,
 unrelated-profile, notebook or owner-data changes were made.
 
 The owner authorized commit, push and release on October 30, 2026. The reviewed
 repairs have been integrated onto current main for U113; source inventory is rebuilt
-for the versioned snapshot. Native packaging and public publication remain pending
-until their receipts are recorded. U111/U112 website and release evidence are retained.
+for the versioned snapshot. Native packaging and GitHub publication are now verified
+by the U113 release receipts. U111/U112 website and release evidence are retained.
 The original incident transcripts remain unavailable.
 
 Repeat safely with the locked project interpreter:
@@ -114,3 +114,7 @@ uses loopback Ollama only, and refuses to overwrite a previous receipt.
 [before](../bench/results/SELF-INSPECTION-before.json),
 [final real/native probes](../bench/results/SELF-INSPECTION-review-ready.json),
 [final full suite](../bench/results/SELF-INSPECTION-review-ready.xml).
+
+## U113 release completion
+
+Owner-authorized source and native packages are published as U113; exact-main multiplatform counts, signature/readback receipts and boundaries are in [U113 release verification](U113-RELEASE-VERIFICATION.md). Earlier review-only status above records the measurement checkpoint. Website production verification is a separate receipt.

@@ -436,7 +436,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U112 source and package checks are recorded in the [verification report](docs/U112-RELEASE-VERIFICATION.md);
+U113 source and package checks are recorded in the [verification report](docs/U113-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -470,6 +470,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 | U110: Natural-language self-inspection and notebook reliability | [Release notes](docs/RELEASE-U110.md), [verification](docs/U110-RELEASE-VERIFICATION.md) |
 | U111: Routing, verification and model transparency | [Release notes](docs/RELEASE-U111.md), [verification](docs/U111-RELEASE-VERIFICATION.md) |
 | U112: Unified AI provider and model manager | [Release notes](docs/RELEASE-U112.md), [verification](docs/U112-RELEASE-VERIFICATION.md) |
+| U113: Reliable self-inspection and scoped verification | [Release notes](docs/RELEASE-U113.md), [verification](docs/U113-RELEASE-VERIFICATION.md) |
 | U109: Reliable installed-source inspection | [Release notes](docs/RELEASE-U109.md), [verification](docs/U109-RELEASE-VERIFICATION.md) |
 | U110: U110 software and release checks | [Release notes](docs/RELEASE-U110.md), [verification](docs/U110-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |

@@ -16,7 +16,7 @@ spec.loader.exec_module(scope)
 class ChangeScopeTests(unittest.TestCase):
     def test_website_and_documentation_paths_use_focused_checks(self):
         self.assertTrue(scope.website_only(['website/index.html', 'cloudflare/publish.mjs', 'docs/README.md',
-            'bench/results/website-copy-live.json', 'HANDOFF.md', 'scripts/discoverability_audit.py',
+            'bench/results/website-copy-live.json', 'README.md', 'TECH.md', 'HANDOFF.md', 'scripts/discoverability_audit.py',
             '.github/workflows/tests.yml', 'scripts/ci_change_scope.py', 'tests/test_ci_change_scope.py']))
 
     def test_application_dependencies_tests_and_unknown_paths_keep_full_suites(self):

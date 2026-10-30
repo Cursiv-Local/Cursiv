@@ -39,7 +39,7 @@ Cloud protocols and consent boundaries were tested with synthetic adapters; no l
 inference or actual model download/deletion was performed. macOS Keychain with an owner's actual
 account remains unverified. The comparison engine is prepared; the desktop side-by-side view is deferred.
 These checks are not a new model-accuracy score. Detached owner signatures are not Windows CA signing
-or Mac notarization. Later self-inspection worksheet changes are separate, uncommitted review work.
+or Mac notarization. Later self-inspection worksheet changes are published separately in U113.
 
 ## Public proof
 
