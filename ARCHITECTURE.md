@@ -216,3 +216,27 @@ Delayed session-note workers also capture their conversation, person/workspace a
 They share the model slot and stop before summarizing or saving when ownership is stale. Updates use
 the captured destination rather than a later global directory. Profile/native-command completion
 updates these metadata notes without an extra, unbudgeted model summary.
+
+## Unified provider manager (unreleased)
+
+The existing chat header and Settings → AI Providers share `chat/provider_registry.py`.
+Descriptors remain present independent of credentials, policy and connectivity.
+`provider_manager` selects an exact destination, `provider_http` validates the
+origin/offline/auth boundary, and provider-specific adapters normalize streams.
+Local Automatic never enters a cloud cascade. Cloud Automatic requires explicit
+provider grants and per-request research-data confirmation; manual failures do not
+fall back. Babel/coding streams use the same selection boundary. Background
+summaries and reviewers remain local rather than uploading through free-key fallback.
+
+Device credentials are separate from non-secret portable settings. DPAPI/Keychain
+failure keeps new keys in memory only. The owner explicitly retained private USB
+key export: the separate opt-in writes readable keys only into the chosen USB copy,
+with its existing warning. Normal exports do not copy new device credentials.
+
+Failed inference has a typed outcome and a conversation/person/workspace-owned
+in-memory snapshot. Retry calls adapters directly, never command/native-tool dispatch.
+The GUI stores the failed user prompt/error metadata without an assistant-success
+row, and successful assistant rows retain requested/attempted/responding provenance.
+Model-generated tools are not executed by text adapters; native Cursiv confirmations
+and workspace checks remain independent. The comparison engine is read-only and
+prepared for a future desktop side-by-side view.

@@ -1,9 +1,8 @@
 """
 Cursiv Settings -- every AI key in one place, plus Cursiv Cloud and the data folder.
 
-Each key row: masked field with Show, Save (tests the key first; only a key
-that works is saved), Remove, and a status line. Keys live in the same
-config.json the rest of Cursiv reads. Opened from the gear in the title bar.
+AI Providers uses the shared registry, secure device credential storage and
+explicit connection/model checks. Saving a key never sends an inference request.
 """
 from __future__ import annotations
 
@@ -23,16 +22,6 @@ import theme
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
 
 
-# (label, config field, free?, where to get a key)
-PROVIDERS = [
-    ("xAI Grok",        "api_key",       False, "https://console.x.ai"),
-    ("OpenAI",          "openai_key",    False, "https://platform.openai.com/api-keys"),
-    ("Claude",          "anthropic_key", False, "https://console.anthropic.com/settings/keys"),
-    ("Google Gemini",   "gemini_key",    True,  "https://aistudio.google.com/apikey"),
-    ("Groq",            "groq_key",      True,  "https://console.groq.com/keys"),
-]
-
-
 def _keys_file() -> Path:
     from cursiv_engine.chat import keys
     return keys.KEYS_FILE
@@ -41,27 +30,19 @@ def _keys_file() -> Path:
 def load_keys() -> dict:
     try:
         from cursiv_engine.core import keystore
-        return keystore.reveal_all(json.loads(_keys_file().read_text(encoding="utf-8")))
+        data = keystore.reveal_all(json.loads(_keys_file().read_text(encoding="utf-8"))) if _keys_file().is_file() else {}
+        from cursiv_engine.chat import provider_registry, provider_settings
+        for provider in provider_registry.providers():
+            if provider.credential:
+                data[provider.credential] = provider_settings.key(provider.id)
+        return data
     except Exception:
         return {}
 
 
-def test_key(field: str, key: str) -> tuple[bool, str]:
-    """Live test call. Returns (works, message)."""
-    try:
-        if field in ("gemini_key", "groq_key"):
-            from cursiv_engine.ui import chat_app as ca
-            return ca.check_free_key(field, key)
-        from cursiv_engine.chat import keys
-        probe = {"api_key": keys.probe_xai, "openai_key": keys.probe_openai, "anthropic_key": keys.probe_claude}[field]
-        ok = bool(probe(key))
-        return ok, "Working." if ok else "The provider rejected this key, or couldn't be reached."
-    except Exception as exc:
-        return False, f"Test failed: {exc}"
-
-
 class _Signals(QObject):
-    tested = pyqtSignal(str, bool, str, str)   # field, ok, message, key
+    provider_status = pyqtSignal(str, str)
+    provider_progress = pyqtSignal(int, str)
 
 
 class SettingsDialog(QDialog):
@@ -69,7 +50,7 @@ class SettingsDialog(QDialog):
     plain sentence what it does. Only controls the app actually enforces."""
     keys_changed = pyqtSignal()
 
-    SECTIONS = ("Privacy & internet", "AI model", "Online AI (optional)", "How Cursiv answers",
+    SECTIONS = ("Privacy & internet", "AI model", "AI Providers", "How Cursiv answers",
                 "Appearance", "Updates", "Your data & account", "Help & diagnostics")
 
     def __init__(self, parent=None, section: str = ""):
@@ -102,7 +83,6 @@ class SettingsDialog(QDialog):
             QListWidget#nav::item:hover {{ color: {theme.TEXT}; }}
         """)
         self._sig = _Signals()
-        self._sig.tested.connect(self._on_tested)
         self._rows: dict[str, dict] = {}
 
         outer = QHBoxLayout(self)
@@ -192,7 +172,7 @@ class SettingsDialog(QDialog):
             "a cloud AI key you saved (used only if you choose that AI, paste an image, or no local model is "
             "ready), Cursiv Cloud (only with no local model), update checks, and Setup's downloads.<br>"
             "<b>Offline mode</b> refuses all of it at the connection level, for the whole program.<br>"
-            "The full list: PRIVACY.md at github.com/winklersllc2026-bit/Cursiv."))
+            "The full list: PRIVACY.md at github.com/Cursiv-Local/Cursiv."))
 
         def setting(name):
             def apply(on):
@@ -214,9 +194,9 @@ class SettingsDialog(QDialog):
             def cloud(on):
                 set_cloud_enabled(on)
                 self._refresh_status()
-            self._switch(lay, "Cursiv Cloud backup",
-                         "Only when no local model is ready, your message goes to cursiv.us for an answer. "
-                         "Off keeps everything on this computer.",
+            self._switch(lay, "Legacy Cursiv Cloud permission",
+                         "Retains permission for older cloud helpers. The unified provider manager does not "
+                         "use this as automatic fallback; select and authorize a provider in AI Providers.",
                          cloud_enabled(), cloud)
         except Exception:
             pass
@@ -283,42 +263,8 @@ class SettingsDialog(QDialog):
                      lambda: self._call_window("_open_setup"))
 
     def _page_keys(self, lay):
-        lay.addWidget(self._explain("Not needed: Cursiv works on this computer without any of these. A key is used only "
-                                    "when the local model can't answer, or to read images, and then that message goes "
-                                    "to that company. Keys are encrypted for your Windows account."))
-        keys = load_keys()
-        card = QFrame(); card.setObjectName("card")
-        grid = QGridLayout(card)
-        grid.setContentsMargins(14, 12, 14, 12)
-        grid.setHorizontalSpacing(8)
-        grid.setVerticalSpacing(4)
-        r = 0
-        for label, field, free, url in PROVIDERS:
-            name = QLabel(label + ("  ·  free" if free else ""))
-            name.setStyleSheet("font-weight: 600;")
-            name.setMinimumWidth(130)
-            edit = QLineEdit(keys.get(field, ""))
-            edit.setEchoMode(QLineEdit.EchoMode.Password)
-            edit.setPlaceholderText("not set")
-            show = QPushButton("Show"); show.setObjectName("ghost"); show.setFixedWidth(58)
-            save = QPushButton("Save"); save.setFixedWidth(64)
-            remove = QPushButton("Remove"); remove.setObjectName("ghost"); remove.setFixedWidth(74)
-            get = QPushButton("Get a key ↗"); get.setObjectName("link")
-            st = QLabel(""); st.setWordWrap(True); st.setStyleSheet(f"color: {SILV2}; font-size: 11px;")
-            grid.addWidget(name, r, 0); grid.addWidget(edit, r, 1); grid.addWidget(show, r, 2)
-            grid.addWidget(save, r, 3); grid.addWidget(remove, r, 4); grid.addWidget(get, r, 5)
-            grid.addWidget(st, r + 1, 1, 1, 5)
-            grid.setColumnStretch(1, 1)
-            row = {"edit": edit, "show": show, "save": save, "remove": remove, "status": st, "label": label}
-            self._rows[field] = row
-            show.clicked.connect(lambda _=False, rw=row: self._toggle_show(rw))
-            save.clicked.connect(lambda _=False, f=field: self._save(f))
-            remove.clicked.connect(lambda _=False, f=field: self._remove(f))
-            get.clicked.connect(lambda _=False, u=url: webbrowser.open(u))
-            self._set_status(field, None, "Saved." if keys.get(field) else "")
-            r += 2
-        lay.addWidget(card)
-        lay.addWidget(self._explain("Gemini and Groq have free keys that take about two minutes to get.", "small"))
+        from provider_settings_panel import build
+        build(self, lay)
 
     def _page_answers(self, lay):
         from cursiv_engine.core import style
@@ -588,45 +534,3 @@ class SettingsDialog(QDialog):
             pass
 
     # ── Actions ──
-    def _set_status(self, field: str, ok: bool | None, text: str):
-        st = self._rows[field]["status"]
-        color = GREEN if ok else (RED if ok is False else SILV2)
-        st.setStyleSheet(f"color: {color}; font-size: 11px;")
-        st.setText(text)
-
-    def _toggle_show(self, row: dict):
-        hidden = row["edit"].echoMode() == QLineEdit.EchoMode.Password
-        row["edit"].setEchoMode(QLineEdit.EchoMode.Normal if hidden else QLineEdit.EchoMode.Password)
-        row["show"].setText("Hide" if hidden else "Show")
-
-    def _save(self, field: str):
-        row = self._rows[field]
-        key = row["edit"].text().strip()
-        if not key:
-            self._set_status(field, False, "Paste a key first.")
-            return
-        row["save"].setEnabled(False)
-        self._set_status(field, None, "Testing…")
-
-        def work():
-            ok, msg = test_key(field, key)
-            self._sig.tested.emit(field, ok, msg, key)
-        threading.Thread(target=work, daemon=True).start()
-
-    def _on_tested(self, field: str, ok: bool, msg: str, key: str):
-        row = self._rows[field]
-        row["save"].setEnabled(True)
-        if not ok:
-            self._set_status(field, False, f"Not saved — {msg}")
-            return
-        from cursiv_engine.ui.chat_app import _store_key
-        _store_key(field, key)
-        self._set_status(field, True, "Saved and working.")
-        self.keys_changed.emit()
-
-    def _remove(self, field: str):
-        from cursiv_engine.ui.chat_app import _store_key
-        _store_key(field, "")
-        self._rows[field]["edit"].clear()
-        self._set_status(field, None, "Removed.")
-        self.keys_changed.emit()

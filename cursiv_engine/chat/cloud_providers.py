@@ -317,7 +317,7 @@ def _quick_llm(runtime: ChatRuntime, messages: list[dict], max_tokens: int) -> s
         if not _speed.wait_idle(300):      # never compete with a chat for the local model
             return ""
         return runtime._local_llm(messages, max_tokens)
-    return runtime._free_key_llm(messages, max_tokens)
+    return ''  # background titles/summaries have no per-request cloud-data consent
 
 def _memory_llm(runtime: ChatRuntime, messages: list[dict], max_tokens: int) -> str:
     """Optional memory extraction stays local even when cloud keys are configured."""

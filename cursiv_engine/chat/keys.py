@@ -22,6 +22,11 @@ KEYS_FILE = APP_DATA / "config.json"
 def saved_key(field: str) -> str:
     """A saved key, decrypted. "" if missing or saved for another account."""
     try:
+        from .provider_registry import providers
+        provider = next((p.id for p in providers() if p.credential == field), None)
+        if provider:
+            from .provider_settings import key
+            return key(provider)
         return keystore.reveal(json.loads(KEYS_FILE.read_text(encoding="utf-8")).get(field, "") or "")
     except Exception:
         return ""
@@ -29,6 +34,12 @@ def saved_key(field: str) -> str:
 
 def store_key(field: str, value: str) -> None:
     """Save a key (encrypted) or other setting; an empty value removes it."""
+    from .provider_registry import providers
+    provider = next((p.id for p in providers() if p.credential == field), None)
+    if provider:
+        from .provider_settings import save_key
+        save_key(provider, value)
+        return
     try:
         try:
             data = json.loads(KEYS_FILE.read_text(encoding="utf-8"))

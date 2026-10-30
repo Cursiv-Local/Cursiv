@@ -1,0 +1,33 @@
+{
+  "scope": "Real loopback Ollama transport only; disposable stores; offline mode enabled; no cloud, downloads, deletes or owner records",
+  "model": "qwen3:4b-instruct",
+  "discovered_live": true,
+  "result": {
+    "provider": "ollama",
+    "requested_model": "qwen3:4b-instruct",
+    "attempted_provider": "ollama",
+    "actual_model": "qwen3:4b-instruct",
+    "responding_provider": "ollama",
+    "tool_calls": [],
+    "tool_results": [],
+    "finish_reason": "stop",
+    "usage": {
+      "prompt_eval_count": 19,
+      "eval_count": 8
+    },
+    "latency": 7.3762,
+    "error": null,
+    "error_message": "",
+    "streaming": true,
+    "canceled": false,
+    "local": true
+  },
+  "response": "Cursiv local provider ready.",
+  "success": true,
+  "source_sha256": {
+    "provider_manager.py": "a1b3bfbd5cf1cfeb609c5f0b2cfc149fe7c473c037ecbf889a9a88c97ebdc308",
+    "provider_adapters.py": "7b4798ec1f5cbe7c88f58445cc54d8204376165d4e9ea650eb8e12b3ffd746a4",
+    "provider_http.py": "02a2d494a4894fe6f7aebdee1c1b363e9783958f5d6a8dc57d07cfe60e7b094f",
+    "provider_types.py": "c9dbed5f42dd06ad09ee01650dab92adeb72ac130f07208a3d08bb039f4ffbca"
+  }
+}

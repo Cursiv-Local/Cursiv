@@ -31,6 +31,16 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `chat/response_style.py` — trims closers, drops false refusals and self-certification.
 - `chat/provenance.py` — source labels from application records.
 - `chat/model_selection.py` — per-turn exact provider/model selection, installed-local checks, transport provenance and no-fallback dispatch.
+- `chat/provider_registry.py` — extensible provider descriptors and conservative, unverified model catalogs.
+- `chat/provider_types.py` — normalized requests, results, provenance and safe provider error categories.
+- `chat/provider_settings.py` — persistent selection/cache/endpoint preferences and device-bound DPAPI/Keychain credentials with session-only fallback.
+- `chat/provider_http.py` — endpoint classification, offline/auth preflight, bounded JSON and no-redirect credential-safe HTTP.
+- `chat/provider_adapters.py` — Ollama, compatible APIs, Gemini and Anthropic discovery/stream normalization; tool calls never execute here.
+- `chat/provider_manager.py` — always-visible inventory, explicit routing, authorization, inference-only recovery and provenance.
+- `chat/provider_local.py` — explicitly approved Ollama pulls/progress/cancellation and confirmed local model deletion; offline downloads blocked.
+- `chat/provider_comparison.py` — read-only comparison preparation/run contract, frozen context hashes, no tool execution, per-model errors and code verification metadata.
+- `launcher/provider_controls.py` — existing desktop header provider selection, refresh, per-request research consent and owned inference-only Retry.
+- `launcher/provider_settings_panel.py` — registry-driven AI Providers settings, credentials, endpoints, explicit cloud-auto authorization and discovery checks.
 - `core/reasoning_context.py` — bounded explicit mission/connectivity constraints, conditional timing and exact prior-answer excerpts/checks; no store writes or inference calls.
 - `chat/status.py` — the network pill and "what can go online" answers.
 - `chat/keys.py` — saved settings and AI keys in config.json.

@@ -16,6 +16,8 @@ def keys_file(tmp_path, monkeypatch):
     from cursiv_engine.chat import keys
     path = tmp_path / ".cursiv" / "config.json"
     monkeypatch.setattr(keys, "KEYS_FILE", path)
+    from cursiv_engine.chat import provider_settings
+    monkeypatch.setattr(provider_settings, 'APP_DATA', path.parent)
     monkeypatch.delenv("CURSIV_PORTABLE", raising=False)
     return path
 
@@ -30,8 +32,10 @@ def test_round_trip_and_foreign_blob():
 
 def test_saved_keys_are_not_plain_on_disk(keys_file):
     from cursiv_engine.ui import chat_app as ca
+    from cursiv_engine.chat import provider_settings
     ca._store_key("groq_key", KEY)
-    assert KEY not in keys_file.read_text(encoding="utf-8")
+    assert not keys_file.exists()
+    assert KEY not in provider_settings.CREDENTIALS.read_text(encoding="utf-8")
     assert ca._saved_key("groq_key") == KEY
 
 

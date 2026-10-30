@@ -1,0 +1,71 @@
+{
+  "scope": "Real installed Qwen3 4B, offline loopback only, disposable homes; no cloud or owner data; transport/application smoke, not a quality benchmark",
+  "rows": [
+    {
+      "mode": "transport",
+      "prompt": "Reply with exactly: Cursiv local provider ready.",
+      "response": "Cursiv local provider ready.",
+      "seconds": 2.2882936000823975,
+      "provenance": {
+        "provider": "ollama",
+        "requested_model": "qwen3:4b-instruct",
+        "attempted_provider": "ollama",
+        "actual_model": "qwen3:4b-instruct",
+        "responding_provider": "ollama",
+        "tool_calls": [],
+        "tool_results": [],
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_eval_count": 19,
+          "eval_count": 8
+        },
+        "latency": 2.2875,
+        "error": null,
+        "error_message": "",
+        "streaming": false,
+        "streamed": true,
+        "canceled": false,
+        "local": true,
+        "request_id": "e66d0fd949ef4c3da1167c8ab6de203b",
+        "artifacts": []
+      },
+      "success": true
+    },
+    {
+      "mode": "application",
+      "prompt": "Explain sediment settling in two short sentences.",
+      "response": "Sediment settles when heavier particles in water slow down and fall to the bottom due to gravity. This happens over time, especially in still or slow-moving water like lakes or rivers.\n\n*[Source: model knowledge (not checked against a source)]*\n*[Answered by Local \u00b7 Ollama \u00b7 qwen3:4b-instruct]*",
+      "seconds": 5.849025899893604,
+      "provenance": {
+        "provider": "ollama",
+        "requested_model": "qwen3:4b-instruct",
+        "attempted_provider": "ollama",
+        "actual_model": "qwen3:4b-instruct",
+        "responding_provider": "ollama",
+        "tool_calls": [],
+        "tool_results": [],
+        "finish_reason": "stop",
+        "usage": {
+          "prompt_eval_count": 1843,
+          "eval_count": 38
+        },
+        "latency": 4.7105,
+        "error": null,
+        "error_message": "",
+        "streaming": false,
+        "streamed": true,
+        "canceled": false,
+        "local": true,
+        "request_id": "0d4ec3e390de469bbc0bd43d7c40e1e8",
+        "artifacts": []
+      },
+      "success": true
+    }
+  ],
+  "source_sha256": {
+    "provider_manager.py": "ec7929326263c26605bc3879784836c878527595333bb6cc98b2cb98564d7c68",
+    "provider_adapters.py": "d58345e1566625c4aa8b4b393e5c56f4b75588e1ae6ee91dbcbab458021359b3",
+    "provider_http.py": "79d13a4ce88156dda01f10fd918a97a6db7f1705823b6c93f98e769528934e02",
+    "provider_types.py": "472b9e5ed236f6345d00cf040760220f69737fb3387f71dda2d1163c6be0b379"
+  }
+}

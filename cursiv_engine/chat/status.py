@@ -15,8 +15,8 @@ from pathlib import Path
 
 from cursiv_engine.core import netgate
 
-KEY_NAMES = (("gemini_key", "Gemini key"), ("groq_key", "Groq key"), ("openai_key", "OpenAI key"),
-             ("anthropic_key", "Claude key"), ("api_key", "xAI key"))
+from .provider_registry import providers
+KEY_NAMES = tuple((p.credential,p.name+' key') for p in providers() if p.credential)
 PREFERRED_MODEL = "chat_model"     # saved with the keys; "" = automatic
 
 
@@ -38,21 +38,31 @@ def network_status() -> dict:
     from cursiv_engine.chat import keys
     online = [name for field, name in KEY_NAMES if keys.saved_key(field)]
     if _cloud_on():
-        online.append("Cursiv Cloud (only when no local model is ready)")
+        online.append("legacy Cursiv Cloud permission (not unified-model fallback)")
     if netgate.setting("web_search_auto"):
         online.append("automatic web search")
     if netgate.setting("update_check_auto"):
         online.append("automatic update check")
     if _phone_linked():
         online.append("the phone link (shares a memory summary with your phone)")
+    from . import provider_settings, provider_http
+    selected = provider_settings.load()
+    cloud_selected = selected['mode'] == 'cloud_auto'
+    if selected['mode'] == 'manual':
+        try:
+            cloud_selected = not provider_http.location(selected['provider'])[1]
+        except Exception:
+            cloud_selected = selected['provider'] not in ('ollama','lmstudio')
+    if cloud_selected:
+        online.append('selected cloud routing (requires authorization and provider configuration)')
     if not online:
         return {"level": "local", "label": "Local answers · internet not blocked",
                 "details": ["Answers come from the model on this computer, and no online feature is on.",
                             "A message you start with search: would still go online.",
                             "Click and turn on offline mode to block the internet completely (LOCAL ONLY)."]}
-    return {"level": "online", "label": "Online features on",
+    return {"level": "online", "label": "Cloud selected · internet not blocked" if cloud_selected else "Online features on",
             "details": ["Can go online: " + ", ".join(online) + ".",
-                        "Keys are used only when the local model can't answer, or for images.",
+                        "Keys do not enable automatic cloud fallback. Choose a cloud provider or explicitly opt into Cloud Automatic; research sharing requires confirmation.",
                         "Turn on offline mode to stop all of it."]}
 
 

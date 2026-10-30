@@ -106,27 +106,27 @@ def test_photo_is_read_locally_and_never_sent_online_when_blocked(tmp_path, monk
     p = _photo(tmp_path / "plot 4.jpg")
     asked = []
 
-    class _Resp:
-        def __init__(self, text): self._t = text
-        def read(self): return json.dumps({"response": self._t}).encode()
-        def __enter__(self): return self
-        def __exit__(self, *a): return False
-
-    def fake_urlopen(req, timeout=0):
-        asked.append(getattr(req, "full_url", req))
-        return _Resp("Green moss on wet rocks beside shallow water.")
-    import urllib.request
-    monkeypatch.setattr(urllib.request, "urlopen", fake_urlopen)
-    monkeypatch.setattr(cc, "_ollama_vision_model", lambda: "gemma3:4b")
+    import io,urllib.error
+    from cursiv_engine.chat import provider_http as http
+    def fake_open(opener,req,**kwargs):
+        asked.append(req.full_url)
+        body=json.loads(req.data)
+        assert body['model']=='gemma3:4b' and body['messages'][0]['images']
+        return io.BytesIO((json.dumps({'model':'gemma3:4b','message':{'content':'Green moss on wet rocks beside shallow water.'},'done':True})+'\n').encode())
+    monkeypatch.setattr(http.urllib.request.OpenerDirector,'open',fake_open)
     netgate.set_offline(True)
-    r = cc.handle_command(f'photo "{p}" what is growing here?', {"gemini_key": "AIza-test"}, [])
-    assert "Green moss" in r.text and "read by gemma3:4b on this computer" in r.text
-    assert all("127.0.0.1" in u for u in asked)                     # only the local engine
-
-    monkeypatch.setattr(cc, "_ollama_vision_model", lambda: "")      # no local image model
+    cfg={'selected_provider':'ollama','selected_model':'gemma3:4b'}
+    r=cc.handle_command(f'photo "{p}" what is growing here?',cfg,[])
+    assert 'Green moss' in r.text and 'Ollama' in r.text and 'gemma3:4b' in r.text and 'on this computer' in r.text
+    assert asked and all('127.0.0.1' in u for u in asked)
     asked.clear()
-    r = cc.handle_command(f'photo "{p}"', {"gemini_key": "AIza-test", "openai_key": "sk-test"}, [])
-    assert "won't send the photo anywhere" in r.text and asked == []
+    def stopped(opener,req,**kwargs):
+        asked.append(req.full_url)
+        raise urllib.error.URLError('synthetic stopped server')
+    monkeypatch.setattr(http.urllib.request.OpenerDirector,'open',stopped)
+    r=cc.handle_command(f'photo "{p}"',dict(cfg,gemini_key='synthetic',openai_key='synthetic'),[])
+    assert 'Ollama request failed' in r.text and 'unavailable' in r.text
+    assert len(asked)==1 and '127.0.0.1' in asked[0]  # no provider fallback or automatic retry
 
 
 def test_photo_command_needs_a_photo_file(tmp_path):

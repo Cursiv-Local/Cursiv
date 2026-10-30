@@ -63,6 +63,8 @@ AI answers can be confidently wrong. Cursiv's checks catch some mistakes, not al
 
 Latest release: **[U110](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U110)**. See the [release notes](docs/RELEASE-U110.md) and [changelog](CHANGELOG.md).
 
+Prepared candidate: **v3.14-U112**, the [unified provider manager](docs/RELEASE-U112.md). Publication is pending release gates.
+
 - [Tests and evidence](docs/CLAIM-EVIDENCE.md): what has been checked and what remains unverified.
 - [Help test Cursiv](https://cursiv.us/testers): send a clear report of what you tried and what happened.
 - [Contributor quick start](CONTRIBUTING.md): setup and checks.

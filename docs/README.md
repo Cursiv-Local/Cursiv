@@ -98,3 +98,5 @@ U83 and U88 were candidates rejected before publication; their reports say why.
 
 Older releases are described in the [CHANGELOG](../CHANGELOG.md) and on
 [GitHub Releases](https://github.com/Cursiv-Local/Cursiv/releases).
+
+- [U111](U111-RELEASE-VERIFICATION.md) — published source, native packages and owner signatures.

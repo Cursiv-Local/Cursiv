@@ -14,95 +14,10 @@ from .runtime import ChatRuntime
 from .activity import serialized_work
 
 def cascade_stream(runtime: ChatRuntime, messages: list[dict], keys: dict, max_tokens: int, local_fn: Callable[[list[dict]], Generator[str, None, None]] | None) -> tuple[Generator[str, None, None], list[str]]:
-    """
-    Stream a one-shot reply (Babel, grow, ...): the local model first when it has
-    one, then every configured key -- Claude, xAI, OpenAI, Groq, Gemini -- then
-    Cursiv Cloud (only when no local model is ready), moving on whenever one
-    fails (bad/expired key, out of credits, offline, empty reply). With no local
-    model, Ollama is the last stop (it downloads one), so this works with no keys.
+    """Command surfaces share the provider manager; saved keys never enable fallback."""
+    from .provider_manager import cascade
+    return cascade(runtime, messages, max_tokens, local_fn)
 
-    Returns (generator, used) where `used` is filled in with the label of the
-    provider that actually answered once the generator starts producing text.
-    """
-    local = (lambda: local_fn(messages)) if local_fn else (lambda: runtime._call_ollama(messages, max_tokens=max_tokens))
-    if not runtime.netgate.allowed():
-        keys = {}                 # offline mode: the local model only
-    attempts: list[tuple[str, runtime.Callable[[], runtime.Generator[str, None, None]]]] = []
-    if runtime._local_model_ready():
-        attempts.append(("Ollama (local)", local))     # tried like a provider: may fall through
-    if keys.get("anthropic_key"):
-        attempts.append(("Claude", lambda: runtime._call_claude_direct(messages, keys["anthropic_key"], max_tokens=max_tokens)))
-    if keys.get("api_key"):
-        attempts.append(("xAI", lambda: runtime._call_xai_stream(messages, keys["api_key"], False, max_tokens)))
-    if keys.get("openai_key"):
-        attempts.append(("OpenAI", lambda: runtime._call_openai_direct(messages, keys["openai_key"], max_tokens=max_tokens)))
-    gemini_key = keys.get("gemini_key") or (runtime._saved_key("gemini_key") if runtime.netgate.allowed() else "")
-    groq_key = keys.get("groq_key") or (runtime._saved_key("groq_key") if runtime.netgate.allowed() else "")
-    if groq_key:
-        attempts.append(("Groq", lambda: runtime._call_groq_direct(messages, groq_key, max_tokens)))
-    if gemini_key:
-        attempts.append(("Gemini", lambda: runtime._call_gemini_direct(messages, gemini_key, max_tokens)))
-    # Local first: Ollama answers whenever it has a model. Cursiv Cloud only steps
-    # in when it doesn't (not installed / no model yet), and only if not turned off.
-    if runtime.cloud_enabled():
-        attempts.append(("Cursiv Cloud", lambda: runtime._call_cursiv_cloud(messages, max_tokens)))
-    # local_fn: e.g. the coding models for codex, instead of the general chat model
-    if not attempts or attempts[0][0] != "Ollama (local)":
-        attempts.append(("Ollama", local))
-
-    used: list[str] = []
-
-    @serialized_work
-    def _gen() -> Generator[str, None, None]:
-        failures: list[str] = []
-        for label, start in attempts:
-            if label == "Cursiv Cloud" and runtime._local_model_ready():
-                continue        # local model available -- it answers instead
-            if label == "Ollama":
-                # Last stop -- nothing left to fall back to, so stream everything
-                # (including first-time download progress) straight through.
-                used.append(label)
-                if failures:
-                    yield f"[{'; '.join(failures)} -- using local Ollama]\n\n"
-                for chunk in start():
-                    if chunk != runtime.RATE_SENTINEL:
-                        yield chunk
-                return
-
-            stream = start()
-            held: list[str] = []      # rate-gate notes seen before real text
-            failed = None
-            try:
-                for chunk in stream:
-                    if chunk == runtime.RATE_SENTINEL:
-                        failed = "busy or unreachable"
-                        break
-                    text = chunk.strip()
-                    if not text:
-                        continue
-                    if text.startswith(runtime._PROVIDER_ERROR_PREFIXES):
-                        failed = text.strip("[]")[:160]
-                        break
-                    if text.startswith("*[Rate gate"):
-                        held.append(chunk)
-                        continue
-                    # Real text: this provider answers. Stream the rest straight through.
-                    used.append(label)
-                    if failures:
-                        yield f"[{'; '.join(failures)} -- answered by {label}]\n\n"
-                    yield from held
-                    yield chunk
-                    for rest in stream:
-                        if rest != runtime.RATE_SENTINEL:
-                            yield rest
-                    return
-            except Exception as e:
-                failed = str(e)[:160]
-            failures.append(f"{label}: {failed or 'empty reply'}")
-        if failures:      # reached only when the local model went first and everything failed
-            yield f"[Nothing answered — {'; '.join(failures)}]"
-
-    return _gen(), used
 
 def _classify_message(runtime: ChatRuntime, text: str) -> str:
     """Return 'code', 'creative', or 'general' for smart model routing."""
@@ -246,7 +161,7 @@ def _router_llm(runtime: ChatRuntime, messages: list[dict], max_tokens: int) -> 
     local model answered never leaves this computer for its check."""
     if runtime._ollama_running() and runtime._resolve_ollama_model():
         return runtime._local_llm(messages, max_tokens)
-    return runtime._free_key_llm(messages, max_tokens)
+    return ''  # reviewers must not upload research context via a different provider
 
 def warm_up_local(runtime: ChatRuntime) -> None:
     """Load the local chat model ahead of the first message (call off the UI thread)."""
