@@ -1,0 +1,18 @@
+[
+  {
+    "tag": "v3.14-U111",
+    "allowed_checkout_lock_sha256": [
+      "38f95b43706863866d5e02725dbcf4b16f192e005d1b7c0a86b5d65c73105079",
+      "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9"
+    ],
+    "native_provenance_and_assets_verified": true
+  },
+  {
+    "tag": "v3.14-U112",
+    "allowed_checkout_lock_sha256": [
+      "38f95b43706863866d5e02725dbcf4b16f192e005d1b7c0a86b5d65c73105079",
+      "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9"
+    ],
+    "native_provenance_and_assets_verified": true
+  }
+]
