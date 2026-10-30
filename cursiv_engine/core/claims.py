@@ -266,7 +266,12 @@ def history_notes(answer: str, ev: Evidence) -> list[str]:
     return out
 
 
-CHECKS = (tool_notes, memory_notes, reference_notes, certainty_notes, blanket_notes, document_notes, history_notes)
+def quotation_notes(answer: str, ev: Evidence) -> list[str]:
+    from .reasoning_context import quotation_problems
+    return quotation_problems(answer, ev.earlier)
+
+
+CHECKS = (tool_notes, memory_notes, reference_notes, certainty_notes, blanket_notes, document_notes, history_notes, quotation_notes)
 
 
 def problems(answer: str, ev: Evidence) -> list[str]:

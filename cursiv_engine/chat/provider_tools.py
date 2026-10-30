@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
+from . import model_selection
 
 def _call_claude_with_tools(runtime: ChatRuntime, messages: list[dict], anthropic_key: str, root: Path, confirm_writes: bool, max_tokens: int, max_loops: int, on_action) -> Generator[str, None, None]:
     """
@@ -90,6 +91,7 @@ def _call_claude_with_tools(runtime: ChatRuntime, messages: list[dict], anthropi
                 r.operation not in ('read_file', 'list_directory', 'search_files') for r in file_results):
             return                  # action acknowledgements already came from the backend
         if text_parts and not tool_calls:
+            model_selection.record(runtime,'claude',runtime.ANTHROPIC_CODE_MODEL,data.get('model'))
             from cursiv_engine.core.file_access import model_prose
             visible = model_prose(' '.join(text_parts))
             for word in visible.split(" "):
@@ -209,6 +211,8 @@ def _call_xai_with_tools(runtime: ChatRuntime, messages: list[dict], api_key: st
                 return              # never let a model replace the verified action receipts
             # Terminal response — fake-stream word by word for rolling feel
             content = msg.get("content") or ""
+            if content:
+                model_selection.record(runtime,'openai' if endpoint_url else 'grok',model,data.get('model'))
             from cursiv_engine.core.file_access import model_prose
             content = model_prose(content)
             for word in content.split(" "):

@@ -44,7 +44,8 @@ def _call_ollama_raw(runtime: ChatRuntime, messages: list[dict], max_tokens: int
     if runtime._ollama_tags() is None:
         yield "\n[Ollama unavailable: it isn't responding right now -- it may be busy downloading a model. Try again in a minute.]"
         return
-    model = runtime._resolve_ollama_model(standard)
+    from . import model_selection
+    model = (model_selection.model('ollama','') if not standard else '') or runtime._resolve_ollama_model(standard)
     if model is None and runtime._models_on_disk():
         # Seen for real: Ollama started with the wrong settings mid-reinstall and
         # listed nothing while 22 GB of models sat on disk. Re-downloading won't help.
@@ -96,6 +97,8 @@ def _call_ollama_raw(runtime: ChatRuntime, messages: list[dict], max_tokens: int
                     chunk = _json.loads(line.decode())
                     token = chunk.get("response", "")
                     if token:
+                        if not standard:
+                            model_selection.record(runtime,'ollama',model,chunk.get('model'))
                         yield token
                     if chunk.get("done"):
                         break

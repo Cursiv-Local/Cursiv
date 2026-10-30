@@ -12,7 +12,9 @@ from typing import Callable, Generator
 from pathlib import Path
 from .runtime import ChatRuntime
 from .activity import serialized_turn
+from . import model_selection
 from cursiv_engine.core import self_inspection
+from cursiv_engine.core import reasoning_context
 
 def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip: bool, person: str | None, event_id: str) -> None:
     """Save lasting facts from this exchange (memory/semantic.py), off the UI thread.
@@ -57,6 +59,8 @@ def _learn_later(runtime: ChatRuntime, message, reply: str, *, origin: str, skip
 
 @serialized_turn
 @self_inspection.scoped
+@model_selection.scoped
+@reasoning_context.scoped
 def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key: str, files: list | None, file_access: bool, root_path: str, openai_key: str, confirm_writes: bool, anthropic_key: str, force_provider: str, replace_draft: bool, on_stage: Callable[[str], None] | None, notebook_scope: str, on_action, on_review=None, review_mode=None) -> Generator[str, None, None]:
     """Cursiv's main chat entry point: _chat_inner, time-boxed (see _time_boxed).
 
@@ -225,6 +229,9 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         action_options = {'on_action': on_action} if on_action is not None else {}
         yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
                                 openai_key, confirm_writes, anthropic_key, force_provider, reply, **action_options)
+        if model_selection.failed():
+            yield (_replace_prefix if replace_draft else '\n\n')+model_selection.failed()
+            return  # no checker, writing retry or learning after a failed selected backend
         if on_action and (runtime._WORKED or runtime._REF_SHOWN):
             on_action(answer_evidence.capture(_field_text, runtime._REF_SHOWN, runtime._WORKED))
         if any(isinstance(chunk, _file_ops.VerifiedText)
@@ -266,13 +273,52 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield (_replace_prefix if replace_draft else '\n\nCorrection: ') + final
             return
         from . import response_style
-        if replace_draft and response_style.refused_writing(_field_text, draft):
+        # Copyable short writing has a measurable contract. Stream the draft as
+        # usual, then permit one bounded revision. Never silently truncate it.
+        _writing_retried=False
+        if response_style.character_limit(_field_text) is not None:
+            issues = response_style.artifact_problems(_field_text, draft)
+            if issues:
+                _writing_retried=True
+                try:
+                    retry_messages = response_style.artifact_retry_messages(_field_text, draft, issues)
+                    revised = model_selection.writing_revision(runtime,retry_messages,api_key=api_key,
+                        openai_key=openai_key,anthropic_key=anthropic_key,max_tokens=500)
+                except Exception:
+                    revised = ''
+                if model_selection.failed():
+                    yield (_replace_prefix if replace_draft else '\n\n')+model_selection.failed()
+                    return
+                if revised and not response_style.artifact_problems(_field_text, revised):
+                    draft = revised
+                else:
+                    draft = (response_style.bounded_excerpt(_field_text,revised or draft) or
+                        'I could not produce a supported post within the requested character limit.')
+                    limit = response_style.character_limit(_field_text)
+                    if len(draft) > limit:
+                        draft = 'Unable to comply.' if limit >= 17 else 'Unavailable'[:limit]
+                reply[:] = [draft]
+                yield (_replace_prefix if replace_draft else '\n\nRevised artifact:\n') + draft
+            if response_style.artifact_only(_field_text):
+                from cursiv_engine.core.conversation_kind import safety_or_technical
+                # Genuine safety claims retain normal checks. Ordinary creative
+                # posts need no evidence footer, ledger, or extra review call.
+                if not safety_or_technical(_field_text) or not __import__('re').search(
+                        r'(?i)\b(?:drink\w*|dosage|medicine|poison\w*|contaminat\w*|emergency|safe to|safety advice)\b', _field_text):
+                    reply[:] = [draft]
+                    yield (runtime.REPLACE_SENTINEL if replace_draft else '\n\nFinal artifact:\n') + draft
+                    return
+        if replace_draft and not _writing_retried and response_style.refused_writing(_field_text, draft):
             # A writing request ("write an X post I'll copy") answered with "I don't post":
             # drafting isn't posting. One retry with the writing instruction first.
             try:
-                _retry = runtime._local_llm(response_style.writing_retry_messages(_field_text), 700).strip()
+                _retry = model_selection.writing_revision(runtime,response_style.writing_retry_messages(_field_text),
+                    api_key=api_key,openai_key=openai_key,anthropic_key=anthropic_key,max_tokens=700)
             except Exception:
                 _retry = ""
+            if model_selection.failed():
+                yield (_replace_prefix if replace_draft else '\n\n')+model_selection.failed()
+                return
             if _retry and not response_style.refused_writing(_field_text, _retry):
                 _notes = [m.group(0).strip() for m in runtime._STATUS_LINE_RE.finditer(''.join(reply))]
                 draft = _retry
@@ -300,8 +346,14 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             reply.append('\n\n' + _unbacked)
             yield '\n\n' + _unbacked
         from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
+        from cursiv_engine.core import reasoning_context
+        _constraint_note = reasoning_context.contradiction_note(_field_text,draft,history,reasoning_context.saved_context())
+        _research_note = _science.grounding_note(_field_text,draft,'\n'.join(runtime._RETRIEVED))
         for _note in (claim_evidence.privacy_overclaim(draft, _field_text), claim_evidence.fiction_label(_field_text),
-                      _science.do_note(draft), _science.simulated_note(_field_text, draft),
+                      _constraint_note, _research_note,
+                      _science.do_note(draft), _science.simulated_note(_field_text, draft,
+                          context='\n'.join(str(r.get('content',''))[:1200] for r in history[-16:] if r.get('role') == 'user'),
+                          calculated=runtime._WORKED.statement if runtime._WORKED and runtime._WORKED.ok else ''),
                       _science.coordinate_note(draft), _science.overconfidence_note(_field_text, draft,
                           authored=('native' if runtime._CURSIV_REPLY else 'calculation'
                               if runtime._WORKED and runtime._WORKED.ok else 'model')) if _own is None else None):
@@ -418,6 +470,8 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             from cursiv_engine.chat import review as _review
             user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
             selected_mode = (review_mode or _review.mode()) if runtime.turn_policy.current().inspect else 'off'
+            if model_selection.current():
+                selected_mode='off'  # exact selection keeps code checks, never rewrites via a different reviewer
             if selected_mode not in _review.MODES:
                 raise ValueError('Invalid answer check mode')
             job = _review.prepare(runtime, user_text, draft, history, selected_mode, background=on_review is not None)

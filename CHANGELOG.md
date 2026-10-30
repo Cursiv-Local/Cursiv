@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U111 — Reliability, routing and model transparency (2026-10-30)
+
+Native notebook routing and confirmation preservation; claim-specific science checks; conditional research constraints; exact provider/model selection and transport provenance. Reconstructed Qwen checks and validation limits are documented in U111-VALIDATION.md.
+
 ## 3.14-U110 — Natural-language self-inspection and notebook reliability (2026-10-29)
 
 - Self-inspection requests preceded by instructions or conversation ("Do not recommend features.

@@ -360,7 +360,7 @@ _STOP = frozenset(
 )
 _WORDS = re.compile(r"[a-z][a-z']+")
 # Acronyms are matched case-sensitively so "who" and "epa" in prose do not count.
-_AUTHORITY_ACRONYM = re.compile(r"\b(CDC|WHO|FEMA|EPA|USDA|NIH|NOAA|OSHA|FDA|USGS)\b")
+_AUTHORITY_ACRONYM = re.compile(r"\b(CDC|WHO|FEMA|EPA|USDA|NIH|NOAA|OSHA|FDA|USGS|NASA)\b")
 _AUTHORITY_NAME = re.compile(
     r"(?i)\b(Centers for Disease Control|World Health Organization|Red Cross|Mayo Clinic|"
     r"National Weather Service|health department|department of [a-z]+|ministry of [a-z]+)\b"
@@ -446,6 +446,19 @@ def citation_problems(grounding: str, sources: str, text: str) -> list[str]:
     problems: list[str] = []
     seen: set[str] = set()
     for sentence in re.split(r"(?<=[.!?])\s+|\n+", body):
+        regulatory = bool(re.search(r'(?i)\b(?:limits?|thresholds?|standards?|requires?|maximum|minimum)\b',sentence)
+                          and re.search(r'\d',sentence) and _authorities(sentence))
+        if regulatory and not _NO_SOURCE.search(sentence) and not re.search(r'(?i)\b(?:not established|unverified|unsupported|you supplied|you stated)\b',sentence):
+            for name in _authorities(sentence):
+                key = _authority_key(name)
+                # Naming an agency in a question is not evidence for its limit.
+                supported = any(key in {_authority_key(n) for n in _authorities(source_sentence)} and set(_NUM.findall(sentence)) <= set(_NUM.findall(source_sentence))
+                    for source_sentence in re.split(r'(?<=[.!?])\s+|\n+',sources or ''))
+                if not supported:
+                    if key not in seen:
+                        seen.add(key)
+                        problems.append(f'unsupported {name} regulatory threshold: the stated value and source were not established by retrieved evidence')
+            continue
         if not _ATTRIBUTION.search(sentence) or _NO_SOURCE.search(sentence):
             continue
         for name in _authorities(sentence):

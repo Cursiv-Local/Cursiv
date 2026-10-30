@@ -12,7 +12,7 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QKeyEvent, QTextBlockFormat, QTextCharFormat, QTextCursor
 from PyQt6.QtWidgets import (
     QComboBox, QMenu, QWidget, QVBoxLayout, QHBoxLayout, QTextBrowser, QPlainTextEdit,
-    QPushButton, QLabel, QSizePolicy,
+    QPushButton, QLabel, QSizePolicy, QLineEdit,
 )
 from theme import BG, BG2, BORDER, GOLD, LGOLD, SILVER, SILV2
 import theme
@@ -59,6 +59,19 @@ class ChatControlsMixin:
 
         header_row = QHBoxLayout()
         header_row.setSpacing(8)
+        self._provider_box = QComboBox()
+        for label,provider in [('Automatic',''),('Ollama (exact model)','ollama'),('OpenAI','openai'),
+                               ('Anthropic','claude'),('xAI','grok'),('Groq','groq'),('Gemini','gemini')]:
+            self._provider_box.addItem(label,provider)
+        self._provider_box.setToolTip('An explicit provider/model never falls back. Cloud providers need your configured key and online access.')
+        self._provider_box.activated.connect(self._on_provider_chosen)
+        header_row.addWidget(self._provider_box)
+        self._exact_model = QLineEdit()
+        self._exact_model.setPlaceholderText('Exact model ID from your provider')
+        self._exact_model.setToolTip('Use an ID available to your account. The provider validates it when you send; no model ID is assumed.')
+        self._exact_model.textChanged.connect(lambda value:self._cfg.update(selected_model=value.strip()))
+        self._exact_model.setVisible(False)
+        header_row.addWidget(self._exact_model)
         # Model picker: which local model answers (Automatic = Cursiv picks for this computer).
         self._model_box = QComboBox()
         self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
@@ -280,18 +293,49 @@ class ChatControlsMixin:
     def _on_models(self, models) -> None:
         from cursiv_engine.chat import status as _st
         box = self._model_box
+        self._installed_models = models
         box.clear()
         if not models:
             box.addItem("No local model yet — open Setup" if models == [] else
                         "The AI engine didn't start: type status for the reason", "")
             box.setEnabled(False)
             return
-        for label, choice, enabled in _st.menu_choices(models):
+        choices = [(m,'model:'+m,True) for m in models] if self._provider_box.currentData() == 'ollama' else _st.menu_choices(models)
+        for label, choice, enabled in choices:
             box.addItem(label, choice)
             box.model().item(box.count() - 1).setEnabled(enabled)
-        box.setCurrentIndex(max(0, box.findData(_st.current_choice())))
+        exact = self._provider_box.currentData() == 'ollama'
+        chosen = self._cfg.get('selected_model','') if exact else ''
+        if exact and chosen and chosen not in models:
+            box.addItem('Unavailable: '+chosen,'model:'+chosen)
+        box.setCurrentIndex(max(0, box.findData('model:'+chosen if chosen else _st.current_choice())))
         box.setEnabled(True)
+        if self._provider_box.currentData() == 'ollama':
+            self._cfg['selected_model'] = (box.currentData() or '').removeprefix('model:')
+
+    def _on_provider_chosen(self, index: int) -> None:
+        provider = self._provider_box.itemData(index) or ''
+        self._cfg.update(selected_provider=provider,selected_model='')
+        cloud = provider not in ('','ollama')
+        self._model_box.setVisible(not cloud)
+        self._exact_model.setVisible(cloud)
+        if cloud:
+            self._exact_model.clear()
+            self._exact_model.setFocus()
+        else:
+            self._on_models(getattr(self,'_installed_models',None))
 
     def _on_model_chosen(self, index: int) -> None:
+        if self._provider_box.currentData() == 'ollama':
+            self._cfg['selected_model'] = (self._model_box.itemData(index) or '').removeprefix('model:')
+            return
+        choice = self._model_box.itemData(index) or 'standard'
+        if choice.startswith('model:'):
+            chosen = choice.removeprefix('model:')
+            self._provider_box.setCurrentIndex(self._provider_box.findData('ollama'))
+            self._on_provider_chosen(self._provider_box.currentIndex())
+            self._model_box.setCurrentIndex(self._model_box.findData(choice))
+            self._cfg.update(selected_provider='ollama',selected_model=chosen)
+            return
         from cursiv_engine.chat import status as _st
         _st.choose(self._model_box.itemData(index) or "standard")

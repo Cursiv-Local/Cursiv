@@ -88,16 +88,37 @@ _HYPOTHETICAL = re.compile(r"(?i)\b(?:hypothetical|invent|imagine|made[- ]up|fic
                            r"sample data|pretend|mock)\b")
 
 
-def simulated_note(question: str, draft: str) -> str:
-    """Invented numbers in a hypothetical are labelled as invented."""
+def simulated_note(question: str, draft: str, *, context: str = '', calculated: str = '') -> str:
+    """Flag additional illustrative results, never label supplied scenario inputs invented.
+
+    `calculated` comes from the actual application calculator record. Ordinary
+    model arithmetic remains an inference, not an observed experimental result.
+    """
     if not _HYPOTHETICAL.search(question or ""):
         return ""
-    numbers = re.findall(r"\b\d+(?:\.\d+)?\b", draft or "")
-    table = re.search(r"(?m)^\s*\|.*\d.*\|\s*$", draft or "") or len(numbers) >= 12
-    if not table:
+    if re.search(r'(?i)\b(?:poem|story|post|tweet|caption|joke|roast)\b', question) and not re.search(r'(?i)\bexperiment|results table\b', question):
+        return ''
+    from decimal import Decimal
+    def values(text, *, word_numbers=False):
+        if word_numbers:
+            words=dict(zero=0,one=1,two=2,three=3,four=4,five=5,six=6,seven=7,eight=8,nine=9,ten=10,
+                eleven=11,twelve=12,thirteen=13,fourteen=14,fifteen=15,sixteen=16,seventeen=17,eighteen=18,nineteen=19,twenty=20)
+            text=re.sub(r'(?i)\b('+'|'.join(words)+r')\b',lambda m:str(words[m[0].lower()]),text)
+        return {Decimal(n) for n in re.findall(r'(?<![\w.])-?\d+(?:\.\d+)?(?![\w.])', text)}
+    supplied = values((question or '') + '\n' + context,word_numbers=True)
+    allowed = supplied | values(calculated)
+    # List/table row numbers are structure, not measured data.
+    body = re.sub(r'(?m)^\s*\d+[.)]\s+', '', draft or '')
+    fresh = values(body) - allowed
+    if not fresh:
         return ""
-    return ("*(The numbers above are invented for illustration. No experiment was run and they are not measurements, "
-            "so they show what results might look like, not what would happen.)*")
+    shown = ', '.join(str(n) for n in sorted(fresh)[:6])
+    if re.search(r'(?i)\b(?:experiment|trial|measured results?|results table|example data|sample data)\b', question + '\n' + body):
+        return (f'*(Cursiv\'s check: additional result values ({shown}) were not supplied or calculated by Cursiv. '
+                'Treat them as invented for illustration, not real measurements. User-supplied inputs are separate; '
+                'no experiment was established by this response.)*')
+    return (f'*(Cursiv\'s check: additional scenario values ({shown}) are unverified assumptions or model-derived '
+            'values, not established observations. The supplied scenario inputs are not invented by the assistant.)*')
 
 
 _COORD = re.compile(r"(-?\d{1,3}(?:\.\d+)?)\s*°\s*([A-Za-z])\b\s*,?\s*(-?\d{1,3}(?:\.\d+)?)\s*°\s*([A-Za-z])\b")
@@ -118,6 +139,24 @@ def coordinate_note(draft: str) -> str:
             "(0-180). Treat any example coordinates above as placeholders, not real sites.)*")
 
 
+def grounding_note(question: str, draft: str, sources: str = '') -> str:
+    """Claim-specific source/causality checks, independent of optional model review."""
+    from .verify import citation_problems
+    problems = citation_problems(question, sources, draft)
+    if re.search(r'(?i)\bnotes say\b',question) and re.search(r'(?i)\btable (?:lists|includes)\b',question):
+        if re.search(r'(?i)\btable\b[^.\n]{0,100}\b(?:more reliable|most accurate|direct record)\b',draft):
+            problems.append('the conflicting sample totals are unresolved. A table is not established as more reliable '
+                'than the notes merely by its format; reconcile the original records before choosing the report total')
+    if re.search(r'(?i)\b(?:mine|mining|acid mine drainage)\b',question) and re.search(r'(?i)\bpH\b',question):
+        for sentence in re.split(r'(?<=[.!?])\s+|\n',draft):
+            if not re.search(r'(?i)acid mine drainage|\bAMD\b|\bmine\b',sentence): continue
+            if re.search(r"(?i)\b(?:not|cannot|can't|doesn.t|may|might|could|would|if|when|assuming|possible|consistent with|hypothesis|unconfirmed)\b",sentence): continue
+            if re.search(r'(?i)\b(?:confirmed|proven|definitely|certainly|conclusively|caused by)\b',sentence):
+                problems.append('the specific mining source is not confirmed by pH and proximity alone; acid mine drainage is a hypothesis, not a verified cause. Investigate it and avoid drinking potentially contaminated water while its safety is unresolved')
+                break
+    return ('*(Cursiv\'s evidence check: ' + '; '.join(dict.fromkeys(problems)) + '.)*') if problems else ''
+
+
 # U103 overconfidence benchmark (bench/overconfidence, scripts/overconfidence_bench.py). Asked about one
 # reading, a look, a smell or one sample, qwen3:4b-instruct answered 6 of 30 with a settled verdict the
 # evidence can't carry: "No, 4.2 mg/L is not a sign your meter is broken", "Yes, you can drink the spring
@@ -134,7 +173,7 @@ _PROOF = re.compile(r"(?i)\b(?:proves?|proof that|confirms? (?:that|it)|definite
                     r"|guarantee[sd]?|100% (?:sure|certain)|clearly (?:shows|indicates|caused))\b")
 _LEAD_HEDGE = re.compile(r"(?i)\b(?:not necessarily|doesn't|does not|don't|do not|cannot|can't|can not|isn't enough"
                          r"|not (?:enough|all|always|definitive|proof|possible|sure|certain)|depends|unless|single|alone"
-                         r"|by itself|hard to say|unclear|might|may|not the only)\b")
+                         r"|by itself|hard to say|unclear|might|may|not the only|no one can (?:say|tell|know))\b")
 _VERDICT = re.compile(r"(?i)^(?:so,?\s*)?(yes|no)\b")
 _ASKS_PROOF = re.compile(r"(?i)\b(?:prove|proof|confirm|mean|definitely|certain|whole)\b")
 _RANGE = re.compile(r"\d+(?:\.\d+)?\s*(?:-|–|to|and)\s*\d+(?:\.\d+)?")
@@ -172,6 +211,9 @@ def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -
     # words such as "calculated by code" in a model's answer.
     if authored == 'native':
         return ''
+    from .turn_policy import creative_request
+    if creative_request(q) and not _SAFE.search(draft):
+        return ''
     if not (_OWN_EVIDENCE.search(q) or (_READING.search(q) and _JUDGEMENT.search(q))):
         return ""
     asks_normal = bool(re.search(r"(?i)\bnormal\b", q)) and bool(_RANGE.search(draft))
@@ -193,7 +235,8 @@ def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -
         elif not (_SAFE.search(line) or _PROOF.search(line) or (_NORMAL.search(line) and not asks_normal)):
             continue
         quoted = line if len(line) <= 90 else line[:87].rsplit(" ", 1)[0] + "…"
-        if re.search(r"(?i)drink|swim|eat|safe", q):
+        if re.search(r"(?i)\b(?:drink\w*|swim\w*|eat|edible|food|potable)\b", q) or (
+                re.search(r'(?i)\bwater\b', q) and re.search(r'(?i)\bcontaminat|toxic|health', q)):
             what = "only a certified lab test (or the local health authority) can say whether it is safe"
         else:
             what = ("one reading or one look can't settle it. Repeat the measurement, check the instrument's "

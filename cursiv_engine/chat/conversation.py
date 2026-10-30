@@ -274,12 +274,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         pass
 
     # ── Project memory, plugin context, and tools (U52) ──────────────────────
+    _project_context = ''
     if not _banter and not (locals().get("_ph") and _ph.emergency):
         try:
             from cursiv_engine.memory import projects as _proj
             from cursiv_engine.memory import semantic as _sem3
             _pc = _proj.context(user_text, _sem3.current_person()) if runtime.turn_policy.current().inspect else ''
             if _pc:
+                _project_context = _pc
                 messages[0]["content"] += "\n\n" + _pc + "\n"
         except Exception:
             pass
@@ -486,6 +488,12 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         # Separate from the replaceable persona so compaction and tool prompts
         # retain the current preference, including a change made this session.
         messages.insert(3, dict(role='system', content=_style_addendum))
+    from cursiv_engine.core import reasoning_context
+    reasoning_context.supplied_memory((_project_context+'\n'+runtime._MEMORY_CTX)
+        if runtime.turn_policy.current().inspect else '')
+    _reasoning = reasoning_context.prompt(user_text, history,reasoning_context.saved_context())
+    if _reasoning:
+        messages.insert(3, dict(role='system',content=_reasoning))
     # Auto-intercept is disabled — Ollama handles coding Q&A directly with the
     # full system prompt injected, which produces better answers than Codex for
     # conversational coding questions.
@@ -503,6 +511,14 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     ant = (anthropic_key or "").strip()
     has_images = len(image_parts) > 0
     fp         = (force_provider or "").lower().strip()
+    from . import model_selection
+    _selected = model_selection.current()
+    if _selected:
+        if image_parts:
+            yield 'Exact-model image input is not supported in this path. No fallback was used.'
+            return
+        yield from model_selection.stream(runtime,_selected,messages,api_key=key,openai_key=oai,anthropic_key=ant)
+        return
     if not runtime.netgate.allowed():
         # Offline mode: saved keys stay saved but aren't used; the local model answers.
         key = oai = ant = ""

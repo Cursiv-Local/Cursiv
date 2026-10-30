@@ -151,6 +151,10 @@ class _Intent:
 
 
 def _intent(text: str) -> _Intent | None:
+    from .turn_policy import notebook_task
+    text = notebook_task(text)
+    if text is None:
+        return None
     text = text.strip()
     from . import file_requests
     if file_requests.recognizes(text):
@@ -278,6 +282,11 @@ def _source(history: list[dict]) -> list[tuple[int, str]]:
 
 
 def _request(text: str, history: list[dict]) -> _Intent | None:
+    from .turn_policy import notebook_task, instruction_text
+    task = notebook_task(text)
+    if task is None:
+        return None
+    text = task
     if text.lstrip().startswith(('@', '/')) or re.match(r'(?i)^agents?\s+', text.strip()):
         return None  # explicit profile/agent commands own their notebook scope and evidence budget
     intent = _intent(text)
@@ -303,8 +312,9 @@ def _request(text: str, history: list[dict]) -> _Intent | None:
         if re.match(r'(?i)^(?:please\s+)?(?:record|log|save|add)\s+(?:(?:a|an|this|that|the|my|new)\s+)?'
                     r'field observation\b\s*[:,-]?\s*\S', text):
             return _Intent('card', text)
-        if (_positive_target(text)
-                and re.search(r'(?i)\b(?:record|add|save|write|put|move|remember)\b', text)):
+        visible = instruction_text(text)
+        if (_positive_target(visible)
+                and re.search(r'(?i)\b(?:record|add|save|write|put|move|remember)\b', visible)):
             return _Intent('clarification')
     return intent
 

@@ -593,6 +593,13 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             return
         try:
             force_provider, stripped = cc.hey_prefix(text)
+            selection_error = ''
+            if not force_provider and self._cfg.get('selected_provider'):
+                selected_model = self._cfg.get('selected_model','')
+                if not selected_model:
+                    selection_error='Choose an exact model ID for the selected provider before requesting a model answer.'
+                else:
+                    force_provider = self._cfg['selected_provider']+'::'+selected_model
             # A provider prefix never transfers notebook execution to the model.
             from cursiv_engine.core import notebook_tools, file_requests
             from cursiv_engine.memory import intents, semantic
@@ -647,7 +654,7 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             # U99: said in plain words? The local model may turn it into one of
             # Cursiv's own commands. Read-only ones run now; anything that changes
             # something waits on a confirm card. The model never runs anything.
-            if propose and not force_provider and unrestricted and not workspace_request:
+            if propose and not force_provider and not selection_error and unrestricted and not workspace_request:
                 proposal = self._propose_action(stripped)
                 if proposal is not None:
                     if proposal.ok and not proposal.needs_confirm:
@@ -665,6 +672,10 @@ class ChatPanel(ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFee
             # goes straight to chat() -- which appends the current user
             # turn itself -- with nothing to trim off the end.
             workspace = self._cfg.get("workspace", '')
+            if selection_error:
+                self._signals.chunk.emit(selection_error)
+                self._signals.done.emit()
+                return  # native operations above remain independent of model configuration
             review_key, review_cancel = self._review_generation, self._cancel_event
             if not self._current_run_target(target):
                 return

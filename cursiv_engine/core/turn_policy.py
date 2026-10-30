@@ -74,7 +74,44 @@ def instruction_text(text: str) -> str:
     fence = re.escape(chr(96) * 3)
     text = re.sub(r'(?s)' + fence + r'.*?(?:' + fence + r'|$)', '', text)
     text = re.sub(r'(?m)^\s*>.*$', '', text)
-    return re.sub(r'"[^"\n]*"|(?<![A-Za-z])\'[^\'\n]*\'', '', text)
+    return re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`|(?<![A-Za-z])\'[^\'\n]*\'', '', text)
+
+
+_WRITING = re.compile(r'(?is)\b(?:write|draft|compose|craft|generate|create|make|give me)\b.{0,100}?'
+    r'\b(?:posts?|tweets?|captions?|promotional descriptions?|descriptions?|poems?|stories|story|songs?|'
+    r'jokes?|roasts?|haikus?|essays?|blurbs?|dialogue|scenes?|scripts?|emails?|letters?)\b|\broast Cursiv\b')
+_SEPARATE_NOTEBOOK = re.compile(r'(?i)(?:[.!?;\n]\s*|\b(?:and then|separately|also)\s*[:,]?\s*)'
+    r'(?P<operation>(?:please\s+)?(?:record|log|save|add|show|find|search|verify|export|correct)\b[^\n]*)')
+
+
+def creative_request(text: str) -> bool:
+    """A requested writing artifact is not permission to operate on its subject."""
+    body=instruction_text(text)
+    if re.match(r'(?i)^\s*(?:please\s+)?(?:(?:can|could|would) you\s+)?'
+                r'(?:record|log|remember|field\s+log|file\s+(?:create|append|replace))\b',body):
+        return False  # a leading native operation owns its literal note/content
+    return bool(_WRITING.search(body))
+
+
+def notebook_task(text: str) -> str | None:
+    """Keep quoted examples inert; accept a separate explicit notebook instruction.
+
+    This classifies intent only. The original complete text still sets permissions,
+    and writes must still use the existing confirmation and native backend.
+    """
+    visible = instruction_text(text)
+    illustrative = bool(re.match(r'(?i)^\s*(?:(?:in|for) (?:a|this) (?:hypothetical|fictional) (?:scene|scenario)|imagine\b|suppose\b)',visible))
+    if not creative_request(text) and not illustrative:
+        return text
+    mask = list(text)
+    for quoted in re.finditer(r'(?s)```.*?(?:```|$)|"[^"\n]*"|“[^”\n]*”|`[^`\n]*`|(?<![A-Za-z])\x27[^\x27\n]*\x27',text):
+        mask[quoted.start():quoted.end()] = ' ' * (quoted.end()-quoted.start())
+    for match in _SEPARATE_NOTEBOOK.finditer(''.join(mask)):
+        operation = text[match.start('operation'):match.end('operation')]
+        if re.search(r'(?i)\b(?:notebook|field log|observation|water temperature|sample [A-Z]+-\d+)\b', operation):
+            if re.match(r'(?i)(?:please\s+)?(?:record|log|save|add|show|find|search|verify|export|correct)\b', operation):
+                return operation.strip()
+    return None
 
 
 def for_text(text: str) -> Policy:

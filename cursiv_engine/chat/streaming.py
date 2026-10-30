@@ -17,7 +17,9 @@ def _strip_status_lines(runtime: ChatRuntime, text: str) -> str:
     return runtime._NOTES_BLOCK_RE.sub("", runtime._STATUS_LINE_RE.sub("", text or "")).strip()
 
 def _set_answered(runtime: ChatRuntime, label: str) -> None:
-    runtime._ANSWERED_BY = label
+    from . import model_selection
+    if not label: model_selection.reset_response()
+    runtime._ANSWERED_BY = model_selection.label_for(label)
 
 def _ollama_label(runtime: ChatRuntime, base: str) -> str:
     try:
@@ -149,6 +151,7 @@ def _friendly(runtime: ChatRuntime, sk, gen):
         if isinstance(chunk, str) and "[" in chunk[:4]:
             nice = sk.friendly_error(chunk)
             if nice:
+                runtime._set_answered('')  # a provider error is not a completed answer
                 yield nice
                 continue
         yield chunk

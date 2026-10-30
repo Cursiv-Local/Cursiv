@@ -81,6 +81,13 @@ flowchart TD
 ```
 
 Native state changes return backend receipts. Model text never proves a write.
+U111 adds bounded explicit connectivity constraints and prior-answer excerpts in
+`core/reasoning_context.py`; compact prompts retain that block. These are conversation
+data, never permission grants. `chat/model_selection.py` supports per-turn exact
+provider/model choices with no fallback, preserving native research operations before
+inference. Exact cloud selection currently uses text-only adapters; images are refused
+explicitly. Automatic mode retains the existing provider/tool cascade. Short copyable
+artifacts retain transport provenance in `core/last_turn.py` without a prose footer.
 Failed `file remember` writes do not initiate a secondary memory save. Final
 prompt assembly records supplied memory separately from retrieved/withheld facts;
 source status and review evidence use that scoped tuple. Source formatting takes

@@ -567,6 +567,12 @@ def stream(runtime, packet, question, history, api_key, openai_key, anthropic_ke
         yield native
         return
     last_turn.record_assembled(messages)
+    from cursiv_engine.chat import model_selection
+    selected = model_selection.current()
+    if selected and selected.provider != 'ollama':
+        runtime._CURSIV_REPLY=True
+        yield 'The source was inspected locally, but this explanation was not sent to the selected cloud model. Choose an installed Ollama model for source explanations. No fallback was used.'
+        return
     fp = (force_provider or '').lower().strip()
     if fp in ('openai','claude','grok'):
         yield 'Own-code inspection uses the installed local model; no source was sent to an online provider.\n\n'
@@ -577,8 +583,13 @@ def stream(runtime, packet, question, history, api_key, openai_key, anthropic_ke
         return
     from cursiv_engine.chat import request_budget
     from . import speed
+    chosen_model = selected.model if selected else runtime._resolve_ollama_model() or ''
+    if selected and chosen_model not in runtime._ollama_pulled_models():
+        runtime._CURSIV_REPLY=True
+        yield 'Selected local source-explanation model is unavailable. No fallback or download was used.'
+        return
     budget = request_budget.Budget(ceiling=2, context=max(8192,speed.num_ctx()),seconds=120,
-                                   local_only=True,local_model=runtime._resolve_ollama_model() or '')
+                                   local_only=True,local_model=chosen_model)
     try:
         with request_budget.use(budget):
             runtime._set_answered(runtime._ollama_label())
@@ -595,7 +606,8 @@ def repair_capability_denial(question, answer):
     Only current installed-source witnesses can replace a model's denial. Failed
     or forbidden reads yield UNKNOWN. This never executes the described feature.
     """
-    if re.search(r'(?i)\b(?:fiction|story|poem|pretend|hypothetical)\b', question):
+    from .turn_policy import creative_request
+    if creative_request(question) or re.search(r'(?i)\b(?:fiction|story|poem|pretend|hypothetical)\b', question):
         return None
     topic = ''
     for line in re.split(r'[\n]|(?<=[.!?])\s+', answer.replace('’', "'")):

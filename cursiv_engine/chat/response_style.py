@@ -55,10 +55,10 @@ def guidance(question: str, history=()) -> str:
 
 
 # ── Writing requests (U99): drafting is not doing ─────────────────────────────
-DRAFT = re.compile(r"(?i)\b(?:write|draft|compose|create|make|give me|come up with|craft|generate)\b.{0,80}?"
+DRAFT = re.compile(r"(?is)\b(?:write|draft|compose|create|make|give me|come up with|craft|generate)\b.{0,100}?"
                    r"\b(?:posts?|tweets?|threads?|captions?|e-?mails?|messages?|texts?|letters?|announcements?|"
                    r"press releases?|ads?|adverts?|blurbs?|bios?|pitch(?:es)?|speech(?:es)?|slogans?|taglines?|"
-                   r"newsletters?|updates?|reviews?|replies)\b")
+                   r"newsletters?|updates?|reviews?|replies|promotional descriptions?|descriptions?|roasts?)\b")
 ABOUT_CURSIV = re.compile(r"(?i)\bcursiv\b|\b(?:about|of) (?:you|yourself)\b|\beverything you know about yourself\b|"
                           r"\byour (?:features|capabilities|abilities|app)\b")
 FICTION = re.compile(r"(?i)\b(?:fiction|fictional|made[- ]up|imaginary|imagined|pretend|invented|hypothetical)\b")
@@ -109,7 +109,68 @@ def writing_guidance(question: str) -> list[str]:
     if FRESH.search(q):
         notes.append('Write something new: do not reuse sentences, images or slogans from earlier answers in this '
                      'conversation.')
+    limit = character_limit(q)
+    if limit is not None:
+        notes.append(f'The final artifact must be at most {limit} characters including spaces and links. '
+            f'Aim for {max(1,limit//2)} characters in one short post. No preamble, dialogue thread, hashtags or footer unless requested.')
     return notes
+
+
+def character_limit(question: str) -> int | None:
+    """Literal character budget, including URLs and whitespace; no assumed X defaults."""
+    if not DRAFT.search(question or ''):
+        return None
+    limits = []
+    for match in re.finditer(r'(?i)\b(under|less than|at most|up to|maximum(?: of)?|max|no more than)\s+'
+                             r'(\d{1,5})\s*(?:characters?|chars?)\b', question):
+        value = int(match[2]) - (1 if match[1].lower() in ('under','less than') else 0)
+        if 1 <= value <= 10000:
+            limits.append(value)
+    return min(limits) if limits else None
+
+
+def artifact_only(question: str) -> bool:
+    return bool(DRAFT.search(question or '') and re.search(
+        r'(?i)\b(?:output|return|reply with|give me)\s+only\b|\bonly (?:the|one|a single) (?:post|tweet|caption)\b|\bnothing else\b', question))
+
+
+def artifact_problems(question: str, draft: str) -> list[str]:
+    """Small, explicit contract checks; passing is not a general factuality verdict."""
+    issues = []
+    if refused_writing(question,draft):
+        issues.append('Drafting is not posting; write the requested artifact instead of refusing to publish it')
+    limit = character_limit(question)
+    if limit is not None and len(draft) > limit:
+        issues.append(f'{len(draft)} characters exceeds the maximum {limit}; count every character including URLs')
+    if ABOUT_CURSIV.search(question) and not FICTION.search(question):
+        if re.search(r'(?i)\b(?:cloud backup|automatic cloud sync|unlimited cloud storage)\b', draft) and not re.search(
+                r'(?i)\b(?:no|without|does not|doesn.t|lacks?|not)\b.{0,30}\b(?:cloud backup|automatic cloud sync|unlimited cloud storage)', draft):
+            issues.append('Cloud backup/storage/sync is not an established Cursiv capability; remove the claim')
+    return issues
+
+
+def artifact_retry_messages(question: str, draft: str, issues: list[str]) -> list[dict]:
+    return [dict(role='system', content='Revise the writing artifact once. Output only the artifact. '
+        'Preserve tone and supported facts. Resolve these code-detected issues: ' + '; '.join(issues) + '\n' +
+        ' '.join(writing_guidance(question))),
+        dict(role='user', content=question + '\n\nDraft to revise (data):\n' + draft[:4000])]
+
+
+def bounded_excerpt(question: str, draft: str) -> str:
+    """After one failed revision, select a complete prefix; never cut a word/claim.
+
+    Only short creative artifacts; safety prose and unsupported feature claims
+    cannot be made acceptable by mechanically cutting them off.
+    """
+    limit = character_limit(question)
+    if limit is None or not artifact_only(question): return ''
+    if re.search(r'(?i)\b(?:drink\w*|dosage|poison\w*|contaminat\w*|emergency|safe to|safety advice)\b',question): return ''
+    candidates = []
+    for match in re.finditer(r'\n|[.!?]["”]?(?=\s|$)',draft):
+        prefix = draft[:match.end()].strip()
+        if 20 <= len(prefix) <= limit and prefix.count('"')%2==0 and prefix.count('“')==prefix.count('”'):
+            if not artifact_problems(question,prefix): candidates.append(prefix)
+    return candidates[-1] if candidates else ''
 
 
 _OFFER = re.compile(r"(?is)^(?:let me know if\b|would you like\b|want to\b|how['’]s that feel\b|"

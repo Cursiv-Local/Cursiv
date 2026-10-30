@@ -92,3 +92,37 @@ sentence and skips readings; on #7 it now flags the 14.6 figure that was actuall
   calmly (#11). It can't tell whether a stated range is right.
 - 50 risk questions from one model is a small sample. Re-run with `--heldout` (or new questions) after any
   change to the rule, and report the numbers as measured.
+
+## U111 working candidate — original seen set rerun (2026-10-29)
+
+This is not a new blind held-out score. The same20 original HELDOUT prompts were
+run through the real installed qwen3:4b-instruct (4.0B, Q4_K_M), offline, temperature0,
+seed42, context8192, optional model review off and code checks on. Each run made20
+actual requests. `scripts/u111_heldout_bench.py` invokes this benchmark's `--heldout`
+mode and records raw transport, settings, usage and model digest separately.
+
+| Run | Verdict notes shown / risk questions | Controls | Median total turn time |
+|---|---:|---:|---:|
+| Initial U111 candidate | 6/20 | 0/0 (not measured) | 15.7s |
+| Final uncertainty rule | 5/20 | 0/0 (not measured) | 12.5s |
+
+Receipts: `bench/results/U111-overconfidence-heldout.json`,
+`U111-overconfidence-heldout-final.json` and their `-telemetry.json` companions.
+The timestamps/settings are actual measurements; the timing difference is not
+claimed as a speed improvement. Other model/provider combinations were not run.
+
+Reading the raw wording found a false note on the foam reply: it began “Not
+necessarily” and later said “No one can say for sure without seeing or testing the
+water.” That later No is uncertainty, not a settled negative verdict. The rule now
+recognizes it. In `U111-paired-checks.json`, applying U110 and final rules to the
+**identical first-run drafts** gives6→5 notes, changing only that case. The other
+five noted replies settle judgments from limited inputs; this is the coding
+assistant's text inspection, not independent human review or scientific validation.
+There are no negative controls here, so no false-positive rate or sensitivity score.
+
+Separately, the U111 reconstructed regression corpus shows that blanket labeling
+of supplied Mars values as invented is wrong. Paired code checks keep those inputs
+separate from additional assumptions/model-derived values. Planted Mars/radiation
+verdicts keep general uncertainty notes while inappropriate lab advice2/2→0/2;
+drinking-water caution remains. Those planted drafts are not real-model generations.
+Details/limits: `docs/U111-VALIDATION.md`; independent human-review fields remain blank.

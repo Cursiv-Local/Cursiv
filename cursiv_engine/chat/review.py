@@ -92,7 +92,8 @@ class Job:
             def ask(messages):
                 return '' if self.cancelled.is_set() else self.ask(messages, self.cancelled)
             # Review has its own immutable evidence/cancellation; the foreground turn has ended.
-            with guard(lambda: not self.cancelled.is_set()):
+            from . import model_selection
+            with guard(lambda: not self.cancelled.is_set()), model_selection.provenance_scope(False):
                 return verify.run_pass(self.question, self.draft, ask=ask, context=self.context,
                                        sources=self.sources, assess=self.assess, mode=self.mode,
                                        update_session=False, previous_failed=False)
@@ -119,8 +120,17 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
     supplied_history = [dict(row, content=runtime._strip_status_lines(str(row.get('content', ''))))
                         for row in history[-4:]]
     ctx = context(supplied_history, '\n'.join(runtime.grounding.memory_sources()))
+    from cursiv_engine.core import reasoning_context
+    history_snapshot = deepcopy(history[-64:])
+    saved_snapshot = reasoning_context.saved_context()
+    def grounded_assessment(text):
+        found = assess(text)
+        constraint = reasoning_context.contradiction_note(question,text,history_snapshot,saved_snapshot)
+        if constraint:
+            found.append(Problem('CONVERSATION_CONSTRAINT','error',constraint))
+        return found
     # Assess formatting/constraints against supplied history too, without an LLM.
-    issues = verify._issues(question, draft, ctx, supplied) + assess(draft)
+    issues = verify._issues(question, draft, ctx, supplied) + grounded_assessment(draft)
     if selected_mode != 'full':
         issues = [p for p in issues if p.code != 'MISSING_LEDGER']
     if selected_mode == 'off' and not issues:
@@ -134,7 +144,7 @@ def prepare(runtime, question, draft, history, selected_mode, *, background: boo
     scope = copy_context()
 
     def assessment(text):
-        found = assess(text)
+        found = grounded_assessment(text)
         problem = presence.contradiction(text, observed or {}) or quote_problem(question, text)
         if problem:
             found.append(Problem('REVIEW_GROUNDING', 'error', problem))

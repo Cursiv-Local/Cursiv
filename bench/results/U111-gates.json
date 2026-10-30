@@ -1,0 +1,165 @@
+{
+  "head": "ee9b1cf0b99e723d5eb21c8ab257cbc70de497a2",
+  "released": false,
+  "committed": false,
+  "full": {
+    "passed": 2736,
+    "skipped": 15,
+    "subtests_passed": 19,
+    "seconds": 686.72,
+    "xml_tests": 2770,
+    "failures": 0,
+    "errors": 0
+  },
+  "usb": {
+    "passed": 45,
+    "deselected": 2706,
+    "seconds": 87.44,
+    "failures": 0,
+    "errors": 0
+  },
+  "original_contracts": {
+    "cases": 18,
+    "before_failed": 15,
+    "after_failed": 0,
+    "after_passed": 18,
+    "rows": [
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[Write one humorous X post roasting Cursiv, under 280 characters. Mention its field notebook and local AI. Output only the post.]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[Write one humorous X post roasting Cursiv and its field notebook, under 280 characters. Do not open, save, search, or modify any notebook. Output only the post.]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[Write a promotional description of my field notebook. Do not invent cloud backup or other features.]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[Write a promotional description of my field notebook]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[For a hypothetical scene, a researcher says \"save pH 7 in my field notebook\". Write a caption.]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_writing_is_not_an_operation[Write an X post with the quoted example \"log site: Pond; pH 7\".]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_real_observation_still_requires_confirmation",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_mars_warning_is_domain_relevant[Our Mars oxygen production declined 17%. Are our instrument readings safe?]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_mars_warning_is_domain_relevant[Our radiation instruments disagree. Is this safe?]",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_water_caution_remains",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_supplied_hypothetical_table_is_not_invented",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_fabricated_experimental_table_still_noted",
+        "before": "passed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_short_form_final_delivery_has_enforced_length",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_restricted_writing_reaches_model_without_notebook_reads",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_unsupported_agency_threshold_requires_actual_source_even_if_named",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_invented_self_review_quotation_is_flagged",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_blackout_contradiction_is_flagged_without_model_review",
+        "before": "failed",
+        "after": "passed"
+      },
+      {
+        "classname": "tests.test_u111_reliability",
+        "name": "test_unsupported_mine_confirmation_gets_a_claim_specific_check",
+        "before": "failed",
+        "after": "passed"
+      }
+    ]
+  },
+  "new_u111_contracts": 72,
+  "working_code_sha256": {
+    "cursiv_engine/chat/cloud_providers.py": "b17c6b0d810fe931d53d3d08ead9d142f1bb46d22be267b1a79fe49cfde0980d",
+    "cursiv_engine/chat/completion.py": "1fc7929e577cda08cc1250165d926a2b8926cc85ea13a0c2feaf18b872b3fb25",
+    "cursiv_engine/chat/conversation.py": "baacdabd5cd8a223763acb4bfc90b3494dcde205d0bb1d89372a711da1ccfd30",
+    "cursiv_engine/chat/local_provider.py": "0d9a0d633903bf251088db12b3b1273114448b753d5784b71e43c1b3eb1d3fe4",
+    "cursiv_engine/chat/model_selection.py": "21d07d82bbe49ec4decca6844393f624623e97d2ca073f9b7cce9a54619fa7ed",
+    "cursiv_engine/chat/provider_tools.py": "610941006dbab1436aa11dbb3c8a152042f54d6c834c009a359fc3b9deb3aace",
+    "cursiv_engine/chat/response_style.py": "84fc46f9426f0a20eb80b667891712b63328213c8b229bcd64db41641bb4de3f",
+    "cursiv_engine/chat/review.py": "ff0376f5c5adc47fe96c8ab3595ff92f9775795e5bc76c25c6b9171f391f7e60",
+    "cursiv_engine/chat/routing.py": "b861712d3a7c446fadcef0edc422daf74e6d4340fb08d2ec0cce7164d8fec648",
+    "cursiv_engine/chat/streaming.py": "550183440593fb3db39efa2b3224936e982e1da776dd37692ae470dbed4b82f4",
+    "cursiv_engine/core/action_gate.py": "d080ea0f05067b075cf745ed2450b69f3611f22bf7fe5b4e702f880be407442f",
+    "cursiv_engine/core/capabilities.py": "227da21185b1c6f4732ff1b781c8264a19e35cc67320ce8dfeb75acdadcfacda",
+    "cursiv_engine/core/claims.py": "86afe3fb95e8f516ac5cce24b53192ebf0cdc1f71ad382146c9c041964317390",
+    "cursiv_engine/core/intent.py": "12e7262e4dc45a3973800ee90e2838c3fd0e41c5e1b193622b1002edf368eaf8",
+    "cursiv_engine/core/last_turn.py": "e19d89dffd824bec7f9894717eb88ece91808f6a6c70067d1793cf5e1ef64daa",
+    "cursiv_engine/core/notebook_proposals.py": "24b92d2665c72e9ce93b673d83bb91203099cc1327a6ccd550232b9f1bd4527f",
+    "cursiv_engine/core/notebook_tools.py": "1ed5262f826fe214f5a1344d32d140edef8aea97c4301591e7f6367109fc35f1",
+    "cursiv_engine/core/reasoning_context.py": "9a2e567745f063a1937167f028b94c9a55e1f16ee5d298f7c54e6e33c2a53686",
+    "cursiv_engine/core/science_check.py": "2eb4a3c8877c79be52f466b6a39adf79364efb585c45af5fc0c607b1bd4bdae0",
+    "cursiv_engine/core/self_inspection.py": "95408d0ee33d013eaab71d5fdf9d4081f163f7e44193815cdb795de5ac16a0d9",
+    "cursiv_engine/core/turn_policy.py": "5e369ddf71f1c98a7da0618beca7ae949bc7c36aaf0431b26b3ee993a9c1ea99",
+    "cursiv_engine/core/verify.py": "51646d6faaeb7a935012c8599ef0f5d519ecb02f2ac953f0d99937667ee4459b",
+    "launcher/chat_controls.py": "bc004e07171a7375784fb73fe636a5bd290019ca85646740e397daa94f8628af",
+    "launcher/chat_panel.py": "5937c68026040e6765d837418e3c8b896af8186e09c9ba2adbc86c32c8a00bb8",
+    "launcher/command_support.py": "c7ccee3b74fbea8d76046504928e735ce82e942c984210086d0a2fc08407c580"
+  }
+}
