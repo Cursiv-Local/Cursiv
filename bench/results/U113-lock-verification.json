@@ -1,0 +1,24 @@
+{
+  "tag": "v3.14-U113",
+  "allowed_tag_checkout_lock_hashes": {
+    "git": "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9",
+    "lf": "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9",
+    "crlf": "38f95b43706863866d5e02725dbcf4b16f192e005d1b7c0a86b5d65c73105079"
+  },
+  "records": [
+    {
+      "provenance": "provenance-3.14-U113.json",
+      "source_commit": "bd11f925df7007e1641fd3b35ffd0ce9dad0a22d",
+      "lock_sha256": "38f95b43706863866d5e02725dbcf4b16f192e005d1b7c0a86b5d65c73105079",
+      "lock_matches_tag": true,
+      "asset_hashes_and_sizes_match": true
+    },
+    {
+      "provenance": "provenance-mac.json",
+      "source_commit": "bd11f925df7007e1641fd3b35ffd0ce9dad0a22d",
+      "lock_sha256": "9276427cc37bdacd575ddb98946b9350901188aae1d6335779031d9416794eb9",
+      "lock_matches_tag": true,
+      "asset_hashes_and_sizes_match": true
+    }
+  ]
+}

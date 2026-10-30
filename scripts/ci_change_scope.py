@@ -15,7 +15,7 @@ PREFIXES = ('cloudflare/tests/', 'docs/', 'bench/results/', 'bench/discovery/')
 STATIC = frozenset(('.html', '.css', '.png', '.ico', '.jpg', '.jpeg', '.svg', '.webp', '.txt', '.webmanifest', '.json'))
 APP_PAGES = frozenset(('website/app.html', 'website/chat.html', 'website/profile.html'))
 FILES = frozenset((
-    'HANDOFF.md', '.github/workflows/website.yml', '.github/workflows/tests.yml',
+    'README.md', 'TECH.md', 'HANDOFF.md', '.github/workflows/website.yml', '.github/workflows/tests.yml',
     'scripts/discoverability_audit.py', 'scripts/generate_web_icons.py',
     'scripts/search_discovery_report.py', 'tests/test_discovery_measurement.py',
     'scripts/ci_change_scope.py', 'tests/test_ci_change_scope.py',
