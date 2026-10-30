@@ -4,23 +4,22 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U112 provider manager — release candidate
+## U112 and U111 released — October 30, 2026
 
-The owner authorized U111 and U112 commit, push and release on October 30, 2026.
-U111 source is merged through PR63 at `932d95d`; its tagged native packages passed.
-Continue [provider manager handoff](docs/PROVIDER-MANAGER-HANDOFF.md) and
-[AI Providers guide](docs/AI-PROVIDERS.md). U112 gates and live-cloud limits remain
-explicit there. Preserve the separately opted-in USB readable-key export.
+The owner authorized both releases after completion. U111 is tagged at `932d95d`
+(PR63); U112 at `fee19dd` (PR65). Exact-main CI and both native packages passed for
+each release; eleven anonymous downloads and eight owner signatures verified per release.
+[U111 verification](docs/U111-RELEASE-VERIFICATION.md),
+[U112 verification](docs/U112-RELEASE-VERIFICATION.md),
+[provider handoff](docs/PROVIDER-MANAGER-HANDOFF.md), [AI Providers guide](docs/AI-PROVIDERS.md).
+Preserve the separately opted-in readable USB key export. Later self-inspection
+worksheet repairs are isolated, uncommitted review work and are not in these binaries.
+Website publication is established separately by its receipt.
 
 ## U110 released (Claude, 2026-10-29)
 
-U111 reliability work is **unreleased and uncommitted** on
-`codex/u111-reliability`, based on main `ee9b1cf`. Continue from
-[U111-HANDOFF](docs/U111-HANDOFF.md): reconstructed notebook/writing incidents,
-claim-specific science checks, conditional mission constraints, self-review excerpts,
-exact provider/model selection and real-Qwen regression receipts. Isolated Windows
-source:2736 passed/15 skipped/19 passing subtests; dedicated USB45 passed. Validation
-and remaining limits are recorded there. No U111 release/publication is authorized.
+U111 is now published; see its verification and validation records above.
+
 
 Natural-language self-inspection routing (`self_inspection._focus`, the `introspection`
 topic and its seeds in `source_analysis.FEATURES`) plus the U109 post-release repairs

@@ -105,3 +105,7 @@ Website proof is deferred to the post-build publication PR, per the release runb
 Final candidate provider/source/workspace/release gates: 284 passed (U112-release-gates.xml). Anonymous U111 download/readback verified all11 files and8 owner signatures (U111-public-downloads.json). U112 source is prepared for protected CI; no live cloud success is claimed.
 
 Final candidate provider/source/workspace/release gates: 284 passed (U112-release-gates.xml). Anonymous U111 download/readback verified all11 files and8 owner signatures (U111-public-downloads.json). U112 source is prepared for protected CI; no live cloud success is claimed.
+
+## Published U112 checkpoint
+
+U112 was committed, pushed and merged through PR65; all17 PR checks and exact-main CI41016350564 passed. Source Windows2834/15 skips, Mac2817/32, Linux2816/33, with19 passing subtests each. Both immutable-tag native packages passed frozen selftests; Windows portable passed. All11 anonymous downloads/digests and8 owner signatures verified. No API/private keys were committed. See U112-RELEASE-VERIFICATION.md. Cloud-account validation, real macOS Keychain use and the comparison desktop view remain limited as described. Website deployment is separate. The subsequent worksheet is uncommitted review work, outside the U112 tag.

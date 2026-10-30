@@ -7,3 +7,5 @@ Always-visible providers and known/manual model IDs; explicit local/cloud automa
 Provider protocols are covered by mocked tests. A real Qwen3 4B loopback smoke passed with offline mode enabled. Live cloud access, macOS credential storage, and the desktop comparison view require separate validation. Text adapters never invent tool execution; native research tools keep their workspace and confirmation gates. See the AI Providers guide for setup and retry limits.
 
 [AI Providers guide](AI-PROVIDERS.md).
+
+[Published source, native packages and owner-signature verification](U112-RELEASE-VERIFICATION.md).

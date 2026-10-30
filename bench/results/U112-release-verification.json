@@ -1,0 +1,107 @@
+{
+  "format": "cursiv-release-verification-1",
+  "version": "3.14-U112",
+  "tag": "v3.14-U112",
+  "checked_utc": "2026-10-30T07:22:10.187504+00:00",
+  "scope": "Tagged source and staged owner-authenticated packages; published asset digests checked separately",
+  "source_commit": "fee19dddc2d9afdcf56b1fe5c749051bf22117b7",
+  "source_pr": 65,
+  "main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41016350564",
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41017558622",
+  "source_tests": {
+    "windows": {
+      "tests": 2868,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 15,
+      "regular_passed": 2834,
+      "passing_subtests": 19,
+      "seconds": 441.313,
+      "receipt": "U112-main-windows.xml"
+    },
+    "mac": {
+      "tests": 2868,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 32,
+      "regular_passed": 2817,
+      "passing_subtests": 19,
+      "seconds": 507.249,
+      "receipt": "U112-main-mac.xml"
+    },
+    "linux": {
+      "tests": 2868,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 33,
+      "regular_passed": 2816,
+      "passing_subtests": 19,
+      "seconds": 189.885,
+      "receipt": "U112-main-linux.xml"
+    },
+    "arm64": {
+      "tests": 114,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "regular_passed": 114,
+      "passing_subtests": 0,
+      "seconds": 32.764,
+      "receipt": "U112-main-arm64.xml"
+    }
+  },
+  "windows_frozen": "ALL PASSED",
+  "windows_portable": "ALL PASSED",
+  "mac_frozen": "ALL PASSED",
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "owner_signatures_verified": 8,
+  "private_key_copied": false,
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "owner_manifest_sha256": "3cdb748a428f8f44606b4193bd08840d296bac0c901e999c1fedd4f0fd7c4c5e",
+  "assets": {
+    "Cursiv-3.14-U112-mac-arm64.dmg": {
+      "size": 72710449,
+      "sha256": "66aea65943110075817a1df521c0a6e2e90263b37c5ff9ac33cae60d21b4d73b"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 72710449,
+      "sha256": "66aea65943110075817a1df521c0a6e2e90263b37c5ff9ac33cae60d21b4d73b"
+    },
+    "cursiv-owner-release-key.json": {
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    "Cursiv-Setup-3.14-U112.exe": {
+      "size": 57678983,
+      "sha256": "c170ed70c753555f286655695e699eb623e0c2f3a55cefd6571166d83e06188b"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 57678983,
+      "sha256": "c170ed70c753555f286655695e699eb623e0c2f3a55cefd6571166d83e06188b"
+    },
+    "owner-release.json": {
+      "size": 1620,
+      "sha256": "3cdb748a428f8f44606b4193bd08840d296bac0c901e999c1fedd4f0fd7c4c5e"
+    },
+    "provenance-3.14-U112.json": {
+      "size": 1798,
+      "sha256": "27f87f2405bf2c7a0200bdf0ca96363786864e96dc2b77c2a0d7e1ec244ef91a"
+    },
+    "provenance-mac.json": {
+      "size": 1758,
+      "sha256": "70f9245ec656ef7aaeec9cb40f45d6c213f452408e0db407b75ebafc8fdefb49"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "3c5b47c361a89f0a6a406ade0c2483407074a3aee9626d855b5e2720bd87c202"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "e9245938bc472053ed1297bc8935c953f9dfd78278ad08ffe3ac80a3822e9cdd"
+    }
+  }
+}
