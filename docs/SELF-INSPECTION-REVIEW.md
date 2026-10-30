@@ -117,4 +117,4 @@ uses loopback Ollama only, and refuses to overwrite a previous receipt.
 
 ## U113 release completion
 
-Owner-authorized source and native packages are published as U113; exact-main multiplatform counts, signature/readback receipts and boundaries are in [U113 release verification](U113-RELEASE-VERIFICATION.md). Earlier review-only status above records the measurement checkpoint. Website production verification is a separate receipt.
+Owner-authorized source and native packages are published as U113; exact-main multiplatform counts, signature/readback receipts and boundaries are in [U113 release verification](U113-RELEASE-VERIFICATION.md). Earlier review-only status above records the measurement checkpoint. Website production is verified by [41 checks across20 public pages](../bench/results/U113-publication.json).

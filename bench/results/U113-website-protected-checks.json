@@ -1,0 +1,102 @@
+{
+  "pr": 69,
+  "head": "e1b25b8da6b45ef4c7c4ed782d6abae270c41e21",
+  "merge": "f8d209f855bcff2d2afb1cf9ae29440016818f9f",
+  "checks": [
+    {
+      "bucket": "pass",
+      "name": "test (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "test-linux",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "test (macos-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "test-linux",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "test (macos-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "test (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "station-arm64",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "public-website",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "station-arm64",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "change-scope",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "security",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "workspace-files (macos-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "workspace-files (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "public-website",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "workspace-files (macos-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "security",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "workspace-files (windows-latest)",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "change-scope",
+      "state": "SUCCESS"
+    },
+    {
+      "bucket": "pass",
+      "name": "GitGuardian Security Checks",
+      "state": "SUCCESS"
+    }
+  ]
+}

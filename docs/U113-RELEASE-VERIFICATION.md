@@ -32,3 +32,9 @@ Original transcripts were unavailable. Real offline Qwen3 4B probes ran in dispo
 - [Source secret scan](../bench/results/U113-source-secret-scan.json)
 
 Website deployment is verified separately by its publication receipt; package checks alone do not establish deployment.
+
+## Verified website publication
+
+Website/evidence [PR69](https://github.com/Cursiv-Local/Cursiv/pull/69) merged as `f8d209f855bcff2d2afb1cf9ae29440016818f9f` after all19 checks passed. Cloudflare deployment `7946b4d2-7cc0-418b-833c-6a730f62930b` moved the public site from U112 to U113. All41 checks passed over20 public pages: exact deployed bytes, release links/hashes, signed manifest, icon MIME types, crawler user-agent access, retained intentional exclusions and canonical handling. [Production readback](../bench/results/U113-publication.json); [protected website checks](../bench/results/U113-website-protected-checks.json).
+
+Manual discovery checks remain manual. User-agent probes do not establish verified Google-IP traffic or dashboard WAF policy. No private API endpoint was queried and no production credential or security rule was changed. Root README/TECH release edits now use focused documentation CI; application, unknown, rename and forced-push scopes retain their full-check boundaries.
