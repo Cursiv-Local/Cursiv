@@ -1,0 +1,77 @@
+{
+  "audit_base": "4451a892ad1c57e5810edc15393a9b4a30cbf449",
+  "u113_source": "bd11f925df7007e1641fd3b35ffd0ce9dad0a22d",
+  "u112_source": "fee19dddc2d9afdcf56b1fe5c749051bf22117b7",
+  "guardian_removal_commit": "d3bc4adeee5a88e75a5dee3adc53daf1a1f6065b",
+  "comparisons": [
+    {
+      "path": "cursiv_engine/core/phases.py",
+      "u112_blob": "90bb93cbbda69653941155be90dbd069e64ea46c",
+      "u113_blob": "acf78fe6c9b4d380ee3f50c04f77ba3d3c0dbcfb",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/core/claim_evidence.py",
+      "u112_blob": "b1f216ec125c32e24e9f268670f8d33040b4f055",
+      "u113_blob": "e3449213b168ee9b360c933201a765a108637c58",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/core/turn_policy.py",
+      "u112_blob": "0191c8d4e25f510edacbfd6673e1a75194d9d806",
+      "u113_blob": "7451bfa1833509f6feee7e2cf9d746958d262496",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/chat/completion.py",
+      "u112_blob": "379c83113abe28353d4724de7411e0d76703b8a0",
+      "u113_blob": "21a5cfa5ce24bb08d10c927c4cd7eae2f7b3d918",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/core/science_check.py",
+      "u112_blob": "914daf97cd8766b1648b677f1ec3e3e23c35b848",
+      "u113_blob": "914daf97cd8766b1648b677f1ec3e3e23c35b848",
+      "changed_in_u113": false
+    },
+    {
+      "path": "cursiv_engine/core/verify.py",
+      "u112_blob": "44490571db380696d538173e53522c304df7558a",
+      "u113_blob": "44490571db380696d538173e53522c304df7558a",
+      "changed_in_u113": false
+    },
+    {
+      "path": "cursiv_engine/core/answer_check.py",
+      "u112_blob": "4d661e4348c0a3164ce6b7c0df9a776acff3ecf2",
+      "u113_blob": "4d661e4348c0a3164ce6b7c0df9a776acff3ecf2",
+      "changed_in_u113": false
+    },
+    {
+      "path": "cursiv_engine/core/claims.py",
+      "u112_blob": "7aef14239ac2fb15d8dcc0a1e7922fcca928907f",
+      "u113_blob": "fc7fd8f066cc8a1b3e7e5025eb9874734b2d3f81",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/core/deterministic_overrides.py",
+      "u112_blob": "11e57aa51e90827839fb9df74a206ba4f7b2fafc",
+      "u113_blob": "67d496b700ac5c07480685d4609908603cd211e7",
+      "changed_in_u113": true
+    },
+    {
+      "path": "cursiv_engine/chat/response_style.py",
+      "u112_blob": "fed097bcc8d44d923d3a6d8ced30a3be870dd8e2",
+      "u113_blob": "fed097bcc8d44d923d3a6d8ced30a3be870dd8e2",
+      "changed_in_u113": false
+    }
+  ],
+  "current_guardian_files": [
+    "cursiv_engine/guardian/__init__.py",
+    "cursiv_engine/guardian/access_gate.py",
+    "cursiv_engine/guardian/identity_core.py",
+    "cursiv_engine/guardian/protected.py",
+    "cursiv_engine/guardian/security_questions.py"
+  ],
+  "old_guardian_restore_found": false,
+  "scope": "Local Git object comparisons and inspected call-wiring diffs; diagnostic label guardian is not proof of an old-service restoration"
+}

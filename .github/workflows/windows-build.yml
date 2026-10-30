@@ -1,0 +1,59 @@
+name: windows-build
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Immutable release tag to build"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  checks: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+      - name: Install locked build dependencies
+        run: python -m pip install --require-hashes -r requirements-release.lock
+      - name: Locate the runner's existing Inno Setup
+        shell: pwsh
+        run: |
+          $source = Join-Path ${env:ProgramFiles(x86)} 'Inno Setup 6'
+          if (!(Test-Path (Join-Path $source 'ISCC.exe'))) { throw 'Runner Inno Setup is unavailable' }
+          $target = Join-Path $env:LOCALAPPDATA 'Programs/Inno Setup 6'
+          New-Item -ItemType Directory -Force -Path (Split-Path $target) | Out-Null
+          Copy-Item -LiteralPath $source -Destination $target -Recurse
+      - name: Build the exact tag and require main, lock, frozen and USB gates
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_REF: ${{ inputs.ref }}
+        run: python scripts/build_release.py "$env:RELEASE_REF"
+      - name: Preserve frozen and portable self-test receipts
+        shell: pwsh
+        run: |
+          $temporary = python -c 'import tempfile; print(tempfile.gettempdir())'
+          $build = Get-ChildItem -LiteralPath $temporary -Directory -Filter 'cursiv_release_*' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+          if (!$build) { throw 'Tagged build receipts are missing' }
+          Copy-Item -LiteralPath (Join-Path $build.FullName 'selftest.txt') -Destination 'installer/Output/frozen-selftest.txt'
+          Copy-Item -LiteralPath (Join-Path $build.FullName 'portable-selftest.txt') -Destination 'installer/Output/portable-selftest.txt'
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cursiv-windows
+          if-no-files-found: error
+          path: |
+            installer/Output/Cursiv-Setup-*.exe
+            installer/Output/SHA256SUMS-*.txt
+            installer/Output/provenance-*.json
+            installer/Output/*-selftest.txt

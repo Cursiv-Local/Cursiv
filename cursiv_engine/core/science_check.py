@@ -88,13 +88,31 @@ _HYPOTHETICAL = re.compile(r"(?i)\b(?:hypothetical|invent|imagine|made[- ]up|fic
                            r"sample data|pretend|mock)\b")
 
 
+def _scenario_prose(text: str) -> str:
+    """Classify locator spans, not their values. This does NOT verify a citation.
+
+    A number reused outside a locator (e.g. foo.py:64 and 64 hours) is still
+    a scenario value. Installed-source citation validation remains independent.
+    """
+    text = re.sub(r'(?m)^\s*\d+[.)]\s+', '', text or '')
+    text = re.sub(r'(?i)[\w/.-]+\.(?:py|js|mjs|ts|tsx|jsx|c|h|cpp|rs|go|md|json|html|css)'
+                  r'`?\s*(?::|#)\s*L?\d+(?:\s*[-–]\s*L?\d+)?', ' ', text)
+    text = re.sub(r'(?i)\blines?\s+L?\d+(?:(?:\s*[-–]\s*|\s*,\s*(?:and\s+)?|\s+and\s+)L?\d+)*', ' ', text)
+    return text
+
+
 def simulated_note(question: str, draft: str, *, context: str = '', calculated: str = '') -> str:
     """Flag additional illustrative results, never label supplied scenario inputs invented.
 
     `calculated` comes from the actual application calculator record. Ordinary
     model arithmetic remains an inference, not an observed experimental result.
     """
-    if not _HYPOTHETICAL.search(question or ""):
+    from .claim_evidence import _assertion_text
+    request = _assertion_text(question)
+    def requested(match):
+        before = re.split(r'[.!?;\n]', request[:match.start()])[-1]
+        return not re.search(r"(?i)\b(?:not|no|never|without|don't|do not)\s+(?:\w+\s+){0,4}$", before)
+    if not any(requested(m) for m in _HYPOTHETICAL.finditer(request)):
         return ""
     if re.search(r'(?i)\b(?:poem|story|post|tweet|caption|joke|roast)\b', question) and not re.search(r'(?i)\bexperiment|results table\b', question):
         return ''
@@ -108,7 +126,7 @@ def simulated_note(question: str, draft: str, *, context: str = '', calculated: 
     supplied = values((question or '') + '\n' + context,word_numbers=True)
     allowed = supplied | values(calculated)
     # List/table row numbers are structure, not measured data.
-    body = re.sub(r'(?m)^\s*\d+[.)]\s+', '', draft or '')
+    body = _scenario_prose(draft)
     fresh = values(body) - allowed
     if not fresh:
         return ""

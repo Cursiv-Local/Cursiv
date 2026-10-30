@@ -274,6 +274,8 @@ def _evidence(runtime: ChatRuntime, message, history) -> 'object':
         memory_saved=False,                 # a model turn never saves; only `remember` / "save this" do
         searched=runtime._WEB_SEARCHED,
         docs=list(dict.fromkeys(p.name for p in runtime._DOCS_SHOWN)),
+        user_numbers=sorted({n.replace(',', '') for row in (history or [])[-64:] if row.get('role')=='user' and isinstance(row.get('content'),str)
+            for n in __import__('re').findall(r'\b\d+(?:\.\d+)?\b',row['content'][:4000])}),
         earlier=earlier,
     )
 

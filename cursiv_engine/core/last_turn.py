@@ -166,15 +166,16 @@ def diagnostic_event(kind,**values):
         del _diagnostic_rows[:-120]
 
 
-def diagnostic_begin(selection,policy,file_access=False):
+def diagnostic_begin(selection,policy,file_access=False,routing_mode=""):
     with _diagnostic_lock:
         if not _diagnostic_enabled:return
         _diagnostic_rows.clear()
-    provider=getattr(selection,'provider','automatic_local')
+    default = 'automatic_cloud' if routing_mode=='manager:cloud_auto' else (routing_mode or 'automatic_local')
+    provider=getattr(selection,'provider',default)
     model=getattr(selection,'model','not selected yet')
-    diagnostic_event('selection',provider=provider,model=model)
+    diagnostic_event('selection',provider=provider,model=model,status='requested mode/destination; inference not attempted')
     diagnostic_event('effective_policy',**vars(policy))
-    diagnostic_event('tools_offered',tools=(['installed public source'] if policy.inspect else [])+
+    diagnostic_event('tools_available',status='permitted capabilities, not executed operations',tools=(['installed public source'] if policy.inspect else [])+
         (['authorized workspace tools'] if file_access and policy.inspect else []))
 
 

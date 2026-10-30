@@ -277,7 +277,11 @@ _SELF_CERT_SENTENCE = re.compile(
 
 
 def drop_self_certification(answer: str) -> str:
-    cleaned = _SELF_CERT_LINE.sub('', answer)
-    cleaned = _SELF_CERT_SENTENCE.sub('', cleaned)
+    def remove_assertions(pattern, text):
+        literals = [(m.start(), m.end()) for m in re.finditer(
+            r'(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?(?:^\s*\1\s*$|\Z)|^\s*>[^\n]*|"[^"\n]*"|“[^”\n]*”|`[^`\n]*`', text)]
+        return pattern.sub(lambda m: m.group() if any((a <= m.start() < b) if pattern is _SELF_CERT_LINE else (a < m.end() and b > m.start()) for a,b in literals) else '', text)
+    cleaned = remove_assertions(_SELF_CERT_LINE, answer)
+    cleaned = remove_assertions(_SELF_CERT_SENTENCE, cleaned)
     cleaned = re.sub(r'\n{3,}', '\n\n', cleaned).strip()
     return cleaned if cleaned and cleaned != answer.strip() else answer

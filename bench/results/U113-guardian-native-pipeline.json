@@ -1,0 +1,577 @@
+{
+  "scope": "Unmocked desktop chat facade, completion, streaming, installed-source collection/native answer; no model inference needed",
+  "checked_utc": "2026-10-30T17:05:53.758665+00:00",
+  "rows": [
+    {
+      "question": "Inspect cursiv_engine/core/claim_evidence.py and explain the function privacy_overclaim.",
+      "requested_selection": "manager:ollama::qwen3:4b-instruct",
+      "output": "Requested installed-source target (VERIFIED static source; selected lines, not execution):\n\n- `cursiv_engine/core/claim_evidence.py:103` \u2014 `privacy_overclaim` (definition ends at line 120)\n\n```python\n103: def privacy_overclaim(answer: str, question: str = \"\") -> str:\n106:     triggered=_privacy_assertion(answer) and bool(_CURSIV.search(answer or '') or _CURSIV.search(question or ''))\n```\n\nOnly the shown declarations and static calls are established. No AI model was used for this source result.\n\n*[Sources: Source declarations VERIFIED: installed source 3.14-U113, snapshot 8a22130d011b; 3 successful reads/3 attempts, 3 tool calls; 413 indexed files searched as metadata, not read in full; app-owned static explanation; not a runtime trace. Written by Cursiv, no AI model]*",
+      "diagnostics": [
+        {
+          "event": "selection",
+          "provider": "ollama",
+          "model": "qwen3:4b-instruct",
+          "status": "requested mode/destination; inference not attempted"
+        },
+        {
+          "event": "effective_policy",
+          "inspect": true,
+          "change": true,
+          "memory_write": true,
+          "automatic_memory": true
+        },
+        {
+          "event": "tools_offered",
+          "status": "permitted capabilities, not executed operations",
+          "tools": [
+            "installed public source"
+          ]
+        },
+        {
+          "event": "classification",
+          "intent": "target"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/netgate.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "routing",
+          "route": "installed_source",
+          "status": "VERIFIED"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "103,106"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "86,87,88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "42,44,45,46"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "150,160,161,163"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "153,154,155,156"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "70,71"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "53,56,58,63"
+        },
+        {
+          "event": "response_origin",
+          "provider": "none",
+          "model": "none",
+          "route": "native_installed_source",
+          "status": "application-generated static evidence; no inference attempted"
+        }
+      ]
+    },
+    {
+      "question": "Inspect cursiv_engine/core/claim_evidence.py and explain the function privacy_overclaim.",
+      "requested_selection": "manager:openai::unconfigured-test-model",
+      "output": "Requested installed-source target (VERIFIED static source; selected lines, not execution):\n\n- `cursiv_engine/core/claim_evidence.py:103` \u2014 `privacy_overclaim` (definition ends at line 120)\n\n```python\n103: def privacy_overclaim(answer: str, question: str = \"\") -> str:\n106:     triggered=_privacy_assertion(answer) and bool(_CURSIV.search(answer or '') or _CURSIV.search(question or ''))\n```\n\nOnly the shown declarations and static calls are established. No AI model was used for this source result.\n\n*[Sources: Source declarations VERIFIED: installed source 3.14-U113, snapshot 8a22130d011b; 3 successful reads/3 attempts, 3 tool calls; 413 indexed files searched as metadata, not read in full; app-owned static explanation; not a runtime trace. Written by Cursiv, no AI model]*",
+      "diagnostics": [
+        {
+          "event": "selection",
+          "provider": "openai",
+          "model": "unconfigured-test-model",
+          "status": "requested mode/destination; inference not attempted"
+        },
+        {
+          "event": "effective_policy",
+          "inspect": true,
+          "change": true,
+          "memory_write": true,
+          "automatic_memory": true
+        },
+        {
+          "event": "tools_offered",
+          "status": "permitted capabilities, not executed operations",
+          "tools": [
+            "installed public source"
+          ]
+        },
+        {
+          "event": "classification",
+          "intent": "target"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/netgate.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "routing",
+          "route": "installed_source",
+          "status": "VERIFIED"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "103,106"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "86,87,88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "42,44,45,46"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "150,160,161,163"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "153,154,155,156"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "70,71"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "53,56,58,63"
+        },
+        {
+          "event": "response_origin",
+          "provider": "none",
+          "model": "none",
+          "route": "native_installed_source",
+          "status": "application-generated static evidence; no inference attempted"
+        }
+      ]
+    },
+    {
+      "question": "Inspect your own source and show guardian functions, not hypothetical scenarios.",
+      "requested_selection": "automatic local",
+      "output": "Installed guardian and policy declarations (VERIFIED static source):\n- emergency guidance: `cursiv_engine/core/phases.py:120` (_emergency)\n- privacy-assertion checks: `cursiv_engine/core/claim_evidence.py:103` (privacy_overclaim)\n- current-turn restrictions: `cursiv_engine/core/turn_policy.py:117` (for_text)\n- response completion and checks: `cursiv_engine/chat/completion.py:64` (chat)\n\nThese are separate application checks. Source inspection does not establish that a warning fired or that a tool ran. Use self diagnostics on before reproducing a turn to record actual triggers and response changes. No AI model was used for this declaration map.\n\n*[Sources: Source declarations VERIFIED: installed source 3.14-U113, snapshot 8a22130d011b; 14 successful reads/14 attempts, 14 tool calls; 413 indexed files searched as metadata, not read in full; app-owned static explanation; not a runtime trace. Written by Cursiv, no AI model]*",
+      "diagnostics": [
+        {
+          "event": "selection",
+          "provider": "automatic_local",
+          "model": "not selected yet",
+          "status": "requested mode/destination; inference not attempted"
+        },
+        {
+          "event": "effective_policy",
+          "inspect": true,
+          "change": true,
+          "memory_write": true,
+          "automatic_memory": true
+        },
+        {
+          "event": "tools_offered",
+          "status": "permitted capabilities, not executed operations",
+          "tools": [
+            "installed public source"
+          ]
+        },
+        {
+          "event": "classification",
+          "intent": "guardian"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/phases.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/chat/completion.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/ui/chat_app.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/netgate.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/self_inspection.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/chat/model_selection.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/file_access.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/action_gate.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/notebook_tools.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/core/source_inspection.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "source_read",
+          "path": "cursiv_engine/memory/intents.py",
+          "status": "hash-checked installed source"
+        },
+        {
+          "event": "routing",
+          "route": "installed_source",
+          "status": "VERIFIED"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/phases.py",
+          "lines": "120,123,126,132"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "103,106"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "117,118,120,122,125"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/chat/completion.py",
+          "lines": "64,75,76"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/ui/chat_app.py",
+          "lines": "25,27"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/phases.py",
+          "lines": "47,49,51"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/phases.py",
+          "lines": "108,117"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "150,160,161,163"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "153,154,155,156"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "86,87,88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/claim_evidence.py",
+          "lines": "42,44,45,46"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "88,89"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "70,71"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/netgate.py",
+          "lines": "53,56,58,63"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "65,67,68,69,70"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "19"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/self_inspection.py",
+          "lines": "127,129,130,131"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "168,174,175,176,184"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/self_inspection.py",
+          "lines": "101,107,109,110"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/self_inspection.py",
+          "lines": "116,118,119"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/self_inspection.py",
+          "lines": "66,67,68,69,70"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/last_turn.py",
+          "lines": "169,172,174,175,176"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/chat/model_selection.py",
+          "lines": "63"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/file_access.py",
+          "lines": "29"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/action_gate.py",
+          "lines": "8,9,10,13,14"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "196,197,198"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/notebook_tools.py",
+          "lines": "326,329,333"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/file_access.py",
+          "lines": "289,292,293"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/file_access.py",
+          "lines": "315,317,318,322"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/source_inspection.py",
+          "lines": "35,38,39,41"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/memory/intents.py",
+          "lines": "174,176,178,179"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "96,102,103,104"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "87,89,90,93"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/turn_policy.py",
+          "lines": "192,193"
+        },
+        {
+          "event": "evidence_returned",
+          "status": "source read",
+          "path": "cursiv_engine/core/notebook_tools.py",
+          "lines": "284,286,290"
+        },
+        {
+          "event": "response_origin",
+          "provider": "none",
+          "model": "none",
+          "route": "native_installed_source",
+          "status": "application-generated static evidence; no inference attempted"
+        }
+      ]
+    },
+    {
+      "question": "No tools. Inspect cursiv_engine/core/claim_evidence.py and explain the function privacy_overclaim.",
+      "requested_selection": "automatic local",
+      "output": "This turn: talk-only; tools and saved-source lookup disabled; memory saves disabled. Conversation history still follows your chat-history settings.\n\nThis message does not authorize that operation. No action was executed.",
+      "diagnostics": [
+        {
+          "event": "selection",
+          "provider": "automatic_local",
+          "model": "not selected yet",
+          "status": "requested mode/destination; inference not attempted"
+        },
+        {
+          "event": "effective_policy",
+          "inspect": false,
+          "change": false,
+          "memory_write": false,
+          "automatic_memory": false
+        },
+        {
+          "event": "tools_offered",
+          "status": "permitted capabilities, not executed operations",
+          "tools": []
+        },
+        {
+          "event": "classification",
+          "intent": "target"
+        }
+      ]
+    }
+  ],
+  "network_attempts": [],
+  "offline_mode": true,
+  "source_sha256": {
+    "cursiv_engine/core/self_inspection.py": "c733649b61e2bc92106c7e16c87ea740b6409f505966e01fb4478aa6fbfbe1a6",
+    "cursiv_engine/core/source_analysis.py": "24857ef64fd37e5f2ecb3f54337bcf42ec552deb2b1b725c644a9a289b149c9a",
+    "cursiv_engine/chat/completion.py": "405495724bcefc8b74b3fb0a02d2f5a958b80821655611690927e879d082fcad"
+  }
+}

@@ -1,0 +1,228 @@
+{
+  "verdict": "READY FOR MANUAL TESTING",
+  "published_baseline": "bd11f925df7007e1641fd3b35ffd0ce9dad0a22d",
+  "worktree_base": "4451a892ad1c57e5810edc15393a9b4a30cbf449",
+  "main_summary": "2824 passed, 33 skipped, 19 subtests passed in 442.96s (0:07:22)",
+  "main_passed": 2824,
+  "supplemental_nonoverlapping_passed": 0,
+  "total_passed": 2824,
+  "failed": 0,
+  "errors": 0,
+  "skipped": 33,
+  "passing_subtests": 19,
+  "new_cases": {
+    "test_u113_guardian_audit": 38,
+    "test_u113_final_reliability": 21,
+    "test_strict_offline_guard": 7
+  },
+  "unexpected_blocked_operations": 0,
+  "expected_guard_denials": 6,
+  "guarded_python_children": 33,
+  "guard_installations": 34,
+  "exclusions": [
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "tests/test_core.py::test_approved_plugin_runs",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_plugin_changed_after_approval_does_not_load",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_switched_off_plugin_does_not_run",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_phone_to_laptop_every_record_photo_fingerprint_and_signature",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log byte-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log line removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[manifest removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[signature changed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[photo byte-photo]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[truncated file-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[not a zip-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_photo_on_a_first_import_is_left_out_and_named",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_receive_import_and_export_work_offline_without_reaching_anything",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_refuses_connections_at_the_socket",
+      "reason": "exercises OS socket calls; application-level mocked enforcement is tested separately"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_still_allows_loopback",
+      "reason": "exercises OS socket calls; application-level mocked enforcement is tested separately"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_phone_log_imports_with_every_fingerprint_and_the_signature_checked",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_sending_the_same_file_again_adds_nothing_and_the_key_is_remembered",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_phone_file_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_chat_command_imports_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_opens_as_an_ordinary_zip_and_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[../evil.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[/abs.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/laptopB.jsonl]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/photos/../../x.jpg]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[other/readme.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_entry_inside_the_zip_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_without_the_phone_header_is_not_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_sent_over_wifi_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phone_never_calls_its_storage_permanent_and_names_every_failure",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_browser_without_ed25519_sends_an_unsigned_file_cursiv_says_so",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_problem_report.py::test_nothing_is_sent_in_offline_mode",
+      "reason": "expects real socket-level offline rejection; no socket calls authorized"
+    }
+  ],
+  "omitted_files": 10,
+  "explicitly_marked_nodes": 31,
+  "resolved_exclusion": "test_fieldsync.py is included in this complete final run; fresh-child optional embedding discovery is disabled in test fixtures",
+  "isolation": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "local_python": "existing system Python3.13; differs from release lock; hosted release lock is independently required",
+  "warnings": 0,
+  "live_inference": false,
+  "os_wide_network_isolation": false,
+  "source_sha256": {
+    "cursiv_engine/chat/completion.py": "e9e0344ff5e9702480411bd859d70cd7c286cb7e90f5b88aa41384890ca42fdd",
+    "cursiv_engine/chat/context.py": "2222e044edfd49c7ae4ea6fdc3e2098b6dd2089a297f6efb75b6e4caead278fe",
+    "cursiv_engine/chat/provider_tools.py": "160c0b96ea3ab1034bf97a18760b06c249ac188528b3efcfc67730fc221511f0",
+    "cursiv_engine/chat/response_style.py": "84a086e721ff5342c7f171910293bcba96123b0271dca33790d3b7d309ddc84c",
+    "cursiv_engine/core/claim_evidence.py": "435a1aae822b1101d3302cfd894323e95d30f1a1705af0bc70567dd3b91086af",
+    "cursiv_engine/core/claims.py": "3769e554c1dd22f592edf7007a625d53b74277a92b3202440ac407bdd9cc784e",
+    "cursiv_engine/core/last_turn.py": "2f168fd9b71dbd4c770f0c8d022a45dc1abd378edc4c8605eb378016f18184bb",
+    "cursiv_engine/core/science_check.py": "a3ef15f6e0c96618d7776f875a1355868e6a596e1ca983a0dd9338690e33aec8",
+    "cursiv_engine/core/self_inspection.py": "c733649b61e2bc92106c7e16c87ea740b6409f505966e01fb4478aa6fbfbe1a6",
+    "cursiv_engine/core/selfknow.py": "37b84ca050537a23ca2d612b2db0091c0c43c10f91fc0ea60bcd01dbbb0f2412",
+    "cursiv_engine/core/source_analysis.py": "23f1152e201b902e35988eaff85c0839faad5a92b347d0c1a618ab6656106839",
+    "cursiv_engine/core/tools.py": "1eec99d23741b09035d200ac35d862ea58073aed57b2507dd6db860492c538f6",
+    "cursiv_engine/core/verify.py": "949a253f725380d19c0a54f49d9c788620332e606aa332678d031fe0e27736c0",
+    "launcher/cursiv_launcher.py": "1efb4f89fc578f024a621cc42cdd22539efe6eb5c5a6d633921ae63437c46fa9",
+    "tests/test_portable_recall_curiosity.py": "fe646b762e321d19ff4df9e97950e14b036bdcea24d8e49be9b266ac5aad3f01",
+    "tests/test_usb_end_to_end.py": "37dbdddb24abe02c0ef754537f0576da03706559a4eb03b22ac074b6ab65a6b7",
+    "scripts/offline_guard.py": "bd1c0070a9d3996e64bd73aeecef387368a23250050f0b05edda8e56a13fbe75",
+    "scripts/offline_validate.py": "4181ebe1cbf9b86f7014a14e3ae4b3633e7fe46745658282551cd253612edb5b",
+    "tests/offline_validation_plugin.py": "6c3889f7e6a116f9a7c4ddf2490e1215094a3835fb03f8cfb199d5fa4e6275d7",
+    "tests/test_strict_offline_guard.py": "2d61d4a7c5cf7f4df0a0274b1610b1c65de896a75005be079af309830f8d8470",
+    "tests/test_u113_final_reliability.py": "b11953269df739c71be734032670e546c524ff7aad6c3243aa8f9d1f70a6e39d",
+    "tests/test_u113_guardian_audit.py": "66bc9e7bac3c23f8296f0e240f3e5446ff2114a4b77921d09e7041fc8ada0d3a"
+  },
+  "receipts": [
+    "U113-offline-release-final.json",
+    "U113-offline-release-final.xml",
+    "U113-offline-child-memory-checked.json"
+  ],
+  "ai_provider_calls": false,
+  "source_index_sha256": "295d256155266b78cbed5bacb00f5bbac10dfb1042aa8146ca6e1a8efcdfa3e1",
+  "index_refresh_validation": "99 passed, zero unexpected operations; U113-offline-release-index.json"
+}

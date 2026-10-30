@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="10" skipped="0" tests="14" time="6.301" timestamp="2026-10-30T12:33:01.470169-04:00" hostname="Josh"><testcase classname="tests.test_u113_guardian_audit" name="test_reported_four_locations_through_chat" time="2.978"><failure message="AssertionError: assert 'Source locations: phases.py:64, claim_evidence.py:88, self_inspection.py:117, completion.py:120.' in 'File access is off. Choose workspace &lt;folder&gt;, then files on. No source was inspected.\n\n*[Sources: Cursiv file execution result (no AI model)]*'">tests\test_u113_guardian_audit.py:21: in test_reported_four_locations_through_chat
+    assert draft in out
+E   AssertionError: assert 'Source locations: phases.py:64, claim_evidence.py:88, self_inspection.py:117, completion.py:120.' in 'File access is off. Choose workspace &lt;folder&gt;, then files on. No source was inspected.\n\n*[Sources: Cursiv file execution result (no AI model)]*'</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_real_native_source_map_is_not_model_prose" time="0.995"><failure message="AssertionError: assert 'No AI model was used for this declaration map.' in 'Installed guardian and policy declarations (VERIFIED static source):\n- emergency guidance: `cursiv_engine/core/phase... model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*'">tests\test_u113_guardian_audit.py:29: in test_real_native_source_map_is_not_model_prose
+    assert 'No AI model was used for this declaration map.' in out
+E   AssertionError: assert 'No AI model was used for this declaration map.' in 'Installed guardian and policy declarations (VERIFIED static source):\n- emergency guidance: `cursiv_engine/core/phase... model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*'</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_source_locator_numbers_are_not_scenario_measurements[phases.py:64, claim_evidence.py:88, self_inspection.py:117, completion.py:120]" time="0.009"><failure message="assert not &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot;&#10; +  where &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot; = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', 'phases.py:64, claim_evidence.py:88, self_inspection.py:117, completion.py:120')&#10; +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note">tests\test_u113_guardian_audit.py:40: in test_source_locator_numbers_are_not_scenario_measurements
+    assert not science_check.simulated_note('Explain a hypothetical code path.',location)
+E   assert not "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*"
+E    +  where "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*" = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', 'phases.py:64, claim_evidence.py:88, self_inspection.py:117, completion.py:120')
+E    +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_source_locator_numbers_are_not_scenario_measurements[`phases.py`, lines 64, 88, 117 and 120]" time="0.009"><failure message="assert not &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot;&#10; +  where &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot; = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', '`phases.py`, lines 64, 88, 117 and 120')&#10; +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note">tests\test_u113_guardian_audit.py:40: in test_source_locator_numbers_are_not_scenario_measurements
+    assert not science_check.simulated_note('Explain a hypothetical code path.',location)
+E   assert not "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*"
+E    +  where "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*" = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', '`phases.py`, lines 64, 88, 117 and 120')
+E    +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_source_locator_numbers_are_not_scenario_measurements[phases.py#L64-L88; completion.py:L117-L120]" time="0.008" /><testcase classname="tests.test_u113_guardian_audit" name="test_source_locator_numbers_are_not_scenario_measurements[phases.py at line 64 and lines 88, 117, 120]" time="0.007"><failure message="assert not &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot;&#10; +  where &quot;*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*&quot; = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', 'phases.py at line 64 and lines 88, 117, 120')&#10; +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note">tests\test_u113_guardian_audit.py:40: in test_source_locator_numbers_are_not_scenario_measurements
+    assert not science_check.simulated_note('Explain a hypothetical code path.',location)
+E   assert not "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*"
+E    +  where "*(Cursiv's check: additional scenario values (64, 88, 117, 120) are unverified assumptions or model-derived values, not established observations. The supplied scenario inputs are not invented by the assistant.)*" = &lt;function simulated_note at 0x00000223A1222660&gt;('Explain a hypothetical code path.', 'phases.py at line 64 and lines 88, 117, 120')
+E    +    where &lt;function simulated_note at 0x00000223A1222660&gt; = science_check.simulated_note</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_matching_measurement_number_remains_a_measurement" time="0.008" /><testcase classname="tests.test_u113_guardian_audit" name="test_exact_file_and_function_are_read_and_answered[ollama]" time="0.187"><failure message="Failed: Requested static target is native">tests\test_u113_guardian_audit.py:57: in test_exact_file_and_function_are_read_and_answered
+    out=final(pipeline,'Inspect cursiv_engine/core/claim_evidence.py and explain the function privacy_overclaim.',force_provider=selection)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u113_guardian_audit.py:10: in final
+    for chunk in ca.chat(question, [], '', None, replace_draft=True, review_mode='off', **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:218: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\self_inspection.py:59: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\model_selection.py:87: in generate
+    with use(choice),provenance_scope(): yield from function(*args,**kwargs)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\reasoning_context.py:24: in generate
+    try: yield from function(*a,**kw)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:236: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+cursiv_engine\chat\streaming.py:137: in _chat_stream
+    for chunk in runtime._drop_fake_tool_lines(runtime._friendly(_sk, runtime._time_boxed(runtime._chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\streaming.py:44: in _drop_fake_tool_lines
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:153: in _friendly
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:90: in _time_boxed
+    yield from gen          # no time limit
+    ^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:218: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\conversation.py:301: in _chat_inner
+    _calls = _tools.plan(user_text, runtime._router_llm, files=bool(file_access and root_path))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\tools.py:169: in plan
+    raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc)},
+cursiv_engine\ui\chat_app.py:940: in _router_llm
+    return _routing._router_llm(_runtime(), messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\routing.py:163: in _router_llm
+    return runtime._local_llm(messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\ui\chat_app.py:608: in _local_llm
+    return _cloud_providers._local_llm(_runtime(), messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\cloud_providers.py:296: in _local_llm
+    out = "".join(c for c in runtime._call_ollama(messages, max_tokens=max_tokens, standard=True) if c != runtime.RATE_SENTINEL).strip()
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u113_guardian_audit.py:54: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline,'_call_ollama',lambda *a,**k:pytest.fail('Requested static target is native'))
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: Requested static target is native</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_exact_file_and_function_are_read_and_answered[manager:openai::fixture-model]" time="0.027"><failure message="Failed: Requested static target is native">tests\test_u113_guardian_audit.py:57: in test_exact_file_and_function_are_read_and_answered
+    out=final(pipeline,'Inspect cursiv_engine/core/claim_evidence.py and explain the function privacy_overclaim.',force_provider=selection)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u113_guardian_audit.py:10: in final
+    for chunk in ca.chat(question, [], '', None, replace_draft=True, review_mode='off', **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:218: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\core\grounding.py:24: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\activity.py:75: in stream
+    for piece in fn(*args, **kwargs):
+                 ^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\self_inspection.py:59: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\model_selection.py:87: in generate
+    with use(choice),provenance_scope(): yield from function(*args,**kwargs)
+                                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\reasoning_context.py:24: in generate
+    try: yield from function(*a,**kw)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\completion.py:236: in chat
+    yield from runtime._chat_stream(message, history, api_key, files, file_access, root_path,
+cursiv_engine\chat\streaming.py:137: in _chat_stream
+    for chunk in runtime._drop_fake_tool_lines(runtime._friendly(_sk, runtime._time_boxed(runtime._chat_inner(message=message, history=history, api_key=api_key, files=files, file_access=file_access, root_path=root_path, openai_key=openai_key, confirm_writes=confirm_writes, anthropic_key=anthropic_key, force_provider=force_provider, on_action=on_action)))):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\streaming.py:44: in _drop_fake_tool_lines
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:153: in _friendly
+    for chunk in gen:
+                 ^^^
+cursiv_engine\chat\streaming.py:90: in _time_boxed
+    yield from gen          # no time limit
+    ^^^^^^^^^^^^^^
+cursiv_engine\core\turn_policy.py:218: in generate
+    yield from function(*args, **kwargs)
+cursiv_engine\chat\conversation.py:301: in _chat_inner
+    _calls = _tools.plan(user_text, runtime._router_llm, files=bool(file_access and root_path))
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\core\tools.py:169: in plan
+    raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc)},
+cursiv_engine\ui\chat_app.py:940: in _router_llm
+    return _routing._router_llm(_runtime(), messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\routing.py:163: in _router_llm
+    return runtime._local_llm(messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\ui\chat_app.py:608: in _local_llm
+    return _cloud_providers._local_llm(_runtime(), messages, max_tokens)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cursiv_engine\chat\cloud_providers.py:296: in _local_llm
+    out = "".join(c for c in runtime._call_ollama(messages, max_tokens=max_tokens, standard=True) if c != runtime.RATE_SENTINEL).strip()
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+tests\test_u113_guardian_audit.py:54: in &lt;lambda&gt;
+    monkeypatch.setattr(pipeline,'_call_ollama',lambda *a,**k:pytest.fail('Requested static target is native'))
+                                                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: Requested static target is native</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_target_read_cannot_bypass_denial[No tools. ]" time="0.016" /><testcase classname="tests.test_u113_guardian_audit" name="test_target_read_cannot_bypass_denial[Do not inspect any files. ]" time="0.015" /><testcase classname="tests.test_u113_guardian_audit" name="test_quoted_or_negated_claims_do_not_trigger_interference[The documentation example says &quot;the tests passed&quot;. This is not a runtime test report.]" time="0.278"><failure message="assert (&quot;Cursiv's check:&quot; not in 'The documen...ds&gt; to look.'&#10;  &#10;  &quot;Cursiv's check:&quot; is contained here:&#10;    dard]*&#10;    &#10;  ?   ^^^^^^^^^^^^^^&#10;    **Cursiv's check:** this answer claims test results, but Cursiv has no record of that happening for this answer. Treat those parts as unverified. Ask &quot;have you inspected your source code?&quot; to see what Cursiv actually read, or self source &lt;words&gt; to look.&#10;  ?   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^)">tests\test_u113_guardian_audit.py:85: in test_quoted_or_negated_claims_do_not_trigger_interference
+    assert "Cursiv's check:" not in out and 'withdrawn' not in out
+E   assert ("Cursiv's check:" not in 'The documen...ds&gt; to look.'
+E     
+E     "Cursiv's check:" is contained here:
+E       dard]*
+E       
+E     ?   ^^^^^^^^^^^^^^
+E       **Cursiv's check:** this answer claims test results, but Cursiv has no record of that happening for this answer. Treat those parts as unverified. Ask "have you inspected your source code?" to see what Cursiv actually read, or self source &lt;words&gt; to look.
+E     ?   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^)</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_quoted_or_negated_claims_do_not_trigger_interference[The literal is `Cursiv is completely private`. It is an example, not a privacy guarantee.]" time="0.130"><failure message="assert (&quot;Cursiv's check:&quot; not in 'The literal...is computer.'&#10;  &#10;  &quot;Cursiv's check:&quot; is contained here:&#10;    dard]*&#10;    &#10;    **Cursiv's check:** an absolute privacy promise above isn't something Cursiv can guarantee. What's true: conversations, memories and the notebook are stored (encrypted) on this computer; Cursiv goes online only through features the person turns on (online AI keys, Cursiv Cloud, web search, update checks, the phone link); installing Ollama, models and updates needs the internet. Offline mode is on right now, so Cursiv refuses every connection off this computer.&#10;  ?   +++++++++++++++)">tests\test_u113_guardian_audit.py:85: in test_quoted_or_negated_claims_do_not_trigger_interference
+    assert "Cursiv's check:" not in out and 'withdrawn' not in out
+E   assert ("Cursiv's check:" not in 'The literal...is computer.'
+E     
+E     "Cursiv's check:" is contained here:
+E       dard]*
+E       
+E       **Cursiv's check:** an absolute privacy promise above isn't something Cursiv can guarantee. What's true: conversations, memories and the notebook are stored (encrypted) on this computer; Cursiv goes online only through features the person turns on (online AI keys, Cursiv Cloud, web search, update checks, the phone link); installing Ollama, models and updates needs the internet. Offline mode is on right now, so Cursiv refuses every connection off this computer.
+E     ?   +++++++++++++++)</failure></testcase><testcase classname="tests.test_u113_guardian_audit" name="test_quoted_or_negated_claims_do_not_trigger_interference[The result is not fully verified. More evidence is needed.]" time="0.131"><failure message="assert (&quot;Cursiv's check:&quot; not in 'The result ...ds&gt; to look.'&#10;  &#10;  &quot;Cursiv's check:&quot; is contained here:&#10;    dard]*&#10;    &#10;  ?   ^^^^^^^^^^^^^^&#10;    **Cursiv's check:** this answer claims verification, but Cursiv has no record of that happening for this answer. Treat those parts as unverified. Ask &quot;have you inspected your source code?&quot; to see what Cursiv actually read, or self source &lt;words&gt; to look.&#10;  ?   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^)">tests\test_u113_guardian_audit.py:85: in test_quoted_or_negated_claims_do_not_trigger_interference
+    assert "Cursiv's check:" not in out and 'withdrawn' not in out
+E   assert ("Cursiv's check:" not in 'The result ...ds&gt; to look.'
+E     
+E     "Cursiv's check:" is contained here:
+E       dard]*
+E       
+E     ?   ^^^^^^^^^^^^^^
+E       **Cursiv's check:** this answer claims verification, but Cursiv has no record of that happening for this answer. Treat those parts as unverified. Ask "have you inspected your source code?" to see what Cursiv actually read, or self source &lt;words&gt; to look.
+E     ?   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^)</failure></testcase></testsuite></testsuites>

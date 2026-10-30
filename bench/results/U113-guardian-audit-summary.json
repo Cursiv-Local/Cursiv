@@ -1,0 +1,48 @@
+{
+  "checked_utc": "2026-10-30T17:15:42.247571+00:00",
+  "base_commit": "4451a892ad1c57e5810edc15393a9b4a30cbf449",
+  "status": "Uncommitted audit fixes; no release approval",
+  "frozen_regressions": {
+    "cases": 14,
+    "before_passed": 4,
+    "before_failed": 10,
+    "after_passed": 14
+  },
+  "new_audit_cases_passed": 38,
+  "full_windows": {
+    "regular_passed": 2909,
+    "skipped": 15,
+    "passing_subtests": 19,
+    "seconds": 532.53,
+    "xml_counts": {
+      "tests": 2943,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 15
+    }
+  },
+  "unmocked_native_pipeline": {
+    "passed": 4,
+    "network_attempts": 0
+  },
+  "live_cloud_inference_tested": false,
+  "budget_increased": false,
+  "source_sha256": {
+    "cursiv_engine/chat/completion.py": "405495724bcefc8b74b3fb0a02d2f5a958b80821655611690927e879d082fcad",
+    "cursiv_engine/chat/response_style.py": "84a086e721ff5342c7f171910293bcba96123b0271dca33790d3b7d309ddc84c",
+    "cursiv_engine/core/claim_evidence.py": "dd16790ba7d93f39817763cd71d73339e978c1c4edb537ce6e9e83d84275b1c7",
+    "cursiv_engine/core/claims.py": "8be0c3bdf32f217c9eed7ab60f55a3b6d3e57da7c6e10c10b80de05359f22fbf",
+    "cursiv_engine/core/last_turn.py": "041a8363a6c753fc279b22eba1c7070b08bfc248c7d33fe88f054b291df977f1",
+    "cursiv_engine/core/own_source_index.json": "f7e7f337681a5ba0d1c8b057e27246252438248d38fd42c825fb157c71a3be47",
+    "cursiv_engine/core/science_check.py": "a3ef15f6e0c96618d7776f875a1355868e6a596e1ca983a0dd9338690e33aec8",
+    "cursiv_engine/core/self_inspection.py": "c733649b61e2bc92106c7e16c87ea740b6409f505966e01fb4478aa6fbfbe1a6",
+    "cursiv_engine/core/source_analysis.py": "24857ef64fd37e5f2ecb3f54337bcf42ec552deb2b1b725c644a9a289b149c9a",
+    "tests/test_u113_guardian_audit.py": "66bc9e7bac3c23f8296f0e240f3e5446ff2114a4b77921d09e7041fc8ada0d3a"
+  },
+  "receipts": [
+    "U113-guardian-audit-before.xml",
+    "U113-guardian-audit-full.xml",
+    "U113-guardian-native-pipeline.json",
+    "U113-guardian-history.json"
+  ]
+}

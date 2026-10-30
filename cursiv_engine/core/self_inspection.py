@@ -113,6 +113,17 @@ def _focus(q):
     return q
 
 
+def explicit_targets(question):
+    """Pure target syntax only; index membership and access are checked at collection."""
+    text = str(question or '').replace('\\', '/')
+    paths = list(dict.fromkeys(re.findall(r'(?<![\w/.-])((?:(?:cursiv_engine|launcher)/[\w/.-]+|[\w-]+)\.py)\b', text)))
+    symbols = list(dict.fromkeys(re.findall('(?i)\\b(?:function|method|symbol)\\s+(?:(?:named|called)\\s+)?[`"\']?([A-Za-z_]\\w*(?:\\.[A-Za-z_]\\w*)*)', text)))
+    if paths:
+        symbols += [name for pair in re.findall(r'`([A-Za-z_]\w*(?:\.[A-Za-z_]\w*)*)`|\b([A-Za-z_]\w*_\w+)\s*\(', text)
+                    for name in pair if name and name not in symbols]
+    return paths, list(dict.fromkeys(symbols))
+
+
 def resolve(question, history=()):
     """Pure self-intent resolution. Explicit user projects/files retain workspace routing."""
     q = turn_policy.task_text(question).strip()
@@ -130,6 +141,11 @@ def resolve(question, history=()):
                  r'(?:[A-Za-z]:[\\/]|\.\.[\\/])', q):
         return ''  # checked on the whole message, before any leading sentence is set aside
     q = _focus(q)
+    if re.search(r'(?i)\b(?:my|attached|selected|uploaded) (?:source )?(?:file|script|module)\b', q):
+        return ''  # an installed basename must not capture a user-owned file request
+    targets, symbols = explicit_targets(q)
+    if re.match(_OPENER, q) and (targets or (symbols and (any('_' in name or '.' in name for name in symbols) or re.search(r'(?i)\b(?:function|method|symbol) (?:named|called)\b', q)) and re.search(r'(?i)\b(?:inspect|source|implementation|code)\b', q))):
+        return 'target'
     if re.fullmatch(r'(?i)(?:what(?:\x27s| is) your (?:current )?model|which model are you (?:using|running))[?.!]*',q):
         return ''  # actual model identity uses application state, not source analysis
     if re.match(r'(?i)^(?:and\s+)?how (?:do|can|should) i\b',q):
@@ -281,7 +297,7 @@ def prepare(question, history=()):
         return None
     if not turn_policy.effective(question).inspect:
         return Packet(topic,'','',error='ACCESS DENIED: Source lookup is disabled for this turn. No application code was inspected.',status='ACCESS DENIED')
-    if topic in ('providers','guardian','pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source','introspection') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
+    if topic in ('target','providers','guardian','pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source','introspection') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
         from . import source_analysis
         try:
             data=source_analysis.collect(question,topic)
@@ -289,6 +305,9 @@ def prepare(question, history=()):
                 if data['status']=='ACCESS DENIED':
                     return Packet(topic,data['version'],data['snapshot'],status=data['status'],analysis=data,coverage=data['coverage'],
                         error="ACCESS DENIED: Installed source reads were denied by file permissions. Check the installation's read access; no user workspace was substituted.")
+                if topic=='target' and data.get('target_errors'):
+                    return Packet(topic,data['version'],data['snapshot'],status=data['status'],analysis=data,coverage=data['coverage'],
+                        error=data['status']+': '+'; '.join(data['target_errors'])+'. No unrelated source target was substituted.')
                 return Packet(topic,data['version'],data['snapshot'],status=data['status'],analysis=data,coverage=data['coverage'],
                     error=(data['status']+': No matching implementation was established in the installed source scope. '
                            'This does not establish that the feature is missing. '+
@@ -582,6 +601,9 @@ def stream(runtime, packet, question, history, api_key, openai_key, anthropic_ke
     if native is not None:
         _active.set(replace(packet,authoritative=True))
         runtime._CURSIV_REPLY=True
+        runtime._set_answered('')
+        last_turn.diagnostic_event('response_origin',provider='none',model='none',route='native_installed_source',
+            status='application-generated static evidence; no inference attempted')
         yield native
         return
     last_turn.record_assembled(messages)

@@ -75,7 +75,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     _field_text = message.get('text', '') if isinstance(message, dict) else str(message or '')
     policy = runtime.turn_policy.current()
     from cursiv_engine.core import last_turn
-    last_turn.diagnostic_begin(model_selection.current(),policy,file_access)
+    last_turn.diagnostic_begin(model_selection.current(),policy,file_access,routing_mode=force_provider)
     last_turn.diagnostic_event('classification',intent=self_inspection.resolve(_field_text,history) or 'ordinary_or_native')
     _replace_prefix = runtime.REPLACE_SENTINEL + (policy.confirmation() + '\n\n' if policy.confirmation() else '')
     from cursiv_engine.core import file_access as _file_ops
@@ -133,6 +133,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         return
     _native = native_answers.answer(_field_text, calculations=policy.inspect) if _own is None else None
     if _native is not None:
+        last_turn.diagnostic_event('response_origin',provider='none',model='none',route='native_application',status='application result; no inference attempted')
         from cursiv_engine.core.conversation_kind import relayed_thread_question
         _requested_provider = (force_provider or '').lower().strip()
         if relayed_thread_question(_field_text) and _requested_provider in ('grok', 'claude', 'openai') and runtime.netgate.is_offline():
@@ -195,6 +196,10 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     _file_reply = (_file_ops.command(_field_text, history, root_path if file_access else None)
                    if policy.inspect and _own is None else None)
     if _file_reply is not None:
+        last_turn.diagnostic_event('response_origin',provider='none',model='none',route='native_workspace',status='native workspace result; no inference attempted')
+        if not _file_reply.pending:
+            for receipt in _file_reply.receipts:
+                last_turn.diagnostic_event('tool_result',tool=receipt.operation,status='ok' if receipt.ok else 'failed',responded=True)
         if on_action:
             for receipt in _file_reply.receipts:
                 on_action(receipt)
@@ -268,6 +273,12 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                      '\n'.join(f'{s.path}:{s.lines[0]} — {s.symbol}' for s in _own.snippets))
             reply[:] = [final]
             yield (_replace_prefix if replace_draft else '\n\n') + final
+            return
+        active_source = self_inspection.current()
+        if active_source is not None and active_source.authoritative:
+            # Application-owned, hash-checked static answers have no model draft
+            # to polish, speculate about, or send to an optional model reviewer.
+            # Access gates and source validation already ran above.
             return
         from cursiv_engine.core import deterministic_overrides as _overrides
         _conflict = _overrides.conflicting_doses(_field_text, runtime._DOCS_SHOWN)

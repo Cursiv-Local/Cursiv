@@ -39,12 +39,33 @@ _CLAIMS = (
 )
 
 
+def _assertion_text(text: str) -> str:
+    """Literal examples are data; surrounding execution assertions remain visible."""
+    text = re.sub(r'(?ms)^\s*(`{3,}|~{3,})[^\n]*\n.*?(?:^\s*\1\s*$|\Z)', ' ', text or '')
+    text = re.sub(r'(?m)^\s*>.*$', ' ', text)
+    return re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`', ' ', text)
+
+
+def _asserted(text, match):
+    before = re.split(r'[.!?;\n]', text[:match.start()])[-1]
+    return not (re.search(r"(?i)\b(?:not|never|cannot|can't|isn't|wasn't|didn't)\s+(?:\w+\s+){0,3}$", before)
+                or re.search(r'(?i)\b(?:if|unless|suppose|hypothetically|for example)\b', before))
+
+
 def unbacked(answer: str, records: list | None = None) -> list[str]:
     """Each kind of verification the answer claims that this turn's records don't support."""
     have = evidence_log.kinds(evidence_log.this_turn() if records is None else records)
     out = []
+    text = _assertion_text(answer)
     for pattern, needs, what in _CLAIMS:
-        if pattern.search(answer or "") and not (needs & have):
+        matches=[m for m in pattern.finditer(text) if _asserted(text,m)]
+        if what=='verification':
+            # A mathematical consistency assertion is not a claim that a tool,
+            # external source or independent observer verified it. Arithmetic
+            # remains checked separately by verify.arithmetic_problems.
+            matches=[m for m in matches if not (m.group().lower()=='is verified' and re.search(
+                r'(?i)\b(?:arithmetic|equation|algebra|equality)\s*$',text[max(0,m.start()-45):m.start()]))]
+        if matches and not (needs & have):
             out.append(what)
     return list(dict.fromkeys(out))
 
@@ -70,6 +91,7 @@ _CURSIV = re.compile(r"(?i)\bcursiv\b|\b(?:i|my|me)\b.{0,40}\b(?:run|runs|runnin
 
 
 def _privacy_assertion(answer: str) -> bool:
+    answer = _assertion_text(answer)
     for match in _ABSOLUTE.finditer(answer or ''):
         start=max(answer.rfind(mark,0,match.start()) for mark in ('.','!','?',';','\n'))+1
         before=answer[start:match.start()]

@@ -1,0 +1,122 @@
+{
+  "label": "final-applicable",
+  "exit_code": 2,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "b3e15353f0efb33b365fb069549af917b6e8b24701d7dcdfc02ab9d898a49a4a",
+  "events": [
+    {
+      "pid": 19732,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    }
+  ],
+  "blocked_operations": [],
+  "exclusions": [
+    {
+      "path": "test_fieldsync.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_still_allows_loopback",
+      "reason": "expects a real loopback connection"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_phone_log_imports_with_every_fingerprint_and_the_signature_checked",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_sending_the_same_file_again_adds_nothing_and_the_key_is_remembered",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_phone_file_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_chat_command_imports_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_opens_as_an_ordinary_zip_and_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[../evil.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[/abs.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/laptopB.jsonl]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/photos/../../x.jpg]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[other/readme.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_entry_inside_the_zip_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_without_the_phone_header_is_not_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_sent_over_wifi_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phone_never_calls_its_storage_permanent_and_names_every_failure",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_browser_without_ed25519_sends_an_unsigned_file_cursiv_says_so",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-final-applicable.xml"
+}

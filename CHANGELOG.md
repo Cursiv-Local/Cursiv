@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U114 — Source targeting and evidence reliability (2026-10-30)
+
+Explicit source files/functions are inspected first with unchanged access/read budgets. Source locations, quoted/negated claims, mathematical self-checks and user-supplied numeric inputs no longer trigger unrelated evidence warnings. Native static answers remain separate from model prose; unsupported resource safety/runtime and actual fabricated tool/source claims remain checked. Diagnostics distinguish available/offered/executed operations and denied/completed reads. Details and offline limits: docs/U113-GUARDIAN-AUDIT.md and docs/U113-MANUAL-TEST-HANDOFF.md.
+
 ## 3.14-U113 — Reliable self-inspection and scoped verification (2026-10-30)
 
 Read-only inspection respects explicit access boundaries and exact selected providers; source evidence stays with its turn. Checked static core maps, scoped emergency/privacy/reference checks and opt-in structural diagnostics reduce the reconstructed worksheet failures. Full Windows source validation: 2,871 passed, 15 skipped, 19 passing subtests. Real Qwen probes and limitations: docs/SELF-INSPECTION-REVIEW.md.

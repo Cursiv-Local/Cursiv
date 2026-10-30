@@ -197,10 +197,34 @@ _N = r"(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?)"      # "2,450" is one num
 _EXPR = re.compile(r"(?i)(?<![\w.,])(" + _N + r"(?:\s*" + _OP + r"\s*" + _N + r")+)\s*(?:=|is|equals|makes|gives)\s*\$?(" + _N + r")(?![\d.])")
 
 
+_NUMERIC_EXPRESSION = _N + r'(?:\s*' + _OP + r'\s*' + _N + r')*'
+_EQUALITY_CHAIN = re.compile(r'(?i)(?<![\w.,])'+_NUMERIC_EXPRESSION+r'(?:\s*=\s*'+_NUMERIC_EXPRESSION+r')+')
+
+
+def _numeric_expression(text):
+    tokens=re.findall(_N+'|'+_OP,text,re.I)
+    expression=''.join(_OPS.get(t.lower(),t) if not re.fullmatch(_N,t) else t.replace(',','') for t in tokens)
+    return eval(expression,{'__builtins__':{}},{})  # same restricted digit/operator grammar as the existing check
+
+
 def arithmetic_problems(draft: str) -> list[str]:
     """Shown arithmetic that is wrong: "17 times 23 is 381", "4 x 3 x 3 = 30"."""
     problems = []
+    complex_spans=[]
+    for chain in _EQUALITY_CHAIN.finditer(draft or ''):
+        parts=[part.strip() for part in chain.group().split('=')]
+        if len(parts)==2 and not re.search(_OP,parts[1],re.I):continue
+        if re.search(r'[)×x*+\-−/÷]\s*$',draft[max(0,chain.start()-3):chain.start()]):continue
+        try:values=[_numeric_expression(part) for part in parts]
+        except (ValueError,ZeroDivisionError,SyntaxError,OverflowError):continue
+        complex_spans.append(chain.span())
+        for i in range(len(values)-1):
+            if abs(values[i]-values[i+1])>max(0.01,abs(values[i])*0.005):
+                shown=int(values[i]) if float(values[i]).is_integer() else round(values[i],2)
+                problems.append(f'arithmetic: {parts[i]} is {shown}, not {parts[i+1]}')
+                break
     for m in _EXPR.finditer(draft or ""):
+        if any(start<=m.start()<end for start,end in complex_spans):continue
         # "(68 − 32) × 5/9 = 36": only the tail "5/9 = 36" matched (benchmark num-010, U68 and U75)
         if re.search(r"[)×x*+\-−/÷]\s*$", draft[max(0, m.start() - 3): m.start()]):
             continue
