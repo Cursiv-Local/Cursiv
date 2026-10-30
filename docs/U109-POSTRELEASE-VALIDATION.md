@@ -1,9 +1,13 @@
-# Post-U109 reliability repairs — local review
+# Post-U109 reliability repairs — validation
 
 Base main: `26e3e5e909dfc266a8f736f5108f3a56673c5fcd`.
-Branch: `codex/u109-postrelease-reliability`. These changes are uncommitted and
-are **not in the published U109 installers**. No version, tag, website or release
-asset has been changed. [Continuing handoff](U109-POSTRELEASE-HANDOFF.md).
+Original branch: `codex/u109-postrelease-reliability`. The implementation was
+subsequently committed as `d0f5caa`, merged through PR60 and published in **U110**
+from `c3ca2c083622bd231dd2053d07ee394845fca08f`. The older U109 installers remain
+unchanged. The measurements below describe the worksheet candidate; the additional
+U110 routing work and native package gates are recorded in
+[U110 release verification](U110-RELEASE-VERIFICATION.md).
+[Continuing handoff](U109-POSTRELEASE-HANDOFF.md).
 
 ## What the reconstructed failure establishes
 
@@ -135,9 +139,19 @@ probe was appended in the current combined corpus without changing those12 promp
 
 ## Final gates and limits
 
-Full application and dedicated USB results will be recorded after completion. Native
-workspace check:63 passed in2.19s. The dedicated USB gate:45 passed/2604 deselected
-in75.56s. Earlier full/targeted failures are documented in the handoff and not erased.
+Final worksheet proof ([machine-readable gates](../bench/results/U109-postrelease-gates-complete.json)):
+
+| Gate | Measured result |
+|---|---|
+| Full isolated Windows suite | 2644 passed,15 skipped,19 passing subtests in676.13s |
+| Dedicated USB | 45 passed,2614 deselected in94.34s |
+| Native workspace | 63 passed in1.89s |
+
+Earlier full/targeted failures are documented in the handoff and not erased. U110
+subsequently added20 routing cases: its Windows source CI reports2664 regular
+passes,15 skips and19 passing subtests; native Windows/portable/Mac package checks
+passed. Those later checks have their own release receipts, rather than being
+retroactively attributed to this worksheet run.
 
 No owner exclusions, real notebooks/memories/accounts/configurations, owner signing keys,
 station code or unrelated profiles were read or changed. Every app/test/model process
@@ -145,7 +159,25 @@ redirected HOME, USERPROFILE, CURSIV_REAL_HOME, CURSIV_APP_DATA, APPDATA and LOC
 before imports, outside OneDrive. The locked Python environment was not modified.
 No old council, extra agents, cloud hosting or model-option changes were added.
 
-Remaining release work, if requested: owner review, version preparation and normal
-protected commit/build/release checks, fresh native Windows/Mac package validation and
-publication. The immutable U109 assets must not be overwritten. An original transcript
-would allow exact wording comparisons beyond the reconstructed worksheet variants.
+On resumption October29, main was already `070c5e4` with U110 released through the
+separate owner-authorized release workflow. A read-only GitHub check confirmed U110
+published with11 assets. The production homepage, `/start` and the public U110 owner
+manifest returned200 and identified U110. This continuation did not rebuild, deploy,
+replace release assets or create another release. The owner then explicitly
+authorized committing, pushing and publishing these verification-record corrections.
+This record completes the worksheet closeout when merged to main through its
+protected PR and linked from the existing U110 release notes. It does not introduce
+a new application version or change the tagged U110 package bytes.
+
+Reconciliation against current U110 passed128 focused tests in20.28s:
+[receipt](../bench/results/U109-postrelease-receipt-check.xml). The subsequent
+documentation/inventory-only checks have a separate
+[metadata receipt](../bench/results/U109-postrelease-receipt-metadata.xml).
+[Secret audit](../bench/results/U109-postrelease-secret-scan.json) covers the
+new committed range from the original base through `070c5e4`, plus current public
+file bytes; excluded owner paths are checked before any read. The public-key
+verification assets are intentional; no private signing key is part of this scope.
+
+Tone and the three broad model narratives remain partial as described above. An
+original transcript would allow exact wording comparisons beyond the reconstructed
+worksheet variants. The existing U109/U110 release assets must not be overwritten.

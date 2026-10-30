@@ -10,13 +10,14 @@ Natural-language self-inspection routing (`self_inspection._focus`, the `introsp
 topic and its seeds in `source_analysis.FEATURES`) plus the U109 post-release repairs
 below. Tests: `tests/test_u110_self_inspection_routing.py`. The owner authorized commit,
 push, GitHub release and website publication on October 29, 2026.
-[U110](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U110) is published from tag `c3ca2c0` (PR60); website from this evidence PR. [Release notes](docs/RELEASE-U110.md); [verification](docs/U110-RELEASE-VERIFICATION.md).
+[U110](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U110) is published from tag `c3ca2c0` (PR60); website/evidence PR61 merged as `070c5e4`. [Release notes](docs/RELEASE-U110.md); [verification](docs/U110-RELEASE-VERIFICATION.md).
 
 ## U109 released (Codex, 2026-10-28)
 
-Post-release worksheet repairs are in progress locally on
-`codex/u109-postrelease-reliability`: [continuing record](docs/U109-POSTRELEASE-HANDOFF.md).
-These changes are not part of the published U109 binaries. Keep notebook identity,
+Post-release worksheet repairs were committed as `d0f5caa`, merged through PR60,
+and included in U110: [worksheet record](docs/U109-POSTRELEASE-HANDOFF.md) and
+[validation](docs/U109-POSTRELEASE-VALIDATION.md). They are not part of the older
+published U109 binaries. Keep notebook identity,
 linked corrections and source evidence ahead of general model prose; preserve all
 release/user-data/station boundaries recorded below.
 

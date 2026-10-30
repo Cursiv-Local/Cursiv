@@ -3,8 +3,12 @@
 [U110 is published](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U110)
 with 11 assets. Every published GitHub digest matched the staged local bytes, and all
 8 platform assets carry owner signatures verified against the existing pinned identity.
-The website is updated by the same PR as this record; live deployment checks are in
-HANDOFF.md once run.
+Website/evidence PR61 merged as `070c5e4`. A later read-only reconciliation confirmed
+the public homepage, `/start` and U110 owner manifest all return200 with U110 content;
+[readback receipt](../bench/results/U110-publication-readback.json). This is a limited
+three-URL publication check, not a new deployment or a repeat of every historical SEO probe.
+The completed [post-U109 worksheet validation](U109-POSTRELEASE-VALIDATION.md) records
+the full source/USB/workspace gates, real local-model regression results and limits.
 
 ## Source and protected gates
 
