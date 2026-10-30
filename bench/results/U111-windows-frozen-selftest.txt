@@ -1,0 +1,14 @@
+Cursiv 3.14-U111 self-test on Windows 11 (AMD64), Python 3.13.13, frozen=True
+PASS  imports: chat engine, commands, window code and the PDF reader load
+PASS  own source: versioned source read and critical-rule witnesses pass; U109 startup/ten-feature/regex source reads pass; no model or notebook data read
+PASS  owner release identity: Pinned owner key f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7
+PASS  plugin isolation: a plugin ran in its own process; network access was refused
+PASS  data folders: writable: C:\Users\joshu\AppData\Local\Temp\cursiv_release_kw3wxtnh\selftest-data\app, C:\Users\joshu\AppData\Local\Temp\cursiv_release_kw3wxtnh\selftest-data\.cursiv
+PASS  portable storage: installed copy (not running from a Cursiv USB)
+PASS  offline reference: 112 offline reference entries
+PASS  calculations: 12.4 C = 54.32 F; 963.1 m between two GPS points
+PASS  field notebook: an entry saved, fingerprint chain checked, exported and signed, signature verified
+PASS  documents: document search works
+PASS  window: full launcher, title bar, tray and chat window build (badge: Local answers · internet not blocked)
+PASS  AI engine (information only): Ollama not installed (Setup installs it)
+ALL PASSED

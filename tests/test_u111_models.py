@@ -14,7 +14,9 @@ def isolate_provenance_records(monkeypatch):
     monkeypatch.setattr(last_turn,'_state',{})
     monkeypatch.setattr(chat_app,'_ANSWERED_BY','')
     try:
-        with selection.use(None),selection.provenance_scope(False): yield
+        from cursiv_engine.chat.provider_manager import turn_options
+        # Synthetic transport tests explicitly authorize their synthetic context.
+        with selection.use(None),selection.provenance_scope(False),turn_options(research_authorized=True): yield
     finally: selection._response.reset(token)
 
 @pytest.mark.parametrize('provider',selection.PROVIDERS)

@@ -74,14 +74,17 @@ def test_local_model_answers_before_a_free_key(monkeypatch):
     assert text == "local answer" and used == ["Ollama (local)"]
 
 
-def test_key_answers_when_the_local_model_fails(monkeypatch):
+def test_automatic_does_not_use_a_key_when_the_local_model_fails(monkeypatch):
     text, used = _order(monkeypatch, local_ready=True, local_text="[Ollama unavailable: busy]")
-    assert text.endswith("gemini answer") and used == ["Gemini"]
+    assert 'Ollama request failed' in text and used == [] and 'gemini answer' not in text
 
 
-def test_key_answers_when_there_is_no_local_model(monkeypatch):
+def test_automatic_does_not_use_a_key_when_there_is_no_local_model(monkeypatch):
+    from cursiv_engine.chat import provider_manager, provider_types
+    monkeypatch.setattr(provider_manager,'choose',lambda mode:(_ for _ in ()).throw(
+        provider_types.ProviderError('ollama',provider_types.ErrorCode.UNAVAILABLE)))
     text, used = _order(monkeypatch, local_ready=False)
-    assert text == "gemini answer" and used == ["Gemini"]
+    assert 'Ollama request failed' in text and used == [] and 'gemini answer' not in text
 
 
 def test_cursiv_cloud_is_off_by_default(monkeypatch):

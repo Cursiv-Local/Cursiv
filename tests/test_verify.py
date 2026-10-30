@@ -520,11 +520,11 @@ def test_check_stays_local_when_a_free_key_is_saved(monkeypatch):
     assert used == ["local", "local"]
 
 
-def test_free_key_is_used_only_without_a_local_model(monkeypatch):
+def test_background_helpers_do_not_upload_without_a_local_model(monkeypatch):
     ca, used, _ = _routing(monkeypatch, local_ready=False)
-    assert ca._router_llm([{"role": "user", "content": "check"}]) == "groq"
-    assert ca._quick_llm([{"role": "user", "content": "learn"}]) == "groq"
-    assert "local" not in used
+    assert ca._router_llm([{"role": "user", "content": "check"}]) == ""
+    assert ca._quick_llm([{"role": "user", "content": "learn"}]) == ""
+    assert used == []
 
 
 def test_failed_local_call_does_not_fall_back_to_the_cloud(monkeypatch):

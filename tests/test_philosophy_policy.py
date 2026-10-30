@@ -75,10 +75,20 @@ def test_perspective_request_gets_policy_in_every_chat_provider(pipeline, monkey
         seen.extend(messages)
         return iter(['From this perspective, the argument concerns moral reasons.'])
     monkeypatch.setattr(pipeline, method, model)
+    from cursiv_engine.chat import provider_adapters, provider_settings, provider_manager
+    def normalized_model(request, result, credential):
+        seen.extend(request.messages)
+        result.text='From this perspective, the argument concerns moral reasons.'
+        result.responding_provider=request.provider
+        result.finish_reason='stop'
+        yield result.text
+    monkeypatch.setattr(provider_adapters,'stream',normalized_model)
+    monkeypatch.setattr(provider_settings,'key',lambda p:'synthetic-credential')
     question = 'Give the strongest argument for moral realism.'
     # Exercise prompt assembly and forced-provider routing, not a provider API.
-    out = ''.join(pipeline.chat(question, [], 'fake-key', None,
-        openai_key='fake-key', anthropic_key='fake-key', force_provider=provider))
+    with provider_manager.turn_options(research_authorized=True):
+        out = ''.join(pipeline.chat(question, [], 'fixture', None,
+            openai_key='fixture', anthropic_key='fixture', force_provider=provider))
     assert 'From this perspective' in out
     assert sum(m.get('content') == policy.INSTRUCTIONS for m in seen) == 1
 

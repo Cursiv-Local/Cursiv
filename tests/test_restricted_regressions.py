@@ -59,11 +59,21 @@ def test_restrictions_precede_every_retrieval_and_retention(pipeline, monkeypatc
         return iter(['We can discuss the question.\nSource: model knowledge (not checked against a source)'])
     monkeypatch.setattr(ca, '_call_ollama', answer)
     monkeypatch.setattr(ca, '_call_openai_direct', answer)
+    from cursiv_engine.chat import provider_adapters, provider_manager, provider_settings
+    def normalized_answer(request,result,credential):
+        captured.extend(request.messages)
+        result.text='We can discuss the question.\nSource: model knowledge (not checked against a source)'
+        result.responding_provider=request.provider
+        result.finish_reason='stop'
+        yield result.text
+    monkeypatch.setattr(provider_adapters,'stream',normalized_answer)
+    monkeypatch.setattr(provider_settings,'key',lambda p:'synthetic-credential')
     if provider == 'openai':
         monkeypatch.setattr(netgate, 'allowed', lambda: True)  # mocked provider, no network
     before = list(tmp_path.iterdir())
-    out = ''.join(ca.chat(text, [], '', None, file_access=True, root_path=str(tmp_path),
-                          force_provider=provider, openai_key='dummy', replace_draft=True))
+    with provider_manager.turn_options(research_authorized=True):
+        out = ''.join(ca.chat(text, [], '', None, file_access=True, root_path=str(tmp_path),
+                              force_provider=provider, openai_key='dummy', replace_draft=True))
     assert 'This turn:' in out and 'memory saves disabled' in out
     assert 'Conversation history still follows' in out
     assert 'From Cursiv\'s offline reference' not in out and 'Checked on this computer' not in out

@@ -161,6 +161,7 @@ def test_gui_grok_label_remains_user_thread_text(panel, pipeline, monkeypatch):
     assert not worker.is_alive()
     QApplication.instance().processEvents()
     assert 'user-supplied' in panel._transcript.toPlainText()
-    # The existing desktop provider shortcut consumes only the leading Grok.
+    # The shortcut consumes the leading Grok; code-owned replies attempt no inference.
     assert panel._history[-2] == dict(role='user', content=question[len('Grok '):])
-    assert 'Grok skipped' in panel._history[-1]['content']
+    assert 'no AI model' in panel._history[-1]['content']
+    assert 'Grok skipped' not in panel._history[-1]['content']

@@ -1,0 +1,74 @@
+{
+  "tag": "v3.14-U111",
+  "source_commit": "932d95d06578c73621d32565346b460fd8d26762",
+  "anonymous_public": true,
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U111-mac-arm64.dmg",
+      "size": 71635447,
+      "sha256": "f0ca6d3d70016273aa0e7e02b21da9b603480c8949b18840ee5da425e1647718",
+      "status": 200
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 71635447,
+      "sha256": "f0ca6d3d70016273aa0e7e02b21da9b603480c8949b18840ee5da425e1647718",
+      "status": 200
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "status": 200
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U111.exe",
+      "size": 57604827,
+      "sha256": "8891a3b30956f8a177bc26b93a761b27fe8e986fa62f02dd1785628707b2c280",
+      "status": 200
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 57604827,
+      "sha256": "8891a3b30956f8a177bc26b93a761b27fe8e986fa62f02dd1785628707b2c280",
+      "status": 200
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "sha256": "4605b5a8122603347ed9074d21a3f6b6565837f0bc68b293eb2012df63931145",
+      "status": 200
+    },
+    {
+      "name": "provenance-3.14-U111.json",
+      "size": 1798,
+      "sha256": "52fc051f0e074fdb925f765bf6dd197f1f8a901755e109b3552a48d2b1e5cbef",
+      "status": 200
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1758,
+      "sha256": "9d6fabd2e13436ef045f2023c569289ac06b56cdb4e3f5cdecafea5fc102ee5b",
+      "status": 200
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "sha256": "5ef4775355650a11ac3fe681d66395446617ee166cc313655d90a3d4a6461092",
+      "status": 200
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "sha256": "923e0b476859717b72c2257b42ceda2ca4f4969923c3db6ebe4e2e2d0bae0760",
+      "status": 200
+    },
+    {
+      "name": "u111-release-verification.json",
+      "size": 3709,
+      "sha256": "8d7e0d0fc06629ecb343abc0e7b7f847eeac7274afdd513e03bcdf7348463290",
+      "status": 200
+    }
+  ],
+  "owner_signatures_verified": 8
+}

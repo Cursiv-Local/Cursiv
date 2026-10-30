@@ -171,3 +171,7 @@ do not market these results as a general accuracy or safety benchmark.
 ## Owner release authorization — 2026-10-30
 
 The owner explicitly authorized commit, push and release of U111 and the provider update (U112) after completion. U111 public source was recovered from the prior audit mirror with all 70/70 manifest hashes matching before version preparation. Protected main CI, USB gates, native packaging, owner signatures and secret scans remain required before publication. No release has been published at this checkpoint.
+
+## Published release checkpoint
+
+Owner-authorized U111 is published from immutable 932d95d, PR63. Exact-main CI and both tagged native packages passed; eleven uploaded digests and eight owner signatures verified. See U111-RELEASE-VERIFICATION.md. Website promotion and anonymous download readback are recorded separately. U112 continues the provider extension.

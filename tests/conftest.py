@@ -34,6 +34,11 @@ The baseline suite changed the copied app's memory during an unrelated test.
 Tests exercise learner work explicitly; ordinary chat tests never start jobs.
 """
     from cursiv_engine.memory import semantic, formation
+    from cursiv_engine.chat import provider_settings
+    monkeypatch.setattr(provider_settings, 'FILE', tmp_path / 'providers' / 'preferences.json')
+    monkeypatch.setattr(provider_settings, 'CREDENTIALS', tmp_path / 'device' / 'credentials.json')
+    monkeypatch.setattr(provider_settings, 'APP_DATA', tmp_path / 'legacy-providers')
+    monkeypatch.setattr(provider_settings, '_session', {})
     folder = tmp_path / 'memory'
     for key, value in (('CURSIV_DIR', folder), ('FACTS_FILE', folder / 'memory_facts.jsonl'),
                        ('SETTINGS_FILE', folder / 'memory_settings.json'),

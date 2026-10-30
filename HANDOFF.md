@@ -4,6 +4,14 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U112 provider manager — release candidate
+
+The owner authorized U111 and U112 commit, push and release on October 30, 2026.
+U111 source is merged through PR63 at `932d95d`; its tagged native packages passed.
+Continue [provider manager handoff](docs/PROVIDER-MANAGER-HANDOFF.md) and
+[AI Providers guide](docs/AI-PROVIDERS.md). U112 gates and live-cloud limits remain
+explicit there. Preserve the separately opted-in USB readable-key export.
+
 ## U110 released (Claude, 2026-10-29)
 
 U111 reliability work is **unreleased and uncommitted** on

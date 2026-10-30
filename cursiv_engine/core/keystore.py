@@ -24,11 +24,16 @@ import os
 import sys
 from pathlib import Path
 
-SECRET_FIELDS = ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key", "cf_api_token")
+SECRET_FIELDS = ("api_key", "openai_key", "anthropic_key", "gemini_key", "groq_key", "openrouter_key", "custom_key", "lmstudio_key", "cf_api_token")
 PREFIX = "dpapi:"
 KC_PREFIX = "keychain:"
 KC_SERVICE = "Cursiv"
 _ENTROPY = b"Cursiv saved key"
+
+
+def secret_fields():
+    from cursiv_engine.chat.provider_registry import providers
+    return tuple(dict.fromkeys((*SECRET_FIELDS,*(p.credential for p in providers() if p.credential))))
 
 
 def _dpapi_available() -> bool:
@@ -124,7 +129,7 @@ def reveal(value: str) -> str:
 
 def reveal_all(data: dict) -> dict:
     """A copy of config data with every saved key readable."""
-    return {k: (reveal(v) if k in SECRET_FIELDS else v) for k, v in data.items()}
+    return {k: (reveal(v) if k in secret_fields() else v) for k, v in data.items()}
 
 
 def _rewrite(path: Path, fn) -> bool:
@@ -134,7 +139,7 @@ def _rewrite(path: Path, fn) -> bool:
         return False
     if not isinstance(data, dict):
         return False
-    new = {k: (fn(v) if k in SECRET_FIELDS and isinstance(v, str) else v) for k, v in data.items()}
+    new = {k: (fn(v) if k in secret_fields() and isinstance(v, str) else v) for k, v in data.items()}
     if new == data:
         return False
     tmp = path.with_suffix(".tmp")
@@ -151,5 +156,26 @@ def migrate(path: Path) -> bool:
 
 
 def export_readable(path: Path) -> bool:
-    """Decrypt the keys in a copied config.json (for a private USB copy)."""
-    return _rewrite(path, reveal)
+    """Owner-authorized private USB export ONLY; the drive contains readable keys.
+
+    Called after the USB maker's separate key-export opt-in, never for normal
+    exports. Device credentials are copied into the exported config, not moved.
+    """
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+    except (OSError, ValueError):
+        return False
+    clean = reveal_all(data)
+    from cursiv_engine.chat import provider_settings, provider_registry
+    for provider in provider_registry.providers():
+        if provider.credential:
+            value = provider_settings.key(provider.id)
+            if value:
+                clean[provider.credential] = value
+            elif provider_settings.has_override(provider.id):
+                clean.pop(provider.credential, None)
+    if clean == data:
+        return False
+    from . import atomic
+    atomic.write_bytes(path, json.dumps(clean, indent=2).encode('utf-8'), protect=False)
+    return True

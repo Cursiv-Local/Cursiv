@@ -44,16 +44,31 @@ class ChatReviewMixin:
                 self._on_error(event.get('text', 'Run failed.'))
         elif kind == 'image' and not cancelled:
             self._on_image(event['text'])
+        elif kind == 'provider_failure':
+            self._on_replace(event['text'])
+            self._reply_is_chat = False
+            self._session_note_model_allowed = False
+            self._pending_history_append = [('user', event['prompt'])] if event.get('prompt') else None
+            self._pending_provider_provenance = event.get('provenance')
+            self._last_exchange = None
+            self._on_done()
+            self._failed_provider_request = (event.get('request'), self._run_target(),
+                (self._cfg.get('selected_provider',''),self._cfg.get('selected_model',''))) if event.get('request') else None
+            self._retry_provider_btn.setVisible(bool(self._failed_provider_request))
+            self._provider_settings_btn.setVisible(True)
         elif kind in ('done', 'cancelled'):
             # Profile runs already own all generation/review work. Their metadata note,
             # and native command receipts, must not start an unbudgeted model summary.
             self._session_note_model_allowed = run is None and bool(event.get('exchange')) and kind == 'done' and not cancelled
             self._pending_history_append = event.get('history')
+            self._pending_provider_provenance = event.get('provenance')
             if kind == 'cancelled' or cancelled:
                 self._on_cancelled()
             else:
                 if 'exchange' in event:
                     self._last_exchange = event['exchange']
+                if event.get('provenance'):
+                    self._failed_provider_request = None
                 self._on_done()
 
     def _deliver_run(self, result, text, target):
@@ -71,7 +86,12 @@ class ChatReviewMixin:
         publish(kind='chunk', text=result.intro + '\n\n')
         parts = []
         try:
-            for chunk in _iter_cancellable(result.generator, cancel_event):
+            from cursiv_engine.chat import provider_manager as manager
+            def authorized_stream():
+                with manager.turn_options(research_authorized=getattr(self,'_provider_turn_authorized',False),
+                        workspace=self._cfg.get('workspace'),local_only=bool(self._cfg.get('project_local_only')),cancel=cancel_event,destination=getattr(self,'_provider_turn_destination',None)):
+                    yield from result.generator
+            for chunk in _iter_cancellable(authorized_stream(), cancel_event):
                 if chunk:
                     parts.append(chunk)
                     publish(kind='chunk', text=chunk)
@@ -79,7 +99,13 @@ class ChatReviewMixin:
                 publish(kind='cancelled')
                 return
             full = ''.join(parts)
-            publish(kind='done', history=[('user', text), ('assistant', full)] if full and text else None)
+            provider_result = manager.outcome()
+            if provider_result is not None and provider_result.error:
+                publish(kind='provider_failure',text=provider_result.error_message,request=manager.snapshot(),
+                        prompt=text,provenance=provider_result.metadata())
+                return
+            publish(kind='done', history=[('user', text), ('assistant', full)] if full and text else None,
+                    provenance=provider_result.metadata() if provider_result else None)
         except Exception as exc:
             publish(kind='error', text=str(exc))
 
@@ -87,12 +113,16 @@ class ChatReviewMixin:
         """Babel/coding and other legacy streams use the same owned UI publication."""
         from chat_panel import _iter_cancellable, _RATE_SENTINEL
         from cursiv_engine.chat.activity import guard, exclusive, guarded, check_guard
+        from cursiv_engine.chat import provider_manager as manager
         cancel = target[1] or threading.Event()
         valid = lambda: self._current_run_target(target) and not cancel.is_set()
         publish = lambda **event: self._signals.run_event.emit(target, event)
         full, rate_limited = '', False
         try:
-            with guard(valid), exclusive():
+            with guard(valid), exclusive(), manager.turn_options(
+                    research_authorized=getattr(self,'_provider_turn_authorized',False),
+                    workspace=self._cfg.get('workspace'),cancel=cancel,
+                    local_only=bool(self._cfg.get('project_local_only')),destination=getattr(self,'_provider_turn_destination',None)):
                 publish(kind='chunk', text=result.intro + '\n\n')
                 for chunk in _iter_cancellable(guarded(result.generator, valid), cancel):
                     if chunk == _RATE_SENTINEL:
@@ -104,6 +134,11 @@ class ChatReviewMixin:
                     publish(kind='cancelled')
                     return
                 check_guard()
+                provider_result = manager.outcome()
+                if provider_result is not None and provider_result.error:
+                    publish(kind='provider_failure',text=provider_result.error_message,request=manager.snapshot(),
+                            prompt=text,provenance=provider_result.metadata())
+                    return
                 if not full:
                     publish(kind='chunk', text='[Rate limited or no response received.]' if rate_limited else '[No response received from the provider.]')
                 if full and result.on_complete:
@@ -111,7 +146,8 @@ class ChatReviewMixin:
                         result.on_complete(full)
                     except Exception:
                         pass  # retained compatibility for optional follow-up callbacks
-                publish(kind='done', history=[('user', text), ('assistant', full[-6000:])] if full and text else None)
+                publish(kind='done', history=[('user', text), ('assistant', full[-6000:])] if full and text else None,
+                        provenance=provider_result.metadata() if provider_result else None)
         except Exception as exc:
             publish(kind='cancelled' if cancel.is_set() else 'error', text=str(exc))
 
