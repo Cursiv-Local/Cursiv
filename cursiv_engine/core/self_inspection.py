@@ -9,6 +9,7 @@ from contextvars import ContextVar
 from dataclasses import dataclass, field, replace
 from functools import wraps
 import ast
+import hashlib
 import json
 import re
 
@@ -16,6 +17,7 @@ from . import self_index, self_source, turn_policy
 
 HEADING = 'Installed Cursiv source evidence'
 _active = ContextVar('cursiv_own_source_packet', default=None)
+_active_question=ContextVar('cursiv_source_packet_scope',default=None)
 
 # Entry-point hints, not claims of behavior. Names must exist in the installed index.
 TOPICS = {
@@ -52,18 +54,22 @@ def scoped(function):
     @wraps(function)
     def generate(*args, **kwargs):
         token = _active.set(None)
+        question_token=_active_question.set(None)
         try:
             yield from function(*args, **kwargs)
         finally:
             _active.reset(token)
+            _active_question.reset(question_token)
     return generate
 
 
 def _topic(text):
     q = text.lower()
+    if re.search(r'(?i)\b(?:guardian|safety checks?|privacy warnings?|emergency detection)\b',q):return 'guardian'
+    if re.search(r'(?i)\b(?:API.provider|provider configuration|model manager)\b',q):return 'providers'
     if re.search(r'\b(?:self.audit|reliability issue|weakness|potential bug)\b',q):return 'audit'
     # Asking about self-inspection itself outranks incidental words such as "model".
-    if re.search(r'\bself.inspect\w*|\bsource.inspection\b|\binspect (?:its|your|cursiv\W?s) own (?:source|code)\b',q):return 'introspection'
+    if re.search(r'\bself.inspect\w*|\bsource.inspection\b',q):return 'introspection'
     if re.search(r'\b(?:regex|regular expression)\b',q):return 'regex'
     if re.search(r'\b(?:entry ?point|startup|launch(?:er|ing)?)\b',q):return 'startup'
     if re.search(r'\b(?:field copy|portable|external ssd|removable drive|usb(?: drive)?|cross.device.*transfer)\b',q):return 'portable'
@@ -72,7 +78,7 @@ def _topic(text):
     if re.search(r'\b(?:offline|network enforcement|network restrictions)\b',q):return 'offline'
     if re.search(r'\b(?:sha.256|hash(?:ing|es)?|fingerprints?|tamper.evident|notebook.{0,35}chain)\b',q):return 'chain'
     if re.search(r'\b(?:persistent memory|conversational memory|memories)\b',q):return 'memory'
-    if re.search(r'\b(?:submit|architecture|pipeline)\b',q):return 'pipeline'
+    if re.search(r'\b(?:submit|architecture|pipeline|response generation)\b',q):return 'pipeline'
     if 'notebook' in q and all(w in q for w in ('creation','correction','verification')):return 'notebook'
     if re.search(r'\b(?:confirm|confirmation|approv\w*|before sav\w*)\b', q): return 'confirmation'
     if re.search(r'\b(?:correct\w*|overwrit\w*|original reading|preserve.*history)\b', q): return 'correction'
@@ -84,6 +90,7 @@ def _topic(text):
     if re.search(r'\b(?:verif\w*|checker|check.*answer)\b', q): return 'verification'
     if re.search(r'\brout\w* function\b', q) and re.search(r'\b(?:source|code)\b', q): return 'introspection'
     if re.search(r'\b(?:messages?|reply|send|chat box|pipeline|architecture)\b', q): return 'pipeline'
+    if re.search(r'\binspect (?:its|your|cursiv\W?s) own (?:source|code)\b',q):return 'introspection'
     if re.search(r'\b(?:own code|own source|codebase|implementation|internals)\b', q): return 'source'
     return ''
 
@@ -258,13 +265,23 @@ class Packet:
         return f'installed source {self.version}, snapshot {self.snapshot[:12]}, {len(self.snippets)} checked excerpts and {len(self.observations)} AST observations: {refs}; static source evidence, not a runtime trace'
 
 
+def invalidate_unrelated(question,history=()):
+    # No question/history text is retained by this ownership key.
+    users=[r.get('content','') for r in history[-8:] if r.get('role')=='user' and isinstance(r.get('content'),str)]
+    key=hashlib.sha256(json.dumps([str(question).strip(),users,vars(turn_policy.current())],sort_keys=True).encode()).hexdigest()
+    if _active_question.get()!=key:
+        _active.set(None)
+        _active_question.set(key)
+
+
 def prepare(question, history=()):
+    invalidate_unrelated(question,history)
     topic = resolve(question, history)
     if not topic:
         return None
     if not turn_policy.effective(question).inspect:
         return Packet(topic,'','',error='ACCESS DENIED: Source lookup is disabled for this turn. No application code was inspected.',status='ACCESS DENIED')
-    if topic in ('pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source','introspection') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
+    if topic in ('providers','guardian','pipeline','startup','pdf','documents','memory','portable','offline','notebook','chain','verification','permissions','audit','regex','source','introspection') or (topic=='models' and re.search(r'(?i)timeout|times? out',question)):
         from . import source_analysis
         try:
             data=source_analysis.collect(question,topic)
@@ -545,7 +562,8 @@ def _structure(path,symbol,lines,topic):
 def stream(runtime, packet, question, history, api_key, openai_key, anthropic_key, force_provider):
     """Use the normal provider adapters without workspace tools or extra planner calls."""
     from . import evidence_log, last_turn
-    messages = [dict(role='system',content=packet.prompt())]
+    from . import capabilities
+    messages = [dict(role='system',content=packet.prompt()),dict(role='system',content=capabilities.turn_block(turn_policy.current(),packet=packet))]
     # Existing current-thread context only; it supplies references, never new source authority.
     for row in [r for r in history if r.get('role')=='user'][-2:]:
         if isinstance(row.get('content'),str):
@@ -569,13 +587,24 @@ def stream(runtime, packet, question, history, api_key, openai_key, anthropic_ke
     last_turn.record_assembled(messages)
     from cursiv_engine.chat import model_selection
     selected = model_selection.current()
-    if selected and selected.provider != 'ollama':
-        runtime._CURSIV_REPLY=True
-        yield 'The source was inspected locally, but this explanation was not sent to the selected cloud model. Choose an installed Ollama model for source explanations. No fallback was used.'
-        return
     fp = (force_provider or '').lower().strip()
-    if fp in ('openai','claude','grok'):
-        yield 'Own-code inspection uses the installed local model; no source was sent to an online provider.\n\n'
+    if selected and (selected.managed or selected.provider!='ollama'):
+        from cursiv_engine.chat import provider_manager,request_budget
+        from . import speed
+        # Inspection remains local. Sending its public evidence requires the
+        # same exact destination, cloud consent and project policy as ordinary chat.
+        budget=request_budget.Budget(ceiling=1,context=max(8192,speed.num_ctx()),seconds=120)
+        with request_budget.use(budget):
+            yield from provider_manager.dispatch(runtime,selected.provider,selected.model,messages,max_tokens=350)
+        return
+    if fp in ('manager:local_auto','manager:cloud_auto'):
+        from cursiv_engine.chat import provider_manager
+        yield from provider_manager.automatic(runtime,fp.removeprefix('manager:'),messages)
+        return
+    if fp in ('openai','claude','grok','groq','gemini','openrouter','lmstudio','custom'):
+        runtime._CURSIV_REPLY=True
+        yield 'Source was inspected locally; no source was sent online. Select an exact provider/model in AI Providers and authorize this request. No fallback was used.'
+        return
     if not runtime._ollama_running() or not runtime._resolve_ollama_model():
         runtime._CURSIV_REPLY = True
         yield 'The source was inspected, but an installed local model is unavailable to explain it. Nothing was downloaded.\n'

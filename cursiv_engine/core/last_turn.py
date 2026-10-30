@@ -66,6 +66,7 @@ def record_assembled(messages: list[dict]) -> None:
 
 
 def record_sent(provider: str, model: str | None, system_text: str, budget: int | None = None) -> None:
+    diagnostic_event('transport',provider=provider,model=model,attempted=True)
     with _lock:
         if not _state:
             _state.update(time=time.time(), assembled=None, question="")
@@ -129,3 +130,57 @@ def evidence_block(budget: int = 1600) -> str:
     rows += [f"- {b['name']} ({b['chars']:,} characters)" for b in blocks]
     text = "\n".join(rows)
     return text[:budget]
+
+
+# Opt-in structural diagnostics. No prompts, excerpts, arguments, credentials or disk log.
+_diagnostic_lock=threading.Lock()
+_diagnostic_enabled=False
+_diagnostic_rows=[]
+
+
+def diagnostics(enabled=None):
+    global _diagnostic_enabled
+    with _diagnostic_lock:
+        if enabled is not None:
+            _diagnostic_enabled=bool(enabled)
+            _diagnostic_rows.clear()
+        return _diagnostic_enabled
+
+
+def diagnostic_event(kind,**values):
+    allowed={'provider','model','intent','route','inspect','change','memory_write','automatic_memory',
+             'tools','tool','status','reason','path','lines','check','triggered','modified','error','attempted','responded','count'}
+    def safe(value):
+        if isinstance(value,(bool,int,float)) or value is None:return value
+        if isinstance(value,(list,tuple)):return [safe(v) for v in value[:16]]
+        text=str(value)[:180]
+        return re.sub(r'(?i)\b(?:sk-[A-Za-z0-9_-]{8,}|gsk_[A-Za-z0-9_-]{8,}|AIza[A-Za-z0-9_-]{12,}|Bearer\s+\S+)','[REDACTED]',text)
+    with _diagnostic_lock:
+        if not _diagnostic_enabled:return
+        row={'event':safe(kind)}
+        for key,value in values.items():
+            if key not in allowed:continue
+            if key=='path' and (not str(value).startswith(('cursiv_engine/','launcher/','docs/')) or '..' in str(value)):continue
+            row[key]=safe(value)
+        _diagnostic_rows.append(row)
+        del _diagnostic_rows[:-120]
+
+
+def diagnostic_begin(selection,policy,file_access=False):
+    with _diagnostic_lock:
+        if not _diagnostic_enabled:return
+        _diagnostic_rows.clear()
+    provider=getattr(selection,'provider','automatic_local')
+    model=getattr(selection,'model','not selected yet')
+    diagnostic_event('selection',provider=provider,model=model)
+    diagnostic_event('effective_policy',**vars(policy))
+    diagnostic_event('tools_offered',tools=(['installed public source'] if policy.inspect else [])+
+        (['authorized workspace tools'] if file_access and policy.inspect else []))
+
+
+def diagnostic_summary():
+    import json
+    with _diagnostic_lock:
+        enabled=_diagnostic_enabled;rows=[dict(row) for row in _diagnostic_rows]
+    return ('Diagnostics '+('on' if enabled else 'off')+'. Memory only; no prompt/source text or tool arguments retained.\n'+
+            json.dumps(rows,indent=2)+'\nCommands: self diagnostics on / off / show')

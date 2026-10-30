@@ -131,6 +131,25 @@ _GROUNDED = re.compile(
     r"evidence)\b")
 
 
+def _reference_claim(pattern,text):
+    """A reference-use claim about this answer, not a requirement on claims in general."""
+    text=re.sub(r'(?m)^\s*>.*$',' ',text)
+    text=re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`',' ',text)
+    for match in pattern.finditer(text):
+        prefix=re.split(r'[.!?\n]',text[:match.start()])[-1]
+        suffix=re.split(r'[.!?\n]',text[match.end():],maxsplit=1)[0]
+        if re.search(r'(?i)\b(?:not(?!\s+only\b)|never)\s+(?:(?:fully|entirely|necessarily|actually|yet|properly)\s+)?$',prefix):continue
+        if re.search(r'(?i)\bnot(?!\s+only\b)|\bnever\b',match.group()):continue
+        if re.search(r'(?i)\b(?:must|should|ought to|needs? to|has to|have to|can|could|may|might)\s+(?:\w+\s+){0,2}be\s*$',prefix):continue
+        if re.search(r'(?i)\b(?:if|suppose|hypothetically)\b',prefix):continue
+        sentence=prefix+match.group()+suffix
+        general=re.search(r'(?i)\b(?:AI|models?|algorithms?|claims|answers|statements|hypotheses|arguments)\b',sentence)
+        current=re.search(r'(?i)\b(?:I|we|Cursiv)\b|\b(?:my|our) (?:claims?|reasoning|references?|sources?)\b|\b(?:this|my|our|the current) (?:answer|response|guidance|advice|reference|entry)\b|\bthese (?:references|sources|instructions)\b',sentence)
+        if general and not current:continue
+        return match.group().strip()
+    return ''
+
+
 def reference_notes(answer: str, ev: Evidence) -> list[str]:
     out = []
     text = answer or ""
@@ -139,11 +158,11 @@ def reference_notes(answer: str, ev: Evidence) -> list[str]:
     if invented:
         out.append(f"the answer cites {', '.join(dict.fromkeys(invented))}, which Cursiv didn't give it for this "
                    "question: that citation doesn't come from the reference")
-    prov = _first(_PROVENANCE, text)
+    prov = _reference_claim(_PROVENANCE, text)
     if prov and not any(m.get("reviewed") for m in ev.ref_meta.values()):
         known = "; ".join(f"{i}: {m['state']}" for i, m in ev.ref_meta.items()) or "no reference entry was used"
         out.append(f'the answer says "{prov}", but nothing in Cursiv\'s records says so ({known})')
-    grounded = _first(_GROUNDED, text)
+    grounded = _reference_claim(_GROUNDED, text)
     if grounded:
         weak = [i for i, m in ev.ref_meta.items() if not m.get("sourced")]
         if not ev.ref_ids and not ev.docs and not ev.searched:

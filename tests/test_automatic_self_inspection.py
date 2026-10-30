@@ -75,14 +75,18 @@ def test_own_inspection_does_not_consult_saved_documents_or_workspace(pipeline,m
 
 
 def test_unavailable_local_model_never_falls_back_to_cloud(pipeline,monkeypatch,own_source):
+    from cursiv_engine.core import source_analysis
+    monkeypatch.setattr(source_analysis,'native',lambda *a:None)  # deliberately exercise the model guard path
     monkeypatch.setattr(pipeline,'_ollama_running',lambda:False)
     monkeypatch.setattr(pipeline,'_call_ollama',lambda *a,**k:pytest.fail('No missing-model generation'))
     monkeypatch.setattr(pipeline,'_free_key_llm',lambda *a,**k:pytest.fail('No cloud fallback for own code'))
     out=final_reply(pipeline,CASES[0][0],[],force_provider='openai',review_mode='off')
-    assert 'Nothing was downloaded' in out and 'no source was sent' in out
+    assert 'exact provider/model' in out and 'no source was sent' in out and 'No fallback' in out
 
 
 def test_invented_implementation_reference_is_withdrawn(pipeline,monkeypatch,own_source):
+    from cursiv_engine.core import source_analysis
+    monkeypatch.setattr(source_analysis,'native',lambda *a:None)  # deliberately exercise the model guard path
     monkeypatch.setattr(pipeline,'_call_ollama',lambda *a,**k:iter(['It runs cursiv_engine/private/fake.py:99.']))
     out=final_reply(pipeline,CASES[0][0],[],review_mode='off')
     assert out.startswith('Source explanation withheld:')

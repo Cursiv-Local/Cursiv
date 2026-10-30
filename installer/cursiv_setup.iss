@@ -1,6 +1,6 @@
 ; ============================================================
-; Cursiv v3.14-U112 — Natural-language self-inspection and notebook reliability
-; Produces: installer\Output\Cursiv-Setup-3.14-U112.exe
+; Cursiv v3.14-U113 â€” Reliable self-inspection and scoped verification
+; Produces: installer\Output\Cursiv-Setup-3.14-U113.exe
 ;
 ; Single PyInstaller bundle: Cursiv.exe (GUI launcher with embedded chat
 ; panel, tray, guardian, feedback loops, and terminal/chat mode via -t).
@@ -11,7 +11,7 @@
 ; ============================================================
 
 #define AppName      "Cursiv"
-#define AppVer       "3.14-U112"
+#define AppVer       "3.14-U113"
 #define AppPublisher "Joshua Winkler"
 #define AppURL       "https://cursiv.us"
 #define SourceURL    "https://github.com/Cursiv-Local/Cursiv"
@@ -44,7 +44,7 @@ InfoBeforeFile=BEFORE-INSTALL.txt
 InfoAfterFile=..\CHANGELOG.md
 AppComments=A personal AI assistant that runs on your own computer. The local model answers first; online features are optional, and offline mode blocks every connection off this computer.
 OutputDir=Output
-OutputBaseFilename=Cursiv-Setup-3.14-U112
+OutputBaseFilename=Cursiv-Setup-3.14-U113
 SetupIconFile=..\launcher\resources\icons\cursiv.ico
 WizardSmallImageFile=..\launcher\resources\icons\cursiv_256.png
 Compression=lzma2/ultra64
@@ -63,8 +63,8 @@ Name: "desktopicon";  Description: "{cm:CreateDesktopIcon}";                    
 Name: "autostart";    Description: "Start Cursiv when Windows starts";                                             GroupDescription: "Startup:"; Flags: unchecked
 
 [Files]
-; ── Main application (PyInstaller bundle: single Cursiv.exe) ─────────────────
-; Includes groovy/version.txt and pandas stub patch — CLI no longer crashes.
+; â”€â”€ Main application (PyInstaller bundle: single Cursiv.exe) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+; Includes groovy/version.txt and pandas stub patch â€” CLI no longer crashes.
 Source: "..\dist\Cursiv\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [InstallDelete]
@@ -78,11 +78,11 @@ Type: filesandordirs; Name: "{app}\scripts"
 Name: "{group}\{#AppName}";            Filename: "{app}\{#AppExe}"; IconFilename: "{app}\{#AppExe}"
 Name: "{group}\Uninstall {#AppName}";  Filename: "{uninstallexe}"
 
-; Desktop shortcut — main launcher (optional)
+; Desktop shortcut â€” main launcher (optional)
 Name: "{autodesktop}\{#AppName}";                  Filename: "{app}\{#AppExe}"; Tasks: desktopicon
 
 [Registry]
-; Autostart (optional task) — HKCU so no admin needed
+; Autostart (optional task) â€” HKCU so no admin needed
 Root: HKCU; Subkey: "SOFTWARE\Microsoft\Windows\CurrentVersion\Run"; \
   ValueType: string; ValueName: "{#AppName}"; \
   ValueData: """{app}\{#AppExe}"" --tray"; \

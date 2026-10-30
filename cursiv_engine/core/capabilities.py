@@ -396,3 +396,24 @@ def agent_permissions(agent: dict) -> str:
             "It cannot read, create, change or delete files, use the field notebook, search the web, "
             "or use any other Cursiv tool. A saved tools field grants no powers. "
             "Automatic personal-memory recall is withheld from research profile runs.")
+
+
+def turn_block(policy, *, file_access=False, packet=None):
+    """Application-owned availability; permission and execution are separate facts."""
+    from cursiv_engine.chat import model_selection,provider_manager
+    from . import evidence_log
+    selected=model_selection.current()
+    rows=['## Capabilities for this turn (application state)',
+          'Cursiv is the application; the selected language model is a separate backend.',
+          'Installed public source lookup: '+('permitted' if policy.inspect else 'denied by current policy')+'.',
+          'Workspace tools: '+('permitted within the authorized root' if file_access and policy.inspect else 'not offered this turn')+'.',
+          f'Changes permitted: {policy.change}; memory writes permitted: {policy.memory_write}.',
+          'Available operations are not completed actions. Only application receipts establish execution.']
+    if selected:
+        rows.append(f'Requested backend: {selected.provider} / {selected.model}. This is not yet a responding-provider receipt.')
+        if policy.inspect:rows.append('Provider state: '+provider_manager.status(selected.provider))
+    if packet:
+        rows.append(f'Installed source status: {packet.status}; excerpts supplied: {len(packet.snippets)}. '
+                    'Verified static source is not a runtime trace. Do not invent unprovided citations.')
+    rows.append('Do not invent settings, key status, menu names, tool results or additional permissions. Provider settings: Settings → AI Providers.')
+    return '\n'.join(rows)

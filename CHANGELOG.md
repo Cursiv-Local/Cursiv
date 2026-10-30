@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U113 — Reliable self-inspection and scoped verification (2026-10-30)
+
+Read-only inspection respects explicit access boundaries and exact selected providers; source evidence stays with its turn. Checked static core maps, scoped emergency/privacy/reference checks and opt-in structural diagnostics reduce the reconstructed worksheet failures. Full Windows source validation: 2,871 passed, 15 skipped, 19 passing subtests. Real Qwen probes and limitations: docs/SELF-INSPECTION-REVIEW.md.
+
 ## 3.14-U112 — Unified AI provider and model manager (2026-10-30)
 
 Always-visible providers and known/manual model IDs; explicit local/cloud automatic modes; exact manual routing; secure device credentials; offline and research-data authorization; owned failure recovery and provider/model provenance. The separate private USB key-export opt-in is preserved.

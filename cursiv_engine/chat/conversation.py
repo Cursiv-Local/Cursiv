@@ -36,6 +36,7 @@ def _chat_inner(runtime: ChatRuntime, message: dict | str, history: list[dict], 
         yield "Please type a message or upload a file."
         return
     from cursiv_engine.core import self_inspection
+    self_inspection.invalidate_unrelated(user_text,history)
     own = self_inspection.current()
     if own is not None and not own.error:
         yield from self_inspection.stream(runtime, own, user_text, history, api_key, openai_key,
@@ -506,6 +507,8 @@ You are in full autonomous coding mode. Follow this protocol exactly:
     # What this answer's instructions were (memory only), for "self prompt" and
     # later questions about why Cursiv answered as it did.
     from cursiv_engine.core import last_turn
+    from cursiv_engine.core import capabilities
+    messages.append(dict(role='system',content=capabilities.turn_block(runtime.turn_policy.current(),file_access=file_access)))
     last_turn.record_assembled(messages)
     key = (api_key or "").strip()
     oai = (openai_key or "").strip()

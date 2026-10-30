@@ -204,6 +204,10 @@ def stream(request, result, credential=''):
     if request.cancel is not None and request.cancel.is_set():
         raise ProviderError(request.provider, E.CANCELLED)
     path, payload = build(request)
+    from cursiv_engine.core import last_turn
+    system='\n\n'.join(m['content'] for m in request.messages if m.get('role')=='system' and isinstance(m.get('content'),str))
+    last_turn.record_sent(request.provider,request.model,system if request.capability!='image_generation' else '')
+    last_turn.diagnostic_event('provider_attempt',provider=request.provider,model=request.model,attempted=True)
     calls = {}
     try:
         if request.capability == 'image_generation':

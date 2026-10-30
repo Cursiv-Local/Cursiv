@@ -196,6 +196,12 @@ def infer(request):
         exc = ProviderError(request.provider, E.MALFORMED)
         result.error, result.error_message = exc.code.value, exc.message
 
+    finally:
+        from cursiv_engine.core import last_turn
+        last_turn.diagnostic_event('provider_result',provider=result.provider,model=result.actual_model,
+            status='failed' if result.error else 'succeeded',error=result.error,
+            attempted=bool(result.attempted_provider),responded=bool(result.responding_provider))
+
 
 def selected_infer(messages, *, cfg=None, capability='text', max_tokens=800):
     """Auxiliary requests (including vision) obey the same exact selection."""

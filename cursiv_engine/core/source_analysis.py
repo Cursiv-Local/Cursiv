@@ -21,6 +21,7 @@ CONTRADICTED='CONTRADICTED'
 STATES=(VERIFIED,INFERRED,UNKNOWN,NOT_FOUND,DENIED,CONTRADICTED)
 
 FEATURES={
+ 'guardian': [('cursiv_engine/core/phases.py','_emergency'),('cursiv_engine/core/claim_evidence.py','privacy_overclaim'),('cursiv_engine/core/turn_policy.py','for_text'),('cursiv_engine/chat/completion.py','chat')],
  'pdf': [('cursiv_engine/core/documents.py','_pages'),('cursiv_engine/core/documents.py','add')],
  'documents': [('cursiv_engine/core/documents.py','search'),('cursiv_engine/core/documents.py','_passages'),('cursiv_engine/core/documents.py','prompt_block')],
  'memory': [('cursiv_engine/memory/semantic.py','add_fact'),('cursiv_engine/memory/semantic.py','_write_facts'),('cursiv_engine/memory/semantic.py','find'),('cursiv_engine/memory/semantic.py','build_context')],
@@ -28,6 +29,7 @@ FEATURES={
  'offline': [('cursiv_engine/core/netgate.py','require'),('cursiv_engine/core/netgate.py','allowed'),('cursiv_engine/core/netgate.py','_hook'),('cursiv_engine/core/netgate.py','install')],
  'notebook': [('cursiv_engine/core/fieldlog.py','add'),('cursiv_engine/core/fieldlog.py','correct'),('cursiv_engine/core/fieldlog.py','verify'),('cursiv_engine/core/fieldlog.py','_append'),('cursiv_engine/core/fieldlog.py','current'),('cursiv_engine/core/notebook_tools.py','command')],
  'chain': [('cursiv_engine/core/fieldlog.py','_fingerprint'),('cursiv_engine/core/fieldlog.py','_append'),('cursiv_engine/core/fieldlog.py','verify')],
+ 'providers': [('cursiv_engine/chat/provider_manager.py','dispatch'),('cursiv_engine/chat/provider_manager.py','infer'),('cursiv_engine/chat/provider_http.py','preflight'),('cursiv_engine/chat/model_selection.py','stream'),('cursiv_engine/chat/local_provider.py','_call_ollama_raw'),('cursiv_engine/chat/local_provider.py','_call_ollama'),('cursiv_engine/chat/routing.py','_fallback_chain')],
  'models': [('cursiv_engine/chat/local_provider.py','_call_ollama_raw'),('cursiv_engine/chat/local_provider.py','_call_ollama'),('cursiv_engine/chat/routing.py','_fallback_chain')],
  'verification': [('cursiv_engine/core/verify.py','run_pass'),('cursiv_engine/core/answer_assessment.py','assess'),('cursiv_engine/chat/review.py','prepare')],
  'permissions': [('cursiv_engine/core/file_access.py','resolve'),('cursiv_engine/core/file_access.py','perform'),('cursiv_engine/core/turn_policy.py','effective')],
@@ -557,6 +559,32 @@ def native(analysis,topic):
         refs='; '.join(f"`{r['path']}:{r['line']}` (`{r['symbol']}`)" for r in records[:8])
         return 'UNKNOWN: '+message+'\nSearched installed source: '+paths+'.'+(
             '\nInspected declarations: '+refs if refs else '')
+    if topic in ('introspection','providers','pipeline'):
+        roots=(FEATURES[topic][:4] if topic!='pipeline' else [
+            ('launcher/chat_panel.py','ChatPanel._send'),('launcher/chat_panel.py','ChatPanel._run_turn'),
+            ('cursiv_engine/chat/completion.py','chat'),('cursiv_engine/chat/streaming.py','_chat_stream'),
+            ('cursiv_engine/chat/conversation.py','_chat_inner')])
+        found={(r['path'],r['symbol']):r for r in analysis.get('evidence',[])}
+        if not all(item in found for item in roots):
+            return unknown('The requested static path was only partially established. No unchecked model explanation replaces missing source witnesses.')
+        declarations=[f"- {chr(96)}{path}:{found[(path,symbol)]['line']}{chr(96)} ({symbol})" for path,symbol in roots]
+        edges=[e for e in analysis.get('edges',[]) if e['status']==VERIFIED and (e['path'],e['symbol']) in roots]
+        edges.sort(key=lambda e:(not any(term in e['expression'] for term in ('_topic','prepare','_run_turn','_cursiv_chat','_chat_stream','_chat_inner','infer','preflight','stream')),e['path'],e['line']))
+        calls=[f"- {chr(96)}{e['path']}:{e['line']}{chr(96)}: {e['expression']} → {chr(96)}{e['target_path']}:{e['target_line']}{chr(96)} ({e['target_symbol']})" for e in edges[:5]]
+        return (f'This request selected the {topic} installed-source route. VERIFIED static declarations:\n'+
+            '\n'.join(declarations)+('\n\nAST-verified call sites (branches may differ at runtime):\n'+'\n'.join(calls) if calls else
+            '\nNo complete cross-module call edge was established in the bounded scope.')+
+            '\n\nThis is an application-generated source map, not observed execution, a tool-success receipt or a model-generated claim. No AI model was needed for this map.')
+    if topic=='guardian':
+        found={(r['path'],r['symbol']):r for r in analysis.get('evidence',[])}
+        required=FEATURES['guardian']
+        if not all(item in found for item in required):
+            return unknown('The complete guardian declaration set was not established; no missing-feature claim is justified.')
+        labels=['emergency guidance','privacy-assertion checks','current-turn restrictions','response completion and checks']
+        refs=[f"- {label}: {chr(96)}{path}:{found[(path,symbol)]['line']}{chr(96)} ({symbol})" for (path,symbol),label in zip(required,labels)]
+        return ('Installed guardian and policy declarations (VERIFIED static source):\n'+'\n'.join(refs)+
+            '\n\nThese are separate application checks. Source inspection does not establish that a warning fired or that a tool ran. '+
+            'Use self diagnostics on before reproducing a turn to record actual triggers and response changes. No AI model was used for this declaration map.')
     if topic in ('notebook','chain','pdf','documents','verification'):
         rule=analysis.get('feature_rules')
         if not rule:return unknown('The reviewed feature explanation no longer matches the selected source witnesses. No operation was executed; this does not establish feature absence.')

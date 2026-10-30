@@ -118,6 +118,8 @@ def _time_boxed(runtime: ChatRuntime, gen, seconds: float, grace: float):
 
 def _chat_stream(runtime: ChatRuntime, message, history, api_key, files, file_access, root_path, openai_key, confirm_writes, anthropic_key, force_provider, reply: list[str], on_action):
     from cursiv_engine.core import selfknow as _sk
+    from cursiv_engine.core import self_inspection
+    self_inspection.invalidate_unrelated(message.get('text','') if isinstance(message,dict) else str(message or ''),history)
     runtime.grounding.reset_executions()
     runtime._CURSIV_REPLY = False
     runtime.grounding.set_memory_sources(())

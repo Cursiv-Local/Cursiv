@@ -74,6 +74,9 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
     from cursiv_engine.core import field_recall, notebook_tools
     _field_text = message.get('text', '') if isinstance(message, dict) else str(message or '')
     policy = runtime.turn_policy.current()
+    from cursiv_engine.core import last_turn
+    last_turn.diagnostic_begin(model_selection.current(),policy,file_access)
+    last_turn.diagnostic_event('classification',intent=self_inspection.resolve(_field_text,history) or 'ordinary_or_native')
     _replace_prefix = runtime.REPLACE_SENTINEL + (policy.confirmation() + '\n\n' if policy.confirmation() else '')
     from cursiv_engine.core import file_access as _file_ops
     if policy.confirmation():
@@ -122,7 +125,10 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         yield _file_ops.VerifiedText(_claim_check)
         return
     _own = self_inspection.prepare(_field_text, history) if not files and not (isinstance(message,dict) and message.get('files')) else None
+    last_turn.diagnostic_event('routing',route='installed_source' if _own else 'native_or_conversation',
+        status=_own.status if _own else 'not requested')
     if _own is not None and _own.error:
+        last_turn.diagnostic_event('access_denial',status=_own.status,reason='installed source unavailable or denied')
         yield _file_ops.VerifiedText(_own.error)
         return
     _native = native_answers.answer(_field_text, calculations=policy.inspect) if _own is None else None
@@ -343,6 +349,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
         # is needed" -- only with a record of that check for this answer. Otherwise say so under it.
         _unbacked = claim_evidence.correction(draft)
         if _unbacked:
+            last_turn.diagnostic_event('guardian',check='source_claim',triggered=True,modified=True)
             reply.append('\n\n' + _unbacked)
             yield '\n\n' + _unbacked
         from cursiv_engine.core import science_check as _science     # U100 audit: formulas, invented data, coordinates
@@ -358,6 +365,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                           authored=('native' if runtime._CURSIV_REPLY else 'calculation'
                               if runtime._WORKED and runtime._WORKED.ok else 'model')) if _own is None else None):
             if _note:
+                last_turn.diagnostic_event('response_modification',modified=True,reason='post_draft_check_note')
                 reply.append('\n\n' + _note)
                 yield '\n\n' + _note
         _source_problem = runtime.grounding.quote_problem(_field_text, draft)
