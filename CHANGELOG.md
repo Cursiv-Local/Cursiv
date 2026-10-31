@@ -2,7 +2,7 @@
 
 ## 3.14-U114 — Source targeting and evidence reliability (2026-10-30)
 
-Explicit source files/functions are inspected first with unchanged access/read budgets. Source locations, quoted/negated claims, mathematical self-checks and user-supplied numeric inputs no longer trigger unrelated evidence warnings. Native static answers remain separate from model prose; unsupported resource safety/runtime and actual fabricated tool/source claims remain checked. Diagnostics distinguish available/offered/executed operations and denied/completed reads. Details and offline limits: docs/U113-GUARDIAN-AUDIT.md and docs/U113-MANUAL-TEST-HANDOFF.md.
+Explicit source files/functions are inspected first with unchanged access/read budgets. Source locations, quoted/negated claims, mathematical self-checks and user-supplied numeric inputs no longer trigger unrelated evidence warnings. Native static answers remain separate from model prose; unsupported resource safety/runtime and actual fabricated tool/source claims remain checked. Diagnostics distinguish available/offered/executed operations and denied/completed reads. The PDF dependency floor/hash lock is6.21.4 following the release security gate. Details and offline limits: docs/U113-GUARDIAN-AUDIT.md and docs/U113-MANUAL-TEST-HANDOFF.md.
 
 ## 3.14-U113 — Reliable self-inspection and scoped verification (2026-10-30)
 

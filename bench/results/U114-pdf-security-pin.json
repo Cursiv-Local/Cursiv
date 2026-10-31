@@ -1,0 +1,28 @@
+{
+  "package": "pypdf",
+  "before": "6.21.2",
+  "after": "6.21.4",
+  "ci_run": 41147388649,
+  "ci_job": 124375566657,
+  "advisories": [
+    "CVE-2026-119208",
+    "CVE-2026-119206",
+    "CVE-2026-119209",
+    "CVE-2026-119207",
+    "CVE-2026-119203",
+    "CVE-2026-119205",
+    "CVE-2026-119204"
+  ],
+  "metadata": "https://pypi.org/pypi/pypdf/6.21.4/json",
+  "upstream_release": "https://github.com/py-pdf/pypdf/releases/tag/6.21.4",
+  "hashes": {
+    "pypdf-6.21.4-py3-none-any.whl": "33e4fb41ca352810eb4e9838aa0d82d6888a5f8bf682f43e99cce5faa666255c",
+    "pypdf-6.21.4.tar.gz": "c8817e3f888d47a087872ded69812c1ef30cacb871d6e053e0c00bbaf0bc2163"
+  },
+  "local_install": false,
+  "verification": "awaiting normal hosted security and source gates",
+  "local_index_checks": 99,
+  "unexpected_guard_operations": 0,
+  "index_receipt": "U113-offline-pdf-pin-index.json",
+  "source_index_sha256": "aadf3e674ab20303888f5e958d0cf2a67330cd60356a932cc113aa1c5c440e91"
+}
