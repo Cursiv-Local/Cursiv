@@ -4,6 +4,20 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U114 preparing — source targeting and evidence reliability
+
+The owner authorized commit/push/release and normal hosted CI (no real AI calls
+or model inference). Preserve the published U113 tag. Repairs and history proof:
+[guardian audit](docs/U113-GUARDIAN-AUDIT.md); final strict-offline validation and
+owner test prompts: [manual handoff](docs/U113-MANUAL-TEST-HANDOFF.md).
+The earlier 2,909/15/19 checkpoint is historical; use the latest strict receipt.
+Final guarded local validation:2,824 passed/33 skipped/19 passing subtests, zero
+unexpected network/process operations. No U114 release is claimed yet. Existing
+notebook confirmations, permissions, provider privacy/offline gates and opted-in
+USB key export remain. Original owner checkout, excluded files and station code
+are unchanged. Windows packages now also have a hosted tag-only build path using
+the existing main/lock/frozen/USB gates; no local dependency install is required.
+
 ## U113 released — October 30, 2026
 
 Owner-authorized [U113](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U113) is published from `bd11f925df7007e1641fd3b35ffd0ce9dad0a22d` (PR68). Exact-main CI and both native packages passed. Eleven anonymous downloads and eight owner signatures verified. [Release evidence](docs/U113-RELEASE-VERIFICATION.md); [implementation and measurements](docs/SELF-INSPECTION-REVIEW.md). Website PR69 is merged and deployment `7946b4d2-7cc0-418b-833c-6a730f62930b` passed [41 live checks across20 public pages](bench/results/U113-publication.json). Preserve existing provider privacy, notebook confirmation and opted-in USB key export.

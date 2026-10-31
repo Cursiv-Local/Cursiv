@@ -30,6 +30,8 @@ def _call_claude_with_tools(runtime: ChatRuntime, messages: list[dict], anthropi
 
     import time as _time
 
+    from cursiv_engine.core import last_turn
+    last_turn.diagnostic_event('tools_offered',provider='claude',tools=[t['name'] for t in runtime.CLAUDE_TOOLS],status='prepared provider schemas; not execution')
     for _ in range(max_loops):
         payload = runtime.json.dumps({
             "model":      runtime.ANTHROPIC_CODE_MODEL,
@@ -175,6 +177,8 @@ def _call_xai_with_tools(runtime: ChatRuntime, messages: list[dict], api_key: st
     loop_msgs = list(messages)
     file_results = []
 
+    from cursiv_engine.core import last_turn
+    last_turn.diagnostic_event('tools_offered',provider=provider_name,tools=[t['function']['name'] for t in runtime.FILE_TOOLS],status='prepared provider schemas; not execution')
     for _ in range(max_loops):
         payload = runtime.json.dumps({
             "model":       model,

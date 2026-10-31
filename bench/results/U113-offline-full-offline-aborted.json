@@ -1,0 +1,764 @@
+{
+  "status": "stopped after guard caught legacy unmocked startup probes; not a completed test result",
+  "events": [
+    {
+      "pid": 12160,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 12160,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 21192,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 21192,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 35352,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 35352,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 35708,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 35708,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 41040,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 41040,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 44780,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 44780,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 51652,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 51652,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 52620,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 52620,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 55392,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 55392,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 60500,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 60500,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 61592,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_lists_accounts_without_names",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_remove_other_account",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_remove_yourself_closes_cursiv",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_wont_remove_the_only_account",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_start_over",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "mocked_hardware_query",
+      "test": "tests/test_agent_evidence_runs.py::test_individual_and_group_have_identical_authorized_evidence"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_qt_buttons_are_ready_while_verifier_is_blocked",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_switching_conversation_cancels_and_discards_result",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_new_turn_rejects_a_late_review_result",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "unapproved external executable: ollama.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_explicit_crosscheck_result_is_not_erased_by_a_late_automatic_review",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "unapproved external executable: ollama.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_save_runs_exactly_the_command_on_the_card_once",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_cancel_changes_nothing",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_edit_puts_the_command_in_the_message_box_and_runs_nothing",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_a_card_with_a_problem_cannot_be_saved",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_card_text_is_shown_as_text_not_markup",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_approved_plugin_runs",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_approved_plugin_runs",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_plugin_changed_after_approval_does_not_load",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_switched_off_plugin_does_not_run",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_restart_and_portable_relocation"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_lease_blocks_second_process"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_startup_lease_survives_local_reference_cleanup"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_documents_import_and_answer_with_offline_mode_on_and_no_connection",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_phone_to_laptop_every_record_photo_fingerprint_and_signature",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log byte-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log line removed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[manifest removed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[signature changed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[photo byte-photo]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[truncated file-error]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[not a zip-error]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_photo_on_a_first_import_is_left_out_and_named",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_receive_import_and_export_work_offline_without_reaching_anything",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_approved_overwrite_and_fresh_process_read"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_file_commands_work_in_a_fresh_process_with_external_sockets_blocked"
+    },
+    {
+      "pid": 61592,
+      "event": "guarded_python_child",
+      "test": "tests/test_grounded_chat.py::test_dated_recall_survives_a_fresh_python_process"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_honesty.py::test_automatic_does_not_use_a_key_when_the_local_model_fails",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_honesty.py::test_automatic_does_not_use_a_key_when_the_local_model_fails",
+      "operation": "socket.getaddrinfo"
+    }
+  ],
+  "blocked_operations": [
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_lists_accounts_without_names",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_remove_other_account",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_remove_yourself_closes_cursiv",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_wont_remove_the_only_account",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_accounts.py::test_settings_start_over",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_qt_buttons_are_ready_while_verifier_is_blocked",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_switching_conversation_cancels_and_discards_result",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_new_turn_rejects_a_late_review_result",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_background_followup_is_saved_and_reloads_with_original_answer",
+      "operation": "unapproved external executable: ollama.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_background_review.py::test_explicit_crosscheck_result_is_not_erased_by_a_late_automatic_review",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_chat_rendering.py::test_autosave_returns_before_disk_write_and_uses_no_gui_objects_in_worker",
+      "operation": "unapproved external executable: ollama.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_save_runs_exactly_the_command_on_the_card_once",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_cancel_changes_nothing",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_edit_puts_the_command_in_the_message_box_and_runs_nothing",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_a_card_with_a_problem_cannot_be_saved",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_confirm_cards.py::test_card_text_is_shown_as_text_not_markup",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_approved_plugin_runs",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_approved_plugin_runs",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_plugin_changed_after_approval_does_not_load",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_core.py::test_switched_off_plugin_does_not_run",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_with_the_ai_engine_down_cursiv_gives_what_it_has",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_documents.py::test_documents_import_and_answer_with_offline_mode_on_and_no_connection",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_phone_to_laptop_every_record_photo_fingerprint_and_signature",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log byte-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log line removed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[manifest removed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[signature changed-refused]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[photo byte-photo]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[truncated file-error]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[not a zip-error]",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_a_damaged_photo_on_a_first_import_is_left_out_and_named",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_end_to_end_field.py::test_receive_import_and_export_work_offline_without_reaching_anything",
+      "operation": "unapproved external executable: node.exe"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_honesty.py::test_automatic_does_not_use_a_key_when_the_local_model_fails",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 61592,
+      "event": "blocked",
+      "test": "tests/test_honesty.py::test_automatic_does_not_use_a_key_when_the_local_model_fails",
+      "operation": "socket.getaddrinfo"
+    }
+  ]
+}

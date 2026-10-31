@@ -31,11 +31,14 @@ class Evidence:
     searched: bool = False                # a web search ran this turn
     docs: list[str] = field(default_factory=list)             # document names whose pages were given
     earlier: list[str] = field(default_factory=list)          # earlier answers in this conversation
+    user_numbers: list[str] = field(default_factory=list)     # transient current-chat inputs, never external verification
 
 
 def _first(pattern: re.Pattern, text: str) -> str:
-    m = pattern.search(text or "")
-    return m.group(0).strip() if m else ""
+    from .claim_evidence import _assertion_text, _asserted
+    text = _assertion_text(text)
+    match = next((m for m in pattern.finditer(text) if _asserted(text, m)), None)
+    return match.group(0).strip() if match else ""
 
 
 # ── tool use ──────────────────────────────────────────────────────────────────
@@ -131,7 +134,7 @@ _GROUNDED = re.compile(
     r"evidence)\b")
 
 
-def _reference_claim(pattern,text):
+def _reference_claim(pattern,text,ev=None):
     """A reference-use claim about this answer, not a requirement on claims in general."""
     text=re.sub(r'(?m)^\s*>.*$',' ',text)
     text=re.sub(r'"[^"\n]*"|“[^”\n]*”|`[^`\n]*`',' ',text)
@@ -143,6 +146,13 @@ def _reference_claim(pattern,text):
         if re.search(r'(?i)\b(?:must|should|ought to|needs? to|has to|have to|can|could|may|might)\s+(?:\w+\s+){0,2}be\s*$',prefix):continue
         if re.search(r'(?i)\b(?:if|suppose|hypothetically)\b',prefix):continue
         sentence=prefix+match.group()+suffix
+        if pattern is _GROUNDED and ev is not None and re.search(
+                r'(?i)\b(?:you|the user) (?:supplied|provided|stated|gave)\b|\b(?:user|conversation|scenario)[- ](?:supplied|provided)\b',sentence):
+            from .verify import _numbers
+            values=_numbers(sentence)
+            if values and values<=(_numbers(ev.question)|set(ev.user_numbers)):
+                continue  # supplied conversational values require no file/reference lookup
+
         general=re.search(r'(?i)\b(?:AI|models?|algorithms?|claims|answers|statements|hypotheses|arguments)\b',sentence)
         current=re.search(r'(?i)\b(?:I|we|Cursiv)\b|\b(?:my|our) (?:claims?|reasoning|references?|sources?)\b|\b(?:this|my|our|the current) (?:answer|response|guidance|advice|reference|entry)\b|\bthese (?:references|sources|instructions)\b',sentence)
         if general and not current:continue
@@ -162,7 +172,7 @@ def reference_notes(answer: str, ev: Evidence) -> list[str]:
     if prov and not any(m.get("reviewed") for m in ev.ref_meta.values()):
         known = "; ".join(f"{i}: {m['state']}" for i, m in ev.ref_meta.items()) or "no reference entry was used"
         out.append(f'the answer says "{prov}", but nothing in Cursiv\'s records says so ({known})')
-    grounded = _reference_claim(_GROUNDED, text)
+    grounded = _reference_claim(_GROUNDED, text, ev)
     if grounded:
         weak = [i for i, m in ev.ref_meta.items() if not m.get("sourced")]
         if not ev.ref_ids and not ev.docs and not ev.searched:
@@ -193,7 +203,22 @@ _HEDGED = re.compile(r"(?i)\b(?:if|whether|not sure|can'?t (?:say|tell|know)|can
                      r"don'?t know|no way to (?:know|tell))\b[^.!?\n]{0,25}$")
 
 
+_RESOURCE_TOPIC=re.compile(r'(?i)\b(?:reserves?|life.support|consumption|oxygen|battery|batteries|fuel|water supply)\b')
+_RESOURCE_GAP=re.compile(r'(?i)\b(?:no|without|missing|unknown)\b[^.!?\n]{0,150}\b(?:rates?|capacities|capacity|diagnostics?|thresholds?|limits?)\b|'
+    r'\b(?:rates?|capacities|capacity|diagnostics?|thresholds?|limits?)\b[^.!?\n]{0,70}\b(?:unknown|missing|not (?:given|provided|specified))\b')
+_RESOURCE_DURATION=re.compile(r'(?i)\b(?:will|can)\s+(?:last|survive|operate|run)\s+(?:for\s+)?\d+(?:\.\d+)?\s*(?:days?|hours?|weeks?|months?)\b')
+_RESOURCE_SAFE=re.compile(r'(?i)\b(?:the )?(?:crew|team|occupants)\s+(?:is|are)\s+safe\b')
+
+
 def certainty_notes(answer: str, ev: Evidence) -> list[str]:
+    from .claim_evidence import _assertion_text
+    answer = _assertion_text(answer)
+    resource=bool(_RESOURCE_TOPIC.search(ev.question or '') and _RESOURCE_GAP.search(ev.question or ''))
+    if resource:
+        assertions=[sentence for sentence in re.split(r'(?<=[.!?])\s+|\n',answer) if not re.search(
+            r"(?i)\b(?:if|assuming|hypothetical|illustrative|cannot|can't|unknown|undetermined)\b",sentence)]
+        if any(_SAFE_CLAIM.search(sentence) or _RESOURCE_SAFE.search(sentence) or _RESOURCE_DURATION.search(sentence) for sentence in assertions):
+            return ['the supplied percentages cannot establish safety or remaining runtime without reserve capacities, consumption rates and operating limits; keep unsupported thresholds and duration estimates separate from the supplied inputs']
     claim = ""
     for m in _SAFE_CLAIM.finditer(answer or ""):
         if not _HEDGED.search((answer or "")[max(0, m.start() - 60): m.start()]):
@@ -225,6 +250,8 @@ _NEGATED = re.compile(r"(?i)\b(?:not|never|no|doesn'?t|don'?t|won'?t|isn'?t|aren
 
 
 def blanket_notes(answer: str, ev: Evidence) -> list[str]:
+    from .claim_evidence import _assertion_text
+    answer = _assertion_text(answer)
     claim = ""
     for m in _BLANKET.finditer(answer or ""):
         before = (answer or "")[max(0, m.start() - 12): m.start()]

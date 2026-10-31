@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="1" failures="0" skipped="0" tests="1" time="4.348" timestamp="2026-10-30T13:59:28.808417-04:00" hostname="Josh"><testcase classname="" name="tests.test_ci_change_scope" time="0.000"><error message="collection failure">tests\test_ci_change_scope.py:9: in &lt;module&gt;
+    from unittest.mock import patch
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\unittest\mock.py:27: in &lt;module&gt;
+    import asyncio
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\asyncio\__init__.py:43: in &lt;module&gt;
+    from .windows_events import *
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\asyncio\windows_events.py:26: in &lt;module&gt;
+    from . import windows_utils
+..\..\..\..\AppData\Local\Programs\Python\Python313\Lib\asyncio\windows_utils.py:132: in &lt;module&gt;
+    class Popen(subprocess.Popen):
+E   TypeError: function() argument 'code' must be code, not str</error></testcase></testsuite></testsuites>

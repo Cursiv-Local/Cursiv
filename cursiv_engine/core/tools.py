@@ -164,6 +164,8 @@ def plan(text: str, ask: Callable[[list[dict]], str], *, files: bool = True) -> 
     tools = all_tools() if policy == Policy() else dict(BUILTIN)
     if not files:
         tools = {n: t for n, t in tools.items() if n not in ('read_file', 'list_folder', 'find_files')}
+    from . import last_turn
+    last_turn.diagnostic_event('tools_offered',tools=[name if name in BUILTIN else 'other tool' for name in tools],status='prepared planner tool list; not execution')
     desc = "\n".join(f"- {n}: {t['description']}" for n, t in tools.items())
     try:
         raw = ask([{"role": "system", "content": _ROUTER.format(tools=desc)},

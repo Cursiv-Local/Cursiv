@@ -1,0 +1,981 @@
+{
+  "label": "full-guarded",
+  "exit_code": 1,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "f5975870703f0f61e57867be5efe084026676fbf0c6e5e35ffd0df15bffd0dd4",
+  "events": [
+    {
+      "pid": 19976,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 19976,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 22208,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 22208,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 24720,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 24720,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 2512,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 2512,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 26676,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 26676,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 27748,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 27748,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 3304,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 3304,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 35120,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 35120,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 36356,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 36356,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 3760,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 3760,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 40148,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 40148,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 42516,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 42516,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45460,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45460,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45504,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45504,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45540,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45540,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45676,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45676,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45696,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45696,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 45704,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 45704,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 4732,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 4732,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 48276,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 48276,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 48308,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 48308,
+      "event": "blocked",
+      "test": "startup",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 48308,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 1
+    },
+    {
+      "pid": 48364,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 48364,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 49972,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 49972,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 50972,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 50972,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 52764,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 52764,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 53012,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 53012,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 53852,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 53852,
+      "event": "mocked_hardware_query",
+      "test": "tests/test_agent_evidence_runs.py::test_individual_and_group_have_identical_authorized_evidence"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_restart_and_portable_relocation"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_lease_blocks_second_process"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_startup_lease_survives_local_reference_cleanup"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_approved_overwrite_and_fresh_process_read"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_file_commands_work_in_a_fresh_process_with_external_sockets_blocked"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_grounded_chat.py::test_dated_recall_survives_a_fresh_python_process"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_module_boundaries.py::test_extracted_chat_modules_import_without_widgets"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_native_boundaries.py::test_legacy_status_does_not_confuse_selection_with_actual_responder[CANDIDATE-992]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_native_boundaries.py::test_legacy_status_does_not_confuse_selection_with_actual_responder[None]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_offline_on_persists_to_config",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_closed_gate_refuses_connections_at_the_socket",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_fresh_install_chat_turn_makes_no_outside_connections[hey, how are you doing?]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_the_page_is_served_and_says_nothing_goes_online",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_a_wrong_code_is_refused_and_five_stop_it",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_a_phone_file_sent_with_the_code_is_imported_with_the_usual_checks",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_something_that_isnt_a_phone_file_is_reported_not_imported",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_too_big_or_empty_is_refused_before_reading",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_it_stops_by_itself_when_nothing_arrives",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_problem_report.py::test_a_report_holds_only_logs_and_never_chats_or_memories",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_problem_report.py::test_nothing_is_sent_in_offline_mode",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_reliability.py::test_a_fresh_process_finds_the_saved_record"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_self_awareness.py::test_a_question_about_the_last_answer_sees_that_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>0]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>1]",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>2]",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>3]",
+      "operation": "socket.sendto"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>4]",
+      "operation": "unapproved external executable: ollama"
+    },
+    {
+      "pid": 53852,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>5]",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_strict_offline_guard.py::test_python_child_inherits_guard"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_u108_evidence.py::test_restart_read_by_identifier_and_append_correction"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_a_fresh_kit_without_personal_data_has_none"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process"
+    },
+    {
+      "pid": 53852,
+      "event": "guarded_python_child",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process"
+    },
+    {
+      "pid": 54116,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 54116,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 59880,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 59880,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 61776,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 61776,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 62100,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 62100,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 6540,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 6540,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 8188,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 8188,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    },
+    {
+      "pid": 9880,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 9880,
+      "event": "guard_exit",
+      "test": "startup",
+      "violations": 0
+    }
+  ],
+  "blocked_operations": [
+    {
+      "pid": 48308,
+      "event": "blocked",
+      "test": "startup",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_native_boundaries.py::test_legacy_status_does_not_confuse_selection_with_actual_responder[CANDIDATE-992]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_native_boundaries.py::test_legacy_status_does_not_confuse_selection_with_actual_responder[None]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_offline_on_persists_to_config",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_closed_gate_refuses_connections_at_the_socket",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_netgate.py::test_fresh_install_chat_turn_makes_no_outside_connections[hey, how are you doing?]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_the_page_is_served_and_says_nothing_goes_online",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_a_wrong_code_is_refused_and_five_stop_it",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_a_phone_file_sent_with_the_code_is_imported_with_the_usual_checks",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_something_that_isnt_a_phone_file_is_reported_not_imported",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_too_big_or_empty_is_refused_before_reading",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_phone_receive.py::test_it_stops_by_itself_when_nothing_arrives",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_problem_report.py::test_a_report_holds_only_logs_and_never_chats_or_memories",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_problem_report.py::test_nothing_is_sent_in_offline_mode",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 53852,
+      "event": "blocked",
+      "test": "tests/test_self_awareness.py::test_a_question_about_the_last_answer_sees_that_answer",
+      "operation": "socket.getaddrinfo"
+    }
+  ],
+  "exclusions": [
+    {
+      "path": "test_fieldsync.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "tests/test_core.py::test_approved_plugin_runs",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_plugin_changed_after_approval_does_not_load",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_switched_off_plugin_does_not_run",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_phone_to_laptop_every_record_photo_fingerprint_and_signature",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log byte-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log line removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[manifest removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[signature changed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[photo byte-photo]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[truncated file-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[not a zip-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_photo_on_a_first_import_is_left_out_and_named",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_receive_import_and_export_work_offline_without_reaching_anything",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_still_allows_loopback",
+      "reason": "expects a real loopback connection"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_phone_log_imports_with_every_fingerprint_and_the_signature_checked",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_sending_the_same_file_again_adds_nothing_and_the_key_is_remembered",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_phone_file_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_chat_command_imports_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_opens_as_an_ordinary_zip_and_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[../evil.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[/abs.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/laptopB.jsonl]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/photos/../../x.jpg]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[other/readme.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_entry_inside_the_zip_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_without_the_phone_header_is_not_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_sent_over_wifi_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phone_never_calls_its_storage_permanent_and_names_every_failure",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_browser_without_ed25519_sends_an_unsigned_file_cursiv_says_so",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-full-guarded.xml"
+}

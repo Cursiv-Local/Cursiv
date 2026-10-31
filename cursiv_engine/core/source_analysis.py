@@ -136,9 +136,13 @@ class Session:
             text=self_index.text(self.base,self.index,path)
             self.characters+=len(text)
             self.texts[path]=text
+            from . import last_turn
+            last_turn.diagnostic_event('source_read',path=path,status='hash-checked installed source')
             if path.endswith('.py'):self.syntax[path]=_syntax(path,text,row['sha256'])
             return text
         except (OSError,ValueError,TypeError,KeyError,UnicodeError,SyntaxError,RecursionError) as exc:
+            from . import last_turn
+            last_turn.diagnostic_event('source_read_denied' if isinstance(exc,PermissionError) else 'source_read_unavailable',path=path,status=DENIED if isinstance(exc,PermissionError) else UNKNOWN)
             self.errors.append(dict(path=path,status=DENIED if isinstance(exc,PermissionError) else UNKNOWN,reason=str(exc)))
             return None
 
@@ -499,6 +503,49 @@ def collect(question,topic,*,limits=None):
     base=self_source.root();version=self_source.version();index=self_index.load(base,version)
     session=Session(base,index,limits or Limits())
     seeds=PIPELINE if topic in ('pipeline','startup','audit','source') else FEATURES.get(topic,[])
+    target_errors=[]
+    if topic=='target':
+        from .self_inspection import explicit_targets
+        requested_paths, requested_symbols = explicit_targets(question)
+        seeds=[]
+        if len(requested_paths)>4:
+            target_errors.append('More than four explicit files requested; narrow the target scope.')
+        else:
+            paths=[]
+            for requested in requested_paths:
+                if '/' in requested and not self_index.public_path(requested):
+                    target_errors.append('Requested file is outside the installed public source policy: '+requested)
+                    session.errors.append(dict(path=requested,status=DENIED,reason=target_errors[-1]))
+                    continue
+                matches=([requested] if requested in index['files'] else
+                    [p for p in index['files'] if '/' not in requested and p.rsplit('/',1)[-1]==requested])
+                if len(matches)!=1 or not self_index.public_path(matches[0]):
+                    target_errors.append('Requested file is unavailable, restricted or ambiguous in the installed public inventory: '+requested)
+                    continue
+                paths.append(matches[0])
+            if not requested_paths and requested_symbols:
+                paths=[p for p,row in index['files'].items() if any(
+                    symbol['name'] in requested_symbols for symbol in row['symbols'])]
+                if len(paths)!=1:
+                    target_errors.append('The function target has no unique file in the installed public inventory.')
+                    paths=[]
+            for path in paths:
+                # Explicit paths win BEFORE any generic seeds or graph expansion.
+                if session.read(path) is None:continue
+                symbols=index['files'][path]['symbols']
+                if requested_symbols:
+                    for requested in requested_symbols:
+                        matches=[r['name'] for r in symbols if r['name']==requested or
+                            (requested.startswith(path[:-3].replace('/','.')+'.') and
+                             requested==path[:-3].replace('/','.')+'.'+r['name'])]
+                        if len(matches)==1:seeds.append((path,matches[0]))
+                        else:target_errors.append('No exact declaration '+requested+' in '+path)
+                else:
+                    seeds.extend((path,r['name']) for r in symbols if '.' not in r['name'])
+                    seeds=seeds[:4]
+            if target_errors and not seeds and not session.errors:
+                session.errors.append(dict(path=','.join(requested_paths),status=UNKNOWN,reason='; '.join(target_errors)))
+
     # Unknown feature names must not turn generic source hints into a feature finding.
     specific=topic=='source' and bool(re.search(r'(?i)\b(?:find|locate)\b.*\bimplementation\b|'
         r'\b(?:identify|which|what)\b.{0,40}\b(?:function|method)s?\b',question))
@@ -527,6 +574,7 @@ def collect(question,topic,*,limits=None):
         status=UNKNOWN
     result=dict(status=status,version=version,snapshot=index['snapshot'],evidence=session.evidence,
         edges=session.edges,roles=roles,coverage=session.coverage(),technical=technical(question,session.texts))
+    if topic=='target':result.update(requested_targets=seeds,target_errors=target_errors)
     if topic=='portable':result['portable_contract']=_portable_contract(session)
     if topic=='memory':result['memory_contract']=_memory_contract(session)
     if topic in ('notebook','chain','pdf','documents','verification'):result['feature_rules']=_feature_rules(session,topic)
@@ -559,6 +607,20 @@ def native(analysis,topic):
         refs='; '.join(f"`{r['path']}:{r['line']}` (`{r['symbol']}`)" for r in records[:8])
         return 'UNKNOWN: '+message+'\nSearched installed source: '+paths+'.'+(
             '\nInspected declarations: '+refs if refs else '')
+    if topic=='target':
+        if analysis.get('target_errors'):
+            return unknown('; '.join(analysis['target_errors']))
+        records=[r for r in analysis.get('evidence',[]) if r.get('primary')]
+        if not records:return unknown('No requested declaration was established in the selected file.')
+        rows=['Requested installed-source target (VERIFIED static source; selected lines, not execution):']
+        for record in records:
+            rows.append(f"- `{record['path']}:{record['line']}` — `{record['symbol']}` (definition ends at line {record['end']})")
+            rows.append('```python\n'+record['excerpt']+'\n```')
+            for fact in record['facts']:
+                if fact['kind'] in ('condition','return'):
+                    rows.append(f"- Static {fact['kind']} at `{record['path']}:{fact['line']}`: `{fact['expression']}`")
+        rows.append('Only the shown declarations and static calls are established. No AI model was used for this source result.')
+        return '\n\n'.join(rows)
     if topic in ('introspection','providers','pipeline'):
         roots=(FEATURES[topic][:4] if topic!='pipeline' else [
             ('launcher/chat_panel.py','ChatPanel._send'),('launcher/chat_panel.py','ChatPanel._run_turn'),

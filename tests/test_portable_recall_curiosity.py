@@ -358,6 +358,7 @@ def test_fresh_process_and_relocation(tmp_path):
     create = """from cursiv_engine.core import fieldlog, curiosity, netgate, documents, paths
 from cursiv_engine.memory import semantic
 from cursiv_engine.coding import brain
+semantic._embed_ok = False  # fresh child: do not probe an embedding server
 netgate.set_offline(True); netgate.install()
 folder=paths.portable_root()/'Workspace'/'research'; folder.mkdir(parents=True)
 file=folder/'protocol.txt'; file.write_text('Water protocol measurements require calibration.', encoding='utf-8')

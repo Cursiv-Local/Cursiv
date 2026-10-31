@@ -138,6 +138,8 @@ def test_usb_full_life_cycle(kit):
     # Start from the drive: everything Cursiv writes lands on it.
     started = _start_from(drive, """
 from cursiv_engine.memory import semantic
+# This fresh child does not inherit pytest's semantic-memory fixture.
+semantic._embed_ok = False  # no local embedding discovery in an offline regression
 semantic.add_fact("Written while running from the USB", "jw", "manual")
 out["facts_file"] = str(semantic.FACTS_FILE)
 """)

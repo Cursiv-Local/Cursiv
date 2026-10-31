@@ -1,0 +1,476 @@
+{
+  "label": "residual-probes",
+  "exit_code": 1,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "f5975870703f0f61e57867be5efe084026676fbf0c6e5e35ffd0df15bffd0dd4",
+  "events": [
+    {
+      "pid": 44788,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 44788,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo",
+      "frames": [
+        {
+          "file": "commands_system.py",
+          "function": "handle",
+          "line": 62
+        },
+        {
+          "file": "commands_system.py",
+          "function": "_engine_line",
+          "line": 43
+        },
+        {
+          "file": "ollama_host.py",
+          "function": "diagnose",
+          "line": 122
+        },
+        {
+          "file": "ollama_host.py",
+          "function": "running",
+          "line": 62
+        },
+        {
+          "file": "request.py",
+          "function": "urlopen",
+          "line": 189
+        },
+        {
+          "file": "request.py",
+          "function": "open",
+          "line": 489
+        },
+        {
+          "file": "request.py",
+          "function": "_open",
+          "line": 506
+        },
+        {
+          "file": "request.py",
+          "function": "_call_chain",
+          "line": 466
+        },
+        {
+          "file": "request.py",
+          "function": "http_open",
+          "line": 1348
+        },
+        {
+          "file": "request.py",
+          "function": "do_open",
+          "line": 1319
+        },
+        {
+          "file": "client.py",
+          "function": "request",
+          "line": 1358
+        },
+        {
+          "file": "client.py",
+          "function": "_send_request",
+          "line": 1404
+        },
+        {
+          "file": "client.py",
+          "function": "endheaders",
+          "line": 1353
+        },
+        {
+          "file": "client.py",
+          "function": "_send_output",
+          "line": 1113
+        },
+        {
+          "file": "client.py",
+          "function": "send",
+          "line": 1057
+        },
+        {
+          "file": "client.py",
+          "function": "connect",
+          "line": 1023
+        },
+        {
+          "file": "socket.py",
+          "function": "create_connection",
+          "line": 840
+        },
+        {
+          "file": "socket.py",
+          "function": "getaddrinfo",
+          "line": 977
+        },
+        {
+          "file": "offline_guard.py",
+          "function": "audit",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "pid": 44788,
+      "event": "mocked_hardware_query",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer"
+    },
+    {
+      "pid": 44788,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo",
+      "frames": [
+        {
+          "file": "selfknow.py",
+          "function": "system_prompt",
+          "line": 239
+        },
+        {
+          "file": "selfknow.py",
+          "function": "live_report",
+          "line": 100
+        },
+        {
+          "file": "selfknow.py",
+          "function": "_safe",
+          "line": 75
+        },
+        {
+          "file": "speed.py",
+          "function": "loaded_models",
+          "line": 399
+        },
+        {
+          "file": "request.py",
+          "function": "urlopen",
+          "line": 189
+        },
+        {
+          "file": "request.py",
+          "function": "open",
+          "line": 489
+        },
+        {
+          "file": "request.py",
+          "function": "_open",
+          "line": 506
+        },
+        {
+          "file": "request.py",
+          "function": "_call_chain",
+          "line": 466
+        },
+        {
+          "file": "request.py",
+          "function": "http_open",
+          "line": 1348
+        },
+        {
+          "file": "request.py",
+          "function": "do_open",
+          "line": 1319
+        },
+        {
+          "file": "client.py",
+          "function": "request",
+          "line": 1358
+        },
+        {
+          "file": "client.py",
+          "function": "_send_request",
+          "line": 1404
+        },
+        {
+          "file": "client.py",
+          "function": "endheaders",
+          "line": 1353
+        },
+        {
+          "file": "client.py",
+          "function": "_send_output",
+          "line": 1113
+        },
+        {
+          "file": "client.py",
+          "function": "send",
+          "line": 1057
+        },
+        {
+          "file": "client.py",
+          "function": "connect",
+          "line": 1023
+        },
+        {
+          "file": "socket.py",
+          "function": "create_connection",
+          "line": 840
+        },
+        {
+          "file": "socket.py",
+          "function": "getaddrinfo",
+          "line": 977
+        },
+        {
+          "file": "offline_guard.py",
+          "function": "audit",
+          "line": 86
+        }
+      ]
+    }
+  ],
+  "blocked_operations": [
+    {
+      "pid": 44788,
+      "event": "blocked",
+      "test": "tests/test_damaged_lines.py::test_status_shows_the_problems",
+      "operation": "socket.getaddrinfo",
+      "frames": [
+        {
+          "file": "commands_system.py",
+          "function": "handle",
+          "line": 62
+        },
+        {
+          "file": "commands_system.py",
+          "function": "_engine_line",
+          "line": 43
+        },
+        {
+          "file": "ollama_host.py",
+          "function": "diagnose",
+          "line": 122
+        },
+        {
+          "file": "ollama_host.py",
+          "function": "running",
+          "line": 62
+        },
+        {
+          "file": "request.py",
+          "function": "urlopen",
+          "line": 189
+        },
+        {
+          "file": "request.py",
+          "function": "open",
+          "line": 489
+        },
+        {
+          "file": "request.py",
+          "function": "_open",
+          "line": 506
+        },
+        {
+          "file": "request.py",
+          "function": "_call_chain",
+          "line": 466
+        },
+        {
+          "file": "request.py",
+          "function": "http_open",
+          "line": 1348
+        },
+        {
+          "file": "request.py",
+          "function": "do_open",
+          "line": 1319
+        },
+        {
+          "file": "client.py",
+          "function": "request",
+          "line": 1358
+        },
+        {
+          "file": "client.py",
+          "function": "_send_request",
+          "line": 1404
+        },
+        {
+          "file": "client.py",
+          "function": "endheaders",
+          "line": 1353
+        },
+        {
+          "file": "client.py",
+          "function": "_send_output",
+          "line": 1113
+        },
+        {
+          "file": "client.py",
+          "function": "send",
+          "line": 1057
+        },
+        {
+          "file": "client.py",
+          "function": "connect",
+          "line": 1023
+        },
+        {
+          "file": "socket.py",
+          "function": "create_connection",
+          "line": 840
+        },
+        {
+          "file": "socket.py",
+          "function": "getaddrinfo",
+          "line": 977
+        },
+        {
+          "file": "offline_guard.py",
+          "function": "audit",
+          "line": 86
+        }
+      ]
+    },
+    {
+      "pid": 44788,
+      "event": "blocked",
+      "test": "tests/test_guardian.py::test_a_probing_question_gets_a_normal_answer",
+      "operation": "socket.getaddrinfo",
+      "frames": [
+        {
+          "file": "selfknow.py",
+          "function": "system_prompt",
+          "line": 239
+        },
+        {
+          "file": "selfknow.py",
+          "function": "live_report",
+          "line": 100
+        },
+        {
+          "file": "selfknow.py",
+          "function": "_safe",
+          "line": 75
+        },
+        {
+          "file": "speed.py",
+          "function": "loaded_models",
+          "line": 399
+        },
+        {
+          "file": "request.py",
+          "function": "urlopen",
+          "line": 189
+        },
+        {
+          "file": "request.py",
+          "function": "open",
+          "line": 489
+        },
+        {
+          "file": "request.py",
+          "function": "_open",
+          "line": 506
+        },
+        {
+          "file": "request.py",
+          "function": "_call_chain",
+          "line": 466
+        },
+        {
+          "file": "request.py",
+          "function": "http_open",
+          "line": 1348
+        },
+        {
+          "file": "request.py",
+          "function": "do_open",
+          "line": 1319
+        },
+        {
+          "file": "client.py",
+          "function": "request",
+          "line": 1358
+        },
+        {
+          "file": "client.py",
+          "function": "_send_request",
+          "line": 1404
+        },
+        {
+          "file": "client.py",
+          "function": "endheaders",
+          "line": 1353
+        },
+        {
+          "file": "client.py",
+          "function": "_send_output",
+          "line": 1113
+        },
+        {
+          "file": "client.py",
+          "function": "send",
+          "line": 1057
+        },
+        {
+          "file": "client.py",
+          "function": "connect",
+          "line": 1023
+        },
+        {
+          "file": "socket.py",
+          "function": "create_connection",
+          "line": 840
+        },
+        {
+          "file": "socket.py",
+          "function": "getaddrinfo",
+          "line": 977
+        },
+        {
+          "file": "offline_guard.py",
+          "function": "audit",
+          "line": 86
+        }
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "path": "test_fieldsync.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-residual-probes.xml"
+}
