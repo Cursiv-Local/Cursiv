@@ -14,7 +14,9 @@ def provider_turn(function):
     def call(self,*args,**kwargs):
         from cursiv_engine.chat import provider_manager as manager
         from cursiv_engine.chat.activity import guard
-        target=kwargs.get('turn_target')
+        target=kwargs.get('turn_target') or self._run_target()
+        if hasattr(self, '_worker_view'):
+            self = self._worker_view(target)
         with (manager.turn_options(research_authorized=getattr(self,'_provider_turn_authorized',False),
                 workspace=self._cfg.get('workspace'),local_only=bool(self._cfg.get('project_local_only')),
                 cancel=target[1] if target else self._cancel_event,destination=getattr(self,'_provider_turn_destination',None)),
@@ -207,15 +209,20 @@ class ProviderControlsMixin:
         request = replace(request, research_authorized=authorized,
                           local_only=bool(self._cfg.get('project_local_only')), cancel=None,
                           authorized_destination=getattr(self,'_provider_turn_destination',None) if authorized else None)
-        self._begin_turn()
+        original_prompt = next((m.get('content', '') for m in reversed(request.messages) if m.get('role') == 'user' and isinstance(m.get('content'), str)), '')
+        self._begin_turn(original_prompt)
         request = replace(request, cancel=self._cancel_event)
         target = self._run_target()
         cfg=dict(self._cfg)
         def work():
             full = ''
+            if request.capability == 'text':
+                self._signals.run_event.emit(target, dict(kind='generation_started'))
             for text in manager.retry(request, provider=provider, model=model, authorize_changed=changed):
                 full += text
-                self._signals.run_event.emit(target, dict(kind='chunk', text=text))
+                result = manager.outcome()
+                self._signals.run_event.emit(target, dict(kind='chunk', text=text,
+                    provenance=result.metadata() if result else None))
             result = manager.outcome()
             if result.error:
                 self._signals.run_event.emit(target, dict(kind='provider_failure', text=result.error_message,

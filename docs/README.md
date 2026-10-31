@@ -7,6 +7,8 @@ link to them.
 
 ## Using Cursiv
 
+- [Paused responses and presentation preferences](INTERRUPT-CONTINUITY.md) (U115 development, not released)
+
 - [Reference](REFERENCE.md): commands and features
 - [Field demo](FIELD-DEMO.md), [field kit test](FIELD-KIT-TEST.md),
   [USB persistence check](USB-PERSISTENCE-CHECK.md)

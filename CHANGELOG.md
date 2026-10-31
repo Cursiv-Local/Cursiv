@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U115 — Interrupt continuity and optional personality (2026-10-31)
+
+Stop promptly releases input, preserves visible partial answers and rejects stale worker output. Bounded paused-task metadata uses existing conversation persistence; Resume continues text through exact provider/offline/privacy gates without replaying tools or writes. Multiple interruptions, restart recovery, retention limits and original-question science checking are covered. Optional Professional/Playful/Sassy presentation, humor frequency and answer detail preserve existing defaults and suppress humor in sensitive contexts. Casual non-scientific discussion avoids unrelated calibration warnings; genuine scientific and execution claims remain checked. Evidence and limits: docs/U115-HANDOFF.md and docs/INTERRUPT-CONTINUITY.md. No real AI calls were used in automated validation.
+
 ## 3.14-U114 — Source targeting and evidence reliability (2026-10-30)
 
 Explicit source files/functions are inspected first with unchanged access/read budgets. Source locations, quoted/negated claims, mathematical self-checks and user-supplied numeric inputs no longer trigger unrelated evidence warnings. Native static answers remain separate from model prose; unsupported resource safety/runtime and actual fabricated tool/source claims remain checked. Diagnostics distinguish available/offered/executed operations and denied/completed reads. The PDF dependency floor/hash lock is6.21.4 following the release security gate. Details and offline limits: docs/U113-GUARDIAN-AUDIT.md and docs/U113-MANUAL-TEST-HANDOFF.md.

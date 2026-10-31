@@ -229,6 +229,15 @@ def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -
     # words such as "calculated by code" in a model's answer.
     if authored == 'native':
         return ''
+    # Owning a toaster, seeing a haircut or considering a cafe is not a
+    # scientific observation. A measurement-calibration warning requires a
+    # relevant domain/measurement, not just the words "my", "saw" or "normal".
+    from .conversation_kind import casual
+    non_scientific = casual(q) or bool(re.search(
+        r'(?i)\b(?:business|caf[eé]|menu|branding|marketing|haircut|hairstyle|barber|fashion|'
+        r'outfit|humou?r|jok\w*|banter|comedy|apolog\w*|gossip|small talk|social|poem|fiction|roleplay)\b', q))
+    if non_scientific and not scientific_context(q, draft):
+        return ''
     from .turn_policy import creative_request
     if creative_request(q) and not _SAFE.search(draft):
         return ''
@@ -261,3 +270,16 @@ def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -
                     "calibration and compare against a stated reference range")
         return f"{OVERCONFIDENCE_MARK} (\"{quoted}\") than one observation supports: {what}.)*"
     return ""
+
+
+def scientific_context(question: str, draft: str = '') -> bool:
+    return bool(_READING.search(question + '\n' + draft) or re.search(
+        r'(?i)\b(?:pH|thermometer|temperature|meter|instrument|calibrat\w*|experiment|'
+        r'hypothesis|scientific|measur\w*|readings?|samples?|water|spring|river|stream|lake|pond|well|soil|'
+        r'air quality|oxygen|nitrate|nitrite|bacteri\w*|E\. coli|coliform|chemical|'
+        r'pollut\w*|contaminat\w*|toxic\w*|poison\w*|pathogen\w*|medical|health|'
+        r'symptoms?|fever|dose|dosage|medicat\w*|blood|heart|lung|skin|moles?|rash|wound|'
+        r'burn\w*|injur\w*|pulse|breath\w*|allerg\w*|insulin|pain|pressure|voltage|'
+        r'radiation|conductivity|turbidity|edible|food|drink\w*|swim\w*|eat|mushrooms?|'
+        r'mold|mould|fung\w*|plants?|wildlife|fish|safe|safety|hazard|surviv\w*|'
+        r'reserve|critical threshold|equipment diagnostics)\b', question))

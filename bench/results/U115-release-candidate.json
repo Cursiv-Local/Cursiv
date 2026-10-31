@@ -1,0 +1,11 @@
+{
+  "version": "3.14-U115",
+  "development_full": "U115-validation-summary.json",
+  "functional_source_matches_development": true,
+  "release_candidate_tests": 175,
+  "release_gate_tests": 36,
+  "unexpected_guard_operations": 0,
+  "portable_baseline_origin": "7d7e1e3c498cda81a04e2bd8f57053abcd2eadac:launcher/chat_panel.py",
+  "website_changed": false,
+  "real_ai_calls": false
+}

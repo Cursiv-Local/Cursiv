@@ -36,6 +36,12 @@ def outcome():
     return _outcome.get()
 
 
+def reset_response():
+    """Start a new desktop turn without inheriting an earlier provider failure."""
+    _outcome.set(None)
+    _request.set(None)
+
+
 def research_authorized():
     return bool(_options.get().get('research_authorized'))
 
@@ -178,6 +184,8 @@ def infer(request):
         exc = ProviderError(request.provider, E.MODEL)
         result.error, result.error_message = exc.code.value, exc.message
     except ProviderError as exc:
+        if request.cancel is not None and request.cancel.is_set():
+            exc = ProviderError(request.provider, E.CANCELLED)
         result.error, result.error_message = exc.code.value, exc.message
         result.canceled = exc.code == E.CANCELLED
         result.responding_provider=None
@@ -193,8 +201,10 @@ def infer(request):
         result.error, result.error_message, result.canceled = exc.code.value, exc.message, True
         raise
     except Exception:
-        exc = ProviderError(request.provider, E.MALFORMED)
+        canceled = request.cancel is not None and request.cancel.is_set()
+        exc = ProviderError(request.provider, E.CANCELLED if canceled else E.MALFORMED)
         result.error, result.error_message = exc.code.value, exc.message
+        result.canceled = canceled
 
     finally:
         from cursiv_engine.core import last_turn

@@ -16,7 +16,7 @@ from PyQt6.QtCore import QObject, pyqtSignal
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QCheckBox, QComboBox, QDialog, QFrame, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,
-    QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
+    QScrollArea, QSpinBox, QStackedWidget, QVBoxLayout, QWidget,
 )
 import theme
 from theme import BG, BG2, BORDER, GOLD, SILVER, SILV2, RED, GREEN, AMBER  # one palette for every window (theme.py)
@@ -277,9 +277,33 @@ class SettingsDialog(QDialog):
         except (OSError, ValueError):
             count = 0
         v.addWidget(self._explain(
-            "Cursiv has one personality: curious, calm, warm and honest, the same in every conversation. "
+            "Cursiv stays curious, calm and honest. Optional presentation preferences apply below. "
             "To change how it talks to you, just say so in chat (\"keep answers shorter\", \"less formal\") "
             f"or type style add <rule>. Your preferences so far: {count}. Type style to see them."))
+        prefs = style.presentation(person)
+        for key, label, choices in (
+            ('personality', 'Conversational personality', [('off', 'Current style (no added personality)'), ('professional', 'Professional'), ('playful', 'Playful'), ('sassy', 'Sassy')]),
+            ('frequency', 'Humor frequency', [('off', 'Off'), ('rare', 'Rare'), ('occasional', 'Occasional'), ('frequent', 'Frequent')]),
+            ('verbosity', 'Answer detail', [('default', 'Current preference'), ('concise', 'Concise'), ('balanced', 'Balanced'), ('detailed', 'Detailed')]),
+        ):
+            v.addWidget(QLabel(label))
+            box = QComboBox()
+            box.setObjectName('presentation_' + key)
+            for value, text in choices:
+                box.addItem(text, value)
+            box.setCurrentIndex(box.findData(prefs[key]))
+            box.currentIndexChanged.connect(lambda _, b=box, k=key: style.configure_presentation(person, **{k: b.currentData()}))
+            v.addWidget(box)
+        v.addWidget(self._explain('Humor is optional and suppressed for sensitive conversations. These settings add no model requests.'))
+        for key, label, ceiling in (('checkpoint_limit', 'Maximum paused tasks per chat', 20),
+                                    ('checkpoint_days', 'Paused task retention (days)', 90)):
+            v.addWidget(QLabel(label))
+            spin = QSpinBox()
+            spin.setObjectName(key)
+            spin.setRange(1, ceiling)
+            spin.setValue(prefs[key])
+            spin.valueChanged.connect(lambda value, k=key: style.configure_presentation(person, **{k: value}))
+            v.addWidget(spin)
         from cursiv_engine.core import presence
         self._switch(lay, 'Adapt communication preferences',
                      'Learn presentation preferences from explicit corrections. Accuracy and permissions take precedence.',

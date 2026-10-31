@@ -26,6 +26,8 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `chat/local_provider.py` — Ollama calls.
 - `chat/cloud_providers.py` — OpenAI, Claude, Gemini, Groq, xAI, Cursiv Cloud calls.
 - `chat/provider_tools.py` — tool calls inside provider answers.
+- `chat/continuity.py` — bounded interrupted-response metadata, resume context and cancellable inference response registration; no model calls or private store.
+- `launcher/chat_continuity.py` — paused-task controls and turn-scoped worker state; existing conversation persistence and provider paths.
 - `chat/streaming.py` — streaming and time limits.
 - `chat/review.py` — the optional follow-up review of an answer.
 - `chat/response_style.py` — trims closers, drops false refusals and self-certification.

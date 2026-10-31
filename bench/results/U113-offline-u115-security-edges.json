@@ -1,0 +1,457 @@
+{
+  "label": "u115-security-edges",
+  "exit_code": 1,
+  "pytest_exit_code": 1,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "bd1c0070a9d3996e64bd73aeecef387368a23250050f0b05edda8e56a13fbe75",
+  "events": [
+    {
+      "pid": 11736,
+      "event": "guard_installed",
+      "test": "tests/test_interrupt_continuity.py::test_saved_checkpoint_survives_a_fresh_python_process",
+      "python_guard": true
+    },
+    {
+      "pid": 11736,
+      "event": "guard_exit",
+      "test": "tests/test_interrupt_continuity.py::test_saved_checkpoint_survives_a_fresh_python_process",
+      "violations": 0
+    },
+    {
+      "pid": 14596,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "python_guard": true
+    },
+    {
+      "pid": 14596,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "violations": 0
+    },
+    {
+      "pid": 15184,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "python_guard": true
+    },
+    {
+      "pid": 15184,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "violations": 0
+    },
+    {
+      "pid": 18412,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "python_guard": true
+    },
+    {
+      "pid": 18412,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "violations": 0
+    },
+    {
+      "pid": 18452,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "python_guard": true
+    },
+    {
+      "pid": 18452,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "violations": 0
+    },
+    {
+      "pid": 23784,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 23784,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 24528,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "python_guard": true
+    },
+    {
+      "pid": 24528,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "violations": 0
+    },
+    {
+      "pid": 24812,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 24812,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 26084,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_interrupt_continuity.py::test_saved_checkpoint_survives_a_fresh_python_process"
+    },
+    {
+      "pid": 26084,
+      "event": "mocked_hardware_query",
+      "test": "tests/test_interrupt_provider_pipeline.py::test_real_resume_pipeline_makes_one_exact_request_with_continuity[ollama]"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 26084,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 6740,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "python_guard": true
+    },
+    {
+      "pid": 6740,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "violations": 0
+    }
+  ],
+  "blocked_operations": [],
+  "exclusions": [
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-u115-security-edges.xml"
+}

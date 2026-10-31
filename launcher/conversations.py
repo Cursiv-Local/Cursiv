@@ -47,7 +47,7 @@ def wait_for_save(conv_id: str | None = None, *, raise_errors: bool = True) -> N
 
 
 def queue_save(conv_id: str | None, messages: list[dict], html: str, *,
-               on_done=None, on_titled=None) -> str:
+               on_done=None, on_titled=None, allow_model_title=True) -> str:
     """Serialize messages/HTML and write them on one ordered worker.
 
     Export of new rich-text blocks happens on the GUI thread; no Qt objects
@@ -61,7 +61,7 @@ def queue_save(conv_id: str | None, messages: list[dict], html: str, *,
 
     def work():
         return _save(conv_id, snapshot, html, on_titled=on_titled,
-                     person=person, directory=directory)
+                     person=person, directory=directory, allow_model_title=allow_model_title)
 
     with _pending_lock:
         _failures.pop(conv_id, None)
@@ -167,22 +167,22 @@ def _smart_title(conv_id: str, messages: list[dict], on_done: Optional[Callable[
 
 
 def save(conv_id: str | None, messages: list[dict], html: str, title: str | None = None,
-         on_titled: Optional[Callable[[], None]] = None) -> str:
+         on_titled: Optional[Callable[[], None]] = None, *, allow_model_title=True) -> str:
     wait_for_save(conv_id, raise_errors=False)   # explicit Save retries a failed autosave
-    conv_id = _save(conv_id, messages, html, title, on_titled)
+    conv_id = _save(conv_id, messages, html, title, on_titled, allow_model_title=allow_model_title)
     with _pending_lock:
         _failures.pop(conv_id, None)
     return conv_id
 
 
 def _save(conv_id: str | None, messages: list[dict], html: str, title: str | None = None,
-          on_titled=None, *, person=None, directory=None) -> str:
+          on_titled=None, *, person=None, directory=None, allow_model_title=True) -> str:
     with _storage_lock:
         return _write_snapshot(conv_id, messages, html, title, on_titled,
-                               person=person, directory=directory)
+                               person=person, directory=directory, allow_model_title=allow_model_title)
 
 
-def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, directory):
+def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, directory, allow_model_title=True):
     directory = directory if directory is not None else DIR
     directory.mkdir(parents=True, exist_ok=True)
     conv_id = conv_id or uuid.uuid4().hex[:12]
@@ -209,7 +209,7 @@ def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, direct
             json.dump(data, stream, ensure_ascii=False)
         tmp.replace(path)
     # AI title: once there's an exchange, and again as the topic develops
-    if data["title_auto"] and len(messages) >= 2 and (
+    if allow_model_title and data["title_auto"] and len(messages) >= 2 and (
             data["titled_at"] == 0 or len(messages) - data["titled_at"] >= 10):
         threading.Thread(target=_smart_title, args=(conv_id, list(messages), on_titled), daemon=True).start()
     return conv_id

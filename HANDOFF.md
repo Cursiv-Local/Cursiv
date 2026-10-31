@@ -4,6 +4,17 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U115 release preparation — October 31, 2026
+
+Ready for owner manual testing: 2,884 passed,33 skipped,19 passing subtests; zero unexpected guard operations. [Final evidence](bench/results/U115-validation-summary.json).
+
+[Interrupt continuity handoff](docs/U115-HANDOFF.md) and [usage](docs/INTERRUPT-CONTINUITY.md).
+Work is based on stabilized U114. Immediate visible Stop, bounded message-owned
+checkpoints, text-only resume through existing provider/privacy gates and opt-in
+presentation preferences are under guarded offline validation. No real AI calls or local model inference are authorized. The owner authorized
+commit/push/application release and normal hosted CI; website work is deferred.
+Preserve the original dirty checkout, Station, private data and all U113/U114 fixes.
+
 ## U114 released — October 30, 2026
 
 Owner-approved [U114](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U114)

@@ -1,0 +1,785 @@
+{
+  "label": "u115-full",
+  "exit_code": 1,
+  "pytest_exit_code": 1,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "bd1c0070a9d3996e64bd73aeecef387368a23250050f0b05edda8e56a13fbe75",
+  "events": [
+    {
+      "pid": 10772,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "python_guard": true
+    },
+    {
+      "pid": 10772,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "violations": 0
+    },
+    {
+      "pid": 11900,
+      "event": "guard_installed",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart",
+      "python_guard": true
+    },
+    {
+      "pid": 11900,
+      "event": "guard_exit",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart",
+      "violations": 0
+    },
+    {
+      "pid": 12624,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 12624,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 13720,
+      "event": "guard_installed",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids",
+      "python_guard": true
+    },
+    {
+      "pid": 13720,
+      "event": "guard_exit",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids",
+      "violations": 0
+    },
+    {
+      "pid": 14408,
+      "event": "guard_installed",
+      "test": "tests/test_u108_evidence.py::test_restart_read_by_identifier_and_append_correction",
+      "python_guard": true
+    },
+    {
+      "pid": 14408,
+      "event": "guard_exit",
+      "test": "tests/test_u108_evidence.py::test_restart_read_by_identifier_and_append_correction",
+      "violations": 0
+    },
+    {
+      "pid": 14880,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "python_guard": true
+    },
+    {
+      "pid": 14880,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "violations": 0
+    },
+    {
+      "pid": 15052,
+      "event": "guard_installed",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart",
+      "python_guard": true
+    },
+    {
+      "pid": 15052,
+      "event": "guard_exit",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart",
+      "violations": 0
+    },
+    {
+      "pid": 16224,
+      "event": "guard_installed",
+      "test": "tests/test_strict_offline_guard.py::test_python_child_inherits_guard",
+      "python_guard": true
+    },
+    {
+      "pid": 16224,
+      "event": "guard_exit",
+      "test": "tests/test_strict_offline_guard.py::test_python_child_inherits_guard",
+      "violations": 0
+    },
+    {
+      "pid": 16244,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "python_guard": true
+    },
+    {
+      "pid": 16244,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation",
+      "violations": 0
+    },
+    {
+      "pid": 1748,
+      "event": "guard_installed",
+      "test": "tests/test_file_access.py::test_approved_overwrite_and_fresh_process_read",
+      "python_guard": true
+    },
+    {
+      "pid": 1748,
+      "event": "guard_exit",
+      "test": "tests/test_file_access.py::test_approved_overwrite_and_fresh_process_read",
+      "violations": 0
+    },
+    {
+      "pid": 17824,
+      "event": "guard_installed",
+      "test": "tests/test_module_boundaries.py::test_extracted_chat_modules_import_without_widgets",
+      "python_guard": true
+    },
+    {
+      "pid": 17824,
+      "event": "guard_exit",
+      "test": "tests/test_module_boundaries.py::test_extracted_chat_modules_import_without_widgets",
+      "violations": 0
+    },
+    {
+      "pid": 18464,
+      "event": "guard_installed",
+      "test": "tests/test_grounded_chat.py::test_dated_recall_survives_a_fresh_python_process",
+      "python_guard": true
+    },
+    {
+      "pid": 18464,
+      "event": "guard_exit",
+      "test": "tests/test_grounded_chat.py::test_dated_recall_survives_a_fresh_python_process",
+      "violations": 0
+    },
+    {
+      "pid": 19044,
+      "event": "guard_installed",
+      "test": "tests/test_data_encryption.py::test_lease_blocks_second_process",
+      "python_guard": true
+    },
+    {
+      "pid": 19044,
+      "event": "guard_exit",
+      "test": "tests/test_data_encryption.py::test_lease_blocks_second_process",
+      "violations": 0
+    },
+    {
+      "pid": 20428,
+      "event": "guard_installed",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle",
+      "python_guard": true
+    },
+    {
+      "pid": 20428,
+      "event": "guard_exit",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle",
+      "violations": 0
+    },
+    {
+      "pid": 2132,
+      "event": "guard_installed",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids",
+      "python_guard": true
+    },
+    {
+      "pid": 2132,
+      "event": "guard_exit",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids",
+      "violations": 0
+    },
+    {
+      "pid": 22284,
+      "event": "guard_installed",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 22284,
+      "event": "guard_exit",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 22844,
+      "event": "guard_installed",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 22844,
+      "event": "guard_exit",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 23632,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    },
+    {
+      "pid": 23632,
+      "event": "mocked_hardware_query",
+      "test": "tests/test_agent_evidence_runs.py::test_individual_and_group_have_identical_authorized_evidence"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_restart_and_portable_relocation"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_lease_blocks_second_process"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_data_encryption.py::test_startup_lease_survives_local_reference_cleanup"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_deferred_tasks.py::test_cross_process_enqueue_is_atomic_and_preserves_unique_ids"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_approved_overwrite_and_fresh_process_read"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_file_access.py::test_file_commands_work_in_a_fresh_process_with_external_sockets_blocked"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_grounded_chat.py::test_dated_recall_survives_a_fresh_python_process"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_fresh_process_retrieves_actual_saved_memory_in_a_new_conversation"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_memory_intents.py::test_portable_memory_survives_drive_relocation_and_fresh_process"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_module_boundaries.py::test_extracted_chat_modules_import_without_widgets"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_reliability.py::test_a_fresh_process_finds_the_saved_record"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>0]",
+      "operation": "socket.getaddrinfo"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>1]",
+      "operation": "socket.connect"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>2]",
+      "operation": "socket.bind"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>3]",
+      "operation": "socket.sendto"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>4]",
+      "operation": "unapproved external executable: ollama"
+    },
+    {
+      "pid": 23632,
+      "event": "expected_guard_denial",
+      "test": "tests/test_strict_offline_guard.py::test_guard_denies_before_network_or_process[<lambda>5]",
+      "operation": "unguardable Python flags"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_strict_offline_guard.py::test_python_child_inherits_guard"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_u108_evidence.py::test_restart_read_by_identifier_and_append_correction"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_u86_remaining_gaps.py::test_forget_survives_restart"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_usb_end_to_end.py::test_a_fresh_kit_without_personal_data_has_none"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process"
+    },
+    {
+      "pid": 23632,
+      "event": "guarded_python_child",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process"
+    },
+    {
+      "pid": 23872,
+      "event": "guard_installed",
+      "test": "tests/test_data_encryption.py::test_startup_lease_survives_local_reference_cleanup",
+      "python_guard": true
+    },
+    {
+      "pid": 23872,
+      "event": "guard_exit",
+      "test": "tests/test_data_encryption.py::test_startup_lease_survives_local_reference_cleanup",
+      "violations": 0
+    },
+    {
+      "pid": 24572,
+      "event": "guard_installed",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart",
+      "python_guard": true
+    },
+    {
+      "pid": 24572,
+      "event": "guard_exit",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart",
+      "violations": 0
+    },
+    {
+      "pid": 24804,
+      "event": "guard_installed",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation",
+      "python_guard": true
+    },
+    {
+      "pid": 24804,
+      "event": "guard_exit",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation",
+      "violations": 0
+    },
+    {
+      "pid": 25040,
+      "event": "guard_installed",
+      "test": "tests/test_data_encryption.py::test_restart_and_portable_relocation",
+      "python_guard": true
+    },
+    {
+      "pid": 25040,
+      "event": "guard_exit",
+      "test": "tests/test_data_encryption.py::test_restart_and_portable_relocation",
+      "violations": 0
+    },
+    {
+      "pid": 25204,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "python_guard": true
+    },
+    {
+      "pid": 25204,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "violations": 0
+    },
+    {
+      "pid": 25480,
+      "event": "guard_installed",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline",
+      "python_guard": true
+    },
+    {
+      "pid": 25480,
+      "event": "guard_exit",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline",
+      "violations": 0
+    },
+    {
+      "pid": 26048,
+      "event": "guard_installed",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart",
+      "python_guard": true
+    },
+    {
+      "pid": 26048,
+      "event": "guard_exit",
+      "test": "tests/test_fieldlog.py::test_the_log_survives_a_restart",
+      "violations": 0
+    },
+    {
+      "pid": 26180,
+      "event": "guard_installed",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle",
+      "python_guard": true
+    },
+    {
+      "pid": 26180,
+      "event": "guard_exit",
+      "test": "tests/test_usb_end_to_end.py::test_usb_full_life_cycle",
+      "violations": 0
+    },
+    {
+      "pid": 26260,
+      "event": "guard_installed",
+      "test": "tests/test_usb_end_to_end.py::test_a_fresh_kit_without_personal_data_has_none",
+      "python_guard": true
+    },
+    {
+      "pid": 26260,
+      "event": "guard_exit",
+      "test": "tests/test_usb_end_to_end.py::test_a_fresh_kit_without_personal_data_has_none",
+      "violations": 0
+    },
+    {
+      "pid": 3228,
+      "event": "guard_installed",
+      "test": "tests/test_file_access.py::test_file_commands_work_in_a_fresh_process_with_external_sockets_blocked",
+      "python_guard": true
+    },
+    {
+      "pid": 3228,
+      "event": "guard_exit",
+      "test": "tests/test_file_access.py::test_file_commands_work_in_a_fresh_process_with_external_sockets_blocked",
+      "violations": 0
+    },
+    {
+      "pid": 428,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "python_guard": true
+    },
+    {
+      "pid": 428,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_portable_notebook_uses_drive_home_and_survives_a_drive_move",
+      "violations": 0
+    },
+    {
+      "pid": 5372,
+      "event": "guard_installed",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline",
+      "python_guard": true
+    },
+    {
+      "pid": 5372,
+      "event": "guard_exit",
+      "test": "tests/test_saved_notes_viewer.py::test_restart_portable_relocation_offline",
+      "violations": 0
+    },
+    {
+      "pid": 5508,
+      "event": "guard_installed",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "python_guard": true
+    },
+    {
+      "pid": 5508,
+      "event": "guard_exit",
+      "test": "tests/test_notebook_integration.py::test_restart_read_and_retry_use_real_python_filesystem_and_no_network",
+      "violations": 0
+    },
+    {
+      "pid": 6804,
+      "event": "guard_installed",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process",
+      "python_guard": true
+    },
+    {
+      "pid": 6804,
+      "event": "guard_exit",
+      "test": "tests/test_verified_filesystem.py::test_actual_file_and_workspace_survive_fresh_process",
+      "violations": 0
+    },
+    {
+      "pid": 7136,
+      "event": "guard_installed",
+      "test": "tests/test_reliability.py::test_a_fresh_process_finds_the_saved_record",
+      "python_guard": true
+    },
+    {
+      "pid": 7136,
+      "event": "guard_exit",
+      "test": "tests/test_reliability.py::test_a_fresh_process_finds_the_saved_record",
+      "violations": 0
+    },
+    {
+      "pid": 9024,
+      "event": "guard_installed",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation",
+      "python_guard": true
+    },
+    {
+      "pid": 9024,
+      "event": "guard_exit",
+      "test": "tests/test_portable_recall_curiosity.py::test_fresh_process_and_relocation",
+      "violations": 0
+    }
+  ],
+  "blocked_operations": [],
+  "exclusions": [
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "tests/test_core.py::test_approved_plugin_runs",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_plugin_changed_after_approval_does_not_load",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_core.py::test_switched_off_plugin_does_not_run",
+      "reason": "plugin worker uses isolated -I Python"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_phone_to_laptop_every_record_photo_fingerprint_and_signature",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log byte-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[log line removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[manifest removed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[signature changed-refused]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[photo byte-photo]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[truncated file-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_send_file_is_caught_and_the_laptop_keeps_what_it_had[not a zip-error]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_a_damaged_photo_on_a_first_import_is_left_out_and_named",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_end_to_end_field.py::test_receive_import_and_export_work_offline_without_reaching_anything",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_refuses_connections_at_the_socket",
+      "reason": "exercises OS socket calls; application-level mocked enforcement is tested separately"
+    },
+    {
+      "path": "tests/test_netgate.py::test_closed_gate_still_allows_loopback",
+      "reason": "exercises OS socket calls; application-level mocked enforcement is tested separately"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_phone_log_imports_with_every_fingerprint_and_the_signature_checked",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_sending_the_same_file_again_adds_nothing_and_the_key_is_remembered",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_phone_file_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_chat_command_imports_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_opens_as_an_ordinary_zip_and_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[../evil.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[/abs.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/laptopB.jsonl]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[cursiv-field-share/photos/../../x.jpg]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_with_anything_a_phone_doesnt_send_is_refused_whole[other/readme.txt]",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_changed_entry_inside_the_zip_is_refused",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_zip_without_the_phone_header_is_not_a_phone_file",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phones_zip_sent_over_wifi_imports",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_the_phone_never_calls_its_storage_permanent_and_names_every_failure",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_phone_notebook.py::test_a_browser_without_ed25519_sends_an_unsigned_file_cursiv_says_so",
+      "reason": "Node child networking cannot be guarded by Python hooks"
+    },
+    {
+      "path": "tests/test_problem_report.py::test_nothing_is_sent_in_offline_mode",
+      "reason": "expects real socket-level offline rejection; no socket calls authorized"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-u115-full.xml"
+}
