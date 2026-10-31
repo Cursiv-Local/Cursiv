@@ -17,8 +17,10 @@ unperformed; hosted release CI was explicitly authorized. PDF lock/floor is6.21.
 A hosted Windows path reuses existing tag/main/lock/frozen/USB gates; PR72 fixed its
 receipt-copy filename only. U113 is unchanged. Preserve owner data, exclusions,
 Station implementation, notebook permissions, exact routing and opted-in USB key export.
-Website deployment/readback remains a separate publication step; no deployment is
-claimed without its receipt. The original dirty owner checkout remains untouched.
+Website PR73 merged as `301f49c`; deployment `c6bf3635-abfe-47d2-8902-055654502a09`
+passed [41 public readback checks across 20 canonical pages](bench/results/U114-publication.json).
+All 19 protected publication checks, 31 website tests and 6 measurement tests passed.
+The original dirty owner checkout remains untouched.
 
 ## U113 released — October 30, 2026
 

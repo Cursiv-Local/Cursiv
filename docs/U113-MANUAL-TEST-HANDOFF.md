@@ -78,7 +78,7 @@ Record actual selected provider/model, footer, full response, diagnostics and an
 
 ## Remaining limits
 
-No live model inference, authentication, network performance, native packaged build, macOS/Linux run or production deployment was attempted. Rules remain bounded heuristics, not universal natural-language proof; supplied-input recognition is deliberately numeric and scoped to user turns. Static source evidence proves current text/AST relationships, not observed runtime execution. Real provider quality and independent self-correction need the owner's manual testing. The owner subsequently authorized commit/push/release and normal hosted CI; no live AI-provider calls or model inference are authorized.
+No live AI-provider inference, authentication or provider performance was tested. Following owner approval, normal hosted Windows/macOS/Linux CI and native Windows/Mac package builds passed; U114 was released and the production website passed 41 public readback checks. [Final release and publication evidence](U114-RELEASE-VERIFICATION.md). Rules remain bounded heuristics, not universal natural-language proof; supplied-input recognition is deliberately numeric and scoped to user turns. Static source evidence proves current text/AST relationships, not observed runtime execution. Real provider quality and independent self-correction need the owner's manual testing.
 
 ## Changed files
 
@@ -86,4 +86,4 @@ Production: U114 version strings in `core/selfknow.py`, `launcher/cursiv_launche
 
 Validation: fresh-child embedding fixtures in `tests/test_usb_end_to_end.py` and `tests/test_portable_recall_curiosity.py`; `tests/test_u113_guardian_audit.py`, `tests/test_u113_final_reliability.py`, `tests/test_strict_offline_guard.py`, `tests/offline_validation_plugin.py`, `scripts/offline_guard.py`, `scripts/offline_validate.py`.
 
-Release: `.github/workflows/windows-build.yml` reuses the existing tag-only native build script on a locked hosted Windows runner. `CHANGELOG.md`, `docs/RELEASE-U114.md`. Documentation: `HANDOFF.md`, `docs/U113-GUARDIAN-AUDIT.md`, this handoff. Evidence: uncommitted `bench/results/U113-guardian-*` and `U113-offline-*` XML/JSON checkpoints. Earlier failing/aborted checkpoints are retained and labeled; only the completed final result should be used for manual-test readiness.
+Release: `.github/workflows/windows-build.yml` reuses the existing tag-only native build script on a locked hosted Windows runner. `CHANGELOG.md`, `docs/RELEASE-U114.md`. Documentation: `HANDOFF.md`, `docs/U113-GUARDIAN-AUDIT.md`, this handoff. Evidence: committed public `bench/results/U113-guardian-*` and `U113-offline-*` XML/JSON checkpoints. Earlier failing/aborted checkpoints are retained and labeled; only the completed final result should be used for manual-test readiness.
