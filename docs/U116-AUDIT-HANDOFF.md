@@ -1,8 +1,7 @@
 # Audit handoff: Codex U115 review, UI cleanup, health check (Claude, 2026-10-31)
 
 Status: **the owner authorized commit, push, release and website publication (October 31, 2026).**
-This is released as v3.14-U116 once the owner's signing step completes (§9). Owner-key signing,
-the GitHub release and the Cloudflare deployment need the owner's Windows PC and accounts. No real AI-provider calls, no model inference, no
+Released as [v3.14-U116](U116-RELEASE-VERIFICATION.md); §9 records how. No real AI-provider calls, no model inference, no
 model or large dependency downloads. Station code untouched.
 
 Base: `main` at `d16368a` (U115 released from `523f017`, release proof PR76). Working tree
@@ -133,7 +132,10 @@ Full suite after all fixes, with the source index rebuilt
    Memory window: the fact must still be there. Then "forget that my dog is called Biscuit" must remove it.
 5. Continue the U115 manual sequence in `docs/U115-HANDOFF.md` (Stop/Resume with real models).
 
-## 9. Release and website: what was done here and what needs the owner
+## 9. Release and website
+
+**Done (October 31, 2026), from the owner's Windows PC:** tagged, built, signed, published and the website
+updated. See [the verification record](U116-RELEASE-VERIFICATION.md). The steps below are kept as the record of the plan.
 
 Done from the cloud session, following the runbook order:
 - **PR #78** (website and docs only, merged as `e7ac5a0`): the site moved to U115 with its verified signed manifest.

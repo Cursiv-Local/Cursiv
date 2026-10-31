@@ -1,0 +1,63 @@
+{
+  "version": "3.14-U116",
+  "tag": "v3.14-U116",
+  "html_url": "https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U116",
+  "published_at": "2026-10-31T19:39:10Z",
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U116-mac-arm64.dmg",
+      "size": 72156398,
+      "digest": "sha256:a9080905176093f922e3fb699cad8916592e58d55624be53691580d2c265c695"
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 72156398,
+      "digest": "sha256:a9080905176093f922e3fb699cad8916592e58d55624be53691580d2c265c695"
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 215,
+      "digest": "sha256:49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U116.exe",
+      "size": 58054575,
+      "digest": "sha256:ed952facbc051f3701cfc98904d0f2378f71e9464a68e0c13297a6bf8613d6fe"
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 58054575,
+      "digest": "sha256:ed952facbc051f3701cfc98904d0f2378f71e9464a68e0c13297a6bf8613d6fe"
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "digest": "sha256:c7a4890f3c292992a55926f835bb5da821c00433f3d687fd84b03cf862b99385"
+    },
+    {
+      "name": "provenance-3.14-U116.json",
+      "size": 1806,
+      "digest": "sha256:b01e4e62c51dc94dae946d0a4b96aee5c979e6a459a92e3c65ea51c4757a1967"
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1759,
+      "digest": "sha256:2ecdc1ba094b64d991d4521ee7b7618f6e1a953abba727517430298a785edc0b"
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "digest": "sha256:33c5a02d9fad26dd15c28bdd6f49a5d74b3d04877412fd1344c4329d44571893"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "digest": "sha256:aff6d33dacdfe18c67aa06b7dbd9a73815e5bdc3c1d56f7e2ebd31a6a91fc97f"
+    },
+    {
+      "name": "u116-release-verification.json",
+      "size": 3916,
+      "digest": "sha256:2e419036a729707c781707b2b72992ec3b8d3ce04a34246b158072a22eb62c6e"
+    }
+  ]
+}
