@@ -241,7 +241,7 @@ They share the model slot and stop before summarizing or saving when ownership i
 the captured destination rather than a later global directory. Profile/native-command completion
 updates these metadata notes without an extra, unbudgeted model summary.
 
-## Unified provider manager (unreleased)
+## Unified provider manager (U112)
 
 The existing chat header and Settings → AI Providers share `chat/provider_registry.py`.
 Descriptors remain present independent of credentials, policy and connectivity.

@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U116 — Audit fixes: cleaner chat bar, safer memory, fewer false warnings (2026-10-31)
+
+The "AI Providers…" button no longer sits permanently under the chat box; it appears only beside a provider failure (Settings → AI Providers is unchanged). "Forget it" / "never mind, forget about it" now dismiss the topic instead of silently deleting the saved memory matching the previous message; "forget that" resolved from the conversation shows the exact memory and asks first; "forget that <memory>" now finds it; talking about a saying ("remember to drink water is good advice") is not saved. The measurement/lab-test warning now requires a measurement or a science, health, safety or field topic, so casual questions (a toaster, a pet's name, a landlord) no longer get it; real observations keep it. The model menu shows its full label. Docs-only CI changes now also run the release-document checks. Details: docs/U116-AUDIT-HANDOFF.md. No real AI calls were used in automated validation.
+
 ## 3.14-U115 — Interrupt continuity and optional personality (2026-10-31)
 
 Stop promptly releases input, preserves visible partial answers and rejects stale worker output. Bounded paused-task metadata uses existing conversation persistence; Resume continues text through exact provider/offline/privacy gates without replaying tools or writes. Multiple interruptions, restart recovery, retention limits and original-question science checking are covered. Optional Professional/Playful/Sassy presentation, humor frequency and answer detail preserve existing defaults and suppress humor in sensitive contexts. Casual non-scientific discussion avoids unrelated calibration warnings; genuine scientific and execution claims remain checked. Evidence and limits: docs/U115-HANDOFF.md and docs/INTERRUPT-CONTINUITY.md. No real AI calls were used in automated validation.

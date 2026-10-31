@@ -67,6 +67,15 @@ _REF = re.compile(r'(?i)^(?:this|that|it|these|this information|that information
                   r'the measurement we discussed|the last measurement|that measurement)$')
 _DISCUSSION = re.compile(r'(?i)^(?:["\x27`>]|how (?:does|do)|why (?:did|do|would)|what (?:if|would)|'
                          r'imagine|suppose|for example|example:|explain|tell me how|if I|someone (?:says|said))\b')
+# "Forget it" / "never mind, forget about it" dismiss the topic; they are not a request to
+# delete the memory that matches the previous message (which used to happen silently).
+# '"Remember to drink water" is good advice' talks about a saying; it is not a request to save it.
+_QUOTED_SAYING = re.compile(r"(?i)^(?:remember|don[\x27’]?t forget)\b.+\b(?:is|was|are|sounds like)\s+(?:a\s+|an\s+)?"
+                            r"(?:(?:really|very|pretty|such)\s+)?(?:good|great|bad|solid|sound|wise|terrible|useful|common|old|classic)\s+"
+                            r"(?:advice|tip|idea|rule|saying|motto|reminder|habit|mantra)\b[\s.!?]*$")
+_DISMISSAL = re.compile(r"(?i)^(?:(?:oh|eh|ah|ok(?:ay)?|nah|no|actually|never ?mind|nvm)[\s,.!;-]+)*"
+                        r"forget (?:it|about it)(?:[\s,.!;-]+(?:never ?mind|nvm|whatever|it[\x27’]?s fine|"
+                        r"not important|doesn[\x27’]?t matter|no worries|no problem|moving on))*[\s.!]*$")
 
 
 def _clean(body: str) -> str:
@@ -78,7 +87,7 @@ def _clean(body: str) -> str:
 
 def _parse(text: str) -> list[Action] | None:
     t = text.strip()
-    if not t or _DISCUSSION.search(t):
+    if not t or _DISCUSSION.search(t) or _DISMISSAL.match(t) or _QUOTED_SAYING.match(t):
         return None
     t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+)', '', t)
     # Split only when a second explicit operation follows; content containing
@@ -122,6 +131,8 @@ def _parse(text: str) -> list[Action] | None:
     m = re.fullmatch(r'(?is)(?:forget|remove from memory|delete (?:the )?(?:saved )?memory)\s+(.+)', t)
     if m:
         query = m[1].strip().rstrip('.!?')
+        # "forget that my dog is called Biscuit" names the memory; "that" alone is a reference.
+        query = re.sub(r'(?is)^(?:that|about)\s+(?=\S+\s+\S)', '', query)
         return [Action(FORGET, query=query, reference=bool(_REF.fullmatch(query)))]
     m = re.fullmatch(r'(?is)(recall|retrieve|look up|fetch|pull up)\s+(.+)', t)
     if m and (m[1].lower() == 'recall' or re.search(r'(?i)\b(memory|memories|saved|stored|record)\b', m[2])):
@@ -153,7 +164,7 @@ def _parse(text: str) -> list[Action] | None:
 
 
 def _cue(text: str) -> bool:
-    if _DISCUSSION.search(text.strip()):
+    if _DISCUSSION.search(text.strip()) or _DISMISSAL.match(text.strip()) or _QUOTED_SAYING.match(text.strip()):
         return False
     return bool(re.search(r'(?i)^(?:please\s+)?(?:(?:can|could|would) you\s+)?'
         r'(?:remember|recall|forget|don[\x27’]?t forget|do not forget|keep in mind|make a mental note|'
@@ -387,7 +398,7 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
     key = _key(person, scope)
     with _lock:
         pending = _pending.get(key)
-        if pending and text.strip().lower() in ('cancel', 'never mind', 'nevermind'):
+        if pending and text.strip().lower() in ('cancel', 'never mind', 'nevermind', 'no', 'keep it', 'no thanks'):
             _pending.pop(key, None)
             return Result(clarification='Memory operation cancelled. No additional change was made.')
         actions = _parse(text)
@@ -397,6 +408,8 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
             action, choices = pending
             answer = text.strip().lower().rstrip('.!?')
             pick = {'first': 0, 'the first one': 0, 'second': 1, 'the second one': 1}.get(answer)
+            if pick is None and len(choices) == 1 and answer in ('yes', 'y', 'yes please', 'confirm', 'do it'):
+                pick = 0
             if answer.isdigit():
                 pick = int(answer) - 1
             if pick is None:
@@ -442,6 +455,14 @@ def _command(text: str, history: list[dict], *, person: str, scope: str = '', cl
                 if action.operation == FORGET:
                     matched = [r['id'] for content in choices for r in _targets(content, person)]
                     choices = list(dict.fromkeys(matched))
+                if len(choices) == 1 and action.operation == FORGET:
+                    # "forget that" is resolved from the conversation, not named by the person:
+                    # show the exact saved memory and delete only after they confirm it.
+                    record = next((r for r in sem.list_facts(person) if r.get('id') == choices[0]), {})
+                    _pending[key] = (action, choices)
+                    result.clarification = ('Forget this saved memory?\n1. ' + choices[0] + ': ' + record.get('text', '') +
+                                            '\nReply 1 (or yes) to forget it, or cancel to keep it.')
+                    break
                 if len(choices) == 1:
                     action.reference = False
                     if action.operation == SAVE:

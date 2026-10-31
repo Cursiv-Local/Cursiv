@@ -83,13 +83,15 @@ class ChatControlsMixin:
         self._model_box.setToolTip("Standard for everyday questions; Deep Think takes longer and reasons first")
         self._model_box.setMinimumWidth(180)
         self._model_box.setMinimumContentsLength(18)
-        self._model_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToMinimumContentsLengthWithIcon)
+        # Fit the longest label ("qwen3:4b-instruct · availability not verified") instead of cutting it off.
+        self._model_box.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
         self._model_box.addItem("Looking for local models…", "")
         self._model_box.setEnabled(False)
         self._model_box.activated.connect(self._on_model_chosen)
         header_row.addWidget(self._model_box)
         self._provider_refresh = QPushButton('↻')
         self._provider_refresh.setToolTip('Refresh this provider’s models; never downloads a model')
+        self._provider_refresh.setFixedWidth(36)
         self._provider_refresh.clicked.connect(self._refresh_provider_models)
         header_row.addWidget(self._provider_refresh)
         header_row.addStretch(1)
@@ -237,6 +239,9 @@ class ChatControlsMixin:
         self._retry_provider_btn.setVisible(False)
         self._provider_settings_btn = QPushButton('AI Providers…')
         self._provider_settings_btn.clicked.connect(self._open_provider_settings)
+        # Recovery only: shown beside a provider failure, never as a permanent bottom-bar
+        # prompt (Settings → AI Providers is the everyday route).
+        self._provider_settings_btn.setVisible(False)
         recovery.addWidget(self._retry_provider_btn)
         recovery.addWidget(self._provider_settings_btn)
         recovery.addStretch(1)

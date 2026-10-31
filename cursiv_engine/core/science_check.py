@@ -229,14 +229,12 @@ def overconfidence_note(question: str, draft: str, *, authored: str = 'model') -
     # words such as "calculated by code" in a model's answer.
     if authored == 'native':
         return ''
-    # Owning a toaster, seeing a haircut or considering a cafe is not a
-    # scientific observation. A measurement-calibration warning requires a
-    # relevant domain/measurement, not just the words "my", "saw" or "normal".
-    from .conversation_kind import casual
-    non_scientific = casual(q) or bool(re.search(
-        r'(?i)\b(?:business|caf[eé]|menu|branding|marketing|haircut|hairstyle|barber|fashion|'
-        r'outfit|humou?r|jok\w*|banter|comedy|apolog\w*|gossip|small talk|social|poem|fiction|roleplay)\b', q))
-    if non_scientific and not scientific_context(q, draft):
+    # Owning a toaster, naming a dog or doubting a landlord is not a scientific
+    # observation. The calibration/lab-test warning requires a measurement or a
+    # relevant science, health or safety domain, not just "my", "saw" or "normal".
+    # (U115 only skipped a fixed list of casual topics, so any topic missing from
+    # that list -- toasters, pets, landlords, films -- still got the warning.)
+    if not scientific_context(q, draft):
         return ''
     from .turn_policy import creative_request
     if creative_request(q) and not _SAFE.search(draft):
@@ -276,6 +274,8 @@ def scientific_context(question: str, draft: str = '') -> bool:
     return bool(_READING.search(question + '\n' + draft) or re.search(
         r'(?i)\b(?:pH|thermometer|temperature|meter|instrument|calibrat\w*|experiment|'
         r'hypothesis|scientific|measur\w*|readings?|samples?|water|spring|river|stream|lake|pond|well|soil|'
+        r'creek|brook|marsh|wetland|estuary|ocean|sea|beach|tide|algae|bloom|sediment|rock|mineral|'
+        r'weather|storm|wind|rain\w*|snow|ice|insects?|birds?|animals?|trees?|leaves|specimen|field site|'
         r'air quality|oxygen|nitrate|nitrite|bacteri\w*|E\. coli|coliform|chemical|'
         r'pollut\w*|contaminat\w*|toxic\w*|poison\w*|pathogen\w*|medical|health|'
         r'symptoms?|fever|dose|dosage|medicat\w*|blood|heart|lung|skin|moles?|rash|wound|'

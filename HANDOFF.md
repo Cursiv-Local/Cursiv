@@ -4,6 +4,16 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U116 — audit fixes (Claude, October 31, 2026)
+
+[Audit handoff](docs/U116-AUDIT-HANDOFF.md). The owner authorized commit, push, release and website.
+Fixed: the permanent "AI Providers…" button (now only beside a provider failure); "forget it" silently
+deleting a memory; "forget that" (resolved from the conversation) now confirms first; "forget that <memory>"
+matching; sayings saved as memories; science warnings on casual chat (now require a measurement or a
+science/health/safety/field domain); model menu truncation; docs-only CI now runs the release-document
+checks. The website moved to U115 with its verified signed manifest. Owner-key signing, the GitHub release and
+the Cloudflare deployment need the owner's Windows PC (handoff §9).
+
 ## U115 released — October 31, 2026
 
 Owner-approved [U115](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U115)

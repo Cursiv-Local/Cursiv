@@ -71,8 +71,7 @@ class ChatReviewMixin:
             self._on_done()
             self._failed_provider_request = (event.get('request'), self._run_target(),
                 (self._cfg.get('selected_provider',''),self._cfg.get('selected_model',''))) if event.get('request') else None
-            self._retry_provider_btn.setVisible(bool(self._failed_provider_request))
-            self._provider_settings_btn.setVisible(True)
+            self._show_provider_recovery(self._failed_provider_request, settings=True)
         elif kind in ('done', 'cancelled'):
             # Profile runs already own all generation/review work. Their metadata note,
             # and native command receipts, must not start an unbudgeted model summary.

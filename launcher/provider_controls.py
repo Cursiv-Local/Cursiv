@@ -53,6 +53,11 @@ class ProviderControlsMixin:
         failed=getattr(self,'_failed_provider_request',None)
         return bool(failed and failed[0] and failed[1][2:] == self._run_target()[2:])
 
+    def _show_provider_recovery(self, retry, settings=None):
+        """Recovery buttons appear only beside a provider failure; no permanent bottom prompt."""
+        self._retry_provider_btn.setVisible(bool(retry))
+        self._provider_settings_btn.setVisible(bool(retry if settings is None else settings))
+
     def _provider_force(self):
         provider = self._cfg.get('selected_provider', '')
         if provider == 'cloud_auto':
