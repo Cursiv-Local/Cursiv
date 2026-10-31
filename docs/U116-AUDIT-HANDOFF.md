@@ -138,15 +138,28 @@ Full suite after all fixes, with the source index rebuilt
 Done from the cloud session, following the runbook order:
 - **PR #78** (website and docs only, merged as `e7ac5a0`): the site moved to U115 with its verified signed manifest.
   The website tests read the app version, so a U116 site must wait for the U116 signature.
-- **PR #77** (app fixes and the version 3.14-U116): branch, commit, protected CI, merge, tag `v3.14-U116`,
-  and the hosted Windows and Mac builds started from that tag.
+- **PR #77** (app fixes and version 3.14-U116, merged as `9e5b672`). Exact-main CI
+  [41223923153](https://github.com/Cursiv-Local/Cursiv/actions/runs/41223923153) passed on Windows, Mac and Linux.
 
-Needs the owner's Windows PC (not possible from a cloud container):
-1. **Sign** the 8 assets with the DPAPI-protected owner key (`docs/RELEASE-RUNBOOK.md` §5–6). The key
-   must never be copied, so it cannot be done remotely.
-2. **Create the GitHub release** `v3.14-U116` with the 11 assets (§7). This session has no
-   release-creation tool.
-3. **Deploy the website** with `node cloudflare/publish.mjs` (`npx wrangler deploy` needs the owner's
-   Cloudflare login), then check it live (§8). The merged site points at **U115**, the newest fully
-   signed release. After U116 is signed and published, run `scripts/website_release.py --old U115 --new U116 …`
-   and add `website/assets/cursiv-owner-release-U116.json`.
+Blocked in the cloud container: the git proxy accepts branch pushes but refuses tag pushes, so
+`v3.14-U116` is **not tagged yet**. `windows-build.yml` builds only from an immutable tag.
+
+Owner steps on the Windows PC, in Git Bash from an up-to-date checkout (`docs/RELEASE-RUNBOOK.md`):
+
+```bash
+git fetch origin && git tag -a v3.14-U116 9e5b672045446ce7c4a147071e3368751f009445 \
+  -m "Cursiv v3.14-U116 — Audit fixes: cleaner chat bar, safer memory, fewer false warnings; exact-main CI 41223923153 passed"
+git push origin v3.14-U116
+gh workflow run windows-build.yml --repo Cursiv-Local/Cursiv -f ref=v3.14-U116
+gh workflow run mac-build.yml --repo Cursiv-Local/Cursiv -f ref=v3.14-U116 -f upload=false
+```
+
+Then runbook §5 (collect and check the 8 assets), §6 (sign with the owner key; never copy it), §7
+(`gh release create v3.14-U116 … --notes-file docs/RELEASE-U116.md`, then cancel the release-triggered
+Mac run). §8 covers the website: `scripts/website_release.py --old U115 --new U116 …`, copy
+`owner-release.json` to `website/assets/cursiv-owner-release-U116.json`, add
+`docs/U116-RELEASE-VERIFICATION.md`, open the PR, merge, then `node cloudflare/publish.mjs`
+(needs the Cloudflare login) and check it live.
+
+The site in `main` already points at **U115** (PR #78) but is **not deployed yet**. Running
+`node cloudflare/publish.mjs` now publishes the U115 pages, if you want them live before U116.
