@@ -44,24 +44,33 @@ git tag -a v3.14-U96 -m "Cursiv v3.14-U96 — <title>; Windows and macOS CI pass
 git push origin v3.14-U96
 ```
 
-## 4. Build the Mac DMG (GitHub) and the Windows installer (this PC)
+## 4. Build native packages on the locked hosted runners
 
 ```bash
+gh workflow run windows-build.yml --repo Cursiv-Local/Cursiv -f ref=v3.14-U96
 gh workflow run mac-build.yml --repo Cursiv-Local/Cursiv -f ref=v3.14-U96 -f upload=false
-"$LOCALAPPDATA/Temp/cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8/Scripts/python.exe" scripts/build_release.py v3.14-U96
 ```
 
-`build_release.py` needs the hash-locked environment above (system Python fails its lock
-check). It builds from the tag, requires the frozen self-test, starts the built app from a
-USB layout (`verify_portable`), compiles Inno Setup and writes `installer/Output/`.
+Record both returned run IDs. Windows uses the existing `build_release.py` from
+the immutable tag and requires exact-main CI, the hash-locked environment, frozen
+self-test, portable USB-layout self-test, Inno Setup, checksums and provenance.
+Its artifact includes `frozen-selftest.txt` and `portable-selftest.txt`. Mac retains
+its native test/build/self-test gates. Neither build uses the owner's records or keys.
+
+The former temporary U88 build environment can expire. Do not silently rebuild it
+or package with system dependencies that fail `release_provenance.check_lock`.
+Hosted builds install the exact lock. Local source tests with an existing Python
+installation are a separate measurement and do not replace native release gates.
 
 ## 5. Collect and check the eight assets
 
 ```bash
 R=release-u96; mkdir -p "$R/mac" "$R/assets"
-RUN=$(gh run list --repo Cursiv-Local/Cursiv --workflow mac-build.yml --limit 1 --json databaseId -q '.[0].databaseId')
+RUN=<verified-Mac-build-run-id>
+WIN_RUN=<verified-Windows-build-run-id>
 gh run watch "$RUN" --repo Cursiv-Local/Cursiv --exit-status && gh run download "$RUN" --repo Cursiv-Local/Cursiv --dir "$R/mac"
-O=installer/Output; A="$R/assets"; M="$R/mac/cursiv-mac"
+gh run watch "$WIN_RUN" --repo Cursiv-Local/Cursiv --exit-status && gh run download "$WIN_RUN" --repo Cursiv-Local/Cursiv --dir "$R/windows"
+O="$R/windows/cursiv-windows"; A="$R/assets"; M="$R/mac/cursiv-mac"
 cp "$O/Cursiv-Setup-3.14-U96.exe" "$A/" && cp "$O/Cursiv-Setup-3.14-U96.exe" "$A/Cursiv-Setup-latest.exe"
 cp "$O/SHA256SUMS-3.14-U96.txt" "$A/SHA256SUMS.txt" && cp "$O/provenance-3.14-U96.json" "$A/"
 cp "$M/Cursiv-3.14-U96-mac-arm64.dmg" "$A/" && cp "$M/Cursiv-3.14-U96-mac-arm64.dmg" "$A/Cursiv-mac-latest.dmg"
@@ -81,7 +90,7 @@ The key and the reviewed signer live in Codex's packaged-app folder (see
 S="$LOCALAPPDATA/Packages/OpenAI.Codex_2p2nqsd0c76g0/LocalCache/Local/CursivReleaseSigning"
 (cd "$S/signer" && sha256sum scripts/owner_release.py cursiv_v215/core/release_identity.py cursiv_v215/core/release_public_key.json)
 cat "$S/signer/trusted-tool-manifest.json"
-V="$LOCALAPPDATA/Temp/cursiv-u88-build-39c0ad1699b74be8bab5385ce1b281d8/Scripts/python.exe"
+V="$LOCALAPPDATA/Programs/Python/Python313/python.exe"
 C=$(git rev-parse v3.14-U96^{commit})
 (cd "$A" && LOCALAPPDATA="$(cygpath -w "$S/..")" "$V" -I "$S/signer/scripts/owner_release.py" sign \
   --version 3.14-U96 --commit "$C" --output owner-release.json \
