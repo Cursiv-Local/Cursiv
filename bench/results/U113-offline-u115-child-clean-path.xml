@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="0" skipped="0" tests="1" time="2.159" timestamp="2026-10-31T00:40:02.100652-04:00" hostname="Josh"><testcase classname="tests.test_interrupt_continuity" name="test_saved_checkpoint_survives_a_fresh_python_process" time="1.664" /></testsuite></testsuites>

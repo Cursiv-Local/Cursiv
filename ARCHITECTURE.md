@@ -102,6 +102,30 @@ session ledger. New turns and conversation changes reject stale results. Pending
 assistant claims are not promoted to verified memory by a later review. See
 [review modes, timing and cancellation limits](docs/ASYNC-ANSWER-REVIEW.md).
 
+## Interrupt continuity (U115 development)
+
+The desktop owns immediate visible cancellation and input availability. The
+existing generation/cancel/conversation/person/workspace target rejects late
+worker output. `launcher/chat_continuity.py` gives each worker its own pending
+state and publishes results through target-checked Qt events. It stores bounded
+checkpoint metadata on ordinary assistant history messages. `conversations.py`
+uses its existing ordered, encryption-aware writer; interruption snapshots
+explicitly suppress model titles and retention summaries.
+
+`chat/continuity.py` supplies deterministic metadata, retention, a context packet
+and an Event-compatible inference-close token. Resume enters the ordinary
+completion/provider path under no-tools/no-memory limits, without native command
+replay, planning or summarization. Local prompt compaction preserves this bounded
+packet; provider/offline/privacy policies remain authoritative. Transport closing
+is asynchronous; an upstream server's cancellation is not guaranteed. The
+existing inference serialization remains; a blocked connection can delay the next
+backend request while the GUI accepts new input.
+
+Optional per-person presentation settings extend `core/style.py`; legacy rules
+and defaults remain. Hints use the normal answer prompt, suppress humor for
+sensitive context, and cannot grant permissions. [User guide](docs/INTERRUPT-CONTINUITY.md)
+and [development measurements/handoff](docs/U115-HANDOFF.md).
+
 ## Logic and storage
 
 - `core/`: calculations, reference lookup, verification, authorization, network

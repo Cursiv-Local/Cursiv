@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="2" time="4.358" timestamp="2026-10-30T23:11:31.546854-04:00" hostname="Josh"><testcase classname="tests.test_interrupt_continuity" name="test_stop_releases_input_before_worker_returns" time="3.754"><failure message="assert not True&#10; +  where True = &lt;chat_panel.ChatPanel object at 0x0000020354558AF0&gt;._streaming">tests\test_interrupt_continuity.py:17: in test_stop_releases_input_before_worker_returns
+    assert not panel._streaming
+E   assert not True
+E    +  where True = &lt;chat_panel.ChatPanel object at 0x0000020354558AF0&gt;._streaming</failure></testcase><testcase classname="tests.test_interrupt_continuity" name="test_stop_saves_visible_partial_without_waiting_or_inference" time="0.028"><failure message="IndexError: list index out of range">tests\test_interrupt_continuity.py:27: in test_stop_saves_visible_partial_without_waiting_or_inference
+    assert panel._history[-1]['content'] == 'Iron oxidation can occur through'
+           ^^^^^^^^^^^^^^^^^^
+E   IndexError: list index out of range</failure></testcase></testsuite></testsuites>

@@ -14,7 +14,7 @@ import re
 import time
 from pathlib import Path
 
-VERSION = "3.14-U114"
+VERSION = "3.14-U115"
 FACTS_FILE = Path(__file__).with_name("cursiv_facts.md")
 RECENT_ERRORS: collections.deque = collections.deque(maxlen=8)
 
@@ -125,7 +125,7 @@ def live_report(*, observed=None) -> str:
         lines.append(f"Projects tracked: {', '.join(_projects.load(person)) or 'none'}")
         from cursiv_engine.core import style as _style
         _st = _style.load(person)
-        lines.append(f"Personality: one fixed personality (no tones); style rules learned from corrections: {len(_st.get('rules', []))}")
+        lines.append(f"Personality: stable base; opt-in presentation in Settings → How Cursiv answers; style rules learned from corrections: {len(_st.get('rules', []))}")
         from cursiv_engine.agents import custom as _custom
         lines.append("Custom agents: " + (", ".join("@" + a["name"] for a in _custom.all_agents()) or "none"))
     except Exception:
@@ -186,7 +186,7 @@ saved and where), self source <words> and self read <path> (Cursiv's own code), 
 - Tools: file operations require the enabled, authorized workspace. Supported operations include reading, listing, creating and confirmed updates; deletion is disabled. Field-log retrieval and curiosity-journal commands use dedicated readers, not general access to private data. Tool availability does not prove a particular call succeeded.
 - Native notebook recording, retrieval and integrity verification use the Field Notebook backend, not field_log.txt. Explicit memory save/recall/list/correct/forget and automatic-learning controls use the memory backend; manual saves remain available with automatic learning off. These explicit local actions need no cloud model. Only application-verified results and actual paths/record IDs establish success; model prose never does.
 - Project memory: projects, project show/forget <name> -- running summaries of ongoing projects, brought back automatically when a project comes up.
-- Personality and style: one fixed personality (no tones); style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
+- Personality and style: stable base with optional Professional/Playful/Sassy presentation, humor frequency and verbosity in Settings → How Cursiv answers; style (show rules learned from corrections), style add <rule>, style forget <words>, style clear.
 - Memory clean-up: memory cleanup (lists misleading saved notes and memories; changes nothing), memory cleanup remove <codes>|all (backs up first).
 - Looking at itself (read-only, app-authored, no AI model): self prompt / self prompt full (the instructions sent for the last answer), self stores (what is saved, where, and how it reaches answers), self map [words] (which module does a job, from its code map), self source <words>, self read <path> [line] (Cursiv's own code and docs).
 - Custom agents: agents (list), agent new <name>: <job>, @name <message>, agent teach <name> <fact>, agent show/edit/delete <name>, agents ask <question>.

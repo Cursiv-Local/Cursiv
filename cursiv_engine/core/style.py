@@ -1,15 +1,15 @@
 """
 How each person wants Cursiv to talk -- learned from their corrections.
 
-Cursiv has one personality (codex/system_prompt.md, "How to talk"); there are no
-selectable tones. On top of it, each person's preferences apply:
+Cursiv keeps its base personality (codex/system_prompt.md, "How to talk").
+Optional presentation presets and each person's learned preferences apply:
 
   * Corrections ("too formal", "stop using bullet points", "no, I meant…",
     "keep it shorter") become short standing rules, saved per person.
   * Rules are added to every reply's instructions.
   * `style` shows them; `style add`, `style forget <words>` / `style clear` change them.
 
-Files written by older versions may still hold a "tone" value; it is ignored.
+Older "tone" values remain ignored; new presentation presets are explicit opt-in.
 
 Stored in ~/.cursiv/style/<person>.json -- plain files on the computer.
 """
@@ -26,6 +26,85 @@ DIR = Path.home() / ".cursiv" / "style"
 MAX_RULES = 15
 PROMPT_HEADING = '## Current answer style'
 _lock = threading.Lock()
+
+def presentation(person: str) -> dict:
+    """New preferences are opt-in; legacy rules/default personality stay intact."""
+    defaults = dict(personality='off', frequency='occasional', verbosity='default',
+                    checkpoint_limit=8, checkpoint_days=14)
+    raw = load(person).get('presentation', {})
+    if isinstance(raw, dict):
+        for key, choices in _PRESENTATION_CHOICES.items():
+            if raw.get(key) in choices:
+                defaults[key] = raw[key]
+        for key, ceiling in (('checkpoint_limit', 20), ('checkpoint_days', 90)):
+            if type(raw.get(key)) is int and 1 <= raw[key] <= ceiling:
+                defaults[key] = raw[key]
+    return defaults
+
+
+_PRESENTATION_CHOICES = dict(personality=('off', 'professional', 'playful', 'sassy'),
+                             frequency=('off', 'rare', 'occasional', 'frequent'),
+                             verbosity=('default', 'concise', 'balanced', 'detailed'))
+
+
+def configure_presentation(person: str, **values) -> None:
+    for key, value in values.items():
+        if key in _PRESENTATION_CHOICES and value in _PRESENTATION_CHOICES[key]:
+            continue
+        if key in ('checkpoint_limit', 'checkpoint_days') and type(value) is int and 1 <= value <= (20 if key == 'checkpoint_limit' else 90):
+            continue
+        raise ValueError('Invalid presentation preference')
+    with _lock:
+        data = load(person)
+        data['presentation'] = {**presentation(person), **values}
+        _save(person, data)
+
+
+def sensitive_context(question: str, history=()) -> bool:
+    from .conversation_kind import safety_or_technical
+    context = '\n'.join([question] + [str(r.get('content', '')) for r in list(history)[-6:] if r.get('role') == 'user'])
+    return safety_or_technical(context) or bool(re.search(
+        r'(?i)\b(?:emergency|medical|diagnos\w*|cancer|pregnan\w*|death|died|dying|grief|grieving|'
+        r'bereave\w*|funeral|abus\w*|assault|trauma|panic|depress\w*|distress|heart attack|'
+        r'overdose|hazard|safety|safe|unsafe|toxic|contaminat\w*|surviv\w*|oxygen reserve|'
+        r'life support|critical threshold|serious|no (?:humou?r|jokes|sarcasm)|be professional)\b', context))
+
+
+def presentation_prompt(person: str, question: str, history=()) -> str:
+    """One short hint on the existing answer request; never a joke generator."""
+    settings = presentation(person)
+    parts = []
+    verbosity = settings['verbosity']
+    if verbosity != 'default':
+        parts.append({'concise': 'Prefer a short direct answer; omit introductions and filler.',
+                      'balanced': 'Use moderate detail suited to the question.',
+                      'detailed': 'Give a thorough explanation when useful.'}[verbosity] +
+                     ' The current request for more or less detail takes precedence.')
+    mode = settings['personality']
+    if mode == 'off':
+        return '\n'.join(parts)
+    if mode == 'professional' or sensitive_context(question, history):
+        return '\n'.join(parts + ['Use a calm professional tone. No humor, sarcasm or interruption jokes for this turn.'])
+    frequency = settings['frequency']
+    if frequency == 'off':
+        return '\n'.join(parts + ['Use natural conversational warmth without jokes or sarcasm.'])
+    # Deterministic scheduling, no RNG/service/background work. Only the first
+    # normal answer immediately after a pause can acknowledge that interruption.
+    import hashlib
+    count = sum(r.get('role') == 'user' for r in history)
+    divisor = {'rare': 7, 'occasional': 3, 'frequent': 1}[frequency]
+    selected = int.from_bytes(hashlib.sha256((question + str(count)).encode()).digest()[:2], 'big') % divisor == 0
+    if not selected:
+        return '\n'.join(parts + ['Keep a natural warm voice; answer directly without a joke this turn.'])
+    tone = 'occasional light humor' if mode == 'playful' else 'an occasional brief witty or gently sarcastic aside'
+    parts.append('You may use ' + tone + ' if it fits naturally. Answer the question promptly; '
+                 'at most one short aside, no lengthy lead-in. Do not mock or insult the user. '
+                 'Keep your own natural voice; humor is optional, not a required template.')
+    last = next((r for r in reversed(history) if r.get('role') == 'assistant'), {})
+    if (last.get('interruption') or {}).get('status') == 'interrupted':
+        parts.append('You may briefly acknowledge the topic change, without repeating a previous joke. '
+                     'The application has preserved the paused response; never claim a tool action completed.')
+    return '\n'.join(parts)
 
 _CORRECTION_RE = re.compile(
     r"\b(too (formal|long|wordy|short|casual|technical|vague|much|preachy|robotic)|"
@@ -110,9 +189,9 @@ def learn_correction(person: str, user_text: str, previous_reply: str, ask: Call
     return None
 
 
-NO_TONES = ("Cursiv has one personality now, the same in every conversation, so there are no tones to pick. "
-            "To change how I talk to you, just tell me (\"keep answers shorter\", \"less formal\") or add a "
-            "rule: style add <rule>. See them with: style")
+NO_TONES = ("Cursiv keeps one personality as its base. Optional Professional, Playful and Sassy presentation "
+            "preferences, humor frequency and answer detail are in Settings → How Cursiv answers. Old tone commands "
+            "do not change these settings. You can also add a rule: style add <rule>. See rules with: style")
 
 
 def forget(person: str, words: str) -> list[str]:

@@ -281,7 +281,10 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             # Access gates and source validation already ran above.
             return
         from cursiv_engine.core import deterministic_overrides as _overrides
-        _conflict = _overrides.conflicting_doses(_field_text, runtime._DOCS_SHOWN)
+        from . import continuity
+        _continuation = continuity.current()
+        _check_question = _continuation['data']['original_request'] if _continuation else _field_text
+        _conflict = _overrides.conflicting_doses(_check_question, runtime._DOCS_SHOWN)
         if _conflict:
             runtime._CURSIV_REPLY = True
             runtime._set_answered('')
@@ -358,6 +361,12 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             draft = _capability_problem
         # U99: "I checked the source", "verified by the live report", "the tests prove", "no correction
         # is needed" -- only with a record of that check for this answer. Otherwise say so under it.
+        if _continuation:
+            # Routing and artifact construction have finished. Check the actual
+            # original question/inputs, without dispatching its commands again
+            # or promoting the interrupted model text into verified evidence.
+            _field_text = _user = message = _check_question
+            history = [dict(role='user', content=_check_question)]
         _unbacked = claim_evidence.correction(draft)
         if _unbacked:
             last_turn.diagnostic_event('guardian',check='source_claim',triggered=True,modified=True)
@@ -487,7 +496,7 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                 raise runtime._SkipCheck      # no slow check (or a wall of notes) after emergency steps
             from cursiv_engine.core import verify as _verify
             from cursiv_engine.chat import review as _review
-            user_text = message.get("text", "") if isinstance(message, dict) else str(message or "")
+            user_text = _field_text
             selected_mode = (review_mode or _review.mode()) if runtime.turn_policy.current().inspect else 'off'
             if model_selection.current():
                 selected_mode='off'  # exact selection keeps code checks, never rewrites via a different reviewer

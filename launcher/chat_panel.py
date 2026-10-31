@@ -40,6 +40,7 @@ from chat_review import ChatReviewMixin
 from chat_feedback import ChatFeedbackMixin
 from chat_actions import ChatActionsMixin
 from provider_controls import ProviderControlsMixin, provider_turn, load_saved_keys as _load_saved_keys
+from chat_continuity import ContinuityMixin
 
 
 _HERE = Path(__file__).parent
@@ -130,7 +131,7 @@ class _ChatSignals(QObject):
 
 
 
-class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, ChatActionsMixin, QWidget):
+class ChatPanel(ContinuityMixin, ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, ChatReviewMixin, ChatFeedbackMixin, ChatActionsMixin, QWidget):
     conversation_changed = pyqtSignal()     # saved / opened / new / renamed -> sidebar refresh
     """
     Self-contained chat view: transcript + input box, wired to the real
@@ -142,6 +143,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         super().__init__(parent)
         self._history: list[dict] = []          # [{"role": "user"|"assistant", "content": str}]
         self._conv_id: Optional[str] = None     # set once the user saves this conversation
+        self._conversation_saved = False
         self._dirty = False                     # messages since the last save
         self._streaming = False
         self._backend_ready = False
@@ -249,19 +251,10 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
     # ── Saved conversations ──────────────────────────────────────────────
     def _after_turn(self) -> None:
         self._dirty = True
-        if self._conv_id or autosave_enabled():    # new chats save themselves; saved ones stay current
+        if self._conversation_saved or autosave_enabled():    # IDs alone do not opt into persistence
             self.save_conversation(background=True)
         self._update_session_note()
         QTimer.singleShot(8000, self._show_suggestions)     # learning finishes in the background
-
-    def _on_saved(self, conv_id: str, error: str, revision: int) -> None:
-        if conv_id == self._conv_id and revision == self._save_revision:
-            self._dirty = bool(error)
-            self._save_error = bool(error)
-            if error:
-                self._status.setText("Conversation could not be saved. Use Save to retry.")
-                self._status.setToolTip(error)
-        self.conversation_changed.emit()
 
     def has_unsaved(self) -> bool:
         if self._conv_id:
@@ -272,7 +265,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
                 conversations.wait_for_save(self._conv_id)
             except Exception:
                 self._dirty = self._save_error = True
-        return self._dirty and bool(self._history) and (not self._conv_id or self._save_error)
+        return self._dirty and bool(self._history) and (not self._conversation_saved or self._save_error)
 
     def is_busy(self) -> bool:
         return self._streaming
@@ -280,7 +273,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
     def current_conversation_id(self) -> Optional[str]:
         return self._conv_id
 
-    def save_conversation(self, title: Optional[str] = None, *, background: bool = False) -> Optional[str]:
+    def save_conversation(self, title: Optional[str] = None, *, background: bool = False, allow_model_title: bool = True) -> Optional[str]:
         if not self._history:
             return None
         import conversations
@@ -290,14 +283,16 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
             self._save_revision += 1
             revision, signals = self._save_revision, self._signals
             self._conv_id = conversations.queue_save(
-                self._conv_id, self._history, self._transcript_cache.capture(),
+                self._conv_id or getattr(self, '_continuity_id', None), self._history, self._transcript_cache.capture(), allow_model_title=allow_model_title,
                 on_titled=self.conversation_changed.emit,
                 on_done=lambda conv_id, error: signals.saved.emit(conv_id, error, revision))
+            self._conversation_saved = True
             return self._conv_id
         self._save_revision += 1
         html = self._transcript.toHtml()
-        self._conv_id = conversations.save(self._conv_id, self._history, html, title,
+        self._conv_id = conversations.save(self._conv_id or getattr(self, '_continuity_id', None), self._history, html, title, allow_model_title=allow_model_title,
                                            on_titled=self.conversation_changed.emit)   # AI title -> sidebar
+        self._conversation_saved = True
         self._transcript_cache.reset(html)
         self._dirty = False
         if self._save_error:
@@ -322,6 +317,10 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._transcript_cache.reset()
         self._history = []
         self._conv_id = None
+        self._conversation_saved = False
+        import uuid
+        self._continuity_id = uuid.uuid4().hex[:12]
+        self._resume_context = None
         self._dirty = False
         self._save_error = False
         try:
@@ -331,6 +330,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
             pass
         self._show_empty_state()
         self._reset_feedback()
+        self._refresh_paused()
         self.conversation_changed.emit()
 
     # ── Empty state ─────────────────────────────────────────────────────
@@ -443,9 +443,11 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._empty_shown = False
         self._history = list(data.get("messages", []))
         self._conv_id = conv_id
+        self._conversation_saved = True
         self._dirty = False
         self._save_error = False
         self._reset_feedback()
+        self._refresh_paused()
         self._show_picking_up(conv_id)
         self._transcript.verticalScrollBar().setValue(self._transcript.verticalScrollBar().maximum())
         self.conversation_changed.emit()
@@ -518,6 +520,11 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         text = self._input.toPlainText().strip()
         if not text:
             return
+        from cursiv_engine.chat import continuity
+        if continuity.recognizes(text) and self._paused():
+            self._input.clear()
+            self._resume_checkpoint(self._paused()[0]['interruption']['checkpoint_id'])
+            return
         self._clear_empty_state()
         if not _CHAT_OK:
             self._append_system("Chat core isn't available -- see the message above.")
@@ -556,6 +563,10 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         thread.start()
 
     def _begin_turn(self, text: str = '') -> None:
+        from cursiv_engine.chat import provider_manager
+        provider_manager.reset_response()
+        import uuid
+        self._continuity_id = self._conv_id or getattr(self, '_continuity_id', None) or uuid.uuid4().hex[:12]
         self._cancel_review()
         self._set_turn_feedback(text)
         self._reset_rendering()
@@ -564,7 +575,11 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._pending_answer_evidence = None
         self._pending_memory_receipt = None
         self._streaming = True
-        self._cancel_event = threading.Event()
+        self._pending_write_context = {}
+        from cursiv_engine.chat.continuity import Cancellation
+        self._cancel_event = Cancellation()
+        self._stream_provenance = None
+        self._resume_context = None
         self._send_btn.setEnabled(False)
         self._voice_btn.setEnabled(False)
         self._stop_btn.setEnabled(True)
@@ -578,12 +593,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._reply_text = ""
         self._reply_is_chat = False
         self._begin_ai_reply()
-
-    def _stop_generation(self) -> None:
-        if self._cancel_event is not None:
-            self._cancel_event.set()
-        self._stop_btn.setEnabled(False)
-        self._status.setText("Stopping…")
+        self._refresh_paused()
 
     @provider_turn
     def _run_turn(self, text: str, history: list[dict], propose: bool = True, turn_target=None) -> None:
@@ -622,13 +632,14 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
                     self._signals.done.emit()
                     return
             native = unrestricted and not workspace_request and (notebook_tools.is_request(stripped, history) or intents.is_request(
-                stripped, history, person=semantic.current_person(), scope=self._conv_id or ''))
+                stripped, history, person=semantic.current_person(), scope=self._conv_id or self._continuity_id))
             if native and self._conv_id is None:
-                import uuid
-                self._conv_id = uuid.uuid4().hex[:12]
-            result = cc.notebook_command(stripped, history, scope=self._conv_id or '', cfg=self._cfg) if unrestricted and not workspace_request else None
+                self._ensure_native_scope(target)
+            result = cc.notebook_command(stripped, history, scope=self._conv_id or self._continuity_id, cfg=self._cfg) if unrestricted and not workspace_request else None
             if result is None and unrestricted and not workspace_request:
-                result = cc.memory_command(stripped, history, scope=self._conv_id or '', preview_saves=propose)
+                result = cc.memory_command(stripped, history, scope=self._conv_id or self._continuity_id, preview_saves=propose)
+                if result is not None:
+                    self._ensure_native_scope(target)
                 if result is not None and result.update_preview:
                     from cursiv_engine.core.intent import ACTIONS, Proposal
                     slots = result.update_preview
@@ -685,6 +696,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
                 return
             if not force_provider:
                 force_provider = 'manager:local_auto'
+            self._signals.run_event.emit(target, dict(kind='generation_started'))
             gen = _cursiv_chat(
                 stripped, history,
                 api_key=self._cfg.get("api_key", ""), files=None,
@@ -733,7 +745,9 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
                     self._signals.run_event.emit(target, dict(kind='replace', text=full))
                     continue
                 full += chunk
-                self._signals.run_event.emit(target, dict(kind='chunk', text=chunk))
+                outcome = manager.outcome()
+                self._signals.run_event.emit(target, dict(kind='chunk', text=chunk,
+                    provenance=outcome.metadata() if outcome else None))
             if cancel_event.is_set():
                 from cursiv_engine.chat import provider_manager as manager
                 result = manager.outcome()
@@ -937,6 +951,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
             self._history[-1]['memory_receipt'] = self._pending_memory_receipt
             self._pending_memory_receipt = None
         self._pending_history_append = None
+        self._finish_checkpoint()
         self._refresh_context_indicator()
         self._after_turn()
         self._streaming = False
@@ -950,29 +965,8 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._cc_btn.setEnabled(bool(getattr(self, "_last_exchange", None)))
         self._status.setText("")
         self._input.setFocus()
+        self._refresh_paused()
         self._start_review()
-
-    def _on_cancelled(self) -> None:
-        self._provider_box.setEnabled(True)
-        self._cloud_model_box.setEnabled(True)
-        self._model_box.setEnabled(True)
-        self._cancel_review()
-        self._flush_reply_chunks(format_blocks=False)
-        self._chunk_timer.stop()
-        self._append_html_block(
-            f'<span style="color:{SILV2}; font-style:italic;"> [Stopped]</span></p>'
-        )
-        for role, content in (getattr(self, "_pending_history_append", None) or []):
-            self._history.append({"role": role, "content": content})
-        self._pending_history_append = None
-        self._after_turn()
-        self._cancel_event = None
-        self._streaming = False
-        self._send_btn.setEnabled(True)
-        self._voice_btn.setEnabled(True)
-        self._stop_btn.setEnabled(False)
-        self._status.setText("")
-        self._input.setFocus()
 
     def _on_error(self, message: str) -> None:
         self._provider_box.setEnabled(True)
@@ -996,6 +990,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._voice_btn.setEnabled(True)
         self._stop_btn.setEnabled(False)
         self._status.setText("")
+        self._refresh_paused()
 
     def _on_pending_write(self, raw_json: str) -> None:
         """
@@ -1005,6 +1000,7 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         instead of a y/n prompt. Still "streaming" (buttons disabled) while
         this is open, matching the terminal blocking on the same decision.
         """
+        target = self._run_target()
         self._flush_reply_chunks(format_blocks=False)
         import json
         try:
@@ -1023,6 +1019,8 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
             QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No,
         ) == QMessageBox.StandardButton.Yes
 
+        if not self._current_run_target(target) or (target[1] and target[1].is_set()):
+            return
         if not approved:
             self._finish_pending_write("Write cancelled — file not modified.")
             return
@@ -1030,10 +1028,13 @@ class ChatPanel(ProviderControlsMixin, ChatControlsMixin, ChatTranscriptMixin, C
         self._status.setText("Writing file...")
         workspace = self._pending_write_context.get("workspace", '')
         threading.Thread(
-            target=self._run_write_approval, args=(path, content, workspace), daemon=True,
+            target=self._run_write_approval, args=(path, content, workspace), kwargs={'turn_target': target}, daemon=True,
         ).start()
 
-    def _run_write_approval(self, path: str, content: str, workspace: str) -> None:
+    @provider_turn
+    def _run_write_approval(self, path: str, content: str, workspace: str, turn_target=None) -> None:
+        if not self._current_run_target(turn_target) or (turn_target[1] and turn_target[1].is_set()):
+            return  # cancellation before the approved operation starts is still safe
         try:
             request = self._pending_write_context.get('request', {})
             result = cc.approve_write(path, content, workspace,

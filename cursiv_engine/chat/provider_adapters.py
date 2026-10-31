@@ -232,84 +232,88 @@ def stream(request, result, credential=''):
             yield result.text
             return
         with http.open_response(request.provider, path, credential=credential, payload=payload,expected_base=request.endpoint_url) as response:
-            result.streaming = True
-            result.streamed = True
-            for data in _objects(response, request.provider, protocol == 'ollama'):
-                if request.cancel is not None and request.cancel.is_set():
-                    raise ProviderError(request.provider, E.CANCELLED)
-                if not isinstance(data, dict):
-                    raise ProviderError(request.provider, E.MALFORMED)
-                if data.get('error') or data.get('type') == 'error':
-                    error = data.get('error', {})
-                    code = error.get('type', '') if isinstance(error, dict) else ''
-                    category = {'authentication_error':E.INVALID_KEY, 'permission_error':E.PERMISSION,
-                                'rate_limit_error':E.RATE, 'overloaded_error':E.UNAVAILABLE}.get(code, E.UNAVAILABLE)
-                    raise ProviderError(request.provider, category)
-                text = ''
-                if protocol == 'ollama':
-                    result.actual_model = data.get('model') or result.actual_model
-                    message = data.get('message') or {}
-                    text = message.get('content') or ''
-                    result.tool_calls.extend(message.get('tool_calls') or [])
-                    if data.get('done'):
-                        result.finish_reason = data.get('done_reason') or 'stop'
-                        result.usage = {k:data[k] for k in ('prompt_eval_count', 'eval_count') if k in data}
-                elif protocol == 'gemini':
-                    result.actual_model = data.get('modelVersion') or result.actual_model
-                    for candidate in data.get('candidates', []):
-                        for part in candidate.get('content', {}).get('parts', []):
-                            if part.get('functionCall'):
-                                result.tool_calls.append(part['functionCall'])
-                            text += part.get('text', '') if not part.get('thought') else ''
-                        result.finish_reason = candidate.get('finishReason') or result.finish_reason
-                    result.usage.update(data.get('usageMetadata') or {})
-                    if data.get('promptFeedback', {}).get('blockReason'):
-                        raise ProviderError(request.provider, E.PERMISSION)
-                elif protocol == 'claude':
-                    kind = data.get('type')
-                    if kind == 'message_start':
-                        result.actual_model = data.get('message', {}).get('model')
-                        result.usage.update(data.get('message', {}).get('usage') or {})
-                    elif kind == 'content_block_start':
-                        block = data.get('content_block', {})
-                        if block.get('type') == 'tool_use':
-                            calls[data.get('index', 0)] = dict(block, arguments='')
-                    elif kind == 'content_block_delta':
-                        delta = data.get('delta', {})
-                        text = delta.get('text', '')
-                        if delta.get('partial_json') is not None:
-                            index = data.get('index', 0)
-                            calls.setdefault(index, {'arguments':''})['arguments'] += delta['partial_json']
-                    elif kind == 'message_delta':
-                        result.finish_reason = data.get('delta', {}).get('stop_reason')
-                        result.usage.update(data.get('usage') or {})
-                else:
-                    result.actual_model = data.get('model') or result.actual_model
-                    result.usage.update(data.get('usage') or {})
-                    if request.provider=='groq':
-                        result.usage.update((data.get('x_groq') or {}).get('usage') or {})
-                    for choice in data.get('choices', []):
-                        delta = choice.get('delta') or {}
-                        text += delta.get('content') or ''
-                        result.finish_reason = choice.get('finish_reason') or result.finish_reason
-                        for call in delta.get('tool_calls') or []:
-                            saved = calls.setdefault(call.get('index', 0), {'id':'', 'type':'function', 'function':{'name':'', 'arguments':''}})
-                            saved['id'] = call.get('id') or saved['id']
-                            for field in ('name', 'arguments'):
-                                saved['function'][field] += call.get('function', {}).get(field) or ''
-                if text:
-                    if not isinstance(text, str):
+            remove_close = request.cancel.register(response.close) if hasattr(request.cancel, 'register') else lambda: None
+            try:
+                result.streaming = True
+                result.streamed = True
+                for data in _objects(response, request.provider, protocol == 'ollama'):
+                    if request.cancel is not None and request.cancel.is_set():
+                        raise ProviderError(request.provider, E.CANCELLED)
+                    if not isinstance(data, dict):
                         raise ProviderError(request.provider, E.MALFORMED)
-                    result.text += text
-                    yield text
-            result.tool_calls.extend(calls.values())
-            if not result.finish_reason or not (result.text or result.tool_calls):
-                raise ProviderError(request.provider, E.MALFORMED)
-            # A text-only path records unsolicited calls but does not invent
-            # results. Native Cursiv tools remain available before generation.
-            if result.tool_calls:
-                raise ProviderError(request.provider, E.CAPABILITY)
-            result.responding_provider = request.provider
+                    if data.get('error') or data.get('type') == 'error':
+                        error = data.get('error', {})
+                        code = error.get('type', '') if isinstance(error, dict) else ''
+                        category = {'authentication_error':E.INVALID_KEY, 'permission_error':E.PERMISSION,
+                                    'rate_limit_error':E.RATE, 'overloaded_error':E.UNAVAILABLE}.get(code, E.UNAVAILABLE)
+                        raise ProviderError(request.provider, category)
+                    text = ''
+                    if protocol == 'ollama':
+                        result.actual_model = data.get('model') or result.actual_model
+                        message = data.get('message') or {}
+                        text = message.get('content') or ''
+                        result.tool_calls.extend(message.get('tool_calls') or [])
+                        if data.get('done'):
+                            result.finish_reason = data.get('done_reason') or 'stop'
+                            result.usage = {k:data[k] for k in ('prompt_eval_count', 'eval_count') if k in data}
+                    elif protocol == 'gemini':
+                        result.actual_model = data.get('modelVersion') or result.actual_model
+                        for candidate in data.get('candidates', []):
+                            for part in candidate.get('content', {}).get('parts', []):
+                                if part.get('functionCall'):
+                                    result.tool_calls.append(part['functionCall'])
+                                text += part.get('text', '') if not part.get('thought') else ''
+                            result.finish_reason = candidate.get('finishReason') or result.finish_reason
+                        result.usage.update(data.get('usageMetadata') or {})
+                        if data.get('promptFeedback', {}).get('blockReason'):
+                            raise ProviderError(request.provider, E.PERMISSION)
+                    elif protocol == 'claude':
+                        kind = data.get('type')
+                        if kind == 'message_start':
+                            result.actual_model = data.get('message', {}).get('model')
+                            result.usage.update(data.get('message', {}).get('usage') or {})
+                        elif kind == 'content_block_start':
+                            block = data.get('content_block', {})
+                            if block.get('type') == 'tool_use':
+                                calls[data.get('index', 0)] = dict(block, arguments='')
+                        elif kind == 'content_block_delta':
+                            delta = data.get('delta', {})
+                            text = delta.get('text', '')
+                            if delta.get('partial_json') is not None:
+                                index = data.get('index', 0)
+                                calls.setdefault(index, {'arguments':''})['arguments'] += delta['partial_json']
+                        elif kind == 'message_delta':
+                            result.finish_reason = data.get('delta', {}).get('stop_reason')
+                            result.usage.update(data.get('usage') or {})
+                    else:
+                        result.actual_model = data.get('model') or result.actual_model
+                        result.usage.update(data.get('usage') or {})
+                        if request.provider=='groq':
+                            result.usage.update((data.get('x_groq') or {}).get('usage') or {})
+                        for choice in data.get('choices', []):
+                            delta = choice.get('delta') or {}
+                            text += delta.get('content') or ''
+                            result.finish_reason = choice.get('finish_reason') or result.finish_reason
+                            for call in delta.get('tool_calls') or []:
+                                saved = calls.setdefault(call.get('index', 0), {'id':'', 'type':'function', 'function':{'name':'', 'arguments':''}})
+                                saved['id'] = call.get('id') or saved['id']
+                                for field in ('name', 'arguments'):
+                                    saved['function'][field] += call.get('function', {}).get(field) or ''
+                    if text:
+                        if not isinstance(text, str):
+                            raise ProviderError(request.provider, E.MALFORMED)
+                        result.text += text
+                        yield text
+                result.tool_calls.extend(calls.values())
+                if not result.finish_reason or not (result.text or result.tool_calls):
+                    raise ProviderError(request.provider, E.MALFORMED)
+                # A text-only path records unsolicited calls but does not invent
+                # results. Native Cursiv tools remain available before generation.
+                if result.tool_calls:
+                    raise ProviderError(request.provider, E.CAPABILITY)
+                result.responding_provider = request.provider
+            finally:
+                remove_close()
     except (TimeoutError, socket.timeout):
         raise ProviderError(request.provider, E.TIMEOUT) from None
     except OSError:

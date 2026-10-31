@@ -1,0 +1,7 @@
+# Frozen from 7d7e1e3c498cda81a04e2bd8f57053abcd2eadac:launcher/chat_panel.py
+class ChatPanel:
+    def _stop_generation(self) -> None:
+        if self._cancel_event is not None:
+            self._cancel_event.set()
+        self._stop_btn.setEnabled(False)
+        self._status.setText('Stopping…')

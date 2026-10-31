@@ -40,9 +40,13 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
     from cursiv_engine.core.style import PROMPT_HEADING
     from cursiv_engine.core.philosophy_policy import INSTRUCTIONS
     from .response_style import GUIDANCE_HEADING
+    from .continuity import HEADING as CONTINUITY_HEADING
     text = runtime._text_messages(messages)
     styles = [m for m in text if m.get('role') == 'system' and m.get('content', '').startswith(PROMPT_HEADING)]
     protected = [dict(role='system', content=INSTRUCTIONS)]
+    continuation = [m for m in text if m.get('role') == 'system' and m.get('content', '').startswith(CONTINUITY_HEADING)]
+    if continuation:
+        protected.append(continuation[-1])  # never silently discard/truncate the paused response
     from cursiv_engine.core.reasoning_context import HEADING as REASONING_HEADING
     reasoning = [m for m in text if m.get('role') == 'system' and m.get('content','').startswith(REASONING_HEADING)]
     if reasoning:
@@ -66,8 +70,11 @@ def _slim(runtime: ChatRuntime, messages: list[dict], budget: int) -> list[dict]
     source = [m for m in text if not (m.get('role') == 'system' and
               (m.get('content') == INSTRUCTIONS or m.get('content', '').startswith(PROMPT_HEADING)
                or m.get('content', '').startswith(GUIDANCE_HEADING)
+               or m.get('content', '').startswith(CONTINUITY_HEADING)
                or m.get('content', '').startswith(REASONING_HEADING)))]
     reserve = sum(len(m['content']) for m in protected)
+    if continuation and reserve >= budget - 1500:
+        raise ValueError('The paused response exceeds this model route\'s context budget. Use a shorter excerpt.')
     result = speed.slim_messages(source, max(0, budget - reserve),
                                  runtime._FULL_PERSONA, speed.compact_persona(runtime.SYSTEM_PROMPT_FILE))
     at = 1 if result and result[0].get('role') == 'system' else 0

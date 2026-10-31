@@ -135,6 +135,7 @@ class ChatControlsMixin:
         self._signals.provider_models.connect(self._provider_models_ready)
         self._signals.crosscheck.connect(self._on_cross_check)
         self._build_feedback(lay)
+        self._build_continuity(lay)
         self._refresh_status_pill()
         self._load_models()
         saved = provider_settings.load()

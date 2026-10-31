@@ -265,6 +265,10 @@ You are in full autonomous coding mode. Follow this protocol exactly:
             from cursiv_engine.memory import semantic as _sem2
             _who = _sem2.current_person()
             _style_addendum = _style.prompt_addendum(_who, user_text)
+            _presentation = _style.presentation_prompt(_who, user_text, history)
+            if _presentation:
+                _style_addendum = (_style.PROMPT_HEADING + '\nPresentation preferences (accuracy, permissions and safety take precedence):\n' +
+                    _presentation + '\n' + _style_addendum.removeprefix(_style.PROMPT_HEADING))
             from cursiv_engine.memory import formation as _formation
             if _style.looks_like_correction(user_text) and _formation.enabled_for(user_text):
                 _prev = next((m.get("content", "") for m in reversed(history or [])
@@ -486,6 +490,9 @@ You are in full autonomous coding mode. Follow this protocol exactly:
         'Persistent memory and other session summaries are separate from this conversation. '
         'If earlier turns are unavailable, say so; do not invent quotations, chronology or the original concern. '
         'Follow later user corrections over earlier statements.')))
+    from . import continuity
+    if continuity.prompt():
+        messages.insert(3, dict(role='system', content=continuity.prompt()))
     if _style_addendum:
         # Separate from the replaceable persona so compaction and tool prompts
         # retain the current preference, including a change made this session.

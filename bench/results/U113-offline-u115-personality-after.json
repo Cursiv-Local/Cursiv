@@ -1,0 +1,18 @@
+{
+  "label": "u115-personality-after",
+  "exit_code": 4,
+  "pytest_exit_code": 4,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "bd1c0070a9d3996e64bd73aeecef387368a23250050f0b05edda8e56a13fbe75",
+  "events": [
+    {
+      "pid": 23092,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    }
+  ],
+  "blocked_operations": [],
+  "exclusions": [],
+  "junit": "bench\\results\\U113-offline-u115-personality-after.xml"
+}

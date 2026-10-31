@@ -1,0 +1,29 @@
+{
+  "scope": "50 synthetic offscreen UI interruptions; autosave off; tracemalloc on; no inference; not real-provider latency",
+  "baseline": {
+    "commit": "7d7e1e3",
+    "stop_handler_ms": 0.0495,
+    "input_released_on_return": false,
+    "note": "U114 waits for worker completion; no invented stop-to-release duration"
+  },
+  "after": {
+    "iterations": 50,
+    "stop_handler_median_ms": 6.44145,
+    "stop_handler_max_ms": 14.5739,
+    "stop_handler_p95_ms": 14.1612,
+    "input_released_on_return": true,
+    "checkpoint_median_ms": 0.0326,
+    "resume_prepare_median_ms": 0.0588,
+    "resume_context_utf8_bytes": 629,
+    "resume_instruction_utf8_bytes": 1229,
+    "additional_model_calls": 0,
+    "additional_embeddings": 0,
+    "active_checkpoints": 8,
+    "checkpoint_metadata_bytes": 422,
+    "serialized_message_additional_bytes": 440,
+    "synthetic_disk_bytes": 1012,
+    "python_traced_current_bytes": 32569,
+    "python_traced_peak_bytes": 38431
+  },
+  "limits": "Bytes are not measured provider tokens; memory excludes native Qt allocations and this is not a hardware/model benchmark."
+}

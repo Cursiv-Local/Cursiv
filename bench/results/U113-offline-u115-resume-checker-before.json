@@ -1,0 +1,59 @@
+{
+  "label": "u115-resume-checker-before",
+  "exit_code": 1,
+  "pytest_exit_code": 1,
+  "scope": "Python audit guard before pytest/application import; propagated startup guard for approved Python children; no OS-wide firewall claim",
+  "guard_sha256": "bd1c0070a9d3996e64bd73aeecef387368a23250050f0b05edda8e56a13fbe75",
+  "events": [
+    {
+      "pid": 14940,
+      "event": "guard_installed",
+      "test": "startup",
+      "python_guard": true
+    }
+  ],
+  "blocked_operations": [],
+  "exclusions": [
+    {
+      "path": "test_network_isolation_process.py",
+      "reason": "requires a real loopback HTTP server"
+    },
+    {
+      "path": "test_offline_process.py",
+      "reason": "isolated -I subprocess and real loopback assertions"
+    },
+    {
+      "path": "test_persistence.py",
+      "reason": "contains an intentional real connectivity probe"
+    },
+    {
+      "path": "test_phone_receive.py",
+      "reason": "requires a real local HTTP receiver"
+    },
+    {
+      "path": "test_plugin_isolation.py",
+      "reason": "isolated -I worker cannot inherit this guard"
+    },
+    {
+      "path": "test_self_knowledge_live.py",
+      "reason": "requires live model inference"
+    },
+    {
+      "path": "test_station_server.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_sessions.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_storage.py",
+      "reason": "Field Station excluded by owner"
+    },
+    {
+      "path": "test_station_telemetry.py",
+      "reason": "Field Station excluded by owner"
+    }
+  ],
+  "junit": "bench\\results\\U113-offline-u115-resume-checker-before.xml"
+}

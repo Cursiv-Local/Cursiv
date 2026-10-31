@@ -5,7 +5,7 @@ import threading
 class ChatReviewMixin:
     def _run_target(self):
         from cursiv_engine.memory import semantic
-        return (self._review_generation, self._cancel_event, self._conv_id,
+        return (self._review_generation, self._cancel_event, self._conv_id or getattr(self, '_continuity_id', None),
                 self._cfg.get('workspace'), self._cfg.get('file_access'), semantic._person_revision)
 
     def _current_run_target(self, target):
@@ -28,6 +28,23 @@ class ChatReviewMixin:
                 self._pending_history_append = None
                 self._on_cancelled()
                 return
+        for name, value in event.get('worker_state', {}).items():
+            setattr(self, name, value)
+        self._cfg.update(event.get('config_delta', {}))
+        if event['kind'] == 'native_scope':
+            self._conv_id = event['conversation_id']
+            return
+        if event['kind'] == 'worker_signal':
+            allowed = {'chunk', 'replace', 'done', 'error', 'cancelled', 'image', 'pending_write',
+                       'write_complete', 'stage', 'tool_receipt', 'state_changed', 'notes_view'}
+            if event['signal'] in allowed:
+                getattr(self._signals, event['signal']).emit(*event['args'])
+            return
+        if event['kind'] == 'generation_started':
+            self._reply_is_chat = True
+            return
+        if event.get('provenance'):
+            self._stream_provenance = event['provenance']
         kind = event['kind']
         cancelled = target[1] is not None and target[1].is_set()
         if kind in ('chunk', 'replace'):
