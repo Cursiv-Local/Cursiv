@@ -7,7 +7,7 @@ link to them.
 
 ## Using Cursiv
 
-- [Paused responses and presentation preferences](INTERRUPT-CONTINUITY.md) (U115 development, not released)
+- [Paused responses and presentation preferences](INTERRUPT-CONTINUITY.md) (U115)
 
 - [Reference](REFERENCE.md): commands and features
 - [Field demo](FIELD-DEMO.md), [field kit test](FIELD-KIT-TEST.md),
@@ -102,6 +102,7 @@ Older releases are described in the [CHANGELOG](../CHANGELOG.md) and on
 [GitHub Releases](https://github.com/Cursiv-Local/Cursiv/releases).
 
 - [U111](U111-RELEASE-VERIFICATION.md) — published routing and verification checks.
+- [U115](U115-RELEASE-VERIFICATION.md) — Stop keeps partial answers as resumable paused tasks; optional presentation settings; source, native packages and signatures.
 - [U114](U114-RELEASE-VERIFICATION.md) — exact source targets, scoped evidence checks, offline audit and signed native packages.
 - [U113](U113-RELEASE-VERIFICATION.md) — reliable self-inspection and scoped verification; source, native packages and signatures.
 - [U112](U112-RELEASE-VERIFICATION.md) — published unified AI provider manager and native package evidence.
