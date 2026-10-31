@@ -46,7 +46,7 @@ jobs:
           $temporary = python -c 'import tempfile; print(tempfile.gettempdir())'
           $build = Get-ChildItem -LiteralPath $temporary -Directory -Filter 'cursiv_release_*' | Sort-Object LastWriteTime -Descending | Select-Object -First 1
           if (!$build) { throw 'Tagged build receipts are missing' }
-          Copy-Item -LiteralPath (Join-Path $build.FullName 'selftest.txt') -Destination 'installer/Output/frozen-selftest.txt'
+          Copy-Item -LiteralPath (Join-Path $build.FullName 'frozen-selftest.txt') -Destination 'installer/Output/frozen-selftest.txt'
           Copy-Item -LiteralPath (Join-Path $build.FullName 'portable-selftest.txt') -Destination 'installer/Output/portable-selftest.txt'
       - uses: actions/upload-artifact@v4
         with:
