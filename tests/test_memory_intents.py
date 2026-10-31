@@ -358,3 +358,48 @@ def test_new_request_discards_pending_choice_from_another_intent(memory):
     assert run('remember a new explicit record').ok
     assert run('2') is None
     assert [f['text'] for f in memory.list_facts('dana')] == ['a new explicit record']
+
+
+@pytest.mark.parametrize('text', ['forget it', 'Forget it, never mind.', 'never mind, forget about it',
+                                  'oh, forget it', 'forget it!'])
+def test_forget_it_dismisses_the_topic_and_never_deletes_a_memory(memory, text):
+    # Health check 2026-10-31: "forget it" after mentioning the dog silently removed
+    # the saved memory "my dog is called Biscuit".
+    assert run('remember that my dog is called Biscuit').outcomes[0].status == 'saved'
+    history = [user("Can you help me name my dog's new toy? My dog is called Biscuit."), model('How about Squeaky?')]
+    assert not mi.is_request(text, history, person='dana', scope='chat-one')
+    assert mi.requested_operations(text) == ()
+    assert run(text, history) is None
+    assert any('Biscuit' in f['text'] for f in sem.list_facts('dana'))
+
+
+def test_an_explicit_forget_still_removes_the_memory(memory):
+    run('remember that my dog is called Biscuit')
+    result = run('forget that my dog is called Biscuit')
+    assert result.outcomes[0].operation == 'FORGET_MEMORY' and result.outcomes[0].ok
+    assert not any('Biscuit' in f['text'] for f in sem.list_facts('dana'))
+
+
+def test_forget_that_resolved_from_the_conversation_asks_before_deleting(memory):
+    run('remember that my dog is called Biscuit')
+    history = [user('My dog is called Biscuit.'), model('Lovely name.')]
+    asked = run('forget that', history)
+    assert 'Forget this saved memory?' in asked.clarification and 'my dog is called Biscuit' in asked.clarification
+    assert not asked.outcomes and any('Biscuit' in f['text'] for f in sem.list_facts('dana'))
+    kept = run('no', history)
+    assert 'cancelled' in kept.clarification.lower()
+    assert any('Biscuit' in f['text'] for f in sem.list_facts('dana'))
+    run('forget that', history)
+    done = run('yes', history)
+    assert done.outcomes[0].operation == 'FORGET_MEMORY' and done.outcomes[0].ok
+    assert not any('Biscuit' in f['text'] for f in sem.list_facts('dana'))
+
+
+@pytest.mark.parametrize('text,saved', [
+    ('remember to drink water is good advice', False),
+    ("Don't forget to stretch is such good advice!", False),
+    ('remember my advice is to calibrate daily', True),
+    ('remember that the sample site is Willow Basin', True),
+])
+def test_talking_about_a_saying_is_not_a_memory_save(memory, text, saved):
+    assert (mi.requested_operations(text) == ('SAVE_MEMORY',)) is saved

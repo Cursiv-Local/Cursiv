@@ -586,7 +586,7 @@ class ChatPanel(ContinuityMixin, ProviderControlsMixin, ChatControlsMixin, ChatT
         self._provider_box.setEnabled(False)
         self._cloud_model_box.setEnabled(False)
         self._model_box.setEnabled(False)
-        self._retry_provider_btn.setVisible(False)
+        self._show_provider_recovery(False)
         self._cc_btn.setEnabled(False)
         self._last_exchange = None           # a new turn: nothing finished to cross-check yet
         self._status.setText("Preparing answer…")
@@ -956,7 +956,7 @@ class ChatPanel(ContinuityMixin, ProviderControlsMixin, ChatControlsMixin, ChatT
         self._after_turn()
         self._streaming = False
         self._send_btn.setEnabled(True)
-        self._retry_provider_btn.setVisible(self._has_current_provider_retry())
+        self._show_provider_recovery(self._has_current_provider_retry())
         self._provider_box.setEnabled(True)
         self._cloud_model_box.setEnabled(True)
         self._model_box.setEnabled(True)

@@ -99,6 +99,10 @@ jobs:
         env:
           QT_QPA_PLATFORM: offscreen
         run: python -m pytest tests -m usb -v
+      - name: Release documents (docs-only changes too)
+        # A docs-only evidence PR once left main failing these checks unseen (U115).
+        if: needs.change-scope.outputs.website_only == 'true'
+        run: python -m pytest tests/test_release_docs.py -q
       - name: Test
         if: needs.change-scope.outputs.website_only != 'true'
         env:
