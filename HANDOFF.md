@@ -4,16 +4,20 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U115 release preparation — October 31, 2026
+## U115 released — October 31, 2026
 
-Ready for owner manual testing: 2,884 passed,33 skipped,19 passing subtests; zero unexpected guard operations. [Final evidence](bench/results/U115-validation-summary.json).
-
-[Interrupt continuity handoff](docs/U115-HANDOFF.md) and [usage](docs/INTERRUPT-CONTINUITY.md).
-Work is based on stabilized U114. Immediate visible Stop, bounded message-owned
-checkpoints, text-only resume through existing provider/privacy gates and opt-in
-presentation preferences are under guarded offline validation. No real AI calls or local model inference are authorized. The owner authorized
-commit/push/application release and normal hosted CI; website work is deferred.
-Preserve the original dirty checkout, Station, private data and all U113/U114 fixes.
+Owner-approved [U115](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U115)
+is published from immutable `523f017` (PR75). All17 protected source checks and exact-main
+Windows2990/16 skips, Mac2973/33, Linux2972/34 plus19 subtests each passed.
+Both native builds, Windows USB-layout startup,11 public downloads and8 owner signatures
+verified. [Release proof](docs/U115-RELEASE-VERIFICATION.md),
+[continuity handoff](docs/U115-HANDOFF.md), [usage](docs/INTERRUPT-CONTINUITY.md).
+Local guarded validation passed2884/33/19 with0 unexpected operations. Stop preserves
+partial text and bounded resumable checkpoints without extra inference; optional
+presentation settings preserve current defaults. Resume uses existing provider/privacy
+gates and cannot replay tools or writes. Real AI-provider calls/model inference remain
+unperformed. Website changes/deployment are explicitly deferred by the owner.
+Preserve the original dirty checkout, Station, private data and existing U113/U114 fixes.
 
 ## U114 released — October 30, 2026
 

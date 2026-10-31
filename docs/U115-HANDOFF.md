@@ -1,6 +1,6 @@
 # U115 development handoff: interrupt continuity and optional personality
 
-Status: **READY FOR OWNER MANUAL TESTING**. Implementation and final validation complete. Base main 7d7e1e3 after U114 release. The owner subsequently authorized commit, push and application release; website work is explicitly deferred. Original dirty owner checkout is untouched. No dependencies/models downloaded; no live AI calls or inference allowed.
+Status: **RELEASED: v3.14-U115**. [Verified release](U115-RELEASE-VERIFICATION.md). Implementation and final validation complete. Base main 7d7e1e3 after U114 release. The owner subsequently authorized commit, push and application release; website work is explicitly deferred. Original dirty owner checkout is untouched. No dependencies/models downloaded; no live AI calls or inference allowed.
 
 The progress entries are chronological. The final checkpoint below is authoritative.
 
@@ -142,3 +142,33 @@ The owner requested commit/push/release, explicitly leaving the website for late
 Release candidate validation:175 interruption/source-inventory tests and36 existing version/build/signing/workspace tests passed with zero unexpected operations. All production Python changes match the completed2,884-test development checkpoint, apart from the reviewed version bump (and the separate launcher version constant). The exact archived U114 baseline has no shallow-history dependency. The first release command used a nonexistent test filename and ran no tests; it is not a validation result. Next: mandatory guarded USB commit hook and protected hosted CI. Website remains deferred.
 
 Hosted CI checkpoint: Linux ran2,971 passing cases/34 skips/19 subtests with one restart-fixture failure: a fresh Python child lacked the launcher import path. The strict local harness supplied PYTHONPATH, masking that setup dependency. The fixture now prepends the repository and launcher directories explicitly in the child, without depending on CI history or environment. No production behavior changed. Source commit e371946 is retained; a follow-up test-only commit will rerun all protected checks. Real AI calls remain prohibited; website unchanged.
+
+
+## Released checkpoint — October 31, 2026
+
+The owner authorized commit, push and application release, explicitly deferring the
+website. Source commits e371946/e150aec merged through PR75 as immutable
+523f0175c5848b36a5065f4ff10165c5dfc65ff7. All17 protected checks passed after the
+test-only restart-fixture portability correction. Exact-main CI41170359384 passed:
+Windows2990/16 skips, Mac2973/33, Linux2972/34, each with19 additional passing subtests;
+existing ARM64 headless source tests114/0. This is not Pi hardware validation.
+
+Tagged Windows41171190258 and Mac41171192335 builds passed locked provenance and
+native startup gates; Windows also passed portable USB-layout startup. All8 platform
+assets have verified owner signatures; the protected private key was not copied or
+printed. U115 was published with11 assets; anonymous downloads returned200 and
+matched staged bytes/GitHub digests, with8 signatures independently reverified.
+The redundant release-triggered Mac run41172357909 was canceled after the verified
+manual build, per the release runbook. The immutable application tag was never moved.
+
+The scanned application candidate comprised83 public paths, with0 secret findings.
+No owner data, excluded files, Station implementation or website paths were changed.
+No real AI calls or live model inference were performed. Real provider quality and
+server-side cancellation remain owner manual tests; see the existing manual sequence.
+Website updates/deployment remain deferred. Release evidence is recorded separately
+after the immutable application tag; no production code is changed by that proof PR.
+[Full release verification](U115-RELEASE-VERIFICATION.md).
+
+Commands running: none. Remaining: owner manual model testing and any later,
+separately authorized website work. Historical development entries above retain the
+state at their original checkpoint; this released checkpoint supersedes their status.

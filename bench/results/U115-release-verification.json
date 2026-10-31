@@ -1,0 +1,108 @@
+{
+  "version": "3.14-U115",
+  "source_commit": "523f0175c5848b36a5065f4ff10165c5dfc65ff7",
+  "tag": "v3.14-U115",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/75",
+  "source_main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41170359384",
+  "windows_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41171190258",
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41171192335",
+  "main_tests": {
+    "windows": {
+      "passed": 2990,
+      "skipped": 16,
+      "passing_subtests": 19
+    },
+    "mac": {
+      "passed": 2973,
+      "skipped": 33,
+      "passing_subtests": 19
+    },
+    "linux": {
+      "passed": 2972,
+      "skipped": 34,
+      "passing_subtests": 19
+    },
+    "arm64_source_only": {
+      "passed": 114,
+      "skipped": 0
+    }
+  },
+  "local_strict_tests": {
+    "passed": 2884,
+    "skipped": 33,
+    "passing_subtests": 19,
+    "unexpected_operations": 0
+  },
+  "source_pr_checks_passed": 17,
+  "tag_workspace_tests_passed": 63,
+  "usb_commit_gate_passed": 45,
+  "native_receipts": {
+    "windows_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "8065aff7fd9beaaf42e71cd7cd00c18db32f7dc350abc6819735a97323fe8368",
+      "receipt": "reports\\U115-downloads\\windows\\cursiv-windows\\frozen-selftest.txt"
+    },
+    "windows_portable": {
+      "status": "ALL PASSED",
+      "sha256": "805af05e1e958cbf2fce9c69f2ae76ab4a5581212ca7c01674723f21b7563bc1",
+      "receipt": "reports\\U115-downloads\\windows\\cursiv-windows\\portable-selftest.txt"
+    },
+    "mac_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "7203318e2b80d354aacba4f145b1b037f3058c97ca7982b8e0f24a8a56f88d56",
+      "receipt": "reports\\U115-downloads\\mac\\cursiv-mac\\selftest.txt"
+    }
+  },
+  "platform_assets": {
+    "Cursiv-3.14-U115-mac-arm64.dmg": {
+      "size": 70695709,
+      "sha256": "24539a0694bd3e40490433ee8a2bd28ac7df3526e379efbcedcd5266cafb0b0a"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 70695709,
+      "sha256": "24539a0694bd3e40490433ee8a2bd28ac7df3526e379efbcedcd5266cafb0b0a"
+    },
+    "Cursiv-Setup-3.14-U115.exe": {
+      "size": 58042186,
+      "sha256": "76d2796c395f4bf99ba3243c13aa5bbb861c8102a31a080fae00309228677c75"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 58042186,
+      "sha256": "76d2796c395f4bf99ba3243c13aa5bbb861c8102a31a080fae00309228677c75"
+    },
+    "provenance-3.14-U115.json": {
+      "size": 1806,
+      "sha256": "9a099bd8269272410fa61b1b30d71e18c317aabe99002f8bb8edcc3f1a2d5bce"
+    },
+    "provenance-mac.json": {
+      "size": 1759,
+      "sha256": "e5699852411794aef5d27d19eb6df1575cdda1313444854ec5ec832144e18022"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "57eac014f6e3605bfa82ea49b0751ec28c7295e8054862a4bdfd4bfacdc4ea2b"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "bab6858357fb7a7c1e7e7887f7a1a1adc4c4fc65ad8d05e48c2015281ff5d561"
+    }
+  },
+  "owner_signatures_verified": 8,
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "private_key_copied": false,
+  "api_keys_committed": false,
+  "source_secret_scan_files": 83,
+  "source_secret_findings": 0,
+  "source_tree": "6e694a657df009e0a2a1b900fe327d53031b1a01",
+  "real_ai_provider_calls": false,
+  "live_ollama_inference": false,
+  "website_changed_or_deployed": false,
+  "authenticode_or_notarization_claimed": false,
+  "verified_utc": "2026-10-31T05:19:17.103867+00:00",
+  "limits": "Synthetic tests do not establish real-provider answer quality or guaranteed server-side cancellation. Website publication is deferred by owner."
+}
