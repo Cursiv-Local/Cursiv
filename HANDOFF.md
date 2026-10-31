@@ -4,19 +4,21 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U114 preparing — source targeting and evidence reliability
+## U114 released — October 30, 2026
 
-The owner authorized commit/push/release and normal hosted CI (no real AI calls
-or model inference). Preserve the published U113 tag. Repairs and history proof:
-[guardian audit](docs/U113-GUARDIAN-AUDIT.md); final strict-offline validation and
-owner test prompts: [manual handoff](docs/U113-MANUAL-TEST-HANDOFF.md).
-The earlier 2,909/15/19 checkpoint is historical; use the latest strict receipt.
-Final guarded local validation:2,824 passed/33 skipped/19 passing subtests, zero
-unexpected network/process operations. No U114 release is claimed yet. Existing
-notebook confirmations, permissions, provider privacy/offline gates and opted-in
-USB key export remain. Original owner checkout, excluded files and station code
-are unchanged. Windows packages now also have a hosted tag-only build path using
-the existing main/lock/frozen/USB gates; no local dependency install is required.
+Owner-approved [U114](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U114)
+is published from immutable `7e6150a` (PR71). Exact-main Windows 2930/16 skips,
+Mac 2913/33 and Linux 2912/34 plus 19 subtests each passed. Tagged native packages,
+Windows USB-layout start,11 public downloads and 8 owner signatures verified.
+[Release evidence](docs/U114-RELEASE-VERIFICATION.md); [root causes/history](docs/U113-GUARDIAN-AUDIT.md);
+[manual tests/launch](docs/U113-MANUAL-TEST-HANDOFF.md). Local strict audit2824/33/19
+had0 unexpected guard operations. Real AI-provider calls/model inference remain
+unperformed; hosted release CI was explicitly authorized. PDF lock/floor is6.21.4.
+A hosted Windows path reuses existing tag/main/lock/frozen/USB gates; PR72 fixed its
+receipt-copy filename only. U113 is unchanged. Preserve owner data, exclusions,
+Station implementation, notebook permissions, exact routing and opted-in USB key export.
+Website deployment/readback remains a separate publication step; no deployment is
+claimed without its receipt. The original dirty owner checkout remains untouched.
 
 ## U113 released — October 30, 2026
 

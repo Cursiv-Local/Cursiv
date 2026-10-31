@@ -1,0 +1,121 @@
+{
+  "format": "cursiv-release-verification-1",
+  "version": "3.14-U114",
+  "tag": "v3.14-U114",
+  "checked_utc": "2026-10-31T00:43:25.998665+00:00",
+  "scope": "Tagged application source and staged owner-authenticated packages; anonymous published downloads and website deployment are verified separately",
+  "source_commit": "7e6150a9eb11b8ff0daac45c167a82458ab714f2",
+  "source_pr": 71,
+  "main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41149185226",
+  "windows_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41151029995",
+  "windows_workflow_definition": "2e7a775beaf7b6ecf72bce496b1219f68f4cb54a",
+  "receipt_collection_fix_pr": 72,
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41150305222",
+  "source_tests": {
+    "windows": {
+      "tests": 2965,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 16,
+      "regular_passed": 2930,
+      "passing_subtests": 19,
+      "seconds": 503.345,
+      "receipt": "U114-main-windows.xml"
+    },
+    "mac": {
+      "tests": 2965,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 33,
+      "regular_passed": 2913,
+      "passing_subtests": 19,
+      "seconds": 546.579,
+      "receipt": "U114-main-mac.xml"
+    },
+    "linux": {
+      "tests": 2965,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 34,
+      "regular_passed": 2912,
+      "passing_subtests": 19,
+      "seconds": 214.614,
+      "receipt": "U114-main-linux.xml"
+    },
+    "arm64": {
+      "tests": 114,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "regular_passed": 114,
+      "passing_subtests": 0,
+      "seconds": 32.789,
+      "receipt": "U114-main-arm64.xml"
+    }
+  },
+  "windows_frozen": "ALL PASSED",
+  "windows_portable": "ALL PASSED",
+  "mac_frozen": "ALL PASSED",
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "owner_signatures_verified": 8,
+  "private_key_copied": false,
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "owner_manifest_sha256": "53d9853de704871d530abd0c533944942021c42b6f95f0f09fc2a9bb5010d3d5",
+  "local_strict_offline": {
+    "passed": 2824,
+    "failed": 0,
+    "skipped": 33,
+    "passing_subtests": 19,
+    "unexpected_guard_operations": 0,
+    "live_ai_requests": false,
+    "os_wide_firewall": false
+  },
+  "pdf_security_pin": "6.21.4",
+  "source_secret_findings": 0,
+  "assets": {
+    "Cursiv-3.14-U114-mac-arm64.dmg": {
+      "size": 70653552,
+      "sha256": "ffbfc0d167aab046d25c5f8d41c1fc8f91ab0885fa4be289bc5805027abdaea3"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 70653552,
+      "sha256": "ffbfc0d167aab046d25c5f8d41c1fc8f91ab0885fa4be289bc5805027abdaea3"
+    },
+    "cursiv-owner-release-key.json": {
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    "Cursiv-Setup-3.14-U114.exe": {
+      "size": 57993387,
+      "sha256": "930e41a0fafd9a0fd635ee06679f9eefc23b97149bbdb86c8a3dae681794a025"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 57993387,
+      "sha256": "930e41a0fafd9a0fd635ee06679f9eefc23b97149bbdb86c8a3dae681794a025"
+    },
+    "owner-release.json": {
+      "size": 1620,
+      "sha256": "53d9853de704871d530abd0c533944942021c42b6f95f0f09fc2a9bb5010d3d5"
+    },
+    "provenance-3.14-U114.json": {
+      "size": 1806,
+      "sha256": "ef2c583b6f8f18c885d0415d5eb9aead49e32247b4803410be3f5e183ceb9b60"
+    },
+    "provenance-mac.json": {
+      "size": 1759,
+      "sha256": "383a13b07aa480f5d28f963b0d72cbdf710462890d8d54189e00c049653a4045"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "e561436beb01f1a12b9d493bcf4cfacb4b81db03d1b1a009c52d0a41024aa25a"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "a42d1f8be3d488cf273762e2b7641549fbbce2054cb248ac36bceeba8359c534"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 # U113 final reliability manual-test handoff
 
-Status: preparing U114 after the owner authorized commit/push/release and normal hosted CI (no real AI-provider calls or model inference). Final local audit remains strictly guarded. The earlier prohibition on publishing is superseded by this later owner instruction; no production release is claimed until its signed artifacts are verified.
+Status: **READY FOR MANUAL TESTING**. U114 is published from immutable source `7e6150a`, with verified native packages and owner signatures. [Release verification](U114-RELEASE-VERIFICATION.md). The owner authorized commit/push/release and normal hosted CI; no real AI-provider request or model inference was used. Website deployment is verified separately.
 
 ## Scope and confirmed repairs
 
@@ -23,7 +23,7 @@ The old Guardian scanner/service was removed in `d3bc4ad`, before the engine dir
 - Intermediate stabilization: **226 passed**, unexpected operations **0**.
 - Final focused boundaries: **143 passed / 2 skipped**, plus **37 passed / 1 skipped**; unexpected operations **0** for both. These overlap the full suite and must not be added to its total.
 - Supplemental laptop/USB sync: **6 passed**, no unexpected operations (`U113-offline-team-sync.xml`). This file was mistakenly omitted from the main run as Station-related. Static review proved it uses only temporary laptop/USB core functions; the classification was corrected and the six nonoverlapping cases were run separately. Initial automatic approval review rejected it based on that classification; it allowed the run after this evidence was supplied.
-- Final complete strict-offline run: **2,824 passed / 0 failed / 0 errors / 33 skipped / 19 passing subtests**, 442.96 seconds. Unexpected blocked operations: **0**; six intentional pre-OS guard probes passed. All six laptop/USB sync cases are included in this total. **59 application regressions (38 prior + 21 worksheet) and 7 guard cases** passed. Receipts: `U113-offline-release-final.json/.xml`; aggregate `U113-offline-final-summary.json`. Ten files were omitted before collection (four Station and six live/server/isolated-worker files); the JSON names every omission and marked node. No warnings were reported. An initial completed run passed all 2,818 assertions but its aggregate guard caught one fresh-child embedding discovery; it is a failed isolation checkpoint, not clean validation. Both child-memory fixture paths now disable optional embedding discovery, and the child/USB recheck passed40 tests with zero unexpected operations. The historical 2,909/15/19 result predates this worksheet and is not the latest strict-offline total.
+- Final complete strict-offline run: **2,824 passed / 0 failed / 0 errors / 33 skipped / 19 passing subtests**, 442.96 seconds. Unexpected blocked operations: **0**; six intentional pre-OS guard probes passed. All six laptop/USB sync cases are included in this total. **59 application regressions (38 prior + 21 worksheet) and 7 guard cases** passed. Receipts: `U113-offline-release-final.json/.xml`; aggregate `U113-offline-final-summary.json`. Ten files were omitted before collection (four Station and six live/server/isolated-worker files); the JSON names every omission and marked node. No warnings were reported. An initial completed run passed all 2,818 assertions but its aggregate guard caught one fresh-child embedding discovery; it is a failed isolation checkpoint, not clean validation. Both child-memory fixture paths now disable optional embedding discovery, and the child/USB recheck passed 40 tests with zero unexpected operations. The historical 2,909/15/19 result predates this worksheet and is not the latest strict-offline total.
 
 Mocked provider pipeline covers Ollama→OpenAI→Groq→Ollama, online→offline→online, selected/requested/reported model identity and response footer, Groq timeout attribution and no fallback. Existing provider tests cover missing keys, privacy, retries and retained request context. All inference adapters are synthetic; no successful live integration, latency or model quality is claimed.
 
@@ -37,7 +37,7 @@ This is a per-process Python guard, **not an OS-wide firewall or packet capture*
 
 ## Launch the patched source (owner action only)
 
-The installed shortcut still launches published U113. Use this audit checkout explicitly:
+Install the signed U114 package for tests using the exact release dependencies. An existing U113 shortcut remains U113 until you install the update. To inspect/test the patched source with the existing local Python environment, use this checkout explicitly:
 
 ```powershell
 Set-Location 'C:\Users\joshu\.codex\worktrees\u113-guardian-audit\Cursiv-v3'

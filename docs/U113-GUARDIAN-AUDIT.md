@@ -1,6 +1,6 @@
-# U113 guardian/checker audit — uncommitted
+# U113 guardian/checker follow-up — included in U114
 
-Owner request: audit history and response interference, reproduce source-line numbers treated as scenario values, and repair explicit installed-source file/function targeting. No commit, push, tag, release or deployment is authorized for this audit.
+Owner request: audit history and response interference, reproduce source-line numbers treated as scenario values, and repair explicit installed-source file/function targeting. The original audit withheld publication approval; the later explicit owner authorization and normal hosted-CI exception led to U114 (see the release status below).
 
 Base: published U113 tag bd11f925; audit checkout starts at documentation merge4451a89. All prior U113 code/evidence is preserved. Original owner checkout is unchanged.
 
@@ -65,7 +65,7 @@ Deterministic inspection does intentionally bypass model inference: this already
 Receipts: `bench/results/U113-guardian-audit-before.xml`, `U113-guardian-audit-affected-final.xml`, `U113-guardian-native-pipeline.json`, and the final full-suite XML. No application code should change after the final full run without revalidating it.
 
 
-Final additional controls bring the new regression file to38 cases: quoted values cannot hide a true self-certification, and owned/attached/selected/uploaded user-file wording cannot be captured by an installed basename. The final target/permission boundary set passed66 tests; the final certification/literal set passed46. In-progress full runs were stopped when these additional boundaries were added; only the final completed full-suite receipt is a release-quality result. No application source will change during that final run.
+Final additional controls bring the new regression file to 38 cases: quoted values cannot hide a true self-certification, and owned/attached/selected/uploaded user-file wording cannot be captured by an installed basename. The final target/permission boundary set passed 66 tests; the final certification/literal set passed 46. In-progress full runs were stopped when these additional boundaries were added; only the final completed full-suite receipt is a release-quality result. No application source will change during that final run.
 
 ### Review locations
 
@@ -106,4 +106,9 @@ The targeted stabilization checkpoint passed **226 tests**, zero unexpected bloc
 The owner subsequently requested commit, push and release of all completed work, then explicitly approved the normal hosted release pipeline while continuing to prohibit real AI-provider calls/model inference. The candidate is U114; the existing published U113 tag will not be moved. Local audit tests remain guarded, including loopback. The expired temporary locked environment is not trusted for packaging; the hosted Windows workflow reuses the existing tagged build script with the dependency lock, exact-main checks, frozen and portable self-tests. Release/signature/publication evidence will be recorded separately.
 
 
-Final guarded local U114 candidate: **2,824 passed,0 failures/errors,33 skipped,19 passing subtests in442.96s**; zero unexpected blocked operations, six intentional deny probes. Includes59 application regressions and7 guard tests. The final complete receipt supersedes all earlier isolation checkpoints and includes the six laptop/USB sync cases. Local Python3.13 uses already-installed packages and differs from the release lock; hosted native release gates independently require the hash-locked dependencies. The old temporary locked environment developed missing files and was not repaired/used for packaging. No local installs, real AI calls or model inference occurred. Normal hosted CI was explicitly authorized separately by the owner.
+Final guarded local U114 candidate: **2,824 passed,0 failures/errors,33 skipped,19 passing subtests in442.96s**; zero unexpected blocked operations, six intentional deny probes. Includes59 application regressions and 7 guard tests. The final complete receipt supersedes all earlier isolation checkpoints and includes the six laptop/USB sync cases. Local Python3.13 uses already-installed packages and differs from the release lock; hosted native release gates independently require the hash-locked dependencies. The old temporary locked environment developed missing files and was not repaired/used for packaging. No local installs, real AI calls or model inference occurred. Normal hosted CI was explicitly authorized separately by the owner.
+
+
+## U114 published
+
+The owner-approved fixes were committed through PR71 and published as U114 at immutable `7e6150a`; no U113 tag was moved. Exact-main Windows 2930/16 skips, Mac 2913/33, Linux 2912/34 plus 19 subtests each passed. Both native builds and all 3 frozen/USB receipts passed;11 anonymous asset downloads and 8 owner signatures verified. The Windows receipt-copy workflow typo was fixed separately through PR72 without changing the application tag. PDF security gate advisories required a hash-pinned6.21.4 patch. [Full verification](U114-RELEASE-VERIFICATION.md). No actual AI-provider call/inference was performed; real model behavior remains manual. Website publication/readback is recorded separately.
