@@ -135,8 +135,11 @@ Full suite after all fixes, with the source index rebuilt
 
 ## 9. Release and website: what was done here and what needs the owner
 
-Done from the cloud session: branch, commit, PR, protected CI, merge, tag `v3.14-U116`, and triggering
-the hosted Windows and Mac builds (see the PR and the release verification record for run IDs).
+Done from the cloud session, following the runbook order:
+- **PR #78** (website and docs only, merged as `e7ac5a0`): the site moved to U115 with its verified signed manifest.
+  The website tests read the app version, so a U116 site must wait for the U116 signature.
+- **PR #77** (app fixes and the version 3.14-U116): branch, commit, protected CI, merge, tag `v3.14-U116`,
+  and the hosted Windows and Mac builds started from that tag.
 
 Needs the owner's Windows PC (not possible from a cloud container):
 1. **Sign** the 8 assets with the DPAPI-protected owner key (`docs/RELEASE-RUNBOOK.md` §5–6). The key
