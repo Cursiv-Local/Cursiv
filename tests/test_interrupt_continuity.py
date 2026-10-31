@@ -267,6 +267,8 @@ def test_paused_controls_preview(panel):
 
 
 def test_saved_checkpoint_survives_a_fresh_python_process(panel, tmp_path, monkeypatch):
+    from pathlib import Path
+    import os
     import subprocess
     import sys
     import conversations
@@ -274,12 +276,17 @@ def test_saved_checkpoint_survives_a_fresh_python_process(panel, tmp_path, monke
     monkeypatch.setattr(conversations, 'DIR', folder)
     row = pause(panel, 'Synthetic restart task', 'The saved partial answer')
     conversations.wait_for_save(panel._conv_id)
-    code = ('from pathlib import Path\nimport conversations\nfrom cursiv_engine.chat import continuity\n'
+    root = Path(__file__).resolve().parents[1]
+    code = (f'import sys\nsys.path[:0]={[str(root), str(root / "launcher")]!r}\n'
+            'from pathlib import Path\nimport conversations\nfrom cursiv_engine.chat import continuity\n'
             f'conversations.DIR=Path({str(folder)!r})\n'
             f'data=conversations.load({panel._conv_id!r})\n'
             'rows=continuity.available(data["messages"],data["id"])\n'
             'assert len(rows)==1\nprint(rows[0]["interruption"]["checkpoint_id"])\n')
-    result = subprocess.run([sys.executable, '-c', code], capture_output=True, text=True, timeout=20)
+    env = dict(os.environ)
+    env['PYTHONPATH'] = env.get('CURSIV_STRICT_GUARD', '')  # retain only the isolation bootstrap, never app paths
+    result = subprocess.run([sys.executable, '-c', code], env=env, cwd=tmp_path,
+                            capture_output=True, text=True, timeout=20)
     assert result.returncode == 0, result.stderr
     assert result.stdout.strip() == row['interruption']['checkpoint_id']
 
