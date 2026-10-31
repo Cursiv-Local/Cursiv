@@ -40,4 +40,10 @@ Real OpenAI/Groq/Ollama response quality, latency and independent self-correctio
 - [Source secret scan](../bench/results/U114-source-secret-scan.json), [protected source checks](../bench/results/U114-protected-source-checks.json), [receipt-fix checks](../bench/results/U114-receipt-fix-protected-checks.json)
 - [Strict-offline final result](../bench/results/U113-offline-final-summary.json), [PDF security pin](../bench/results/U114-pdf-security-pin.json)
 
-Website deployment/readback is documented separately; package checks alone do not establish deployment. Public-agent probes do not establish Google-IP traffic, WAF dashboard policy or search ranking. Manual discovery checks stay manual.
+## Verified website publication
+
+[Website PR73](https://github.com/Cursiv-Local/Cursiv/pull/73) merged as `301f49c0d4209c0f74eb871885664f79566311c1`. All 19 protected publication checks passed, including 31 website tests and 6 aggregate-measurement tests; the required guarded commit hook passed 45 USB tests. Only public website/docs/evidence paths changed, so the full desktop suites were not repeated for publication.
+
+Deployment `c6bf3635-abfe-47d2-8902-055654502a09` changed the live site from U113 to U114 using the exact merged public bundle and existing Cloudflare authentication. [All 41 public readback checks](../bench/results/U114-publication.json) passed across 20 canonical pages, robots/sitemap, official icon bytes and image types, the signed release manifest, retained noindex pages, apex/WWW/legacy redirects and query canonical handling. HTML bytes matched the deployed bundle with `no-transform`; the download page names the verified U114 installer hashes. [Protected website checks](../bench/results/U114-website-protected-checks.json).
+
+Public-agent probes do not establish Google-IP traffic, WAF dashboard policy or search ranking. No production credentials were changed, no private API endpoints were queried, and no AI request or inference was performed. Manual discovery checks stay manual.

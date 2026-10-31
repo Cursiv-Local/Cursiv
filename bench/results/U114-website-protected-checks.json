@@ -1,0 +1,97 @@
+[
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393773938",
+    "name": "test (windows-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393773950",
+    "name": "test-linux",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393773959",
+    "name": "test (macos-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393760958",
+    "name": "test (macos-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393760838",
+    "name": "test-linux",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393760912",
+    "name": "test (windows-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393733113",
+    "name": "station-arm64",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393733539",
+    "name": "security",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393733086",
+    "name": "workspace-files (macos-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057732/job/124393732758",
+    "name": "public-website",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393732762",
+    "name": "change-scope",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153057735/job/124393733024",
+    "name": "workspace-files (windows-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393718359",
+    "name": "station-arm64",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393718226",
+    "name": "workspace-files (macos-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393717971",
+    "name": "security",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393718334",
+    "name": "workspace-files (windows-latest)",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053565/job/124393718203",
+    "name": "public-website",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41153053503/job/124393718262",
+    "name": "change-scope",
+    "state": "SUCCESS"
+  },
+  {
+    "link": "https://dashboard.gitguardian.com",
+    "name": "GitGuardian Security Checks",
+    "state": "SUCCESS"
+  }
+]
