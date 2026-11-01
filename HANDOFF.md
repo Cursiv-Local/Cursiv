@@ -11,8 +11,8 @@ Fixed: the permanent "AI Providers…" button (now only beside a provider failur
 deleting a memory; "forget that" (resolved from the conversation) now confirms first; "forget that <memory>"
 matching; sayings saved as memories; science warnings on casual chat (now require a measurement or a
 science/health/safety/field domain); model menu truncation; docs-only CI now runs the release-document
-checks. The website moved to U115 with its verified signed manifest. Owner-key signing, the GitHub release and
-the Cloudflare deployment need the owner's Windows PC (handoff §9).
+checks. Released from the owner's Windows PC: signed, published with 11 assets, and the website moved to U116
+([verification](docs/U116-RELEASE-VERIFICATION.md)). The owner manual tests (handoff §8) are not recorded as run.
 
 ## U115 released — October 31, 2026
 

@@ -1,0 +1,103 @@
+{
+  "version": "3.14-U116",
+  "source_commit": "9e5b672045446ce7c4a147071e3368751f009445",
+  "tag": "v3.14-U116",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/77",
+  "source_main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41223923153",
+  "windows_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41234564506",
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41233420923",
+  "main_tests": {
+    "windows": {
+      "passed": 3016,
+      "skipped": 16,
+      "passing_subtests": 19
+    },
+    "mac": {
+      "passed": 2999,
+      "skipped": 33,
+      "passing_subtests": 19
+    },
+    "linux": {
+      "passed": 2998,
+      "skipped": 34,
+      "passing_subtests": 19
+    },
+    "arm64_source_only": {
+      "passed": 114,
+      "skipped": 0
+    }
+  },
+  "source_pr_checks_passed": 17,
+  "native_receipts": {
+    "windows_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "e1e259969673d6e6b76dff6243965750e2886cefb37084731d40539605bd364b",
+      "receipt": "frozen-selftest.txt"
+    },
+    "windows_portable": {
+      "status": "ALL PASSED",
+      "sha256": "a1c48aad9f045c21e9c2deef27ecbb6ca52eb9e6848658e5b5bfbf66cbb4ba21",
+      "receipt": "portable-selftest.txt"
+    },
+    "mac_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "d6b41ac7d25c96cc20ae077c0967316b1563a58f59699d14cf587204aba09daf",
+      "receipt": "selftest.txt"
+    }
+  },
+  "platform_assets": {
+    "Cursiv-3.14-U116-mac-arm64.dmg": {
+      "size": 72156398,
+      "sha256": "a9080905176093f922e3fb699cad8916592e58d55624be53691580d2c265c695"
+    },
+    "Cursiv-Setup-3.14-U116.exe": {
+      "size": 58054575,
+      "sha256": "ed952facbc051f3701cfc98904d0f2378f71e9464a68e0c13297a6bf8613d6fe"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 58054575,
+      "sha256": "ed952facbc051f3701cfc98904d0f2378f71e9464a68e0c13297a6bf8613d6fe"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 72156398,
+      "sha256": "a9080905176093f922e3fb699cad8916592e58d55624be53691580d2c265c695"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "aff6d33dacdfe18c67aa06b7dbd9a73815e5bdc3c1d56f7e2ebd31a6a91fc97f"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "33c5a02d9fad26dd15c28bdd6f49a5d74b3d04877412fd1344c4329d44571893"
+    },
+    "provenance-3.14-U116.json": {
+      "size": 1806,
+      "sha256": "b01e4e62c51dc94dae946d0a4b96aee5c979e6a459a92e3c65ea51c4757a1967"
+    },
+    "provenance-mac.json": {
+      "size": 1759,
+      "sha256": "2ecdc1ba094b64d991d4521ee7b7618f6e1a953abba727517430298a785edc0b"
+    }
+  },
+  "owner_signatures_verified": 8,
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "private_key_copied": false,
+  "api_keys_committed": false,
+  "source_secret_scan": {
+    "scope": "pattern scan of the 40 files changed from v3.14-U115 to v3.14-U116",
+    "files": 40,
+    "findings": 0
+  },
+  "source_tree": "ee51c34732004cf7ac344a3a26ecb58bda9cba15",
+  "real_ai_provider_calls": false,
+  "live_ollama_inference": false,
+  "website_changed_or_deployed": false,
+  "authenticode_or_notarization_claimed": false,
+  "verified_utc": "2026-10-31T19:38:25.711370+00:00",
+  "limits": "Automated checks used mocked providers only and do not establish real-model behaviour. The owner manual tests in docs/U116-AUDIT-HANDOFF.md section 8 are not recorded as run. The website is published after this receipt, in a separate step."
+}

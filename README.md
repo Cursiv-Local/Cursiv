@@ -61,7 +61,7 @@ AI answers can be confidently wrong. Cursiv's checks catch some mistakes, not al
 
 ## Releases, evidence and development
 
-Latest release: **[U115](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U115)**. See the [release notes](docs/RELEASE-U115.md) and [changelog](CHANGELOG.md).
+Latest release: **[U116](https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U116)**. See the [release notes](docs/RELEASE-U116.md) and [changelog](CHANGELOG.md).
 
 
 - [Tests and evidence](docs/CLAIM-EVIDENCE.md): what has been checked and what remains unverified.
