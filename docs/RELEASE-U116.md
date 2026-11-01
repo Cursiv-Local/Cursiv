@@ -7,4 +7,6 @@ A focused review of U115 and the chat window. No new features.
 - **Fewer false science warnings.** The "repeat the measurement, check the calibration" note now needs a measurement or a science, health, safety or field topic. Casual questions (a toaster noise, a pet's name, a landlord) no longer get it; creek water, rashes, mushrooms and thermometer readings still do.
 - **Model menu** shows its full label instead of cutting it off.
 
+**Correction (November 1, 2026).** The "forget it" fix above covered only the memory parser. In the U116 app, the confirm-card route can still offer "Forget this? it", and the reply after Yes can falsely say a memory was removed. Check the Memory window for what is actually saved. This is fixed for the next release.
+
 Validation: see the release verification record. Automated checks used mocked providers only; no real AI calls or live model inference. Real-model behaviour remains an owner manual test (docs/U116-AUDIT-HANDOFF.md, section 8).

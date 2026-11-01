@@ -132,6 +132,18 @@ Full suite after all fixes, with the source index rebuilt
    Memory window: the fact must still be there. Then "forget that my dog is called Biscuit" must remove it.
 5. Continue the U115 manual sequence in `docs/U115-HANDOFF.md` (Stop/Resume with real models).
 
+## 8b. Owner prompt run (November 1, 2026)
+
+The owner ran the test prompts on installed U116 and found failures the mocked tests missed. All are covered by
+`tests/test_owner_prompt_run.py`:
+
+- "forget it" still reached the confirm card through `core/intent.py`, and after Yes the model claimed a removal
+  that did not happen. Model prose can no longer claim a memory change (`memory/intents.unverified_claim`).
+- "search my notebook for Site A" searched for the request's own words.
+- "remember to drink water is good advice" fell through to the old `remember` search and listed stored notes.
+- A question about readings ("What's the difference?") became a notebook save instead of an answer.
+- "how do you decide whether to route a question to the notebook?" got the canned decline; it now reads the source.
+
 ## 9. Release and website
 
 **Done (October 31, 2026), from the owner's Windows PC:** tagged, built, signed, published and the website

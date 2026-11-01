@@ -145,6 +145,9 @@ def handle(runtime: CommandRuntime, text: str, cmd: str, cfg: dict, history: lis
                                   'queue retry <ID> [--reconciled]. Flush uses only local read-only profiles.')
 
     if cmd.startswith("remember ") or cmd == "remember":
+        from cursiv_engine.memory.intents import conversational
+        if conversational(text):
+            return UNHANDLED
         if not runtime._STRAND_OK:
             return runtime.TextResult("Saved notes aren't available.")
         q = text[9:].strip()
