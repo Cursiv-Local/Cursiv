@@ -102,6 +102,7 @@ Older releases are described in the [CHANGELOG](../CHANGELOG.md) and on
 [GitHub Releases](https://github.com/Cursiv-Local/Cursiv/releases).
 
 - [U111](U111-RELEASE-VERIFICATION.md) — published routing and verification checks.
+- [U117](U117-RELEASE-VERIFICATION.md) — fixes from the owner's U116 prompt run (memory claims, notebook search, readings questions, routing questions) and the Settings update check result; source, native packages and signatures.
 - [U116](U116-RELEASE-VERIFICATION.md) — audit fixes for the chat bar, memory commands and science warnings; source, native packages and signatures.
 - [U115](U115-RELEASE-VERIFICATION.md) — Stop keeps partial answers as resumable paused tasks; optional presentation settings; source, native packages and signatures.
 - [U114](U114-RELEASE-VERIFICATION.md) — exact source targets, scoped evidence checks, offline audit and signed native packages.

@@ -1,0 +1,112 @@
+{
+  "version": "3.14-U117",
+  "tag": "v3.14-U117",
+  "checked_utc": "2026-11-02T22:43:57.021147+00:00",
+  "scope": "Anonymous production release asset readback after owner-approved publication",
+  "ai_provider_requests": false,
+  "assets_verified": 11,
+  "owner_signatures_verified": 8,
+  "source_commit": "61754700e2c088830e56ee197f4ae020d1c51f2e",
+  "private_key_copied": false,
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U117-mac-arm64.dmg",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/Cursiv-3.14-U117-mac-arm64.dmg",
+      "http_status": 200,
+      "size": 71145628,
+      "sha256": "dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1",
+      "github_digest": "sha256:dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1",
+      "matches_staged": true
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U117.exe",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/Cursiv-Setup-3.14-U117.exe",
+      "http_status": 200,
+      "size": 58050426,
+      "sha256": "154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49",
+      "github_digest": "sha256:154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49",
+      "matches_staged": true
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/Cursiv-Setup-latest.exe",
+      "http_status": 200,
+      "size": 58050426,
+      "sha256": "154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49",
+      "github_digest": "sha256:154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49",
+      "matches_staged": true
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/Cursiv-mac-latest.dmg",
+      "http_status": 200,
+      "size": 71145628,
+      "sha256": "dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1",
+      "github_digest": "sha256:dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1",
+      "matches_staged": true
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/SHA256SUMS-mac.txt",
+      "http_status": 200,
+      "size": 185,
+      "sha256": "f4bb0708f1b64e66b7576e85391fe1323c92058af317b673495cc972e4d0021b",
+      "github_digest": "sha256:f4bb0708f1b64e66b7576e85391fe1323c92058af317b673495cc972e4d0021b",
+      "matches_staged": true
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/SHA256SUMS.txt",
+      "http_status": 200,
+      "size": 185,
+      "sha256": "5ca07d225d1bddef95fc13f66e8e2ccfd4259c31d96ad37ad3572e39bece2c86",
+      "github_digest": "sha256:5ca07d225d1bddef95fc13f66e8e2ccfd4259c31d96ad37ad3572e39bece2c86",
+      "matches_staged": true
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/cursiv-owner-release-key.json",
+      "http_status": 200,
+      "size": 221,
+      "sha256": "40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "github_digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01",
+      "matches_staged": true
+    },
+    {
+      "name": "owner-release.json",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/owner-release.json",
+      "http_status": 200,
+      "size": 1620,
+      "sha256": "cc739a7254850c174d3b3f47edd7c5adfdcea33039fad9afe61ab4bc7b69be49",
+      "github_digest": "sha256:cc739a7254850c174d3b3f47edd7c5adfdcea33039fad9afe61ab4bc7b69be49",
+      "matches_staged": true
+    },
+    {
+      "name": "provenance-3.14-U117.json",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/provenance-3.14-U117.json",
+      "http_status": 200,
+      "size": 1806,
+      "sha256": "7abed445e9c66b79578116303f031d045106c6a3385245c3e8f3fa91ce3c74d3",
+      "github_digest": "sha256:7abed445e9c66b79578116303f031d045106c6a3385245c3e8f3fa91ce3c74d3",
+      "matches_staged": true
+    },
+    {
+      "name": "provenance-mac.json",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/provenance-mac.json",
+      "http_status": 200,
+      "size": 1757,
+      "sha256": "e27ede4f9e31c455b3a5fafdf1b77b0307e1a636a9648780dc2dde9b24274dee",
+      "github_digest": "sha256:e27ede4f9e31c455b3a5fafdf1b77b0307e1a636a9648780dc2dde9b24274dee",
+      "matches_staged": true
+    },
+    {
+      "name": "u117-release-verification.json",
+      "url": "https://github.com/Cursiv-Local/Cursiv/releases/download/v3.14-U117/u117-release-verification.json",
+      "http_status": 200,
+      "size": 4270,
+      "sha256": "5d2cf69bfae36b569efe986e9bdb01d98981df581112e002270d8a7c447fc3f6",
+      "github_digest": "sha256:5d2cf69bfae36b569efe986e9bdb01d98981df581112e002270d8a7c447fc3f6",
+      "matches_staged": true
+    }
+  ]
+}

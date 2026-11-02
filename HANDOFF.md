@@ -10,7 +10,9 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 notebook and routing failures in [U116 handoff §8b](docs/U116-AUDIT-HANDOFF.md), tested by
 `tests/test_owner_prompt_run.py`) and PR #81 (Settings → Updates shows the check result). Not fixed: the
 intermittent Windows "Access is denied" when a conversation save replaces its file
-(`launcher/conversations.py` `_write_snapshot`), seen in `tests/test_background_review.py`.
+(`launcher/conversations.py` `_write_snapshot`), seen in `tests/test_background_review.py`. Released from the
+owner's Windows PC: signed, published with 11 assets, U116's published notes corrected, and the website moved to
+U117 ([verification](docs/U117-RELEASE-VERIFICATION.md)). The owner has not re-run the prompt set on U117.
 
 ## U116 — audit fixes (Claude, October 31, 2026)
 
