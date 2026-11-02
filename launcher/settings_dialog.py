@@ -134,14 +134,15 @@ class SettingsDialog(QDialog):
         v.addWidget(self._explain(explain))
         return box
 
-    def _action(self, lay, label: str, explain: str, handler, primary: bool = False) -> QPushButton:
+    def _action(self, lay, label: str, explain: str, handler, primary: bool = False,
+                button: str = "Open") -> QPushButton:
         v = self._card(lay)
         row = QHBoxLayout()
         text = QVBoxLayout(); text.setSpacing(2)
         t = QLabel(label); t.setStyleSheet("font-size: 14px; font-weight: 600;"); text.addWidget(t)
         text.addWidget(self._explain(explain))
         row.addLayout(text, 1)
-        btn = QPushButton("Open" if not primary else label.split(" ")[0])
+        btn = QPushButton(button if not primary else label.split(" ")[0])
         if not primary:
             btn.setObjectName("ghost")
         btn.clicked.connect(handler)
@@ -373,12 +374,19 @@ class SettingsDialog(QDialog):
         except Exception:
             version = "?"
         lay.addWidget(self._explain(f"This is Cursiv {version}."))
-        self._action(lay, "Check for updates now",
-                     "Asks GitHub whether a newer version exists. If it does, you'll see what's new and can install it.",
-                     lambda: self._call_window("_check_updates"), primary=False)
+        self._update_btn = self._action(lay, "Check for updates now",
+                                        "Asks GitHub whether a newer version exists. If it does, you'll see what's new and can install it.",
+                                        lambda: self._call_window("_check_updates", False, self._show_update_result),
+                                        button="Check now")
+        self._update_result = self._explain("")
+        lay.addWidget(self._update_result)
         self._switch(lay, "Check automatically after login",
                      "Cursiv asks GitHub for a new version each time you log in. Nothing about you is sent.",
                      netgate.setting("update_check_auto"), lambda on: netgate.set_setting("update_check_auto", on))
+
+    def _show_update_result(self, text: str, done: bool = True):
+        self._update_result.setText(text)
+        self._update_btn.setEnabled(done)
 
     def _page_data(self, lay):
         data_dir = Path.home() / ".cursiv"

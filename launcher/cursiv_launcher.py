@@ -776,20 +776,29 @@ class CursivLauncher(QMainWindow):
 
     # ── Update checker ────────────────────────────────────────────────────
 
-    def _check_updates(self, automatic: bool = False):
+    def _update_status(self, msg: str, done: bool = True):
+        """Status line, plus the window that asked for this check (Settings covers the status line)."""
+        self._set_status(msg)
+        report = getattr(self, "_update_report", None)
+        if report:
+            report(msg, done)
+
+    def _check_updates(self, automatic: bool = False, report=None):
         """Manual (button/tray) or automatic (shortly after startup) update check.
-        The automatic one stays silent unless a newer version actually exists."""
+        The automatic one stays silent unless a newer version actually exists.
+        report(text, done), when given, also receives each status message."""
         self._update_check_auto = automatic
+        self._update_report = report
         if automatic and not _auto_update_check_on():
             return
         if not _net_allowed():
             if not automatic:
-                self._set_status("Offline mode is on, so Cursiv won't contact GitHub. Type 'offline off' to check for updates.")
+                self._update_status("Offline mode is on, so Cursiv won't contact GitHub. Type 'offline off' to check for updates.")
             return
         if not automatic:
             self._upd_btn.setEnabled(False)
             self._upd_btn.setText("Checking…")
-            self._set_status("Querying GitHub for updates…")
+            self._update_status("Querying GitHub for updates…", done=False)
         # Keep a reference -- the checker's signal object must outlive this call.
         self._update_checker = UpdateChecker(self._on_update_result)
         self._update_checker.check()
@@ -800,19 +809,19 @@ class CursivLauncher(QMainWindow):
         self._upd_btn.setText("Check for Updates")
         if not result.get("ok"):
             if not automatic:
-                self._set_status(f"Update check failed — {result.get('error', 'no internet?')}")
+                self._update_status(f"Update check failed — {result.get('error', 'no internet?')}")
             return
         tag = result["tag"]
         if not _version_is_newer(tag, _CURRENT_VERSION):
             if not automatic:
-                self._set_status(f"You're up to date  ({_CURRENT_VERSION})")
+                self._update_status(f"You're up to date  ({_CURRENT_VERSION})")
             return
         if os.environ.get("CURSIV_PORTABLE") == "1":
             # The installer would install onto this PC, not the USB.
-            self._set_status(f"v{tag} is available — to update this USB, update Cursiv on your "
-                             "computer, then use \"Make a Cursiv USB…\" again.")
+            self._update_status(f"v{tag} is available — to update this USB, update Cursiv on your "
+                                "computer, then use \"Make a Cursiv USB…\" again.")
             return
-        self._set_status(f"Update available: v{tag}")
+        self._update_status(f"Update available: v{tag}")
         if automatic and self.isHidden():
             self.showNormal()
         dlg = UpdateDialog(tag, result["body"], result["exe_url"], self, exe_size=result.get("exe_size", 0))
