@@ -101,10 +101,15 @@ def query(*, words: str = '', sample: str = '', start: str = '', end: str = '',
                                               for item in r.get('measurements') or [])]
     if words:
         terms = re.findall(r'[\w.-]+', words.casefold())
-        rows = [r for r in rows if all(term in ' '.join(str(r.get(k, '')) for k in
-                ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold() for term in terms)]
-        mentions = [r for r in mentions if all(term in ' '.join(str(r.get(k, '')) for k in
-                    ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold() for term in terms)]
+
+        def matches(record):
+            text = ' '.join(str(record.get(k, '')) for k in
+                            ('site', 'sample_id', 'project', 'note', 'measurements', 'reason')).casefold()
+            tokens = re.findall(r'[\w.-]+', text)         # "A" in "Site A" must not match every letter a
+            return all(term in tokens if len(term) < 3 else term in text for term in terms)
+
+        rows = [r for r in rows if matches(r)]
+        mentions = [r for r in mentions if matches(r)]
     if corrections:
         rows = [r for r in rows if r.get('corrects')]
         mentions = [r for r in mentions if r.get('corrects')]
@@ -219,7 +224,8 @@ def filters_for_request(text: str) -> dict:
         filters['corrections'] = True
     terms = re.search(r'(?i)(?:mentioning|about|search)\s+(.+?)[?.!]*$', text)
     if terms and not sample and 'project' not in filters:
-        filters['words'] = re.sub(_DATE_SUFFIX, '', terms[1], flags=re.I).strip(' .?!"\'')
+        words = re.sub(_DATE_SUFFIX, '', terms[1], flags=re.I).strip(' .?!"\'')
+        filters['words'] = re.sub(r'(?i)^(?:(?:(?:my|the)\s+)?(?:field\s+)?(?:notebook|log|notes|records?)\s+)?for\s+', '', words)
     site = re.search(r'(?i)\bat\s+(.+?)(?=\s+(?:yesterday|today|last\s+\w+|for\s+sample|'
                      r'(?:on|since|from|between)\s+\d{4}-\d{2}-\d{2})\b|[?.!]|$)', text)
     if site:

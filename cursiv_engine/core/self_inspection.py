@@ -21,6 +21,8 @@ _active_question=ContextVar('cursiv_source_packet_scope',default=None)
 
 # Entry-point hints, not claims of behavior. Names must exist in the installed index.
 TOPICS = {
+    'routing': [('cursiv_engine/core/intent.py','might_be_action'), ('cursiv_engine/core/intent.py','propose'),
+                ('cursiv_engine/core/field_recall.py','is_request'), ('cursiv_engine/core/notebook_tools.py','command')],
     'pipeline': [('launcher/chat_panel.py','ChatPanel._send'), ('launcher/chat_panel.py','ChatPanel._run_turn'), ('cursiv_engine/ui/chat_app.py','chat'),
                  ('cursiv_engine/chat/completion.py','chat'), ('cursiv_engine/chat/streaming.py','_chat_stream'),
                  ('cursiv_engine/chat/conversation.py','_chat_inner'),
@@ -71,6 +73,7 @@ def _topic(text):
     # Asking about self-inspection itself outranks incidental words such as "model".
     if re.search(r'\bself.inspect\w*|\bsource.inspection\b',q):return 'introspection'
     if re.search(r'\b(?:regex|regular expression)\b',q):return 'regex'
+    if re.search(r'\brout\w*\b.{0,50}\bnotebook\b',q):return 'routing'
     if re.search(r'\b(?:entry ?point|startup|launch(?:er|ing)?)\b',q):return 'startup'
     if re.search(r'\b(?:field copy|portable|external ssd|removable drive|usb(?: drive)?|cross.device.*transfer)\b',q):return 'portable'
     if re.search(r'\b(?:pdf|pdfs)\b',q):return 'pdf'
@@ -172,7 +175,7 @@ def resolve(question, history=()):
     # Broad feature help, saved-memory recall and current-state questions have
     # authoritative native routes. Own-source retrieval requires implementation
     # mechanics, rather than merely mentioning Cursiv or saying "your memory".
-    mechanics = re.search(r'(?i)\b(?:code|source|implementation|internals|functions?|methods?|modules?|regex|regular expression|'
+    mechanics = re.search(r'(?i)\b(?:rout\w*|code|source|implementation|internals|functions?|methods?|modules?|regex|regular expression|'
                           r'pipeline|startup|entry.?point|submit|importer|trace|audit|timeout|times? out|process\w*|handle\w*|enforc\w*|called|invoked|fails?|fallback|'
                           r'retriev\w*|lookup|correct\w*|overwrit\w*|preserv\w*|replac\w*|'
                           r'find.*sample|notebook.*sav\w*|keep.*inside|prevent\w*.*(?:path|escap))\b',q)

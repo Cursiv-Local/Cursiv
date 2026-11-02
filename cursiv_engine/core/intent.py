@@ -39,6 +39,7 @@ _QUESTION = re.compile(r"(?i)^(?:what|why|how|when|who|which|explain|tell me abo
 _ABOUT_ME = re.compile(r"(?i)\b(?:did i|have i|i (?:recorded|logged|told you)|did i tell you|you remember|"
                        r"my (?:notebook|log|samples|notes|files?|workspace|memory|[\w ]{1,20} samples)|"
                        r"in my [\w ]{1,25}(?:samples|notebook|notes)|[\w-]+\.(?:txt|md|csv|json))\b")
+_LOG_REQUEST = re.compile(r"(?i)^(?:please\s+)?(?:log|record|save|add|note|jot|write|remember)\b")
 
 
 def might_be_action(text: str) -> bool:
@@ -54,8 +55,14 @@ def might_be_action(text: str) -> bool:
         return False
     from .turn_policy import instruction_text
     t = instruction_text(t)
+    from cursiv_engine.memory.intents import conversational
+    if conversational(t):
+        return False
     if _QUESTION.match(t) and not _ABOUT_ME.search(t):
         return False
+    last = re.split(r"(?<=[.!?])\s+", t.strip())[-1]
+    if last != t.strip() and last.endswith("?") and _QUESTION.match(last) and not _LOG_REQUEST.match(t):
+        return False                # readings given in order to ask about them, not to save them
     return bool(_ACTION_WORDS.search(t) or (_MEASUREMENT.search(t) and _PLACE.search(t)))
 
 

@@ -76,6 +76,32 @@ _QUOTED_SAYING = re.compile(r"(?i)^(?:remember|don[\x27’]?t forget)\b.+\b(?:is
 _DISMISSAL = re.compile(r"(?i)^(?:(?:oh|eh|ah|ok(?:ay)?|nah|no|actually|never ?mind|nvm)[\s,.!;-]+)*"
                         r"forget (?:it|about it)(?:[\s,.!;-]+(?:never ?mind|nvm|whatever|it[\x27’]?s fine|"
                         r"not important|doesn[\x27’]?t matter|no worries|no problem|moving on))*[\s.!]*$")
+_MEMORY_CHANGED = r"(?:removed|deleted|forgotten|erased|cleared|saved|stored|updated|added)"
+_MEMORY_CLAIM = re.compile(
+    r"(?im)^\s*[*_`]*(?:(?:the|your|that|this)\s+)?memor(?:y|ies)\b(?:\s+[\"“\x27][^\"”\n]{0,300}[\"”\x27])?\s+"
+    r"(?:(?:has been|have been|was|were|is now|successfully)\s+)*" + _MEMORY_CHANGED + r"\b|"
+    r"\b(?:I(?:[\x27’]ve| have)?|it (?:has been|was)|that (?:has been|was))\s+" + _MEMORY_CHANGED +
+    r"\b[^.\n]{0,60}\b(?:to|from|in)\s+(?:my |your |the )?memor(?:y|ies)\b")
+
+
+def conversational(text: str) -> bool:
+    """"Forget it" and sayings are chat on every route: parser, confirm card and old commands."""
+    t = (text or "").strip()
+    return bool(_DISMISSAL.match(t) or _QUOTED_SAYING.match(t))
+
+
+def unverified_claim(text: str) -> bool:
+    """Memory actions return natively before any model call, so model prose never confirms one."""
+    text = re.sub(r"[✅✔☑]️?\s*", "", text or "")
+    text = re.sub(r"[\"“][^\"”\n]*[\"”]", '""', text)        # a quoted example is not a claim
+    return bool(_MEMORY_CLAIM.search(re.sub(r"(?<=[.!?,])\s+", "\n", text)))
+
+
+def model_prose(text: str) -> str:
+    if unverified_claim(text):
+        return ("No memory was changed. The model described a memory change, but no verified memory action ran. "
+                "To remove one, type forget and its exact words; the Memory window shows what is saved.")
+    return text
 
 
 def _clean(body: str) -> str:
@@ -87,7 +113,7 @@ def _clean(body: str) -> str:
 
 def _parse(text: str) -> list[Action] | None:
     t = text.strip()
-    if not t or _DISCUSSION.search(t) or _DISMISSAL.match(t) or _QUOTED_SAYING.match(t):
+    if not t or _DISCUSSION.search(t) or conversational(t):
         return None
     t = re.sub(r'(?i)^(?:please\s+|(?:can|could|would) you\s+)', '', t)
     # Split only when a second explicit operation follows; content containing
@@ -164,7 +190,7 @@ def _parse(text: str) -> list[Action] | None:
 
 
 def _cue(text: str) -> bool:
-    if _DISCUSSION.search(text.strip()) or _DISMISSAL.match(text.strip()) or _QUOTED_SAYING.match(text.strip()):
+    if _DISCUSSION.search(text.strip()) or conversational(text):
         return False
     return bool(re.search(r'(?i)^(?:please\s+)?(?:(?:can|could|would) you\s+)?'
         r'(?:remember|recall|forget|don[\x27’]?t forget|do not forget|keep in mind|make a mental note|'
