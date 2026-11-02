@@ -1,0 +1,63 @@
+{
+  "version": "3.14-U117",
+  "tag": "v3.14-U117",
+  "html_url": "https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U117",
+  "published_at": "2026-11-02T22:42:16Z",
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U117-mac-arm64.dmg",
+      "size": 71145628,
+      "digest": "sha256:dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1"
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U117.exe",
+      "size": 58050426,
+      "digest": "sha256:154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49"
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 58050426,
+      "digest": "sha256:154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49"
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 71145628,
+      "digest": "sha256:dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1"
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "digest": "sha256:f4bb0708f1b64e66b7576e85391fe1323c92058af317b673495cc972e4d0021b"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "digest": "sha256:5ca07d225d1bddef95fc13f66e8e2ccfd4259c31d96ad37ad3572e39bece2c86"
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 221,
+      "digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "digest": "sha256:cc739a7254850c174d3b3f47edd7c5adfdcea33039fad9afe61ab4bc7b69be49"
+    },
+    {
+      "name": "provenance-3.14-U117.json",
+      "size": 1806,
+      "digest": "sha256:7abed445e9c66b79578116303f031d045106c6a3385245c3e8f3fa91ce3c74d3"
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1757,
+      "digest": "sha256:e27ede4f9e31c455b3a5fafdf1b77b0307e1a636a9648780dc2dde9b24274dee"
+    },
+    {
+      "name": "u117-release-verification.json",
+      "size": 4270,
+      "digest": "sha256:5d2cf69bfae36b569efe986e9bdb01d98981df581112e002270d8a7c447fc3f6"
+    }
+  ]
+}

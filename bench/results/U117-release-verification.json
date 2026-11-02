@@ -1,0 +1,108 @@
+{
+  "version": "3.14-U117",
+  "source_commit": "61754700e2c088830e56ee197f4ae020d1c51f2e",
+  "tag": "v3.14-U117",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/83",
+  "included_prs": [
+    "https://github.com/Cursiv-Local/Cursiv/pull/81",
+    "https://github.com/Cursiv-Local/Cursiv/pull/82"
+  ],
+  "source_main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41535691908",
+  "windows_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41537433355",
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41537438197",
+  "main_tests": {
+    "windows": {
+      "passed": 3060,
+      "skipped": 16,
+      "passing_subtests": 19
+    },
+    "mac": {
+      "passed": 3043,
+      "skipped": 33,
+      "passing_subtests": 19
+    },
+    "linux": {
+      "passed": 3042,
+      "skipped": 34,
+      "passing_subtests": 19
+    },
+    "arm64_source_only": {
+      "passed": 114,
+      "skipped": 0
+    }
+  },
+  "source_pr_checks_passed": 17,
+  "source_pr_note": "The PR's first macOS test job hit its 15-minute timeout and was cancelled; the rerun passed. The push run on the same commit passed on all platforms.",
+  "native_receipts": {
+    "windows_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "bc0b9b6cf28d7073935577445c9c5123ae2761adb72672ac844322c09aca8f0d",
+      "receipt": "frozen-selftest.txt"
+    },
+    "windows_portable": {
+      "status": "ALL PASSED",
+      "sha256": "ca4413011c2b4540e2881f827f509fa387cb278570f7a2fa38361035d4f7f34e",
+      "receipt": "portable-selftest.txt"
+    },
+    "mac_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "5bb51ee43ca0ac564d7ceed78c387828f0304334c7fff640d4d9adb5b5b36174",
+      "receipt": "selftest.txt"
+    }
+  },
+  "platform_assets": {
+    "Cursiv-3.14-U117-mac-arm64.dmg": {
+      "size": 71145628,
+      "sha256": "dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1"
+    },
+    "Cursiv-Setup-3.14-U117.exe": {
+      "size": 58050426,
+      "sha256": "154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 58050426,
+      "sha256": "154143ab04193cc3b5fc247e0b9fe424471ff6b15660ad4cdacb35e080256b49"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 71145628,
+      "sha256": "dc13e7f2f4581b1f80940fbc57cf2cfa1a4d8c92cc5f51e61614613e79b194f1"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "f4bb0708f1b64e66b7576e85391fe1323c92058af317b673495cc972e4d0021b"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "5ca07d225d1bddef95fc13f66e8e2ccfd4259c31d96ad37ad3572e39bece2c86"
+    },
+    "provenance-3.14-U117.json": {
+      "size": 1806,
+      "sha256": "7abed445e9c66b79578116303f031d045106c6a3385245c3e8f3fa91ce3c74d3"
+    },
+    "provenance-mac.json": {
+      "size": 1757,
+      "sha256": "e27ede4f9e31c455b3a5fafdf1b77b0307e1a636a9648780dc2dde9b24274dee"
+    }
+  },
+  "owner_signatures_verified": 8,
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "private_key_copied": false,
+  "api_keys_committed": false,
+  "source_secret_scan": {
+    "scope": "pattern scan of the 36 files changed from v3.14-U116 to v3.14-U117",
+    "files": 36,
+    "findings": 0
+  },
+  "source_tree": "9586e42309e0d678e81932543de2b8822a20b5f1",
+  "real_ai_provider_calls": false,
+  "live_ollama_inference": false,
+  "website_changed_or_deployed": false,
+  "authenticode_or_notarization_claimed": false,
+  "verified_utc": "2026-11-02T22:41:39.204496+00:00",
+  "limits": "Automated checks used mocked providers only and do not establish real-model behaviour. The owner has not re-run the U116 prompt set on U117. The intermittent Windows conversation-save 'Access is denied' is not fixed. The website is published after this receipt, in a separate step."
+}
