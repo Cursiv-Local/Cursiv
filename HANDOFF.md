@@ -4,6 +4,14 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U117 — fixes from the owner's U116 prompt run (Claude, November 2, 2026)
+
+[Release notes](docs/RELEASE-U117.md). The owner asked for the merge and release. Includes PR #82 (the memory,
+notebook and routing failures in [U116 handoff §8b](docs/U116-AUDIT-HANDOFF.md), tested by
+`tests/test_owner_prompt_run.py`) and PR #81 (Settings → Updates shows the check result). Not fixed: the
+intermittent Windows "Access is denied" when a conversation save replaces its file
+(`launcher/conversations.py` `_write_snapshot`), seen in `tests/test_background_review.py`.
+
 ## U116 — audit fixes (Claude, October 31, 2026)
 
 [Audit handoff](docs/U116-AUDIT-HANDOFF.md). The owner authorized commit, push, release and website.
