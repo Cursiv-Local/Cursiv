@@ -394,10 +394,10 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
             yield (_replace_prefix if replace_draft else '\n\n') + _source_problem
             skip = deterministic_correction = True
             draft = _source_problem
-        if _file_ops.unverified_claim(draft):
+        if _file_ops.unverified_claim(draft) or _memory_intents.unverified_claim(draft):
             # An LLM acknowledgement cannot establish a completed action. Native
             # action routes return earlier; provider receipts do not use this prose.
-            correction = str(_file_ops.model_prose(draft))
+            correction = str(_memory_intents.model_prose(_file_ops.model_prose(draft)))
             reply[:] = [correction]
             if replace_draft:
                 yield _replace_prefix + correction
