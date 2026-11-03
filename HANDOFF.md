@@ -4,6 +4,14 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## U118 — conversation saves no longer fail on Windows (Claude, November 2, 2026)
+
+[Release notes](docs/RELEASE-U118.md). The owner asked for the merge and release so they can test it. Includes
+PR #85: `conversations.load()`, `list_all()` and `retitle_old()` read under `_storage_lock`, and
+`cursiv_engine/core/atomic.replace` retries `os.replace` briefly on `PermissionError` (used by `write_bytes` and
+the plain conversation save). Tested by `tests/test_conversation_save_lock.py`. This closes the "Access is denied"
+item left open in U117. The owner has not re-run the prompt set on U117 or U118.
+
 ## U117 — fixes from the owner's U116 prompt run (Claude, November 2, 2026)
 
 [Release notes](docs/RELEASE-U117.md). The owner asked for the merge and release. Includes PR #82 (the memory,
