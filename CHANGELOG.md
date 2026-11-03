@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U118 — Conversation saves no longer fail on Windows (2026-11-02)
+
+A conversation save could fail with Windows "Access is denied" when the chat file was being read at the moment the save swapped in the new version. Opening and listing conversations now wait for a save in progress, and the swap retries briefly while something outside Cursiv (antivirus, the search indexer) has the file open. A reader that never lets go still reports the failure instead of losing it silently. Tested by `tests/test_conversation_save_lock.py`. Details: docs/RELEASE-U118.md. No real AI calls were used in automated validation.
+
 ## 3.14-U117 — Fixes from the owner's U116 prompt run (2026-11-02)
 
 "Forget it" no longer reaches the "Forget this? it" confirm card, and model prose can no longer claim a memory was saved, changed or removed (it is replaced with "No memory was changed"). "search my notebook for Site A" searches for "Site A", with short words matching whole tokens. A message about readings that ends in a question is answered instead of saved, unless it asks to log. "remember to drink water is good advice" no longer lists saved notes. Notebook routing questions read the real routing source. Settings → Updates shows the check result under a "Check now" button. Details: docs/U116-AUDIT-HANDOFF.md §8b and docs/RELEASE-U117.md. No real AI calls were used in automated validation.
