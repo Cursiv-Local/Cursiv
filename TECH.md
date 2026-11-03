@@ -436,7 +436,7 @@ records the actual release procedure and evidence.
 ## Tests, benchmarks and release history
 
 Software regression counts and model-answer scores measure different things.
-U117 source and package checks are recorded in the [verification report](docs/U117-RELEASE-VERIFICATION.md);
+U118 source and package checks are recorded in the [verification report](docs/U118-RELEASE-VERIFICATION.md);
 published U89 checks belong to its own verification report. Never relabel an older
 model benchmark as a score for a new release. Run the fixed suite from the actual
 new tag, retain its model/configuration and review failures before publishing a score.
@@ -475,6 +475,7 @@ conversation replay. [Benchmark results](bench/RESULTS.md),
 | U115: Interrupted-response continuity and optional presentation | [Release notes](docs/RELEASE-U115.md), [verification](docs/U115-RELEASE-VERIFICATION.md) |
 | U116: Audit fixes: cleaner chat bar, safer memory, fewer false warnings | [Release notes](docs/RELEASE-U116.md), [verification](docs/U116-RELEASE-VERIFICATION.md) |
 | U117: Fixes from the owner's U116 prompt run | [Release notes](docs/RELEASE-U117.md), [verification](docs/U117-RELEASE-VERIFICATION.md) |
+| U118: Conversation saves no longer fail on Windows | [Release notes](docs/RELEASE-U118.md), [verification](docs/U118-RELEASE-VERIFICATION.md) |
 | U109: Reliable installed-source inspection | [Release notes](docs/RELEASE-U109.md), [verification](docs/U109-RELEASE-VERIFICATION.md) |
 | U110: U110 software and release checks | [Release notes](docs/RELEASE-U110.md), [verification](docs/U110-RELEASE-VERIFICATION.md) |
 | U92: feature discovery and live-transcript repairs | [Release notes](docs/RELEASE-U92.md), [verification](docs/U92-RELEASE-VERIFICATION.md) |

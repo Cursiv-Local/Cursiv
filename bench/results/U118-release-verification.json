@@ -1,0 +1,107 @@
+{
+  "version": "3.14-U118",
+  "source_commit": "72c2ea7304bdf1099a6b730906a1c5d49524061f",
+  "tag": "v3.14-U118",
+  "source_pr": "https://github.com/Cursiv-Local/Cursiv/pull/86",
+  "included_prs": [
+    "https://github.com/Cursiv-Local/Cursiv/pull/85"
+  ],
+  "source_main_ci": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41572240157",
+  "windows_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41573935083",
+  "mac_build": "https://github.com/Cursiv-Local/Cursiv/actions/runs/41573938280",
+  "main_tests": {
+    "windows": {
+      "passed": 3064,
+      "skipped": 16,
+      "passing_subtests": 19
+    },
+    "mac": {
+      "passed": 3045,
+      "skipped": 35,
+      "passing_subtests": 19
+    },
+    "linux": {
+      "passed": 3044,
+      "skipped": 36,
+      "passing_subtests": 19
+    },
+    "arm64_source_only": {
+      "passed": 114,
+      "skipped": 0
+    }
+  },
+  "source_pr_checks_passed": 17,
+  "source_pr_note": "All PR checks passed on the first run. On the exact-main push run, test-linux first failed test_station_server.py::test_concurrent_writes_stay_one_unbroken_chain (one of 20 simultaneous local requests got a connection reset; Field Station code not changed by this release); its rerun passed.",
+  "native_receipts": {
+    "windows_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "b876ea2d950f39cabb88db05810829c8f697edab371e464edae97dd50eab41e3",
+      "receipt": "frozen-selftest.txt"
+    },
+    "windows_portable": {
+      "status": "ALL PASSED",
+      "sha256": "fab1e6440c0ba20a32ed0c55e7a3005e5b147b1cdfd6c9c1122c264870fe6180",
+      "receipt": "portable-selftest.txt"
+    },
+    "mac_frozen": {
+      "status": "ALL PASSED",
+      "sha256": "e938d7a5b22663c53df4a87e074710f043bfc6b5269940b09f0f93cdbc177344",
+      "receipt": "selftest.txt"
+    }
+  },
+  "platform_assets": {
+    "Cursiv-3.14-U118-mac-arm64.dmg": {
+      "size": 70685070,
+      "sha256": "9119924b27392f1a4a3209a65532dbe87b6f3874ba98e253656e3951939015d7"
+    },
+    "Cursiv-Setup-3.14-U118.exe": {
+      "size": 58054538,
+      "sha256": "02f4f2786a946b10dfefdd60614421f11c66572e667de58d3e8528fcfbff179d"
+    },
+    "Cursiv-Setup-latest.exe": {
+      "size": 58054538,
+      "sha256": "02f4f2786a946b10dfefdd60614421f11c66572e667de58d3e8528fcfbff179d"
+    },
+    "Cursiv-mac-latest.dmg": {
+      "size": 70685070,
+      "sha256": "9119924b27392f1a4a3209a65532dbe87b6f3874ba98e253656e3951939015d7"
+    },
+    "SHA256SUMS-mac.txt": {
+      "size": 185,
+      "sha256": "e11143542d3f3f78fb8d75fd0cf933cb71d728b45125e3393570942c12cb4489"
+    },
+    "SHA256SUMS.txt": {
+      "size": 185,
+      "sha256": "cf0eb854f105b990606d260ebc671a83decc2fb8a3277b08a407c6bc3396c6da"
+    },
+    "provenance-3.14-U118.json": {
+      "size": 1806,
+      "sha256": "75c56cbaeadd81d4f4ffbdba7299b82231ff3b56733c437e6bfc789d8480650a"
+    },
+    "provenance-mac.json": {
+      "size": 1757,
+      "sha256": "b0425603055148d3687053db3f4b445d5f9c158d88d67065a13cb5b04104fb9d"
+    }
+  },
+  "owner_signatures_verified": 8,
+  "owner_key_id": "f9e12af95f7e983f1a4521c1bc9a77cb96090635277de24ec1e73341e9b9f5e7",
+  "trusted_signer_hashes": {
+    "scripts/owner_release.py": "63be2a6ef3e871cda00c014f9c0352ca9598b5c0da0b00425f8ff2a783722c5c",
+    "cursiv_v215/core/release_identity.py": "3b8f94913cede8ac0a30cc9f3705059e95c68ab6ec0ae4d31ec36d13c7340429",
+    "cursiv_v215/core/release_public_key.json": "49448386e66921d2940ae05dac29fa2cd929886dfb22573f645bb7a814df5218"
+  },
+  "private_key_copied": false,
+  "api_keys_committed": false,
+  "source_secret_scan": {
+    "scope": "pattern scan of the 28 files changed from v3.14-U117 to v3.14-U118",
+    "files": 28,
+    "findings": 0
+  },
+  "source_tree": "ca4ea1e6a3e66cd9a6cdbdec8a224788b7b09e53",
+  "real_ai_provider_calls": false,
+  "live_ollama_inference": false,
+  "website_changed_or_deployed": false,
+  "authenticode_or_notarization_claimed": false,
+  "verified_utc": "2026-11-03T03:57:33.477752+00:00",
+  "limits": "Automated checks used mocked providers only and do not establish real-model behaviour. The owner has not re-run the prompt set on U117 or U118. The website is published after this receipt, in a separate step."
+}

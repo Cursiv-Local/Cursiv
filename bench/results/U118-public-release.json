@@ -1,0 +1,63 @@
+{
+  "version": "3.14-U118",
+  "tag": "v3.14-U118",
+  "html_url": "https://github.com/Cursiv-Local/Cursiv/releases/tag/v3.14-U118",
+  "published_at": "2026-11-03T03:58:03Z",
+  "assets": [
+    {
+      "name": "Cursiv-3.14-U118-mac-arm64.dmg",
+      "size": 70685070,
+      "digest": "sha256:9119924b27392f1a4a3209a65532dbe87b6f3874ba98e253656e3951939015d7"
+    },
+    {
+      "name": "Cursiv-mac-latest.dmg",
+      "size": 70685070,
+      "digest": "sha256:9119924b27392f1a4a3209a65532dbe87b6f3874ba98e253656e3951939015d7"
+    },
+    {
+      "name": "cursiv-owner-release-key.json",
+      "size": 221,
+      "digest": "sha256:40b2827d01ce3a50a5b7769f2818c638e6d52045716f6da0d427c5a2e4615c01"
+    },
+    {
+      "name": "Cursiv-Setup-3.14-U118.exe",
+      "size": 58054538,
+      "digest": "sha256:02f4f2786a946b10dfefdd60614421f11c66572e667de58d3e8528fcfbff179d"
+    },
+    {
+      "name": "Cursiv-Setup-latest.exe",
+      "size": 58054538,
+      "digest": "sha256:02f4f2786a946b10dfefdd60614421f11c66572e667de58d3e8528fcfbff179d"
+    },
+    {
+      "name": "owner-release.json",
+      "size": 1620,
+      "digest": "sha256:ebd8af7398602cfb64b5e14643c998e3e1d0235d28c646083194d5bcfe3f611f"
+    },
+    {
+      "name": "provenance-3.14-U118.json",
+      "size": 1806,
+      "digest": "sha256:75c56cbaeadd81d4f4ffbdba7299b82231ff3b56733c437e6bfc789d8480650a"
+    },
+    {
+      "name": "provenance-mac.json",
+      "size": 1757,
+      "digest": "sha256:b0425603055148d3687053db3f4b445d5f9c158d88d67065a13cb5b04104fb9d"
+    },
+    {
+      "name": "SHA256SUMS-mac.txt",
+      "size": 185,
+      "digest": "sha256:e11143542d3f3f78fb8d75fd0cf933cb71d728b45125e3393570942c12cb4489"
+    },
+    {
+      "name": "SHA256SUMS.txt",
+      "size": 185,
+      "digest": "sha256:cf0eb854f105b990606d260ebc671a83decc2fb8a3277b08a407c6bc3396c6da"
+    },
+    {
+      "name": "u118-release-verification.json",
+      "size": 4284,
+      "digest": "sha256:9c04192b789f3a8cd4cd28f4cbb8529bc8c2b593448b228a08c15f868e33deb8"
+    }
+  ]
+}
