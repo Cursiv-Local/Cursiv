@@ -7,7 +7,25 @@ from __future__ import annotations
 
 import os
 import tempfile
+import time
 from pathlib import Path
+
+
+def replace(source: Path | str, target: Path | str, *, attempts: int = 20, delay: float = 0.025) -> None:
+    """os.replace, retried while Windows refuses because something has the target open.
+
+    Windows denies the swap ("Access is denied") while another handle reads the target,
+    for example a second read in this process, an antivirus scan or the search indexer.
+    Those handles close within moments, so a short retry finishes the save instead of losing it.
+    """
+    for attempt in range(attempts):
+        try:
+            os.replace(source, target)
+            return
+        except PermissionError:
+            if attempt == attempts - 1:
+                raise
+            time.sleep(delay)
 
 
 def write_text(path: Path | str, text: str, encoding: str = "utf-8") -> None:
@@ -29,7 +47,7 @@ def write_bytes(path: Path | str, data: bytes, *, protect: bool = True) -> None:
             stream.write(data)
             stream.flush()
             os.fsync(stream.fileno())
-        os.replace(tmp, path)
+        replace(tmp, path)
         if path.read_bytes() != data:
             raise OSError('Atomic write read-back verification failed')
     finally:

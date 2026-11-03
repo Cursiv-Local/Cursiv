@@ -205,9 +205,12 @@ def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, direct
         _atomic.write_text(path, json.dumps(data, ensure_ascii=False))
     else:
         tmp = path.with_suffix(".tmp")
-        with tmp.open('w', encoding='utf-8') as stream:
-            json.dump(data, stream, ensure_ascii=False)
-        tmp.replace(path)
+        try:
+            with tmp.open('w', encoding='utf-8') as stream:
+                json.dump(data, stream, ensure_ascii=False)
+            _atomic.replace(tmp, path)
+        finally:
+            tmp.unlink(missing_ok=True)
     # AI title: once there's an exchange, and again as the topic develops
     if allow_model_title and data["title_auto"] and len(messages) >= 2 and (
             data["titled_at"] == 0 or len(messages) - data["titled_at"] >= 10):
@@ -217,7 +220,8 @@ def _write_snapshot(conv_id, messages, html, title, on_titled, *, person, direct
 
 def load(conv_id: str) -> dict | None:
     wait_for_save(conv_id)
-    return _load(DIR / f"{conv_id}.json")
+    with _storage_lock:          # an open read makes Windows refuse a save's file swap
+        return _load(DIR / f"{conv_id}.json")
 
 
 def _load(path: Path) -> dict | None:
@@ -235,7 +239,8 @@ def list_all() -> list[dict]:
     out = []
     for f in DIR.glob("*.json") if DIR.exists() else []:
         try:
-            d = json.loads(private_store.read_text(f))
+            with _storage_lock:
+                d = json.loads(private_store.read_text(f))
         except vault.VaultError:
             raise
         except Exception:
@@ -259,7 +264,8 @@ def retitle_old(on_done: Optional[Callable[[], None]] = None) -> None:
     def work():
         for f in sorted(DIR.glob("*.json")) if DIR.exists() else []:
             try:
-                d = json.loads(private_store.read_text(f))
+                with _storage_lock:
+                    d = json.loads(private_store.read_text(f))
             except vault.VaultError:
                 raise
             except Exception:
