@@ -38,6 +38,12 @@ def handle_command(runtime: CommandRuntime, raw: str, cfg: dict, history: list[d
     pair = command_sequence.state_reply(text)
     if pair is not None:
         return runtime.TextResult(pair)
+    # Robot evidence (core/robot_evidence.py): exact "robot evidence ..." / "robot trust ..." commands and
+    # plain "import the robot data from <folder>" requests, before file requests read the folder as a file.
+    from cursiv_engine.core import robot_evidence
+    _robot = robot_evidence.command(text)
+    if _robot is not None:
+        return runtime.TextResult(_robot)
     from cursiv_engine.core import file_requests
     from cursiv_engine.core import self_inspection
     if self_inspection.resolve(text,history):

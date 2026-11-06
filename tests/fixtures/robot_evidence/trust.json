@@ -1,0 +1,27 @@
+{
+  "format": "cursiv-trust-1",
+  "robots": {
+    "probe-07": [
+      {
+        "key_id": "01e4405403703234",
+        "public_key": "cth4QCTyhjzSibBpKtytXgvIdq3KjkcZ9sVyF+SmBPs=",
+        "status": "active",
+        "note": "enrolled by the lab harness",
+        "valid_from_seq": null,
+        "valid_until_seq": null
+      }
+    ]
+  },
+  "stations": {
+    "station-fixture": [
+      {
+        "key_id": "b3aff1cd99403f80",
+        "public_key": "oK1L4kcl6JhzVZeVJGdpA9j0Cc4o2pCw1vlzagAEf94=",
+        "status": "active",
+        "note": "simulation station",
+        "valid_from_seq": null,
+        "valid_until_seq": null
+      }
+    ]
+  }
+}

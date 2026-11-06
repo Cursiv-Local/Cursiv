@@ -4,6 +4,33 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## Robot evidence from Cursiv Robotics (Claude, November 6, 2026; branch `claude/robot-evidence`, not released)
+
+The owner asked that the Cursiv Robotics workflow not stop at a folder of files. [User guide](docs/ROBOT-EVIDENCE.md).
+`core/robot_evidence.py` finds, verifies (the bundled Rust `cursiv-verify`) and imports signed robot evidence
+packages into `~/.cursiv/robotics/`, and adds each package's research summary to the document library, so normal
+answers cite it and `documents.cited_pages_problems` applies. `core/robot_evidence_import.py` and
+`core/robot_evidence_layout.py` are vendored from Cursiv-Robotics (MIT, same author; header names the commit).
+Hooks:
+- `command_dispatch.handle_command`, before `file_requests`: `robot evidence …`, `robot trust …`, and plain
+  "import the robot data from <folder>", which only previews.
+- `chat/completion.py`, after the documents check: `robot_evidence.citation_problems` flags cited
+  `robot/observation_id`s that no imported package has. It is empty, and costs nothing, without imports.
+- `usb_maker._bring_data`: `drive_note` lists packages on the drive; it never imports.
+- Research Files: an "Import robot evidence…" button, run off the UI thread.
+- `launcher/build.spec`: bundles `tools/cursiv-verify` if present (`scripts/get_cursiv_verify.py`, pinned commit).
+
+Rules:
+- Robot trust keys are added only from a trust file, with preview and `confirm`; never from packages (no TOFU).
+- No trusted keys means no import unless the person types `without trust`; the summary then says authenticity
+  is not assessed.
+- Without the verifier nothing is imported.
+
+Tests: `tests/test_robot_evidence.py` (real verifier when `CURSIV_VERIFY` or `tools/` has it; CI job
+`robot-evidence` builds it on Windows and Linux and sets `CURSIV_REQUIRE_VERIFIER`). Not done: no Qt run of the
+new button; the owner has not imported a package from a real drive; the intent model (`core/intent.py`) was
+not taught robot evidence on purpose, since plain words are matched deterministically instead.
+
 ## U118 — conversation saves no longer fail on Windows (Claude, November 2, 2026)
 
 [Release notes](docs/RELEASE-U118.md). The owner asked for the merge and release so they can test it. Includes
