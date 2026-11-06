@@ -53,3 +53,4 @@ release-u*/
 
 # Field Station development data (scripts/station_dev.py)
 .station-dev/
+/tools/

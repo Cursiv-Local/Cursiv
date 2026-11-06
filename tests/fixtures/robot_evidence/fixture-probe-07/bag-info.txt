@@ -1,0 +1,6 @@
+Bagging-Date: 2026-11-06
+Payload-Oxum: 31672.7
+Bag-Software-Agent: cursiv-evidence 0.1.0
+External-Identifier: station-fixture
+Cursiv-Package-Version: 2
+External-Description: Cursiv Robotics evidence package; verify with cursiv-verify (manifest.json is a DSSE envelope)

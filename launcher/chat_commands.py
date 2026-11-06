@@ -374,6 +374,9 @@ _HELP_TOPICS = {
     "documents": ("Your documents and calculations", """\
   add document <path>         import a PDF or text file (protocol, SOP, permit)
   documents                   what's imported
+  robot evidence find <folder>   signed robot evidence on a drive, checked (nothing imported)
+  robot evidence import <folder> verify it and add its research summary here
+  robot trust add <trust.json>   trust a station's keys (you see them first)
   Answer only from my documents: Settings -> How Cursiv answers
   Worked out in code, not guessed: units (convert 12.4 C to F), degrees-minutes-seconds,
   UTM (what is 44.1234, -71.5678 in UTM), distance and bearing between two points,

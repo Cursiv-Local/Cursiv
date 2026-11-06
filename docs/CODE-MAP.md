@@ -104,6 +104,9 @@ model) → `chat/conversation.py` (prompt) → `chat/routing.py` → a provider 
 - `core/devicekey.py` — this installation's signing key for exports.
 - `core/demo.py` — the field demo's separate sample data.
 - `core/documents.py` — the team's imported protocols and SOPs.
+- `core/robot_evidence.py` — robot evidence from Cursiv Robotics: find, verify (bundled cursiv-verify), import, robot trust keys (no trust on first use), research summaries into documents, cited robot records checked.
+- `core/robot_evidence_import.py` — vendored Cursiv Robotics importer: discover packages, fingerprint the source, copy, re-verify, write views and the research summary.
+- `core/robot_evidence_layout.py` — vendored Cursiv Robotics package layout (formats 1 and 2): which files hold a robot's records.
 - `core/curiosity.py`, `core/curiosity_engine.py` — the investigation journal.
 
 ### Files and workspace

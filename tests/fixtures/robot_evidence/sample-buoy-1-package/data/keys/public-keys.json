@@ -1,0 +1,17 @@
+{
+  "keys": {
+    "11d4f4f5144a66c3": {
+      "public_key": "vAV1Llr/4BCMlTbluhEpzlxN/70heiSkBAUDe/978Xs=",
+      "seen_for": "station virtual-station"
+    },
+    "c682ad5e1fd8a058": {
+      "public_key": "c34ppQ7hQ+VwhXBqXhhvT5H4EIlgbRiq/np3AIMy0rc=",
+      "seen_for": "analysis-01"
+    },
+    "fbcd84dc07290890": {
+      "public_key": "0LZOCWnTPGijQ/jnMs8fA/y9gM9ZoOKMIZFm6q3hQtU=",
+      "seen_for": "buoy-02"
+    }
+  },
+  "note": "Keys that appear in this package. Listing here establishes NOTHING about who holds them; verify against your own trust store."
+}

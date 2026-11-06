@@ -5,7 +5,9 @@ storage/verification APIs. Switching views never saves, sends or grants access.
 """
 from __future__ import annotations
 
-from PyQt6.QtCore import Qt
+import threading
+
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtWidgets import (
     QFileDialog, QFrame, QHBoxLayout, QLabel, QListWidget, QListWidgetItem,
     QPushButton, QScrollArea, QStackedWidget, QVBoxLayout, QWidget,
@@ -15,6 +17,8 @@ import theme
 
 
 class ResearchFilesPanel(QWidget):
+    _robot_done = pyqtSignal(str)            # robot evidence import finished (runs off the UI thread)
+
     def __init__(self, panel, parent=None):
         super().__init__(parent)
         self._panel = panel
@@ -52,7 +56,13 @@ class ResearchFilesPanel(QWidget):
         self._remove_btn = QPushButton("Remove from library")
         self._remove_btn.setStyleSheet(theme.ghost_button())
         self._remove_btn.clicked.connect(self._propose_remove)
-        for button in (self._import_btn, self._ask_btn, self._remove_btn):
+        self._robot_btn = QPushButton("Import robot evidence…")
+        self._robot_btn.setStyleSheet(theme.ghost_button())
+        self._robot_btn.setToolTip("Verify signed robot evidence packages (Cursiv Robotics) from a drive or folder and add "
+                                   "their research summaries here. The originals are not changed.")
+        self._robot_btn.clicked.connect(self._import_robot_evidence)
+        self._robot_done.connect(self._robot_finished)
+        for button in (self._import_btn, self._robot_btn, self._ask_btn, self._remove_btn):
             row.addWidget(button)
         layout.addLayout(row)
         self._status = QLabel("")
@@ -126,6 +136,27 @@ class ResearchFilesPanel(QWidget):
         if failed:
             parts.append("Not imported: " + "; ".join(failed))
         self._status.setText("\n".join(parts))
+
+    def _import_robot_evidence(self):
+        folder = QFileDialog.getExistingDirectory(self, "Folder or drive with robot evidence packages")
+        if folder:
+            self.import_robot_evidence(folder)
+
+    def import_robot_evidence(self, folder):
+        """Verify and import robot evidence (core/robot_evidence.py) without blocking the window."""
+        from cursiv_engine.core import robot_evidence
+        self._robot_btn.setEnabled(False)
+        self._status.setText("Verifying robot evidence… (large packages take a while)")
+
+        def work():
+            reply = robot_evidence.command(f"robot evidence import {folder}") or "Nothing happened."
+            self._robot_done.emit(reply)
+        threading.Thread(target=work, daemon=True).start()
+
+    def _robot_finished(self, reply):
+        self._robot_btn.setEnabled(True)
+        self.refresh()
+        self._status.setText(reply)
 
     def _ask(self):
         record = self._selected()
