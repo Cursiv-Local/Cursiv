@@ -58,6 +58,6 @@ Like documents, this data is not covered by encryption at rest: evidence must st
 ## For builders
 
 The verifier is `cursiv-verify` from Cursiv Robotics. `py -3.13 scripts/get_cursiv_verify.py` builds it into `tools/`
-from a pinned commit (it needs Rust), and `launcher/build.spec` bundles it when it is there. Without it a build
+from a pinned commit (it needs Rust; currently Cursiv-Robotics `1e244e3`), and `launcher/build.spec` bundles it when it is there. Without it a build
 still works, but robot evidence import says the verifier is missing. For development, set `CURSIV_VERIFY` to a built
 `cursiv-verify`. CI builds the pinned commit and runs `tests/test_robot_evidence.py` against it on Windows and Linux.
