@@ -1,0 +1,13 @@
+{
+  "keys": {
+    "01e4405403703234": {
+      "public_key": "cth4QCTyhjzSibBpKtytXgvIdq3KjkcZ9sVyF+SmBPs=",
+      "seen_for": "probe-07"
+    },
+    "b3aff1cd99403f80": {
+      "public_key": "oK1L4kcl6JhzVZeVJGdpA9j0Cc4o2pCw1vlzagAEf94=",
+      "seen_for": "station station-fixture"
+    }
+  },
+  "note": "Keys that appear in this package. Listing here establishes NOTHING about who holds them; verify against your own trust store."
+}

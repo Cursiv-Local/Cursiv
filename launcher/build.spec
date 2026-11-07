@@ -54,6 +54,15 @@ _bundle.update(_source['files'])
 datas += [(str(ROOT / p), str(Path(p).parent)) for p in sorted(_bundle) if (ROOT / p).is_file()]
 datas.append((str(_index_file), 'cursiv_engine/core'))
 
+# Robot evidence verifier (Cursiv Robotics' cursiv-verify), when scripts/get_cursiv_verify.py has put it in
+# tools/. Without it the release still builds; robot evidence import then says the verifier is missing.
+_verify = ROOT / "tools" / ("cursiv-verify.exe" if sys.platform == "win32" else "cursiv-verify")
+if _verify.is_file():
+    _extra_binaries.append((str(_verify), "tools"))
+else:
+    print("NOTE: tools/cursiv-verify not found: this build cannot import robot evidence "
+          "(run scripts/get_cursiv_verify.py first)")
+
 
 # ── Hidden imports that PyInstaller static analysis misses ───────────────────
 hiddenimports = [

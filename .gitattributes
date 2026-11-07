@@ -1,0 +1,2 @@
+# Signed evidence fixtures must stay byte-exact on every checkout (Windows would convert LF to CRLF).
+tests/fixtures/robot_evidence/** -text

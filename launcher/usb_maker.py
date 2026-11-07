@@ -585,6 +585,10 @@ class UsbMakerDialog(QDialog):
                 message = usb_sync.describe_import(items)
                 if any(it["action"] == "team" for it in items):
                     message = _team_import(Path(d["root"])) + "\n\n" + message
+                from cursiv_engine.core import robot_evidence
+                robots = robot_evidence.drive_note(Path(d["root"]))   # listed only; never imported by this step
+                if robots:
+                    message = message + "\n\n" + robots
                 self._sig.planned.emit(items, message)
             except Exception as exc:
                 self._sig.planned.emit(None, f"Couldn't compare the drive: {exc}")

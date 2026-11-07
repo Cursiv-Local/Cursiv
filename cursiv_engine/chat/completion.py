@@ -430,6 +430,14 @@ def chat(runtime: ChatRuntime, message: dict | str, history: list[dict], api_key
                 _bad_cites = _docs.cited_pages_problems(draft, list(runtime._DOCS_SHOWN))
                 if _bad_cites:
                     _flag += "\n\n*(Cursiv's check: the answer " + "; ".join(_bad_cites) + ". Check it against the pages listed above.)*"
+            try:
+                from cursiv_engine.core import robot_evidence as _robots
+                _bad_robot = _robots.citation_problems(draft)       # empty unless robot evidence is imported
+            except Exception:
+                _bad_robot = []
+            if _bad_robot:
+                _flag += ("\n\n*(Cursiv's check: the answer " + "; ".join(_bad_robot) +
+                          ". Robot records are cited as robot/observation_id from imported robot evidence.)*")
             if runtime._WORKED:
                 from cursiv_engine.core import calc as _calc
                 _miss = _calc.check(draft, runtime._WORKED)
