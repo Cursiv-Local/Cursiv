@@ -219,3 +219,41 @@ def test_older_workspace_entries_are_assessed_from_their_saved_report(tmp_path):
     index.write_text(json.dumps(ws))
     full, caveats = rob.standing(rob.packages()[0])
     assert full is False and caveats and all("authenticity" not in c for c in caveats)
+
+
+def test_the_self_test_requires_the_verifier_only_in_a_built_app(monkeypatch):
+    import selftest
+    check = dict(selftest._checks())["robot evidence verifier"]
+    monkeypatch.setattr(rob, "verifier", lambda: None)
+    assert "source run" in check()
+    monkeypatch.setattr(selftest.sys, "frozen", True, raising=False)
+    with pytest.raises(RuntimeError, match="not bundled"):
+        check()
+
+
+@NEEDS_VERIFIER
+def test_the_self_test_starts_the_bundled_verifier():
+    import selftest
+    assert "starts" in dict(selftest._checks())["robot evidence verifier"]()
+
+
+def test_release_builds_refuse_to_build_without_the_verifier(tmp_path, monkeypatch):
+    spec = (Path(__file__).parent.parent / "launcher" / "build.spec").read_text(encoding="utf-8")
+    block = spec[spec.index("_verify = ROOT"):spec.index("# ── Hidden imports")]
+    monkeypatch.delenv("CURSIV_REQUIRE_VERIFIER", raising=False)
+    found = {"ROOT": tmp_path, "sys": __import__("sys"), "os": os, "_extra_binaries": []}
+    exec(block, found)
+    assert found["_extra_binaries"] == [], "a development build without the verifier still builds"
+    monkeypatch.setenv("CURSIV_REQUIRE_VERIFIER", "1")
+    with pytest.raises(SystemExit, match="cursiv-verify is missing"):
+        exec(block, dict(found))
+    (tmp_path / "tools").mkdir()
+    exe = "cursiv-verify.exe" if os.name == "nt" else "cursiv-verify"
+    (tmp_path / "tools" / exe).write_bytes(b"binary")
+    present = dict(found, _extra_binaries=[])
+    exec(block, present)
+    assert present["_extra_binaries"] == [(str(tmp_path / "tools" / exe), "tools")]
+    build = (Path(__file__).parent.parent / "scripts" / "build_release.py").read_text(encoding="utf-8")
+    assert "get_cursiv_verify.py" in build and "CURSIV_REQUIRE_VERIFIER" in build
+    for wf in ("windows-build.yml", "mac-build.yml"):
+        assert "rust-toolchain" in (Path(__file__).parent.parent / ".github" / "workflows" / wf).read_text(encoding="utf-8")

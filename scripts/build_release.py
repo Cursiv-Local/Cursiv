@@ -167,6 +167,11 @@ def main() -> int:
         from release_provenance import check_lock, record
         check_lock(work)
         env = build_environment()
+        # Robot evidence needs the independent verifier inside the app; tags without the
+        # script predate the feature. build.spec refuses to build without it when required.
+        if (work / 'scripts/get_cursiv_verify.py').is_file():
+            subprocess.run([sys.executable, 'scripts/get_cursiv_verify.py'], cwd=work, env=env, check=True)
+            env['CURSIV_REQUIRE_VERIFIER'] = '1'
         subprocess.run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "launcher/build.spec"],
                        cwd=work, env=env, check=True)
         report = verify_frozen(work, env)

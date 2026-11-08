@@ -9,6 +9,7 @@ Output: dist/Cursiv/Cursiv.exe  (one-dir bundle, windowed)
 macOS:  dist/Cursiv.app (built on a Mac; .github/workflows/mac-build.yml makes the .dmg)
 """
 
+import os
 import sys
 from pathlib import Path
 
@@ -59,6 +60,10 @@ datas.append((str(_index_file), 'cursiv_engine/core'))
 _verify = ROOT / "tools" / ("cursiv-verify.exe" if sys.platform == "win32" else "cursiv-verify")
 if _verify.is_file():
     _extra_binaries.append((str(_verify), "tools"))
+elif os.environ.get("CURSIV_REQUIRE_VERIFIER"):
+    # Release builds (scripts/build_release.py, mac-build.yml) advertise robot evidence import,
+    # so a missing verifier stops the build instead of shipping a feature that cannot work.
+    raise SystemExit("tools/cursiv-verify is missing: run scripts/get_cursiv_verify.py before a release build")
 else:
     print("NOTE: tools/cursiv-verify not found: this build cannot import robot evidence "
           "(run scripts/get_cursiv_verify.py first)")

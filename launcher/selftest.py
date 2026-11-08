@@ -126,6 +126,19 @@ def _checks():
         assert documents.search("anything at all") is not None
         return "document search works"
 
+    def robot_evidence():
+        from cursiv_engine.core import robot_evidence
+        found = robot_evidence.verifier()
+        if found is None:
+            if getattr(sys, "frozen", False):
+                raise RuntimeError("the robot evidence verifier (cursiv-verify) is not bundled with this app")
+            return "verifier not present (source run; release builds bundle it)"
+        import subprocess
+        out = subprocess.run([str(found)], capture_output=True, text=True, timeout=60)
+        if "usage" not in (out.stderr + out.stdout):
+            raise RuntimeError(f"cursiv-verify at {found} did not start (exit {out.returncode})")
+        return f"cursiv-verify bundled and starts ({found.name})"
+
     def window():
         os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
         from PyQt6.QtWidgets import QApplication
@@ -169,7 +182,7 @@ def _checks():
             ("data folders", data_folders),
             ("portable storage", portable_storage), ("offline reference", reference),
             ("calculations", calculations), ("field notebook", field_notebook), ("documents", documents),
-            ("window", window), ("AI engine (information only)", engine)]
+            ("robot evidence verifier", robot_evidence), ("window", window), ("AI engine (information only)", engine)]
 
 
 def run(report: str | None = None) -> int:
