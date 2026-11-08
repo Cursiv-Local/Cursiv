@@ -30,14 +30,18 @@ citations to individual records.
 
 | Package | Result |
 |---|---|
-| Verified (every check passes with your trusted keys) | Imported |
-| Signed by keys you have not trusted | Imported only with `robot evidence import <folder> without trust`, and labelled "authenticity not assessed" |
-| Changed, cut off, incomplete or with links outside itself | Refused, with the reason in plain words |
+| Every check passes with your trusted keys, and the science checks find nothing to review | Imported, and called **fully verified** |
+| Records intact and signed by keys you trust, but with scientific anomalies to review (clock drift, out-of-range values, contradictions…) or completeness not established | Imported, and labelled **NOT fully verified** with the reasons, at the top of its summary, in import replies and in `robot evidence` |
+| Signed by keys you have not trusted | Imported only with `robot evidence import <folder> without trust`, and labelled "authenticity not assessed" and NOT fully verified |
+| Changed, cut off, missing records, incomplete or with links outside itself | Refused, with the reason in plain words |
+| The drive changed while it was being imported, or the copy is not byte-identical | Refused, and the partial copy removed. Make sure nothing is writing to the drive, then import again |
+| The verifier did not finish in time (default one hour; set `CURSIV_VERIFY_TIMEOUT` in seconds for very large packages) | Nothing is imported |
 | Already imported | Nothing changes |
 | No verifier on this computer | Nothing is imported, and Cursiv says why |
 
-Synthetic (simulated) records stay labelled SYNTHETIC everywhere. A signature shows who recorded a value and that it
-is unchanged; it does not show that the value is scientifically correct.
+Synthetic (simulated) records stay labelled SYNTHETIC everywhere. If an answer cites records from a package that is not
+fully verified and does not say so, Cursiv's check says so under the answer. A signature shows who recorded a value
+and that it is unchanged; it does not show that the value is scientifically correct.
 
 ## Removing trust
 
@@ -58,6 +62,6 @@ Like documents, this data is not covered by encryption at rest: evidence must st
 ## For builders
 
 The verifier is `cursiv-verify` from Cursiv Robotics. `py -3.13 scripts/get_cursiv_verify.py` builds it into `tools/`
-from a pinned commit (it needs Rust; currently Cursiv-Robotics `1e244e3`), and `launcher/build.spec` bundles it when it is there. Without it a build
+from a pinned commit (it needs Rust; the commit is in that script), and `launcher/build.spec` bundles it when it is there. Without it a build
 still works, but robot evidence import says the verifier is missing. For development, set `CURSIV_VERIFY` to a built
 `cursiv-verify`. CI builds the pinned commit and runs `tests/test_robot_evidence.py` against it on Windows and Linux.

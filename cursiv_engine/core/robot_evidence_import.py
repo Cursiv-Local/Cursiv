@@ -1,7 +1,7 @@
 """Robot evidence importer. Vendored from Cursiv-Robotics (python/cursiv_integration/importer.py at
-commit 48151c0, MIT License, same author). Changed only where it finds the verifier (Cursiv's bundled
-cursiv-verify, see core/robot_evidence.py) and its layout import. Cursiv uses it through
-core/robot_evidence.py; the command line entry point below is kept for parity.
+commit 1814b97 (PR #6), MIT License, same author). Changed only where it finds
+the verifier (Cursiv's bundled cursiv-verify, see core/robot_evidence.py) and its layout import. Cursiv
+uses it through core/robot_evidence.py; the command line entry point below is kept for parity.
 
 Reference importer: Cursiv Robotics evidence packages into a Cursiv research workspace.
 
@@ -15,10 +15,21 @@ Python standard library and the `cursiv-verify` binary, so it can be copied into
   7. write a research summary (Markdown) that cites individual records, for Cursiv's
      `add document` and report writing.
 
-Rules: the source is never modified (a fingerprint of every source file is taken before and
-after); nothing is imported into the workspace unless integrity passes (`--quarantine` keeps a
-failing package separately, marked); synthetic records stay labelled synthetic; AI-authored
-findings are shown as interpretations, never as observations.
+Rules:
+- The source is never modified, and it must not change during the import: every source file is
+  fingerprinted before verification and again after copying, and the copy must be byte-identical
+  to that snapshot. Any difference aborts the import (fail closed) and removes the partial copy.
+- Nothing enters the workspace unless structure, integrity and attachments pass, authenticity
+  passes or was not assessed (no trust store given), and completeness did not fail (records
+  missing). `--quarantine` keeps a failing package separately, marked.
+- A package is "fully verified" only if the verifier's status is "verified" (every verdict an
+  unqualified pass), the science and reasoning checks ran, no derived result or finding is
+  invalid, and there are no scientific anomalies. Anything less is imported with its caveats
+  stated first in the research summary, never presented as fully verified.
+- The verifier has a time limit (CURSIV_VERIFY_TIMEOUT seconds, default 3600); a verifier that
+  does not finish imports nothing.
+- Synthetic records stay labelled synthetic; AI-authored findings are shown as interpretations,
+  never as observations.
 
     py -m cursiv_integration import E:\\ --workspace C:\\Users\\you\\CursivResearch --trust trust.json
 """
@@ -92,11 +103,34 @@ def fingerprint(d: Path) -> str:
     return h.hexdigest()
 
 
-def verify(pkg: Path, trust: Path | None) -> tuple[int, dict]:
+DEFAULT_TIMEOUT_S = 3600.0
+# Science flags that say something is unknown rather than wrong (shown, but not anomalies).
+ROUTINE_UNKNOWNS = ("calibration_unknown", "uncertainty_unknown", "location_unknown", "type_unprofiled")
+
+
+def verify_timeout() -> float:
+    try:
+        t = float(os.environ.get("CURSIV_VERIFY_TIMEOUT", DEFAULT_TIMEOUT_S))
+    except ValueError:
+        return DEFAULT_TIMEOUT_S
+    return t if t > 0 else DEFAULT_TIMEOUT_S
+
+
+def verify(pkg: Path, trust: Path | None, timeout: float | None = None, profile: Path | None = None) -> tuple[int, dict]:
+    """Run cursiv-verify. Returns (exit code, report); exit 2 with {"error": ...} when the
+    verifier fails, produces no report or does not finish within `timeout` seconds (it is
+    then killed, and nothing should be imported)."""
     cmd = [str(_verify_bin()), "package", str(pkg), "--json", "--science"]
     if trust:
         cmd += ["--trust", str(trust)]
-    out = subprocess.run(cmd, capture_output=True, text=True)
+    if profile:
+        cmd += ["--profile", str(profile)]
+    limit = timeout if timeout is not None else verify_timeout()
+    try:
+        out = subprocess.run(cmd, capture_output=True, text=True, timeout=limit)
+    except subprocess.TimeoutExpired:
+        return 2, {"error": f"the verifier did not finish within {limit:g} s and was stopped "
+                            "(set CURSIV_VERIFY_TIMEOUT to allow longer for very large packages)"}
     try:
         return out.returncode, json.loads(out.stdout)
     except ValueError:
@@ -122,24 +156,64 @@ def records(pkg: Path, unreadable: list | None = None) -> list[dict]:
     return out
 
 
-def import_package(src: Path, workspace: Path, trust: Path | None, *, quarantine: bool = False) -> dict:
+def assess(rep: dict) -> tuple[bool, list[str]]:
+    """(fully verified, caveats): every reason, in plain words, that a package which may be
+    admitted is still not fully verified. Fully verified needs every verdict to pass and the
+    science and reasoning checks to have run and found nothing wrong."""
+    ver = rep.get("verification") or {}
+    v = ver.get("verdicts") or {}
+    sci, rsn = rep.get("science") or {}, rep.get("reasoning") or {}
+    caveats = []
+    if str(v.get("authenticity", "")).startswith("not_assessed"):
+        caveats.append("authenticity not assessed: no trusted keys were given, so who signed these records is not established")
+    if str(v.get("completeness", "")).startswith("not_established"):
+        caveats.append("completeness not established: no trusted checkpoint covers every record, so records could be missing")
+    for k, x in v.items():
+        if str(x).split(":")[0] not in ("pass", "not_assessed", "not_established"):
+            caveats.append(f"{k}: {x}")
+    if sci.get("status") == "not_assessed" or not sci:
+        caveats.append("science and reasoning checks not run: " + str(sci.get("reason", "no science report")))
+    else:
+        bad = sorted({f["code"] for f in sci.get("flags", []) if f.get("code") not in ROUTINE_UNKNOWNS})
+        if bad:
+            n = sum(1 for f in sci.get("flags", []) if f.get("code") not in ROUTINE_UNKNOWNS)
+            caveats.append(f"{n} scientific anomaly flag(s) to review ({', '.join(bad)})")
+    errs = [f for f in rsn.get("flags", []) if f.get("severity") == "error"]
+    if errs:
+        caveats.append(f"{len(errs)} derived result(s) or finding(s) are invalid ({', '.join(sorted({f['code'] for f in errs}))})")
+    full = ver.get("status") == "verified" and not caveats
+    return full, caveats
+
+
+def import_package(src: Path, workspace: Path, trust: Path | None, *, quarantine: bool = False,
+                   timeout: float | None = None, profile: Path | None = None) -> dict:
+    """`profile` is a science profile (cursiv-verify --profile) for the mission; without one the
+    verifier's general profile is used, which knows no mission region or clock arrangement."""
     src, workspace = Path(src), Path(workspace)
     before = fingerprint(src)
-    code, rep = verify(src, trust)
+    code, rep = verify(src, trust, timeout, profile)
     v = (rep.get("verification") or {}).get("verdicts", {})
-    # evidence enters the workspace only if it is intact AND not signed by an untrusted key
-    # (authenticity "not_assessed", when no trust store is given, is allowed and stated in the summary)
+    # Evidence enters the workspace only if it is intact, not signed by an untrusted key, and not
+    # missing records. Authenticity "not_assessed" (no trust store given) and completeness
+    # "not_established" are admitted, and stated as caveats; neither is "fully verified".
     integrity_ok = (v.get("integrity") == "pass" and v.get("structure") == "pass" and v.get("attachments") == "pass"
-                    and v.get("authenticity", "").split(":")[0] in ("pass", "not_assessed"))
+                    and v.get("authenticity", "").split(":")[0] in ("pass", "not_assessed")
+                    and v.get("completeness", "").split(":")[0] in ("pass", "not_established"))
+    fully_verified, caveats = assess(rep)
     bag_info = (src / "bag-info.txt").read_text(encoding="utf-8", errors="replace") if (src / "bag-info.txt").exists() else ""
     version = next((l.split(":", 1)[1].strip() for l in bag_info.splitlines() if l.startswith("Cursiv-Package-Version:")), None)
     status = {"package": src.name, "source": str(src), "contract_version": CONTRACT_VERSION, "package_version": version, "verify_exit": code,
-              "verdicts": v, "imported": False, "imported_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+              "verdicts": v, "verification_status": (rep.get("verification") or {}).get("status"),
+              "fully_verified": fully_verified and integrity_ok, "caveats": caveats,
+              "imported": False, "imported_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")}
+    if "error" in rep:
+        status["reason"] = f"the verifier did not produce a report ({rep['error']}): not imported"
+        return status
     if version not in (*SUPPORTED_PACKAGE_VERSIONS, None):
         status["reason"] = f"package version {version} is not supported by this importer (supports {', '.join(SUPPORTED_PACKAGE_VERSIONS)})"
         return status
     if not integrity_ok and not quarantine:
-        status["reason"] = ("integrity, structure, attachments or authenticity did not pass: not imported "
+        status["reason"] = ("integrity, structure, attachments, authenticity or completeness did not pass: not imported "
                             "(use --quarantine to keep it separately, marked)")
         return status
     area = "packages" if integrity_ok else "quarantine"
@@ -149,17 +223,28 @@ def import_package(src: Path, workspace: Path, trust: Path | None, *, quarantine
         status["imported"] = dest.is_dir()
         return status
     tmp = workspace / area / f".importing-{src.name}-{os.getpid()}"
-    shutil.copytree(src, tmp, symlinks=False)
-    code2, rep2 = verify(tmp, trust)
-    if rep2.get("verification", {}).get("verdicts") != rep.get("verification", {}).get("verdicts"):
+    shutil.rmtree(tmp, ignore_errors=True)
+    try:
+        shutil.copytree(src, tmp, symlinks=False)
+        # Fail closed unless the source still matches the snapshot taken before it was verified,
+        # and the copy is byte-identical to that snapshot (same files, sizes and contents).
+        after, copied = fingerprint(src), fingerprint(tmp)
+        status["source_unchanged"] = before == after
+        if before != after:
+            status["reason"] = ("the source changed during import (another program wrote to it): not imported. "
+                                "Make sure nothing is writing to the drive, then import again so a stable copy is verified")
+            return status
+        if copied != before:
+            status["reason"] = "the copy is not byte-identical to the verified source (transfer or disk fault): not imported"
+            return status
+        code2, rep2 = verify(tmp, trust, timeout, profile)
+        if "error" in rep2 or rep2.get("verification", {}).get("verdicts") != rep.get("verification", {}).get("verdicts"):
+            status["reason"] = "the copy did not verify like the source (transfer or disk fault): not imported"
+            return status
+        tmp.rename(dest)
+    finally:
         shutil.rmtree(tmp, ignore_errors=True)
-        status["reason"] = "the copy did not verify like the source (transfer or disk fault): not imported"
-        return status
-    tmp.rename(dest)
-    after = fingerprint(src)
-    status["source_unchanged"] = before == after
-    if before != after:
-        status["reason"] = "WARNING: the source changed during import (another program wrote to it)"
+    status["package_sha256"] = before
     status.update(imported=True, area=area, path=str(dest))
     views = workspace / "views" / src.name
     views.mkdir(parents=True, exist_ok=True)
@@ -212,10 +297,16 @@ def research_summary(views: Path, name: str, rep: dict, recs: list[dict], integr
     md = [f"# Research summary: {name}", ""]
     if synth:
         md.append(f"> **SYNTHETIC DATA:** {synth} of {len(obs)} records are simulated and are not real-world evidence.")
+    full, caveats = assess(rep)
     if not integrity_ok:
-        md.append("> **QUARANTINED:** this package failed integrity or authenticity verification. Do not use it as evidence.")
+        md.append("> **QUARANTINED:** this package failed integrity, authenticity or completeness verification. Do not use it as evidence.")
+    elif full:
+        md.append("> **Fully verified:** every verification check passed with trusted keys, and the science and reasoning checks found nothing wrong.")
+    else:
+        md.append("> **NOT FULLY VERIFIED.** Anyone citing these records must say so. Reasons:")
     if str(ver.get("verdicts", {}).get("authenticity", "")).startswith("not_assessed"):
         md.append("> **Authenticity not assessed:** no trust store was given, so who signed these records is not established.")
+    md += [f"> - {c}" for c in caveats if not c.startswith("authenticity not assessed")]
     md += ["", "> Writers (human or AI): cite records as `robot/observation_id`; keep Known / Inferred / Assumed / Unknown labels; "
            "interpretations below are claims by their authors, not observations.", "", "## Verification", "", "| Question | Result |", "|---|---|"]
     md += [f"| {k} | {str(x).split(':')[0]} |" for k, x in ver.get("verdicts", {}).items()]
@@ -287,6 +378,7 @@ def main(argv=None) -> int:
     i.add_argument("--workspace", required=True)
     i.add_argument("--trust", action="append", default=[], help="trust store (cursiv-trust-1); repeat for several stations; "
                    "without one, authenticity is not assessed")
+    i.add_argument("--profile", help="science profile for the mission (default: the verifier's general profile)")
     i.add_argument("--quarantine", action="store_true", help="keep packages that fail integrity, separately and marked")
     a = ap.parse_args(argv)
     if a.cmd == "discover":
@@ -300,7 +392,7 @@ def main(argv=None) -> int:
     ok = True
     for p in pkgs:
         trust = merge_trust([Path(t) for t in a.trust], Path(a.workspace))
-        s = import_package(p, Path(a.workspace), trust, quarantine=a.quarantine)
+        s = import_package(p, Path(a.workspace), trust, quarantine=a.quarantine, profile=Path(a.profile) if a.profile else None)
         print(json.dumps({k: s.get(k) for k in ("package", "imported", "area", "verdicts", "records", "synthetic_records", "summary", "reason")}, indent=1))
         ok &= bool(s["imported"]) and s.get("area") == "packages"
     return 0 if ok else 1
