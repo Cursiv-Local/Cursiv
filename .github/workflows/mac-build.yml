@@ -53,7 +53,12 @@ jobs:
           if test -f scripts/prepare_release.py; then
             python -c "import subprocess,sys;sys.path.insert(0,'scripts');from prepare_release import require_ci;require_ci(subprocess.check_output(['git','rev-parse','HEAD'],text=True).strip(),main_tip=False)"
           fi
+      - uses: dtolnay/rust-toolchain@stable
+      - name: Build the robot evidence verifier (pinned Cursiv-Robotics commit)
+        run: python scripts/get_cursiv_verify.py
       - name: Build Cursiv.app
+        env:
+          CURSIV_REQUIRE_VERIFIER: "1"
         run: python -m PyInstaller --noconfirm --clean launcher/build.spec
       - name: Self-test the built app
         env:

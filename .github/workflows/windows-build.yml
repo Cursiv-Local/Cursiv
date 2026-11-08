@@ -25,6 +25,7 @@ jobs:
         with:
           python-version: "3.13"
           cache: pip
+      - uses: dtolnay/rust-toolchain@stable   # builds the pinned robot evidence verifier (scripts/get_cursiv_verify.py)
       - name: Install locked build dependencies
         run: python -m pip install --require-hashes -r requirements-release.lock
       - name: Locate the runner's existing Inno Setup

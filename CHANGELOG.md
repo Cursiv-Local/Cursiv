@@ -1,5 +1,9 @@
 # Changelog
 
+## 3.14-U119 — Robot evidence import (2026-11-08)
+
+Signed evidence packages from Cursiv Robotics (robots, sensor stations, the phone importer, the virtual lab) can be checked and imported from a drive or folder: `robot evidence find / import / verify / show`, `robot trust add` (keys previewed, then confirmed; never taken from packages), and Research Files → Import robot evidence…. Each package is verified by the bundled `cursiv-verify`, copied byte for byte, and its research summary is added to your documents, so answers cite individual records and Cursiv checks those citations. A package is called fully verified only when every check passed; anything less says NOT fully verified and why, including under answers that cite it. A drive that changes during import, a copy that differs, missing records or a verifier that does not finish import nothing. Release builds now include the verifier, and the self-test checks it. Details: docs/RELEASE-U119.md and docs/ROBOT-EVIDENCE.md. No real AI calls were used in automated validation.
+
 ## 3.14-U118 — Conversation saves no longer fail on Windows (2026-11-02)
 
 A conversation save could fail with Windows "Access is denied" when the chat file was being read at the moment the save swapped in the new version. Opening and listing conversations now wait for a save in progress, and the swap retries briefly while something outside Cursiv (antivirus, the search indexer) has the file open. A reader that never lets go still reports the failure instead of losing it silently. Tested by `tests/test_conversation_save_lock.py`. Details: docs/RELEASE-U118.md. No real AI calls were used in automated validation.
