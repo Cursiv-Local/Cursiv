@@ -154,3 +154,68 @@ def test_answers_citing_robot_records_are_checked(tmp_path):
     bad = rob.citation_problems(f"See `{real}` and `probe-07/probe-07-deadbeef00000000`.")
     assert bad == ["cites robot record probe-07/probe-07-deadbeef00000000, which is not in any imported robot evidence"]
     assert rob.citation_problems("and/or other robot/arms text, http://a/b") == [], "only known robots are checked"
+
+
+@NEEDS_VERIFIER
+def test_a_drive_that_changes_during_import_imports_nothing(tmp_path, monkeypatch):
+    from cursiv_engine.core import robot_evidence_import as imp
+    trust_both(tmp_path)
+    src = tmp_path / "usb" / "fixture-probe-07"
+    shutil.copytree(FIX / "fixture-probe-07", src)
+    real = imp.verify
+
+    def verify_then_someone_writes(p, t, timeout=None, profile=None):
+        out = real(p, t, timeout, profile)
+        if Path(p) == src:
+            (src / "bag-info.txt").write_text((src / "bag-info.txt").read_text() + "Note: written during import\n")
+        return out
+    monkeypatch.setattr(imp, "verify", verify_then_someone_writes)
+    reply = rob.command(f"robot evidence import {src}")
+    assert "NOT imported" in reply and "source changed during import" in reply, reply
+    assert not rob.packages() and not documents.library()
+    assert not list((rob.workspace() / "packages").glob("*")), "no partial copy is left"
+
+
+@NEEDS_VERIFIER
+def test_a_verifier_that_does_not_finish_imports_nothing(tmp_path, monkeypatch):
+    from cursiv_engine.core import robot_evidence_import as imp
+    trust_both(tmp_path)
+    seen = {}
+
+    def hangs(cmd, **kw):
+        seen["timeout"] = kw.get("timeout")
+        raise imp.subprocess.TimeoutExpired(cmd, kw.get("timeout"))
+    monkeypatch.setenv("CURSIV_VERIFY_TIMEOUT", "7")
+    monkeypatch.setattr(imp.subprocess, "run", hangs)
+    reply = rob.command(f"robot evidence import {FIX / 'fixture-probe-07'}")
+    assert seen["timeout"] == 7.0 and "NOT imported" in reply and "did not finish within 7 s" in reply, reply
+    assert not rob.packages() and not documents.library()
+
+
+@NEEDS_VERIFIER
+def test_not_fully_verified_evidence_says_so_everywhere(tmp_path):
+    reply = rob.command(f"robot evidence import {FIX / 'fixture-probe-07'} without trust")
+    assert "NOT fully verified" in reply and "authenticity not assessed" in reply, reply
+    assert "Fully verified." not in reply
+    assert "NOT fully verified" in rob.command("robot evidence")
+    text = (rob.summaries_dir() / "fixture-probe-07 (robot evidence).md").read_text()
+    assert "NOT FULLY VERIFIED" in text and "Authenticity not assessed" in text
+    obs = (rob.workspace() / "views" / "fixture-probe-07" / "observations.csv").read_text().splitlines()[1].split(",")
+    cite = f"`{obs[0]}/{obs[2]}`"
+    notes = rob.citation_caveats(f"The probe read 12.0 degC {cite}.")
+    assert len(notes) == 1 and "fixture-probe-07" in notes[0] and "authenticity not assessed" in notes[0]
+    assert rob.citation_caveats(f"The probe read 12.0 degC {cite} (not fully verified: authenticity not assessed).") == []
+    assert rob.citation_caveats("No robot records cited here.") == []
+
+
+@NEEDS_VERIFIER
+def test_older_workspace_entries_are_assessed_from_their_saved_report(tmp_path):
+    trust_both(tmp_path)
+    rob.command(f"robot evidence import {FIX / 'fixture-probe-07'}")
+    index = rob.workspace() / "workspace.json"
+    ws = json.loads(index.read_text())
+    for p in ws["packages"]:
+        p.pop("fully_verified"), p.pop("caveats")      # as written by the first Cursiv release of this feature
+    index.write_text(json.dumps(ws))
+    full, caveats = rob.standing(rob.packages()[0])
+    assert full is False and caveats and all("authenticity" not in c for c in caveats)

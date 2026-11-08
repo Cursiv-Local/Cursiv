@@ -4,6 +4,28 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
+## Robot evidence hardening (Claude, November 8, 2026; branch `claude/robot-evidence-hardening`, not released)
+
+From an external code review of robot evidence. The vendored importer (`core/robot_evidence_import.py`) now
+matches Cursiv-Robotics `claude/importer-hardening` (header names the commit):
+- A source that changes during import aborts it, and the partial copy is removed (it used to import with a warning).
+- The copy must be byte-identical to the fingerprint taken before verification.
+- Completeness "fail" (records missing) is refused.
+- The verifier has a time limit (`CURSIV_VERIFY_TIMEOUT`, default 3600 s).
+- `assess()` gives `fully_verified` and plain `caveats`. Fully verified needs: verifier status `verified`,
+  science and reasoning run, nothing invalid, no anomalies.
+
+`core/robot_evidence.py`:
+- `standing(p)` returns that pair; older workspace entries are assessed from their saved `verification.json`.
+- Import replies and `robot evidence` say "Fully verified." or "NOT fully verified: <reasons>".
+- `citation_caveats` (in `chat/completion.py`, after `citation_problems`) adds a note when an answer cites records
+  from a package that is not fully verified and the answer does not already say so.
+
+The pinned verifier (`scripts/get_cursiv_verify.py`) adds a general science profile with no mission region; the
+old default flagged every package recorded outside the survey test field. Tests: 4 new in
+`tests/test_robot_evidence.py`; the byte-identity, completeness and timeout cases are also tested in
+Cursiv-Robotics `tests/test_integration.py`.
+
 ## Robot evidence from Cursiv Robotics (Claude, November 6, 2026; branch `claude/robot-evidence`, not released)
 
 The owner asked that the Cursiv Robotics workflow not stop at a folder of files. [User guide](docs/ROBOT-EVIDENCE.md).

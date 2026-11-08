@@ -269,6 +269,26 @@ def _remember_document(status: dict) -> None:
     atomic.write_text(index, json.dumps(ws, indent=2))
 
 
+def standing(p: dict) -> tuple[bool, list[str]]:
+    """(fully verified, caveats) for an imported package. Entries written before caveats were
+    recorded are assessed again from their saved verifier report."""
+    if "fully_verified" in p:
+        return bool(p["fully_verified"]), list(p.get("caveats") or [])
+    from cursiv_engine.core import robot_evidence_import as imp
+    try:
+        rep = json.loads((workspace() / "views" / p["package"] / "verification.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError, KeyError):
+        return False, ["its verification report is missing; re-check it with robot evidence verify"]
+    return imp.assess(rep)
+
+
+def _standing_text(p: dict) -> str:
+    full, caveats = standing(p)
+    if full:
+        return "Fully verified."
+    return "NOT fully verified: " + "; ".join(caveats) + "." if caveats else "NOT fully verified."
+
+
 def _named(name: str) -> dict | None:
     name = name.strip().strip('"')
     pk = packages()
@@ -277,8 +297,8 @@ def _named(name: str) -> dict | None:
 
 # ── citations in answers ─────────────────────────────────────────────────────
 
-def _citation_index() -> tuple[set[str], set[str]]:
-    """(known "robot/observation_id" pairs, robot ids) from every imported package."""
+def _citation_index() -> tuple[dict[str, str], set[str]]:
+    """(known "robot/observation_id" -> package name, robot ids) from every imported package."""
     marker = workspace() / "workspace.json"
     try:
         stamp = marker.stat().st_mtime_ns
@@ -286,13 +306,13 @@ def _citation_index() -> tuple[set[str], set[str]]:
         return set(), set()
     if _citation_index.cache and _citation_index.cache[0] == stamp:
         return _citation_index.cache[1]
-    ids, robots = set(), set()
+    ids, robots = {}, set()
     for p in packages():
         f = workspace() / "views" / p["package"] / "observations.csv"
         try:
             with f.open(encoding="utf-8", newline="") as fh:
                 for row in csv.DictReader(fh):
-                    ids.add(f"{row['robot_id']}/{row['observation_id']}")
+                    ids[f"{row['robot_id']}/{row['observation_id']}"] = p["package"]
                     robots.add(row["robot_id"])
         except (OSError, KeyError, csv.Error):
             continue
@@ -314,6 +334,32 @@ def citation_problems(answer: str) -> list[str]:
         if robot in robots and key not in ids and key not in bad:
             bad.append(key)
     return [f"cites robot record {k}, which is not in any imported robot evidence" for k in bad[:5]]
+
+
+_ALREADY_SAID = re.compile(r"not\s+fully\s+verified|authenticity\s+(?:was\s+|is\s+)?not\s+assessed", re.I)
+
+
+def citation_caveats(answer: str) -> list[str]:
+    """Packages whose records the answer cites although they are not fully verified (for
+    example imported without trusted keys), unless the answer already says so. Robot evidence
+    must carry its caveats wherever it is used, AI-written answers and reports included."""
+    ids, robots = _citation_index()
+    if not robots or _ALREADY_SAID.search(answer or ""):
+        return []
+    cited = []
+    for robot, obs in _CITE.findall(answer or ""):
+        pkg = ids.get(f"{robot}/{obs}")
+        if pkg and pkg not in cited:
+            cited.append(pkg)
+    out = []
+    for name in cited[:5]:
+        p = next((x for x in packages() if x["package"] == name), None)
+        if p is None:
+            continue
+        full, caveats = standing(p)
+        if not full:
+            out.append(f"cites records from {name}, which is not fully verified ({'; '.join(caveats) or 'see its summary'})")
+    return out
 
 
 # ── drives ───────────────────────────────────────────────────────────────────
@@ -340,7 +386,7 @@ def _describe(s: dict) -> str:
         doc = f" Its research summary is in your documents as \"{s['document']}\"." if s.get("document") else ""
         synth = f", {s.get('synthetic_records', 0)} synthetic" if s.get("synthetic_records") else ""
         again = " (imported before; nothing changed)" if "imported before" in (s.get("reason") or "") else ""
-        return f"- {s['package']}: imported{again}, {s.get('records', '?')} records{synth}. {plain}{doc}"
+        return f"- {s['package']}: imported{again}, {s.get('records', '?')} records{synth}. {plain} {_standing_text(s)}{doc}"
     return f"- {s['package']}: NOT imported. {s.get('reason', '')} {plain}".rstrip()
 
 
@@ -386,7 +432,8 @@ def _command(t: str, low: str) -> str:
         return "Robot evidence on this computer:\n" + "\n".join(
             f"- {p['package']}: {p.get('records', '?')} records ({p.get('synthetic_records', 0)} synthetic), missions "
             f"{', '.join(p.get('missions') or []) or 'unknown'}, imported {p.get('imported_at', '')}; "
-            f"{', '.join(f'{k} {str(v).split(chr(58))[0]}' for k, v in (p.get('verdicts') or {}).items())}"
+            f"{', '.join(f'{k} {str(v).split(chr(58))[0]}' for k, v in (p.get('verdicts') or {}).items())}. "
+            + _standing_text(p)
             + (f"; summary in documents: {p['document']}" if p.get("document") else "") for p in pk)
     if low.startswith("robot evidence find "):
         return _preview(t[len("robot evidence find "):])
