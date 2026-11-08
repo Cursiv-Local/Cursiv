@@ -18,7 +18,7 @@ import tempfile
 from pathlib import Path
 
 REPO = "https://github.com/Cursiv-Local/Cursiv-Robotics"
-COMMIT = "7a61325999c351e2b18972d3e5347e3a35d27857"   # Cursiv-Robotics claude/importer-hardening (general science profile)
+COMMIT = "1814b971dd6f16c838436eb7e405f1b6536a07dc"   # Cursiv-Robotics main after PR #6 (importer hardening, general profile)
 ROOT = Path(__file__).resolve().parent.parent
 
 

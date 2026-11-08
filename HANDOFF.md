@@ -7,7 +7,7 @@ U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 ## Robot evidence hardening (Claude, November 8, 2026; branch `claude/robot-evidence-hardening`, not released)
 
 From an external code review of robot evidence. The vendored importer (`core/robot_evidence_import.py`) now
-matches Cursiv-Robotics `claude/importer-hardening` (header names the commit):
+matches Cursiv-Robotics `1814b97` (PR #6; the header names the commit):
 - A source that changes during import aborts it, and the partial copy is removed (it used to import with a warning).
 - The copy must be byte-identical to the fingerprint taken before verification.
 - Completeness "fail" (records missing) is refused.

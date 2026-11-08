@@ -1,5 +1,5 @@
 """Robot evidence importer. Vendored from Cursiv-Robotics (python/cursiv_integration/importer.py at
-commit 7a61325, branch claude/importer-hardening, MIT License, same author). Changed only where it finds
+commit 1814b97 (PR #6), MIT License, same author). Changed only where it finds
 the verifier (Cursiv's bundled cursiv-verify, see core/robot_evidence.py) and its layout import. Cursiv
 uses it through core/robot_evidence.py; the command line entry point below is kept for parity.
 
