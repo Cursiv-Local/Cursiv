@@ -78,3 +78,18 @@ def test_live_benchmark_fingerprint_uses_source_paths_and_normalizes_newlines(tm
     assert source_fingerprint(tmp_path) == first
     path.write_bytes(b'print(2)\n')
     assert source_fingerprint(tmp_path) != first
+
+
+def test_the_verifier_is_built_with_the_full_environment_so_cargo_is_found(tmp_path, monkeypatch):
+    """U119's Windows build failed: the packaging PATH leaves out CARGO_HOME, so cargo was 'not installed'."""
+    work = tmp_path / 'src'
+    assert release.build_verifier(work) is False, 'a tag without the script builds no verifier'
+    (work / 'scripts').mkdir(parents=True)
+    (work / 'scripts/get_cursiv_verify.py').write_text('', encoding='utf-8')
+    monkeypatch.setenv('PATH', os.pathsep.join(['/opt/cargo/bin', os.environ.get('PATH', '')]))
+    seen = []
+    monkeypatch.setattr(release.subprocess, 'run', lambda args, **kw: seen.append((args, kw)))
+    assert release.build_verifier(work) is True
+    args, kw = seen[0]
+    assert args[-1].replace('\\', '/') == 'scripts/get_cursiv_verify.py' and kw['cwd'] == work and kw['check']
+    assert kw['env']['PATH'] == os.environ['PATH'], 'not the trimmed packaging PATH'

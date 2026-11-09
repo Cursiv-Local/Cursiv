@@ -1,8 +1,12 @@
 # Changelog
 
-## 3.14-U119 — Robot evidence import (2026-11-08)
+## 3.14-U120 — Robot evidence import (2026-11-09)
 
-Signed evidence packages from Cursiv Robotics (robots, sensor stations, the phone importer, the virtual lab) can be checked and imported from a drive or folder: `robot evidence find / import / verify / show`, `robot trust add` (keys previewed, then confirmed; never taken from packages), and Research Files → Import robot evidence…. Each package is verified by the bundled `cursiv-verify`, copied byte for byte, and its research summary is added to your documents, so answers cite individual records and Cursiv checks those citations. A package is called fully verified only when every check passed; anything less says NOT fully verified and why, including under answers that cite it. A drive that changes during import, a copy that differs, missing records or a verifier that does not finish import nothing. Release builds now include the verifier, and the self-test checks it. Details: docs/RELEASE-U119.md and docs/ROBOT-EVIDENCE.md. No real AI calls were used in automated validation.
+Signed evidence packages from Cursiv Robotics (robots, sensor stations, the phone importer, the virtual lab) can be checked and imported from a drive or folder: `robot evidence find / import / verify / show`, `robot trust add` (keys previewed, then confirmed; never taken from packages), and Research Files → Import robot evidence…. Each package is verified by the bundled `cursiv-verify`, copied byte for byte, and its research summary is added to your documents, so answers cite individual records and Cursiv checks those citations. A package is called fully verified only when every check passed; anything less says NOT fully verified and why, including under answers that cite it. A drive that changes during import, a copy that differs, missing records or a verifier that does not finish import nothing. Release builds now include the verifier, and the self-test checks it. Details: docs/RELEASE-U120.md and docs/ROBOT-EVIDENCE.md. No real AI calls were used in automated validation.
+
+## 3.14-U119 — Not published (2026-11-08)
+
+Tagged but never published: the Windows release build could not find Rust to build the robot evidence verifier. The same feature, with that fixed, is U120. Details: docs/RELEASE-U119.md.
 
 ## 3.14-U118 — Conversation saves no longer fail on Windows (2026-11-02)
 

@@ -33,6 +33,20 @@ VERSION_FILES = {
 }
 
 
+def build_verifier(work: Path) -> bool:
+    """Build the robot evidence verifier into the tagged worktree's tools/ (scripts/get_cursiv_verify.py).
+
+    It runs with this process's own environment, not build_environment(): Rust's cargo lives in
+    CARGO_HOME, which the packaging PATH deliberately leaves out (U119's Windows build stopped there).
+    The binary comes from a pinned commit with locked dependencies, so the PATH does not change it.
+    Returns False for tags that predate robot evidence (no script)."""
+    script = work / 'scripts/get_cursiv_verify.py'
+    if not script.is_file():
+        return False
+    subprocess.run([sys.executable, str(script.relative_to(work))], cwd=work, env=dict(os.environ), check=True)
+    return True
+
+
 def build_environment() -> dict[str, str]:
     """Exclude unrelated DLL directories inherited from an editor/runtime PATH.
 
@@ -169,8 +183,7 @@ def main() -> int:
         env = build_environment()
         # Robot evidence needs the independent verifier inside the app; tags without the
         # script predate the feature. build.spec refuses to build without it when required.
-        if (work / 'scripts/get_cursiv_verify.py').is_file():
-            subprocess.run([sys.executable, 'scripts/get_cursiv_verify.py'], cwd=work, env=env, check=True)
+        if build_verifier(work):
             env['CURSIV_REQUIRE_VERIFIER'] = '1'
         subprocess.run([sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "launcher/build.spec"],
                        cwd=work, env=env, check=True)

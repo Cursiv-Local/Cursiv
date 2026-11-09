@@ -4,10 +4,12 @@ Current rules and the latest releases. Everything older (each release from U61 t
 U96, past plans, the 2026-10-21/22 reviews) is unchanged in
 [docs/HANDOFF-HISTORY.md](docs/HANDOFF-HISTORY.md).
 
-## U119 — robot evidence release (Claude, November 8, 2026)
+## U120 — robot evidence release (Claude, November 9, 2026)
 
-[Release notes](docs/RELEASE-U119.md). The owner asked for a release so they can test robot evidence import on their PC.
-U119 ships the two robot evidence entries below. Release builds now bundle the verifier:
+[Release notes](docs/RELEASE-U120.md). The owner asked for a release so they can test robot evidence import on their PC.
+The v3.14-U119 tag (`5184d4e`) was never published. Its Windows build stopped because the packaging PATH from
+`build_environment()` leaves out cargo. `build_verifier()` now builds the verifier with the normal environment
+(`tests/test_release_build.py`). The tag is kept, like U88. U120 ships the two robot evidence entries below. Release builds now bundle the verifier:
 - `scripts/build_release.py` runs `scripts/get_cursiv_verify.py` in the tagged worktree, so it needs Rust; both build
   workflows install it.
 - `CURSIV_REQUIRE_VERIFIER=1` makes `launcher/build.spec` stop if the verifier is missing.
@@ -16,7 +18,7 @@ U119 ships the two robot evidence entries below. Release builds now bundle the v
 
 Owner signing and publication happen on the owner's PC, per `docs/RELEASE-RUNBOOK.md` steps 5-8.
 
-## Robot evidence hardening (Claude, November 8, 2026; released in U119)
+## Robot evidence hardening (Claude, November 8, 2026; released in U120)
 
 From an external code review of robot evidence. The vendored importer (`core/robot_evidence_import.py`) now
 matches Cursiv-Robotics `1814b97` (PR #6; the header names the commit):
@@ -38,7 +40,7 @@ old default flagged every package recorded outside the survey test field. Tests:
 `tests/test_robot_evidence.py`; the byte-identity, completeness and timeout cases are also tested in
 Cursiv-Robotics `tests/test_integration.py`.
 
-## Robot evidence from Cursiv Robotics (Claude, November 6, 2026; released in U119)
+## Robot evidence from Cursiv Robotics (Claude, November 6, 2026; released in U120)
 
 The owner asked that the Cursiv Robotics workflow not stop at a folder of files. [User guide](docs/ROBOT-EVIDENCE.md).
 `core/robot_evidence.py` finds, verifies (the bundled Rust `cursiv-verify`) and imports signed robot evidence
